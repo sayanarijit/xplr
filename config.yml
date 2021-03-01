@@ -1,0 +1,161 @@
+general:
+  show_hidden: false
+  table:
+    header:
+      cols:
+      - format: "│      path"
+      - format: "is symlink"
+      - format: "index"
+      height: 1
+      style:
+        add_modifier:
+          bits: 1
+        sub_modifier:
+          bits: 0
+    row:
+      cols:
+      - format: "{{tree}}{{prefix}}{{icon}} {{relativePath}}{{#if isDir}}/{{/if}}{{suffix}}"
+      - format: "{{isSymlink}}"
+      - format: "{{focusRelativeIndex}}/{{bufferRelativeIndex}}/{{index}}/{{totalItems}}"
+
+    col_spacing: 3
+    col_widths:
+      - percentage: 60
+      - percentage: 20
+      - percentage: 20
+
+    tree:
+    - format: "├─"
+    - format: "├─"
+    - format: "╰─"
+
+  normal_ui:
+    prefix: "   "
+    suffix: " "
+
+  focused_ui:
+    prefix: "▸ ["
+    suffix: "]"
+    style:
+      fg: Blue
+      add_modifier:
+        bits: 1
+      sub_modifier:
+        bits: 0
+
+  selected_ui:
+    prefix: "  {"
+    suffix: "}"
+    style:
+      fg: LightGreen
+      add_modifier:
+        bits: 0
+      sub_modifier:
+        bits: 0
+
+filetypes:
+  directory:
+    icon: ""
+    style:
+      add_modifier:
+        bits: 1
+      sub_modifier:
+        bits: 0
+
+  file:
+    icon: ""
+
+  symlink:
+    icon: ""
+    style:
+      fg: Blue
+      add_modifier:
+        bits: 1
+      sub_modifier:
+        bits: 0
+
+  extension:
+    md:
+      icon: ""
+    lock:
+      icon: ""
+
+  special:
+    poetry.lock:
+      icon: ""
+
+key_bindings:
+  global:
+    ctrl-c:
+      help: quit
+      actions:
+        - Quit
+    q:
+      help: quit
+      actions:
+        - Quit
+    escape:
+      help: quit
+      actions:
+        - Quit
+    left:
+      help: back
+      actions:
+        - Back
+    dot:
+      help: toggle show hidden
+      actions:
+        - ToggleShowHidden
+    right:
+      help: enter
+      actions:
+        - Enter
+    up:
+      help: up
+      actions:
+        - FocusPreviousItem
+    down:
+      help: down
+      actions:
+        - FocusNextItem
+
+    shift-g:
+      help: bottom
+      actions:
+        - FocusLastItem
+
+    tilda:
+      help: go home
+      actions:
+        - ChangeDirectory: ~
+
+    forward-slash:
+      help: go root
+      actions:
+        - ChangeDirectory: /  # not working for some reason
+
+  explore_mode:
+    space:
+      help: select
+      actions:
+        - Select
+        - FocusNextItem
+    g:
+      help: go to
+      actions:
+        - EnterSubmode: GoTo
+
+  explore_submodes:
+    GoTo:
+      g:
+        help: top
+        actions:
+          - FocusFirstItem
+          - ExitSubmode
+
+  select_mode:
+    space:
+      help: toggle selection
+      actions:
+        - ToggleSelection
+        - FocusNextItem
