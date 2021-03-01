@@ -49,7 +49,7 @@ general:
     style:
       fg: LightGreen
       add_modifier:
-        bits: 0
+        bits: 1
       sub_modifier:
         bits: 0
 
@@ -98,6 +98,10 @@ key_bindings:
       help: quit
       actions:
         - Quit
+    question-mark:
+      help: print debug info
+      actions:
+        - PrintAppStateAndQuit
     left:
       help: back
       actions:
@@ -113,16 +117,16 @@ key_bindings:
     up:
       help: up
       actions:
-        - FocusPreviousItem
+        - FocusPrevious
     down:
       help: down
       actions:
-        - FocusNextItem
+        - FocusNext
 
     shift-g:
       help: bottom
       actions:
-        - FocusLastItem
+        - FocusLast
 
     tilda:
       help: go home
@@ -139,18 +143,22 @@ key_bindings:
       help: select
       actions:
         - Select
-        - FocusNextItem
+        - FocusNext
     g:
       help: go to
       actions:
         - EnterSubmode: GoTo
+    return:
+      help: done
+      actions:
+        - PrintFocusedAndQuit
 
   explore_submodes:
     GoTo:
       g:
         help: top
         actions:
-          - FocusFirstItem
+          - FocusFirst
           - ExitSubmode
 
   select_mode:
@@ -158,4 +166,20 @@ key_bindings:
       help: toggle selection
       actions:
         - ToggleSelection
-        - FocusNextItem
+        - FocusNext
+    g:
+      help: go to
+      actions:
+        - EnterSubmode: GoTo
+    return:
+      help: done
+      actions:
+        - PrintSelectedAndQuit
+
+  select_submodes:
+    GoTo:
+      g:
+        help: top
+        actions:
+          - FocusFirst
+          - ExitSubmode
