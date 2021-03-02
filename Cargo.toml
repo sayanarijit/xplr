@@ -19,6 +19,7 @@ dirs = "3.0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 handlebars = "3.5.3"
+shellwords = "1.0.0"
 
 [dev-dependencies]
 criterion = "0.3"

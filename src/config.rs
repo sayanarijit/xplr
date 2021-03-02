@@ -224,16 +224,37 @@ impl Default for KeyBindings {
                 help: open
                 actions:
                   - Call:
-                      command: xdg-open
+                      command: bash
                       args:
-                        - "{{absolutePath}}"
+                        - "-c"
+                        - "xdg-open {{shell_escape absolutePath}} x"
+                  - Quit
               e:
                 help: edit
                 actions:
                   - Call:
                       command: vim
                       args:
-                        - "{{absolutePath}}"
+                        - "{{absolutepath}}"
+              forward-slash:
+                help: search
+                actions:
+                  - Call:
+                      command: bash
+                      args:
+                        - "-c"
+                        - "cd $(dirname {{shell_escape absolutePath}}) && fzf"
+                  - Quit
+
+              c:
+                help: copy to
+                actions:
+                  - Call:
+                      command: bash
+                      args:
+                        - "-c"
+                        - "cp {{shell_escape absolutePath}} $(xplr)/"
+
               escape:
                 help: quit
                 actions:

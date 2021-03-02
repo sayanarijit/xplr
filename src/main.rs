@@ -1,5 +1,6 @@
 use crossterm::terminal as term;
-use handlebars::Handlebars;
+use handlebars::{handlebars_helper, Handlebars};
+use shellwords;
 use std::io;
 use termion::get_tty;
 use termion::{input::TermRead, screen::AlternateScreen};
@@ -11,10 +12,14 @@ use xplr::error::Error;
 use xplr::input::Key;
 use xplr::ui;
 
+handlebars_helper!(hex: |v: i64| format!("0x{:x}", v));
+handlebars_helper!(shell_escape: |v: str| format!("{}", shellwords::escape(v)));
+
 fn main() -> Result<(), Error> {
     let mut app = app::create()?;
 
     let mut hb = Handlebars::new();
+    hb.register_helper("shell_escape", Box::new(shell_escape));
     hb.register_template_string(
         app::TEMPLATE_TABLE_ROW,
         &app.config
@@ -82,7 +87,9 @@ fn main() -> Result<(), Error> {
                             let stdout = AlternateScreen::from(stdout);
                             let backend = CrosstermBackend::new(stdout);
                             terminal = Terminal::new(backend)?;
-                            terminal.draw(|f| ui::draw(&a, &hb, f, &mut table_state, &mut list_state))?;
+                            terminal.draw(|f| {
+                                ui::draw(&a, &hb, f, &mut table_state, &mut list_state)
+                            })?;
                         };
 
                         a.call = None;
