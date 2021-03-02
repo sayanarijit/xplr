@@ -72,11 +72,10 @@ pub fn draw<B: Backend>(
         .style(app.config.general.table.style)
         .highlight_style(app.config.general.focused_ui.style)
         .column_spacing(app.config.general.table.col_spacing)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(format!(" {} ", app.pwd.to_str().unwrap_or("???"))),
-        );
+        .block(Block::default().borders(Borders::ALL).title(format!(
+            " {} ",
+            app.directory_buffer.pwd.to_str().unwrap_or("???")
+        )));
 
     let table = app
         .config

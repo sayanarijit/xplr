@@ -14,6 +14,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
+pub const VERSION: &str = "v0.1.7"; // Update Cargo.toml
 pub const UNSUPPORTED_STR: &str = "???";
 pub const TOTAL_ROWS: usize = 50;
 
@@ -39,8 +40,9 @@ fn expand_tilde<P: AsRef<Path>>(path_user_input: P) -> Option<PathBuf> {
     })
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DirectoryBuffer {
+    pub pwd: PathBuf,
     pub focus: Option<usize>,
     pub items: Vec<(PathBuf, DirectoryItemMetadata)>,
     pub total: usize,
@@ -214,6 +216,7 @@ impl DirectoryBuffer {
         });
 
         Ok(Self {
+            pwd: path.into(),
             total,
             items: visible,
             focus,
@@ -255,10 +258,10 @@ pub struct DirectoryItemMetadata {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
+    pub version: String,
     pub config: Config,
-    pub pwd: PathBuf,
     pub directory_buffer: DirectoryBuffer,
-    pub saved_buffers: HashMap<PathBuf, DirectoryBuffer>,
+    pub saved_buffers: HashMap<PathBuf, Option<usize>>,
     pub selected_paths: HashSet<PathBuf>,
     pub mode: Mode,
     pub show_hidden: bool,
@@ -270,21 +273,24 @@ impl App {
     pub fn new(
         config: &Config,
         pwd: &PathBuf,
-        saved_buffers: &HashMap<PathBuf, DirectoryBuffer>,
+        saved_buffers: &HashMap<PathBuf, Option<usize>>,
         selected_paths: &HashSet<PathBuf>,
         mode: Mode,
         show_hidden: bool,
         focus: Option<usize>,
     ) -> Result<Self, Error> {
         let directory_buffer =
-            DirectoryBuffer::load(config, focus.or(Some(0)), pwd, show_hidden, selected_paths)?;
+            DirectoryBuffer::load(config, focus.or(Some(0)), &pwd, show_hidden, selected_paths)?;
 
         let mut saved_buffers = saved_buffers.clone();
-        saved_buffers.insert(pwd.into(), directory_buffer.to_owned());
+        saved_buffers.insert(
+            directory_buffer.pwd.clone().into(),
+            directory_buffer.focus.clone(),
+        );
 
         Ok(Self {
+            version: VERSION.into(),
             config: config.to_owned(),
-            pwd: pwd.to_owned(),
             directory_buffer,
             saved_buffers,
             selected_paths: selected_paths.to_owned(),
@@ -309,7 +315,7 @@ impl App {
     pub fn toggle_hidden(self) -> Result<Self, Error> {
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode,
@@ -327,7 +333,7 @@ impl App {
 
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode,
@@ -345,7 +351,7 @@ impl App {
 
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode,
@@ -373,7 +379,7 @@ impl App {
 
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode,
@@ -395,7 +401,7 @@ impl App {
 
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode,
@@ -437,7 +443,7 @@ impl App {
     pub fn focus_by_index(self, idx: &usize) -> Result<Self, Error> {
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode.clone(),
@@ -449,7 +455,7 @@ impl App {
     pub fn focus_by_buffer_relative_index(self, idx: &usize) -> Result<Self, Error> {
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode.clone(),
@@ -461,7 +467,7 @@ impl App {
     pub fn focus_by_focus_relative_index(self, idx: &isize) -> Result<Self, Error> {
         Self::new(
             &self.config,
-            &self.pwd,
+            &self.directory_buffer.pwd,
             &self.saved_buffers,
             &self.selected_paths,
             self.mode.clone(),
@@ -477,10 +483,16 @@ impl App {
             .directory_buffer
             .focused_item()
             .map(|(p, _)| p)
-            .map(|p| if p.is_dir() { p } else { self.pwd.clone() })
-            .unwrap_or_else(|| self.pwd.clone());
+            .map(|p| {
+                if p.is_dir() {
+                    p
+                } else {
+                    self.directory_buffer.pwd.clone()
+                }
+            })
+            .unwrap_or_else(|| self.directory_buffer.pwd.clone());
 
-        let focus = self.saved_buffers.get(&pwd).and_then(|b| b.focus);
+        let focus = self.saved_buffers.get(&pwd).unwrap_or(&None);
 
         Self::new(
             &self.config,
@@ -489,13 +501,13 @@ impl App {
             &self.selected_paths,
             self.mode,
             self.show_hidden,
-            focus,
+            focus.clone(),
         )
     }
 
     pub fn back(self) -> Result<Self, Error> {
         let app = self.clone();
-        self.focus_path(&app.pwd)
+        self.focus_path(&app.directory_buffer.pwd)
     }
 
     pub fn select(self) -> Result<Self, Error> {
@@ -559,7 +571,7 @@ impl App {
 
     pub fn print_pwd(self) -> Result<Self, Error> {
         let mut app = self;
-        app.result = app.pwd.to_str().map(|s| s.to_string());
+        app.result = app.directory_buffer.pwd.to_str().map(|s| s.to_string());
         Ok(app)
     }
 
@@ -747,16 +759,29 @@ pub fn create() -> Result<App, Error> {
     let config_file = config_dir.join("config.yml");
 
     let config: Config = if config_file.exists() {
-        serde_yaml::from_reader(BufReader::new(&File::open(config_file)?))?
+        serde_yaml::from_reader(BufReader::new(&File::open(&config_file)?))?
     } else {
         Config::default()
     };
 
-    let pwd = PathBuf::from("./")
-        .canonicalize()
-        .unwrap_or(PathBuf::from("/"));
+    if !config.version.eq(VERSION) {
+        return Err(Error::IncompatibleVersion(
+            format!("Config file {} is outdated", config_file.to_string_lossy()),
+        ));
+    }
 
-    App::new(
+    let root = Path::new("/");
+    let pwd = PathBuf::from(std::env::args().skip(1).next().unwrap_or("./".into()))
+        .canonicalize()
+        .unwrap_or(root.into());
+
+    let (pwd, file_to_focus) = if pwd.is_file() {
+        (pwd.parent().unwrap_or(root).into(), Some(pwd))
+    } else {
+        (pwd, None)
+    };
+
+    let app = App::new(
         &config,
         &pwd,
         &Default::default(),
@@ -764,5 +789,11 @@ pub fn create() -> Result<App, Error> {
         Mode::Explore,
         config.general.show_hidden,
         None,
-    )
+    )?;
+
+    if let Some(file) = file_to_focus {
+        app.focus_path(&file)
+    } else {
+        Ok(app)
+    }
 }

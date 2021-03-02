@@ -4,6 +4,7 @@ use serde_yaml;
 
 #[derive(Debug)]
 pub enum Error {
+    IncompatibleVersion(String),
     Terminated,
 
     // Real errors

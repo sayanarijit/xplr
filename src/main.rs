@@ -12,13 +12,13 @@ use xplr::error::Error;
 use xplr::input::Key;
 use xplr::ui;
 
-handlebars_helper!(shell_escape: |v: str| format!("{}", shellwords::escape(v)));
+handlebars_helper!(shellescape: |v: str| format!("{}", shellwords::escape(v)));
 
 fn main() -> Result<(), Error> {
     let mut app = app::create()?;
 
     let mut hb = Handlebars::new();
-    hb.register_helper("shell_escape", Box::new(shell_escape));
+    hb.register_helper("shellescape", Box::new(shellescape));
     hb.register_template_string(
         app::TEMPLATE_TABLE_ROW,
         &app.config
@@ -73,6 +73,7 @@ fn main() -> Result<(), Error> {
                             std::mem::drop(terminal);
                             if let Some((_, meta)) = a.directory_buffer.focused_item() {
                                 let _ = std::process::Command::new(cmd.command.clone())
+                                    .current_dir(&a.directory_buffer.pwd)
                                     .args(
                                         cmd.args
                                             .iter()

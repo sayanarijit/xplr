@@ -1,3 +1,4 @@
+use crate::app::VERSION;
 use crate::input::Key;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -32,6 +33,8 @@ impl Default for Format {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CommandConfig {
     pub command: String,
+
+    #[serde(default)]
     pub args: Vec<String>,
 }
 
@@ -187,7 +190,6 @@ impl Default for KeyBindings {
                 help: print debug info
                 actions:
                   - PrintAppState
-                  - Quit
               up:
                 help: up
                 actions:
@@ -200,10 +202,6 @@ impl Default for KeyBindings {
                 help: bottom
                 actions:
                   - FocusLast
-              forward-slash:
-                help: go root
-                actions:
-                  - ChangeDirectory: /
               tilde:
                 help: go home
                 actions:
@@ -227,14 +225,14 @@ impl Default for KeyBindings {
                       command: bash
                       args:
                         - "-c"
-                        - "xdg-open {{shell_escape absolutePath}} &> /dev/null"
+                        - FILE="{{shellescape relativePath}}" && xdg-open "${FILE:?}" &> /dev/null
               e:
                 help: edit
                 actions:
                   - Call:
                       command: vim
                       args:
-                        - "{{absolutePath}}"
+                        - "{{shellescape relativePath}}"
               forward-slash:
                 help: search
                 actions:
@@ -242,17 +240,14 @@ impl Default for KeyBindings {
                       command: bash
                       args:
                         - "-c"
-                        - "cd $(dirname {{shell_escape absolutePath}}) && fzf"
+                        - FILE="$(ls -a | fzf)" && xplr "${FILE:?}" || xplr "${PWD:?}"
                   - Quit
 
-              c:
-                help: copy to
+              s:
+                help: shell
                 actions:
                   - Call:
                       command: bash
-                      args:
-                        - "-c"
-                        - "cp {{shell_escape absolutePath}} $(xplr)/"
 
               escape:
                 help: quit
@@ -268,7 +263,6 @@ impl Default for KeyBindings {
                 help: done
                 actions:
                   - PrintFocused
-                  - Quit
               space:
                 help: select
                 actions:
@@ -505,8 +499,10 @@ impl Default for GeneralConfig {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
+    pub version: String,
+
     #[serde(default)]
     pub general: GeneralConfig,
 
@@ -515,4 +511,15 @@ pub struct Config {
 
     #[serde(default)]
     pub key_bindings: KeyBindings,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            version: VERSION.into(),
+            general: Default::default(),
+            filetypes: Default::default(),
+            key_bindings: Default::default(),
+        }
+    }
 }
