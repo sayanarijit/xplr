@@ -30,6 +30,12 @@ impl Default for Format {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CommandConfig {
+    pub command: String,
+    pub args: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum GlobalAction {
     // Common actions
     ToggleShowHidden,
@@ -44,11 +50,14 @@ pub enum GlobalAction {
     FocusPathByBufferRelativeIndex(usize),
     FocusPathByFocusRelativeIndex(isize),
     ChangeDirectory(String),
+    Call(CommandConfig),
 
     // Quit options
-    PrintPwdAndQuit,
-    PrintAppStateAndQuit,
+    PrintFocused,
+    PrintPwd,
+    PrintAppState,
     Quit,
+    Terminate,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -66,6 +75,7 @@ pub enum ExploreModeAction {
     FocusPathByFocusRelativeIndex(isize),
     FocusPath(String),
     ChangeDirectory(String),
+    Call(CommandConfig),
 
     // Explore mode exclusive options
     EnterSubmode(String),
@@ -76,9 +86,9 @@ pub enum ExploreModeAction {
     // SelectAllRecursive,
 
     // Quit options
-    PrintFocusedAndQuit,
-    PrintPwdAndQuit,
-    PrintAppStateAndQuit,
+    PrintFocused,
+    PrintPwd,
+    PrintAppState,
     Quit,
 }
 
@@ -97,6 +107,7 @@ pub enum SelectModeAction {
     FocusPathByFocusRelativeIndex(isize),
     FocusPath(String),
     ChangeDirectory(String),
+    Call(CommandConfig),
 
     // Select mode exclusive options
     EnterSubmode(String),
@@ -111,8 +122,8 @@ pub enum SelectModeAction {
     // ClearSelectedPaths,
 
     // Quit options
-    PrintSelectedAndQuit,
-    PrintAppStateAndQuit,
+    PrintSelected,
+    PrintAppState,
     Quit,
 }
 
@@ -167,7 +178,7 @@ impl Default for KeyBindings {
               ctrl-c:
                 help: quit
                 actions:
-                  - Quit
+                  - Terminate
               q:
                 help: quit
                 actions:
@@ -175,7 +186,8 @@ impl Default for KeyBindings {
               question-mark:
                 help: print debug info
                 actions:
-                  - PrintAppStateAndQuit
+                  - PrintAppState
+                  - Quit
               up:
                 help: up
                 actions:
@@ -208,10 +220,25 @@ impl Default for KeyBindings {
                 help: back
                 actions:
                   - Back
+              o:
+                help: open
+                actions:
+                  - Call:
+                      command: xdg-open
+                      args:
+                        - "{{absolutePath}}"
+              e:
+                help: edit
+                actions:
+                  - Call:
+                      command: vim
+                      args:
+                        - "{{absolutePath}}"
               escape:
                 help: quit
                 actions:
                   - Quit
+
             explore_mode:
               g:
                 help: go to
@@ -220,7 +247,8 @@ impl Default for KeyBindings {
               return:
                 help: done
                 actions:
-                  - PrintFocusedAndQuit
+                  - PrintFocused
+                  - Quit
               space:
                 help: select
                 actions:
@@ -246,7 +274,8 @@ impl Default for KeyBindings {
               return:
                 help: done
                 actions:
-                  - PrintSelectedAndQuit
+                  - PrintSelected
+                  - Quit
             select_submodes:
               GoTo:
                 g:
@@ -397,56 +426,62 @@ pub struct GeneralConfig {
 
 impl Default for GeneralConfig {
     fn default() -> Self {
-        Self {
-            show_hidden: false,
-            table: TableConfig {
-                header: None,
-                row: TableRowConfig {
-                    cols: vec![UIElement {
-                        format: "{{tree}}{{prefix}}{{relativePath}}{{#if isDir}}/{{/if}}{{suffix}}"
-                            .into(),
-                        style: Default::default(),
-                    }],
-                    style: Default::default(),
-                    height: 1,
-                },
+        let yaml = r###"
+          show_hidden: false
+          table:
+            header:
+              cols:
+              - format: "│      path"
+              - format: "is symlink"
+              - format: "index"
+              height: 1
+              style:
+                add_modifier:
+                  bits: 1
+                sub_modifier:
+                  bits: 0
+            row:
+              cols:
+              - format: "{{tree}}{{prefix}}{{icon}} {{relativePath}}{{#if isDir}}/{{/if}}{{suffix}}"
+              - format: "{{isSymlink}}"
+              - format: "{{focusRelativeIndex}}/{{bufferRelativeIndex}}/{{index}}/{{totalItems}}"
 
-                style: Default::default(),
-                tree: Some((
-                    UIElement {
-                        format: "├─".into(),
-                        style: Default::default(),
-                    },
-                    UIElement {
-                        format: "├─".into(),
-                        style: Default::default(),
-                    },
-                    UIElement {
-                        format: "└─".into(),
-                        style: Default::default(),
-                    },
-                )),
-                col_spacing: 1,
-                col_widths: vec![Constraint::Percentage(100)],
-            },
-            normal_ui: UIConfig {
-                prefix: "   ".into(),
-                suffix: " ".into(),
-                style: Default::default(),
-            },
+            col_spacing: 3
+            col_widths:
+              - percentage: 60
+              - percentage: 20
+              - percentage: 20
 
-            focused_ui: UIConfig {
-                prefix: "▸ [".into(),
-                suffix: "]".into(),
-                style: Style::default().add_modifier(Modifier::BOLD),
-            },
+            tree:
+            - format: "├─"
+            - format: "├─"
+            - format: "╰─"
 
-            selected_ui: UIConfig {
-                prefix: "  {".into(),
-                suffix: "}".into(),
-                style: Style::default().add_modifier(Modifier::BOLD),
-            },
-        }
+          normal_ui:
+            prefix: "   "
+            suffix: " "
+
+          focused_ui:
+            prefix: "▸ ["
+            suffix: "]"
+            style:
+              fg: Blue
+              add_modifier:
+                bits: 1
+              sub_modifier:
+                bits: 0
+
+          selected_ui:
+            prefix: "  {"
+            suffix: "}"
+            style:
+              fg: LightGreen
+              add_modifier:
+                bits: 1
+              sub_modifier:
+                bits: 0
+                "###;
+        serde_yaml::from_str(yaml).unwrap()
     }
 }
 

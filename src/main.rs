@@ -29,10 +29,10 @@ fn main() -> Result<(), Error> {
             .join("\t"),
     )?;
 
+    let stdin = io::stdin();
     let stdout = get_tty()?;
     // let stdout = MouseTerminal::from(stdout);
     let stdout = AlternateScreen::from(stdout);
-    let stdin = io::stdin();
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
@@ -51,19 +51,45 @@ fn main() -> Result<(), Error> {
         if let Some(actions) = app.actions_from_key(key) {
             for action in actions.iter() {
                 app = match app.handle(action) {
-                    Ok(a) => {
+                    Ok(mut a) => {
                         terminal
                             .draw(|f| ui::draw(&a, &hb, f, &mut table_state, &mut list_state))?;
-                        if a.result.is_some() {
+
+                        if let Some(result) = a.result.clone() {
                             term::disable_raw_mode().unwrap();
                             std::mem::drop(terminal);
-                            println!("{}", &a.result.unwrap_or("".into()));
+                            if !result.is_empty() {
+                                println!("{}", &result);
+                            };
                             break 'outer;
                         };
+
+                        if let Some(cmd) = a.call.clone() {
+                            term::disable_raw_mode().unwrap();
+                            std::mem::drop(terminal);
+                            if let Some((_, meta)) = a.directory_buffer.focused_item() {
+                                let _ = std::process::Command::new(cmd.command.clone())
+                                    .args(
+                                        cmd.args
+                                            .iter()
+                                            .map(|arg| hb.render_template(arg, &meta).unwrap()),
+                                    )
+                                    .status();
+                            };
+
+                            term::enable_raw_mode().unwrap();
+                            let stdout = get_tty()?;
+                            let stdout = AlternateScreen::from(stdout);
+                            let backend = CrosstermBackend::new(stdout);
+                            terminal = Terminal::new(backend)?;
+                            terminal.draw(|f| ui::draw(&a, &hb, f, &mut table_state, &mut list_state))?;
+                        };
+
+                        a.call = None;
+                        a.result = None;
                         a
                     }
                     Err(e) => {
-                        term::disable_raw_mode().unwrap();
                         result = Err(e);
                         break 'outer;
                     }

@@ -1,4 +1,4 @@
-An experimental, minimal, configurable TUI file explorer, stealing ideas from `nnn` and `fzf`.
+An experimental, minimal, configurable TUI file explorer, stealing ideas from [`nnn`](https://github.com/jarun/nnn) and [`fzf`](https://github.com/junegunn/fzf).
 
 ![Screenshot](https://user-images.githubusercontent.com/11632726/109526906-1b555080-7ad9-11eb-9fd7-03e092220618.gif)
 
@@ -29,7 +29,13 @@ You can also experiment and help by suggesting ideas/opinions.
 cargo install xplr
 ```
 
-2. Create config directory `~/.config/xplr/` and place the [`config.yml`](https://github.com/sayanarijit/xplr/blob/main/config.yml) file inside it.
+2. Create the customizable config file (requires [`yq`](https://github.com/mikefarah/yq))
+
+```bash
+mkdir -p ~/.config/xplr
+
+echo "?" | xplr | yq ".config" -y | tee ~/.config/xplr/config.yml
+```
 
 3. Check the key bindings in the config file.
 

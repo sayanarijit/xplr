@@ -4,8 +4,7 @@ use serde_yaml;
 
 #[derive(Debug)]
 pub enum Error {
-    // Not an error but,
-    Interrupted,
+    Terminated,
 
     // Real errors
     TemplateError(handlebars::TemplateError),

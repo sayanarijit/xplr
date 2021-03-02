@@ -1,4 +1,6 @@
-use crate::config::{Action, Config, ExploreModeAction, GlobalAction, Mode, SelectModeAction};
+use crate::config::{
+    Action, CommandConfig, Config, ExploreModeAction, GlobalAction, Mode, SelectModeAction,
+};
 use crate::error::Error;
 use crate::input::Key;
 use dirs;
@@ -260,6 +262,7 @@ pub struct App {
     pub selected_paths: HashSet<PathBuf>,
     pub mode: Mode,
     pub show_hidden: bool,
+    pub call: Option<CommandConfig>,
     pub result: Option<String>,
 }
 
@@ -288,6 +291,7 @@ impl App {
             mode,
             show_hidden,
             result: None,
+            call: None,
         })
     }
 
@@ -352,6 +356,11 @@ impl App {
 
     pub fn change_directory(self, dir: &String) -> Result<Self, Error> {
         self.focus_path(&PathBuf::from(dir))?.enter()
+    }
+
+    pub fn call(mut self, cmd: &CommandConfig) -> Result<Self, Error> {
+        self.call = Some(cmd.clone());
+        Ok(self)
     }
 
     pub fn focus_next_item(self) -> Result<Self, Error> {
@@ -539,7 +548,7 @@ impl App {
         Ok(app)
     }
 
-    pub fn print_focused_and_quit(self) -> Result<Self, Error> {
+    pub fn print_focused(self) -> Result<Self, Error> {
         let mut app = self;
         app.result = app
             .directory_buffer
@@ -548,13 +557,13 @@ impl App {
         Ok(app)
     }
 
-    pub fn print_pwd_and_quit(self) -> Result<Self, Error> {
+    pub fn print_pwd(self) -> Result<Self, Error> {
         let mut app = self;
         app.result = app.pwd.to_str().map(|s| s.to_string());
         Ok(app)
     }
 
-    pub fn print_selected_and_quit(self) -> Result<Self, Error> {
+    pub fn print_selected(self) -> Result<Self, Error> {
         let mut app = self;
         app.result = Some(
             app.selected_paths
@@ -568,15 +577,20 @@ impl App {
         Ok(app)
     }
 
-    pub fn print_app_state_and_quit(self) -> Result<Self, Error> {
+    pub fn print_app_state(self) -> Result<Self, Error> {
         let state = serde_yaml::to_string(&self)?;
         let mut app = self;
         app.result = Some(state);
         Ok(app)
     }
 
-    pub fn quit(self) -> Result<Self, Error> {
-        Err(Error::Interrupted)
+    pub fn quit(mut self) -> Result<Self, Error> {
+        self.result = Some("".into());
+        Ok(self)
+    }
+
+    pub fn terminate(self) -> Result<Self, Error> {
+        Err(Error::Terminated)
     }
 
     pub fn actions_from_key(&self, key: Key) -> Option<Vec<Action>> {
@@ -654,9 +668,12 @@ impl App {
                 self.focus_by_focus_relative_index(&n)
             }
             Action::Global(GlobalAction::ChangeDirectory(dir)) => self.change_directory(&dir),
-            Action::Global(GlobalAction::PrintPwdAndQuit) => self.print_pwd_and_quit(),
-            Action::Global(GlobalAction::PrintAppStateAndQuit) => self.print_app_state_and_quit(),
+            Action::Global(GlobalAction::Call(cmd)) => self.call(&cmd),
+            Action::Global(GlobalAction::PrintFocused) => self.print_focused(),
+            Action::Global(GlobalAction::PrintPwd) => self.print_pwd(),
+            Action::Global(GlobalAction::PrintAppState) => self.print_app_state(),
             Action::Global(GlobalAction::Quit) => self.quit(),
+            Action::Global(GlobalAction::Terminate) => self.terminate(),
 
             // Explore mode
             Action::ExploreMode(ExploreModeAction::ToggleShowHidden) => self.toggle_hidden(),
@@ -679,18 +696,15 @@ impl App {
             Action::ExploreMode(ExploreModeAction::ChangeDirectory(dir)) => {
                 self.change_directory(&dir)
             }
+            Action::ExploreMode(ExploreModeAction::Call(cmd)) => self.call(&cmd),
             Action::ExploreMode(ExploreModeAction::Select) => self.select(),
             Action::ExploreMode(ExploreModeAction::EnterSubmode(submode)) => {
                 self.enter_submode(submode)
             }
             Action::ExploreMode(ExploreModeAction::ExitSubmode) => self.exit_submode(),
-            Action::ExploreMode(ExploreModeAction::PrintFocusedAndQuit) => {
-                self.print_focused_and_quit()
-            }
-            Action::ExploreMode(ExploreModeAction::PrintPwdAndQuit) => self.print_pwd_and_quit(),
-            Action::ExploreMode(ExploreModeAction::PrintAppStateAndQuit) => {
-                self.print_app_state_and_quit()
-            }
+            Action::ExploreMode(ExploreModeAction::PrintFocused) => self.print_focused(),
+            Action::ExploreMode(ExploreModeAction::PrintPwd) => self.print_pwd(),
+            Action::ExploreMode(ExploreModeAction::PrintAppState) => self.print_app_state(),
             Action::ExploreMode(ExploreModeAction::Quit) => self.quit(),
 
             // Select mode
@@ -712,17 +726,14 @@ impl App {
             Action::SelectMode(SelectModeAction::ChangeDirectory(dir)) => {
                 self.change_directory(&dir)
             }
+            Action::SelectMode(SelectModeAction::Call(cmd)) => self.call(&cmd),
             Action::SelectMode(SelectModeAction::ToggleSelection) => self.toggle_selection(),
             Action::SelectMode(SelectModeAction::EnterSubmode(submode)) => {
                 self.enter_submode(submode)
             }
             Action::SelectMode(SelectModeAction::ExitSubmode) => self.exit_submode(),
-            Action::SelectMode(SelectModeAction::PrintSelectedAndQuit) => {
-                self.print_selected_and_quit()
-            }
-            Action::SelectMode(SelectModeAction::PrintAppStateAndQuit) => {
-                self.print_app_state_and_quit()
-            }
+            Action::SelectMode(SelectModeAction::PrintSelected) => self.print_selected(),
+            Action::SelectMode(SelectModeAction::PrintAppState) => self.print_app_state(),
             Action::SelectMode(SelectModeAction::Quit) => self.quit(),
         }
     }
