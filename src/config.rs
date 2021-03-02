@@ -234,7 +234,7 @@ impl Default for KeyBindings {
                   - Call:
                       command: vim
                       args:
-                        - "{{absolutepath}}"
+                        - "{{absolutePath}}"
               forward-slash:
                 help: search
                 actions:

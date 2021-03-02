@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "An experimental, minimal, configurable TUI file explorer, stealing ideas from nnn and fzf."
