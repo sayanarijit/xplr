@@ -12,7 +12,6 @@ use xplr::error::Error;
 use xplr::input::Key;
 use xplr::ui;
 
-handlebars_helper!(hex: |v: i64| format!("0x{:x}", v));
 handlebars_helper!(shell_escape: |v: str| format!("{}", shellwords::escape(v)));
 
 fn main() -> Result<(), Error> {

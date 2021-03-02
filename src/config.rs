@@ -227,8 +227,7 @@ impl Default for KeyBindings {
                       command: bash
                       args:
                         - "-c"
-                        - "xdg-open {{shell_escape absolutePath}} x"
-                  - Quit
+                        - "xdg-open {{shell_escape absolutePath}} &> /dev/null"
               e:
                 help: edit
                 actions:
