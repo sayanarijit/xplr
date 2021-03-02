@@ -31,7 +31,6 @@ impl Default for Format {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum GlobalAction {
-
     // Common actions
     ToggleShowHidden,
     Back,
@@ -54,7 +53,6 @@ pub enum GlobalAction {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ExploreModeAction {
-
     // Common actions
     ToggleShowHidden,
     Back,
@@ -86,7 +84,6 @@ pub enum ExploreModeAction {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum SelectModeAction {
-
     // Common actions
     ToggleShowHidden,
     Back,
@@ -165,126 +162,100 @@ pub struct KeyBindings {
 
 impl Default for KeyBindings {
     fn default() -> Self {
-        let mut global: HashMap<Key, GlobalActionMenu> = Default::default();
-        let mut explore_mode: HashMap<Key, ExploreModeActionMenu> = Default::default();
-        let explore_submodes: HashMap<String, ExploreSubmodeActionMenu> = Default::default();
-        let mut select_mode: HashMap<Key, SelectModeActionMenu> = Default::default();
-        let select_submodes: HashMap<String, SelectSubmodeActionMenu> = Default::default();
-
-        global.insert(
-            Key::CtrlC,
-            GlobalActionMenu {
-                help: "quit".into(),
-                actions: vec![GlobalAction::Quit],
-            },
-        );
-
-        global.insert(
-            Key::Q,
-            GlobalActionMenu {
-                help: "quit".into(),
-                actions: vec![GlobalAction::Quit],
-            },
-        );
-
-        global.insert(
-            Key::Escape,
-            GlobalActionMenu {
-                help: "quit".into(),
-                actions: vec![GlobalAction::Quit],
-            },
-        );
-
-        global.insert(
-            Key::Left,
-            GlobalActionMenu {
-                help: "left".into(),
-                actions: vec![GlobalAction::Back],
-            },
-        );
-
-        global.insert(
-            Key::Dot,
-            GlobalActionMenu {
-                help: "show/hide hidden files".into(),
-                actions: vec![GlobalAction::ToggleShowHidden],
-            },
-        );
-
-        global.insert(
-            Key::Right,
-            GlobalActionMenu {
-                help: "enter".into(),
-                actions: vec![GlobalAction::Enter],
-            },
-        );
-
-        global.insert(
-            Key::Up,
-            GlobalActionMenu {
-                help: "<prev".into(),
-                actions: vec![GlobalAction::FocusPrevious],
-            },
-        );
-
-        global.insert(
-            Key::Down,
-            GlobalActionMenu {
-                help: "next>".into(),
-                actions: vec![GlobalAction::FocusNext],
-            },
-        );
-
-        global.insert(
-            Key::G,
-            GlobalActionMenu {
-                help: "top".into(),
-                actions: vec![GlobalAction::FocusFirst],
-            },
-        );
-
-        global.insert(
-            Key::ShiftG,
-            GlobalActionMenu {
-                help: "bottom".into(),
-                actions: vec![GlobalAction::FocusLast],
-            },
-        );
-
-        global.insert(
-            Key::Tilde,
-            GlobalActionMenu {
-                help: "home".into(),
-                actions: vec![GlobalAction::ChangeDirectory("~".to_string())],
-            },
-        );
-
-        explore_mode.insert(
-            Key::Space,
-            ExploreModeActionMenu {
-                help: "select".into(),
-                actions: vec![ExploreModeAction::Select, ExploreModeAction::FocusNext],
-            },
-        );
-
-        select_mode.insert(
-            Key::Space,
-            SelectModeActionMenu {
-                help: "select/unselect".into(),
-                actions: vec![
-                    SelectModeAction::ToggleSelection,
-                    SelectModeAction::FocusNext,
-                ],
-            },
-        );
-
-        Self {
-            global,
-            explore_mode,
-            explore_submodes,
-            select_mode,
-            select_submodes,
-        }
+        let yaml = r###"
+            global:
+              ctrl-c:
+                help: quit
+                actions:
+                  - Quit
+              q:
+                help: quit
+                actions:
+                  - Quit
+              question-mark:
+                help: print debug info
+                actions:
+                  - PrintAppStateAndQuit
+              up:
+                help: up
+                actions:
+                  - FocusPrevious
+              down:
+                help: down
+                actions:
+                  - FocusNext
+              shift-g:
+                help: bottom
+                actions:
+                  - FocusLast
+              forward-slash:
+                help: go root
+                actions:
+                  - ChangeDirectory: /
+              tilde:
+                help: go home
+                actions:
+                  - ChangeDirectory: "~"
+              dot:
+                help: toggle show hidden
+                actions:
+                  - ToggleShowHidden
+              right:
+                help: enter
+                actions:
+                  - Enter
+              left:
+                help: back
+                actions:
+                  - Back
+              escape:
+                help: quit
+                actions:
+                  - Quit
+            explore_mode:
+              g:
+                help: go to
+                actions:
+                  - EnterSubmode: GoTo
+              return:
+                help: done
+                actions:
+                  - PrintFocusedAndQuit
+              space:
+                help: select
+                actions:
+                  - Select
+                  - FocusNext
+            explore_submodes:
+              GoTo:
+                g:
+                  help: top
+                  actions:
+                    - FocusFirst
+                    - ExitSubmode
+            select_mode:
+              space:
+                help: toggle selection
+                actions:
+                  - ToggleSelection
+                  - FocusNext
+              g:
+                help: go to
+                actions:
+                  - EnterSubmode: GoTo
+              return:
+                help: done
+                actions:
+                  - PrintSelectedAndQuit
+            select_submodes:
+              GoTo:
+                g:
+                  help: top
+                  actions:
+                    - FocusFirst
+                    - ExitSubmode
+            "###;
+        serde_yaml::from_str(yaml).unwrap()
     }
 }
 
