@@ -128,7 +128,7 @@ key_bindings:
       actions:
         - FocusLast
 
-    tilda:
+    tilde:
       help: go home
       actions:
         - ChangeDirectory: ~

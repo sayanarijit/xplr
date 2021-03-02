@@ -252,7 +252,7 @@ impl Default for KeyBindings {
         );
 
         global.insert(
-            Key::Tilda,
+            Key::Tilde,
             GlobalActionMenu {
                 help: "home".into(),
                 actions: vec![GlobalAction::ChangeDirectory("~".to_string())],
