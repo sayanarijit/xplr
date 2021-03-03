@@ -49,5 +49,7 @@ TODO research
 - [ ] Research saner configuration formats.
 - [ ] Research saner key binding options.
 - [ ] Research how to go beyond filesystem and explore any tree-like structure.
+- [ ] Research ways to make it faster (load and run).
+- [ ] Research ways to implement a plugin system.
 - [ ] CLI options and help menu.
 - [ ] Go beyond research and implement things.

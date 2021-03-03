@@ -87,6 +87,7 @@ fn main() -> Result<(), Error> {
                             let stdout = AlternateScreen::from(stdout);
                             let backend = CrosstermBackend::new(stdout);
                             terminal = Terminal::new(backend)?;
+                            a = a.refresh()?;
                             terminal.draw(|f| {
                                 ui::draw(&a, &hb, f, &mut table_state, &mut list_state)
                             })?;

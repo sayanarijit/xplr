@@ -230,9 +230,10 @@ impl Default for KeyBindings {
                 help: edit
                 actions:
                   - Call:
-                      command: vim
+                      command: bash
                       args:
-                        - "{{shellescape relativePath}}"
+                        - -c
+                        - FILE="{{shellescape relativePath}}" && "${EDITOR:-vim}" "${FILE:?}"
               forward-slash:
                 help: search
                 actions:
@@ -472,11 +473,11 @@ impl Default for GeneralConfig {
             - format: "╰─"
 
           normal_ui:
-            prefix: "   "
-            suffix: " "
+            prefix: "  "
+            suffix: ""
 
           focused_ui:
-            prefix: "▸ ["
+            prefix: "▸["
             suffix: "]"
             style:
               fg: Blue
@@ -486,7 +487,7 @@ impl Default for GeneralConfig {
                 bits: 0
 
           selected_ui:
-            prefix: "  {"
+            prefix: " {"
             suffix: "}"
             style:
               fg: LightGreen

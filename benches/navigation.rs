@@ -16,14 +16,14 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus next item", |b| {
         b.iter(|| {
             app.clone()
-                .handle(&config::Action::Global(config::GlobalAction::FocusNextItem))
+                .handle(&config::Action::Global(config::GlobalAction::FocusNext))
         })
     });
 
     c.bench_function("focus previous item", |b| {
         b.iter(|| {
             app.clone().handle(&config::Action::Global(
-                config::GlobalAction::FocusPreviousItem,
+                config::GlobalAction::FocusPrevious,
             ))
         })
     });
@@ -31,14 +31,14 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus first item", |b| {
         b.iter(|| {
             app.clone()
-                .handle(&config::Action::Global(config::GlobalAction::FocusFirstItem))
+                .handle(&config::Action::Global(config::GlobalAction::FocusFirst))
         })
     });
 
     c.bench_function("focus last item", |b| {
         b.iter(|| {
             app.clone()
-                .handle(&config::Action::Global(config::GlobalAction::FocusLastItem))
+                .handle(&config::Action::Global(config::GlobalAction::FocusLast))
         })
     });
 }

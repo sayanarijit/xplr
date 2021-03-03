@@ -14,7 +14,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.1.7"; // Update Cargo.toml
+pub const VERSION: &str = "v0.1.8"; // Update Cargo.toml
 pub const UNSUPPORTED_STR: &str = "???";
 pub const TOTAL_ROWS: usize = 50;
 
@@ -301,15 +301,33 @@ impl App {
         })
     }
 
+    pub fn refresh(self) -> Result<Self, Error> {
+        Self::new(
+            &self.config,
+            &self.directory_buffer.pwd,
+            &self.saved_buffers,
+            &self.selected_paths,
+            self.mode,
+            self.show_hidden,
+            self.directory_buffer.focus,
+        )
+    }
+
     pub fn exit_submode(self) -> Result<Self, Error> {
-        let mut app = self;
-        let mode = match app.mode {
+        let mode = match self.mode {
             Mode::ExploreSubmode(_) => Mode::Explore,
             Mode::SelectSubmode(_) => Mode::Select,
             m => m,
         };
-        app.mode = mode;
-        Ok(app)
+        Self::new(
+            &self.config,
+            &self.directory_buffer.pwd,
+            &self.saved_buffers,
+            &self.selected_paths,
+            mode,
+            self.show_hidden,
+            self.directory_buffer.focus,
+        )
     }
 
     pub fn toggle_hidden(self) -> Result<Self, Error> {
@@ -765,9 +783,10 @@ pub fn create() -> Result<App, Error> {
     };
 
     if !config.version.eq(VERSION) {
-        return Err(Error::IncompatibleVersion(
-            format!("Config file {} is outdated", config_file.to_string_lossy()),
-        ));
+        return Err(Error::IncompatibleVersion(format!(
+            "Config file {} is outdated",
+            config_file.to_string_lossy()
+        )));
     }
 
     let root = Path::new("/");
