@@ -102,7 +102,11 @@ pub fn draw<B: Backend>(
             .focus
             .map(app::DirectoryBuffer::relative_focus),
     );
-    f.render_stateful_widget(table, chunks[0], table_state);
+
+    let left_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)].as_ref())
+        .split(chunks[1]);
 
     let selected: Vec<ListItem> = app
         .selected_paths
@@ -120,5 +124,20 @@ pub fn draw<B: Backend>(
             .borders(Borders::ALL)
             .title(format!(" Selected ({}) ", selected_count)),
     );
-    f.render_stateful_widget(selected_list, chunks[1], list_state);
+
+    // Help menu
+    let help_menu_rows: Vec<Row> = app
+        .parsed_help_menu
+        .clone()
+        .iter()
+        .map(|(h, k)| Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())]))
+        .collect();
+
+    let help_menu = Table::new(help_menu_rows)
+        .block(Block::default().borders(Borders::ALL).title(" Help "))
+        .widths(&[TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)]);
+
+    f.render_stateful_widget(table, chunks[0], table_state);
+    f.render_stateful_widget(selected_list, left_chunks[0], list_state);
+    f.render_widget(help_menu, left_chunks[1]);
 }

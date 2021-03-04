@@ -48,7 +48,15 @@ fn main() -> Result<(), Error> {
     let mut list_state = ListState::default();
 
     term::enable_raw_mode().unwrap();
-    terminal.draw(|f| ui::draw(&app, &hb, f, &mut table_state, &mut list_state))?;
+    terminal.draw(|f| {
+        ui::draw(
+            &app,
+            &hb,
+            f,
+            &mut table_state,
+            &mut list_state,
+        )
+    })?;
 
     let mut result = Ok(());
     'outer: for key in keys {
@@ -56,8 +64,15 @@ fn main() -> Result<(), Error> {
             for action in actions.iter() {
                 app = match app.handle(action) {
                     Ok(mut a) => {
-                        terminal
-                            .draw(|f| ui::draw(&a, &hb, f, &mut table_state, &mut list_state))?;
+                        terminal.draw(|f| {
+                            ui::draw(
+                                &a,
+                                &hb,
+                                f,
+                                &mut table_state,
+                                &mut list_state,
+                            )
+                        })?;
 
                         if let Some(result) = a.result.clone() {
                             term::disable_raw_mode().unwrap();
@@ -89,7 +104,13 @@ fn main() -> Result<(), Error> {
                             terminal = Terminal::new(backend)?;
                             a = a.refresh()?;
                             terminal.draw(|f| {
-                                ui::draw(&a, &hb, f, &mut table_state, &mut list_state)
+                                ui::draw(
+                                    &a,
+                                    &hb,
+                                    f,
+                                    &mut table_state,
+                                    &mut list_state,
+                                )
                             })?;
                         };
 

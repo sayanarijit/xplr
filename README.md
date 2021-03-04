@@ -8,13 +8,13 @@ Example usage:
 
 ```bash
 # Edit file
-vim $(xplr)
+vim "$(xplr)"
 
 # Copy file(s)
-cp $(xplr) $(xplr)
+cp "$(xplr)" "$(xplr)/"
 
 # Search and move file
-mv $(fzf) $(xplr)
+mv "$(fzf)" "$(xplr)/"
 ```
 
 

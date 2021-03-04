@@ -1,5 +1,5 @@
-use termion::event::Key as TermionKey;
 use serde::{Deserialize, Serialize};
+use termion::event::Key as TermionKey;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -244,6 +244,12 @@ pub enum Key {
     QuestionMark,
 
     NotSupported,
+}
+
+impl std::fmt::Display for Key {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 impl Key {

@@ -254,6 +254,26 @@ pub struct DirectoryItemMetadata {
     pub total: usize,
 }
 
+pub fn parse_help_menu<'a>(
+    kb: impl Iterator<Item = (&'a Key, &'a (String, Vec<Action>))>,
+) -> Vec<(String, String)> {
+    let mut m = kb
+        .map(|(k, a)| {
+            (
+                a.0.clone(),
+                serde_yaml::to_string(k)
+                    .unwrap()
+                    .strip_prefix("---")
+                    .unwrap_or_default()
+                    .trim()
+                    .to_string(),
+            )
+        })
+        .collect::<Vec<(String, String)>>();
+    m.sort();
+    m
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
@@ -263,6 +283,7 @@ pub struct App {
     pub selected_paths: HashSet<PathBuf>,
     pub mode: Mode,
     pub parsed_key_bindings: HashMap<Key, (String, Vec<Action>)>,
+    pub parsed_help_menu: Vec<(String, String)>,
     pub show_hidden: bool,
     pub call: Option<CommandConfig>,
     pub result: Option<String>,
@@ -289,6 +310,8 @@ impl App {
 
         let parsed_key_bindings = config.key_bindings.clone().filtered(&mode);
 
+        let parsed_help_menu = parse_help_menu(parsed_key_bindings.iter());
+
         Ok(Self {
             version: VERSION.into(),
             config: config.to_owned(),
@@ -297,6 +320,7 @@ impl App {
             selected_paths: selected_paths.to_owned(),
             mode,
             parsed_key_bindings,
+            parsed_help_menu,
             show_hidden,
             result: None,
             call: None,
@@ -526,8 +550,8 @@ impl App {
     }
 
     pub fn back(self) -> Result<Self, Error> {
-        let app = self.clone();
-        self.focus_path(&app.directory_buffer.pwd)
+        let pwd = self.directory_buffer.pwd.clone();
+        self.focus_path(&pwd)
     }
 
     pub fn select(self) -> Result<Self, Error> {
@@ -541,10 +565,15 @@ impl App {
             })
             .unwrap_or_else(|| self.selected_paths.clone());
 
-        let mut app = self;
-        app.selected_paths = selected_paths;
-        app.mode = Mode::Select;
-        Ok(app)
+        Self::new(
+            &self.config,
+            &self.directory_buffer.pwd,
+            &self.saved_buffers,
+            &selected_paths,
+            Mode::Select,
+            self.show_hidden,
+            self.directory_buffer.focus,
+        )
     }
 
     pub fn toggle_selection(self) -> Result<Self, Error> {
@@ -568,16 +597,34 @@ impl App {
             Mode::Select
         };
 
-        let mut app = self;
-        app.selected_paths = selected_paths;
-        app.mode = mode;
-        Ok(app)
+        Self::new(
+            &self.config,
+            &self.directory_buffer.pwd,
+            &self.saved_buffers,
+            &selected_paths,
+            mode,
+            self.show_hidden,
+            self.directory_buffer.focus,
+        )
     }
 
     pub fn enter_submode(self, submode: &String) -> Result<Self, Error> {
-        let mut app = self;
-        app.mode = Mode::ExploreSubmode(submode.clone());
-        Ok(app)
+        let mode = match self.mode {
+            Mode::Explore => Mode::ExploreSubmode(submode.clone()),
+            Mode::ExploreSubmode(_) => Mode::ExploreSubmode(submode.clone()),
+            Mode::Select => Mode::SelectSubmode(submode.clone()),
+            Mode::SelectSubmode(_) => Mode::SelectSubmode(submode.clone()),
+        };
+
+        Self::new(
+            &self.config,
+            &self.directory_buffer.pwd,
+            &self.saved_buffers,
+            &self.selected_paths,
+            mode,
+            self.show_hidden,
+            self.directory_buffer.focus,
+        )
     }
 
     pub fn print_focused(self) -> Result<Self, Error> {
