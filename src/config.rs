@@ -15,6 +15,69 @@ pub enum Mode {
     SelectSubmode(String),
 }
 
+impl Mode {
+    pub fn does_support(self, action: &Action) -> bool {
+        match (self, action) {
+            // Special
+            (_, Action::Terminate) => true,
+
+            // Explore mode
+            (Self::Explore, Action::Back) => true,
+            (Self::Explore, Action::Call(_)) => true,
+            (Self::Explore, Action::ChangeDirectory(_)) => true,
+            (Self::Explore, Action::Enter) => true,
+            (Self::Explore, Action::EnterSubmode(_)) => true,
+            (Self::Explore, Action::ExitSubmode) => false,
+            (Self::Explore, Action::FocusFirst) => true,
+            (Self::Explore, Action::FocusLast) => true,
+            (Self::Explore, Action::FocusNext) => true,
+            (Self::Explore, Action::FocusPath(_)) => true,
+            (Self::Explore, Action::FocusPathByBufferRelativeIndex(_)) => true,
+            (Self::Explore, Action::FocusPathByFocusRelativeIndex(_)) => true,
+            (Self::Explore, Action::FocusPathByIndex(_)) => true,
+            (Self::Explore, Action::FocusPrevious) => true,
+            (Self::Explore, Action::PrintAppState) => true,
+            (Self::Explore, Action::PrintFocused) => true,
+            (Self::Explore, Action::PrintSelected) => false,
+            (Self::Explore, Action::Quit) => true,
+            (Self::Explore, Action::Select) => true,
+            (Self::Explore, Action::ToggleSelection) => false,
+            (Self::Explore, Action::ToggleShowHidden) => true,
+
+            // Explore submode
+            (Self::ExploreSubmode(_), Action::ExitSubmode) => true,
+            (Self::ExploreSubmode(_), a) => Self::does_support(Self::Explore, a),
+
+            // Select mode
+            (Self::Select, Action::Back) => true,
+            (Self::Select, Action::Call(_)) => true,
+            (Self::Select, Action::ChangeDirectory(_)) => true,
+            (Self::Select, Action::Enter) => true,
+            (Self::Select, Action::EnterSubmode(_)) => true,
+            (Self::Select, Action::ExitSubmode) => true,
+            (Self::Select, Action::FocusFirst) => true,
+            (Self::Select, Action::FocusLast) => true,
+            (Self::Select, Action::FocusNext) => true,
+            (Self::Select, Action::FocusPath(_)) => true,
+            (Self::Select, Action::FocusPathByBufferRelativeIndex(_)) => true,
+            (Self::Select, Action::FocusPathByFocusRelativeIndex(_)) => true,
+            (Self::Select, Action::FocusPathByIndex(_)) => true,
+            (Self::Select, Action::FocusPrevious) => true,
+            (Self::Select, Action::PrintAppState) => true,
+            (Self::Select, Action::PrintFocused) => false,
+            (Self::Select, Action::PrintSelected) => true,
+            (Self::Select, Action::Quit) => true,
+            (Self::Select, Action::Select) => false,
+            (Self::Select, Action::ToggleSelection) => true,
+            (Self::Select, Action::ToggleShowHidden) => true,
+
+            // Select submode
+            (Self::SelectSubmode(_), Action::ExitSubmode) => true,
+            (Self::SelectSubmode(_), a) => Self::does_support(Self::Select, a),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Format {
     Line,
@@ -39,33 +102,7 @@ pub struct CommandConfig {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum GlobalAction {
-    // Common actions
-    ToggleShowHidden,
-    Back,
-    Enter,
-    FocusPrevious,
-    FocusNext,
-    FocusFirst,
-    FocusLast,
-    FocusPath(String),
-    FocusPathByIndex(usize),
-    FocusPathByBufferRelativeIndex(usize),
-    FocusPathByFocusRelativeIndex(isize),
-    ChangeDirectory(String),
-    Call(CommandConfig),
-
-    // Quit options
-    PrintFocused,
-    PrintPwd,
-    PrintAppState,
-    Quit,
-    Terminate,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum ExploreModeAction {
-    // Common actions
+pub enum Action {
     ToggleShowHidden,
     Back,
     Enter,
@@ -79,43 +116,9 @@ pub enum ExploreModeAction {
     FocusPath(String),
     ChangeDirectory(String),
     Call(CommandConfig),
-
-    // Explore mode exclusive options
     EnterSubmode(String),
     ExitSubmode,
     Select,
-    // Unselect,
-    // SelectAll,
-    // SelectAllRecursive,
-
-    // Quit options
-    PrintFocused,
-    PrintPwd,
-    PrintAppState,
-    Quit,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum SelectModeAction {
-    // Common actions
-    ToggleShowHidden,
-    Back,
-    Enter,
-    FocusPrevious,
-    FocusNext,
-    FocusFirst,
-    FocusLast,
-    FocusPathByIndex(usize),
-    FocusPathByBufferRelativeIndex(usize),
-    FocusPathByFocusRelativeIndex(isize),
-    FocusPath(String),
-    ChangeDirectory(String),
-    Call(CommandConfig),
-
-    // Select mode exclusive options
-    EnterSubmode(String),
-    ExitSubmode,
-    // Select,
     // Unselect,
     // SelectAll,
     // SelectAllRecursive,
@@ -125,53 +128,68 @@ pub enum SelectModeAction {
     // ClearSelectedPaths,
 
     // Quit options
+    PrintFocused,
     PrintSelected,
     PrintAppState,
     Quit,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum Action {
-    Global(GlobalAction),
-    ExploreMode(ExploreModeAction),
-    SelectMode(SelectModeAction),
+    Terminate,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct GlobalActionMenu {
+pub struct ActionMenu {
     #[serde(default)]
     pub help: String,
-    pub actions: Vec<GlobalAction>,
+    pub actions: Vec<Action>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ExploreModeActionMenu {
-    #[serde(default)]
-    pub help: String,
-    pub actions: Vec<ExploreModeAction>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SelectModeActionMenu {
-    #[serde(default)]
-    pub help: String,
-    pub actions: Vec<SelectModeAction>,
-}
-
-pub type ExploreSubmodeActionMenu = HashMap<Key, ExploreModeActionMenu>;
-pub type SelectSubmodeActionMenu = HashMap<Key, SelectModeActionMenu>;
+pub type SubmodeActionMenu = HashMap<Key, ActionMenu>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KeyBindings {
-    pub global: HashMap<Key, GlobalActionMenu>,
+    pub global: HashMap<Key, ActionMenu>,
     #[serde(default)]
-    pub explore_mode: HashMap<Key, ExploreModeActionMenu>,
+    pub explore_mode: HashMap<Key, ActionMenu>,
     #[serde(default)]
-    pub explore_submodes: HashMap<String, ExploreSubmodeActionMenu>,
+    pub explore_submodes: HashMap<String, SubmodeActionMenu>,
     #[serde(default)]
-    pub select_mode: HashMap<Key, SelectModeActionMenu>,
+    pub select_mode: HashMap<Key, ActionMenu>,
     #[serde(default)]
-    pub select_submodes: HashMap<String, SelectSubmodeActionMenu>,
+    pub select_submodes: HashMap<String, SubmodeActionMenu>,
+}
+
+impl KeyBindings {
+    pub fn filtered(&self, mode: &Mode) -> HashMap<Key, (String, Vec<Action>)> {
+        let mode_bindings: Option<HashMap<Key, ActionMenu>> = match mode {
+            Mode::Explore => Some(self.explore_mode.clone()),
+            Mode::ExploreSubmode(s) => self.explore_submodes.clone().get(s).map(|a| a.to_owned()),
+            Mode::Select => Some(self.select_mode.clone()),
+            Mode::SelectSubmode(s) => self.select_submodes.clone().get(s).map(|a| a.to_owned()),
+        };
+
+        let kb = self.global.clone().into_iter();
+
+        let kb: HashMap<Key, ActionMenu> = if let Some(modal_kb) = mode_bindings {
+            kb.chain(modal_kb.into_iter()).collect()
+        } else {
+            kb.collect()
+        };
+
+        kb.into_iter()
+            .map(|(k, am)| {
+                (
+                    k.clone(),
+                    (
+                        am.help,
+                        am.actions
+                            .into_iter()
+                            .filter(|a| mode.clone().does_support(a))
+                            .collect::<Vec<Action>>(),
+                    ),
+                )
+            })
+            .filter(|(_, (_, actions))| !actions.is_empty())
+            .collect()
+    }
 }
 
 impl Default for KeyBindings {

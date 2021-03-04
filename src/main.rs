@@ -52,7 +52,7 @@ fn main() -> Result<(), Error> {
 
     let mut result = Ok(());
     'outer: for key in keys {
-        if let Some(actions) = app.actions_from_key(key) {
+        if let Some(actions) = app.actions_from_key(&key) {
             for action in actions.iter() {
                 app = match app.handle(action) {
                     Ok(mut a) => {
@@ -71,7 +71,7 @@ fn main() -> Result<(), Error> {
                         if let Some(cmd) = a.call.clone() {
                             term::disable_raw_mode().unwrap();
                             std::mem::drop(terminal);
-                            if let Some((_, meta)) = a.directory_buffer.focused_item() {
+                            if let Some((_, meta)) = a.directory_buffer.focused() {
                                 let _ = std::process::Command::new(cmd.command.clone())
                                     .current_dir(&a.directory_buffer.pwd)
                                     .args(

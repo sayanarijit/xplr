@@ -1,6 +1,4 @@
-use crate::config::{
-    Action, CommandConfig, Config, ExploreModeAction, GlobalAction, Mode, SelectModeAction,
-};
+use crate::config::{Action, CommandConfig, Config, Mode};
 use crate::error::Error;
 use crate::input::Key;
 use dirs;
@@ -142,8 +140,8 @@ impl DirectoryBuffer {
                     &config.general.normal_ui
                 };
 
-                let is_first_item = net_idx == 0;
-                let is_last_item = net_idx == total.max(1) - 1;
+                let is_first = net_idx == 0;
+                let is_last = net_idx == total.max(1) - 1;
 
                 let tree = config
                     .general
@@ -151,9 +149,9 @@ impl DirectoryBuffer {
                     .tree
                     .clone()
                     .map(|t| {
-                        if is_last_item {
+                        if is_last {
                             t.2.format.clone()
-                        } else if is_first_item {
+                        } else if is_first {
                             t.0.format.clone()
                         } else {
                             t.1.format.clone()
@@ -191,8 +189,8 @@ impl DirectoryBuffer {
                     suffix: ui.suffix.clone(),
                     tree: tree.into(),
                     is_symlink,
-                    is_first_item,
-                    is_last_item,
+                    is_first,
+                    is_last,
                     is_dir,
                     is_file,
                     is_readonly,
@@ -201,7 +199,7 @@ impl DirectoryBuffer {
                     index: net_idx + 1,
                     focus_relative_index,
                     buffer_relative_index: rel_idx + 1,
-                    total_items: total,
+                    total: total,
                 };
                 (abs.to_owned(), m)
             })
@@ -223,7 +221,7 @@ impl DirectoryBuffer {
         })
     }
 
-    pub fn focused_item(&self) -> Option<(PathBuf, DirectoryItemMetadata)> {
+    pub fn focused(&self) -> Option<(PathBuf, DirectoryItemMetadata)> {
         self.focus.and_then(|f| {
             self.items
                 .get(Self::relative_focus(f))
@@ -242,8 +240,8 @@ pub struct DirectoryItemMetadata {
     pub prefix: String,
     pub suffix: String,
     pub tree: String,
-    pub is_first_item: bool,
-    pub is_last_item: bool,
+    pub is_first: bool,
+    pub is_last: bool,
     pub is_symlink: bool,
     pub is_dir: bool,
     pub is_file: bool,
@@ -253,7 +251,7 @@ pub struct DirectoryItemMetadata {
     pub index: usize,
     pub focus_relative_index: String,
     pub buffer_relative_index: usize,
-    pub total_items: usize,
+    pub total: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -264,6 +262,7 @@ pub struct App {
     pub saved_buffers: HashMap<PathBuf, Option<usize>>,
     pub selected_paths: HashSet<PathBuf>,
     pub mode: Mode,
+    pub parsed_key_bindings: HashMap<Key, (String, Vec<Action>)>,
     pub show_hidden: bool,
     pub call: Option<CommandConfig>,
     pub result: Option<String>,
@@ -288,6 +287,8 @@ impl App {
             directory_buffer.focus.clone(),
         );
 
+        let parsed_key_bindings = config.key_bindings.clone().filtered(&mode);
+
         Ok(Self {
             version: VERSION.into(),
             config: config.to_owned(),
@@ -295,6 +296,7 @@ impl App {
             saved_buffers,
             selected_paths: selected_paths.to_owned(),
             mode,
+            parsed_key_bindings,
             show_hidden,
             result: None,
             call: None,
@@ -342,7 +344,7 @@ impl App {
         )
     }
 
-    pub fn focus_first_item(self) -> Result<Self, Error> {
+    pub fn focus_first(self) -> Result<Self, Error> {
         let focus = if self.directory_buffer.total == 0 {
             None
         } else {
@@ -360,7 +362,7 @@ impl App {
         )
     }
 
-    pub fn focus_last_item(self) -> Result<Self, Error> {
+    pub fn focus_last(self) -> Result<Self, Error> {
         let focus = if self.directory_buffer.total == 0 {
             None
         } else {
@@ -387,7 +389,7 @@ impl App {
         Ok(self)
     }
 
-    pub fn focus_next_item(self) -> Result<Self, Error> {
+    pub fn focus_next(self) -> Result<Self, Error> {
         let len = self.directory_buffer.total;
         let focus = self
             .directory_buffer
@@ -406,7 +408,7 @@ impl App {
         )
     }
 
-    pub fn focus_previous_item(self) -> Result<Self, Error> {
+    pub fn focus_previous(self) -> Result<Self, Error> {
         let len = self.directory_buffer.total;
         let focus = if len == 0 {
             None
@@ -499,7 +501,7 @@ impl App {
     pub fn enter(self) -> Result<Self, Error> {
         let pwd = self
             .directory_buffer
-            .focused_item()
+            .focused()
             .map(|(p, _)| p)
             .map(|p| {
                 if p.is_dir() {
@@ -531,7 +533,7 @@ impl App {
     pub fn select(self) -> Result<Self, Error> {
         let selected_paths = self
             .directory_buffer
-            .focused_item()
+            .focused()
             .map(|(p, _)| {
                 let mut selected_paths = self.selected_paths.clone();
                 selected_paths.insert(p);
@@ -548,7 +550,7 @@ impl App {
     pub fn toggle_selection(self) -> Result<Self, Error> {
         let selected_paths = self
             .directory_buffer
-            .focused_item()
+            .focused()
             .map(|(p, _)| {
                 let mut selected_paths = self.selected_paths.clone();
                 if selected_paths.contains(&p) {
@@ -582,7 +584,7 @@ impl App {
         let mut app = self;
         app.result = app
             .directory_buffer
-            .focused_item()
+            .focused()
             .and_then(|(p, _)| p.to_str().map(|s| s.to_string()));
         Ok(app)
     }
@@ -623,148 +625,34 @@ impl App {
         Err(Error::Terminated)
     }
 
-    pub fn actions_from_key(&self, key: Key) -> Option<Vec<Action>> {
-        self.config
-            .key_bindings
-            .global
-            .get(&key)
-            .map(|m| {
-                m.actions
-                    .iter()
-                    .map(|a| Action::Global(a.clone()))
-                    .collect()
-            })
-            .or_else(|| match &self.mode {
-                Mode::Explore => self.config.key_bindings.explore_mode.get(&key).map(|m| {
-                    m.actions
-                        .iter()
-                        .map(|a| Action::ExploreMode(a.clone()))
-                        .collect()
-                }),
-
-                Mode::Select => self.config.key_bindings.select_mode.get(&key).map(|m| {
-                    m.actions
-                        .iter()
-                        .map(|a| Action::SelectMode(a.clone()))
-                        .collect()
-                }),
-
-                Mode::ExploreSubmode(sub) => self
-                    .config
-                    .key_bindings
-                    .explore_submodes
-                    .get(sub)
-                    .and_then(|kb| {
-                        kb.get(&key).map(|m| {
-                            m.actions
-                                .iter()
-                                .map(|a| Action::ExploreMode(a.clone()))
-                                .collect()
-                        })
-                    }),
-
-                Mode::SelectSubmode(sub) => self
-                    .config
-                    .key_bindings
-                    .select_submodes
-                    .get(sub)
-                    .and_then(|kb| {
-                        kb.get(&key).map(|m| {
-                            m.actions
-                                .iter()
-                                .map(|a| Action::SelectMode(a.clone()))
-                                .collect()
-                        })
-                    }),
-            })
+    pub fn actions_from_key(&self, key: &Key) -> Option<Vec<Action>> {
+        self.parsed_key_bindings.get(key).map(|(_, a)| a.to_owned())
     }
 
     pub fn handle(self, action: &Action) -> Result<Self, Error> {
         match action {
-            // Global actions
-            Action::Global(GlobalAction::ToggleShowHidden) => self.toggle_hidden(),
-            Action::Global(GlobalAction::Back) => self.back(),
-            Action::Global(GlobalAction::Enter) => self.enter(),
-            Action::Global(GlobalAction::FocusNext) => self.focus_next_item(),
-            Action::Global(GlobalAction::FocusPrevious) => self.focus_previous_item(),
-            Action::Global(GlobalAction::FocusFirst) => self.focus_first_item(),
-            Action::Global(GlobalAction::FocusLast) => self.focus_last_item(),
-            Action::Global(GlobalAction::FocusPath(path)) => self.focus_path(&path.into()),
-            Action::Global(GlobalAction::FocusPathByIndex(n)) => self.focus_by_index(n),
-            Action::Global(GlobalAction::FocusPathByBufferRelativeIndex(n)) => {
-                self.focus_by_buffer_relative_index(&n)
-            }
-            Action::Global(GlobalAction::FocusPathByFocusRelativeIndex(n)) => {
-                self.focus_by_focus_relative_index(&n)
-            }
-            Action::Global(GlobalAction::ChangeDirectory(dir)) => self.change_directory(&dir),
-            Action::Global(GlobalAction::Call(cmd)) => self.call(&cmd),
-            Action::Global(GlobalAction::PrintFocused) => self.print_focused(),
-            Action::Global(GlobalAction::PrintPwd) => self.print_pwd(),
-            Action::Global(GlobalAction::PrintAppState) => self.print_app_state(),
-            Action::Global(GlobalAction::Quit) => self.quit(),
-            Action::Global(GlobalAction::Terminate) => self.terminate(),
-
-            // Explore mode
-            Action::ExploreMode(ExploreModeAction::ToggleShowHidden) => self.toggle_hidden(),
-            Action::ExploreMode(ExploreModeAction::Back) => self.back(),
-            Action::ExploreMode(ExploreModeAction::Enter) => self.enter(),
-            Action::ExploreMode(ExploreModeAction::FocusNext) => self.focus_next_item(),
-            Action::ExploreMode(ExploreModeAction::FocusPrevious) => self.focus_previous_item(),
-            Action::ExploreMode(ExploreModeAction::FocusFirst) => self.focus_first_item(),
-            Action::ExploreMode(ExploreModeAction::FocusLast) => self.focus_last_item(),
-            Action::ExploreMode(ExploreModeAction::FocusPath(path)) => {
-                self.focus_path(&path.into())
-            }
-            Action::ExploreMode(ExploreModeAction::FocusPathByIndex(n)) => self.focus_by_index(n),
-            Action::ExploreMode(ExploreModeAction::FocusPathByBufferRelativeIndex(n)) => {
-                self.focus_by_buffer_relative_index(&n)
-            }
-            Action::ExploreMode(ExploreModeAction::FocusPathByFocusRelativeIndex(n)) => {
-                self.focus_by_focus_relative_index(&n)
-            }
-            Action::ExploreMode(ExploreModeAction::ChangeDirectory(dir)) => {
-                self.change_directory(&dir)
-            }
-            Action::ExploreMode(ExploreModeAction::Call(cmd)) => self.call(&cmd),
-            Action::ExploreMode(ExploreModeAction::Select) => self.select(),
-            Action::ExploreMode(ExploreModeAction::EnterSubmode(submode)) => {
-                self.enter_submode(submode)
-            }
-            Action::ExploreMode(ExploreModeAction::ExitSubmode) => self.exit_submode(),
-            Action::ExploreMode(ExploreModeAction::PrintFocused) => self.print_focused(),
-            Action::ExploreMode(ExploreModeAction::PrintPwd) => self.print_pwd(),
-            Action::ExploreMode(ExploreModeAction::PrintAppState) => self.print_app_state(),
-            Action::ExploreMode(ExploreModeAction::Quit) => self.quit(),
-
-            // Select mode
-            Action::SelectMode(SelectModeAction::ToggleShowHidden) => self.toggle_hidden(),
-            Action::SelectMode(SelectModeAction::Back) => self.back(),
-            Action::SelectMode(SelectModeAction::Enter) => self.enter(),
-            Action::SelectMode(SelectModeAction::FocusNext) => self.focus_next_item(),
-            Action::SelectMode(SelectModeAction::FocusPrevious) => self.focus_previous_item(),
-            Action::SelectMode(SelectModeAction::FocusFirst) => self.focus_first_item(),
-            Action::SelectMode(SelectModeAction::FocusLast) => self.focus_last_item(),
-            Action::SelectMode(SelectModeAction::FocusPath(path)) => self.focus_path(&path.into()),
-            Action::SelectMode(SelectModeAction::FocusPathByIndex(n)) => self.focus_by_index(n),
-            Action::SelectMode(SelectModeAction::FocusPathByBufferRelativeIndex(n)) => {
-                self.focus_by_buffer_relative_index(&n)
-            }
-            Action::SelectMode(SelectModeAction::FocusPathByFocusRelativeIndex(n)) => {
-                self.focus_by_focus_relative_index(&n)
-            }
-            Action::SelectMode(SelectModeAction::ChangeDirectory(dir)) => {
-                self.change_directory(&dir)
-            }
-            Action::SelectMode(SelectModeAction::Call(cmd)) => self.call(&cmd),
-            Action::SelectMode(SelectModeAction::ToggleSelection) => self.toggle_selection(),
-            Action::SelectMode(SelectModeAction::EnterSubmode(submode)) => {
-                self.enter_submode(submode)
-            }
-            Action::SelectMode(SelectModeAction::ExitSubmode) => self.exit_submode(),
-            Action::SelectMode(SelectModeAction::PrintSelected) => self.print_selected(),
-            Action::SelectMode(SelectModeAction::PrintAppState) => self.print_app_state(),
-            Action::SelectMode(SelectModeAction::Quit) => self.quit(),
+            Action::ToggleShowHidden => self.toggle_hidden(),
+            Action::Back => self.back(),
+            Action::Enter => self.enter(),
+            Action::FocusPrevious => self.focus_previous(),
+            Action::FocusNext => self.focus_next(),
+            Action::FocusFirst => self.focus_first(),
+            Action::FocusLast => self.focus_last(),
+            Action::FocusPathByIndex(i) => self.focus_by_index(i),
+            Action::FocusPathByBufferRelativeIndex(i) => self.focus_by_buffer_relative_index(i),
+            Action::FocusPathByFocusRelativeIndex(i) => self.focus_by_focus_relative_index(i),
+            Action::FocusPath(p) => self.focus_path(&p.into()),
+            Action::ChangeDirectory(d) => self.change_directory(d.into()),
+            Action::Call(c) => self.call(c),
+            Action::EnterSubmode(s) => self.enter_submode(s),
+            Action::ExitSubmode => self.exit_submode(),
+            Action::Select => self.select(),
+            Action::ToggleSelection => self.toggle_selection(),
+            Action::PrintFocused => self.print_focused(),
+            Action::PrintSelected => self.print_selected(),
+            Action::PrintAppState => self.print_app_state(),
+            Action::Quit => self.quit(),
+            Action::Terminate => self.terminate(),
         }
     }
 }
