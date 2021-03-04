@@ -12,7 +12,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.1.8"; // Update Cargo.toml
+pub const VERSION: &str = "v0.1.10"; // Update Cargo.toml
 pub const UNSUPPORTED_STR: &str = "???";
 pub const TOTAL_ROWS: usize = 50;
 
@@ -341,10 +341,12 @@ impl App {
 
     pub fn exit_submode(self) -> Result<Self, Error> {
         let mode = match self.mode {
+            Mode::Explore => Mode::Explore,
             Mode::ExploreSubmode(_) => Mode::Explore,
+            Mode::Select => Mode::Select,
             Mode::SelectSubmode(_) => Mode::Select,
-            m => m,
         };
+
         Self::new(
             &self.config,
             &self.directory_buffer.pwd,

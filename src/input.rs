@@ -19,7 +19,7 @@ pub enum Key {
     Return,
     Space,
     Tab,
-    Escape,
+    Esc,
 
     Zero,
     One,
@@ -270,7 +270,7 @@ impl Key {
             TermionKey::Char('\n') => Key::Return,
             TermionKey::Char(' ') => Key::Space,
             TermionKey::Char('\t') => Key::Tab,
-            TermionKey::Esc => Key::Escape,
+            TermionKey::Esc => Key::Esc,
 
             TermionKey::Char('0') => Key::Zero,
             TermionKey::Char('1') => Key::One,

@@ -268,7 +268,7 @@ impl Default for KeyBindings {
                   - Call:
                       command: bash
 
-              escape:
+              esc:
                 help: quit
                 actions:
                   - Quit
