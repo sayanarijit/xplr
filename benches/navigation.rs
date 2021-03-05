@@ -28,6 +28,15 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus last item", |b| {
         b.iter(|| app.clone().handle(&config::Action::FocusLast))
     });
+
+    c.bench_function("leave and enter directory", |b| {
+        b.iter(|| {
+            app.clone()
+                .handle(&config::Action::Back)
+                .unwrap()
+                .handle(&config::Action::Enter)
+        })
+    });
 }
 criterion_group!(benches, criterion_benchmark);
 criterion_main!(benches);
