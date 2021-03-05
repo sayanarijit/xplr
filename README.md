@@ -17,6 +17,13 @@ cp "$(xplr)" "$(xplr)/"
 mv "$(fzf)" "$(xplr)/"
 ```
 
+As of now the fuctionality is pretty limited. You basically have to drop
+into a shell (default key `s`) in the directory to do things like
+create/delete/rename files. A lot of research and implementations to go.
+
+Although, it's currently satisfying my needs (for customization and speed)
+with this vim plugin https://github.com/sayanarijit/xplr.vim.
+
 
 Let's brainstorm
 ----------------
