@@ -134,7 +134,11 @@ pub fn draw<B: Backend>(
         .collect();
 
     let help_menu = Table::new(help_menu_rows)
-        .block(Block::default().borders(Borders::ALL).title(" Help "))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(format!(" Help [{}] ", &app.mode)),
+        )
         .widths(&[TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)]);
 
     f.render_stateful_widget(table, chunks[0], table_state);

@@ -2,6 +2,7 @@ use crate::app::VERSION;
 use crate::input::Key;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt;
 use tui::layout::Constraint as TUIConstraint;
 use tui::style::Color;
 use tui::style::Modifier;
@@ -13,6 +14,28 @@ pub enum Mode {
     ExploreSubmode(String),
     Select,
     SelectSubmode(String),
+}
+
+impl fmt::Display for Mode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Explore => {
+                write!(f, "explore")
+            }
+
+            Self::Select => {
+                write!(f, "select")
+            }
+
+            Self::ExploreSubmode(s) => {
+                write!(f, "explore({})", &s)
+            }
+
+            Self::SelectSubmode(s) => {
+                write!(f, "select({})", &s)
+            }
+        }
+    }
 }
 
 impl Mode {
@@ -477,7 +500,7 @@ impl Default for GeneralConfig {
               cols:
               - format: "{{tree}}{{prefix}}{{icon}} {{relativePath}}{{#if isDir}}/{{/if}}{{suffix}}"
               - format: "{{isSymlink}}"
-              - format: "{{focusRelativeIndex}}/{{bufferRelativeIndex}}/{{index}}/{{totalItems}}"
+              - format: "{{focusRelativeIndex}}/{{bufferRelativeIndex}}/{{index}}/{{total}}"
 
             col_spacing: 3
             col_widths:
