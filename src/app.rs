@@ -12,7 +12,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.1.10"; // Update Cargo.toml
+pub const VERSION: &str = "v0.1.11"; // Update Cargo.toml
 pub const UNSUPPORTED_STR: &str = "???";
 pub const TOTAL_ROWS: usize = 50;
 

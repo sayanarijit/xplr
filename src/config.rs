@@ -266,7 +266,7 @@ impl Default for KeyBindings {
                       command: bash
                       args:
                         - "-c"
-                        - FILE="{{shellescape relativePath}}" && xdg-open "${FILE:?}" &> /dev/null
+                        - FILE="{{relativePath}}" && xdg-open "${FILE:?}" &> /dev/null
               e:
                 help: edit
                 actions:
@@ -274,7 +274,7 @@ impl Default for KeyBindings {
                       command: bash
                       args:
                         - -c
-                        - FILE="{{shellescape relativePath}}" && "${EDITOR:-vim}" "${FILE:?}"
+                        - FILE="{{relativePath}}" && "${EDITOR:-vim}" "${FILE:?}"
               forward-slash:
                 help: search
                 actions:
