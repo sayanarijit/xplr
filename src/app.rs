@@ -12,7 +12,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.1.11"; // Update Cargo.toml
+pub const VERSION: &str = "v0.1.12"; // Update Cargo.toml
 pub const UNSUPPORTED_STR: &str = "???";
 pub const TOTAL_ROWS: usize = 50;
 
@@ -275,6 +275,20 @@ pub fn parse_help_menu<'a>(
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum Task {
+    NoOp,
+    Quit,
+    PrintAndQuit(String),
+    Call(CommandConfig),
+}
+
+impl Default for Task {
+    fn default() -> Self {
+        Self::NoOp
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
     pub config: Config,
@@ -285,8 +299,7 @@ pub struct App {
     pub parsed_key_bindings: HashMap<Key, (String, Vec<Action>)>,
     pub parsed_help_menu: Vec<(String, String)>,
     pub show_hidden: bool,
-    pub call: Option<CommandConfig>,
-    pub result: Option<String>,
+    pub task: Task,
 }
 
 impl App {
@@ -322,8 +335,7 @@ impl App {
             parsed_key_bindings,
             parsed_help_menu,
             show_hidden,
-            result: None,
-            call: None,
+            task: Task::NoOp,
         })
     }
 
@@ -411,7 +423,7 @@ impl App {
     }
 
     pub fn call(mut self, cmd: &CommandConfig) -> Result<Self, Error> {
-        self.call = Some(cmd.clone());
+        self.task = Task::Call(cmd.clone());
         Ok(self)
     }
 
@@ -631,22 +643,28 @@ impl App {
 
     pub fn print_focused(self) -> Result<Self, Error> {
         let mut app = self;
-        app.result = app
+        app.task = app
             .directory_buffer
             .focused()
-            .and_then(|(p, _)| p.to_str().map(|s| s.to_string()));
+            .and_then(|(p, _)| p.to_str().map(|s| Task::PrintAndQuit(s.to_string())))
+            .unwrap_or_default();
         Ok(app)
     }
 
     pub fn print_pwd(self) -> Result<Self, Error> {
         let mut app = self;
-        app.result = app.directory_buffer.pwd.to_str().map(|s| s.to_string());
+        app.task = app
+            .directory_buffer
+            .pwd
+            .to_str()
+            .map(|s| Task::PrintAndQuit(s.to_string()))
+            .unwrap_or_default();
         Ok(app)
     }
 
     pub fn print_selected(self) -> Result<Self, Error> {
         let mut app = self;
-        app.result = Some(
+        app.task = Task::PrintAndQuit(
             app.selected_paths
                 .clone()
                 .iter()
@@ -661,12 +679,12 @@ impl App {
     pub fn print_app_state(self) -> Result<Self, Error> {
         let state = serde_yaml::to_string(&self)?;
         let mut app = self;
-        app.result = Some(state);
+        app.task = Task::PrintAndQuit(state);
         Ok(app)
     }
 
     pub fn quit(mut self) -> Result<Self, Error> {
-        self.result = Some("".into());
+        self.task = Task::Quit;
         Ok(self)
     }
 

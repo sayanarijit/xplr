@@ -8,17 +8,21 @@ use tui::backend::CrosstermBackend;
 use tui::widgets::{ListState, TableState};
 use tui::Terminal;
 use xplr::app;
+use xplr::app::Task;
 use xplr::error::Error;
 use xplr::input::Key;
 use xplr::ui;
+use std::fs;
 
 handlebars_helper!(shellescape: |v: str| format!("{}", shellwords::escape(v)));
+handlebars_helper!(readfile: |v: str| fs::read_to_string(v).unwrap());
 
 fn main() -> Result<(), Error> {
     let mut app = app::create()?;
 
     let mut hb = Handlebars::new();
     hb.register_helper("shellescape", Box::new(shellescape));
+    hb.register_helper("readfile", Box::new(readfile));
     hb.register_template_string(
         app::TEMPLATE_TABLE_ROW,
         &app.config
@@ -48,15 +52,7 @@ fn main() -> Result<(), Error> {
     let mut list_state = ListState::default();
 
     term::enable_raw_mode().unwrap();
-    terminal.draw(|f| {
-        ui::draw(
-            &app,
-            &hb,
-            f,
-            &mut table_state,
-            &mut list_state,
-        )
-    })?;
+    terminal.draw(|f| ui::draw(&app, &hb, f, &mut table_state, &mut list_state))?;
 
     let mut result = Ok(());
     'outer: for key in keys {
@@ -64,58 +60,54 @@ fn main() -> Result<(), Error> {
             for action in actions.iter() {
                 app = match app.handle(action) {
                     Ok(mut a) => {
-                        terminal.draw(|f| {
-                            ui::draw(
-                                &a,
-                                &hb,
-                                f,
-                                &mut table_state,
-                                &mut list_state,
-                            )
-                        })?;
+                        terminal
+                            .draw(|f| ui::draw(&a, &hb, f, &mut table_state, &mut list_state))?;
 
-                        if let Some(result) = a.result.clone() {
-                            term::disable_raw_mode().unwrap();
-                            std::mem::drop(terminal);
-                            if !result.is_empty() {
-                                println!("{}", &result);
-                            };
-                            break 'outer;
+                        match a.task.clone() {
+                            Task::NoOp => {}
+
+                            Task::Quit => {
+                                term::disable_raw_mode().unwrap();
+                                std::mem::drop(terminal);
+                                break 'outer;
+                            }
+
+                            Task::PrintAndQuit(txt) => {
+                                term::disable_raw_mode().unwrap();
+                                std::mem::drop(terminal);
+                                if !txt.is_empty() {
+                                    println!("{}", &txt);
+                                };
+                                break 'outer;
+                            }
+
+                            Task::Call(cmd) => {
+                                term::disable_raw_mode().unwrap();
+                                std::mem::drop(terminal);
+                                if let Some((_, meta)) = a.directory_buffer.focused() {
+                                    let _ = std::process::Command::new(cmd.command.clone())
+                                        .current_dir(&a.directory_buffer.pwd)
+                                        .args(
+                                            cmd.args
+                                                .iter()
+                                                .map(|arg| hb.render_template(arg, &meta).unwrap()),
+                                        )
+                                        .status();
+                                };
+
+                                term::enable_raw_mode().unwrap();
+                                let stdout = get_tty()?;
+                                let stdout = AlternateScreen::from(stdout);
+                                let backend = CrosstermBackend::new(stdout);
+                                terminal = Terminal::new(backend)?;
+                                a = a.refresh()?;
+                                terminal.draw(|f| {
+                                    ui::draw(&a, &hb, f, &mut table_state, &mut list_state)
+                                })?;
+                            }
                         };
 
-                        if let Some(cmd) = a.call.clone() {
-                            term::disable_raw_mode().unwrap();
-                            std::mem::drop(terminal);
-                            if let Some((_, meta)) = a.directory_buffer.focused() {
-                                let _ = std::process::Command::new(cmd.command.clone())
-                                    .current_dir(&a.directory_buffer.pwd)
-                                    .args(
-                                        cmd.args
-                                            .iter()
-                                            .map(|arg| hb.render_template(arg, &meta).unwrap()),
-                                    )
-                                    .status();
-                            };
-
-                            term::enable_raw_mode().unwrap();
-                            let stdout = get_tty()?;
-                            let stdout = AlternateScreen::from(stdout);
-                            let backend = CrosstermBackend::new(stdout);
-                            terminal = Terminal::new(backend)?;
-                            a = a.refresh()?;
-                            terminal.draw(|f| {
-                                ui::draw(
-                                    &a,
-                                    &hb,
-                                    f,
-                                    &mut table_state,
-                                    &mut list_state,
-                                )
-                            })?;
-                        };
-
-                        a.call = None;
-                        a.result = None;
+                        a.task = Task::NoOp;
                         a
                     }
                     Err(e) => {
