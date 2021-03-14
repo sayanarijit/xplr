@@ -242,6 +242,7 @@ pub enum Key {
     Dot,
     Comma,
     QuestionMark,
+    Pound,
 
     NotSupported,
 }
@@ -482,6 +483,7 @@ impl Key {
             TermionKey::Char('.') => Key::Dot,
             TermionKey::Char(',') => Key::Comma,
             TermionKey::Char('?') => Key::QuestionMark,
+            TermionKey::Char('#') => Key::Pound,
 
             _ => Key::NotSupported,
         }

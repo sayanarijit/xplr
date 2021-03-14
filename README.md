@@ -41,7 +41,7 @@ cargo install xplr
 ```bash
 mkdir -p ~/.config/xplr
 
-echo "?" | xplr | yq ".config" -y | tee ~/.config/xplr/config.yml
+echo "#" | xplr | yq ".config" -y | tee ~/.config/xplr/config.yml
 ```
 
 3. Check the key bindings in the config file.

@@ -227,7 +227,7 @@ impl Default for KeyBindings {
                 help: quit
                 actions:
                   - Quit
-              question-mark:
+              pound:
                 help: print debug info
                 actions:
                   - PrintAppState

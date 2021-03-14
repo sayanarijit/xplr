@@ -1,6 +1,7 @@
 use crossterm::terminal as term;
 use handlebars::{handlebars_helper, Handlebars};
 use shellwords;
+use std::fs;
 use std::io;
 use termion::get_tty;
 use termion::{input::TermRead, screen::AlternateScreen};
@@ -12,10 +13,9 @@ use xplr::app::Task;
 use xplr::error::Error;
 use xplr::input::Key;
 use xplr::ui;
-use std::fs;
 
 handlebars_helper!(shellescape: |v: str| format!("{}", shellwords::escape(v)));
-handlebars_helper!(readfile: |v: str| fs::read_to_string(v).unwrap());
+handlebars_helper!(readfile: |v: str| fs::read_to_string(v).unwrap_or_default());
 
 fn main() -> Result<(), Error> {
     let mut app = app::create()?;
@@ -111,6 +111,8 @@ fn main() -> Result<(), Error> {
                         a
                     }
                     Err(e) => {
+                        term::disable_raw_mode().unwrap();
+                        std::mem::drop(terminal);
                         result = Err(e);
                         break 'outer;
                     }
