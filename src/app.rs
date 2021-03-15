@@ -12,7 +12,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.1.12"; // Update Cargo.toml
+pub const VERSION: &str = "v0.1.13"; // Update Cargo.toml
 pub const UNSUPPORTED_STR: &str = "???";
 pub const TOTAL_ROWS: usize = 50;
 
@@ -300,6 +300,7 @@ pub struct App {
     pub parsed_help_menu: Vec<(String, String)>,
     pub show_hidden: bool,
     pub task: Task,
+    pub number_input: usize,
 }
 
 impl App {
@@ -311,6 +312,7 @@ impl App {
         mode: Mode,
         show_hidden: bool,
         focus: Option<usize>,
+        number_input: usize,
     ) -> Result<Self, Error> {
         let directory_buffer =
             DirectoryBuffer::load(config, focus.or(Some(0)), &pwd, show_hidden, selected_paths)?;
@@ -336,6 +338,7 @@ impl App {
             parsed_help_menu,
             show_hidden,
             task: Task::NoOp,
+            number_input: number_input,
         })
     }
 
@@ -348,6 +351,7 @@ impl App {
             self.mode,
             self.show_hidden,
             self.directory_buffer.focus,
+            0,
         )
     }
 
@@ -367,6 +371,20 @@ impl App {
             mode,
             self.show_hidden,
             self.directory_buffer.focus,
+            0,
+        )
+    }
+
+    pub fn number_input(self, n: u8) -> Result<Self, Error> {
+        Self::new(
+            &self.config,
+            &self.directory_buffer.pwd,
+            &self.saved_buffers,
+            &self.selected_paths,
+            self.mode,
+            self.show_hidden,
+            self.directory_buffer.focus,
+            self.number_input * 10 + n as usize,
         )
     }
 
@@ -379,6 +397,7 @@ impl App {
             self.mode,
             !self.show_hidden,
             self.directory_buffer.focus,
+            0,
         )
     }
 
@@ -397,6 +416,7 @@ impl App {
             self.mode,
             self.show_hidden,
             focus,
+            0,
         )
     }
 
@@ -415,6 +435,7 @@ impl App {
             self.mode,
             self.show_hidden,
             focus,
+            0,
         )
     }
 
@@ -429,10 +450,11 @@ impl App {
 
     pub fn focus_next(self) -> Result<Self, Error> {
         let len = self.directory_buffer.total;
+        let step = self.number_input.max(1);
         let focus = self
             .directory_buffer
             .focus
-            .map(|f| (len - 1).min(f + 1))
+            .map(|f| (len.max(1) - 1).min(f + step))
             .or(Some(0));
 
         Self::new(
@@ -443,18 +465,20 @@ impl App {
             self.mode,
             self.show_hidden,
             focus,
+            0,
         )
     }
 
     pub fn focus_previous(self) -> Result<Self, Error> {
         let len = self.directory_buffer.total;
+        let step = self.number_input.max(1);
         let focus = if len == 0 {
             None
         } else {
             self.directory_buffer
                 .focus
-                .map(|f| Some(1.max(f) - 1))
-                .unwrap_or(Some(len - 1))
+                .map(|f| Some(step.max(f) - step))
+                .unwrap_or(Some(step.max(len) - step))
         };
 
         Self::new(
@@ -465,6 +489,7 @@ impl App {
             self.mode,
             self.show_hidden,
             focus,
+            0,
         )
     }
 
@@ -493,6 +518,7 @@ impl App {
                     self.mode.clone(),
                     self.show_hidden,
                     focus,
+                    0,
                 )
             })
             .unwrap_or_else(|| Ok(self.to_owned()))
@@ -507,6 +533,7 @@ impl App {
             self.mode.clone(),
             self.show_hidden,
             Some(idx.clone()),
+            0,
         )
     }
 
@@ -519,6 +546,7 @@ impl App {
             self.mode.clone(),
             self.show_hidden,
             Some(DirectoryBuffer::relative_focus(idx.clone())),
+            0,
         )
     }
 
@@ -533,39 +561,51 @@ impl App {
             self.directory_buffer
                 .focus
                 .map(|f| ((f as isize) + idx).min(0) as usize), // TODO: make it safer
+            0,
         )
     }
 
-    pub fn enter(self) -> Result<Self, Error> {
-        let pwd = self
-            .directory_buffer
-            .focused()
-            .map(|(p, _)| p)
-            .map(|p| {
-                if p.is_dir() {
-                    p
-                } else {
-                    self.directory_buffer.pwd.clone()
-                }
-            })
-            .unwrap_or_else(|| self.directory_buffer.pwd.clone());
+    pub fn enter(mut self) -> Result<Self, Error> {
+        let mut step = self.number_input.max(1);
+        while step > 0 {
+            let pwd = self
+                .directory_buffer
+                .focused()
+                .map(|(p, _)| p)
+                .map(|p| {
+                    if p.is_dir() {
+                        p
+                    } else {
+                        self.directory_buffer.pwd.clone()
+                    }
+                })
+                .unwrap_or_else(|| self.directory_buffer.pwd.clone());
 
-        let focus = self.saved_buffers.get(&pwd).unwrap_or(&None);
+            let focus = self.saved_buffers.get(&pwd).unwrap_or(&None);
 
-        Self::new(
-            &self.config,
-            &pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            focus.clone(),
-        )
+            self = Self::new(
+                &self.config,
+                &pwd,
+                &self.saved_buffers,
+                &self.selected_paths,
+                self.mode,
+                self.show_hidden,
+                focus.clone(),
+                0,
+            )?;
+            step -= 1;
+        }
+        Ok(self)
     }
 
-    pub fn back(self) -> Result<Self, Error> {
-        let pwd = self.directory_buffer.pwd.clone();
-        self.focus_path(&pwd)
+    pub fn back(mut self) -> Result<Self, Error> {
+        let mut step = self.number_input.max(1);
+        while step > 0 {
+            let pwd = self.directory_buffer.pwd.clone();
+            self = self.focus_path(&pwd)?;
+            step -= 1;
+        }
+        Ok(self)
     }
 
     pub fn select(self) -> Result<Self, Error> {
@@ -587,6 +627,7 @@ impl App {
             Mode::Select,
             self.show_hidden,
             self.directory_buffer.focus,
+            0,
         )
     }
 
@@ -619,6 +660,7 @@ impl App {
             mode,
             self.show_hidden,
             self.directory_buffer.focus,
+            0,
         )
     }
 
@@ -638,6 +680,7 @@ impl App {
             mode,
             self.show_hidden,
             self.directory_buffer.focus,
+            self.number_input,
         )
     }
 
@@ -693,11 +736,15 @@ impl App {
     }
 
     pub fn actions_from_key(&self, key: &Key) -> Option<Vec<Action>> {
-        self.parsed_key_bindings.get(key).map(|(_, a)| a.to_owned())
+        match key {
+            Key::Number(n) => Some(vec![Action::NumberInput(*n)]),
+            key => self.parsed_key_bindings.get(key).map(|(_, a)| a.to_owned()),
+        }
     }
 
     pub fn handle(self, action: &Action) -> Result<Self, Error> {
         match action {
+            Action::NumberInput(n) => self.number_input(*n),
             Action::ToggleShowHidden => self.toggle_hidden(),
             Action::Back => self.back(),
             Action::Enter => self.enter(),
@@ -763,6 +810,7 @@ pub fn create() -> Result<App, Error> {
         Mode::Explore,
         config.general.show_hidden,
         None,
+        0,
     )?;
 
     if let Some(file) = file_to_focus {

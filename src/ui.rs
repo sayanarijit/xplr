@@ -2,7 +2,9 @@ use crate::app;
 use handlebars::Handlebars;
 use tui::backend::Backend;
 use tui::layout::{Constraint as TUIConstraint, Direction, Layout};
-use tui::widgets::{Block, Borders, Cell, List, ListItem, ListState, Row, Table, TableState};
+use tui::widgets::{
+    Block, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, TableState,
+};
 use tui::Frame;
 
 pub fn draw<B: Backend>(
@@ -105,7 +107,14 @@ pub fn draw<B: Backend>(
 
     let left_chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)].as_ref())
+        .constraints(
+            [
+                TUIConstraint::Percentage(40),
+                TUIConstraint::Percentage(50),
+                TUIConstraint::Min(1),
+            ]
+            .as_ref(),
+        )
         .split(chunks[1]);
 
     let selected: Vec<ListItem> = app
@@ -141,7 +150,12 @@ pub fn draw<B: Backend>(
         )
         .widths(&[TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)]);
 
+    // Input box
+    let input_box = Paragraph::new(format!("> {}", &app.number_input))
+        .block(Block::default().borders(Borders::ALL).title(" input "));
+
     f.render_stateful_widget(table, chunks[0], table_state);
     f.render_stateful_widget(selected_list, left_chunks[0], list_state);
     f.render_widget(help_menu, left_chunks[1]);
+    f.render_widget(input_box, left_chunks[2]);
 }

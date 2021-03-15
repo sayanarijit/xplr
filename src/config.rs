@@ -43,6 +43,7 @@ impl Mode {
         match (self, action) {
             // Special
             (_, Action::Terminate) => true,
+            (_, Action::NumberInput(_)) => true,
 
             // Explore mode
             (Self::Explore, Action::Back) => true,
@@ -126,6 +127,7 @@ pub struct CommandConfig {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Action {
+    NumberInput(u8),
     ToggleShowHidden,
     Back,
     Enter,
