@@ -1,66 +1,211 @@
 use crate::app;
+use crate::app::Node;
 use handlebars::Handlebars;
+use serde::{Deserialize, Serialize};
 use tui::backend::Backend;
+use tui::layout::Rect;
 use tui::layout::{Constraint as TUIConstraint, Direction, Layout};
 use tui::widgets::{
     Block, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, TableState,
 };
 use tui::Frame;
 
-pub fn draw<B: Backend>(
-    app: &app::App,
-    hb: &Handlebars,
-    f: &mut Frame<B>,
-    table_state: &mut TableState,
-    list_state: &mut ListState,
-) {
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .margin(1)
-        .constraints([TUIConstraint::Percentage(70), TUIConstraint::Percentage(30)].as_ref())
-        .split(f.size());
+const TOTAL_ROWS: usize = 50;
 
-    let body = app
-        .directory_buffer
-        .items
-        .iter()
-        .map(|(_, m)| {
-            let txt = hb
-                .render(app::TEMPLATE_TABLE_ROW, &m)
-                .ok()
-                .unwrap_or_else(|| app::UNSUPPORTED_STR.into())
-                .split("\t")
-                .map(|x| Cell::from(x.to_string()))
-                .collect::<Vec<Cell>>();
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct NodeUIMetadata {
+    // From Node
+    pub parent: String,
+    pub relative_path: String,
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_symlink: bool,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
 
-            let style = if m.is_focused {
-                app.config.general.focused_ui.style
-            } else if m.is_selected {
-                app.config.general.selected_ui.style
-            } else {
-                app.config
-                    .filetypes
-                    .special
-                    .get(&m.relative_path)
-                    .or_else(|| app.config.filetypes.extension.get(&m.extension))
-                    .unwrap_or_else(|| {
-                        if m.is_symlink {
-                            &app.config.filetypes.symlink
-                        } else if m.is_dir {
-                            &app.config.filetypes.directory
-                        } else {
-                            &app.config.filetypes.file
-                        }
-                    })
-                    .style
-            };
-            (txt, style)
+    // Extra
+    pub index: usize,
+    pub relative_index: usize,
+    pub is_before_focus: bool,
+    pub is_after_focus: bool,
+    pub tree: String,
+    pub icon: String,
+    pub prefix: String,
+    pub suffix: String,
+    pub is_selected: bool,
+    pub is_focused: bool,
+    pub total: usize,
+}
+
+impl NodeUIMetadata {
+    fn new(
+        node: &Node,
+        index: usize,
+        relative_index: usize,
+        is_before_focus: bool,
+        is_after_focus: bool,
+        tree: String,
+        icon: String,
+        prefix: String,
+        suffix: String,
+        is_selected: bool,
+        is_focused: bool,
+        total: usize,
+    ) -> Self {
+        Self {
+            parent: node.parent.clone(),
+            relative_path: node.relative_path.clone(),
+            absolute_path: node.absolute_path.clone(),
+            extension: node.extension.clone(),
+            is_symlink: node.is_symlink,
+            is_dir: node.is_dir,
+            is_file: node.is_file,
+            is_readonly: node.is_readonly,
+            mime_essence: node.mime_essence.clone(),
+            index,
+            relative_index,
+            is_before_focus,
+            is_after_focus,
+            tree,
+            icon,
+            prefix,
+            suffix,
+            is_selected,
+            is_focused,
+            total,
+        }
+    }
+}
+
+fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Handlebars) {
+    let config = app.config().to_owned();
+
+    let rows = app
+        .directory_buffer()
+        .map(|dir| {
+            let offset = (
+                dir.focus.max(TOTAL_ROWS) - TOTAL_ROWS,
+                dir.focus.max(TOTAL_ROWS),
+            );
+
+            dir.nodes
+                .iter()
+                .enumerate()
+                .skip_while(|(i, _)| *i < offset.0)
+                .take_while(|(i, _)| *i <= offset.1)
+                .map(|(index, node)| {
+                    let is_focused = dir.focus == index;
+
+                    // TODO : Optimize
+                    let is_selected = app.selected().contains(&node);
+
+                    let ui = if is_focused {
+                        &config.general.focused_ui
+                    } else if is_selected {
+                        &config.general.selected_ui
+                    } else {
+                        &config.general.normal_ui
+                    };
+
+                    let is_first = index == 0;
+                    let is_last = index == dir.total.max(1) - 1;
+
+                    let tree = config
+                        .general
+                        .table
+                        .tree
+                        .clone()
+                        .map(|t| {
+                            if is_last {
+                                t.2.format.clone()
+                            } else if is_first {
+                                t.0.format.clone()
+                            } else {
+                                t.1.format.clone()
+                            }
+                        })
+                        .unwrap_or_default();
+
+                    let filetype = config
+                        .filetypes
+                        .special
+                        .get(&node.relative_path)
+                        .or_else(|| config.filetypes.extension.get(&node.extension))
+                        .or_else(|| config.filetypes.mime_essence.get(&node.mime_essence))
+                        .unwrap_or_else(|| {
+                            if node.is_symlink {
+                                &config.filetypes.symlink
+                            } else if node.is_dir {
+                                &config.filetypes.directory
+                            } else {
+                                &config.filetypes.file
+                            }
+                        });
+
+                    let (relative_index, is_before_focus, is_after_focus) = if dir.focus > index {
+                        (dir.focus - index, true, false)
+                    } else if dir.focus < index {
+                        (index - dir.focus, false, true)
+                    } else {
+                        (0, false, false)
+                    };
+
+                    let meta = NodeUIMetadata::new(
+                        &node,
+                        index,
+                        relative_index,
+                        is_before_focus,
+                        is_after_focus,
+                        tree,
+                        filetype.icon.clone(),
+                        ui.prefix.clone(),
+                        ui.suffix.clone(),
+                        is_selected,
+                        is_focused,
+                        dir.total,
+                    );
+
+                    let cols = hb
+                        .render(app::TEMPLATE_TABLE_ROW, &meta)
+                        .ok()
+                        .unwrap_or_else(|| app::UNSUPPORTED_STR.into())
+                        .split("\t")
+                        .map(|x| Cell::from(x.to_string()))
+                        .collect::<Vec<Cell>>();
+
+                    let style = if is_focused {
+                        config.general.focused_ui.style
+                    } else if is_selected {
+                        config.general.selected_ui.style
+                    } else {
+                        config
+                            .filetypes
+                            .special
+                            .get(&node.relative_path)
+                            .or_else(|| config.filetypes.extension.get(&node.extension))
+                            .or_else(|| config.filetypes.mime_essence.get(&node.mime_essence))
+                            .unwrap_or_else(|| {
+                                if node.is_symlink {
+                                    &config.filetypes.symlink
+                                } else if node.is_dir {
+                                    &config.filetypes.directory
+                                } else {
+                                    &config.filetypes.file
+                                }
+                            })
+                            .style
+                    };
+
+                    Row::new(cols).style(style)
+                })
+                .collect::<Vec<Row>>()
         })
-        .map(|(t, s)| Row::new(t).style(s))
-        .collect::<Vec<Row>>();
+        .unwrap_or_default();
 
-    let table_constraints: Vec<TUIConstraint> = app
-        .config
+    let table_constraints: Vec<TUIConstraint> = config
         .general
         .table
         .col_widths
@@ -69,18 +214,18 @@ pub fn draw<B: Backend>(
         .map(|c| c.into())
         .collect();
 
-    let table = Table::new(body)
+    let table = Table::new(rows)
         .widths(&table_constraints)
-        .style(app.config.general.table.style)
-        .highlight_style(app.config.general.focused_ui.style)
-        .column_spacing(app.config.general.table.col_spacing)
-        .block(Block::default().borders(Borders::ALL).title(format!(
-            " {} ",
-            app.directory_buffer.pwd.to_str().unwrap_or("???")
-        )));
+        .style(config.general.table.style)
+        .highlight_style(config.general.focused_ui.style)
+        .column_spacing(config.general.table.col_spacing)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(format!(" {} ", app.pwd())),
+        );
 
-    let table = app
-        .config
+    let table = config
         .general
         .table
         .header
@@ -99,29 +244,17 @@ pub fn draw<B: Backend>(
         })
         .unwrap_or_else(|| table.clone());
 
-    table_state.select(
-        app.directory_buffer
-            .focus
-            .map(app::DirectoryBuffer::relative_focus),
-    );
+    let mut table_state = TableState::default();
+    table_state.select(app.directory_buffer().map(|dir| dir.focus));
 
-    let left_chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints(
-            [
-                TUIConstraint::Percentage(40),
-                TUIConstraint::Percentage(50),
-                TUIConstraint::Min(1),
-            ]
-            .as_ref(),
-        )
-        .split(chunks[1]);
+    f.render_stateful_widget(table, rect, &mut table_state);
+}
 
+fn draw_selected<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     let selected: Vec<ListItem> = app
-        .selected_paths
+        .selected()
         .iter()
-        .map(|p| p.to_str().unwrap_or(app::UNSUPPORTED_STR))
-        .map(String::from)
+        .map(|n| n.absolute_path.clone())
         .map(ListItem::new)
         .collect();
 
@@ -134,28 +267,122 @@ pub fn draw<B: Backend>(
             .title(format!(" Selected ({}) ", selected_count)),
     );
 
+    let mut list_state = ListState::default();
+    if selected_count > 0 {
+        list_state.select(Some(selected_count.max(1) - 1));
+    }
+    f.render_stateful_widget(selected_list, rect, &mut list_state);
+}
+
+fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     // Help menu
-    let help_menu_rows: Vec<Row> = app
-        .parsed_help_menu
+    let mode = app.mode();
+    let extra_help_lines = mode
+        .extra_help
         .clone()
-        .iter()
-        .map(|(h, k)| Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())]))
-        .collect();
+        .map(|e| e.lines().map(|l| l.to_string()).collect::<Vec<String>>());
+
+    let help_menu_rows: Vec<Row> = mode
+        .help
+        .clone()
+        .map(|h| {
+            h.lines()
+                .map(|l| Row::new(vec![Cell::from(l.to_string())]))
+                .collect()
+        })
+        .unwrap_or_else(|| {
+            extra_help_lines
+                .unwrap_or_default()
+                .into_iter()
+                .map(|l| Row::new(vec![Cell::from(l)]))
+                .chain(mode.key_bindings.on_key.iter().filter_map(|(k, a)| {
+                    a.help.clone().map(|h| {
+                        Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                    })
+                }))
+                .chain(
+                    mode.key_bindings
+                        .on_alphabet
+                        .iter()
+                        .map(|a| ("a-Z", a.help.clone()))
+                        .filter_map(|(k, mh)| {
+                            mh.map(|h| {
+                                Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                            })
+                        }),
+                )
+                .chain(
+                    mode.key_bindings
+                        .on_number
+                        .iter()
+                        .map(|a| ("0-9", a.help.clone()))
+                        .filter_map(|(k, mh)| {
+                            mh.map(|h| {
+                                Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                            })
+                        }),
+                )
+                .chain(
+                    mode.key_bindings
+                        .on_special_character
+                        .iter()
+                        .map(|a| ("spcl chars", a.help.clone()))
+                        .filter_map(|(k, mh)| {
+                            mh.map(|h| {
+                                Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                            })
+                        }),
+                )
+                .chain(
+                    mode.key_bindings
+                        .default
+                        .iter()
+                        .map(|a| ("default", a.help.clone()))
+                        .filter_map(|(k, mh)| {
+                            mh.map(|h| {
+                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
+                            })
+                        }),
+                )
+                .collect::<Vec<Row>>()
+        });
 
     let help_menu = Table::new(help_menu_rows)
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(format!(" Help [{}] ", &app.mode)),
+                .title(format!(" Help [{}] ", &mode.name)),
         )
         .widths(&[TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)]);
+    f.render_widget(help_menu, rect);
+}
 
-    // Input box
-    let input_box = Paragraph::new(format!("> {}", &app.number_input))
+fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+    let input_buf = Paragraph::new(format!("> {}", app.input_buffer().unwrap_or(&"".into())))
         .block(Block::default().borders(Borders::ALL).title(" input "));
+    f.render_widget(input_buf, rect);
+}
 
-    f.render_stateful_widget(table, chunks[0], table_state);
-    f.render_stateful_widget(selected_list, left_chunks[0], list_state);
-    f.render_widget(help_menu, left_chunks[1]);
-    f.render_widget(input_box, left_chunks[2]);
+pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
+    let rect = f.size();
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([TUIConstraint::Max(rect.height - 5), TUIConstraint::Max(3)].as_ref())
+        .split(rect);
+
+    let upper_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([TUIConstraint::Percentage(70), TUIConstraint::Percentage(30)].as_ref())
+        .split(chunks[0]);
+
+    let upper_left_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([TUIConstraint::Percentage(50), TUIConstraint::Percentage(50)].as_ref())
+        .split(upper_chunks[1]);
+
+    draw_input_buffer(f, chunks[1], app, hb);
+    draw_table(f, upper_chunks[0], app, hb);
+    draw_selected(f, upper_left_chunks[0], app, hb);
+    draw_help_menu(f, upper_left_chunks[1], app, hb);
 }

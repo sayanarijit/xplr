@@ -1,349 +1,23 @@
+use crate::app::ExternalMsg;
 use crate::app::VERSION;
-use crate::input::Key;
+use dirs;
 use serde::{Deserialize, Serialize};
+use serde_yaml;
+use std::collections::BTreeMap;
 use std::collections::HashMap;
-use std::fmt;
+use std::fs;
 use tui::layout::Constraint as TUIConstraint;
 use tui::style::Color;
 use tui::style::Modifier;
 use tui::style::Style;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Mode {
-    Explore,
-    ExploreSubmode(String),
-    Select,
-    SelectSubmode(String),
-}
-
-impl fmt::Display for Mode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Explore => {
-                write!(f, "explore")
-            }
-
-            Self::Select => {
-                write!(f, "select")
-            }
-
-            Self::ExploreSubmode(s) => {
-                write!(f, "explore({})", &s)
-            }
-
-            Self::SelectSubmode(s) => {
-                write!(f, "select({})", &s)
-            }
-        }
-    }
-}
-
-impl Mode {
-    pub fn does_support(self, action: &Action) -> bool {
-        match (self, action) {
-            // Special
-            (_, Action::Terminate) => true,
-            (_, Action::NumberInput(_)) => true,
-
-            // Explore mode
-            (Self::Explore, Action::Back) => true,
-            (Self::Explore, Action::Call(_)) => true,
-            (Self::Explore, Action::ChangeDirectory(_)) => true,
-            (Self::Explore, Action::Enter) => true,
-            (Self::Explore, Action::EnterSubmode(_)) => true,
-            (Self::Explore, Action::ExitSubmode) => false,
-            (Self::Explore, Action::FocusFirst) => true,
-            (Self::Explore, Action::FocusLast) => true,
-            (Self::Explore, Action::FocusNext) => true,
-            (Self::Explore, Action::FocusPath(_)) => true,
-            (Self::Explore, Action::FocusPathByBufferRelativeIndex(_)) => true,
-            (Self::Explore, Action::FocusPathByFocusRelativeIndex(_)) => true,
-            (Self::Explore, Action::FocusPathByIndex(_)) => true,
-            (Self::Explore, Action::FocusPrevious) => true,
-            (Self::Explore, Action::PrintAppState) => true,
-            (Self::Explore, Action::PrintFocused) => true,
-            (Self::Explore, Action::PrintSelected) => false,
-            (Self::Explore, Action::Quit) => true,
-            (Self::Explore, Action::Select) => true,
-            (Self::Explore, Action::ToggleSelection) => false,
-            (Self::Explore, Action::ToggleShowHidden) => true,
-
-            // Explore submode
-            (Self::ExploreSubmode(_), Action::ExitSubmode) => true,
-            (Self::ExploreSubmode(_), a) => Self::does_support(Self::Explore, a),
-
-            // Select mode
-            (Self::Select, Action::Back) => true,
-            (Self::Select, Action::Call(_)) => true,
-            (Self::Select, Action::ChangeDirectory(_)) => true,
-            (Self::Select, Action::Enter) => true,
-            (Self::Select, Action::EnterSubmode(_)) => true,
-            (Self::Select, Action::ExitSubmode) => true,
-            (Self::Select, Action::FocusFirst) => true,
-            (Self::Select, Action::FocusLast) => true,
-            (Self::Select, Action::FocusNext) => true,
-            (Self::Select, Action::FocusPath(_)) => true,
-            (Self::Select, Action::FocusPathByBufferRelativeIndex(_)) => true,
-            (Self::Select, Action::FocusPathByFocusRelativeIndex(_)) => true,
-            (Self::Select, Action::FocusPathByIndex(_)) => true,
-            (Self::Select, Action::FocusPrevious) => true,
-            (Self::Select, Action::PrintAppState) => true,
-            (Self::Select, Action::PrintFocused) => false,
-            (Self::Select, Action::PrintSelected) => true,
-            (Self::Select, Action::Quit) => true,
-            (Self::Select, Action::Select) => false,
-            (Self::Select, Action::ToggleSelection) => true,
-            (Self::Select, Action::ToggleShowHidden) => true,
-
-            // Select submode
-            (Self::SelectSubmode(_), Action::ExitSubmode) => true,
-            (Self::SelectSubmode(_), a) => Self::does_support(Self::Select, a),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Format {
-    Line,
-    Pretty,
-    Yaml,
-    YamlPretty,
-    Template(String),
-}
-
-impl Default for Format {
-    fn default() -> Self {
-        Self::Line
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct CommandConfig {
-    pub command: String,
+pub struct Action {
+    #[serde(default)]
+    pub help: Option<String>,
 
     #[serde(default)]
-    pub args: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Action {
-    NumberInput(u8),
-    ToggleShowHidden,
-    Back,
-    Enter,
-    FocusPrevious,
-    FocusNext,
-    FocusFirst,
-    FocusLast,
-    FocusPathByIndex(usize),
-    FocusPathByBufferRelativeIndex(usize),
-    FocusPathByFocusRelativeIndex(isize),
-    FocusPath(String),
-    ChangeDirectory(String),
-    Call(CommandConfig),
-    EnterSubmode(String),
-    ExitSubmode,
-    Select,
-    // Unselect,
-    // SelectAll,
-    // SelectAllRecursive,
-    // UnselectAll,
-    // UnSelectAllRecursive,
-    ToggleSelection,
-    // ClearSelectedPaths,
-
-    // Quit options
-    PrintFocused,
-    PrintSelected,
-    PrintAppState,
-    Quit,
-    Terminate,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ActionMenu {
-    #[serde(default)]
-    pub help: String,
-    pub actions: Vec<Action>,
-}
-
-pub type SubmodeActionMenu = HashMap<Key, ActionMenu>;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct KeyBindings {
-    pub global: HashMap<Key, ActionMenu>,
-    #[serde(default)]
-    pub explore_mode: HashMap<Key, ActionMenu>,
-    #[serde(default)]
-    pub explore_submodes: HashMap<String, SubmodeActionMenu>,
-    #[serde(default)]
-    pub select_mode: HashMap<Key, ActionMenu>,
-    #[serde(default)]
-    pub select_submodes: HashMap<String, SubmodeActionMenu>,
-}
-
-impl KeyBindings {
-    pub fn filtered(&self, mode: &Mode) -> HashMap<Key, (String, Vec<Action>)> {
-        let mode_bindings: Option<HashMap<Key, ActionMenu>> = match mode {
-            Mode::Explore => Some(self.explore_mode.clone()),
-            Mode::ExploreSubmode(s) => self.explore_submodes.clone().get(s).map(|a| a.to_owned()),
-            Mode::Select => Some(self.select_mode.clone()),
-            Mode::SelectSubmode(s) => self.select_submodes.clone().get(s).map(|a| a.to_owned()),
-        };
-
-        let kb = self.global.clone().into_iter();
-
-        let kb: HashMap<Key, ActionMenu> = if let Some(modal_kb) = mode_bindings {
-            kb.chain(modal_kb.into_iter()).collect()
-        } else {
-            kb.collect()
-        };
-
-        kb.into_iter()
-            .map(|(k, am)| {
-                (
-                    k.clone(),
-                    (
-                        am.help,
-                        am.actions
-                            .into_iter()
-                            .filter(|a| mode.clone().does_support(a))
-                            .collect::<Vec<Action>>(),
-                    ),
-                )
-            })
-            .filter(|(_, (_, actions))| !actions.is_empty())
-            .collect()
-    }
-}
-
-impl Default for KeyBindings {
-    fn default() -> Self {
-        let yaml = r###"
-            global:
-              ctrl-c:
-                help: quit
-                actions:
-                  - Terminate
-              q:
-                help: quit
-                actions:
-                  - Quit
-              pound:
-                help: print debug info
-                actions:
-                  - PrintAppState
-              up:
-                help: up
-                actions:
-                  - FocusPrevious
-              down:
-                help: down
-                actions:
-                  - FocusNext
-              shift-g:
-                help: bottom
-                actions:
-                  - FocusLast
-              tilde:
-                help: go home
-                actions:
-                  - ChangeDirectory: "~"
-              dot:
-                help: toggle show hidden
-                actions:
-                  - ToggleShowHidden
-              right:
-                help: enter
-                actions:
-                  - Enter
-              left:
-                help: back
-                actions:
-                  - Back
-              o:
-                help: open
-                actions:
-                  - Call:
-                      command: bash
-                      args:
-                        - "-c"
-                        - FILE="{{relativePath}}" && xdg-open "${FILE:?}" &> /dev/null
-              e:
-                help: edit
-                actions:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - FILE="{{relativePath}}" && "${EDITOR:-vim}" "${FILE:?}"
-              forward-slash:
-                help: search
-                actions:
-                  - Call:
-                      command: bash
-                      args:
-                        - "-c"
-                        - FILE="$(ls -a | fzf)" && xplr "${FILE:?}" || xplr "${PWD:?}"
-                  - Quit
-
-              s:
-                help: shell
-                actions:
-                  - Call:
-                      command: bash
-
-              esc:
-                help: quit
-                actions:
-                  - Quit
-
-            explore_mode:
-              g:
-                help: go to
-                actions:
-                  - EnterSubmode: GoTo
-              return:
-                help: done
-                actions:
-                  - PrintFocused
-              space:
-                help: select
-                actions:
-                  - Select
-                  - FocusNext
-            explore_submodes:
-              GoTo:
-                g:
-                  help: top
-                  actions:
-                    - FocusFirst
-                    - ExitSubmode
-            select_mode:
-              space:
-                help: toggle selection
-                actions:
-                  - ToggleSelection
-                  - FocusNext
-              g:
-                help: go to
-                actions:
-                  - EnterSubmode: GoTo
-              return:
-                help: done
-                actions:
-                  - PrintSelected
-                  - Quit
-            select_submodes:
-              GoTo:
-                g:
-                  help: top
-                  actions:
-                    - FocusFirst
-                    - ExitSubmode
-            "###;
-        serde_yaml::from_str(yaml).unwrap()
-    }
+    pub messages: Vec<ExternalMsg>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -362,6 +36,8 @@ pub struct FileTypesConfig {
     pub file: FileTypeConfig,
     #[serde(default)]
     pub symlink: FileTypeConfig,
+    #[serde(default)]
+    pub mime_essence: HashMap<String, FileTypeConfig>,
     #[serde(default)]
     pub extension: HashMap<String, FileTypeConfig>,
     #[serde(default)]
@@ -390,6 +66,7 @@ impl Default for FileTypesConfig {
                     .fg(Color::Cyan),
             },
 
+            mime_essence: Default::default(),
             extension: Default::default(),
             special: Default::default(),
         }
@@ -472,12 +149,16 @@ pub struct TableConfig {
 pub struct GeneralConfig {
     #[serde(default)]
     pub show_hidden: bool,
+
     #[serde(default)]
     pub table: TableConfig,
+
     #[serde(default)]
     pub normal_ui: UIConfig,
+
     #[serde(default)]
     pub focused_ui: UIConfig,
+
     #[serde(default)]
     pub selected_ui: UIConfig,
 }
@@ -489,9 +170,9 @@ impl Default for GeneralConfig {
           table:
             header:
               cols:
-              - format: "│      path"
-              - format: "is symlink"
-              - format: "index"
+              - format: "│     path"
+              - format: "type"
+              - format: " index"
               height: 1
               style:
                 add_modifier:
@@ -500,9 +181,9 @@ impl Default for GeneralConfig {
                   bits: 0
             row:
               cols:
-              - format: "{{tree}}{{prefix}}{{icon}} {{relativePath}}{{#if isDir}}/{{/if}}{{suffix}}"
-              - format: "{{isSymlink}}"
-              - format: "{{focusRelativeIndex}}/{{bufferRelativeIndex}}/{{index}}/{{total}}"
+              - format: "{{{tree}}}{{{prefix}}}{{{icon}}} {{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}"
+              - format: "{{{mimeEssence}}}"
+              - format: "{{#if isBeforeFocus}}-{{else}} {{/if}}{{{relativeIndex}}}/{{{index}}}/{{{total}}}"
 
             col_spacing: 3
             col_widths:
@@ -544,6 +225,203 @@ impl Default for GeneralConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PipesConfig {
+    pub msg_in: String,
+    pub focus_out: String,
+    pub selected_out: String,
+    pub mode_out: String,
+}
+
+impl Default for PipesConfig {
+    fn default() -> Self {
+        let pipesdir = dirs::runtime_dir()
+            .unwrap_or("/tmp".into())
+            .join("xplr")
+            .join("session")
+            .join(std::process::id().to_string())
+            .join("pipe");
+
+        fs::create_dir_all(&pipesdir).unwrap();
+
+        let msg_in = pipesdir.join("msg_in").to_string_lossy().to_string();
+
+        let focus_out = pipesdir.join("focus_out").to_string_lossy().to_string();
+
+        let selected_out = pipesdir.join("selected_out").to_string_lossy().to_string();
+
+        let mode_out = pipesdir.join("mode_out").to_string_lossy().to_string();
+
+        fs::write(&msg_in, "").unwrap();
+        fs::write(&focus_out, "").unwrap();
+        fs::write(&selected_out, "").unwrap();
+        fs::write(&mode_out, "").unwrap();
+
+        Self {
+            msg_in,
+            focus_out,
+            selected_out,
+            mode_out,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KeyBindings {
+    #[serde(default)]
+    pub on_key: BTreeMap<String, Action>,
+
+    #[serde(default)]
+    pub on_alphabet: Option<Action>,
+
+    #[serde(default)]
+    pub on_number: Option<Action>,
+
+    #[serde(default)]
+    pub on_special_character: Option<Action>,
+
+    #[serde(default)]
+    pub default: Option<Action>,
+}
+
+impl Default for KeyBindings {
+    fn default() -> Self {
+        let on_key: BTreeMap<String, Action> = serde_yaml::from_str(
+            r###"
+              up:
+                help: up
+                messages:
+                  - FocusPrevious
+
+              down:
+                help: down
+                messages:
+                  - FocusNext
+
+              right:
+                help: enter
+                messages:
+                  - Enter
+
+              left:
+                help: back
+                messages:
+                  - Back
+
+              g:
+                help: go to
+                messages:
+                  - SwitchMode: goto
+
+              G:
+                help: bottom
+                messages:
+                  - FocusLast
+
+              s:
+                help: shell
+                messages:
+                  - Call:
+                      command: bash
+                      args: []
+
+              /:
+                help: find
+                messages:
+                  - Call:
+                      command: bash
+                      args:
+                        - "-c"
+                        - |
+                            PTH="$(echo -e ${XPLR_DIRECTORY_NODES:?} | sed -s 's/,/\n/g' | fzf)"
+                            if [ -d "$PTH" ]; then
+                                echo "ChangeDirectory: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                            elif [ -f "$PTH" ]; then
+                                echo "FocusPath: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                            fi
+
+              space:
+                help: toggle selection
+                messages:
+                  - ToggleSelection
+                  - FocusNext
+
+              d:
+                help: debug
+                messages:
+                  - Debug: /tmp/xplr.yml
+
+              enter:
+                help: quit with result
+                messages:
+                  - PrintResultAndQuit
+
+              "#":
+                help: quit with debug
+                messages:
+                  - PrintAppStateAndQuit
+
+              esc:
+                help: cancel & quit
+                messages:
+                  - Terminate
+
+              q:
+                help: cancel & quit
+                messages:
+                  - Terminate
+            "###,
+        )
+        .unwrap();
+
+        let default = Some(Action {
+            help: None,
+            messages: vec![ExternalMsg::SwitchMode("default".into())],
+        });
+
+        let on_number = Some(Action {
+            help: Some("input".to_string()),
+            messages: vec![
+                ExternalMsg::BufferStringFromKey,
+                ExternalMsg::SwitchMode("number".into()),
+            ],
+        });
+
+        Self {
+            on_key,
+            on_alphabet: Default::default(),
+            on_number,
+            on_special_character: Default::default(),
+            default,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Mode {
+    pub name: String,
+
+    #[serde(default)]
+    pub help: Option<String>,
+
+    #[serde(default)]
+    pub extra_help: Option<String>,
+
+    #[serde(default)]
+    pub key_bindings: KeyBindings,
+}
+
+impl Default for Mode {
+    fn default() -> Self {
+        Self {
+            name: "default".into(),
+            help: Default::default(),
+            extra_help: Default::default(),
+            key_bindings: Default::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
     pub version: String,
 
@@ -554,16 +432,78 @@ pub struct Config {
     pub filetypes: FileTypesConfig,
 
     #[serde(default)]
-    pub key_bindings: KeyBindings,
+    pub pipes: PipesConfig,
+
+    #[serde(default)]
+    pub modes: HashMap<String, Mode>,
 }
 
 impl Default for Config {
     fn default() -> Self {
+        let goto_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: go to
+              key_bindings:
+                on_key:
+                  g:
+                    help: top
+                    messages:
+                      - FocusFirst
+                      - SwitchMode: default
+            "###,
+        )
+        .unwrap();
+
+        let number_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: number
+              key_bindings:
+                on_key:
+                  up:
+                    help: go up
+                    messages:
+                      - FocusPreviousByRelativeIndexFromInput
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  down:
+                    help: go down
+                    messages:
+                      - FocusNextByRelativeIndexFromInput
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  enter:
+                    help: go down
+                    messages:
+                      - FocusByIndexFromInput
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                on_number:
+                  help: input
+                  messages:
+                    - BufferStringFromKey
+
+                default:
+                  messages:
+                    - ResetInputBuffer
+                    - SwitchMode: default
+            "###,
+        )
+        .unwrap();
+
+        let mut modes: HashMap<String, Mode> = Default::default();
+        modes.insert("default".into(), Mode::default());
+        modes.insert("goto".into(), goto_mode);
+        modes.insert("number".into(), number_mode);
+
         Self {
             version: VERSION.into(),
             general: Default::default(),
             filetypes: Default::default(),
-            key_bindings: Default::default(),
+            pipes: Default::default(),
+            modes,
         }
     }
 }

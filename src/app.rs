@@ -1,821 +1,593 @@
-use crate::config::{Action, CommandConfig, Config, Mode};
+use crate::config::Config;
+use crate::config::Mode;
 use crate::error::Error;
 use crate::input::Key;
-use dirs;
+use mime_guess;
 use serde::{Deserialize, Serialize};
-use serde_yaml;
+use std::cmp::Ordering;
+use std::collections::BinaryHeap;
 use std::collections::HashMap;
-use std::collections::HashSet;
-use std::fs;
-use std::fs::File;
-use std::io::BufReader;
-use std::path::Path;
+use std::collections::VecDeque;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.1.13"; // Update Cargo.toml
-pub const UNSUPPORTED_STR: &str = "???";
-pub const TOTAL_ROWS: usize = 50;
+pub const VERSION: &str = "v0.2.0"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
-fn expand_tilde<P: AsRef<Path>>(path_user_input: P) -> Option<PathBuf> {
-    let p = path_user_input.as_ref();
-    if !p.starts_with("~") {
-        return Some(p.to_path_buf());
-    }
-    if p == Path::new("~") {
-        return dirs::home_dir();
-    }
-    dirs::home_dir().map(|mut h| {
-        if h == Path::new("/") {
-            // Corner case: `h` root directory;
-            // don't prepend extra `/`, just drop the tilde.
-            p.strip_prefix("~").unwrap().to_path_buf()
-        } else {
-            h.push(p.strip_prefix("~/").unwrap());
-            h
-        }
-    })
-}
+pub const UNSUPPORTED_STR: &str = "???";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DirectoryBuffer {
-    pub pwd: PathBuf,
-    pub focus: Option<usize>,
-    pub items: Vec<(PathBuf, DirectoryItemMetadata)>,
-    pub total: usize,
-}
-
-impl DirectoryBuffer {
-    pub fn relative_focus(focus: usize) -> usize {
-        focus.min(TOTAL_ROWS)
-    }
-
-    pub fn explore(
-        path: &PathBuf,
-        show_hidden: bool,
-    ) -> Result<(usize, impl Iterator<Item = (PathBuf, String)>), Error> {
-        let hide_hidden = !show_hidden;
-
-        let total = fs::read_dir(&path)?
-            .filter_map(|d| d.ok().map(|e| e.path()))
-            .filter_map(|p| p.canonicalize().ok())
-            .filter_map(|abs_path| {
-                abs_path
-                    .file_name()
-                    .map(|rel_path| rel_path.to_str().unwrap_or(UNSUPPORTED_STR).to_string())
-            })
-            .filter(|rel_path| !(hide_hidden && rel_path.starts_with('.')))
-            .count();
-
-        let items = fs::read_dir(&path)?
-            .filter_map(|d| d.ok().map(|e| e.path()))
-            .filter_map(|p| p.canonicalize().ok())
-            .filter_map(|abs_path| {
-                abs_path.file_name().map(|rel_path| {
-                    (
-                        abs_path.to_path_buf(),
-                        rel_path.to_str().unwrap_or(UNSUPPORTED_STR).to_string(),
-                    )
-                })
-            })
-            .filter(move |(_, rel_path)| !(hide_hidden && rel_path.starts_with('.')));
-        Ok((total, items))
-    }
-
-    pub fn load(
-        config: &Config,
-        focus: Option<usize>,
-        path: &PathBuf,
-        show_hidden: bool,
-        selected_paths: &HashSet<PathBuf>,
-    ) -> Result<DirectoryBuffer, Error> {
-        let offset = focus
-            .map(|f| (f.max(TOTAL_ROWS) - TOTAL_ROWS, f.max(TOTAL_ROWS)))
-            .unwrap_or((0, TOTAL_ROWS));
-
-        let (total, items) = DirectoryBuffer::explore(&path, show_hidden)?;
-        let visible: Vec<(PathBuf, DirectoryItemMetadata)> = items
-            .enumerate()
-            .skip_while(|(i, _)| *i < offset.0)
-            .take_while(|(i, _)| *i <= offset.1)
-            .enumerate()
-            .map(|(rel_idx, (net_idx, (abs, rel)))| {
-                let ext = abs
-                    .extension()
-                    .and_then(|s| s.to_str())
-                    .unwrap_or("")
-                    .to_string();
-                (net_idx, rel_idx, abs, rel, ext)
-            })
-            .map(|(net_idx, rel_idx, abs, rel, ext)| {
-                let absolute_path: String =
-                    abs.as_os_str().to_str().unwrap_or(UNSUPPORTED_STR).into();
-                let relative_path = rel.to_string();
-                let extension = ext.to_string();
-                let is_dir = abs.is_dir();
-                let is_file = abs.is_file();
-
-                let maybe_meta = abs.metadata().ok();
-
-                let is_symlink = maybe_meta
-                    .clone()
-                    .map(|m| m.file_type().is_symlink())
-                    .unwrap_or(false);
-
-                let is_readonly = maybe_meta
-                    .clone()
-                    .map(|m| m.permissions().readonly())
-                    .unwrap_or(false);
-
-                let (focus_idx, is_focused) =
-                    focus.map(|f| (f, net_idx == f)).unwrap_or((0, false));
-                let is_selected = selected_paths.contains(&abs);
-
-                let ui = if is_focused {
-                    &config.general.focused_ui
-                } else if is_selected {
-                    &config.general.selected_ui
-                } else {
-                    &config.general.normal_ui
-                };
-
-                let is_first = net_idx == 0;
-                let is_last = net_idx == total.max(1) - 1;
-
-                let tree = config
-                    .general
-                    .table
-                    .tree
-                    .clone()
-                    .map(|t| {
-                        if is_last {
-                            t.2.format.clone()
-                        } else if is_first {
-                            t.0.format.clone()
-                        } else {
-                            t.1.format.clone()
-                        }
-                    })
-                    .unwrap_or_default();
-
-                let filetype = config
-                    .filetypes
-                    .special
-                    .get(&relative_path)
-                    .or_else(|| config.filetypes.extension.get(&extension))
-                    .unwrap_or_else(|| {
-                        if is_symlink {
-                            &config.filetypes.symlink
-                        } else if is_dir {
-                            &config.filetypes.directory
-                        } else {
-                            &config.filetypes.file
-                        }
-                    });
-
-                let focus_relative_index = if focus_idx <= net_idx {
-                    format!(" {}", net_idx - focus_idx)
-                } else {
-                    format!("-{}", focus_idx - net_idx)
-                };
-
-                let m = DirectoryItemMetadata {
-                    absolute_path,
-                    relative_path,
-                    extension,
-                    icon: filetype.icon.clone(),
-                    prefix: ui.prefix.clone(),
-                    suffix: ui.suffix.clone(),
-                    tree: tree.into(),
-                    is_symlink,
-                    is_first,
-                    is_last,
-                    is_dir,
-                    is_file,
-                    is_readonly,
-                    is_selected,
-                    is_focused,
-                    index: net_idx + 1,
-                    focus_relative_index,
-                    buffer_relative_index: rel_idx + 1,
-                    total: total,
-                };
-                (abs.to_owned(), m)
-            })
-            .collect();
-
-        let focus = focus.map(|f| {
-            if Self::relative_focus(f) >= visible.len() {
-                visible.len().max(1) - 1
-            } else {
-                f
-            }
-        });
-
-        Ok(Self {
-            pwd: path.into(),
-            total,
-            items: visible,
-            focus,
-        })
-    }
-
-    pub fn focused(&self) -> Option<(PathBuf, DirectoryItemMetadata)> {
-        self.focus.and_then(|f| {
-            self.items
-                .get(Self::relative_focus(f))
-                .map(|f| f.to_owned())
-        })
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DirectoryItemMetadata {
-    pub absolute_path: String,
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Node {
+    pub parent: String,
     pub relative_path: String,
+    pub absolute_path: String,
     pub extension: String,
-    pub icon: String,
-    pub prefix: String,
-    pub suffix: String,
-    pub tree: String,
-    pub is_first: bool,
-    pub is_last: bool,
     pub is_symlink: bool,
     pub is_dir: bool,
     pub is_file: bool,
     pub is_readonly: bool,
-    pub is_selected: bool,
-    pub is_focused: bool,
-    pub index: usize,
-    pub focus_relative_index: String,
-    pub buffer_relative_index: usize,
+    pub mime_essence: String,
+}
+
+impl Node {
+    pub fn new(parent: String, relative_path: String) -> Self {
+        let absolute_path = PathBuf::from(&parent)
+            .join(&relative_path)
+            .canonicalize()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
+
+        let path = PathBuf::from(&absolute_path);
+
+        let extension = path
+            .extension()
+            .map(|e| e.to_string_lossy().to_string())
+            .unwrap_or_default();
+
+        let maybe_metadata = path.metadata().ok();
+
+        let is_symlink = maybe_metadata
+            .clone()
+            .map(|m| m.file_type().is_symlink())
+            .unwrap_or(false);
+
+        let is_dir = maybe_metadata.clone().map(|m| m.is_dir()).unwrap_or(false);
+
+        let is_file = maybe_metadata.clone().map(|m| m.is_file()).unwrap_or(false);
+
+        let is_readonly = maybe_metadata
+            .map(|m| m.permissions().readonly())
+            .unwrap_or(false);
+
+        let mime_essence = mime_guess::from_path(&path)
+            .first()
+            .map(|m| m.essence_str().to_string())
+            .unwrap_or_default();
+
+        Self {
+            parent,
+            relative_path,
+            absolute_path,
+            extension,
+            is_symlink,
+            is_dir,
+            is_file,
+            is_readonly,
+            mime_essence,
+        }
+    }
+}
+
+impl Ord for Node {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Notice that the we flip the ordering on costs.
+        // In case of a tie we compare positions - this step is necessary
+        // to make implementations of `PartialEq` and `Ord` consistent.
+        other.relative_path.cmp(&self.relative_path)
+    }
+}
+impl PartialOrd for Node {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct DirectoryBuffer {
+    pub parent: String,
+    pub nodes: Vec<Node>,
     pub total: usize,
+    pub focus: usize,
 }
 
-pub fn parse_help_menu<'a>(
-    kb: impl Iterator<Item = (&'a Key, &'a (String, Vec<Action>))>,
-) -> Vec<(String, String)> {
-    let mut m = kb
-        .map(|(k, a)| {
-            (
-                a.0.clone(),
-                serde_yaml::to_string(k)
-                    .unwrap()
-                    .strip_prefix("---")
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string(),
-            )
-        })
-        .collect::<Vec<(String, String)>>();
-    m.sort();
-    m
+impl DirectoryBuffer {
+    pub fn new(parent: String, nodes: Vec<Node>, focus: usize) -> Self {
+        let total = nodes.len();
+        Self {
+            parent,
+            nodes,
+            total,
+            focus,
+        }
+    }
+
+    pub fn focused_node(&self) -> Option<&Node> {
+        self.nodes.get(self.focus)
+    }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Task {
-    NoOp,
-    Quit,
-    PrintAndQuit(String),
-    Call(CommandConfig),
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum InternalMsg {
+    AddDirectory(String, DirectoryBuffer),
+    HandleKey(Key),
 }
 
-impl Default for Task {
-    fn default() -> Self {
-        Self::NoOp
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum ExternalMsg {
+    Refresh,
+    FocusNext,
+    FocusNextByRelativeIndex(usize),
+    FocusNextByRelativeIndexFromInput,
+    FocusPrevious,
+    FocusPreviousByRelativeIndex(usize),
+    FocusPreviousByRelativeIndexFromInput,
+    FocusFirst,
+    FocusLast,
+    FocusPath(String),
+    FocusByIndex(usize),
+    FocusByIndexFromInput,
+    FocusByFileName(String),
+    ChangeDirectory(String),
+    Enter,
+    Back,
+    BufferString(String),
+    BufferStringFromKey,
+    ResetInputBuffer,
+    SwitchMode(String),
+    Call(Command),
+    ToggleSelection,
+    PrintResultAndQuit,
+    PrintAppStateAndQuit,
+    Debug(String),
+    Terminate,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MsgIn {
+    Internal(InternalMsg),
+    External(ExternalMsg),
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Command {
+    pub command: String,
+
+    #[serde(default)]
+    pub args: Vec<String>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum MsgOut {
+    Refresh,
+    PrintResultAndQuit,
+    PrintAppStateAndQuit,
+    Debug(String),
+    Call(Command),
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Task {
+    priority: usize,
+    msg: MsgIn,
+    key: Option<Key>,
+}
+
+impl Task {
+    pub fn new(priority: usize, msg: MsgIn, key: Option<Key>) -> Self {
+        Self { priority, msg, key }
+    }
+}
+
+impl Ord for Task {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Notice that the we flip the ordering on costs.
+        // In case of a tie we compare positions - this step is necessary
+        // to make implementations of `PartialEq` and `Ord` consistent.
+        other.priority.cmp(&self.priority)
+    }
+}
+impl PartialOrd for Task {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
-    pub version: String,
-    pub config: Config,
-    pub directory_buffer: DirectoryBuffer,
-    pub saved_buffers: HashMap<PathBuf, Option<usize>>,
-    pub selected_paths: HashSet<PathBuf>,
-    pub mode: Mode,
-    pub parsed_key_bindings: HashMap<Key, (String, Vec<Action>)>,
-    pub parsed_help_menu: Vec<(String, String)>,
-    pub show_hidden: bool,
-    pub task: Task,
-    pub number_input: usize,
+    config: Config,
+    pwd: String,
+    directory_buffers: HashMap<String, DirectoryBuffer>,
+    tasks: BinaryHeap<Task>,
+    selected: Vec<Node>,
+    msg_out: VecDeque<MsgOut>,
+    mode: Mode,
+    input_buffer: Option<String>,
 }
 
 impl App {
-    pub fn new(
-        config: &Config,
-        pwd: &PathBuf,
-        saved_buffers: &HashMap<PathBuf, Option<usize>>,
-        selected_paths: &HashSet<PathBuf>,
-        mode: Mode,
-        show_hidden: bool,
-        focus: Option<usize>,
-        number_input: usize,
-    ) -> Result<Self, Error> {
-        let directory_buffer =
-            DirectoryBuffer::load(config, focus.or(Some(0)), &pwd, show_hidden, selected_paths)?;
+    pub fn new(pwd: String) -> Self {
+        let config = Config::default();
+        let mode = config
+            .modes
+            .get(&"default".to_string())
+            .map(|k| k.to_owned())
+            .unwrap_or_default();
 
-        let mut saved_buffers = saved_buffers.clone();
-        saved_buffers.insert(
-            directory_buffer.pwd.clone().into(),
-            directory_buffer.focus.clone(),
-        );
-
-        let parsed_key_bindings = config.key_bindings.clone().filtered(&mode);
-
-        let parsed_help_menu = parse_help_menu(parsed_key_bindings.iter());
-
-        Ok(Self {
-            version: VERSION.into(),
-            config: config.to_owned(),
-            directory_buffer,
-            saved_buffers,
-            selected_paths: selected_paths.to_owned(),
+        Self {
+            config,
+            pwd,
+            directory_buffers: Default::default(),
+            tasks: Default::default(),
+            selected: Default::default(),
+            msg_out: Default::default(),
             mode,
-            parsed_key_bindings,
-            parsed_help_menu,
-            show_hidden,
-            task: Task::NoOp,
-            number_input: number_input,
-        })
-    }
-
-    pub fn refresh(self) -> Result<Self, Error> {
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            self.directory_buffer.focus,
-            0,
-        )
-    }
-
-    pub fn exit_submode(self) -> Result<Self, Error> {
-        let mode = match self.mode {
-            Mode::Explore => Mode::Explore,
-            Mode::ExploreSubmode(_) => Mode::Explore,
-            Mode::Select => Mode::Select,
-            Mode::SelectSubmode(_) => Mode::Select,
-        };
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            mode,
-            self.show_hidden,
-            self.directory_buffer.focus,
-            0,
-        )
-    }
-
-    pub fn number_input(self, n: u8) -> Result<Self, Error> {
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            self.directory_buffer.focus,
-            self.number_input * 10 + n as usize,
-        )
-    }
-
-    pub fn toggle_hidden(self) -> Result<Self, Error> {
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            !self.show_hidden,
-            self.directory_buffer.focus,
-            0,
-        )
-    }
-
-    pub fn focus_first(self) -> Result<Self, Error> {
-        let focus = if self.directory_buffer.total == 0 {
-            None
-        } else {
-            Some(0)
-        };
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            focus,
-            0,
-        )
-    }
-
-    pub fn focus_last(self) -> Result<Self, Error> {
-        let focus = if self.directory_buffer.total == 0 {
-            None
-        } else {
-            Some(self.directory_buffer.total - 1)
-        };
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            focus,
-            0,
-        )
-    }
-
-    pub fn change_directory(self, dir: &String) -> Result<Self, Error> {
-        self.focus_path(&PathBuf::from(dir))?.enter()
-    }
-
-    pub fn call(mut self, cmd: &CommandConfig) -> Result<Self, Error> {
-        self.task = Task::Call(cmd.clone());
-        Ok(self)
-    }
-
-    pub fn focus_next(self) -> Result<Self, Error> {
-        let len = self.directory_buffer.total;
-        let step = self.number_input.max(1);
-        let focus = self
-            .directory_buffer
-            .focus
-            .map(|f| (len.max(1) - 1).min(f + step))
-            .or(Some(0));
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            focus,
-            0,
-        )
-    }
-
-    pub fn focus_previous(self) -> Result<Self, Error> {
-        let len = self.directory_buffer.total;
-        let step = self.number_input.max(1);
-        let focus = if len == 0 {
-            None
-        } else {
-            self.directory_buffer
-                .focus
-                .map(|f| Some(step.max(f) - step))
-                .unwrap_or(Some(step.max(len) - step))
-        };
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode,
-            self.show_hidden,
-            focus,
-            0,
-        )
-    }
-
-    pub fn focus_path(self, path: &PathBuf) -> Result<Self, Error> {
-        expand_tilde(path)
-            .unwrap_or(path.into())
-            .parent()
-            .map(|pwd| {
-                let (_, items) = DirectoryBuffer::explore(&pwd.into(), self.show_hidden)?;
-                let focus = items
-                    .enumerate()
-                    .find_map(|(i, (p, _))| {
-                        if p.as_path() == path.as_path() {
-                            Some(i)
-                        } else {
-                            None
-                        }
-                    })
-                    .or(Some(0));
-
-                Self::new(
-                    &self.config,
-                    &pwd.into(),
-                    &self.saved_buffers,
-                    &self.selected_paths,
-                    self.mode.clone(),
-                    self.show_hidden,
-                    focus,
-                    0,
-                )
-            })
-            .unwrap_or_else(|| Ok(self.to_owned()))
-    }
-
-    pub fn focus_by_index(self, idx: &usize) -> Result<Self, Error> {
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode.clone(),
-            self.show_hidden,
-            Some(idx.clone()),
-            0,
-        )
-    }
-
-    pub fn focus_by_buffer_relative_index(self, idx: &usize) -> Result<Self, Error> {
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode.clone(),
-            self.show_hidden,
-            Some(DirectoryBuffer::relative_focus(idx.clone())),
-            0,
-        )
-    }
-
-    pub fn focus_by_focus_relative_index(self, idx: &isize) -> Result<Self, Error> {
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            self.mode.clone(),
-            self.show_hidden,
-            self.directory_buffer
-                .focus
-                .map(|f| ((f as isize) + idx).min(0) as usize), // TODO: make it safer
-            0,
-        )
-    }
-
-    pub fn enter(mut self) -> Result<Self, Error> {
-        let mut step = self.number_input.max(1);
-        while step > 0 {
-            let pwd = self
-                .directory_buffer
-                .focused()
-                .map(|(p, _)| p)
-                .map(|p| {
-                    if p.is_dir() {
-                        p
-                    } else {
-                        self.directory_buffer.pwd.clone()
-                    }
-                })
-                .unwrap_or_else(|| self.directory_buffer.pwd.clone());
-
-            let focus = self.saved_buffers.get(&pwd).unwrap_or(&None);
-
-            self = Self::new(
-                &self.config,
-                &pwd,
-                &self.saved_buffers,
-                &self.selected_paths,
-                self.mode,
-                self.show_hidden,
-                focus.clone(),
-                0,
-            )?;
-            step -= 1;
+            input_buffer: Default::default(),
         }
-        Ok(self)
     }
 
-    pub fn back(mut self) -> Result<Self, Error> {
-        let mut step = self.number_input.max(1);
-        while step > 0 {
-            let pwd = self.directory_buffer.pwd.clone();
-            self = self.focus_path(&pwd)?;
-            step -= 1;
+    pub fn focused_node(&self) -> Option<&Node> {
+        self.directory_buffer().and_then(|d| d.focused_node())
+    }
+
+    pub fn enqueue(mut self, task: Task) -> Self {
+        self.tasks.push(task);
+        self
+    }
+
+    pub fn possibly_mutate(mut self) -> Result<Self, Error> {
+        if let Some(task) = self.tasks.pop() {
+            match task.msg {
+                MsgIn::Internal(msg) => self.handle_internal(msg),
+                MsgIn::External(msg) => self.handle_external(msg, task.key),
+            }
+        } else {
+            Ok(self)
         }
-        Ok(self)
     }
 
-    pub fn select(self) -> Result<Self, Error> {
-        let selected_paths = self
-            .directory_buffer
-            .focused()
-            .map(|(p, _)| {
-                let mut selected_paths = self.selected_paths.clone();
-                selected_paths.insert(p);
-                selected_paths
-            })
-            .unwrap_or_else(|| self.selected_paths.clone());
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &selected_paths,
-            Mode::Select,
-            self.show_hidden,
-            self.directory_buffer.focus,
-            0,
-        )
+    fn handle_internal(self, msg: InternalMsg) -> Result<Self, Error> {
+        match msg {
+            InternalMsg::AddDirectory(parent, dir) => self.add_directory(parent, dir),
+            InternalMsg::HandleKey(key) => self.handle_key(key),
+        }
     }
 
-    pub fn toggle_selection(self) -> Result<Self, Error> {
-        let selected_paths = self
-            .directory_buffer
-            .focused()
-            .map(|(p, _)| {
-                let mut selected_paths = self.selected_paths.clone();
-                if selected_paths.contains(&p) {
-                    selected_paths.remove(&p);
+    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self, Error> {
+        match msg {
+            ExternalMsg::Refresh => self.refresh(),
+            ExternalMsg::FocusFirst => self.focus_first(),
+            ExternalMsg::FocusLast => self.focus_last(),
+            ExternalMsg::FocusPrevious => self.focus_previous(),
+            ExternalMsg::FocusPreviousByRelativeIndex(i) => {
+                self.focus_previous_by_relative_index(i)
+            }
+
+            ExternalMsg::FocusPreviousByRelativeIndexFromInput => {
+                self.focus_previous_by_relative_index_from_input()
+            }
+            ExternalMsg::FocusNext => self.focus_next(),
+            ExternalMsg::FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
+            ExternalMsg::FocusNextByRelativeIndexFromInput => {
+                self.focus_next_by_relative_index_from_input()
+            }
+            ExternalMsg::FocusPath(p) => self.focus_path(&p),
+            ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
+            ExternalMsg::FocusByIndexFromInput => self.focus_by_index_from_input(),
+            ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n),
+            ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir),
+            ExternalMsg::Enter => self.enter(),
+            ExternalMsg::Back => self.back(),
+            ExternalMsg::BufferString(input) => self.buffer_string(&input),
+            ExternalMsg::BufferStringFromKey => self.buffer_string_from_key(key),
+            ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
+            ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
+            ExternalMsg::Call(cmd) => self.call(cmd),
+            ExternalMsg::ToggleSelection => self.toggle_selection(),
+            ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
+            ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
+            ExternalMsg::Debug(path) => self.debug(&path),
+            ExternalMsg::Terminate => Err(Error::Terminated),
+        }
+    }
+
+    fn handle_key(mut self, key: Key) -> Result<Self, Error> {
+        let kb = self.mode.key_bindings.clone();
+        let msgs = kb
+            .on_key
+            .get(&key.to_string())
+            .map(|a| Some(a.messages.clone()))
+            .unwrap_or_else(|| {
+                if key.is_alphabet() {
+                    kb.on_alphabet.map(|a| a.messages)
+                } else if key.is_number() {
+                    kb.on_number.map(|a| a.messages)
+                } else if key.is_special_character() {
+                    kb.on_special_character.map(|a| a.messages)
                 } else {
-                    selected_paths.insert(p);
+                    kb.default.map(|a| a.messages)
                 }
-                selected_paths
-            })
-            .unwrap_or_else(|| self.selected_paths.clone());
+            });
 
-        let mode = if selected_paths.len() == 0 {
-            Mode::Explore
-        } else {
-            Mode::Select
+        if let Some(msgs) = msgs.to_owned() {
+            for msg in msgs {
+                self = self.enqueue(Task::new(0, MsgIn::External(msg), Some(key)));
+            }
         };
 
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &selected_paths,
-            mode,
-            self.show_hidden,
-            self.directory_buffer.focus,
-            0,
-        )
-    }
-
-    pub fn enter_submode(self, submode: &String) -> Result<Self, Error> {
-        let mode = match self.mode {
-            Mode::Explore => Mode::ExploreSubmode(submode.clone()),
-            Mode::ExploreSubmode(_) => Mode::ExploreSubmode(submode.clone()),
-            Mode::Select => Mode::SelectSubmode(submode.clone()),
-            Mode::SelectSubmode(_) => Mode::SelectSubmode(submode.clone()),
-        };
-
-        Self::new(
-            &self.config,
-            &self.directory_buffer.pwd,
-            &self.saved_buffers,
-            &self.selected_paths,
-            mode,
-            self.show_hidden,
-            self.directory_buffer.focus,
-            self.number_input,
-        )
-    }
-
-    pub fn print_focused(self) -> Result<Self, Error> {
-        let mut app = self;
-        app.task = app
-            .directory_buffer
-            .focused()
-            .and_then(|(p, _)| p.to_str().map(|s| Task::PrintAndQuit(s.to_string())))
-            .unwrap_or_default();
-        Ok(app)
-    }
-
-    pub fn print_pwd(self) -> Result<Self, Error> {
-        let mut app = self;
-        app.task = app
-            .directory_buffer
-            .pwd
-            .to_str()
-            .map(|s| Task::PrintAndQuit(s.to_string()))
-            .unwrap_or_default();
-        Ok(app)
-    }
-
-    pub fn print_selected(self) -> Result<Self, Error> {
-        let mut app = self;
-        app.task = Task::PrintAndQuit(
-            app.selected_paths
-                .clone()
-                .iter()
-                .filter_map(|p| p.to_str())
-                .map(|s| s.to_string())
-                .collect::<Vec<String>>()
-                .join("\n"),
-        );
-        Ok(app)
-    }
-
-    pub fn print_app_state(self) -> Result<Self, Error> {
-        let state = serde_yaml::to_string(&self)?;
-        let mut app = self;
-        app.task = Task::PrintAndQuit(state);
-        Ok(app)
-    }
-
-    pub fn quit(mut self) -> Result<Self, Error> {
-        self.task = Task::Quit;
         Ok(self)
     }
 
-    pub fn terminate(self) -> Result<Self, Error> {
-        Err(Error::Terminated)
+    fn refresh(mut self) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
     }
 
-    pub fn actions_from_key(&self, key: &Key) -> Option<Vec<Action>> {
-        match key {
-            Key::Number(n) => Some(vec![Action::NumberInput(*n)]),
-            key => self.parsed_key_bindings.get(key).map(|(_, a)| a.to_owned()),
+    fn focus_first(mut self) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = 0;
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_last(mut self) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = dir.total.max(1) - 1;
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_previous(mut self) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = dir.focus.max(1) - 1;
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = dir.focus.max(index) - index;
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_previous_by_relative_index_from_input(self) -> Result<Self, Error> {
+        if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
+            self.focus_previous_by_relative_index(index)
+        } else {
+            Ok(self)
         }
     }
 
-    pub fn handle(self, action: &Action) -> Result<Self, Error> {
-        match action {
-            Action::NumberInput(n) => self.number_input(*n),
-            Action::ToggleShowHidden => self.toggle_hidden(),
-            Action::Back => self.back(),
-            Action::Enter => self.enter(),
-            Action::FocusPrevious => self.focus_previous(),
-            Action::FocusNext => self.focus_next(),
-            Action::FocusFirst => self.focus_first(),
-            Action::FocusLast => self.focus_last(),
-            Action::FocusPathByIndex(i) => self.focus_by_index(i),
-            Action::FocusPathByBufferRelativeIndex(i) => self.focus_by_buffer_relative_index(i),
-            Action::FocusPathByFocusRelativeIndex(i) => self.focus_by_focus_relative_index(i),
-            Action::FocusPath(p) => self.focus_path(&p.into()),
-            Action::ChangeDirectory(d) => self.change_directory(d.into()),
-            Action::Call(c) => self.call(c),
-            Action::EnterSubmode(s) => self.enter_submode(s),
-            Action::ExitSubmode => self.exit_submode(),
-            Action::Select => self.select(),
-            Action::ToggleSelection => self.toggle_selection(),
-            Action::PrintFocused => self.print_focused(),
-            Action::PrintSelected => self.print_selected(),
-            Action::PrintAppState => self.print_app_state(),
-            Action::Quit => self.quit(),
-            Action::Terminate => self.terminate(),
+    fn focus_next(mut self) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = (dir.focus + 1).min(dir.total.max(1) - 1);
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_next_by_relative_index_from_input(self) -> Result<Self, Error> {
+        if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
+            self.focus_next_by_relative_index(index)
+        } else {
+            Ok(self)
         }
     }
-}
 
-pub fn create() -> Result<App, Error> {
-    let config_dir = dirs::config_dir()
-        .unwrap_or(PathBuf::from("."))
-        .join("xplr");
-
-    let config_file = config_dir.join("config.yml");
-
-    let config: Config = if config_file.exists() {
-        serde_yaml::from_reader(BufReader::new(&File::open(&config_file)?))?
-    } else {
-        Config::default()
-    };
-
-    if !config.version.eq(VERSION) {
-        return Err(Error::IncompatibleVersion(format!(
-            "Config file {} is outdated",
-            config_file.to_string_lossy()
-        )));
+    fn change_directory(mut self, dir: &String) -> Result<Self, Error> {
+        if PathBuf::from(dir).is_dir() {
+            self.pwd = dir.to_owned();
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
     }
 
-    let root = Path::new("/");
-    let pwd = PathBuf::from(std::env::args().skip(1).next().unwrap_or("./".into()))
-        .canonicalize()
-        .unwrap_or(root.into());
+    fn enter(self) -> Result<Self, Error> {
+        self.focused_node()
+            .map(|n| n.absolute_path.clone())
+            .map(|p| self.clone().change_directory(&p))
+            .unwrap_or(Ok(self))
+    }
 
-    let (pwd, file_to_focus) = if pwd.is_file() {
-        (pwd.parent().unwrap_or(root).into(), Some(pwd))
-    } else {
-        (pwd, None)
-    };
+    fn back(self) -> Result<Self, Error> {
+        PathBuf::from(self.pwd())
+            .parent()
+            .map(|p| {
+                self.clone()
+                    .change_directory(&p.to_string_lossy().to_string())
+            })
+            .unwrap_or(Ok(self))
+    }
 
-    let app = App::new(
-        &config,
-        &pwd,
-        &Default::default(),
-        &Default::default(),
-        Mode::Explore,
-        config.general.show_hidden,
-        None,
-        0,
-    )?;
+    fn buffer_string(mut self, input: &String) -> Result<Self, Error> {
+        if let Some(buf) = self.input_buffer.as_mut() {
+            buf.extend(input.chars());
+        } else {
+            self.input_buffer = Some(input.to_owned());
+        };
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
 
-    if let Some(file) = file_to_focus {
-        app.focus_path(&file)
-    } else {
-        Ok(app)
+    fn buffer_string_from_key(self, key: Option<Key>) -> Result<Self, Error> {
+        if let Some(c) = key.and_then(|k| k.to_char()) {
+            self.buffer_string(&c.to_string())
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn reset_input_buffer(mut self) -> Result<Self, Error> {
+        self.input_buffer = None;
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn focus_by_index(mut self, index: usize) -> Result<Self, Error> {
+        if let Some(dir) = self.directory_buffer_mut() {
+            dir.focus = index.min(dir.total.max(1) - 1);
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn focus_by_index_from_input(self) -> Result<Self, Error> {
+        if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
+            self.focus_by_index(index)
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn focus_by_file_name(mut self, name: &String) -> Result<Self, Error> {
+        if let Some(dir_buf) = self.directory_buffer_mut() {
+            if let Some(focus) = dir_buf
+                .clone()
+                .nodes
+                .iter()
+                .enumerate()
+                .find(|(_, n)| &n.relative_path == name)
+                .map(|(i, _)| i)
+            {
+                dir_buf.focus = focus;
+                self.msg_out.push_back(MsgOut::Refresh);
+            };
+        };
+        Ok(self)
+    }
+
+    fn focus_path(self, path: &String) -> Result<Self, Error> {
+        let pathbuf = PathBuf::from(path);
+        if let Some(parent) = pathbuf.parent() {
+            if let Some(filename) = pathbuf.file_name() {
+                self.change_directory(&parent.to_string_lossy().to_string())?
+                    .focus_by_file_name(&filename.to_string_lossy().to_string())
+            } else {
+                Ok(self)
+            }
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn switch_mode(mut self, mode: &String) -> Result<Self, Error> {
+        if let Some(mode) = self.config.modes.get(mode) {
+            self.mode = mode.to_owned();
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn call(mut self, command: Command) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::Call(command));
+        Ok(self)
+    }
+
+    fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self, Error> {
+        // TODO: Optimize
+        self.directory_buffers.insert(parent, dir);
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn toggle_selection(mut self) -> Result<Self, Error> {
+        self.clone()
+            .focused_node()
+            .map(|n| {
+                if self.selected().contains(n) {
+                    self.selected = self
+                        .clone()
+                        .selected
+                        .into_iter()
+                        .filter(|s| s != n)
+                        .collect();
+                    Ok(self.clone())
+                } else {
+                    self.selected.push(n.to_owned());
+                    Ok(self.clone())
+                }
+            })
+            .unwrap_or(Ok(self))
+    }
+
+    fn print_result_and_quit(mut self) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::PrintResultAndQuit);
+        Ok(self)
+    }
+
+    fn print_app_state_and_quit(mut self) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::PrintAppStateAndQuit);
+        Ok(self)
+    }
+
+    fn debug(mut self, path: &String) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::Debug(path.to_owned()));
+        Ok(self)
+    }
+
+    fn directory_buffer_mut(&mut self) -> Option<&mut DirectoryBuffer> {
+        self.directory_buffers.get_mut(&self.pwd)
+    }
+
+    /// Get a reference to the app's pwd.
+    pub fn pwd(&self) -> &String {
+        &self.pwd
+    }
+
+    /// Get a reference to the app's current directory buffer.
+    pub fn directory_buffer(&self) -> Option<&DirectoryBuffer> {
+        self.directory_buffers.get(&self.pwd)
+    }
+
+    /// Get a reference to the app's config.
+    pub fn config(&self) -> &Config {
+        &self.config
+    }
+
+    /// Get a reference to the app's selected.
+    pub fn selected(&self) -> &Vec<Node> {
+        &self.selected
+    }
+
+    pub fn pop_msg_out(&mut self) -> Option<MsgOut> {
+        self.msg_out.pop_front()
+    }
+
+    /// Get a reference to the app's mode.
+    pub fn mode(&self) -> &Mode {
+        &self.mode
+    }
+
+    /// Get a reference to the app's directory buffers.
+    pub fn directory_buffers(&self) -> &HashMap<String, DirectoryBuffer> {
+        &self.directory_buffers
+    }
+
+    /// Get a reference to the app's input buffer.
+    pub fn input_buffer(&self) -> Option<&String> {
+        self.input_buffer.as_ref()
     }
 }

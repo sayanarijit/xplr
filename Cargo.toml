@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.1.13"  # Update app.rs
+version = "0.2.0"  # Update app.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "An experimental, minimal, configurable TUI file explorer, stealing ideas from nnn and fzf."
@@ -17,9 +17,11 @@ termion = "1.5"
 crossterm = "0.18"
 dirs = "3.0.1"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 serde_yaml = "0.8"
 handlebars = "3.5.3"
 shellwords = "1.0.0"
+mime_guess = "2.0.3"
 
 [dev-dependencies]
 criterion = "0.3"
