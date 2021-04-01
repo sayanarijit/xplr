@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 use std::fs;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.3"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.4"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 

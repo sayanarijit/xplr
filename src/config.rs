@@ -282,7 +282,7 @@ impl Default for KeyBindings {
                       args: []
 
               /:
-                help: find
+                help: search
                 messages:
                   - Call:
                       command: bash
@@ -450,6 +450,17 @@ impl Default for Config {
                       - FocusByIndexFromInput
                       - ResetInputBuffer
                       - SwitchMode: default
+
+                  esc:
+                    help: cancel
+                    messages:
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  q:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
 
                 on_number:
                   help: input

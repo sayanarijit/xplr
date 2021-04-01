@@ -41,7 +41,9 @@ cargo install xplr
 ```bash
 mkdir -p ~/.config/xplr
 
-echo "PrintAppStateAndQuit" | xplr | yq ".config" -y | tee ~/.config/xplr/config.yml
+xplr | yq ".config" -y | tee ~/.config/xplr/config.yml
+
+# When the app loads, press `#`
 ```
 
 3. Check the key bindings in the config file.

@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.2.3"  # Update app.rs
+version = "0.2.4"  # Update app.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "An experimental, minimal, configurable TUI file explorer, stealing ideas from nnn and fzf."

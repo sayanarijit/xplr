@@ -297,7 +297,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                 .map(|l| Row::new(vec![Cell::from(l)]))
                 .chain(mode.key_bindings.on_key.iter().filter_map(|(k, a)| {
                     a.help.clone().map(|h| {
-                        Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                        Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
                     })
                 }))
                 .chain(
@@ -307,7 +307,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                         .map(|a| ("a-Z", a.help.clone()))
                         .filter_map(|(k, mh)| {
                             mh.map(|h| {
-                                Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
                             })
                         }),
                 )
@@ -318,7 +318,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                         .map(|a| ("0-9", a.help.clone()))
                         .filter_map(|(k, mh)| {
                             mh.map(|h| {
-                                Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
                             })
                         }),
                 )
@@ -329,7 +329,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                         .map(|a| ("spcl chars", a.help.clone()))
                         .filter_map(|(k, mh)| {
                             mh.map(|h| {
-                                Row::new(vec![Cell::from(h.to_string()), Cell::from(k.to_string())])
+                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
                             })
                         }),
                 )
@@ -365,24 +365,25 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
     let rect = f.size();
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .margin(1)
-        .constraints([TUIConstraint::Max(rect.height - 5), TUIConstraint::Max(3)].as_ref())
-        .split(rect);
 
-    let upper_chunks = Layout::default()
+    let chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([TUIConstraint::Percentage(70), TUIConstraint::Percentage(30)].as_ref())
+        .split(rect);
+
+    let left_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([TUIConstraint::Length(rect.height - 3), TUIConstraint::Min(3)].as_ref())
         .split(chunks[0]);
 
-    let upper_left_chunks = Layout::default()
+
+    let right_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([TUIConstraint::Percentage(50), TUIConstraint::Percentage(50)].as_ref())
-        .split(upper_chunks[1]);
+        .split(chunks[1]);
 
-    draw_input_buffer(f, chunks[1], app, hb);
-    draw_table(f, upper_chunks[0], app, hb);
-    draw_selected(f, upper_left_chunks[0], app, hb);
-    draw_help_menu(f, upper_left_chunks[1], app, hb);
+    draw_table(f, left_chunks[0], app, hb);
+    draw_input_buffer(f, left_chunks[1], app, hb);
+    draw_selected(f, right_chunks[0], app, hb);
+    draw_help_menu(f, right_chunks[1], app, hb);
 }
