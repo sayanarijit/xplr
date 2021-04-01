@@ -445,7 +445,7 @@ impl Default for Config {
                       - SwitchMode: default
 
                   enter:
-                    help: go down
+                    help: to index
                     messages:
                       - FocusByIndexFromInput
                       - ResetInputBuffer
