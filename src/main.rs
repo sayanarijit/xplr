@@ -5,6 +5,7 @@ use handlebars::{handlebars_helper, Handlebars};
 use shellwords;
 use std::env;
 use std::fs;
+use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
 use std::sync::mpsc;
@@ -14,6 +15,7 @@ use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
 use xplr::app;
+use xplr::config::Config;
 use xplr::error::Error;
 use xplr::explorer;
 use xplr::input::Key;
@@ -38,7 +40,19 @@ fn main() -> Result<(), Error> {
 
     let mut last_pwd = pwd.clone();
 
-    let mut app = app::App::new(pwd.clone());
+    let config_dir = dirs::config_dir()
+        .unwrap_or(PathBuf::from("."))
+        .join("xplr");
+
+    let config_file = config_dir.join("config.yml");
+
+    let config: Config = if config_file.exists() {
+        serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?
+    } else {
+        Config::default()
+    };
+
+    let mut app = app::App::new(config, pwd.clone());
 
     let mut hb = Handlebars::new();
     hb.register_helper("shellescape", Box::new(shellescape));

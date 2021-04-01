@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.0"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.1"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -216,8 +216,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(pwd: String) -> Self {
-        let config = Config::default();
+    pub fn new(config: Config, pwd: String) -> Self {
         let mode = config
             .modes
             .get(&"default".to_string())
