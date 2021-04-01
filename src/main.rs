@@ -1,8 +1,7 @@
 use crossterm::event::Event;
 use crossterm::terminal as term;
 use crossterm::{event, execute};
-use handlebars::{handlebars_helper, Handlebars};
-use shellwords;
+use handlebars::Handlebars;
 use std::env;
 use std::fs;
 use std::io;
@@ -20,9 +19,6 @@ use xplr::error::Error;
 use xplr::explorer;
 use xplr::input::Key;
 use xplr::ui;
-
-handlebars_helper!(shellescape: |v: str| format!("{}", shellwords::escape(v)));
-handlebars_helper!(readfile: |v: str| fs::read_to_string(v).unwrap_or_default());
 
 fn main() -> Result<(), Error> {
     let mut pwd = PathBuf::from(env::args().skip(1).next().unwrap_or(".".into()))
@@ -52,11 +48,9 @@ fn main() -> Result<(), Error> {
         Config::default()
     };
 
-    let mut app = app::App::new(config, pwd.clone());
+    let mut app = app::App::create(config, pwd.clone())?;
 
     let mut hb = Handlebars::new();
-    hb.register_helper("shellescape", Box::new(shellescape));
-    hb.register_helper("readfile", Box::new(readfile));
     hb.register_template_string(
         app::TEMPLATE_TABLE_ROW,
         &app.config()
@@ -157,6 +151,10 @@ fn main() -> Result<(), Error> {
                     break 'outer;
                 }
 
+                app::MsgOut::ClearScreen => {
+                    terminal.clear()?;
+                }
+
                 app::MsgOut::Refresh => {
                     if app.pwd() != &last_pwd {
                         explorer::explore(
@@ -242,6 +240,7 @@ fn main() -> Result<(), Error> {
                         .env("XPLR_FOCUS_PATH", focus_path)
                         .env("XPLR_FOCUS_INDEX", focus_index)
                         .env("XPLR_SELECTED", selected)
+                        .env("XPLR_RUNTIME_PATH", app.runtime_path())
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
                         .env("XPLR_PIPE_SELECTED_OUT", pipe_selected_out)
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)

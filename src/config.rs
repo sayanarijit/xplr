@@ -312,6 +312,23 @@ impl Default for KeyBindings {
                 messages:
                   - PrintResultAndQuit
 
+              o:
+                help: open
+                messages:
+                  - Call:
+                      command: bash
+                      args:
+                        - -c
+                        - xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
+                  - ClearScreen
+                  - Refresh
+              
+              ctrl-l:
+                help: clear
+                messages:
+                  - ClearScreen
+                  - Refresh
+
               "#":
                 help: quit with debug
                 messages:

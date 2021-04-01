@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 use std::fs;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.1"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.3"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -25,14 +25,9 @@ pub struct PipesConfig {
     pub mode_out: String,
 }
 
-impl Default for PipesConfig {
-    fn default() -> Self {
-        let pipesdir = dirs::runtime_dir()
-            .unwrap_or("/tmp".into())
-            .join("xplr")
-            .join("session")
-            .join(std::process::id().to_string())
-            .join("pipe");
+impl PipesConfig {
+    fn from_runtime_path(path: &String) -> Self {
+        let pipesdir = PathBuf::from(path).join("pipe");
 
         fs::create_dir_all(&pipesdir).unwrap();
 
@@ -168,6 +163,7 @@ pub enum InternalMsg {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
     Refresh,
+    ClearScreen,
     FocusNext,
     FocusNextByRelativeIndex(usize),
     FocusNextByRelativeIndexFromInput,
@@ -212,6 +208,7 @@ pub struct Command {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
     Refresh,
+    ClearScreen,
     PrintResultAndQuit,
     PrintAppStateAndQuit,
     Debug(String),
@@ -255,27 +252,46 @@ pub struct App {
     msg_out: VecDeque<MsgOut>,
     mode: Mode,
     input_buffer: Option<String>,
+    pid: u32,
+    runtime_path: String,
     pipes: PipesConfig,
 }
 
 impl App {
-    pub fn new(config: Config, pwd: String) -> Self {
-        let mode = config
-            .modes
-            .get(&"default".to_string())
-            .map(|k| k.to_owned())
-            .unwrap_or_default();
+    pub fn create(config: Config, pwd: String) -> Result<Self, Error> {
+        if config.version != VERSION {
+            Err(Error::IncompatibleVersion(
+                "incompatible config version".into(),
+            ))
+        } else {
+            let mode = config
+                .modes
+                .get(&"default".to_string())
+                .map(|k| k.to_owned())
+                .unwrap_or_default();
 
-        Self {
-            config,
-            pwd,
-            directory_buffers: Default::default(),
-            tasks: Default::default(),
-            selected: Default::default(),
-            msg_out: Default::default(),
-            mode,
-            input_buffer: Default::default(),
-            pipes: Default::default(),
+            let pid = std::process::id();
+            let runtime_path = dirs::runtime_dir()
+                .unwrap_or("/tmp".into())
+                .join("xplr")
+                .join("session")
+                .join(&pid.to_string())
+                .to_string_lossy()
+                .to_string();
+
+            Ok(Self {
+                config,
+                pwd,
+                directory_buffers: Default::default(),
+                tasks: Default::default(),
+                selected: Default::default(),
+                msg_out: Default::default(),
+                mode,
+                input_buffer: Default::default(),
+                pid,
+                runtime_path: runtime_path.clone(),
+                pipes: PipesConfig::from_runtime_path(&runtime_path),
+            })
         }
     }
 
@@ -309,6 +325,7 @@ impl App {
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self, Error> {
         match msg {
             ExternalMsg::Refresh => self.refresh(),
+            ExternalMsg::ClearScreen => self.clear_screen(),
             ExternalMsg::FocusFirst => self.focus_first(),
             ExternalMsg::FocusLast => self.focus_last(),
             ExternalMsg::FocusPrevious => self.focus_previous(),
@@ -373,6 +390,11 @@ impl App {
 
     fn refresh(mut self) -> Result<Self, Error> {
         self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn clear_screen(mut self) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::ClearScreen);
         Ok(self)
     }
 
@@ -637,5 +659,15 @@ impl App {
     /// Get a reference to the app's pipes.
     pub fn pipes(&self) -> &PipesConfig {
         &self.pipes
+    }
+
+    /// Get a reference to the app's pid.
+    pub fn pid(&self) -> &u32 {
+        &self.pid
+    }
+
+    /// Get a reference to the app's runtime path.
+    pub fn runtime_path(&self) -> &String {
+        &self.runtime_path
     }
 }
