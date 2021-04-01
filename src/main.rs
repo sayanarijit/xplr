@@ -107,7 +107,7 @@ fn main() -> Result<(), Error> {
         }
     });
 
-    let pipe_msg_in = app.config().pipes.msg_in.clone();
+    let pipe_msg_in = app.pipes().msg_in.clone();
     thread::spawn(move || loop {
         let in_str = fs::read_to_string(&pipe_msg_in).unwrap_or_default();
 
@@ -176,7 +176,7 @@ fn main() -> Result<(), Error> {
                         .map(|n| n.absolute_path.clone())
                         .unwrap_or_default();
 
-                    fs::write(&app.config().pipes.focus_out, focused).unwrap();
+                    fs::write(&app.pipes().focus_out, focused).unwrap();
 
                     let selected = app
                         .selected()
@@ -185,9 +185,9 @@ fn main() -> Result<(), Error> {
                         .collect::<Vec<String>>()
                         .join("\n");
 
-                    fs::write(&app.config().pipes.selected_out, selected).unwrap();
+                    fs::write(&app.pipes().selected_out, selected).unwrap();
 
-                    fs::write(&app.config().pipes.mode_out, &app.mode().name).unwrap();
+                    fs::write(&app.pipes().mode_out, &app.mode().name).unwrap();
                 }
 
                 app::MsgOut::Call(cmd) => {
@@ -196,6 +196,9 @@ fn main() -> Result<(), Error> {
                     term::disable_raw_mode().unwrap();
                     execute!(terminal.backend_mut(), term::LeaveAlternateScreen).unwrap();
                     terminal.show_cursor()?;
+
+                    let pid = std::process::id().to_string();
+                    let input_buffer = app.input_buffer().map(|i| i.to_owned()).unwrap_or_default();
 
                     let focus_path = app
                         .focused_node()
@@ -226,14 +229,16 @@ fn main() -> Result<(), Error> {
                         })
                         .unwrap_or_default();
 
-                    let pipe_msg_in = app.config().pipes.msg_in.clone();
-                    let pipe_focus_out = app.config().pipes.focus_out.clone();
-                    let pipe_selected_out = app.config().pipes.selected_out.clone();
+                    let pipe_msg_in = app.pipes().msg_in.clone();
+                    let pipe_focus_out = app.pipes().focus_out.clone();
+                    let pipe_selected_out = app.pipes().selected_out.clone();
 
                     let app_yaml = serde_yaml::to_string(&app).unwrap_or_default();
 
                     let _ = std::process::Command::new(cmd.command.clone())
                         .current_dir(app.pwd())
+                        .env("XPLR_PID", pid)
+                        .env("XPLR_INPUT_BUFFER", input_buffer)
                         .env("XPLR_FOCUS_PATH", focus_path)
                         .env("XPLR_FOCUS_INDEX", focus_index)
                         .env("XPLR_SELECTED", selected)

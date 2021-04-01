@@ -1,11 +1,9 @@
 use crate::app::ExternalMsg;
 use crate::app::VERSION;
-use dirs;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-use std::fs;
 use tui::layout::Constraint as TUIConstraint;
 use tui::style::Color;
 use tui::style::Modifier;
@@ -225,47 +223,6 @@ impl Default for GeneralConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PipesConfig {
-    pub msg_in: String,
-    pub focus_out: String,
-    pub selected_out: String,
-    pub mode_out: String,
-}
-
-impl Default for PipesConfig {
-    fn default() -> Self {
-        let pipesdir = dirs::runtime_dir()
-            .unwrap_or("/tmp".into())
-            .join("xplr")
-            .join("session")
-            .join(std::process::id().to_string())
-            .join("pipe");
-
-        fs::create_dir_all(&pipesdir).unwrap();
-
-        let msg_in = pipesdir.join("msg_in").to_string_lossy().to_string();
-
-        let focus_out = pipesdir.join("focus_out").to_string_lossy().to_string();
-
-        let selected_out = pipesdir.join("selected_out").to_string_lossy().to_string();
-
-        let mode_out = pipesdir.join("mode_out").to_string_lossy().to_string();
-
-        fs::write(&msg_in, "").unwrap();
-        fs::write(&focus_out, "").unwrap();
-        fs::write(&selected_out, "").unwrap();
-        fs::write(&mode_out, "").unwrap();
-
-        Self {
-            msg_in,
-            focus_out,
-            selected_out,
-            mode_out,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KeyBindings {
     #[serde(default)]
     pub on_key: BTreeMap<String, Action>,
@@ -432,9 +389,6 @@ pub struct Config {
     pub filetypes: FileTypesConfig,
 
     #[serde(default)]
-    pub pipes: PipesConfig,
-
-    #[serde(default)]
     pub modes: HashMap<String, Mode>,
 }
 
@@ -502,7 +456,6 @@ impl Default for Config {
             version: VERSION.into(),
             general: Default::default(),
             filetypes: Default::default(),
-            pipes: Default::default(),
             modes,
         }
     }

@@ -8,6 +8,7 @@ use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::fs;
 use std::path::PathBuf;
 
 pub const VERSION: &str = "v0.2.1"; // Update Cargo.toml
@@ -15,6 +16,47 @@ pub const VERSION: &str = "v0.2.1"; // Update Cargo.toml
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
 pub const UNSUPPORTED_STR: &str = "???";
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PipesConfig {
+    pub msg_in: String,
+    pub focus_out: String,
+    pub selected_out: String,
+    pub mode_out: String,
+}
+
+impl Default for PipesConfig {
+    fn default() -> Self {
+        let pipesdir = dirs::runtime_dir()
+            .unwrap_or("/tmp".into())
+            .join("xplr")
+            .join("session")
+            .join(std::process::id().to_string())
+            .join("pipe");
+
+        fs::create_dir_all(&pipesdir).unwrap();
+
+        let msg_in = pipesdir.join("msg_in").to_string_lossy().to_string();
+
+        let focus_out = pipesdir.join("focus_out").to_string_lossy().to_string();
+
+        let selected_out = pipesdir.join("selected_out").to_string_lossy().to_string();
+
+        let mode_out = pipesdir.join("mode_out").to_string_lossy().to_string();
+
+        fs::write(&msg_in, "").unwrap();
+        fs::write(&focus_out, "").unwrap();
+        fs::write(&selected_out, "").unwrap();
+        fs::write(&mode_out, "").unwrap();
+
+        Self {
+            msg_in,
+            focus_out,
+            selected_out,
+            mode_out,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Node {
@@ -213,6 +255,7 @@ pub struct App {
     msg_out: VecDeque<MsgOut>,
     mode: Mode,
     input_buffer: Option<String>,
+    pipes: PipesConfig,
 }
 
 impl App {
@@ -232,6 +275,7 @@ impl App {
             msg_out: Default::default(),
             mode,
             input_buffer: Default::default(),
+            pipes: Default::default(),
         }
     }
 
@@ -588,5 +632,10 @@ impl App {
     /// Get a reference to the app's input buffer.
     pub fn input_buffer(&self) -> Option<&String> {
         self.input_buffer.as_ref()
+    }
+
+    /// Get a reference to the app's pipes.
+    pub fn pipes(&self) -> &PipesConfig {
+        &self.pipes
     }
 }
