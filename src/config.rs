@@ -320,8 +320,6 @@ impl Default for KeyBindings {
                       args:
                         - -c
                         - xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
-                  - ClearScreen
-                  - Refresh
               
               ctrl-l:
                 help: clear

@@ -91,10 +91,18 @@ fn main() -> Result<(), Error> {
 
             if !is_paused {
                 if event::poll(std::time::Duration::from_millis(1)).unwrap() {
-                    if let Event::Key(key) = event::read().unwrap() {
-                        let key = Key::from_event(key);
-                        let msg = app::MsgIn::Internal(app::InternalMsg::HandleKey(key));
-                        tx_key.send(app::Task::new(0, msg, Some(key))).unwrap();
+                    match event::read().unwrap() {
+                        Event::Key(key) => {
+                            let key = Key::from_event(key);
+                            let msg = app::MsgIn::Internal(app::InternalMsg::HandleKey(key));
+                            tx_key.send(app::Task::new(0, msg, Some(key))).unwrap();
+                        }
+
+                        Event::Resize(_, _) => {
+                            let msg = app::MsgIn::External(app::ExternalMsg::Refresh);
+                            tx_key.send(app::Task::new(0, msg, None)).unwrap();
+                        }
+                        _ => {}
                     }
                 }
             }
