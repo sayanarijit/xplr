@@ -158,7 +158,7 @@ pub struct GeneralConfig {
     pub focused_ui: UIConfig,
 
     #[serde(default)]
-    pub selected_ui: UIConfig,
+    pub selection_ui: UIConfig,
 }
 
 impl Default for GeneralConfig {
@@ -208,7 +208,7 @@ impl Default for GeneralConfig {
               sub_modifier:
                 bits: 0
 
-          selected_ui:
+          selection_ui:
             prefix: " {"
             suffix: "}"
             style:

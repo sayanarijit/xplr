@@ -105,7 +105,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let ui = if is_focused {
                         &config.general.focused_ui
                     } else if is_selected {
-                        &config.general.selected_ui
+                        &config.general.selection_ui
                     } else {
                         &config.general.normal_ui
                     };
@@ -179,7 +179,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let style = if is_focused {
                         config.general.focused_ui.style
                     } else if is_selected {
-                        config.general.selected_ui.style
+                        config.general.selection_ui.style
                     } else {
                         config
                             .filetypes
@@ -251,27 +251,27 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
 }
 
 fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let selected: Vec<ListItem> = app
+    let selection: Vec<ListItem> = app
         .selection()
         .iter()
         .map(|n| n.absolute_path.clone())
         .map(ListItem::new)
         .collect();
 
-    let selected_count = selected.len();
+    let selection_count = selection.len();
 
     // Selected items
-    let selected_list = List::new(selected).block(
+    let selection_list = List::new(selection).block(
         Block::default()
             .borders(Borders::ALL)
-            .title(format!(" Selected ({}) ", selected_count)),
+            .title(format!(" Selection ({}) ", selection_count)),
     );
 
     let mut list_state = ListState::default();
-    if selected_count > 0 {
-        list_state.select(Some(selected_count.max(1) - 1));
+    if selection_count > 0 {
+        list_state.select(Some(selection_count.max(1) - 1));
     }
-    f.render_stateful_widget(selected_list, rect, &mut list_state);
+    f.render_stateful_widget(selection_list, rect, &mut list_state);
 }
 
 fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
