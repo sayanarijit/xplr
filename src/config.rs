@@ -341,6 +341,11 @@ impl Default for KeyBindings {
                 help: cancel & quit
                 messages:
                   - Terminate
+
+              ctrl-c:
+                help: cancel & quit
+                messages:
+                  - Terminate
             "###,
         )
         .unwrap();
