@@ -245,50 +245,58 @@ impl Default for KeyBindings {
         let on_key: BTreeMap<String, Action> = serde_yaml::from_str(
             r###"
               up:
-                help: up
+                help: up [k]
+                messages:
+                  - FocusPrevious
+
+              k:
                 messages:
                   - FocusPrevious
 
               down:
-                help: down
+                help: down [j]
+                messages:
+                  - FocusNext
+
+              j:
                 messages:
                   - FocusNext
 
               right:
-                help: enter
+                help: enter [l]
+                messages:
+                  - Enter
+
+              l:
                 messages:
                   - Enter
 
               left:
-                help: back
+                help: back [h]
+                messages:
+                  - Back
+
+              h:
                 messages:
                   - Back
 
               g:
                 help: go to
                 messages:
-                  - SwitchMode: goto
+                  - SwitchMode: go to
 
               G:
-                help: bottom
+                help: go to bottom
                 messages:
                   - FocusLast
 
-              s:
-                help: shell
-                messages:
-                  - Call:
-                      command: bash
-                      args: []
-                  - Explore
-
-              /:
-                help: search
+              ctrl-f:
+                help: search [/]
                 messages:
                   - Call:
                       command: bash
                       args:
-                        - "-c"
+                        - -c
                         - |
                             PTH=$(echo -e "${XPLR_DIRECTORY_NODES:?}" | fzf)
                             if [ -d "$PTH" ]; then
@@ -297,89 +305,60 @@ impl Default for KeyBindings {
                                 echo "FocusPath: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
                             fi
 
-              space:
-                help: toggle selection
+              /:
                 messages:
-                  - ToggleSelection
-                  - FocusNext
-
-              n:
-                help: create new
-                messages:
-                  - SwitchMode: create
+                  - Call:
+                      command: bash
+                      args:
+                        - -c
+                        - |
+                            PTH=$(echo -e "${XPLR_DIRECTORY_NODES:?}" | fzf)
+                            if [ -d "$PTH" ]; then
+                                echo "ChangeDirectory: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                            elif [ -f "$PTH" ]; then
+                                echo "FocusPath: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                            fi
 
               d:
                 help: delete
                 messages:
                   - SwitchMode: delete
 
-              c:
-                help: copy here
+              ":":
+                help: action
                 messages:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                          while IFS= read -r line; do
-                            cp -v "${line:?}" ./
-                          done <<< "${XPLR_SELECTION:?}"
-                          read -p "[enter to continue]"
-                  - ClearSelection
-                  - Explore
+                  - SwitchMode: action
 
-              m:
-                help: move here
+              space:
+                help: toggle selection [v]
                 messages:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                          while IFS= read -r line; do
-                            mv -v "${line:?}" ./
-                          done <<< "${XPLR_SELECTION:?}"
-                          read -p "[enter to continue]"
-                  - Explore
+                  - ToggleSelection
+                  - FocusNext
+
+              v:
+                messages:
+                  - ToggleSelection
+                  - FocusNext
 
               enter:
                 help: quit with result
                 messages:
                   - PrintResultAndQuit
 
-              o:
-                help: open
-                messages:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                          xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
-
-              ctrl-l:
-                help: clear
-                messages:
-                  - ClearScreen
-                  - Refresh
-
               "#":
-                help: quit with debug
                 messages:
                   - PrintAppStateAndQuit
 
-              esc:
-                help: cancel & quit
+              ctrl-c:
+                help: cancel & quit [q|esc]
                 messages:
                   - Terminate
 
               q:
-                help: cancel & quit
                 messages:
                   - Terminate
 
-              ctrl-c:
-                help: cancel & quit
+              esc:
                 messages:
                   - Terminate
             "###,
@@ -461,6 +440,104 @@ impl Default for Config {
                       - FocusFirst
                       - SwitchMode: default
 
+                  x:
+                    help: open in gui
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
+                      - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - SwitchMode: default
+            "###,
+        )
+        .unwrap();
+
+        let action_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: action to
+              key_bindings:
+                on_key:
+                  "!":
+                    help: shell
+                    messages:
+                      - Call:
+                          command: bash
+                      - Explore
+                      - SwitchMode: default
+
+                  n:
+                    help: create new
+                    messages:
+                      - SwitchMode: create
+
+                  s:
+                    help: selection operations
+                    messages:
+                      - SwitchMode: selection ops
+
+                  ctrl-c:
+                    help: cancel & quit [q]
+                    messages:
+                      - Terminate
+
+                  q:
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - SwitchMode: default
+            "###,
+        )
+        .unwrap();
+
+        let selection_ops_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: selection ops
+              key_bindings:
+                on_key:
+                  c:
+                    help: copy here
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              while IFS= read -r line; do
+                                cp -v "${line:?}" ./
+                              done <<< "${XPLR_SELECTION:?}"
+                              read -p "[enter to continue]"
+                      - ClearSelection
+                      - Explore
+                      - SwitchMode: default
+
+                  m:
+                    help: move here
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              while IFS= read -r line; do
+                                mv -v "${line:?}" ./
+                              done <<< "${XPLR_SELECTION:?}"
+                              read -p "[enter to continue]"
+                      - Explore
+                      - SwitchMode: default
+
                   ctrl-c:
                     help: cancel & quit
                     messages:
@@ -479,14 +556,26 @@ impl Default for Config {
               key_bindings:
                 on_key:
                   up:
-                    help: go up
+                    help: to up [k]
+                    messages:
+                      - FocusPreviousByRelativeIndexFromInput
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  k:
                     messages:
                       - FocusPreviousByRelativeIndexFromInput
                       - ResetInputBuffer
                       - SwitchMode: default
 
                   down:
-                    help: go down
+                    help: to down [j]
+                    messages:
+                      - FocusNextByRelativeIndexFromInput
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  j:
                     messages:
                       - FocusNextByRelativeIndexFromInput
                       - ResetInputBuffer
@@ -617,10 +706,12 @@ impl Default for Config {
 
         let mut modes: HashMap<String, Mode> = Default::default();
         modes.insert("default".into(), Mode::default());
-        modes.insert("goto".into(), goto_mode);
+        modes.insert("go to".into(), goto_mode);
         modes.insert("number".into(), number_mode);
         modes.insert("create".into(), create_mode);
         modes.insert("delete".into(), delete_mode);
+        modes.insert("action".into(), action_mode);
+        modes.insert("selection ops".into(), selection_ops_mode);
 
         Self {
             version: VERSION.into(),

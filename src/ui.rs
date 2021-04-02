@@ -353,7 +353,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                 .borders(Borders::ALL)
                 .title(format!(" Help [{}] ", &mode.name)),
         )
-        .widths(&[TUIConstraint::Percentage(40), TUIConstraint::Percentage(60)]);
+        .widths(&[TUIConstraint::Percentage(30), TUIConstraint::Percentage(70)]);
     f.render_widget(help_menu, rect);
 }
 
