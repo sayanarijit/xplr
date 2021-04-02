@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 use std::fs;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.9"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.10"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -162,6 +162,7 @@ pub enum InternalMsg {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
+    Explore,
     Refresh,
     ClearScreen,
     FocusNext,
@@ -184,7 +185,10 @@ pub enum ExternalMsg {
     ResetInputBuffer,
     SwitchMode(String),
     Call(Command),
+    Select,
+    UnSelect,
     ToggleSelection,
+    ClearSelection,
     PrintResultAndQuit,
     PrintAppStateAndQuit,
     Debug(String),
@@ -207,6 +211,7 @@ pub struct Command {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
+    Explore,
     Refresh,
     ClearScreen,
     PrintResultAndQuit,
@@ -324,6 +329,7 @@ impl App {
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self, Error> {
         match msg {
+            ExternalMsg::Explore => self.explore(),
             ExternalMsg::Refresh => self.refresh(),
             ExternalMsg::ClearScreen => self.clear_screen(),
             ExternalMsg::FocusFirst => self.focus_first(),
@@ -353,7 +359,10 @@ impl App {
             ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
             ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
             ExternalMsg::Call(cmd) => self.call(cmd),
+            ExternalMsg::Select => self.select(),
+            ExternalMsg::UnSelect => self.un_select(),
             ExternalMsg::ToggleSelection => self.toggle_selection(),
+            ExternalMsg::ClearSelection => self.clear_selection(),
             ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
             ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
             ExternalMsg::Debug(path) => self.debug(&path),
@@ -385,6 +394,11 @@ impl App {
             self = self.enqueue(Task::new(0, MsgIn::External(msg), Some(key)));
         }
 
+        Ok(self)
+    }
+
+    fn explore(mut self) -> Result<Self, Error> {
+        self.msg_out.push_back(MsgOut::Explore);
         Ok(self)
     }
 
@@ -572,30 +586,42 @@ impl App {
     }
 
     fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self, Error> {
-        // TODO: Optimize
         self.directory_buffers.insert(parent, dir);
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
+    fn select(mut self) -> Result<Self, Error> {
+        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+            self.selection.push(n.clone());
+            self.msg_out.push_back(MsgOut::Refresh);
+        }
+        Ok(self)
+    }
+
+    fn un_select(mut self) -> Result<Self, Error> {
+        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+            self.selection = self.selection.into_iter().filter(|s| s != &n).collect();
+            self.msg_out.push_back(MsgOut::Refresh);
+        }
+        Ok(self)
+    }
+
     fn toggle_selection(mut self) -> Result<Self, Error> {
-        self.clone()
-            .focused_node()
-            .map(|n| {
-                if self.selection().contains(n) {
-                    self.selection = self
-                        .clone()
-                        .selection
-                        .into_iter()
-                        .filter(|s| s != n)
-                        .collect();
-                    Ok(self.clone())
-                } else {
-                    self.selection.push(n.to_owned());
-                    Ok(self.clone())
-                }
-            })
-            .unwrap_or(Ok(self))
+        if let Some(n) = self.focused_node() {
+            if self.selection().contains(n) {
+                self = self.un_select()?;
+            } else {
+                self = self.select()?;
+            }
+        }
+        Ok(self)
+    }
+
+    fn clear_selection(mut self) -> Result<Self, Error> {
+        self.selection.clear();
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
     }
 
     fn print_result_and_quit(mut self) -> Result<Self, Error> {
@@ -652,8 +678,8 @@ impl App {
     }
 
     /// Get a reference to the app's input buffer.
-    pub fn input_buffer(&self) -> Option<&String> {
-        self.input_buffer.as_ref()
+    pub fn input_buffer(&self) -> Option<String> {
+        self.input_buffer.clone()
     }
 
     /// Get a reference to the app's pipes.
@@ -669,5 +695,30 @@ impl App {
     /// Get a reference to the app's runtime path.
     pub fn session_path(&self) -> &String {
         &self.session_path
+    }
+
+    pub fn refresh_selection(mut self) -> Result<Self, Error> {
+        self.selection = self
+            .selection
+            .into_iter()
+            .filter(|n| PathBuf::from(&n.absolute_path).exists())
+            .collect();
+        Ok(self)
+    }
+
+    pub fn result(&self) -> Vec<&Node> {
+        if self.selection.is_empty() {
+            self.focused_node().map(|n| vec![n]).unwrap_or_default()
+        } else {
+            self.selection.iter().map(|n| n).collect()
+        }
+    }
+
+    pub fn result_str(&self) -> String {
+        self.result()
+            .into_iter()
+            .map(|n| n.absolute_path.clone())
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 }

@@ -358,7 +358,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
 }
 
 fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let input_buf = Paragraph::new(format!("> {}", app.input_buffer().unwrap_or(&"".into())))
+    let input_buf = Paragraph::new(format!("> {}", app.input_buffer().unwrap_or("".into())))
         .block(Block::default().borders(Borders::ALL).title(" input "));
     f.render_widget(input_buf, rect);
 }
@@ -373,9 +373,14 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
 
     let left_chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([TUIConstraint::Length(rect.height - 3), TUIConstraint::Min(3)].as_ref())
+        .constraints(
+            [
+                TUIConstraint::Length(rect.height - 3),
+                TUIConstraint::Length(3),
+            ]
+            .as_ref(),
+        )
         .split(chunks[0]);
-
 
     let right_chunks = Layout::default()
         .direction(Direction::Vertical)

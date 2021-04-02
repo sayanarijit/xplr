@@ -289,7 +289,7 @@ impl Default for KeyBindings {
                       args:
                         - "-c"
                         - |
-                            PTH="$(echo -e ${XPLR_DIRECTORY_NODES:?} | sed -s 's/,/\n/g' | fzf)"
+                            PTH=$(echo -e "${XPLR_DIRECTORY_NODES:?}" | fzf)
                             if [ -d "$PTH" ]; then
                                 echo "ChangeDirectory: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
                             elif [ -f "$PTH" ]; then
@@ -302,8 +302,8 @@ impl Default for KeyBindings {
                   - ToggleSelection
                   - FocusNext
 
-              c:
-                help: create
+              n:
+                help: create new
                 messages:
                   - SwitchMode: create
 
@@ -311,6 +311,35 @@ impl Default for KeyBindings {
                 help: delete
                 messages:
                   - SwitchMode: delete
+
+              c:
+                help: copy here
+                messages:
+                  - Call:
+                      command: bash
+                      args:
+                        - -c
+                        - |
+                          while IFS= read -r line; do
+                            cp -v "${line:?}" ./
+                          done <<< "${XPLR_SELECTION:?}"
+                          read -p "[enter to continue]"
+                  - ClearSelection
+                  - Explore
+
+              m:
+                help: move here
+                messages:
+                  - Call:
+                      command: bash
+                      args:
+                        - -c
+                        - |
+                          while IFS= read -r line; do
+                            mv -v "${line:?}" ./
+                          done <<< "${XPLR_SELECTION:?}"
+                          read -p "[enter to continue]"
+                  - Explore
 
               enter:
                 help: quit with result
@@ -503,6 +532,7 @@ impl Default for Config {
                               touch "${XPLR_INPUT_BUFFER:?}"
                       - ResetInputBuffer
                       - SwitchMode: default
+                      - Explore
 
                   d:
                     help: create directory
@@ -515,6 +545,7 @@ impl Default for Config {
                               mkdir -p "${XPLR_INPUT_BUFFER:?}"
                       - ResetInputBuffer
                       - SwitchMode: default
+                      - Explore
 
                   esc:
                     help: cancel
@@ -547,15 +578,16 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              if [ ! -e "$XPLR_SELECTION" ]; then
-                                while IFS= read -r line; do
-                                  rm -i "${line:?}"
-                                done < ${XPLR_PIPE_SELECTION_OUT:?}
-                              else
-                                rm -i ${XPLR_FOCUS_PATH:?}
-                              fi
+                              while IFS= read -r line; do
+                                if [ -d "$line" ]; then
+                                  rmdir -v "${line:?}"
+                                else
+                                  rm -v "${line:?}"
+                                fi
+                              done <<< "${XPLR_RESULT:?}"
                               read -p "[Enter to continue]"
                       - SwitchMode: default
+                      - Explore
 
                   D:
                     help: force delete
@@ -565,15 +597,10 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              if [ ! -e "$XPLR_SELECTION" ]; then
-                                while IFS= read -r line; do
-                                  rm -rf "${line:?}"
-                                done < ${XPLR_PIPE_SELECTION_OUT:?}
-                              else
-                                rm -rf ${XPLR_FOCUS_PATH:?}
-                              fi
-                              read -p "[Enter to continue]"
+                              echo -e "${XPLR_RESULT:?}" | xargs -l rm -rfv
+                              read -p "[enter to continue]"
                       - SwitchMode: default
+                      - Explore
 
                   ctrl-c:
                     help: cancel & quit

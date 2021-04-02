@@ -138,18 +138,7 @@ fn main() -> Result<(), Error> {
                 }
 
                 app::MsgOut::PrintResultAndQuit => {
-                    let out = if app.selection().is_empty() {
-                        app.focused_node()
-                            .map(|n| n.absolute_path.clone())
-                            .unwrap_or_default()
-                    } else {
-                        app.selection()
-                            .into_iter()
-                            .map(|n| n.absolute_path.clone())
-                            .collect::<Vec<String>>()
-                            .join("\n")
-                    };
-                    output = Some(out);
+                    output = Some(app.result_str());
                     break 'outer;
                 }
 
@@ -161,6 +150,14 @@ fn main() -> Result<(), Error> {
 
                 app::MsgOut::ClearScreen => {
                     terminal.clear()?;
+                }
+
+                app::MsgOut::Explore => {
+                    explorer::explore(
+                        app.pwd().clone(),
+                        app.focused_node().map(|n| n.relative_path.clone()),
+                        tx_explorer.clone(),
+                    );
                 }
 
                 app::MsgOut::Refresh => {
@@ -183,6 +180,8 @@ fn main() -> Result<(), Error> {
                         .unwrap_or_default();
 
                     fs::write(&app.pipes().focus_out, focused).unwrap();
+
+                    app = app.refresh_selection()?;
 
                     let selection = app
                         .selection()
@@ -222,7 +221,7 @@ fn main() -> Result<(), Error> {
                         .iter()
                         .map(|n| n.absolute_path.clone())
                         .collect::<Vec<String>>()
-                        .join(",");
+                        .join("\n");
 
                     let directory_nodes = app
                         .directory_buffer()
@@ -231,7 +230,7 @@ fn main() -> Result<(), Error> {
                                 .iter()
                                 .map(|n| n.absolute_path.clone())
                                 .collect::<Vec<String>>()
-                                .join(",")
+                                .join("\n")
                         })
                         .unwrap_or_default();
 
@@ -240,6 +239,8 @@ fn main() -> Result<(), Error> {
                     let pipe_selection_out = app.pipes().selection_out.clone();
 
                     let app_yaml = serde_yaml::to_string(&app).unwrap_or_default();
+                    let session_path = app.session_path();
+                    let result = app.result_str();
 
                     let _ = std::process::Command::new(cmd.command.clone())
                         .current_dir(app.pwd())
@@ -248,11 +249,12 @@ fn main() -> Result<(), Error> {
                         .env("XPLR_FOCUS_PATH", focus_path)
                         .env("XPLR_FOCUS_INDEX", focus_index)
                         .env("XPLR_SELECTION", selection)
-                        .env("XPLR_SESSION_PATH", app.session_path())
+                        .env("XPLR_SESSION_PATH", session_path)
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
                         .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
                         .env("XPLR_APP_YAML", app_yaml)
+                        .env("XPLR_RESULT", result)
                         .env("XPLR_DIRECTORY_NODES", directory_nodes)
                         .args(cmd.args.clone())
                         .status();
