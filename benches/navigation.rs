@@ -8,33 +8,85 @@ fn criterion_benchmark(c: &mut Criterion) {
         fs::File::create(format!("/tmp/xplr_bench/{}", i)).unwrap();
     });
 
-    let app = app::create()
+    let app = app::App::create()
         .expect("failed to create app")
-        .change_directory(&"/tmp/xplr_bench".to_string())
+        .enqueue(app::Task::new(
+            1,
+            app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
+            None,
+        ))
+        .possibly_mutate()
         .unwrap();
 
     c.bench_function("focus next item", |b| {
-        b.iter(|| app.clone().handle(&config::Action::FocusNext))
+        b.iter(|| {
+            app.clone()
+                .enqueue(app::Task::new(
+                    1,
+                    app::MsgIn::External(app::ExternalMsg::FocusNext),
+                    None,
+                ))
+                .possibly_mutate()
+                .unwrap()
+        })
     });
 
     c.bench_function("focus previous item", |b| {
-        b.iter(|| app.clone().handle(&config::Action::FocusPrevious))
+        b.iter(|| {
+            app.clone()
+                .enqueue(app::Task::new(
+                    1,
+                    app::MsgIn::External(app::ExternalMsg::FocusPrevious),
+                    None,
+                ))
+                .possibly_mutate()
+                .unwrap()
+        })
     });
 
     c.bench_function("focus first item", |b| {
-        b.iter(|| app.clone().handle(&config::Action::FocusFirst))
+        b.iter(|| {
+            app.clone()
+                .enqueue(app::Task::new(
+                    1,
+                    app::MsgIn::External(app::ExternalMsg::FocusFirst),
+                    None,
+                ))
+                .possibly_mutate()
+                .unwrap()
+        })
     });
 
     c.bench_function("focus last item", |b| {
-        b.iter(|| app.clone().handle(&config::Action::FocusLast))
+        b.iter(|| {
+            app.clone()
+                .enqueue(app::Task::new(
+                    1,
+                    app::MsgIn::External(app::ExternalMsg::FocusLast),
+                    None,
+                ))
+                .possibly_mutate()
+                .unwrap()
+        })
     });
 
     c.bench_function("leave and enter directory", |b| {
         b.iter(|| {
             app.clone()
-                .handle(&config::Action::Back)
+                .enqueue(app::Task::new(
+                    1,
+                    app::MsgIn::External(app::ExternalMsg::Back),
+                    None,
+                ))
+                .possibly_mutate()
                 .unwrap()
-                .handle(&config::Action::Enter)
+                .enqueue(app::Task::new(
+                    1,
+                    app::MsgIn::External(app::ExternalMsg::Back),
+                    None,
+                ))
+                .possibly_mutate()
+                .unwrap()
         })
     });
 }
