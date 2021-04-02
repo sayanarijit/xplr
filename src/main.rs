@@ -138,12 +138,12 @@ fn main() -> Result<(), Error> {
                 }
 
                 app::MsgOut::PrintResultAndQuit => {
-                    let out = if app.selected().is_empty() {
+                    let out = if app.selection().is_empty() {
                         app.focused_node()
                             .map(|n| n.absolute_path.clone())
                             .unwrap_or_default()
                     } else {
-                        app.selected()
+                        app.selection()
                             .into_iter()
                             .map(|n| n.absolute_path.clone())
                             .collect::<Vec<String>>()
@@ -184,14 +184,14 @@ fn main() -> Result<(), Error> {
 
                     fs::write(&app.pipes().focus_out, focused).unwrap();
 
-                    let selected = app
-                        .selected()
+                    let selection = app
+                        .selection()
                         .iter()
                         .map(|n| n.absolute_path.clone())
                         .collect::<Vec<String>>()
                         .join("\n");
 
-                    fs::write(&app.pipes().selected_out, selected).unwrap();
+                    fs::write(&app.pipes().selection_out, selection).unwrap();
 
                     fs::write(&app.pipes().mode_out, &app.mode().name).unwrap();
                 }
@@ -217,8 +217,8 @@ fn main() -> Result<(), Error> {
                         .unwrap_or_default()
                         .to_string();
 
-                    let selected = app
-                        .selected()
+                    let selection = app
+                        .selection()
                         .iter()
                         .map(|n| n.absolute_path.clone())
                         .collect::<Vec<String>>()
@@ -237,7 +237,7 @@ fn main() -> Result<(), Error> {
 
                     let pipe_msg_in = app.pipes().msg_in.clone();
                     let pipe_focus_out = app.pipes().focus_out.clone();
-                    let pipe_selected_out = app.pipes().selected_out.clone();
+                    let pipe_selection_out = app.pipes().selection_out.clone();
 
                     let app_yaml = serde_yaml::to_string(&app).unwrap_or_default();
 
@@ -247,10 +247,10 @@ fn main() -> Result<(), Error> {
                         .env("XPLR_INPUT_BUFFER", input_buffer)
                         .env("XPLR_FOCUS_PATH", focus_path)
                         .env("XPLR_FOCUS_INDEX", focus_index)
-                        .env("XPLR_SELECTED", selected)
+                        .env("XPLR_SELECTION", selection)
                         .env("XPLR_RUNTIME_PATH", app.runtime_path())
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
-                        .env("XPLR_PIPE_SELECTED_OUT", pipe_selected_out)
+                        .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
                         .env("XPLR_APP_YAML", app_yaml)
                         .env("XPLR_DIRECTORY_NODES", directory_nodes)

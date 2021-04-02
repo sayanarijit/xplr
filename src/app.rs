@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 use std::fs;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.5"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.6"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -21,7 +21,7 @@ pub const UNSUPPORTED_STR: &str = "???";
 pub struct PipesConfig {
     pub msg_in: String,
     pub focus_out: String,
-    pub selected_out: String,
+    pub selection_out: String,
     pub mode_out: String,
 }
 
@@ -35,19 +35,19 @@ impl PipesConfig {
 
         let focus_out = pipesdir.join("focus_out").to_string_lossy().to_string();
 
-        let selected_out = pipesdir.join("selected_out").to_string_lossy().to_string();
+        let selection_out = pipesdir.join("selection_out").to_string_lossy().to_string();
 
         let mode_out = pipesdir.join("mode_out").to_string_lossy().to_string();
 
         fs::write(&msg_in, "").unwrap();
         fs::write(&focus_out, "").unwrap();
-        fs::write(&selected_out, "").unwrap();
+        fs::write(&selection_out, "").unwrap();
         fs::write(&mode_out, "").unwrap();
 
         Self {
             msg_in,
             focus_out,
-            selected_out,
+            selection_out,
             mode_out,
         }
     }
@@ -248,7 +248,7 @@ pub struct App {
     pwd: String,
     directory_buffers: HashMap<String, DirectoryBuffer>,
     tasks: BinaryHeap<Task>,
-    selected: Vec<Node>,
+    selection: Vec<Node>,
     msg_out: VecDeque<MsgOut>,
     mode: Mode,
     input_buffer: Option<String>,
@@ -284,7 +284,7 @@ impl App {
                 pwd,
                 directory_buffers: Default::default(),
                 tasks: Default::default(),
-                selected: Default::default(),
+                selection: Default::default(),
                 msg_out: Default::default(),
                 mode,
                 input_buffer: Default::default(),
@@ -582,16 +582,16 @@ impl App {
         self.clone()
             .focused_node()
             .map(|n| {
-                if self.selected().contains(n) {
-                    self.selected = self
+                if self.selection().contains(n) {
+                    self.selection = self
                         .clone()
-                        .selected
+                        .selection
                         .into_iter()
                         .filter(|s| s != n)
                         .collect();
                     Ok(self.clone())
                 } else {
-                    self.selected.push(n.to_owned());
+                    self.selection.push(n.to_owned());
                     Ok(self.clone())
                 }
             })
@@ -632,9 +632,9 @@ impl App {
         &self.config
     }
 
-    /// Get a reference to the app's selected.
-    pub fn selected(&self) -> &Vec<Node> {
-        &self.selected
+    /// Get a reference to the app's selection.
+    pub fn selection(&self) -> &Vec<Node> {
+        &self.selection
     }
 
     pub fn pop_msg_out(&mut self) -> Option<MsgOut> {

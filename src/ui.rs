@@ -100,7 +100,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let is_focused = dir.focus == index;
 
                     // TODO : Optimize
-                    let is_selected = app.selected().contains(&node);
+                    let is_selected = app.selection().contains(&node);
 
                     let ui = if is_focused {
                         &config.general.focused_ui
@@ -250,9 +250,9 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
     f.render_stateful_widget(table, rect, &mut table_state);
 }
 
-fn draw_selected<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     let selected: Vec<ListItem> = app
-        .selected()
+        .selection()
         .iter()
         .map(|n| n.absolute_path.clone())
         .map(ListItem::new)
@@ -384,6 +384,6 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
 
     draw_table(f, left_chunks[0], app, hb);
     draw_input_buffer(f, left_chunks[1], app, hb);
-    draw_selected(f, right_chunks[0], app, hb);
+    draw_selection(f, right_chunks[0], app, hb);
     draw_help_menu(f, right_chunks[1], app, hb);
 }
