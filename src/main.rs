@@ -1,12 +1,10 @@
+use anyhow::Result;
 use crossterm::event::Event;
 use crossterm::terminal as term;
 use crossterm::{event, execute};
 use handlebars::Handlebars;
-use std::env;
 use std::fs;
-use std::io;
 use std::io::prelude::*;
-use std::path::PathBuf;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
@@ -14,41 +12,12 @@ use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
 use xplr::app;
-use xplr::config::Config;
-use xplr::error::Error;
 use xplr::explorer;
 use xplr::input::Key;
 use xplr::ui;
 
-fn main() -> Result<(), Error> {
-    let mut pwd = PathBuf::from(env::args().skip(1).next().unwrap_or(".".into()))
-        .canonicalize()
-        .unwrap_or_default();
-
-    let mut focused_path = None;
-
-    if pwd.is_file() {
-        focused_path = pwd.file_name().map(|n| n.to_string_lossy().to_string());
-        pwd = pwd.parent().map(|p| p.into()).unwrap_or_default();
-    }
-
-    let pwd = pwd.to_string_lossy().to_string();
-
-    let mut last_pwd = pwd.clone();
-
-    let config_dir = dirs::config_dir()
-        .unwrap_or(PathBuf::from("."))
-        .join("xplr");
-
-    let config_file = config_dir.join("config.yml");
-
-    let config: Config = if config_file.exists() {
-        serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?
-    } else {
-        Config::default()
-    };
-
-    let mut app = app::App::create(config, pwd.clone())?;
+fn main() -> Result<()> {
+    let mut app = app::App::create()?;
 
     let mut hb = Handlebars::new();
     hb.register_template_string(
@@ -72,13 +41,13 @@ fn main() -> Result<(), Error> {
     let tx_pipe = tx_key.clone();
     let tx_explorer = tx_key.clone();
 
-    term::enable_raw_mode().unwrap();
-    let mut stdout = get_tty().unwrap();
+    term::enable_raw_mode()?;
+    let mut stdout = get_tty()?;
     // let mut stdout = stdout.lock();
-    execute!(stdout, term::EnterAlternateScreen).unwrap();
+    execute!(stdout, term::EnterAlternateScreen)?;
     // let stdout = MouseTerminal::from(stdout);
     let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend).unwrap();
+    let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
 
     let (tx, rx_key) = mpsc::channel();
@@ -128,13 +97,14 @@ fn main() -> Result<(), Error> {
         thread::sleep(Duration::from_millis(10));
     });
 
-    explorer::explore(pwd.clone(), focused_path, tx_init);
+    explorer::explore(app.pwd().clone(), std::env::args().skip(1).next(), tx_init);
 
+    let mut last_pwd = app.pwd().clone();
     'outer: while result.is_ok() {
         while let Some(msg) = app.pop_msg_out() {
             match msg {
                 app::MsgOut::Debug(path) => {
-                    fs::write(&path, serde_yaml::to_string(&app).unwrap_or_default())?;
+                    fs::write(&path, serde_yaml::to_string(&app)?)?;
                 }
 
                 app::MsgOut::PrintResultAndQuit => {
@@ -171,7 +141,7 @@ fn main() -> Result<(), Error> {
                     };
 
                     // UI
-                    terminal.draw(|f| ui::draw(f, &app, &hb)).unwrap();
+                    terminal.draw(|f| ui::draw(f, &app, &hb))?;
 
                     // Pipes
                     let focused = app
@@ -179,7 +149,7 @@ fn main() -> Result<(), Error> {
                         .map(|n| n.absolute_path.clone())
                         .unwrap_or_default();
 
-                    fs::write(&app.pipes().focus_out, focused).unwrap();
+                    fs::write(&app.pipes().focus_out, focused)?;
 
                     app = app.refresh_selection()?;
 
@@ -190,16 +160,16 @@ fn main() -> Result<(), Error> {
                         .collect::<Vec<String>>()
                         .join("\n");
 
-                    fs::write(&app.pipes().selection_out, selection).unwrap();
+                    fs::write(&app.pipes().selection_out, selection)?;
 
-                    fs::write(&app.pipes().mode_out, &app.mode().name).unwrap();
+                    fs::write(&app.pipes().mode_out, &app.mode().name)?;
                 }
 
                 app::MsgOut::Call(cmd) => {
-                    tx.send(true).unwrap();
+                    tx.send(true)?;
                     terminal.clear()?;
-                    term::disable_raw_mode().unwrap();
-                    execute!(terminal.backend_mut(), term::LeaveAlternateScreen).unwrap();
+                    term::disable_raw_mode()?;
+                    execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
                     terminal.show_cursor()?;
 
                     let pid = std::process::id().to_string();
@@ -238,7 +208,7 @@ fn main() -> Result<(), Error> {
                     let pipe_focus_out = app.pipes().focus_out.clone();
                     let pipe_selection_out = app.pipes().selection_out.clone();
 
-                    let app_yaml = serde_yaml::to_string(&app).unwrap_or_default();
+                    let app_yaml = serde_yaml::to_string(&app)?;
                     let session_path = app.session_path();
                     let result = app.result_str();
 
@@ -260,10 +230,10 @@ fn main() -> Result<(), Error> {
                         .status();
 
                     terminal.hide_cursor()?;
-                    execute!(terminal.backend_mut(), term::EnterAlternateScreen).unwrap();
-                    term::enable_raw_mode().unwrap();
-                    tx.send(false).unwrap();
-                    terminal.draw(|f| ui::draw(f, &app, &hb)).unwrap();
+                    execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
+                    term::enable_raw_mode()?;
+                    tx.send(false)?;
+                    terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
             };
         }
@@ -283,8 +253,8 @@ fn main() -> Result<(), Error> {
         // thread::sleep(Duration::from_millis(10));
     }
 
-    term::disable_raw_mode().unwrap();
-    execute!(terminal.backend_mut(), term::LeaveAlternateScreen).unwrap();
+    term::disable_raw_mode()?;
+    execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
     terminal.show_cursor()?;
 
     if let Some(out) = output {

@@ -1,17 +1,19 @@
 use crate::config::Config;
 use crate::config::Mode;
-use crate::error::Error;
 use crate::input::Key;
+use anyhow::{bail, Result};
 use mime_guess;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::env;
 use std::fs;
+use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.10"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.11"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -263,11 +265,35 @@ pub struct App {
 }
 
 impl App {
-    pub fn create(config: Config, pwd: String) -> Result<Self, Error> {
+    pub fn create() -> Result<Self> {
+        let mut pwd = PathBuf::from(env::args().skip(1).next().unwrap_or(".".into()))
+            .canonicalize()
+            .unwrap_or_default();
+
+        if pwd.is_file() {
+            pwd = pwd.parent().map(|p| p.into()).unwrap_or_default();
+        }
+
+        let pwd = pwd.to_string_lossy().to_string();
+
+        let config_dir = dirs::config_dir()
+            .unwrap_or(PathBuf::from("."))
+            .join("xplr");
+
+        let config_file = config_dir.join("config.yml");
+
+        let config: Config = if config_file.exists() {
+            serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?
+        } else {
+            Config::default()
+        };
+
         if config.version != VERSION {
-            Err(Error::IncompatibleVersion(
-                "incompatible config version".into(),
-            ))
+            bail!(
+                "incompatible config version {} in {}",
+                config.version,
+                config_file.to_string_lossy().to_string()
+            )
         } else {
             let mode = config
                 .modes
@@ -309,7 +335,7 @@ impl App {
         self
     }
 
-    pub fn possibly_mutate(mut self) -> Result<Self, Error> {
+    pub fn possibly_mutate(mut self) -> Result<Self> {
         if let Some(task) = self.tasks.pop() {
             match task.msg {
                 MsgIn::Internal(msg) => self.handle_internal(msg),
@@ -320,14 +346,14 @@ impl App {
         }
     }
 
-    fn handle_internal(self, msg: InternalMsg) -> Result<Self, Error> {
+    fn handle_internal(self, msg: InternalMsg) -> Result<Self> {
         match msg {
             InternalMsg::AddDirectory(parent, dir) => self.add_directory(parent, dir),
             InternalMsg::HandleKey(key) => self.handle_key(key),
         }
     }
 
-    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self, Error> {
+    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
         match msg {
             ExternalMsg::Explore => self.explore(),
             ExternalMsg::Refresh => self.refresh(),
@@ -366,11 +392,11 @@ impl App {
             ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
             ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
             ExternalMsg::Debug(path) => self.debug(&path),
-            ExternalMsg::Terminate => Err(Error::Terminated),
+            ExternalMsg::Terminate => bail!("terminated"),
         }
     }
 
-    fn handle_key(mut self, key: Key) -> Result<Self, Error> {
+    fn handle_key(mut self, key: Key) -> Result<Self> {
         let kb = self.mode.key_bindings.clone();
         let default = kb.default.clone();
         let msgs = kb
@@ -397,22 +423,22 @@ impl App {
         Ok(self)
     }
 
-    fn explore(mut self) -> Result<Self, Error> {
+    fn explore(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::Explore);
         Ok(self)
     }
 
-    fn refresh(mut self) -> Result<Self, Error> {
+    fn refresh(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
-    fn clear_screen(mut self) -> Result<Self, Error> {
+    fn clear_screen(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::ClearScreen);
         Ok(self)
     }
 
-    fn focus_first(mut self) -> Result<Self, Error> {
+    fn focus_first(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = 0;
             self.msg_out.push_back(MsgOut::Refresh);
@@ -420,7 +446,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_last(mut self) -> Result<Self, Error> {
+    fn focus_last(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.total.max(1) - 1;
             self.msg_out.push_back(MsgOut::Refresh);
@@ -428,7 +454,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_previous(mut self) -> Result<Self, Error> {
+    fn focus_previous(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.focus.max(1) - 1;
             self.msg_out.push_back(MsgOut::Refresh);
@@ -436,7 +462,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self, Error> {
+    fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.focus.max(index) - index;
             self.msg_out.push_back(MsgOut::Refresh);
@@ -444,7 +470,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_previous_by_relative_index_from_input(self) -> Result<Self, Error> {
+    fn focus_previous_by_relative_index_from_input(self) -> Result<Self> {
         if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
             self.focus_previous_by_relative_index(index)
         } else {
@@ -452,7 +478,7 @@ impl App {
         }
     }
 
-    fn focus_next(mut self) -> Result<Self, Error> {
+    fn focus_next(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = (dir.focus + 1).min(dir.total.max(1) - 1);
             self.msg_out.push_back(MsgOut::Refresh);
@@ -460,7 +486,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self, Error> {
+    fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
             self.msg_out.push_back(MsgOut::Refresh);
@@ -468,7 +494,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_next_by_relative_index_from_input(self) -> Result<Self, Error> {
+    fn focus_next_by_relative_index_from_input(self) -> Result<Self> {
         if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
             self.focus_next_by_relative_index(index)
         } else {
@@ -476,7 +502,7 @@ impl App {
         }
     }
 
-    fn change_directory(mut self, dir: &String) -> Result<Self, Error> {
+    fn change_directory(mut self, dir: &String) -> Result<Self> {
         if PathBuf::from(dir).is_dir() {
             self.pwd = dir.to_owned();
             self.msg_out.push_back(MsgOut::Refresh);
@@ -484,14 +510,14 @@ impl App {
         Ok(self)
     }
 
-    fn enter(self) -> Result<Self, Error> {
+    fn enter(self) -> Result<Self> {
         self.focused_node()
             .map(|n| n.absolute_path.clone())
             .map(|p| self.clone().change_directory(&p))
             .unwrap_or(Ok(self))
     }
 
-    fn back(self) -> Result<Self, Error> {
+    fn back(self) -> Result<Self> {
         PathBuf::from(self.pwd())
             .parent()
             .map(|p| {
@@ -501,7 +527,7 @@ impl App {
             .unwrap_or(Ok(self))
     }
 
-    fn buffer_string(mut self, input: &String) -> Result<Self, Error> {
+    fn buffer_string(mut self, input: &String) -> Result<Self> {
         if let Some(buf) = self.input_buffer.as_mut() {
             buf.extend(input.chars());
         } else {
@@ -511,7 +537,7 @@ impl App {
         Ok(self)
     }
 
-    fn buffer_string_from_key(self, key: Option<Key>) -> Result<Self, Error> {
+    fn buffer_string_from_key(self, key: Option<Key>) -> Result<Self> {
         if let Some(c) = key.and_then(|k| k.to_char()) {
             self.buffer_string(&c.to_string())
         } else {
@@ -519,13 +545,13 @@ impl App {
         }
     }
 
-    fn reset_input_buffer(mut self) -> Result<Self, Error> {
+    fn reset_input_buffer(mut self) -> Result<Self> {
         self.input_buffer = None;
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
-    fn focus_by_index(mut self, index: usize) -> Result<Self, Error> {
+    fn focus_by_index(mut self, index: usize) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = index.min(dir.total.max(1) - 1);
             self.msg_out.push_back(MsgOut::Refresh);
@@ -533,7 +559,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_by_index_from_input(self) -> Result<Self, Error> {
+    fn focus_by_index_from_input(self) -> Result<Self> {
         if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
             self.focus_by_index(index)
         } else {
@@ -541,7 +567,7 @@ impl App {
         }
     }
 
-    fn focus_by_file_name(mut self, name: &String) -> Result<Self, Error> {
+    fn focus_by_file_name(mut self, name: &String) -> Result<Self> {
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
                 .clone()
@@ -558,7 +584,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_path(self, path: &String) -> Result<Self, Error> {
+    fn focus_path(self, path: &String) -> Result<Self> {
         let pathbuf = PathBuf::from(path);
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
@@ -572,7 +598,7 @@ impl App {
         }
     }
 
-    fn switch_mode(mut self, mode: &String) -> Result<Self, Error> {
+    fn switch_mode(mut self, mode: &String) -> Result<Self> {
         if let Some(mode) = self.config.modes.get(mode) {
             self.mode = mode.to_owned();
             self.msg_out.push_back(MsgOut::Refresh);
@@ -580,18 +606,18 @@ impl App {
         Ok(self)
     }
 
-    fn call(mut self, command: Command) -> Result<Self, Error> {
+    fn call(mut self, command: Command) -> Result<Self> {
         self.msg_out.push_back(MsgOut::Call(command));
         Ok(self)
     }
 
-    fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self, Error> {
+    fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
         self.directory_buffers.insert(parent, dir);
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
-    fn select(mut self) -> Result<Self, Error> {
+    fn select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection.push(n.clone());
             self.msg_out.push_back(MsgOut::Refresh);
@@ -599,7 +625,7 @@ impl App {
         Ok(self)
     }
 
-    fn un_select(mut self) -> Result<Self, Error> {
+    fn un_select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection = self.selection.into_iter().filter(|s| s != &n).collect();
             self.msg_out.push_back(MsgOut::Refresh);
@@ -607,7 +633,7 @@ impl App {
         Ok(self)
     }
 
-    fn toggle_selection(mut self) -> Result<Self, Error> {
+    fn toggle_selection(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node() {
             if self.selection().contains(n) {
                 self = self.un_select()?;
@@ -618,23 +644,23 @@ impl App {
         Ok(self)
     }
 
-    fn clear_selection(mut self) -> Result<Self, Error> {
+    fn clear_selection(mut self) -> Result<Self> {
         self.selection.clear();
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
-    fn print_result_and_quit(mut self) -> Result<Self, Error> {
+    fn print_result_and_quit(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::PrintResultAndQuit);
         Ok(self)
     }
 
-    fn print_app_state_and_quit(mut self) -> Result<Self, Error> {
+    fn print_app_state_and_quit(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::PrintAppStateAndQuit);
         Ok(self)
     }
 
-    fn debug(mut self, path: &String) -> Result<Self, Error> {
+    fn debug(mut self, path: &String) -> Result<Self> {
         self.msg_out.push_back(MsgOut::Debug(path.to_owned()));
         Ok(self)
     }
@@ -697,7 +723,7 @@ impl App {
         &self.session_path
     }
 
-    pub fn refresh_selection(mut self) -> Result<Self, Error> {
+    pub fn refresh_selection(mut self) -> Result<Self> {
         self.selection = self
             .selection
             .into_iter()
