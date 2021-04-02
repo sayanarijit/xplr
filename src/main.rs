@@ -1,6 +1,6 @@
 use anyhow::Result;
-use crossterm::terminal as term;
 use crossterm::execute;
+use crossterm::terminal as term;
 use handlebars::Handlebars;
 use std::fs;
 use std::io::prelude::*;
@@ -51,9 +51,14 @@ fn main() -> Result<()> {
             .file_name()
             .map(|n| n.to_string_lossy().to_string())
     });
-    explorer::explore(app.pwd().clone(), focused_path, tx_msg_in.clone());
+    explorer::explore(
+        app.explorer_config().clone(),
+        app.pwd().clone(),
+        focused_path,
+        tx_msg_in.clone(),
+    );
 
-    pipe_reader::keep_reading(app.pipes().msg_in.clone(), tx_msg_in.clone());
+    pipe_reader::keep_reading(app.pipe().msg_in.clone(), tx_msg_in.clone());
 
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
@@ -83,6 +88,7 @@ fn main() -> Result<()> {
 
                 app::MsgOut::Explore => {
                     explorer::explore(
+                        app.explorer_config().clone(),
                         app.pwd().clone(),
                         app.focused_node().map(|n| n.relative_path.clone()),
                         tx_msg_in.clone(),
@@ -92,6 +98,7 @@ fn main() -> Result<()> {
                 app::MsgOut::Refresh => {
                     if app.pwd() != &last_pwd {
                         explorer::explore(
+                            app.explorer_config().clone(),
                             app.pwd().clone(),
                             app.focused_node().map(|n| n.relative_path.clone()),
                             tx_msg_in.clone(),
@@ -108,7 +115,7 @@ fn main() -> Result<()> {
                         .map(|n| n.absolute_path.clone())
                         .unwrap_or_default();
 
-                    fs::write(&app.pipes().focus_out, focused)?;
+                    fs::write(&app.pipe().focus_out, focused)?;
 
                     app = app.refresh_selection()?;
 
@@ -119,9 +126,9 @@ fn main() -> Result<()> {
                         .collect::<Vec<String>>()
                         .join("\n");
 
-                    fs::write(&app.pipes().selection_out, selection)?;
+                    fs::write(&app.pipe().selection_out, selection)?;
 
-                    fs::write(&app.pipes().mode_out, &app.mode().name)?;
+                    fs::write(&app.pipe().mode_out, &app.mode().name)?;
                 }
 
                 app::MsgOut::Call(cmd) => {
@@ -163,9 +170,9 @@ fn main() -> Result<()> {
                         })
                         .unwrap_or_default();
 
-                    let pipe_msg_in = app.pipes().msg_in.clone();
-                    let pipe_focus_out = app.pipes().focus_out.clone();
-                    let pipe_selection_out = app.pipes().selection_out.clone();
+                    let pipe_msg_in = app.pipe().msg_in.clone();
+                    let pipe_focus_out = app.pipe().focus_out.clone();
+                    let pipe_selection_out = app.pipe().selection_out.clone();
 
                     let app_yaml = serde_yaml::to_string(&app)?;
                     let session_path = app.session_path();
@@ -215,6 +222,8 @@ fn main() -> Result<()> {
     term::disable_raw_mode()?;
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
     terminal.show_cursor()?;
+
+    fs::remove_dir_all(app.session_path())?;
 
     if let Some(out) = output {
         println!("{}", out);

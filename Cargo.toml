@@ -1,9 +1,9 @@
 [package]
 name = "xplr"
-version = "0.2.13"  # Update app.rs
+version = "0.2.14"  # Update app.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
-description = "An experimental, minimal, configurable TUI file explorer, stealing ideas from nnn and fzf."
+description = "A hackable, minimal, fast TUI file explorer, stealing ideas from nnn and fzf"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/sayanarijit/xplr"

@@ -1,64 +1,30 @@
-An experimental, minimal, configurable TUI file explorer, stealing ideas from [`nnn`](https://github.com/jarun/nnn) and [`fzf`](https://github.com/junegunn/fzf).
+<h1 align="center">xplr</h1>
 
-![Screenshot](https://user-images.githubusercontent.com/11632726/109526906-1b555080-7ad9-11eb-9fd7-03e092220618.gif)
+<p align="center">
+A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https://github.com/jarun/nnn">nnn</a> and <a href="https://github.com/junegunn/fzf">fzf</a>.
+</p>
 
+<p align="center">
+<a href="https://asciinema.org/a/3THQPXNVi801Yu8nWxO6qfUa4" target="_blank">
+<img src="https://s4.gifyu.com/images/xplr.gif"/>
+</a>
+</p>
 
-Example usage:
---------------
+<h3 align="center">
+[<a href="https://github.com/sayanarijit/xplr/wiki/Features">Features</a>]
+[<a href="https://github.com/sayanarijit/xplr/wiki/Quickstart">Quickstart</a>]
+[<a href="https://github.com/sayanarijit/xplr/wiki/Plugins">Plugins</a>]
+[<a href="https://github.com/sayanarijit/xplr/wiki">Documentation</a>]
+[<a href="https://github.com/sayanarijit/xplr/wiki/TODO">TODO</a>]
+</h3>
 
-```bash
-# Edit file
-vim "$(xplr)"
-
-# Copy file(s)
-cp "$(xplr)" "$(xplr)/"
-
-# Search and move file
-mv "$(fzf)" "$(xplr)/"
-```
-
-As of now the fuctionality is pretty limited. You basically have to drop
-into a shell (default key `s`) in the directory to do things like
-create/delete/rename files. A lot of research and implementations to go.
-
-Although, it's currently satisfying my needs (for customization and speed)
-with this vim plugin https://github.com/sayanarijit/xplr.vim.
+<br>
 
 
-Let's brainstorm
-----------------
+Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, it's speciality is it's hackability.
 
-You can also experiment and help by suggesting ideas/opinions.
+Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you should be able to configure the key bindings,
+different run modes, and also the way it looks by modifying one single configuration file.
 
-1. Install
-
-```bash
-cargo install xplr
-```
-
-2. Create the customizable config file (requires [`yq`](https://github.com/mikefarah/yq))
-
-```bash
-mkdir -p ~/.config/xplr
-
-xplr | yq ".config" -y | tee ~/.config/xplr/config.yml
-
-# When the app loads, press `#`
-```
-
-3. Check the key bindings in the config file.
-
-4. Run `xplr`.
-
-
-TODO research
--------------
-
-- [ ] Research FIFO/socket options for better integration with other tools.
-- [ ] Research saner configuration formats.
-- [ ] Research saner key binding options.
-- [ ] Research how to go beyond filesystem and explore any tree-like structure.
-- [ ] Research ways to make it faster (load and run).
-- [ ] Research ways to implement a plugin system.
-- [ ] CLI options and help menu.
-- [ ] Go beyond research and implement things.
+If you come up with something cool, or if you feel it's lacking somewhere in portability, flexibility or performance, don't hesitate to
+[start a conversation](https://github.com/sayanarijit/xplr/discussions/2).

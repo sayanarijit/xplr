@@ -46,19 +46,19 @@ impl Default for FileTypesConfig {
     fn default() -> Self {
         FileTypesConfig {
             directory: FileTypeConfig {
-                icon: "d".into(),
+                icon: "ð".into(),
                 style: Style::default()
                     .add_modifier(Modifier::BOLD)
                     .fg(Color::Blue),
             },
 
             file: FileTypeConfig {
-                icon: "f".into(),
+                icon: "ƒ".into(),
                 style: Default::default(),
             },
 
             symlink: FileTypeConfig {
-                icon: "s".into(),
+                icon: "§".into(),
                 style: Style::default()
                     .add_modifier(Modifier::ITALIC)
                     .fg(Color::Cyan),
@@ -293,31 +293,11 @@ impl Default for KeyBindings {
               ctrl-f:
                 help: search [/]
                 messages:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                            PTH=$(echo -e "${XPLR_DIRECTORY_NODES:?}" | fzf)
-                            if [ -d "$PTH" ]; then
-                                echo "ChangeDirectory: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
-                            elif [ -f "$PTH" ]; then
-                                echo "FocusPath: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
-                            fi
+                  - SwitchMode: search
 
               /:
                 messages:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                            PTH=$(echo -e "${XPLR_DIRECTORY_NODES:?}" | fzf)
-                            if [ -d "$PTH" ]; then
-                                echo "ChangeDirectory: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
-                            elif [ -f "$PTH" ]; then
-                                echo "FocusPath: ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
-                            fi
+                  - SwitchMode: search
 
               d:
                 help: delete
@@ -339,6 +319,13 @@ impl Default for KeyBindings {
                 messages:
                   - ToggleSelection
                   - FocusNext
+
+              ".":
+                help: show hidden
+                messages:
+                  - ToggleNodeFilter:
+                      filter: RelativePathDoesNotStartWith
+                      input: .
 
               enter:
                 help: quit with result
@@ -429,6 +416,69 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
+        let search_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: search
+              key_bindings:
+                on_key:
+                  enter:
+                    help: focus
+                    messages:
+                      - ResetNodeFilters
+                      - SwitchMode: default
+                  
+                  up:
+                    help: up
+                    messages:
+                      - FocusPrevious
+
+                  down:
+                    help: down
+                    messages:
+                      - FocusNext
+
+                  right:
+                    help: enter
+                    messages:
+                      - Enter
+                      - ResetInputBuffer
+                      - ResetNodeFilters
+                      - SwitchMode: default
+
+                  left:
+                    help: back
+                    messages:
+                      - Back
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  esc:
+                    help: cancel
+                    messages:
+                      - ResetNodeFilters
+                      - SwitchMode: default
+
+                  backspace:
+                    help: clear
+                    messages:
+                      - ResetInputBuffer
+                      - ResetNodeFilters
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - BufferStringFromKey
+                    - AddNodeFilterFromInputString:
+                        filter: RelativePathDoesContain
+                        case_sensitive: false
+            "###,
+        )
+        .unwrap();
+
         let goto_mode: Mode = serde_yaml::from_str(
             r###"
               name: go to
@@ -515,9 +565,9 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              while IFS= read -r line; do
+                              (while IFS= read -r line; do
                                 cp -v "${line:?}" ./
-                              done <<< "${XPLR_SELECTION:?}"
+                              done <<< "${XPLR_SELECTION:?}")
                               read -p "[enter to continue]"
                       - ClearSelection
                       - Explore
@@ -531,9 +581,9 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              while IFS= read -r line; do
+                              (while IFS= read -r line; do
                                 mv -v "${line:?}" ./
-                              done <<< "${XPLR_SELECTION:?}"
+                              done <<< "${XPLR_SELECTION:?}")
                               read -p "[enter to continue]"
                       - Explore
                       - SwitchMode: default
@@ -559,34 +609,34 @@ impl Default for Config {
                     help: to up [k]
                     messages:
                       - FocusPreviousByRelativeIndexFromInput
-                      - ResetInputBuffer
                       - SwitchMode: default
 
                   k:
                     messages:
                       - FocusPreviousByRelativeIndexFromInput
-                      - ResetInputBuffer
                       - SwitchMode: default
 
                   down:
                     help: to down [j]
                     messages:
                       - FocusNextByRelativeIndexFromInput
-                      - ResetInputBuffer
                       - SwitchMode: default
 
                   j:
                     messages:
                       - FocusNextByRelativeIndexFromInput
-                      - ResetInputBuffer
                       - SwitchMode: default
 
                   enter:
                     help: to index
                     messages:
                       - FocusByIndexFromInput
-                      - ResetInputBuffer
                       - SwitchMode: default
+
+                  backspace:
+                    help: clear
+                    messages:
+                      - ResetInputBuffer
 
                   ctrl-c:
                     help: cancel & quit
@@ -600,7 +650,6 @@ impl Default for Config {
 
                 default:
                   messages:
-                    - ResetInputBuffer
                     - SwitchMode: default
             "###,
         )
@@ -620,7 +669,6 @@ impl Default for Config {
                             - -c
                             - |
                               touch "${XPLR_INPUT_BUFFER:?}"
-                      - ResetInputBuffer
                       - SwitchMode: default
                       - Explore
 
@@ -633,14 +681,17 @@ impl Default for Config {
                             - -c
                             - |
                               mkdir -p "${XPLR_INPUT_BUFFER:?}"
-                      - ResetInputBuffer
                       - SwitchMode: default
                       - Explore
+
+                  backspace:
+                    help: clear
+                    messages:
+                      - ResetInputBuffer
 
                   esc:
                     help: cancel
                     messages:
-                      - ResetInputBuffer
                       - SwitchMode: default
 
                   ctrl-c:
@@ -668,14 +719,14 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              while IFS= read -r line; do
+                              (while IFS= read -r line; do
                                 if [ -d "$line" ]; then
                                   rmdir -v "${line:?}"
                                 else
                                   rm -v "${line:?}"
                                 fi
-                              done <<< "${XPLR_RESULT:?}"
-                              read -p "[Enter to continue]"
+                              done <<< "${XPLR_RESULT:?}")
+                              read -p "[enter to continue]"
                       - SwitchMode: default
                       - Explore
 
@@ -687,7 +738,7 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              echo -e "${XPLR_RESULT:?}" | xargs -l rm -rfv
+                              (echo -e "${XPLR_RESULT:?}" | xargs -l rm -rfv)
                               read -p "[enter to continue]"
                       - SwitchMode: default
                       - Explore
@@ -711,6 +762,7 @@ impl Default for Config {
         modes.insert("create".into(), create_mode);
         modes.insert("delete".into(), delete_mode);
         modes.insert("action".into(), action_mode);
+        modes.insert("search".into(), search_mode);
         modes.insert("selection ops".into(), selection_ops_mode);
 
         Self {

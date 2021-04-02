@@ -13,21 +13,21 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.13"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.14"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
 pub const UNSUPPORTED_STR: &str = "???";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PipesConfig {
+pub struct Pipe {
     pub msg_in: String,
     pub focus_out: String,
     pub selection_out: String,
     pub mode_out: String,
 }
 
-impl PipesConfig {
+impl Pipe {
     fn from_session_path(path: &String) -> Self {
         let pipesdir = PathBuf::from(path).join("pipe");
 
@@ -163,6 +163,237 @@ pub enum InternalMsg {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum NodeFilter {
+    RelativePathIs,
+    RelativePathIsNot,
+
+    RelativePathDoesStartWith,
+    RelativePathDoesNotStartWith,
+
+    RelativePathDoesContain,
+    RelativePathDoesNotContain,
+
+    RelativePathDoesEndWith,
+    RelativePathDoesNotEndWith,
+
+    AbsolutePathIs,
+    AbsolutePathIsNot,
+
+    AbsolutePathDoesStartWith,
+    AbsolutePathDoesNotStartWith,
+
+    AbsolutePathDoesContain,
+    AbsolutePathDoesNotContain,
+
+    AbsolutePathDoesEndWith,
+    AbsolutePathDoesNotEndWith,
+}
+
+impl NodeFilter {
+    fn apply(&self, node: &Node, input: &String, case_sensitive: bool) -> bool {
+        match self {
+            Self::RelativePathIs => {
+                if case_sensitive {
+                    &node.relative_path == input
+                } else {
+                    node.relative_path.to_lowercase() == input.to_lowercase()
+                }
+            }
+
+            Self::RelativePathIsNot => {
+                if case_sensitive {
+                    &node.relative_path != input
+                } else {
+                    node.relative_path.to_lowercase() != input.to_lowercase()
+                }
+            }
+
+            Self::RelativePathDoesStartWith => {
+                if case_sensitive {
+                    node.relative_path.starts_with(input)
+                } else {
+                    node.relative_path
+                        .to_lowercase()
+                        .starts_with(&input.to_lowercase())
+                }
+            }
+
+            Self::RelativePathDoesNotStartWith => {
+                if case_sensitive {
+                    !node.relative_path.starts_with(input)
+                } else {
+                    !node
+                        .relative_path
+                        .to_lowercase()
+                        .starts_with(&input.to_lowercase())
+                }
+            }
+
+            Self::RelativePathDoesContain => {
+                if case_sensitive {
+                    node.relative_path.contains(input)
+                } else {
+                    node.relative_path
+                        .to_lowercase()
+                        .contains(&input.to_lowercase())
+                }
+            }
+
+            Self::RelativePathDoesNotContain => {
+                if case_sensitive {
+                    !node.relative_path.contains(input)
+                } else {
+                    !node
+                        .relative_path
+                        .to_lowercase()
+                        .contains(&input.to_lowercase())
+                }
+            }
+
+            Self::RelativePathDoesEndWith => {
+                if case_sensitive {
+                    node.relative_path.ends_with(input)
+                } else {
+                    node.relative_path
+                        .to_lowercase()
+                        .ends_with(&input.to_lowercase())
+                }
+            }
+
+            Self::RelativePathDoesNotEndWith => {
+                if case_sensitive {
+                    !node.relative_path.ends_with(input)
+                } else {
+                    !node
+                        .relative_path
+                        .to_lowercase()
+                        .ends_with(&input.to_lowercase())
+                }
+            }
+
+            Self::AbsolutePathIs => {
+                if case_sensitive {
+                    &node.absolute_path == input
+                } else {
+                    node.absolute_path.to_lowercase() == input.to_lowercase()
+                }
+            }
+
+            Self::AbsolutePathIsNot => {
+                if case_sensitive {
+                    &node.absolute_path != input
+                } else {
+                    node.absolute_path.to_lowercase() != input.to_lowercase()
+                }
+            }
+
+            Self::AbsolutePathDoesStartWith => {
+                if case_sensitive {
+                    node.absolute_path.starts_with(input)
+                } else {
+                    node.absolute_path
+                        .to_lowercase()
+                        .starts_with(&input.to_lowercase())
+                }
+            }
+
+            Self::AbsolutePathDoesNotStartWith => {
+                if case_sensitive {
+                    !node.absolute_path.starts_with(input)
+                } else {
+                    !node
+                        .absolute_path
+                        .to_lowercase()
+                        .starts_with(&input.to_lowercase())
+                }
+            }
+
+            Self::AbsolutePathDoesContain => {
+                if case_sensitive {
+                    node.absolute_path.contains(input)
+                } else {
+                    node.absolute_path
+                        .to_lowercase()
+                        .contains(&input.to_lowercase())
+                }
+            }
+
+            Self::AbsolutePathDoesNotContain => {
+                if case_sensitive {
+                    !node.absolute_path.contains(input)
+                } else {
+                    !node
+                        .absolute_path
+                        .to_lowercase()
+                        .contains(&input.to_lowercase())
+                }
+            }
+
+            Self::AbsolutePathDoesEndWith => {
+                if case_sensitive {
+                    node.absolute_path.ends_with(input)
+                } else {
+                    node.absolute_path
+                        .to_lowercase()
+                        .ends_with(&input.to_lowercase())
+                }
+            }
+
+            Self::AbsolutePathDoesNotEndWith => {
+                if case_sensitive {
+                    !node.absolute_path.ends_with(input)
+                } else {
+                    !node
+                        .absolute_path
+                        .to_lowercase()
+                        .ends_with(&input.to_lowercase())
+                }
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct NodeFilterApplicable {
+    filter: NodeFilter,
+    input: String,
+    #[serde(default)]
+    case_sensitive: bool,
+}
+
+impl NodeFilterApplicable {
+    pub fn new(filter: NodeFilter, input: String, case_sensitive: bool) -> Self {
+        Self {
+            filter,
+            input,
+            case_sensitive,
+        }
+    }
+
+    fn apply(&self, node: &Node) -> bool {
+        self.filter.apply(node, &self.input, self.case_sensitive)
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct NodeFilterFromInputString {
+    filter: NodeFilter,
+    #[serde(default)]
+    case_sensitive: bool,
+}
+
+#[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct ExplorerConfig {
+    filters: Vec<NodeFilterApplicable>,
+}
+
+impl ExplorerConfig {
+    pub fn apply(&self, node: &Node) -> bool {
+        self.filters.iter().all(|f| f.apply(node))
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
     Explore,
     Refresh,
@@ -191,6 +422,11 @@ pub enum ExternalMsg {
     UnSelect,
     ToggleSelection,
     ClearSelection,
+    AddNodeFilter(NodeFilterApplicable),
+    RemoveNodeFilter(NodeFilterApplicable),
+    ToggleNodeFilter(NodeFilterApplicable),
+    AddNodeFilterFromInputString(NodeFilterFromInputString),
+    ResetNodeFilters,
     PrintResultAndQuit,
     PrintAppStateAndQuit,
     Debug(String),
@@ -261,7 +497,8 @@ pub struct App {
     input_buffer: Option<String>,
     pid: u32,
     session_path: String,
-    pipes: PipesConfig,
+    pipe: Pipe,
+    explorer_config: ExplorerConfig,
 }
 
 impl App {
@@ -310,6 +547,15 @@ impl App {
                 .to_string_lossy()
                 .to_string();
 
+            let mut explorer_config = ExplorerConfig::default();
+            if !config.general.show_hidden {
+                explorer_config.filters.push(NodeFilterApplicable::new(
+                    NodeFilter::RelativePathDoesNotStartWith,
+                    ".".into(),
+                    Default::default(),
+                ));
+            }
+
             Ok(Self {
                 config,
                 pwd,
@@ -321,7 +567,8 @@ impl App {
                 input_buffer: Default::default(),
                 pid,
                 session_path: session_path.clone(),
-                pipes: PipesConfig::from_session_path(&session_path),
+                pipe: Pipe::from_session_path(&session_path),
+                explorer_config,
             })
         }
     }
@@ -389,6 +636,13 @@ impl App {
             ExternalMsg::UnSelect => self.un_select(),
             ExternalMsg::ToggleSelection => self.toggle_selection(),
             ExternalMsg::ClearSelection => self.clear_selection(),
+            ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
+            ExternalMsg::AddNodeFilterFromInputString(f) => {
+                self.add_node_filter_from_input_string(f)
+            }
+            ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
+            ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
+            ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
             ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
             ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
             ExternalMsg::Debug(path) => self.debug(&path),
@@ -600,6 +854,7 @@ impl App {
 
     fn switch_mode(mut self, mode: &String) -> Result<Self> {
         if let Some(mode) = self.config.modes.get(mode) {
+            self.input_buffer = None;
             self.mode = mode.to_owned();
             self.msg_out.push_back(MsgOut::Refresh);
         };
@@ -627,7 +882,12 @@ impl App {
 
     fn un_select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
-            self.selection = self.selection.into_iter().filter(|s| s != &n).collect();
+            self.selection = self
+                .selection
+                .clone()
+                .into_iter()
+                .filter(|s| s != &n)
+                .collect();
             self.msg_out.push_back(MsgOut::Refresh);
         }
         Ok(self)
@@ -647,6 +907,61 @@ impl App {
     fn clear_selection(mut self) -> Result<Self> {
         self.selection.clear();
         self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn add_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
+        self.explorer_config.filters.push(filter);
+        self.msg_out.push_back(MsgOut::Explore);
+        Ok(self)
+    }
+
+    fn add_node_filter_from_input_string(
+        mut self,
+        filter: NodeFilterFromInputString,
+    ) -> Result<Self> {
+        if let Some(input) = self.input_buffer() {
+            self.explorer_config.filters.push(NodeFilterApplicable::new(
+                filter.filter,
+                input,
+                filter.case_sensitive,
+            ));
+            self.msg_out.push_back(MsgOut::Explore);
+        };
+        Ok(self)
+    }
+
+    fn remove_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
+        self.explorer_config.filters = self
+            .explorer_config
+            .filters
+            .into_iter()
+            .filter(|f| f != &filter)
+            .collect();
+        self.msg_out.push_back(MsgOut::Explore);
+        Ok(self)
+    }
+
+    fn toggle_node_filter(self, filter: NodeFilterApplicable) -> Result<Self> {
+        if self.explorer_config.filters.contains(&filter) {
+            self.remove_node_filter(filter)
+        } else {
+            self.add_node_filter(filter)
+        }
+    }
+
+    fn reset_node_filters(mut self) -> Result<Self> {
+        self.explorer_config.filters.clear();
+
+        if !self.config.general.show_hidden {
+            self.explorer_config.filters.push(NodeFilterApplicable::new(
+                NodeFilter::RelativePathDoesNotStartWith,
+                ".".into(),
+                Default::default(),
+            ));
+        };
+        self.msg_out.push_back(MsgOut::Explore);
+
         Ok(self)
     }
 
@@ -709,8 +1024,8 @@ impl App {
     }
 
     /// Get a reference to the app's pipes.
-    pub fn pipes(&self) -> &PipesConfig {
-        &self.pipes
+    pub fn pipe(&self) -> &Pipe {
+        &self.pipe
     }
 
     /// Get a reference to the app's pid.
@@ -726,6 +1041,7 @@ impl App {
     pub fn refresh_selection(mut self) -> Result<Self> {
         self.selection = self
             .selection
+            .clone()
             .into_iter()
             .filter(|n| PathBuf::from(&n.absolute_path).exists())
             .collect();
@@ -746,5 +1062,10 @@ impl App {
             .map(|n| n.absolute_path.clone())
             .collect::<Vec<String>>()
             .join("\n")
+    }
+
+    /// Get a reference to the app's explorer config.
+    pub fn explorer_config(&self) -> &ExplorerConfig {
+        &self.explorer_config
     }
 }
