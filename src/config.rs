@@ -302,10 +302,15 @@ impl Default for KeyBindings {
                   - ToggleSelection
                   - FocusNext
 
-              d:
-                help: debug
+              c:
+                help: create
                 messages:
-                  - Debug: /tmp/xplr.yml
+                  - SwitchMode: create
+
+              d:
+                help: delete
+                messages:
+                  - SwitchMode: delete
 
               enter:
                 help: quit with result
@@ -319,8 +324,9 @@ impl Default for KeyBindings {
                       command: bash
                       args:
                         - -c
-                        - xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
-              
+                        - |
+                          xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
+
               ctrl-l:
                 help: clear
                 messages:
@@ -424,6 +430,15 @@ impl Default for Config {
                     messages:
                       - FocusFirst
                       - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - SwitchMode: default
             "###,
         )
         .unwrap();
@@ -454,13 +469,7 @@ impl Default for Config {
                       - ResetInputBuffer
                       - SwitchMode: default
 
-                  esc:
-                    help: cancel
-                    messages:
-                      - ResetInputBuffer
-                      - SwitchMode: default
-
-                  q:
+                  ctrl-c:
                     help: cancel & quit
                     messages:
                       - Terminate
@@ -478,10 +487,112 @@ impl Default for Config {
         )
         .unwrap();
 
+        let create_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: create
+              key_bindings:
+                on_key:
+                  f:
+                    help: create file
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              touch "${XPLR_INPUT_BUFFER:?}"
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  d:
+                    help: create directory
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              mkdir -p "${XPLR_INPUT_BUFFER:?}"
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  esc:
+                    help: cancel
+                    messages:
+                      - ResetInputBuffer
+                      - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - BufferStringFromKey
+            "###,
+        )
+        .unwrap();
+
+        let delete_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: delete
+              key_bindings:
+                on_key:
+                  d:
+                    help: delete
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              if [ ! -e "$XPLR_SELECTION" ]; then
+                                while IFS= read -r line; do
+                                  rm -i "${line:?}"
+                                done < ${XPLR_PIPE_SELECTION_OUT:?}
+                              else
+                                rm -i ${XPLR_FOCUS_PATH:?}
+                              fi
+                              read -p "[Enter to continue]"
+                      - SwitchMode: default
+
+                  D:
+                    help: force delete
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              if [ ! -e "$XPLR_SELECTION" ]; then
+                                while IFS= read -r line; do
+                                  rm -rf "${line:?}"
+                                done < ${XPLR_PIPE_SELECTION_OUT:?}
+                              else
+                                rm -rf ${XPLR_FOCUS_PATH:?}
+                              fi
+                              read -p "[Enter to continue]"
+                      - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+                
+                default:
+                  messages:
+                    - SwitchMode: default
+            "###,
+        )
+        .unwrap();
+
         let mut modes: HashMap<String, Mode> = Default::default();
         modes.insert("default".into(), Mode::default());
         modes.insert("goto".into(), goto_mode);
         modes.insert("number".into(), number_mode);
+        modes.insert("create".into(), create_mode);
+        modes.insert("delete".into(), delete_mode);
 
         Self {
             version: VERSION.into(),

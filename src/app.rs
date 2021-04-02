@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 use std::fs;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.8"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.9"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -26,7 +26,7 @@ pub struct PipesConfig {
 }
 
 impl PipesConfig {
-    fn from_runtime_path(path: &String) -> Self {
+    fn from_session_path(path: &String) -> Self {
         let pipesdir = PathBuf::from(path).join("pipe");
 
         fs::create_dir_all(&pipesdir).unwrap();
@@ -253,7 +253,7 @@ pub struct App {
     mode: Mode,
     input_buffer: Option<String>,
     pid: u32,
-    runtime_path: String,
+    session_path: String,
     pipes: PipesConfig,
 }
 
@@ -271,7 +271,7 @@ impl App {
                 .unwrap_or_default();
 
             let pid = std::process::id();
-            let runtime_path = dirs::runtime_dir()
+            let session_path = dirs::runtime_dir()
                 .unwrap_or("/tmp".into())
                 .join("xplr")
                 .join("session")
@@ -289,8 +289,8 @@ impl App {
                 mode,
                 input_buffer: Default::default(),
                 pid,
-                runtime_path: runtime_path.clone(),
-                pipes: PipesConfig::from_runtime_path(&runtime_path),
+                session_path: session_path.clone(),
+                pipes: PipesConfig::from_session_path(&session_path),
             })
         }
     }
@@ -363,6 +363,7 @@ impl App {
 
     fn handle_key(mut self, key: Key) -> Result<Self, Error> {
         let kb = self.mode.key_bindings.clone();
+        let default = kb.default.clone();
         let msgs = kb
             .on_key
             .get(&key.to_string())
@@ -375,15 +376,14 @@ impl App {
                 } else if key.is_special_character() {
                     kb.on_special_character.map(|a| a.messages)
                 } else {
-                    kb.default.map(|a| a.messages)
+                    None
                 }
-            });
+            })
+            .unwrap_or_else(|| default.map(|a| a.messages).unwrap_or_default());
 
-        if let Some(msgs) = msgs.to_owned() {
-            for msg in msgs {
-                self = self.enqueue(Task::new(0, MsgIn::External(msg), Some(key)));
-            }
-        };
+        for msg in msgs {
+            self = self.enqueue(Task::new(0, MsgIn::External(msg), Some(key)));
+        }
 
         Ok(self)
     }
@@ -667,7 +667,7 @@ impl App {
     }
 
     /// Get a reference to the app's runtime path.
-    pub fn runtime_path(&self) -> &String {
-        &self.runtime_path
+    pub fn session_path(&self) -> &String {
+        &self.session_path
     }
 }

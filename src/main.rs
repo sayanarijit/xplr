@@ -248,7 +248,7 @@ fn main() -> Result<(), Error> {
                         .env("XPLR_FOCUS_PATH", focus_path)
                         .env("XPLR_FOCUS_INDEX", focus_index)
                         .env("XPLR_SELECTION", selection)
-                        .env("XPLR_RUNTIME_PATH", app.runtime_path())
+                        .env("XPLR_SESSION_PATH", app.session_path())
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
                         .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
