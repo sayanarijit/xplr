@@ -280,6 +280,7 @@ impl Default for KeyBindings {
                   - Call:
                       command: bash
                       args: []
+                  - Explore
 
               /:
                 help: search
@@ -521,7 +522,7 @@ impl Default for Config {
               name: create
               key_bindings:
                 on_key:
-                  f:
+                  enter:
                     help: create file
                     messages:
                       - Call:
@@ -534,7 +535,7 @@ impl Default for Config {
                       - SwitchMode: default
                       - Explore
 
-                  d:
+                  ctrl-d:
                     help: create directory
                     messages:
                       - Call:

@@ -1,19 +1,18 @@
 use anyhow::Result;
-use crossterm::event::Event;
 use crossterm::terminal as term;
-use crossterm::{event, execute};
+use crossterm::execute;
 use handlebars::Handlebars;
 use std::fs;
 use std::io::prelude::*;
+use std::path::PathBuf;
 use std::sync::mpsc;
-use std::thread;
-use std::time::Duration;
 use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
 use xplr::app;
+use xplr::event_reader;
 use xplr::explorer;
-use xplr::input::Key;
+use xplr::pipe_reader;
 use xplr::ui;
 
 fn main() -> Result<()> {
@@ -36,10 +35,7 @@ fn main() -> Result<()> {
     let mut result = Ok(());
     let mut output = None;
 
-    let (tx_key, rx) = mpsc::channel();
-    let tx_init = tx_key.clone();
-    let tx_pipe = tx_key.clone();
-    let tx_explorer = tx_key.clone();
+    let (tx_msg_in, rx_msg_in) = mpsc::channel();
 
     term::enable_raw_mode()?;
     let mut stdout = get_tty()?;
@@ -50,54 +46,17 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
 
-    let (tx, rx_key) = mpsc::channel();
-    thread::spawn(move || {
-        let mut is_paused = false;
-        loop {
-            if let Some(paused) = rx_key.try_recv().ok() {
-                is_paused = paused;
-            };
-
-            if !is_paused {
-                if event::poll(std::time::Duration::from_millis(1)).unwrap() {
-                    match event::read().unwrap() {
-                        Event::Key(key) => {
-                            let key = Key::from_event(key);
-                            let msg = app::MsgIn::Internal(app::InternalMsg::HandleKey(key));
-                            tx_key.send(app::Task::new(0, msg, Some(key))).unwrap();
-                        }
-
-                        Event::Resize(_, _) => {
-                            let msg = app::MsgIn::External(app::ExternalMsg::Refresh);
-                            tx_key.send(app::Task::new(0, msg, None)).unwrap();
-                        }
-                        _ => {}
-                    }
-                }
-            }
-        }
+    let focused_path = std::env::args().skip(1).next().and_then(|p| {
+        PathBuf::from(p)
+            .file_name()
+            .map(|n| n.to_string_lossy().to_string())
     });
+    explorer::explore(app.pwd().clone(), focused_path, tx_msg_in.clone());
 
-    let pipe_msg_in = app.pipes().msg_in.clone();
-    thread::spawn(move || loop {
-        let in_str = fs::read_to_string(&pipe_msg_in).unwrap_or_default();
+    pipe_reader::keep_reading(app.pipes().msg_in.clone(), tx_msg_in.clone());
 
-        if !in_str.is_empty() {
-            let msgs = in_str
-                .lines()
-                .filter_map(|s| serde_yaml::from_str::<app::ExternalMsg>(s.trim()).ok());
-
-            msgs.for_each(|msg| {
-                tx_pipe
-                    .send(app::Task::new(2, app::MsgIn::External(msg), None))
-                    .unwrap();
-            });
-            fs::write(&pipe_msg_in, "").unwrap();
-        };
-        thread::sleep(Duration::from_millis(10));
-    });
-
-    explorer::explore(app.pwd().clone(), std::env::args().skip(1).next(), tx_init);
+    let (tx_event_reader, rx_event_reader) = mpsc::channel();
+    event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
 
     let mut last_pwd = app.pwd().clone();
     'outer: while result.is_ok() {
@@ -126,7 +85,7 @@ fn main() -> Result<()> {
                     explorer::explore(
                         app.pwd().clone(),
                         app.focused_node().map(|n| n.relative_path.clone()),
-                        tx_explorer.clone(),
+                        tx_msg_in.clone(),
                     );
                 }
 
@@ -135,7 +94,7 @@ fn main() -> Result<()> {
                         explorer::explore(
                             app.pwd().clone(),
                             app.focused_node().map(|n| n.relative_path.clone()),
-                            tx_explorer.clone(),
+                            tx_msg_in.clone(),
                         );
                         last_pwd = app.pwd().to_owned();
                     };
@@ -166,7 +125,7 @@ fn main() -> Result<()> {
                 }
 
                 app::MsgOut::Call(cmd) => {
-                    tx.send(true)?;
+                    tx_event_reader.send(true)?;
                     terminal.clear()?;
                     term::disable_raw_mode()?;
                     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
@@ -232,13 +191,13 @@ fn main() -> Result<()> {
                     terminal.hide_cursor()?;
                     execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
                     term::enable_raw_mode()?;
-                    tx.send(false)?;
+                    tx_event_reader.send(false)?;
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
             };
         }
 
-        for task in rx.try_iter() {
+        for task in rx_msg_in.try_iter() {
             app = app.enqueue(task);
         }
 
