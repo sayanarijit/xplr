@@ -6,7 +6,7 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 
 <p align="center">
 <a href="https://asciinema.org/a/3THQPXNVi801Yu8nWxO6qfUa4" target="_blank">
-<img src="https://s4.gifyu.com/images/xplr.gif"/>
+<img src="https://s4.gifyu.com/images/xplr.gif" />
 </a>
 </p>
 
@@ -20,11 +20,18 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 
 <br>
 
-
 Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, it's speciality is it's hackability.
 
 Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you should be able to configure the key bindings,
 different run modes, and also the way it looks by modifying one single configuration file.
+
+<p align="center">
+
+<a href="https://asciinema.org/a/404815" target="_blank">
+<img src="https://s4.gifyu.com/images/xplr9d8b7b05c6bc39ae.gif" />
+</a>
+
+</p>
 
 If you come up with something cool, or if you feel it's lacking somewhere in portability, flexibility or performance, don't hesitate to
 [start a conversation](https://github.com/sayanarijit/xplr/discussions/2).
