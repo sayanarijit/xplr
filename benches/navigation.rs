@@ -82,7 +82,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 .unwrap()
                 .enqueue(app::Task::new(
                     1,
-                    app::MsgIn::External(app::ExternalMsg::Back),
+                    app::MsgIn::External(app::ExternalMsg::Enter),
                     None,
                 ))
                 .possibly_mutate()
