@@ -1,10 +1,12 @@
 use crate::app;
+use crate::app::HelpMenuLine;
 use crate::app::Node;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::layout::{Constraint as TUIConstraint, Direction, Layout};
+use tui::style::{Color, Style};
 use tui::widgets::{
     Block, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, TableState,
 };
@@ -275,83 +277,21 @@ fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
 }
 
 fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    // Help menu
-    let mode = app.mode();
-    let extra_help_lines = mode
-        .extra_help
-        .clone()
-        .map(|e| e.lines().map(|l| l.to_string()).collect::<Vec<String>>());
-
-    let help_menu_rows: Vec<Row> = mode
-        .help
-        .clone()
-        .map(|h| {
-            h.lines()
-                .map(|l| Row::new(vec![Cell::from(l.to_string())]))
-                .collect()
+    let help_menu_rows = app
+        .mode()
+        .help_menu()
+        .into_iter()
+        .map(|l| match l {
+            HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
+            HelpMenuLine::KeyMap(k, h) => Row::new([Cell::from(k), Cell::from(h)].to_vec()),
         })
-        .unwrap_or_else(|| {
-            extra_help_lines
-                .unwrap_or_default()
-                .into_iter()
-                .map(|l| Row::new(vec![Cell::from(l)]))
-                .chain(mode.key_bindings.on_key.iter().filter_map(|(k, a)| {
-                    a.help.clone().map(|h| {
-                        Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
-                    })
-                }))
-                .chain(
-                    mode.key_bindings
-                        .on_alphabet
-                        .iter()
-                        .map(|a| ("a-Z", a.help.clone()))
-                        .filter_map(|(k, mh)| {
-                            mh.map(|h| {
-                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
-                            })
-                        }),
-                )
-                .chain(
-                    mode.key_bindings
-                        .on_number
-                        .iter()
-                        .map(|a| ("0-9", a.help.clone()))
-                        .filter_map(|(k, mh)| {
-                            mh.map(|h| {
-                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
-                            })
-                        }),
-                )
-                .chain(
-                    mode.key_bindings
-                        .on_special_character
-                        .iter()
-                        .map(|a| ("spcl chars", a.help.clone()))
-                        .filter_map(|(k, mh)| {
-                            mh.map(|h| {
-                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
-                            })
-                        }),
-                )
-                .chain(
-                    mode.key_bindings
-                        .default
-                        .iter()
-                        .map(|a| ("default", a.help.clone()))
-                        .filter_map(|(k, mh)| {
-                            mh.map(|h| {
-                                Row::new(vec![Cell::from(k.to_string()), Cell::from(h.to_string())])
-                            })
-                        }),
-                )
-                .collect::<Vec<Row>>()
-        });
+        .collect::<Vec<Row>>();
 
     let help_menu = Table::new(help_menu_rows)
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(format!(" Help [{}] ", &mode.name)),
+                .title(format!(" Help [{}] ", &app.mode().name)),
         )
         .widths(&[TUIConstraint::Percentage(30), TUIConstraint::Percentage(70)]);
     f.render_widget(help_menu, rect);
@@ -361,6 +301,31 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
     let input_buf = Paragraph::new(format!("> {}", app.input_buffer().unwrap_or("".into())))
         .block(Block::default().borders(Borders::ALL).title(" input "));
     f.render_widget(input_buf, rect);
+}
+
+fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+    let logs = app
+        .logs()
+        .iter()
+        .rev()
+        .take(1)
+        .rev()
+        .map(|l| match &l.level {
+            app::LogLevel::Info => {
+                ListItem::new(l.to_string()).style(Style::default().fg(Color::Gray))
+            }
+            app::LogLevel::Success => {
+                ListItem::new(l.to_string()).style(Style::default().fg(Color::Green))
+            }
+            app::LogLevel::Error => {
+                ListItem::new(l.to_string()).style(Style::default().fg(Color::Red))
+            }
+        })
+        .collect::<Vec<ListItem>>();
+
+    let logs_list = List::new(logs).block(Block::default().borders(Borders::ALL).title(" Logs "));
+
+    f.render_widget(logs_list, rect);
 }
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
@@ -382,13 +347,19 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
         )
         .split(chunks[0]);
 
+    draw_table(f, left_chunks[0], app, hb);
+
+    if app.input_buffer().is_some() {
+        draw_input_buffer(f, left_chunks[1], app, hb);
+    } else {
+        draw_logs(f, left_chunks[1], app, hb);
+    };
+
     let right_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([TUIConstraint::Percentage(50), TUIConstraint::Percentage(50)].as_ref())
         .split(chunks[1]);
 
-    draw_table(f, left_chunks[0], app, hb);
-    draw_input_buffer(f, left_chunks[1], app, hb);
     draw_selection(f, right_chunks[0], app, hb);
     draw_help_menu(f, right_chunks[1], app, hb);
 }

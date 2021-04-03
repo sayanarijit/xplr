@@ -12,10 +12,20 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
         if !in_str.is_empty() {
             let msgs = in_str
                 .lines()
-                .filter_map(|s| serde_yaml::from_str::<ExternalMsg>(s.trim()).ok());
+                .map(|s| serde_yaml::from_str::<ExternalMsg>(s.trim()));
 
-            msgs.for_each(|msg| {
-                tx.send(Task::new(2, MsgIn::External(msg), None)).unwrap();
+            msgs.for_each(|msg| match msg {
+                Ok(m) => {
+                    tx.send(Task::new(2, MsgIn::External(m), None)).unwrap();
+                }
+                Err(e) => {
+                    tx.send(Task::new(
+                        0,
+                        MsgIn::External(ExternalMsg::LogError(e.to_string())),
+                        None,
+                    ))
+                    .unwrap();
+                }
             });
             fs::write(&pipe, "").unwrap();
         };

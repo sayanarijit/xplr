@@ -170,6 +170,35 @@ fn main() -> Result<()> {
                         })
                         .unwrap_or_default();
 
+                    let logs = app
+                        .logs()
+                        .iter()
+                        .map(|l| l.to_string())
+                        .collect::<Vec<String>>()
+                        .join("\n");
+
+                    let help_menu = app
+                        .config()
+                        .modes
+                        .iter()
+                        .map(|(name, mode)| {
+                            let help = mode
+                                .help_menu()
+                                .iter()
+                                .map(|l| match l {
+                                    app::HelpMenuLine::Paragraph(p) => format!("\t{}", p),
+                                    app::HelpMenuLine::KeyMap(k, h) => {
+                                        format!(" {:15} | {}", k, h)
+                                    }
+                                })
+                                .collect::<Vec<String>>()
+                                .join("\n");
+
+                            format!("### {}\n\n key             | action\n --------------- | ------\n{}", name, help)
+                        })
+                        .collect::<Vec<String>>()
+                        .join("\n\n\n");
+
                     let pipe_msg_in = app.pipe().msg_in.clone();
                     let pipe_focus_out = app.pipe().focus_out.clone();
                     let pipe_selection_out = app.pipe().selection_out.clone();
@@ -191,7 +220,9 @@ fn main() -> Result<()> {
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
                         .env("XPLR_APP_YAML", app_yaml)
                         .env("XPLR_RESULT", result)
+                        .env("XPLR_GLOBAL_HELP_MENU", help_menu)
                         .env("XPLR_DIRECTORY_NODES", directory_nodes)
+                        .env("XPLR_LOGS", logs)
                         .args(cmd.args.clone())
                         .status();
 

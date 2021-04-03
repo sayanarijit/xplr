@@ -1,4 +1,5 @@
 use crate::app::ExternalMsg;
+use crate::app::HelpMenuLine;
 use crate::app::VERSION;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
@@ -293,11 +294,17 @@ impl Default for KeyBindings {
               ctrl-f:
                 help: search [/]
                 messages:
+                  - ResetNodeFilters
                   - SwitchMode: search
+                  - SetInputBuffer: ""
+                  - Explore
 
               /:
                 messages:
+                  - ResetNodeFilters
                   - SwitchMode: search
+                  - SetInputBuffer: ""
+                  - Explore
 
               d:
                 help: delete
@@ -326,6 +333,7 @@ impl Default for KeyBindings {
                   - ToggleNodeFilter:
                       filter: RelativePathDoesNotStartWith
                       input: .
+                  - Explore
 
               enter:
                 help: quit with result
@@ -335,6 +343,18 @@ impl Default for KeyBindings {
               "#":
                 messages:
                   - PrintAppStateAndQuit
+
+              "?":
+                help: global help menu
+                messages:
+                  - Call:
+                      command: bash
+                      args:
+                        - -c
+                        - |
+                          echo -e "${XPLR_GLOBAL_HELP_MENU}"
+                          echo
+                          read -p "[enter to continue]"
 
               ctrl-c:
                 help: cancel & quit [q|esc]
@@ -360,8 +380,9 @@ impl Default for KeyBindings {
         let on_number = Some(Action {
             help: Some("input".to_string()),
             messages: vec![
-                ExternalMsg::BufferStringFromKey,
+                ExternalMsg::ResetInputBuffer,
                 ExternalMsg::SwitchMode("number".into()),
+                ExternalMsg::BufferInputFromKey,
             ],
         });
 
@@ -387,6 +408,71 @@ pub struct Mode {
 
     #[serde(default)]
     pub key_bindings: KeyBindings,
+}
+
+impl Mode {
+    pub fn help_menu(&self) -> Vec<HelpMenuLine> {
+        let extra_help_lines = self.extra_help.clone().map(|e| {
+            e.lines()
+                .map(|l| HelpMenuLine::Paragraph(l.into()))
+                .collect::<Vec<HelpMenuLine>>()
+        });
+
+        self.help
+            .clone()
+            .map(|h| {
+                h.lines()
+                    .map(|l| HelpMenuLine::Paragraph(l.into()))
+                    .collect()
+            })
+            .unwrap_or_else(|| {
+                extra_help_lines
+                    .unwrap_or_default()
+                    .into_iter()
+                    .chain(self.key_bindings.on_key.iter().filter_map(|(k, a)| {
+                        a.help
+                            .clone()
+                            .map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
+                    }))
+                    .chain(
+                        self.key_bindings
+                            .on_alphabet
+                            .iter()
+                            .map(|a| ("[a-Z]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
+                            .on_number
+                            .iter()
+                            .map(|a| ("[0-9]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
+                            .on_special_character
+                            .iter()
+                            .map(|a| ("[spcl chars]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
+                            .default
+                            .iter()
+                            .map(|a| ("[default]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
+                            }),
+                    )
+                    .collect()
+            })
+    }
 }
 
 impl Default for Mode {
@@ -426,6 +512,7 @@ impl Default for Config {
                     messages:
                       - ResetNodeFilters
                       - SwitchMode: default
+                      - Explore
                   
                   up:
                     help: up
@@ -440,29 +527,32 @@ impl Default for Config {
                   right:
                     help: enter
                     messages:
-                      - Enter
-                      - ResetInputBuffer
                       - ResetNodeFilters
+                      - Enter
                       - SwitchMode: default
+                      - Explore
 
                   left:
                     help: back
                     messages:
+                      - ResetNodeFilters
                       - Back
-                      - ResetInputBuffer
                       - SwitchMode: default
+                      - Explore
 
                   esc:
                     help: cancel
                     messages:
                       - ResetNodeFilters
                       - SwitchMode: default
+                      - Explore
 
                   backspace:
                     help: clear
                     messages:
-                      - ResetInputBuffer
+                      - SetInputBuffer: ""
                       - ResetNodeFilters
+                      - Explore
 
                   ctrl-c:
                     help: cancel & quit
@@ -471,10 +561,12 @@ impl Default for Config {
 
                 default:
                   messages:
-                    - BufferStringFromKey
-                    - AddNodeFilterFromInputString:
+                    - BufferInputFromKey
+                    - ResetNodeFilters
+                    - AddNodeFilterFromInput:
                         filter: RelativePathDoesContain
                         case_sensitive: false
+                    - Explore
             "###,
         )
         .unwrap();
@@ -526,8 +618,8 @@ impl Default for Config {
                       - Explore
                       - SwitchMode: default
 
-                  n:
-                    help: create new
+                  c:
+                    help: create
                     messages:
                       - SwitchMode: create
 
@@ -535,6 +627,18 @@ impl Default for Config {
                     help: selection operations
                     messages:
                       - SwitchMode: selection ops
+
+                  l:
+                    help: logs
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              echo -e "$XPLR_LOGS"
+                              read -p "[enter to continue]"
+                      - SwitchMode: default
 
                   ctrl-c:
                     help: cancel & quit [q]
@@ -566,11 +670,15 @@ impl Default for Config {
                             - -c
                             - |
                               (while IFS= read -r line; do
-                                cp -v "${line:?}" ./
+                                if cp -v "${line:?}" ./; then
+                                  echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                                else
+                                  echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                                fi
                               done <<< "${XPLR_SELECTION:?}")
+                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                              echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
                               read -p "[enter to continue]"
-                      - ClearSelection
-                      - Explore
                       - SwitchMode: default
 
                   m:
@@ -582,10 +690,14 @@ impl Default for Config {
                             - -c
                             - |
                               (while IFS= read -r line; do
-                                mv -v "${line:?}" ./
+                                if mv -v "${line:?}" ./; then
+                                  echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                                else
+                                  echo "LogError: failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                                fi
                               done <<< "${XPLR_SELECTION:?}")
+                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                               read -p "[enter to continue]"
-                      - Explore
                       - SwitchMode: default
 
                   ctrl-c:
@@ -646,7 +758,7 @@ impl Default for Config {
                 on_number:
                   help: input
                   messages:
-                    - BufferStringFromKey
+                    - BufferInputFromKey
 
                 default:
                   messages:
@@ -660,34 +772,17 @@ impl Default for Config {
               name: create
               key_bindings:
                 on_key:
-                  enter:
+                  f:
                     help: create file
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              touch "${XPLR_INPUT_BUFFER:?}"
-                      - SwitchMode: default
-                      - Explore
+                      - SwitchMode: create file
+                      - SetInputBuffer: ""
 
-                  ctrl-d:
+                  d:
                     help: create directory
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              mkdir -p "${XPLR_INPUT_BUFFER:?}"
-                      - SwitchMode: default
-                      - Explore
-
-                  backspace:
-                    help: clear
-                    messages:
-                      - ResetInputBuffer
+                      - SwitchMode: create directory
+                      - SetInputBuffer: ""
 
                   esc:
                     help: cancel
@@ -701,7 +796,96 @@ impl Default for Config {
 
                 default:
                   messages:
-                    - BufferStringFromKey
+                    - SwitchMode: default
+            "###,
+        )
+        .unwrap();
+
+        let create_file_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: create file
+              key_bindings:
+                on_key:
+                  enter:
+                    help: create file
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              PTH="${XPLR_INPUT_BUFFER:?}"
+                              if touch "${PTH:?}"; then
+                                echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                              else
+                                echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                                echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+                              fi
+                      - SwitchMode: default
+
+                  backspace:
+                    help: clear
+                    messages:
+                      - SetInputBuffer: ""
+
+                  esc:
+                    help: cancel
+                    messages:
+                      - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - BufferInputFromKey
+            "###,
+        )
+        .unwrap();
+
+        let create_dir_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: create directory
+              key_bindings:
+                on_key:
+                  enter:
+                    help: create directory
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              PTH="${XPLR_INPUT_BUFFER:?}"
+                              if mkdir -p "$PTH"; then
+                                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                                echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                              else
+                                echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                              fi
+                      - SwitchMode: default
+
+                  backspace:
+                    help: clear
+                    messages:
+                      - SetInputBuffer: ""
+
+                  esc:
+                    help: cancel
+                    messages:
+                      - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - BufferInputFromKey
             "###,
         )
         .unwrap();
@@ -721,14 +905,22 @@ impl Default for Config {
                             - |
                               (while IFS= read -r line; do
                                 if [ -d "$line" ]; then
-                                  rmdir -v "${line:?}"
+                                  if rmdir -v "${line:?}"; then
+                                    echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                                  else
+                                    echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                                  fi
                                 else
-                                  rm -v "${line:?}"
+                                  if rm -v "${line:?}"; then
+                                    echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                                  else
+                                    echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                                  fi
                                 fi
                               done <<< "${XPLR_RESULT:?}")
+                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                               read -p "[enter to continue]"
                       - SwitchMode: default
-                      - Explore
 
                   D:
                     help: force delete
@@ -738,7 +930,14 @@ impl Default for Config {
                           args:
                             - -c
                             - |
-                              (echo -e "${XPLR_RESULT:?}" | xargs -l rm -rfv)
+                              (while IFS= read -r line; do
+                                if rm -rfv "${line:?}"; then
+                                  echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                                else
+                                  echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                                fi
+                              done <<< "${XPLR_RESULT:?}")
+                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                               read -p "[enter to continue]"
                       - SwitchMode: default
                       - Explore
@@ -760,6 +959,8 @@ impl Default for Config {
         modes.insert("go to".into(), goto_mode);
         modes.insert("number".into(), number_mode);
         modes.insert("create".into(), create_mode);
+        modes.insert("create file".into(), create_file_mode);
+        modes.insert("create directory".into(), create_dir_mode);
         modes.insert("delete".into(), delete_mode);
         modes.insert("action".into(), action_mode);
         modes.insert("search".into(), search_mode);

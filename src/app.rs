@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::config::Mode;
 use crate::input::Key;
 use anyhow::{bail, Result};
+use chrono::{DateTime, Utc};
 use mime_guess;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -162,7 +163,7 @@ pub enum InternalMsg {
     HandleKey(Key),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 pub enum NodeFilter {
     RelativePathIs,
     RelativePathIsNot,
@@ -376,7 +377,7 @@ impl NodeFilterApplicable {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub struct NodeFilterFromInputString {
+pub struct NodeFilterFromInput {
     filter: NodeFilter,
     #[serde(default)]
     case_sensitive: bool,
@@ -407,14 +408,16 @@ pub enum ExternalMsg {
     FocusFirst,
     FocusLast,
     FocusPath(String),
+    FocusPathFromInput,
     FocusByIndex(usize),
     FocusByIndexFromInput,
     FocusByFileName(String),
     ChangeDirectory(String),
     Enter,
     Back,
-    BufferString(String),
-    BufferStringFromKey,
+    BufferInput(String),
+    BufferInputFromKey,
+    SetInputBuffer(String),
     ResetInputBuffer,
     SwitchMode(String),
     Call(Command),
@@ -425,8 +428,11 @@ pub enum ExternalMsg {
     AddNodeFilter(NodeFilterApplicable),
     RemoveNodeFilter(NodeFilterApplicable),
     ToggleNodeFilter(NodeFilterApplicable),
-    AddNodeFilterFromInputString(NodeFilterFromInputString),
+    AddNodeFilterFromInput(NodeFilterFromInput),
     ResetNodeFilters,
+    LogInfo(String),
+    LogSuccess(String),
+    LogError(String),
     PrintResultAndQuit,
     PrintAppStateAndQuit,
     Debug(String),
@@ -463,11 +469,17 @@ pub struct Task {
     priority: usize,
     msg: MsgIn,
     key: Option<Key>,
+    created_at: DateTime<Utc>,
 }
 
 impl Task {
     pub fn new(priority: usize, msg: MsgIn, key: Option<Key>) -> Self {
-        Self { priority, msg, key }
+        Self {
+            priority,
+            msg,
+            key,
+            created_at: Utc::now(),
+        }
     }
 }
 
@@ -476,13 +488,58 @@ impl Ord for Task {
         // Notice that the we flip the ordering on costs.
         // In case of a tie we compare positions - this step is necessary
         // to make implementations of `PartialEq` and `Ord` consistent.
-        other.priority.cmp(&self.priority)
+        other
+            .priority
+            .cmp(&self.priority)
+            .then_with(|| other.created_at.cmp(&self.created_at))
     }
 }
 impl PartialOrd for Task {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum LogLevel {
+    Info,
+    Success,
+    Error,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Log {
+    pub level: LogLevel,
+    pub message: String,
+    pub created_at: DateTime<Utc>,
+}
+
+impl Log {
+    pub fn new(level: LogLevel, message: String) -> Self {
+        Self {
+            level,
+            message,
+            created_at: Utc::now(),
+        }
+    }
+}
+
+impl std::fmt::Display for Log {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let level_str = match self.level {
+            LogLevel::Info => "INFO   ",
+            LogLevel::Success => "SUCCESS",
+            LogLevel::Error => "ERROR  ",
+        };
+        write!(f, "[{}] {} {}", &self.created_at, level_str, &self.message)
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum HelpMenuLine {
+    KeyMap(String, String),
+    Paragraph(String),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -499,6 +556,7 @@ pub struct App {
     session_path: String,
     pipe: Pipe,
     explorer_config: ExplorerConfig,
+    logs: Vec<Log>,
 }
 
 impl App {
@@ -569,6 +627,7 @@ impl App {
                 session_path: session_path.clone(),
                 pipe: Pipe::from_session_path(&session_path),
                 explorer_config,
+                logs: Default::default(),
             })
         }
     }
@@ -621,14 +680,16 @@ impl App {
                 self.focus_next_by_relative_index_from_input()
             }
             ExternalMsg::FocusPath(p) => self.focus_path(&p),
+            ExternalMsg::FocusPathFromInput => self.focus_path_from_input(),
             ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
             ExternalMsg::FocusByIndexFromInput => self.focus_by_index_from_input(),
             ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n),
             ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir),
             ExternalMsg::Enter => self.enter(),
             ExternalMsg::Back => self.back(),
-            ExternalMsg::BufferString(input) => self.buffer_string(&input),
-            ExternalMsg::BufferStringFromKey => self.buffer_string_from_key(key),
+            ExternalMsg::BufferInput(input) => self.buffer_input(&input),
+            ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
+            ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
             ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
             ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
             ExternalMsg::Call(cmd) => self.call(cmd),
@@ -637,12 +698,13 @@ impl App {
             ExternalMsg::ToggleSelection => self.toggle_selection(),
             ExternalMsg::ClearSelection => self.clear_selection(),
             ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
-            ExternalMsg::AddNodeFilterFromInputString(f) => {
-                self.add_node_filter_from_input_string(f)
-            }
+            ExternalMsg::AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
             ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
             ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
             ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
+            ExternalMsg::LogInfo(l) => self.log_info(l),
+            ExternalMsg::LogSuccess(l) => self.log_success(l),
+            ExternalMsg::LogError(l) => self.log_error(l),
             ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
             ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
             ExternalMsg::Debug(path) => self.debug(&path),
@@ -781,7 +843,7 @@ impl App {
             .unwrap_or(Ok(self))
     }
 
-    fn buffer_string(mut self, input: &String) -> Result<Self> {
+    fn buffer_input(mut self, input: &String) -> Result<Self> {
         if let Some(buf) = self.input_buffer.as_mut() {
             buf.extend(input.chars());
         } else {
@@ -791,12 +853,18 @@ impl App {
         Ok(self)
     }
 
-    fn buffer_string_from_key(self, key: Option<Key>) -> Result<Self> {
+    fn buffer_input_from_key(self, key: Option<Key>) -> Result<Self> {
         if let Some(c) = key.and_then(|k| k.to_char()) {
-            self.buffer_string(&c.to_string())
+            self.buffer_input(&c.to_string())
         } else {
             Ok(self)
         }
+    }
+
+    fn set_input_buffer(mut self, string: String) -> Result<Self> {
+        self.input_buffer = Some(string);
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
     }
 
     fn reset_input_buffer(mut self) -> Result<Self> {
@@ -847,6 +915,14 @@ impl App {
             } else {
                 Ok(self)
             }
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn focus_path_from_input(self) -> Result<Self> {
+        if let Some(p) = self.input_buffer() {
+            self.focus_path(&p)
         } else {
             Ok(self)
         }
@@ -912,21 +988,18 @@ impl App {
 
     fn add_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
         self.explorer_config.filters.push(filter);
-        self.msg_out.push_back(MsgOut::Explore);
+        self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
-    fn add_node_filter_from_input_string(
-        mut self,
-        filter: NodeFilterFromInputString,
-    ) -> Result<Self> {
+    fn add_node_filter_from_input(mut self, filter: NodeFilterFromInput) -> Result<Self> {
         if let Some(input) = self.input_buffer() {
             self.explorer_config.filters.push(NodeFilterApplicable::new(
                 filter.filter,
                 input,
                 filter.case_sensitive,
             ));
-            self.msg_out.push_back(MsgOut::Explore);
+            self.msg_out.push_back(MsgOut::Refresh);
         };
         Ok(self)
     }
@@ -938,7 +1011,7 @@ impl App {
             .into_iter()
             .filter(|f| f != &filter)
             .collect();
-        self.msg_out.push_back(MsgOut::Explore);
+        self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
@@ -960,8 +1033,23 @@ impl App {
                 Default::default(),
             ));
         };
-        self.msg_out.push_back(MsgOut::Explore);
+        self.msg_out.push_back(MsgOut::Refresh);
 
+        Ok(self)
+    }
+
+    fn log_info(mut self, message: String) -> Result<Self> {
+        self.logs.push(Log::new(LogLevel::Info, message));
+        Ok(self)
+    }
+
+    fn log_success(mut self, message: String) -> Result<Self> {
+        self.logs.push(Log::new(LogLevel::Success, message));
+        Ok(self)
+    }
+
+    fn log_error(mut self, message: String) -> Result<Self> {
+        self.logs.push(Log::new(LogLevel::Error, message));
         Ok(self)
     }
 
@@ -1067,5 +1155,10 @@ impl App {
     /// Get a reference to the app's explorer config.
     pub fn explorer_config(&self) -> &ExplorerConfig {
         &self.explorer_config
+    }
+
+    /// Get a reference to the app's logs.
+    pub fn logs(&self) -> &Vec<Log> {
+        &self.logs
     }
 }

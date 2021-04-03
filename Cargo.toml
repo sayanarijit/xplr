@@ -22,6 +22,7 @@ serde_yaml = "0.8"
 handlebars = "3.5"
 mime_guess = "2.0.3"
 anyhow = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
 
 [dev-dependencies]
 criterion = "0.3"
