@@ -266,7 +266,7 @@ fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
     let selection_list = List::new(selection).block(
         Block::default()
             .borders(Borders::ALL)
-            .title(format!(" selection ({}) ", selection_count)),
+            .title(format!(" Selection ({}) ", selection_count)),
     );
 
     let mut list_state = ListState::default();
@@ -291,7 +291,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(format!(" help [{}] ", &app.mode().name)),
+                .title(format!(" Help [{}] ", &app.mode().name)),
         )
         .widths(&[TUIConstraint::Percentage(30), TUIConstraint::Percentage(70)]);
     f.render_widget(help_menu, rect);
@@ -299,7 +299,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
 
 fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     let input_buf = Paragraph::new(format!("> {}", app.input_buffer().unwrap_or("".into())))
-        .block(Block::default().borders(Borders::ALL).title(" input "));
+        .block(Block::default().borders(Borders::ALL).title(" Input "));
     f.render_widget(input_buf, rect);
 }
 
@@ -323,7 +323,7 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
         })
         .collect::<Vec<ListItem>>();
 
-    let logs_list = List::new(logs).block(Block::default().borders(Borders::ALL).title(" logs "));
+    let logs_list = List::new(logs).block(Block::default().borders(Borders::ALL).title(" Logs "));
 
     f.render_widget(logs_list, rect);
 }
