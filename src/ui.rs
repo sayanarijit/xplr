@@ -266,7 +266,7 @@ fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
     let selection_list = List::new(selection).block(
         Block::default()
             .borders(Borders::ALL)
-            .title(format!(" Selection ({}) ", selection_count)),
+            .title(format!(" selection ({}) ", selection_count)),
     );
 
     let mut list_state = ListState::default();
@@ -291,7 +291,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(format!(" Help [{}] ", &app.mode().name)),
+                .title(format!(" help [{}] ", &app.mode().name)),
         )
         .widths(&[TUIConstraint::Percentage(30), TUIConstraint::Percentage(70)]);
     f.render_widget(help_menu, rect);
@@ -323,7 +323,7 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
         })
         .collect::<Vec<ListItem>>();
 
-    let logs_list = List::new(logs).block(Block::default().borders(Borders::ALL).title(" Logs "));
+    let logs_list = List::new(logs).block(Block::default().borders(Borders::ALL).title(" logs "));
 
     f.render_widget(logs_list, rect);
 }
