@@ -400,156 +400,102 @@ pub enum ExternalMsg {
     /// Explore the present working directory and register the filtered nodes.
     /// This operation is expensive. So, try avoiding using it too often.
     /// Once exploration is done, it will auto `Refresh` the state.
-    ///
-    /// Example: `- Explore`
-    /// or `echo Explore >> ${XPLR_PIPE_MSG_IN:?}`
     Explore,
 
     /// Refresh the app state (uncluding UI).
     /// But it will not re-explore the directory if the working directory is the same.
     /// If there is some change in the working directory and you want to re-explore it,
     /// use the `Explore` message instead.
-    ///
-    /// Example: `- Refresh`
-    /// or `echo Refresh >> ${XPLR_PIPE_MSG_IN:?}`
     Refresh,
 
     /// Clears the screen.
-    ///
-    /// Example: `- ClearScreen`
-    /// or `echo ClearScreen >> ${XPLR_PIPE_MSG_IN:?}`
     ClearScreen,
 
     /// Focus next node.
-    ///
-    /// Example: `- FocusNext`
-    /// or `echo FocusNext >> ${XPLR_PIPE_MSG_IN:?}`
     FocusNext,
 
     /// Focus on the `n`th node relative to the current focus where `n` is a given value.
     ///
-    /// Example: `- FocusNextByRelativeIndex: 2`
-    /// or `echo "FocusNextByRelativeIndex: 2" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `FocusNextByRelativeIndex: 2`
     FocusNextByRelativeIndex(usize),
 
     /// Focus on the `n`th node relative to the current focus where `n` is read from
     /// the input buffer.
-    ///
-    /// Example: `- FocusNextByRelativeIndexFromInput`
-    /// or `echo FocusNextByRelativeIndexFromInput >> ${XPLR_PIPE_MSG_IN:?}`
     FocusNextByRelativeIndexFromInput,
 
     /// Focus on the previous item.
-    ///
-    /// Example: `- FocusPrevious`
-    /// or `echo FocusPrevious >> ${XPLR_PIPE_MSG_IN:?}`
     FocusPrevious,
 
     /// Focus on the `-n`th node relative to the current focus where `n` is a given value.
     ///
-    /// Example: `- FocusPreviousByRelativeIndex: 2`
-    /// or `echo "FocusPreviousByRelativeIndex: 2" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `FocusPreviousByRelativeIndex: 2`
     FocusPreviousByRelativeIndex(usize),
 
     /// Focus on the `-n`th node relative to the current focus where `n` is read from
     /// the input buffer.
-    ///
-    /// Example: `- FocusPreviousByRelativeIndexFromInput`
-    /// or `echo FocusPreviousByRelativeIndexFromInput >> ${XPLR_PIPE_MSG_IN:?}`
     FocusPreviousByRelativeIndexFromInput,
 
     /// Focus on the first node.
-    ///
-    /// Example: `- FocusFirst`
-    /// or `echo FocusFirst >> ${XPLR_PIPE_MSG_IN:?}`
     FocusFirst,
     
     /// Focus on the last node.
-    ///
-    /// Example: `- FocusLast`
-    /// or `echo FocusLast >> ${XPLR_PIPE_MSG_IN:?}`
     FocusLast,
     
     /// Focus on the given path.
     ///
-    /// Example: `- FocusPath: /tmp`
-    /// or `echo "FocusPath: /tmp" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `FocusPath: /tmp`
     FocusPath(String),
 
     /// Focus on the path read from input buffer.
-    ///
-    /// Example: `- FocusPathFromInput`
-    /// or `echo "FocusPathFromInput" >> ${XPLR_PIPE_MSG_IN:?}`
     FocusPathFromInput,
 
     /// Focus on the absolute `n`th node where `n` is a given value.
     ///
-    /// Example: `- FocusByIndex: 2`
-    /// or `echo "FocusByIndex: 2" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `FocusByIndex: 2`
     FocusByIndex(usize),
     
     /// Focus on the absolute `n`th node where `n` is read from the input buffer.
-    ///
-    /// Example: `- FocusByIndexFromInput`
-    /// or `echo "FocusByIndexFromInput" >> ${XPLR_PIPE_MSG_IN:?}`
     FocusByIndexFromInput,
     
     /// Focus on the file by name from the present working directory.
     ///
-    /// Example: `- FocusByFileName: README.md`
-    /// or `echo "FocusByFileName: README.md" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `FocusByFileName: README.md`
     FocusByFileName(String),
 
     /// Change the present working directory ($PWD)
     ///
-    /// Example: `- ChangeDirectory: /tmp`
-    /// or `echo "ChangeDirectory: README.md" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `ChangeDirectory: /tmp`
     ChangeDirectory(String),
 
     /// Enter into the currently focused path if it's a directory.
-    ///
-    /// Example: `- Enter`
-    /// or `echo Enter >> ${XPLR_PIPE_MSG_IN:?}`
     Enter,
 
     /// Go back to the parent directory.
-    ///
-    /// Example: `- Back`
-    /// or `echo Back >> ${XPLR_PIPE_MSG_IN:?}`
     Back,
 
     /// Append/buffer the given string into the input buffer.
     ///
-    /// Example: `- Back`
-    /// or `echo Back >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `BufferInput: foo`
     BufferInput(String),
 
     /// Append/buffer the characted read from a keyboard input into the
     /// input buffer.
-    ///
-    /// Example: `- BufferInputFromKey`
-    /// Note: this doesn't work with pipes.
     BufferInputFromKey,
 
     /// Set/rewrite the input buffer with the given string.
     /// When the input buffer is not-null (even if empty string)
     /// it will show in the UI.
     ///
-    /// Example: `- SetInputBuffer: "foo"`
-    /// or `echo SetInputBuffer: "foo" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `SetInputBuffer: foo`
     SetInputBuffer(String),
 
     /// Reset the input buffer back to null. It will not show in the UI.
-    ///
-    /// Example: `- ReSetInputBuffer: "foo"`
-    /// or `echo ReSetInputBuffer >> ${XPLR_PIPE_MSG_IN:?}`
     ResetInputBuffer,
 
     /// Switch input mode.
     /// This will call `Refresh` automatically.
     ///
-    /// Example: `- SwitchMode: "default"`
-    /// or `echo SwitchMode: "default" >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `SwitchMode: default`
     SwitchMode(String),
 
     /// Call a shell command with the given arguments.
@@ -558,26 +504,70 @@ pub enum ExternalMsg {
     /// can be used.
     /// You may need to pass `Refresh` or `Explore` depening on the expectation.
     ///
-    /// Example: `- Call: {command: "bash", args: ["-c", "echo $PWD"]}`
-    /// or `echo 'Call: {command: "ls", atgs: ["-l"]}' >> ${XPLR_PIPE_MSG_IN:?}`
+    /// Example: `Call: {command: bash, args: ["-c", "read -p test"]}`
     Call(Command),
 
-    // TODO document
+    /// Select the focused node.
     Select,
+    
+    /// Unselect the focused node.
     UnSelect,
+
+    /// Toggle selection on the focused node.
     ToggleSelection,
+
+    /// Clear the selection
     ClearSelection,
+
+    /// Add a filter to explude nodes while exploring directories.
+    ///
+    /// Example: `AddNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     AddNodeFilter(NodeFilterApplicable),
+
+    /// Remove an existing filter.
+    ///
+    /// Example: `RemoveNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     RemoveNodeFilter(NodeFilterApplicable),
+
+    /// Remove a filter if it exists, else, add a it.
+    ///
+    /// Example: `ToggleNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     ToggleNodeFilter(NodeFilterApplicable),
+
+    /// Add a node filter reading the input from the buffer.
+    ///
+    /// Example: `AddNodeFilterFromInput: {filter: RelativePathDoesStartWith}`
     AddNodeFilterFromInput(NodeFilterFromInput),
+
+    /// Reset the node filters back to the default configuration.
     ResetNodeFilters,
+
+    /// Log information message. Stored in `$XPLR_LOGS`.
+    ///
+        /// Example: `LogInfo: launching satellite`
     LogInfo(String),
+
+    /// Log a success message. Stored in `$XPLR_LOGS`.
+    ///
+    /// Example: `LogSuccess: satellite reached destination`. Stored in `$XPLR_LOGS`
     LogSuccess(String),
+
+    /// Log an error message, Stoted in `$XPLR_LOGS`
+    ///
+    /// Example: `LogError: satellite crashed`
     LogError(String),
+
+    /// Print selected paths if it's not empty, else, print the focused node's path.
     PrintResultAndQuit,
+
+    /// Print the state of application in YAML format. Helpful for debugging or generating
+    /// the default configuration file.
     PrintAppStateAndQuit,
+
+    /// Write the application state to a file, without quitting. Also helpful for debugging.
     Debug(String),
+
+    /// Terminate the application with a non-zero return code.
     Terminate,
 }
 
