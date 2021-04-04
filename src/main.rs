@@ -207,7 +207,7 @@ fn main() -> Result<()> {
                     let session_path = app.session_path();
                     let result = app.result_str();
 
-                    let _ = std::process::Command::new(cmd.command.clone())
+                    let status = std::process::Command::new(cmd.command.clone())
                         .current_dir(app.pwd())
                         .env("XPLR_PID", pid)
                         .env("XPLR_INPUT_BUFFER", input_buffer)
@@ -224,7 +224,20 @@ fn main() -> Result<()> {
                         .env("XPLR_DIRECTORY_NODES", directory_nodes)
                         .env("XPLR_LOGS", logs)
                         .args(cmd.args.clone())
-                        .status();
+                        .status()
+                        .map(|s| {
+                            if s.success() {
+                                Ok(())
+                            } else {
+                                Err(format!("process exited with code {}", &s))
+                            }
+                        })
+                        .unwrap_or_else(|e| Err(e.to_string()));
+
+                    if let Err(e) = status {
+                        let msg = app::MsgIn::External(app::ExternalMsg::LogError(e));
+                        tx_msg_in.send(app::Task::new(1, msg, None))?;
+                    };
 
                     terminal.hide_cursor()?;
                     execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
