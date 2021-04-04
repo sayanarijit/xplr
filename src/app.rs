@@ -14,7 +14,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.14"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.15"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -396,7 +396,6 @@ impl ExplorerConfig {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
-    
     /// Explore the present working directory and register the filtered nodes.
     /// This operation is expensive. So, try avoiding using it too often.
     /// Once exploration is done, it will auto `Refresh` the state.
@@ -437,10 +436,10 @@ pub enum ExternalMsg {
 
     /// Focus on the first node.
     FocusFirst,
-    
+
     /// Focus on the last node.
     FocusLast,
-    
+
     /// Focus on the given path.
     ///
     /// Example: `FocusPath: /tmp`
@@ -453,10 +452,10 @@ pub enum ExternalMsg {
     ///
     /// Example: `FocusByIndex: 2`
     FocusByIndex(usize),
-    
+
     /// Focus on the absolute `n`th node where `n` is read from the input buffer.
     FocusByIndexFromInput,
-    
+
     /// Focus on the file by name from the present working directory.
     ///
     /// Example: `FocusByFileName: README.md`
@@ -509,7 +508,7 @@ pub enum ExternalMsg {
 
     /// Select the focused node.
     Select,
-    
+
     /// Unselect the focused node.
     UnSelect,
 
@@ -544,7 +543,7 @@ pub enum ExternalMsg {
 
     /// Log information message. Stored in `$XPLR_LOGS`.
     ///
-        /// Example: `LogInfo: launching satellite`
+    /// Example: `LogInfo: launching satellite`
     LogInfo(String),
 
     /// Log a success message. Stored in `$XPLR_LOGS`.
@@ -717,9 +716,13 @@ impl App {
 
         if config.version != VERSION {
             bail!(
-                "incompatible config version {} in {}",
+                "incompatible configuration version in {}
+                You config version is : {}
+                Required version is   : {}
+                Visit https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide",
+                config_file.to_string_lossy().to_string(),
                 config.version,
-                config_file.to_string_lossy().to_string()
+                VERSION,
             )
         } else {
             let mode = config

@@ -11,10 +11,11 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 </p>
 
 <h3 align="center">
-[<a href="https://github.com/sayanarijit/xplr/wiki/Features">Features</a>]
 [<a href="https://github.com/sayanarijit/xplr/wiki/Quickstart">Quickstart</a>]
+[<a href="https://github.com/sayanarijit/xplr/wiki/Features">Features</a>]
 [<a href="https://github.com/sayanarijit/xplr/wiki/Plugins">Plugins</a>]
 [<a href="https://github.com/sayanarijit/xplr/wiki">Documentation</a>]
+[<a href="https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide">Upgrade Guide</a>]
 [<a href="https://github.com/sayanarijit/xplr/wiki/TODO">TODO</a>]
 </h3>
 
