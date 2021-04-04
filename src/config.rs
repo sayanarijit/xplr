@@ -609,6 +609,13 @@ impl Default for Config {
             r###"
               name: action to
               key_bindings:
+                on_number:
+                  help: go to index
+                  messages:
+                    - ResetInputBuffer
+                    - SwitchMode: number
+                    - BufferInputFromKey
+
                 on_key:
                   "!":
                     help: shell
