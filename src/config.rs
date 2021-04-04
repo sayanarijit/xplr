@@ -327,6 +327,17 @@ impl Default for KeyBindings {
                   - ToggleSelection
                   - FocusNext
 
+              r:
+                help: rename
+                messages:
+                  - SwitchMode: rename
+                  - Call:
+                      command: bash
+                      args:
+                        - -c
+                        - |
+                          echo "SetInputBuffer: ${XPLR_FOCUS_PATH}" >> "${XPLR_PIPE_MSG_IN:?}"
+
               ".":
                 help: show hidden
                 messages:
@@ -897,6 +908,51 @@ impl Default for Config {
         )
         .unwrap();
 
+        let rename_mode: Mode = serde_yaml::from_str(
+            r###"
+              name: rename
+              key_bindings:
+                on_key:
+                  enter:
+                    help: rename
+                    messages:
+                      - Call:
+                          command: bash
+                          args:
+                            - -c
+                            - |
+                              SRC="${XPLR_FOCUS_PATH:?}"
+                              TARGET="${XPLR_INPUT_BUFFER:?}"
+                              if mv -v "${SRC:?}" "${TARGET:?}"; then
+                                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                                echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                              else
+                                echo "LogError: failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                              fi
+                      - SwitchMode: default
+
+                  backspace:
+                    help: clear
+                    messages:
+                      - SetInputBuffer: ""
+
+                  esc:
+                    help: cancel
+                    messages:
+                      - SwitchMode: default
+
+                  ctrl-c:
+                    help: cancel & quit
+                    messages:
+                      - Terminate
+
+                default:
+                  messages:
+                    - BufferInputFromKey
+            "###,
+        )
+        .unwrap();
+
         let delete_mode: Mode = serde_yaml::from_str(
             r###"
               name: delete
@@ -966,6 +1022,7 @@ impl Default for Config {
         modes.insert("go to".into(), goto_mode);
         modes.insert("number".into(), number_mode);
         modes.insert("create".into(), create_mode);
+        modes.insert("rename".into(), rename_mode);
         modes.insert("create file".into(), create_file_mode);
         modes.insert("create directory".into(), create_dir_mode);
         modes.insert("delete".into(), delete_mode);

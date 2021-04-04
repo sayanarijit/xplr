@@ -14,7 +14,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.18"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.19"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -492,14 +492,14 @@ pub enum ExternalMsg {
     ResetInputBuffer,
 
     /// Switch input mode.
-    /// This will call `Refresh` automatically.
+    /// This will reset the input buffer and call `Refresh` automatically.
     ///
     /// Example: `SwitchMode: default`
     SwitchMode(String),
 
     /// Call a shell command with the given arguments.
     /// Note that the arguments will be shell-escaped.
-    /// So read the variables, the `-c` option of teh shell
+    /// So to read the variables, the `-c` option of the shell
     /// can be used.
     /// You may need to pass `Refresh` or `Explore` depening on the expectation.
     ///
