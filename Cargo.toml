@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.2.16"  # Update app.rs
+version = "0.2.17"  # Update app.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "A hackable, minimal, fast TUI file explorer, stealing ideas from nnn and fzf"
@@ -22,7 +22,6 @@ handlebars = "3.5"
 mime_guess = "2.0.3"
 anyhow = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
-skim = "0.9.4"
 
 [dev-dependencies]
 criterion = "0.3"

@@ -14,7 +14,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.16"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.17"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
