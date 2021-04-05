@@ -58,7 +58,7 @@ jobs:
         shell: bash
         run: |
           cd target/${{ matrix.target }}/release
-          BINARY_NAME=spt${{ matrix.binary_postfix }}
+          BINARY_NAME=xplr${{ matrix.binary_postfix }}
           strip $BINARY_NAME
           RELEASE_NAME=xplr-${{ matrix.artifact_prefix }}
           tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
