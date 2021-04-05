@@ -21,6 +21,11 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 
 <br>
 
+[![Continuous Integration](https://github.com/sayanarijit/xplr/actions/workflows/ci.yml/badge.svg)](https://github.com/sayanarijit/xplr/actions/workflows/ci.yml)
+[![Continuous Delivery](https://github.com/sayanarijit/xplr/actions/workflows/cd.yml/badge.svg)](https://github.com/sayanarijit/xplr/actions/workflows/cd.yml)
+
+<br>
+
 Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, it's speciality is it's hackability.
 
 Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you should be able to configure the key bindings,

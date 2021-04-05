@@ -3,13 +3,11 @@ use crate::config::Mode;
 use crate::input::Key;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Utc};
-use mime_guess;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::VecDeque;
-use std::env;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
@@ -29,7 +27,7 @@ pub struct Pipe {
 }
 
 impl Pipe {
-    fn from_session_path(path: &String) -> Self {
+    fn from_session_path(path: &str) -> Self {
         let pipesdir = PathBuf::from(path).join("pipe");
 
         fs::create_dir_all(&pipesdir).unwrap();
@@ -191,11 +189,11 @@ pub enum NodeFilter {
 }
 
 impl NodeFilter {
-    fn apply(&self, node: &Node, input: &String, case_sensitive: bool) -> bool {
+    fn apply(&self, node: &Node, input: &str, case_sensitive: bool) -> bool {
         match self {
             Self::RelativePathIs => {
                 if case_sensitive {
-                    &node.relative_path == input
+                    node.relative_path == input
                 } else {
                     node.relative_path.to_lowercase() == input.to_lowercase()
                 }
@@ -203,7 +201,7 @@ impl NodeFilter {
 
             Self::RelativePathIsNot => {
                 if case_sensitive {
-                    &node.relative_path != input
+                    node.relative_path != input
                 } else {
                     node.relative_path.to_lowercase() != input.to_lowercase()
                 }
@@ -274,7 +272,7 @@ impl NodeFilter {
 
             Self::AbsolutePathIs => {
                 if case_sensitive {
-                    &node.absolute_path == input
+                    node.absolute_path == input
                 } else {
                     node.absolute_path.to_lowercase() == input.to_lowercase()
                 }
@@ -282,7 +280,7 @@ impl NodeFilter {
 
             Self::AbsolutePathIsNot => {
                 if case_sensitive {
-                    &node.absolute_path != input
+                    node.absolute_path != input
                 } else {
                     node.absolute_path.to_lowercase() != input.to_lowercase()
                 }
@@ -691,19 +689,9 @@ pub struct App {
 }
 
 impl App {
-    pub fn create() -> Result<Self> {
-        let mut pwd = PathBuf::from(env::args().skip(1).next().unwrap_or(".".into()))
-            .canonicalize()
-            .unwrap_or_default();
-
-        if pwd.is_file() {
-            pwd = pwd.parent().map(|p| p.into()).unwrap_or_default();
-        }
-
-        let pwd = pwd.to_string_lossy().to_string();
-
+    pub fn create(pwd: PathBuf) -> Result<Self> {
         let config_dir = dirs::config_dir()
-            .unwrap_or(PathBuf::from("."))
+            .unwrap_or_else(|| PathBuf::from("."))
             .join("xplr");
 
         let config_file = config_dir.join("config.yml");
@@ -733,7 +721,7 @@ impl App {
 
             let pid = std::process::id();
             let session_path = dirs::runtime_dir()
-                .unwrap_or("/tmp".into())
+                .unwrap_or_else(|| "/tmp".into())
                 .join("xplr")
                 .join("session")
                 .join(&pid.to_string())
@@ -751,7 +739,7 @@ impl App {
 
             Ok(Self {
                 config,
-                pwd,
+                pwd: pwd.to_string_lossy().to_string(),
                 directory_buffers: Default::default(),
                 tasks: Default::default(),
                 selection: Default::default(),
@@ -842,7 +830,7 @@ impl App {
             ExternalMsg::LogError(l) => self.log_error(l),
             ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
             ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
-            ExternalMsg::Debug(path) => self.debug(&path),
+            ExternalMsg::Debug(path) => self.debug(path),
             ExternalMsg::Terminate => bail!("terminated"),
         }
     }
@@ -953,7 +941,7 @@ impl App {
         }
     }
 
-    fn change_directory(mut self, dir: &String) -> Result<Self> {
+    fn change_directory(mut self, dir: &str) -> Result<Self> {
         if PathBuf::from(dir).is_dir() {
             self.pwd = dir.to_owned();
             self.msg_out.push_back(MsgOut::Refresh);
@@ -978,9 +966,9 @@ impl App {
             .unwrap_or(Ok(self))
     }
 
-    fn buffer_input(mut self, input: &String) -> Result<Self> {
+    fn buffer_input(mut self, input: &str) -> Result<Self> {
         if let Some(buf) = self.input_buffer.as_mut() {
-            buf.extend(input.chars());
+            buf.push_str(input)
         } else {
             self.input_buffer = Some(input.to_owned());
         };
@@ -1024,14 +1012,14 @@ impl App {
         }
     }
 
-    fn focus_by_file_name(mut self, name: &String) -> Result<Self> {
+    fn focus_by_file_name(mut self, name: &str) -> Result<Self> {
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
                 .clone()
                 .nodes
                 .iter()
                 .enumerate()
-                .find(|(_, n)| &n.relative_path == name)
+                .find(|(_, n)| n.relative_path == name)
                 .map(|(i, _)| i)
             {
                 dir_buf.focus = focus;
@@ -1041,7 +1029,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_path(self, path: &String) -> Result<Self> {
+    fn focus_path(self, path: &str) -> Result<Self> {
         let pathbuf = PathBuf::from(path);
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
@@ -1063,7 +1051,7 @@ impl App {
         }
     }
 
-    fn switch_mode(mut self, mode: &String) -> Result<Self> {
+    fn switch_mode(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.get(mode) {
             self.input_buffer = None;
             self.mode = mode.to_owned();
@@ -1085,7 +1073,7 @@ impl App {
 
     fn select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
-            self.selection.push(n.clone());
+            self.selection.push(n);
             self.msg_out.push_back(MsgOut::Refresh);
         }
         Ok(self)
@@ -1198,8 +1186,8 @@ impl App {
         Ok(self)
     }
 
-    fn debug(mut self, path: &String) -> Result<Self> {
-        self.msg_out.push_back(MsgOut::Debug(path.to_owned()));
+    fn debug(mut self, path: String) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::Debug(path));
         Ok(self)
     }
 
@@ -1275,7 +1263,7 @@ impl App {
         if self.selection.is_empty() {
             self.focused_node().map(|n| vec![n]).unwrap_or_default()
         } else {
-            self.selection.iter().map(|n| n).collect()
+            self.selection.iter().collect()
         }
     }
 

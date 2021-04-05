@@ -1,6 +1,5 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use serde::{Deserialize, Serialize};
-use serde_yaml;
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -302,86 +301,81 @@ impl Key {
     }
 
     pub fn is_alphabet(&self) -> bool {
-        match self {
-            Self::A => true,
-            Self::B => true,
-            Self::C => true,
-            Self::D => true,
-            Self::E => true,
-            Self::F => true,
-            Self::G => true,
-            Self::H => true,
-            Self::I => true,
-            Self::J => true,
-            Self::K => true,
-            Self::L => true,
-            Self::M => true,
-            Self::N => true,
-            Self::O => true,
-            Self::P => true,
-            Self::Q => true,
-            Self::R => true,
-            Self::S => true,
-            Self::T => true,
-            Self::U => true,
-            Self::V => true,
-            Self::W => true,
-            Self::X => true,
-            Self::Y => true,
-            Self::Z => true,
-
-            Self::ShiftA => true,
-            Self::ShiftB => true,
-            Self::ShiftC => true,
-            Self::ShiftD => true,
-            Self::ShiftE => true,
-            Self::ShiftF => true,
-            Self::ShiftG => true,
-            Self::ShiftH => true,
-            Self::ShiftI => true,
-            Self::ShiftJ => true,
-            Self::ShiftK => true,
-            Self::ShiftL => true,
-            Self::ShiftM => true,
-            Self::ShiftN => true,
-            Self::ShiftO => true,
-            Self::ShiftP => true,
-            Self::ShiftQ => true,
-            Self::ShiftR => true,
-            Self::ShiftS => true,
-            Self::ShiftT => true,
-            Self::ShiftU => true,
-            Self::ShiftV => true,
-            Self::ShiftW => true,
-            Self::ShiftX => true,
-            Self::ShiftY => true,
-            Self::ShiftZ => true,
-
-            _ => false,
-        }
+        matches!(
+            self,
+            Self::A
+                | Self::B
+                | Self::C
+                | Self::D
+                | Self::E
+                | Self::F
+                | Self::G
+                | Self::H
+                | Self::I
+                | Self::J
+                | Self::K
+                | Self::L
+                | Self::M
+                | Self::N
+                | Self::O
+                | Self::P
+                | Self::Q
+                | Self::R
+                | Self::S
+                | Self::T
+                | Self::U
+                | Self::V
+                | Self::W
+                | Self::X
+                | Self::Y
+                | Self::Z
+                | Self::ShiftA
+                | Self::ShiftB
+                | Self::ShiftC
+                | Self::ShiftD
+                | Self::ShiftE
+                | Self::ShiftF
+                | Self::ShiftG
+                | Self::ShiftH
+                | Self::ShiftI
+                | Self::ShiftJ
+                | Self::ShiftK
+                | Self::ShiftL
+                | Self::ShiftM
+                | Self::ShiftN
+                | Self::ShiftO
+                | Self::ShiftP
+                | Self::ShiftQ
+                | Self::ShiftR
+                | Self::ShiftS
+                | Self::ShiftT
+                | Self::ShiftU
+                | Self::ShiftV
+                | Self::ShiftW
+                | Self::ShiftX
+                | Self::ShiftY
+                | Self::ShiftZ
+        )
     }
 
     pub fn is_number(&self) -> bool {
-        match self {
-            Self::Num0 => true,
-            Self::Num1 => true,
-            Self::Num2 => true,
-            Self::Num3 => true,
-            Self::Num4 => true,
-            Self::Num5 => true,
-            Self::Num6 => true,
-            Self::Num7 => true,
-            Self::Num8 => true,
-            Self::Num9 => true,
-            _ => false,
-        }
+        matches!(
+            self,
+            Self::Num0
+                | Self::Num1
+                | Self::Num2
+                | Self::Num3
+                | Self::Num4
+                | Self::Num5
+                | Self::Num6
+                | Self::Num7
+                | Self::Num8
+                | Self::Num9,
+        )
     }
 
     pub fn is_special_character(&self) -> bool {
-        match self {
-            Self::Special(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Special(_))
     }
 
     pub fn to_char(&self) -> Option<char> {

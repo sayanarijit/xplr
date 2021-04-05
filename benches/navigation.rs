@@ -8,7 +8,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         fs::File::create(format!("/tmp/xplr_bench/{}", i)).unwrap();
     });
 
-    let app = app::App::create()
+    let app = app::App::create("/tmp/xplr_bench".into())
         .expect("failed to create app")
         .enqueue(app::Task::new(
             1,
