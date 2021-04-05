@@ -12,7 +12,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.21"; // Update Cargo.toml
+pub const VERSION: &str = "v0.3.0"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -23,11 +23,15 @@ pub struct Pipe {
     pub msg_in: String,
     pub focus_out: String,
     pub selection_out: String,
+    pub result_out: String,
     pub mode_out: String,
+    pub directory_nodes_out: String,
+    pub global_help_menu_out: String,
+    pub logs_out: String,
 }
 
 impl Pipe {
-    fn from_session_path(path: &str) -> Self {
+    fn from_session_path(path: &str) -> Result<Self> {
         let pipesdir = PathBuf::from(path).join("pipe");
 
         fs::create_dir_all(&pipesdir).unwrap();
@@ -38,19 +42,41 @@ impl Pipe {
 
         let selection_out = pipesdir.join("selection_out").to_string_lossy().to_string();
 
+        let result_out = pipesdir.join("result_out").to_string_lossy().to_string();
+
         let mode_out = pipesdir.join("mode_out").to_string_lossy().to_string();
 
-        fs::write(&msg_in, "").unwrap();
-        fs::write(&focus_out, "").unwrap();
-        fs::write(&selection_out, "").unwrap();
-        fs::write(&mode_out, "").unwrap();
+        let directory_nodes_out = pipesdir
+            .join("directory_nodes_out")
+            .to_string_lossy()
+            .to_string();
 
-        Self {
+        let global_help_menu_out = pipesdir
+            .join("global_help_menu_out")
+            .to_string_lossy()
+            .to_string();
+
+        let logs_out = pipesdir.join("logs_out").to_string_lossy().to_string();
+
+        fs::write(&msg_in, "")?;
+        fs::write(&focus_out, "")?;
+        fs::write(&selection_out, "")?;
+        fs::write(&mode_out, "")?;
+        fs::write(&directory_nodes_out, "")?;
+        fs::write(&global_help_menu_out, "")?;
+        fs::write(&result_out, "")?;
+        fs::write(&logs_out, "")?;
+
+        Ok(Self {
             msg_in,
             focus_out,
             selection_out,
+            result_out,
             mode_out,
-        }
+            directory_nodes_out,
+            global_help_menu_out,
+            logs_out,
+        })
     }
 }
 
@@ -387,7 +413,7 @@ pub struct ExplorerConfig {
 }
 
 impl ExplorerConfig {
-    pub fn apply(&self, node: &Node) -> bool {
+    pub fn filter(&self, node: &Node) -> bool {
         self.filters.iter().all(|f| f.apply(node))
     }
 }
@@ -545,17 +571,17 @@ pub enum ExternalMsg {
     /// Reset the node filters back to the default configuration.
     ResetNodeFilters,
 
-    /// Log information message. Stored in `$XPLR_LOGS`.
+    /// Log information message.
     ///
     /// Example: `LogInfo: launching satellite`
     LogInfo(String),
 
-    /// Log a success message. Stored in `$XPLR_LOGS`.
+    /// Log a success message.
     ///
-    /// Example: `LogSuccess: satellite reached destination`. Stored in `$XPLR_LOGS`
+    /// Example: `LogSuccess: satellite reached destination`.
     LogSuccess(String),
 
-    /// Log an error message, Stoted in `$XPLR_LOGS`
+    /// Log an error message.
     ///
     /// Example: `LogError: satellite crashed`
     LogError(String),
@@ -754,7 +780,7 @@ impl App {
                 input_buffer: Default::default(),
                 pid,
                 session_path: session_path.clone(),
-                pipe: Pipe::from_session_path(&session_path),
+                pipe: Pipe::from_session_path(&session_path)?,
                 explorer_config,
                 logs: Default::default(),
             })
@@ -1281,12 +1307,40 @@ impl App {
         }
     }
 
+    pub fn directory_nodes_str(&self) -> String {
+        self.directory_buffer()
+            .map(|d| {
+                d.nodes
+                    .iter()
+                    .map(|n| format!("{}\n", n.absolute_path))
+                    .collect::<Vec<String>>()
+                    .join("")
+            })
+            .unwrap_or_default()
+    }
+
+    pub fn logs_str(&self) -> String {
+        self.logs()
+            .iter()
+            .map(|l| format!("{}\n", l))
+            .collect::<Vec<String>>()
+            .join("")
+    }
+
+    pub fn selection_str(&self) -> String {
+        self.selection
+            .iter()
+            .map(|n| format!("{}\n", n.absolute_path))
+            .collect::<Vec<String>>()
+            .join("")
+    }
+
     pub fn result_str(&self) -> String {
         self.result()
             .into_iter()
-            .map(|n| n.absolute_path.clone())
+            .map(|n| format!("{}\n", n.absolute_path))
             .collect::<Vec<String>>()
-            .join("\n")
+            .join("")
     }
 
     /// Get a reference to the app's explorer config.
@@ -1297,5 +1351,31 @@ impl App {
     /// Get a reference to the app's logs.
     pub fn logs(&self) -> &Vec<Log> {
         &self.logs
+    }
+
+    pub fn global_help_menu_str(&self) -> String {
+        self.config()
+            .modes
+            .iter()
+            .map(|(name, mode)| {
+                let help = mode
+                    .help_menu()
+                    .iter()
+                    .map(|l| match l {
+                        HelpMenuLine::Paragraph(p) => format!("\t{}\n", p),
+                        HelpMenuLine::KeyMap(k, h) => {
+                            format!(" {:15} | {}\n", k, h)
+                        }
+                    })
+                    .collect::<Vec<String>>()
+                    .join("");
+
+                format!(
+                    "### {}\n\n key             | action\n --------------- | ------\n{}\n",
+                    name, help
+                )
+            })
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 }

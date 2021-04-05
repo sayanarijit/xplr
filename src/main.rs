@@ -111,6 +111,7 @@ fn main() -> Result<()> {
                 }
 
                 app::MsgOut::Refresh => {
+                    app = app.refresh_selection()?;
                     if app.pwd() != &last_pwd {
                         explorer::explore(
                             app.explorer_config().clone(),
@@ -131,19 +132,12 @@ fn main() -> Result<()> {
                         .unwrap_or_default();
 
                     fs::write(&app.pipe().focus_out, focused)?;
-
-                    app = app.refresh_selection()?;
-
-                    let selection = app
-                        .selection()
-                        .iter()
-                        .map(|n| n.absolute_path.clone())
-                        .collect::<Vec<String>>()
-                        .join("\n");
-
-                    fs::write(&app.pipe().selection_out, selection)?;
-
+                    fs::write(&app.pipe().selection_out, app.selection_str())?;
                     fs::write(&app.pipe().mode_out, &app.mode().name)?;
+                    fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
+                    fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
+                    fs::write(&app.pipe().logs_out, app.logs_str())?;
+                    fs::write(&app.pipe().result_out, app.result_str())?;
                 }
 
                 app::MsgOut::Call(cmd) => {
@@ -167,60 +161,14 @@ fn main() -> Result<()> {
                         .unwrap_or_default()
                         .to_string();
 
-                    let selection = app
-                        .selection()
-                        .iter()
-                        .map(|n| n.absolute_path.clone())
-                        .collect::<Vec<String>>()
-                        .join("\n");
-
-                    let directory_nodes = app
-                        .directory_buffer()
-                        .map(|d| {
-                            d.nodes
-                                .iter()
-                                .map(|n| n.absolute_path.clone())
-                                .collect::<Vec<String>>()
-                                .join("\n")
-                        })
-                        .unwrap_or_default();
-
-                    let logs = app
-                        .logs()
-                        .iter()
-                        .map(|l| l.to_string())
-                        .collect::<Vec<String>>()
-                        .join("\n");
-
-                    let help_menu = app
-                        .config()
-                        .modes
-                        .iter()
-                        .map(|(name, mode)| {
-                            let help = mode
-                                .help_menu()
-                                .iter()
-                                .map(|l| match l {
-                                    app::HelpMenuLine::Paragraph(p) => format!("\t{}", p),
-                                    app::HelpMenuLine::KeyMap(k, h) => {
-                                        format!(" {:15} | {}", k, h)
-                                    }
-                                })
-                                .collect::<Vec<String>>()
-                                .join("\n");
-
-                            format!("### {}\n\n key             | action\n --------------- | ------\n{}", name, help)
-                        })
-                        .collect::<Vec<String>>()
-                        .join("\n\n\n");
-
                     let pipe_msg_in = app.pipe().msg_in.clone();
                     let pipe_focus_out = app.pipe().focus_out.clone();
                     let pipe_selection_out = app.pipe().selection_out.clone();
-
-                    let app_yaml = serde_yaml::to_string(&app)?;
+                    let pipe_result_out = app.pipe().result_out.clone();
+                    let pipe_directory_nodes_out = app.pipe().directory_nodes_out.clone();
+                    let pipe_global_help_menu_out = app.pipe().global_help_menu_out.clone();
+                    let pipe_logs_out = app.pipe().logs_out.clone();
                     let session_path = app.session_path();
-                    let result = app.result_str();
 
                     let status = std::process::Command::new(cmd.command.clone())
                         .current_dir(app.pwd())
@@ -228,16 +176,14 @@ fn main() -> Result<()> {
                         .env("XPLR_INPUT_BUFFER", input_buffer)
                         .env("XPLR_FOCUS_PATH", focus_path)
                         .env("XPLR_FOCUS_INDEX", focus_index)
-                        .env("XPLR_SELECTION", selection)
                         .env("XPLR_SESSION_PATH", session_path)
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
                         .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
-                        .env("XPLR_APP_YAML", app_yaml)
-                        .env("XPLR_RESULT", result)
-                        .env("XPLR_GLOBAL_HELP_MENU", help_menu)
-                        .env("XPLR_DIRECTORY_NODES", directory_nodes)
-                        .env("XPLR_LOGS", logs)
+                        .env("XPLR_PIPE_RESULT_OUT", pipe_result_out)
+                        .env("XPLR_PIPE_GLOBAL_HELP_MENU_OUT", pipe_global_help_menu_out)
+                        .env("XPLR_PIPE_DIRECTORY_NODES_OUT", pipe_directory_nodes_out)
+                        .env("XPLR_PIPE_LOGS_OUT", pipe_logs_out)
                         .args(cmd.args.clone())
                         .status()
                         .map(|s| {
