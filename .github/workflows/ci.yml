@@ -52,22 +52,22 @@ jobs:
         with:
           command: test
 
-  bench:
-    name: Benchmarks
-    runs-on: ubuntu-latest
-    needs: prepare
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-      # These dependencies are required for `clipboard`
-      - run: sudo apt-get install -y -qq libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-      - uses: actions-rs/cargo@v1
-        with:
-          command: bench
+  # bench:
+  #   name: Benchmarks
+  #   runs-on: ubuntu-latest
+  #   needs: prepare
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         profile: minimal
+  #         override: true
+  #     # These dependencies are required for `clipboard`
+  #     - run: sudo apt-get install -y -qq libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+  #     - uses: actions-rs/cargo@v1
+  #       with:
+  #         command: bench
 
   fmt:
     name: Rustfmt

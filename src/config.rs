@@ -330,12 +330,8 @@ impl Default for KeyBindings {
                 help: rename
                 messages:
                   - SwitchMode: rename
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                          echo "SetInputBuffer: ${XPLR_FOCUS_PATH}" >> "${XPLR_PIPE_MSG_IN:?}"
+                  - BashExec: |
+                      echo "SetInputBuffer: ${XPLR_FOCUS_PATH}" >> "${XPLR_PIPE_MSG_IN:?}"
 
               ".":
                 help: show hidden
@@ -357,14 +353,10 @@ impl Default for KeyBindings {
               "?":
                 help: global help menu
                 messages:
-                  - Call:
-                      command: bash
-                      args:
-                        - -c
-                        - |
-                          echo -e "${XPLR_GLOBAL_HELP_MENU}"
-                          echo
-                          read -p "[enter to continue]"
+                  - BashExec: |
+                      echo -e "${XPLR_GLOBAL_HELP_MENU}"
+                      echo
+                      read -p "[enter to continue]"
 
               ctrl-c:
                 help: cancel & quit [q|esc]
@@ -585,12 +577,8 @@ impl Default for Config {
                   x:
                     help: open in gui
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
+                      - BashExec: |
+                          xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
                       - SwitchMode: default
 
                   ctrl-c:
@@ -638,13 +626,9 @@ impl Default for Config {
                   l:
                     help: logs
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              echo -e "$XPLR_LOGS"
-                              read -p "[enter to continue]"
+                      - BashExec: |
+                          echo -e "$XPLR_LOGS"
+                          read -p "[enter to continue]"
                       - SwitchMode: default
 
                   ctrl-c:
@@ -671,40 +655,32 @@ impl Default for Config {
                   c:
                     help: copy here
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              (while IFS= read -r line; do
-                                if cp -v "${line:?}" ./; then
-                                  echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
-                                else
-                                  echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
-                                fi
-                              done <<< "${XPLR_SELECTION:?}")
-                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                              echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
-                              read -p "[enter to continue]"
+                      - BashExec: |
+                          (while IFS= read -r line; do
+                            if cp -v "${line:?}" ./; then
+                              echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                            else
+                              echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                            fi
+                          done <<< "${XPLR_SELECTION:?}")
+                          echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                          echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
+                          read -p "[enter to continue]"
                       - SwitchMode: default
 
                   m:
                     help: move here
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              (while IFS= read -r line; do
-                                if mv -v "${line:?}" ./; then
-                                  echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
-                                else
-                                  echo "LogError: failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
-                                fi
-                              done <<< "${XPLR_SELECTION:?}")
-                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                              read -p "[enter to continue]"
+                      - BashExec: |
+                          (while IFS= read -r line; do
+                            if mv -v "${line:?}" ./; then
+                              echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                            else
+                              echo "LogError: failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                            fi
+                          done <<< "${XPLR_SELECTION:?}")
+                          echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                          read -p "[enter to continue]"
                       - SwitchMode: default
 
                   ctrl-c:
@@ -816,19 +792,15 @@ impl Default for Config {
                   enter:
                     help: create file
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              PTH="${XPLR_INPUT_BUFFER:?}"
-                              if touch "${PTH:?}"; then
-                                echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
-                                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                              else
-                                echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
-                                echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
-                              fi
+                      - BashExec: |
+                          PTH="${XPLR_INPUT_BUFFER:?}"
+                          if touch "${PTH:?}"; then
+                            echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                          else
+                            echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+                          fi
                       - SwitchMode: default
 
                   backspace:
@@ -861,18 +833,14 @@ impl Default for Config {
                   enter:
                     help: create directory
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              PTH="${XPLR_INPUT_BUFFER:?}"
-                              if mkdir -p "$PTH"; then
-                                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                                echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
-                              else
-                                echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
-                              fi
+                      - BashExec: |
+                          PTH="${XPLR_INPUT_BUFFER:?}"
+                          if mkdir -p "$PTH"; then
+                            echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                          else
+                            echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                          fi
                       - SwitchMode: default
 
                   backspace:
@@ -905,19 +873,15 @@ impl Default for Config {
                   enter:
                     help: rename
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              SRC="${XPLR_FOCUS_PATH:?}"
-                              TARGET="${XPLR_INPUT_BUFFER:?}"
-                              if mv -v "${SRC:?}" "${TARGET:?}"; then
-                                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                                echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
-                              else
-                                echo "LogError: failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
-                              fi
+                      - BashExec: |
+                          SRC="$(basename ${XPLR_FOCUS_PATH:?})"
+                          TARGET="${XPLR_INPUT_BUFFER:?}"
+                          if mv -v "${SRC:?}" "${TARGET:?}"; then
+                            echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                          else
+                            echo "LogError: failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                          fi
                       - SwitchMode: default
 
                   backspace:
@@ -950,47 +914,39 @@ impl Default for Config {
                   d:
                     help: delete
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              (while IFS= read -r line; do
-                                if [ -d "$line" ]; then
-                                  if rmdir -v "${line:?}"; then
-                                    echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
-                                  else
-                                    echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
-                                  fi
-                                else
-                                  if rm -v "${line:?}"; then
-                                    echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
-                                  else
-                                    echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
-                                  fi
-                                fi
-                              done <<< "${XPLR_RESULT:?}")
-                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                              read -p "[enter to continue]"
+                      - BashExec: |
+                          (while IFS= read -r line; do
+                            if [ -d "$line" ]; then
+                              if rmdir -v "${line:?}"; then
+                                echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                              else
+                                echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                              fi
+                            else
+                              if rm -v "${line:?}"; then
+                                echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                              else
+                                echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                              fi
+                            fi
+                          done <<< "${XPLR_RESULT:?}")
+                          echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                          read -p "[enter to continue]"
                       - SwitchMode: default
 
                   D:
                     help: force delete
                     messages:
-                      - Call:
-                          command: bash
-                          args:
-                            - -c
-                            - |
-                              (while IFS= read -r line; do
-                                if rm -rfv "${line:?}"; then
-                                  echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
-                                else
-                                  echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
-                                fi
-                              done <<< "${XPLR_RESULT:?}")
-                              echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                              read -p "[enter to continue]"
+                      - BashExec: |
+                          (while IFS= read -r line; do
+                            if rm -rfv "${line:?}"; then
+                              echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                            else
+                              echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                            fi
+                          done <<< "${XPLR_RESULT:?}")
+                          echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                          read -p "[enter to continue]"
                       - SwitchMode: default
                       - Explore
 

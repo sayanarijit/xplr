@@ -5,6 +5,16 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 </p>
 
 <p align="center">
+<a href="https://github.com/sayanarijit/xplr/actions/workflows/ci.yml" target="_blank">
+<img src="https://github.com/sayanarijit/xplr/actions/workflows/ci.yml/badge.svg" />
+</a>
+
+<a href="https://github.com/sayanarijit/xplr/actions/workflows/cd.yml" target="_blank">
+<img src="https://github.com/sayanarijit/xplr/actions/workflows/cd.yml/badge.svg" />
+</a>
+</p>
+
+<p align="center">
 <a href="https://asciinema.org/a/3THQPXNVi801Yu8nWxO6qfUa4" target="_blank">
 <img src="https://s4.gifyu.com/images/xplr.gif" />
 </a>
@@ -18,11 +28,6 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 [<a href="https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide">Upgrade Guide</a>]
 [<a href="https://github.com/sayanarijit/xplr/wiki/TODO">TODO</a>]
 </h3>
-
-<br>
-
-[![Continuous Integration](https://github.com/sayanarijit/xplr/actions/workflows/ci.yml/badge.svg)](https://github.com/sayanarijit/xplr/actions/workflows/ci.yml)
-[![Continuous Delivery](https://github.com/sayanarijit/xplr/actions/workflows/cd.yml/badge.svg)](https://github.com/sayanarijit/xplr/actions/workflows/cd.yml)
 
 <br>
 
