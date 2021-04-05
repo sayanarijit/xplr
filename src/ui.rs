@@ -3,9 +3,10 @@ use crate::app::HelpMenuLine;
 use crate::app::Node;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use tui::backend::Backend;
 use tui::layout::Rect;
-use tui::layout::{Constraint as TUIConstraint, Direction, Layout};
+use tui::layout::{Constraint as TuiConstraint, Direction, Layout};
 use tui::style::{Color, Style};
 use tui::widgets::{
     Block, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, TableState,
@@ -16,7 +17,7 @@ const TOTAL_ROWS: usize = 50;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct NodeUIMetadata {
+struct NodeUiMetadata {
     // From Node
     pub parent: String,
     pub relative_path: String,
@@ -42,7 +43,7 @@ struct NodeUIMetadata {
     pub total: usize,
 }
 
-impl NodeUIMetadata {
+impl NodeUiMetadata {
     fn new(
         node: &Node,
         index: usize,
@@ -122,11 +123,11 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         .clone()
                         .map(|t| {
                             if is_last {
-                                t.2.format.clone()
+                                t.2.format
                             } else if is_first {
-                                t.0.format.clone()
+                                t.0.format
                             } else {
-                                t.1.format.clone()
+                                t.1.format
                             }
                         })
                         .unwrap_or_default();
@@ -147,15 +148,14 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                             }
                         });
 
-                    let (relative_index, is_before_focus, is_after_focus) = if dir.focus > index {
-                        (dir.focus - index, true, false)
-                    } else if dir.focus < index {
-                        (index - dir.focus, false, true)
-                    } else {
-                        (0, false, false)
-                    };
+                    let (relative_index, is_before_focus, is_after_focus) =
+                        match dir.focus.cmp(&index) {
+                            Ordering::Greater => (dir.focus - index, true, false),
+                            Ordering::Less => (index - dir.focus, false, true),
+                            Ordering::Equal => (0, false, false),
+                        };
 
-                    let meta = NodeUIMetadata::new(
+                    let meta = NodeUiMetadata::new(
                         &node,
                         index,
                         relative_index,
@@ -174,7 +174,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         .render(app::TEMPLATE_TABLE_ROW, &meta)
                         .ok()
                         .unwrap_or_else(|| app::UNSUPPORTED_STR.into())
-                        .split("\t")
+                        .split('\t')
                         .map(|x| Cell::from(x.to_string()))
                         .collect::<Vec<Cell>>();
 
@@ -207,7 +207,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
         })
         .unwrap_or_default();
 
-    let table_constraints: Vec<TUIConstraint> = config
+    let table_constraints: Vec<TuiConstraint> = config
         .general
         .table
         .col_widths
@@ -293,13 +293,16 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                 .borders(Borders::ALL)
                 .title(format!(" Help [{}] ", &app.mode().name)),
         )
-        .widths(&[TUIConstraint::Percentage(30), TUIConstraint::Percentage(70)]);
+        .widths(&[TuiConstraint::Percentage(30), TuiConstraint::Percentage(70)]);
     f.render_widget(help_menu, rect);
 }
 
 fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let input_buf = Paragraph::new(format!("> {}", app.input_buffer().unwrap_or("".into())))
-        .block(Block::default().borders(Borders::ALL).title(" Input "));
+    let input_buf = Paragraph::new(format!(
+        "> {}",
+        app.input_buffer().unwrap_or_else(|| "".into())
+    ))
+    .block(Block::default().borders(Borders::ALL).title(" Input "));
     f.render_widget(input_buf, rect);
 }
 
@@ -333,15 +336,15 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
 
     let chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([TUIConstraint::Percentage(70), TUIConstraint::Percentage(30)].as_ref())
+        .constraints([TuiConstraint::Percentage(70), TuiConstraint::Percentage(30)].as_ref())
         .split(rect);
 
     let left_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints(
             [
-                TUIConstraint::Length(rect.height - 3),
-                TUIConstraint::Length(3),
+                TuiConstraint::Length(rect.height - 3),
+                TuiConstraint::Length(3),
             ]
             .as_ref(),
         )
@@ -357,7 +360,7 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
 
     let right_chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([TUIConstraint::Percentage(50), TUIConstraint::Percentage(50)].as_ref())
+        .constraints([TuiConstraint::Percentage(50), TuiConstraint::Percentage(50)].as_ref())
         .split(chunks[1]);
 
     draw_selection(f, right_chunks[0], app, hb);

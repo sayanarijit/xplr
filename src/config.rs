@@ -2,10 +2,9 @@ use crate::app::ExternalMsg;
 use crate::app::HelpMenuLine;
 use crate::app::VERSION;
 use serde::{Deserialize, Serialize};
-use serde_yaml;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-use tui::layout::Constraint as TUIConstraint;
+use tui::layout::Constraint as TuiConstraint;
 use tui::style::Color;
 use tui::style::Modifier;
 use tui::style::Style;
@@ -73,7 +72,7 @@ impl Default for FileTypesConfig {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct UIConfig {
+pub struct UiConfig {
     #[serde(default)]
     pub prefix: String,
     #[serde(default)]
@@ -83,7 +82,7 @@ pub struct UIConfig {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct UIElement {
+pub struct UiElement {
     #[serde(default)]
     pub format: String,
     #[serde(default)]
@@ -93,7 +92,7 @@ pub struct UIElement {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TableRowConfig {
     #[serde(default)]
-    pub cols: Vec<UIElement>,
+    pub cols: Vec<UiElement>,
     #[serde(default)]
     pub style: Style,
     #[serde(default)]
@@ -116,14 +115,14 @@ impl Default for Constraint {
     }
 }
 
-impl Into<TUIConstraint> for Constraint {
-    fn into(self) -> TUIConstraint {
+impl Into<TuiConstraint> for Constraint {
+    fn into(self) -> TuiConstraint {
         match self {
-            Self::Length(n) => TUIConstraint::Length(n),
-            Self::Percentage(n) => TUIConstraint::Percentage(n),
-            Self::Ratio(x, y) => TUIConstraint::Ratio(x, y),
-            Self::Max(n) => TUIConstraint::Max(n),
-            Self::Min(n) => TUIConstraint::Min(n),
+            Self::Length(n) => TuiConstraint::Length(n),
+            Self::Percentage(n) => TuiConstraint::Percentage(n),
+            Self::Ratio(x, y) => TuiConstraint::Ratio(x, y),
+            Self::Max(n) => TuiConstraint::Max(n),
+            Self::Min(n) => TuiConstraint::Min(n),
         }
     }
 }
@@ -137,7 +136,7 @@ pub struct TableConfig {
     #[serde(default)]
     pub style: Style,
     #[serde(default)]
-    pub tree: Option<(UIElement, UIElement, UIElement)>,
+    pub tree: Option<(UiElement, UiElement, UiElement)>,
     #[serde(default)]
     pub col_spacing: u16,
     #[serde(default)]
@@ -153,13 +152,13 @@ pub struct GeneralConfig {
     pub table: TableConfig,
 
     #[serde(default)]
-    pub normal_ui: UIConfig,
+    pub normal_ui: UiConfig,
 
     #[serde(default)]
-    pub focused_ui: UIConfig,
+    pub focused_ui: UiConfig,
 
     #[serde(default)]
-    pub selection_ui: UIConfig,
+    pub selection_ui: UiConfig,
 }
 
 impl Default for GeneralConfig {
@@ -441,45 +440,35 @@ impl Mode {
                     .unwrap_or_default()
                     .into_iter()
                     .chain(self.key_bindings.on_key.iter().filter_map(|(k, a)| {
-                        a.help
-                            .clone()
-                            .map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
+                        a.help.clone().map(|h| HelpMenuLine::KeyMap(k.into(), h))
                     }))
                     .chain(
                         self.key_bindings
                             .on_alphabet
                             .iter()
                             .map(|a| ("[a-Z]", a.help.clone()))
-                            .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
-                            }),
+                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
                     )
                     .chain(
                         self.key_bindings
                             .on_number
                             .iter()
                             .map(|a| ("[0-9]", a.help.clone()))
-                            .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
-                            }),
+                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
                     )
                     .chain(
                         self.key_bindings
                             .on_special_character
                             .iter()
                             .map(|a| ("[spcl chars]", a.help.clone()))
-                            .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
-                            }),
+                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
                     )
                     .chain(
                         self.key_bindings
                             .default
                             .iter()
                             .map(|a| ("[default]", a.help.clone()))
-                            .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), h.into()))
-                            }),
+                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
                     )
                     .collect()
             })

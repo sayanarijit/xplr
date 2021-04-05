@@ -1,7 +1,10 @@
+#![allow(clippy::too_many_arguments)]
+
 use anyhow::Result;
 use crossterm::execute;
 use crossterm::terminal as term;
 use handlebars::Handlebars;
+use std::env;
 use std::fs;
 use std::io::prelude::*;
 use std::path::PathBuf;
@@ -16,7 +19,32 @@ use xplr::pipe_reader;
 use xplr::ui;
 
 fn main() -> Result<()> {
-    let mut app = app::App::create()?;
+    let (tx_msg_in, rx_msg_in) = mpsc::channel();
+    let (tx_event_reader, rx_event_reader) = mpsc::channel();
+
+    let mut pwd = PathBuf::from(env::args().nth(1).unwrap_or_else(|| ".".into()))
+        .canonicalize()
+        .unwrap_or_default();
+    let mut focused_path = None;
+
+    if pwd.is_file() {
+        focused_path = Some(
+            pwd.file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string(),
+        );
+        pwd = pwd.parent().map(|p| p.into()).unwrap_or_default();
+    }
+
+    let mut app = app::App::create(pwd)?;
+
+    explorer::explore(
+        app.explorer_config().clone(),
+        app.pwd().clone(),
+        focused_path,
+        tx_msg_in.clone(),
+    );
 
     let mut hb = Handlebars::new();
     hb.register_template_string(
@@ -35,8 +63,6 @@ fn main() -> Result<()> {
     let mut result = Ok(());
     let mut output = None;
 
-    let (tx_msg_in, rx_msg_in) = mpsc::channel();
-
     term::enable_raw_mode()?;
     let mut stdout = get_tty()?;
     // let mut stdout = stdout.lock();
@@ -46,21 +72,8 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
 
-    let focused_path = std::env::args().skip(1).next().and_then(|p| {
-        PathBuf::from(p)
-            .file_name()
-            .map(|n| n.to_string_lossy().to_string())
-    });
-    explorer::explore(
-        app.explorer_config().clone(),
-        app.pwd().clone(),
-        focused_path,
-        tx_msg_in.clone(),
-    );
-
     pipe_reader::keep_reading(app.pipe().msg_in.clone(), tx_msg_in.clone());
 
-    let (tx_event_reader, rx_event_reader) = mpsc::channel();
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
 
     let mut last_pwd = app.pwd().clone();
@@ -139,7 +152,7 @@ fn main() -> Result<()> {
                     terminal.show_cursor()?;
 
                     let pid = std::process::id().to_string();
-                    let input_buffer = app.input_buffer().map(|i| i.to_owned()).unwrap_or_default();
+                    let input_buffer = app.input_buffer().unwrap_or_default();
 
                     let focus_path = app
                         .focused_node()

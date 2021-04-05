@@ -1,5 +1,4 @@
 use crate::app::{ExternalMsg, MsgIn, Task};
-use serde_yaml;
 use std::fs;
 use std::sync::mpsc::Sender;
 use std::thread;
