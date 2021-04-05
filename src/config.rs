@@ -331,7 +331,7 @@ impl Default for KeyBindings {
                 messages:
                   - SwitchMode: rename
                   - BashExec: |
-                      echo "SetInputBuffer: ${XPLR_FOCUS_PATH}" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo "SetInputBuffer: $(basename ${XPLR_FOCUS_PATH})" >> "${XPLR_PIPE_MSG_IN:?}"
 
               ".":
                 help: show hidden
@@ -874,7 +874,7 @@ impl Default for Config {
                     help: rename
                     messages:
                       - BashExec: |
-                          SRC="$(basename ${XPLR_FOCUS_PATH:?})"
+                          SRC="${XPLR_FOCUS_PATH:?}"
                           TARGET="${XPLR_INPUT_BUFFER:?}"
                           if mv -v "${SRC:?}" "${TARGET:?}"; then
                             echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
