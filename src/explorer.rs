@@ -27,7 +27,7 @@ pub fn explore(
                     })
                 })
                 .map(|name| Node::new(parent.clone(), name))
-                .filter(|n| config.apply(n))
+                .filter(|n| config.filter(n))
                 .collect::<Vec<Node>>()
             })
             .map(|nodes| {

@@ -354,7 +354,7 @@ impl Default for KeyBindings {
                 help: global help menu
                 messages:
                   - BashExec: |
-                      echo -e "${XPLR_GLOBAL_HELP_MENU}"
+                      cat "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
                       echo
                       read -p "[enter to continue]"
 
@@ -627,7 +627,7 @@ impl Default for Config {
                     help: logs
                     messages:
                       - BashExec: |
-                          echo -e "$XPLR_LOGS"
+                          cat "${XPLR_PIPE_LOGS_OUT}"
                           read -p "[enter to continue]"
                       - SwitchMode: default
 
@@ -662,7 +662,7 @@ impl Default for Config {
                             else
                               echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                             fi
-                          done <<< "${XPLR_SELECTION:?}")
+                          done < "${XPLR_PIPE_SELECTION_OUT:?}")
                           echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                           echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
                           read -p "[enter to continue]"
@@ -678,7 +678,7 @@ impl Default for Config {
                             else
                               echo "LogError: failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                             fi
-                          done <<< "${XPLR_SELECTION:?}")
+                          done < "${XPLR_PIPE_SELECTION_OUT:?}")
                           echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                           read -p "[enter to continue]"
                       - SwitchMode: default
@@ -929,7 +929,7 @@ impl Default for Config {
                                 echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                               fi
                             fi
-                          done <<< "${XPLR_RESULT:?}")
+                          done < "${XPLR_PIPE_RESULT_OUT:?}")
                           echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                           read -p "[enter to continue]"
                       - SwitchMode: default
@@ -944,7 +944,7 @@ impl Default for Config {
                             else
                               echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                             fi
-                          done <<< "${XPLR_RESULT:?}")
+                          done < "${XPLR_PIPE_RESULT_OUT:?}")
                           echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                           read -p "[enter to continue]"
                       - SwitchMode: default
