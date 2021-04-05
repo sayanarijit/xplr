@@ -13,6 +13,7 @@ use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
 use xplr::app;
+use xplr::auto_refresher;
 use xplr::event_reader;
 use xplr::explorer;
 use xplr::pipe_reader;
@@ -72,6 +73,7 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
 
+    auto_refresher::start_auto_refreshing(tx_msg_in.clone());
     pipe_reader::keep_reading(app.pipe().msg_in.clone(), tx_msg_in.clone());
 
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);

@@ -12,7 +12,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.2.19"; // Update Cargo.toml
+pub const VERSION: &str = "v0.2.20"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -504,6 +504,12 @@ pub enum ExternalMsg {
     /// Example: `Call: {command: bash, args: ["-c", "read -p test"]}`
     Call(Command),
 
+    /// An alias to `Call: {command: bash, args: ["-c", "${command}"]}`
+    /// where ${command} is the given value.
+    ///
+    /// Example: `BashExec: "read -p test"`
+    BashExec(String),
+
     /// Select the focused node.
     Select,
 
@@ -816,6 +822,7 @@ impl App {
             ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
             ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
             ExternalMsg::Call(cmd) => self.call(cmd),
+            ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
             ExternalMsg::Select => self.select(),
             ExternalMsg::UnSelect => self.un_select(),
             ExternalMsg::ToggleSelection => self.toggle_selection(),
@@ -1063,6 +1070,13 @@ impl App {
     fn call(mut self, command: Command) -> Result<Self> {
         self.msg_out.push_back(MsgOut::Call(command));
         Ok(self)
+    }
+
+    fn bash_exec(self, script: String) -> Result<Self> {
+        self.call(Command {
+            command: "bash".into(),
+            args: vec!["-c".into(), script],
+        })
     }
 
     fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
