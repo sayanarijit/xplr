@@ -16,7 +16,7 @@ use std::time::Duration;
 pub const VERSION: &str = "v0.3.3"; // Update Cargo.toml and default.nix
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
-pub const UPGRADE_GUIDE_LINK: &str = "github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
+pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
