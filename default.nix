@@ -1,6 +1,6 @@
 with import <nixpkgs> { };
 
-# Update the src url, version and sha256 when new version
+# Run nix-build and update the src url, version and sha256 when new version
 
 rustPlatform.buildRustPackage rec {
   name = "xplr";
@@ -9,6 +9,6 @@ rustPlatform.buildRustPackage rec {
     ("https://github.com/sayanarijit/xplr/archive/refs/tags/v0.3.2.tar.gz");
   buildInputs = [ cargo ];
   checkPhase = "";
-  cargoSha256 = "sha256-IyaYkHXmqXziXNK6uYU+XNNWA8a8S8cuMxkopps/9kk=";
+  cargoSha256 = "0000000000000000000000000000000000000000000000000000";
 }
 

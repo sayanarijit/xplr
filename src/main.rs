@@ -40,6 +40,22 @@ fn main() -> Result<()> {
 
     let mut app = app::App::create(pwd)?;
 
+    if app.version() != &app.config().version {
+        let msg = format!(
+            "version mismatch, to update your config file to {}, visit {}",
+            app.version(),
+            app::UPGRADE_GUIDE_LINK,
+        );
+
+        tx_msg_in.send(app::Task::new(
+            0,
+            app::MsgIn::External(app::ExternalMsg::LogInfo(msg)),
+            None,
+        ))?;
+    };
+
+    fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
+
     explorer::explore(
         app.explorer_config().clone(),
         app.pwd().clone(),
@@ -73,12 +89,12 @@ fn main() -> Result<()> {
     let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
 
+    // Threads
     auto_refresher::start_auto_refreshing(tx_msg_in.clone());
     pipe_reader::keep_reading(app.pipe().msg_in.clone(), tx_msg_in.clone());
-
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
 
-    let mut last_pwd = app.pwd().clone();
+    let mut last_app = app.clone();
     'outer: while result.is_ok() {
         while let Some(msg) = app.pop_msg_out() {
             match msg {
@@ -112,33 +128,41 @@ fn main() -> Result<()> {
 
                 app::MsgOut::Refresh => {
                     app = app.refresh_selection()?;
-                    if app.pwd() != &last_pwd {
+                    if app.pwd() != last_app.pwd() {
                         explorer::explore(
                             app.explorer_config().clone(),
                             app.pwd().clone(),
                             app.focused_node().map(|n| n.relative_path.clone()),
                             tx_msg_in.clone(),
                         );
-                        last_pwd = app.pwd().to_owned();
                     };
 
                     // UI
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
 
-                    let focused = app
-                        .focused_node()
-                        .map(|n| format!("{}\n", n.absolute_path.clone()))
-                        .unwrap_or_default();
+                    if app.focused_node() != last_app.focused_node() {
+                        fs::write(&app.pipe().focus_out, app.focused_node_str())?;
+                    };
 
-                    let mode = format!("{}\n", &app.mode().name);
+                    if app.selection() != last_app.selection() {
+                        fs::write(&app.pipe().selection_out, app.selection_str())?;
+                    };
 
-                    fs::write(&app.pipe().focus_out, focused)?;
-                    fs::write(&app.pipe().selection_out, app.selection_str())?;
-                    fs::write(&app.pipe().mode_out, mode)?;
-                    fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
-                    fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
-                    fs::write(&app.pipe().logs_out, app.logs_str())?;
-                    fs::write(&app.pipe().result_out, app.result_str())?;
+                    if app.mode_str() != last_app.mode_str() {
+                        fs::write(&app.pipe().mode_out, app.mode_str())?;
+                    };
+
+                    if app.directory_buffer() != last_app.directory_buffer() {
+                        fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
+                    };
+
+                    if app.logs() != last_app.logs() {
+                        fs::write(&app.pipe().logs_out, app.logs_str())?;
+                    };
+
+                    if app.result() != last_app.result() {
+                        fs::write(&app.pipe().result_out, app.result_str())?;
+                    }
                 }
 
                 app::MsgOut::Call(cmd) => {
@@ -148,13 +172,7 @@ fn main() -> Result<()> {
                     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
                     terminal.show_cursor()?;
 
-                    let pid = std::process::id().to_string();
                     let input_buffer = app.input_buffer().unwrap_or_default();
-
-                    let focus_path = app
-                        .focused_node()
-                        .map(|n| n.absolute_path.clone())
-                        .unwrap_or_default();
 
                     let focus_index = app
                         .directory_buffer()
@@ -176,9 +194,9 @@ fn main() -> Result<()> {
                         .current_dir(app.pwd())
                         .env("XPLR_APP_VERSION", app.version())
                         .env("XPLR_CONFIG_VERSION", &app.config().version)
-                        .env("XPLR_PID", pid)
+                        .env("XPLR_PID", &app.pid().to_string())
                         .env("XPLR_INPUT_BUFFER", input_buffer)
-                        .env("XPLR_FOCUS_PATH", focus_path)
+                        .env("XPLR_FOCUS_PATH", app.focused_node_str())
                         .env("XPLR_FOCUS_INDEX", focus_index)
                         .env("XPLR_SESSION_PATH", session_path)
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
@@ -212,21 +230,20 @@ fn main() -> Result<()> {
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
             };
+            last_app = app.clone();
         }
 
         for task in rx_msg_in.try_iter() {
             app = app.enqueue(task);
         }
 
-        let (new_app, new_result) = match app.clone().possibly_mutate() {
+        let (new_app, new_result) = match app.clone().mutate_or_sleep() {
             Ok(a) => (a, Ok(())),
             Err(e) => (app, Err(e)),
         };
 
         app = new_app;
         result = new_result;
-
-        // thread::sleep(Duration::from_millis(10));
     }
 
     term::disable_raw_mode()?;
