@@ -36,7 +36,7 @@ A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https:
 
 <br>
 
-Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, it's speciality is it's hackability.
+Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, its speciality is its hackability.
 
 Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you should be able to configure the key bindings,
 different run modes, and also the way it looks by modifying one single configuration file.
