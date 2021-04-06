@@ -12,7 +12,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.3.0"; // Update Cargo.toml
+pub const VERSION: &str = "v0.3.1"; // Update Cargo.toml
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 
@@ -703,6 +703,21 @@ pub enum HelpMenuLine {
     Paragraph(String),
 }
 
+pub fn is_compatible(existing: &str, required: &str) -> bool {
+    let mut existing = existing.split('.');
+    let mut required = required.split('.');
+
+    let mut major_existing = existing.next().unwrap_or_default();
+    let mut major_required = required.next().unwrap_or_default();
+
+    if major_existing == "v0" && major_required == "v0" {
+        major_existing = existing.next().unwrap_or_default();
+        major_required = required.next().unwrap_or_default();
+    };
+
+    major_existing == major_required
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     config: Config,
@@ -734,7 +749,7 @@ impl App {
             Config::default()
         };
 
-        if config.version != VERSION {
+        if config.version != VERSION && !is_compatible(&config.version, VERSION) {
             bail!(
                 "incompatible configuration version in {}
                 You config version is : {}
@@ -744,47 +759,47 @@ impl App {
                 config.version,
                 VERSION,
             )
-        } else {
-            let mode = config
-                .modes
-                .get(&"default".to_string())
-                .map(|k| k.to_owned())
-                .unwrap_or_default();
+        };
 
-            let pid = std::process::id();
-            let session_path = dirs::runtime_dir()
-                .unwrap_or_else(|| "/tmp".into())
-                .join("xplr")
-                .join("session")
-                .join(&pid.to_string())
-                .to_string_lossy()
-                .to_string();
+        let mode = config
+            .modes
+            .get(&"default".to_string())
+            .map(|k| k.to_owned())
+            .unwrap_or_default();
 
-            let mut explorer_config = ExplorerConfig::default();
-            if !config.general.show_hidden {
-                explorer_config.filters.push(NodeFilterApplicable::new(
-                    NodeFilter::RelativePathDoesNotStartWith,
-                    ".".into(),
-                    Default::default(),
-                ));
-            }
+        let pid = std::process::id();
+        let session_path = dirs::runtime_dir()
+            .unwrap_or_else(|| "/tmp".into())
+            .join("xplr")
+            .join("session")
+            .join(&pid.to_string())
+            .to_string_lossy()
+            .to_string();
 
-            Ok(Self {
-                config,
-                pwd: pwd.to_string_lossy().to_string(),
-                directory_buffers: Default::default(),
-                tasks: Default::default(),
-                selection: Default::default(),
-                msg_out: Default::default(),
-                mode,
-                input_buffer: Default::default(),
-                pid,
-                session_path: session_path.clone(),
-                pipe: Pipe::from_session_path(&session_path)?,
-                explorer_config,
-                logs: Default::default(),
-            })
+        let mut explorer_config = ExplorerConfig::default();
+        if !config.general.show_hidden {
+            explorer_config.filters.push(NodeFilterApplicable::new(
+                NodeFilter::RelativePathDoesNotStartWith,
+                ".".into(),
+                Default::default(),
+            ));
         }
+
+        Ok(Self {
+            config,
+            pwd: pwd.to_string_lossy().to_string(),
+            directory_buffers: Default::default(),
+            tasks: Default::default(),
+            selection: Default::default(),
+            msg_out: Default::default(),
+            mode,
+            input_buffer: Default::default(),
+            pid,
+            session_path: session_path.clone(),
+            pipe: Pipe::from_session_path(&session_path)?,
+            explorer_config,
+            logs: Default::default(),
+        })
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
