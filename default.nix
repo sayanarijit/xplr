@@ -9,6 +9,5 @@ rustPlatform.buildRustPackage rec {
     ("https://github.com/sayanarijit/xplr/archive/refs/tags/v0.3.2.tar.gz");
   buildInputs = [ cargo ];
   checkPhase = "";
-  cargoSha256 = "0000000000000000000000000000000000000000000000000000";
+  cargoSha256 = "1wxb0ian7b9abi00i9v2wxkqiw71c3zcxrv5j89pqj5k23wzv04i";
 }
-
