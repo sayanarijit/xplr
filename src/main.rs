@@ -174,6 +174,8 @@ fn main() -> Result<()> {
 
                     let status = std::process::Command::new(cmd.command.clone())
                         .current_dir(app.pwd())
+                        .env("XPLR_APP_VERSION", app.version())
+                        .env("XPLR_CONFIG_VERSION", &app.config().version)
                         .env("XPLR_PID", pid)
                         .env("XPLR_INPUT_BUFFER", input_buffer)
                         .env("XPLR_FOCUS_PATH", focus_path)

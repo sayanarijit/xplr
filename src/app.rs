@@ -720,6 +720,7 @@ pub fn is_compatible(existing: &str, required: &str) -> bool {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
+    version: String,
     config: Config,
     pwd: String,
     directory_buffers: HashMap<String, DirectoryBuffer>,
@@ -786,6 +787,7 @@ impl App {
         }
 
         Ok(Self {
+            version: VERSION.to_string(),
             config,
             pwd: pwd.to_string_lossy().to_string(),
             directory_buffers: Default::default(),
@@ -1392,5 +1394,10 @@ impl App {
             })
             .collect::<Vec<String>>()
             .join("\n")
+    }
+
+    /// Get a reference to the app's version.
+    pub fn version(&self) -> &String {
+        &self.version
     }
 }
