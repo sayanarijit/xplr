@@ -15,7 +15,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
             None,
         ))
-        .possibly_mutate()
+        .mutate_or_sleep()
         .unwrap();
 
     c.bench_function("focus next item", |b| {
@@ -26,7 +26,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     app::MsgIn::External(app::ExternalMsg::FocusNext),
                     None,
                 ))
-                .possibly_mutate()
+                .mutate_or_sleep()
                 .unwrap()
         })
     });
@@ -39,7 +39,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     app::MsgIn::External(app::ExternalMsg::FocusPrevious),
                     None,
                 ))
-                .possibly_mutate()
+                .mutate_or_sleep()
                 .unwrap()
         })
     });
@@ -52,7 +52,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     app::MsgIn::External(app::ExternalMsg::FocusFirst),
                     None,
                 ))
-                .possibly_mutate()
+                .mutate_or_sleep()
                 .unwrap()
         })
     });
@@ -65,7 +65,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     app::MsgIn::External(app::ExternalMsg::FocusLast),
                     None,
                 ))
-                .possibly_mutate()
+                .mutate_or_sleep()
                 .unwrap()
         })
     });
@@ -78,14 +78,14 @@ fn criterion_benchmark(c: &mut Criterion) {
                     app::MsgIn::External(app::ExternalMsg::Back),
                     None,
                 ))
-                .possibly_mutate()
+                .mutate_or_sleep()
                 .unwrap()
                 .enqueue(app::Task::new(
                     1,
                     app::MsgIn::External(app::ExternalMsg::Enter),
                     None,
                 ))
-                .possibly_mutate()
+                .mutate_or_sleep()
                 .unwrap()
         })
     });

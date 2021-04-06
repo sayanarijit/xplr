@@ -27,7 +27,8 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
                 }
             });
             fs::write(&pipe, "").unwrap();
-        };
-        thread::sleep(Duration::from_millis(10));
+        } else {
+            thread::sleep(Duration::from_millis(50));
+        }
     });
 }

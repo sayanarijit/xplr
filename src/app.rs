@@ -11,12 +11,12 @@ use std::collections::VecDeque;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
+use std::time::Duration;
 
 pub const VERSION: &str = "v0.3.2"; // Update Cargo.toml and default.nix
-
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
-
 pub const UNSUPPORTED_STR: &str = "???";
+pub const UPGRADE_GUIDE_LINK: &str = "github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
@@ -755,10 +755,11 @@ impl App {
                 "incompatible configuration version in {}
                 You config version is : {}
                 Required version is   : {}
-                Visit https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide",
+                Visit {}",
                 config_file.to_string_lossy().to_string(),
                 config.version,
                 VERSION,
+                UPGRADE_GUIDE_LINK,
             )
         };
 
@@ -808,18 +809,25 @@ impl App {
         self.directory_buffer().and_then(|d| d.focused_node())
     }
 
+    pub fn focused_node_str(&self) -> String {
+        self.focused_node()
+            .map(|n| format!("{}\n", n.absolute_path.clone()))
+            .unwrap_or_default()
+    }
+
     pub fn enqueue(mut self, task: Task) -> Self {
         self.tasks.push(task);
         self
     }
 
-    pub fn possibly_mutate(mut self) -> Result<Self> {
+    pub fn mutate_or_sleep(mut self) -> Result<Self> {
         if let Some(task) = self.tasks.pop() {
             match task.msg {
                 MsgIn::Internal(msg) => self.handle_internal(msg),
                 MsgIn::External(msg) => self.handle_external(msg, task.key),
             }
         } else {
+            std::thread::sleep(Duration::from_millis(5));
             Ok(self)
         }
     }
@@ -1281,6 +1289,10 @@ impl App {
         &self.mode
     }
 
+    pub fn mode_str(&self) -> String {
+        format!("{}\n", &self.mode.name)
+    }
+
     /// Get a reference to the app's directory buffers.
     pub fn directory_buffers(&self) -> &HashMap<String, DirectoryBuffer> {
         &self.directory_buffers
@@ -1302,7 +1314,7 @@ impl App {
     }
 
     /// Get a reference to the app's runtime path.
-    pub fn session_path(&self) -> &String {
+    pub fn session_path(&self) -> &str {
         &self.session_path
     }
 
