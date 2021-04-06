@@ -83,7 +83,7 @@ fn main() -> Result<()> {
         while let Some(msg) = app.pop_msg_out() {
             match msg {
                 app::MsgOut::Debug(path) => {
-                    fs::write(&path, serde_yaml::to_string(&app)?)?;
+                    fs::write(&path, format!("{}\n", serde_yaml::to_string(&app)?))?;
                 }
 
                 app::MsgOut::PrintResultAndQuit => {
@@ -92,7 +92,7 @@ fn main() -> Result<()> {
                 }
 
                 app::MsgOut::PrintAppStateAndQuit => {
-                    let out = serde_yaml::to_string(&app)?;
+                    let out = format!("{}\n", serde_yaml::to_string(&app)?);
                     output = Some(out);
                     break 'outer;
                 }
@@ -234,7 +234,7 @@ fn main() -> Result<()> {
     fs::remove_dir_all(app.session_path())?;
 
     if let Some(out) = output {
-        println!("{}", out);
+        print!("{}", out);
     }
 
     result
