@@ -13,7 +13,7 @@ use std::io;
 use std::path::PathBuf;
 use std::time::Duration;
 
-pub const VERSION: &str = "v0.3.3"; // Update Cargo.toml and default.nix
+pub const VERSION: &str = "v0.3.4"; // Update Cargo.toml and default.nix
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
@@ -811,7 +811,7 @@ impl App {
 
     pub fn focused_node_str(&self) -> String {
         self.focused_node()
-            .map(|n| format!("{}\n", n.absolute_path.clone()))
+            .map(|n| n.absolute_path.clone())
             .unwrap_or_default()
     }
 
