@@ -125,15 +125,16 @@ fn main() -> Result<()> {
                     // UI
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
 
-                    // Pipes
                     let focused = app
                         .focused_node()
-                        .map(|n| n.absolute_path.clone())
+                        .map(|n| format!("{}\n", n.absolute_path.clone()))
                         .unwrap_or_default();
+
+                    let mode = format!("{}\n", &app.mode().name);
 
                     fs::write(&app.pipe().focus_out, focused)?;
                     fs::write(&app.pipe().selection_out, app.selection_str())?;
-                    fs::write(&app.pipe().mode_out, &app.mode().name)?;
+                    fs::write(&app.pipe().mode_out, mode)?;
                     fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
                     fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
                     fs::write(&app.pipe().logs_out, app.logs_str())?;
@@ -162,6 +163,7 @@ fn main() -> Result<()> {
                         .to_string();
 
                     let pipe_msg_in = app.pipe().msg_in.clone();
+                    let pipe_mode_out = app.pipe().mode_out.clone();
                     let pipe_focus_out = app.pipe().focus_out.clone();
                     let pipe_selection_out = app.pipe().selection_out.clone();
                     let pipe_result_out = app.pipe().result_out.clone();
@@ -180,6 +182,7 @@ fn main() -> Result<()> {
                         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
                         .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
                         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
+                        .env("XPLR_PIPE_MODE_OUT", pipe_mode_out)
                         .env("XPLR_PIPE_RESULT_OUT", pipe_result_out)
                         .env("XPLR_PIPE_GLOBAL_HELP_MENU_OUT", pipe_global_help_menu_out)
                         .env("XPLR_PIPE_DIRECTORY_NODES_OUT", pipe_directory_nodes_out)
