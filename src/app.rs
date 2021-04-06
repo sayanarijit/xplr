@@ -12,7 +12,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.3.1"; // Update Cargo.toml
+pub const VERSION: &str = "v0.3.1"; // Update Cargo.toml and default.nix
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 

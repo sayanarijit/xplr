@@ -1,5 +1,7 @@
 with import <nixpkgs> { };
 
+# Update the src url, version and sha256 when new version
+
 rustPlatform.buildRustPackage rec {
   name = "xplr";
   version = "0.3.1";
