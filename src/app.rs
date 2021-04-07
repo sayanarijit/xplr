@@ -13,7 +13,7 @@ use std::io;
 use std::path::PathBuf;
 use std::time::Duration;
 
-pub const VERSION: &str = "v0.3.6"; // Update Cargo.toml and default.nix
+pub const VERSION: &str = "v0.3.7"; // Update Cargo.toml and default.nix
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
