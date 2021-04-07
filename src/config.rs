@@ -49,7 +49,7 @@ impl Default for FileTypesConfig {
                 icon: "ð".into(),
                 style: Style::default()
                     .add_modifier(Modifier::BOLD)
-                    .fg(Color::Blue),
+                    .fg(Color::Cyan),
             },
 
             file: FileTypeConfig {
