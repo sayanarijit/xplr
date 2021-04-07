@@ -169,7 +169,7 @@ fn main() -> Result<()> {
                     tx_event_reader.send(true)?;
                     terminal.clear()?;
                     term::disable_raw_mode()?;
-                    execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
+                    terminal.set_cursor(0, 0)?;
                     terminal.show_cursor()?;
 
                     let input_buffer = app.input_buffer().unwrap_or_default();
@@ -224,7 +224,7 @@ fn main() -> Result<()> {
                     };
 
                     terminal.hide_cursor()?;
-                    execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
+                    terminal.clear()?;
                     term::enable_raw_mode()?;
                     tx_event_reader.send(false)?;
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
