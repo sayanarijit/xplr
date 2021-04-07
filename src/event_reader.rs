@@ -4,7 +4,6 @@ use crate::input::Key;
 use crossterm::event::{self, Event};
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
-use std::time::Duration;
 
 pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
     thread::spawn(move || {
@@ -14,7 +13,7 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                 is_paused = paused;
             };
 
-            if !is_paused && event::poll(std::time::Duration::from_millis(1)).unwrap() {
+            if !is_paused {
                 match event::read() {
                     Ok(Event::Key(key)) => {
                         let key = Key::from_event(key);
@@ -37,8 +36,6 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                             .unwrap();
                     }
                 }
-            } else {
-                thread::sleep(Duration::from_millis(1));
             }
         }
     });

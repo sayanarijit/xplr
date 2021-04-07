@@ -24,8 +24,12 @@ anyhow = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 
 [dev-dependencies]
-criterion = "0.3"
+criterion = "*"
+flamegraph = "*"
 
 [[bench]]
 name = "navigation"
 harness = false
+
+[profile.release]
+debug = true
