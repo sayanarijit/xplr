@@ -623,6 +623,13 @@ impl Default for Config {
                     messages:
                       - SwitchMode: create
 
+                  e:
+                    help: open in editor
+                    messages:
+                      - BashExec: |
+                          ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
+                      - SwitchMode: default
+
                   s:
                     help: selection operations
                     messages:
