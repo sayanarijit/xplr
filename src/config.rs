@@ -517,7 +517,7 @@ impl Default for Config {
                           filter: RelativePathDoesContain
                           case_sensitive: false
                       - Enter
-                      - SwitchMode: default
+                      - SetInputBuffer: ""
                       - Explore
 
                   left:
@@ -527,7 +527,7 @@ impl Default for Config {
                           filter: RelativePathDoesContain
                           case_sensitive: false
                       - Back
-                      - SwitchMode: default
+                      - SetInputBuffer: ""
                       - Explore
 
                   esc:
