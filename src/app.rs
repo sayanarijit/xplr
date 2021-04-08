@@ -7,13 +7,14 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
 use std::time::Duration;
 
-pub const VERSION: &str = "v0.3.7"; // Update Cargo.toml and default.nix
+pub const VERSION: &str = "v0.3.8"; // Update Cargo.toml and default.nix
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
@@ -187,7 +188,7 @@ pub enum InternalMsg {
     HandleKey(Key),
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub enum NodeFilter {
     RelativePathIs,
     RelativePathIsNot,
@@ -378,7 +379,7 @@ impl NodeFilter {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct NodeFilterApplicable {
     filter: NodeFilter,
     input: String,
@@ -409,7 +410,7 @@ pub struct NodeFilterFromInput {
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ExplorerConfig {
-    filters: Vec<NodeFilterApplicable>,
+    filters: HashSet<NodeFilterApplicable>,
 }
 
 impl ExplorerConfig {
@@ -567,6 +568,11 @@ pub enum ExternalMsg {
     ///
     /// Example: `AddNodeFilterFromInput: {filter: RelativePathDoesStartWith}`
     AddNodeFilterFromInput(NodeFilterFromInput),
+
+    /// Remove a node filter reading the input from the buffer.
+    ///
+    /// Example: `RemoveNodeFilterFromInput: {filter: RelativePathDoesStartWith}`
+    RemoveNodeFilterFromInput(NodeFilterFromInput),
 
     /// Reset the node filters back to the default configuration.
     ResetNodeFilters,
@@ -780,7 +786,7 @@ impl App {
 
         let mut explorer_config = ExplorerConfig::default();
         if !config.general.show_hidden {
-            explorer_config.filters.push(NodeFilterApplicable::new(
+            explorer_config.filters.insert(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
                 Default::default(),
@@ -881,6 +887,7 @@ impl App {
             ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
             ExternalMsg::AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
             ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
+            ExternalMsg::RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
             ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
             ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
             ExternalMsg::LogInfo(l) => self.log_info(l),
@@ -1175,31 +1182,42 @@ impl App {
     }
 
     fn add_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
-        self.explorer_config.filters.push(filter);
+        self.explorer_config.filters.insert(filter);
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
     fn add_node_filter_from_input(mut self, filter: NodeFilterFromInput) -> Result<Self> {
         if let Some(input) = self.input_buffer() {
-            self.explorer_config.filters.push(NodeFilterApplicable::new(
-                filter.filter,
-                input,
-                filter.case_sensitive,
-            ));
+            self.explorer_config
+                .filters
+                .insert(NodeFilterApplicable::new(
+                    filter.filter,
+                    input,
+                    filter.case_sensitive,
+                ));
             self.msg_out.push_back(MsgOut::Refresh);
         };
         Ok(self)
     }
 
     fn remove_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
-        self.explorer_config.filters = self
-            .explorer_config
-            .filters
-            .into_iter()
-            .filter(|f| f != &filter)
-            .collect();
+        self.explorer_config.filters.remove(&filter);
         self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn remove_node_filter_from_input(mut self, filter: NodeFilterFromInput) -> Result<Self> {
+        if let Some(input) = self.input_buffer() {
+            self.explorer_config
+                .filters
+                .remove(&NodeFilterApplicable::new(
+                    filter.filter,
+                    input,
+                    filter.case_sensitive,
+                ));
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
         Ok(self)
     }
 
@@ -1215,15 +1233,15 @@ impl App {
         self.explorer_config.filters.clear();
 
         if !self.config.general.show_hidden {
-            self.explorer_config.filters.push(NodeFilterApplicable::new(
+            self.add_node_filter(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
                 Default::default(),
-            ));
-        };
-        self.msg_out.push_back(MsgOut::Refresh);
-
-        Ok(self)
+            ))
+        } else {
+            self.msg_out.push_back(MsgOut::Refresh);
+            Ok(self)
+        }
     }
 
     fn log_info(mut self, message: String) -> Result<Self> {

@@ -293,14 +293,12 @@ impl Default for KeyBindings {
               ctrl-f:
                 help: search [/]
                 messages:
-                  - ResetNodeFilters
                   - SwitchMode: search
                   - SetInputBuffer: ""
                   - Explore
 
               /:
                 messages:
-                  - ResetNodeFilters
                   - SwitchMode: search
                   - SetInputBuffer: ""
                   - Explore
@@ -502,7 +500,9 @@ impl Default for Config {
                   enter:
                     help: focus
                     messages:
-                      - ResetNodeFilters
+                      - RemoveNodeFilterFromInput:
+                          filter: RelativePathDoesContain
+                          case_sensitive: false
                       - SwitchMode: default
                       - Explore
                   
@@ -519,7 +519,9 @@ impl Default for Config {
                   right:
                     help: enter
                     messages:
-                      - ResetNodeFilters
+                      - RemoveNodeFilterFromInput:
+                          filter: RelativePathDoesContain
+                          case_sensitive: false
                       - Enter
                       - SwitchMode: default
                       - Explore
@@ -527,7 +529,9 @@ impl Default for Config {
                   left:
                     help: back
                     messages:
-                      - ResetNodeFilters
+                      - RemoveNodeFilterFromInput:
+                          filter: RelativePathDoesContain
+                          case_sensitive: false
                       - Back
                       - SwitchMode: default
                       - Explore
@@ -535,15 +539,19 @@ impl Default for Config {
                   esc:
                     help: cancel
                     messages:
-                      - ResetNodeFilters
+                      - RemoveNodeFilterFromInput:
+                          filter: RelativePathDoesContain
+                          case_sensitive: false
                       - SwitchMode: default
                       - Explore
 
                   backspace:
                     help: clear
                     messages:
+                      - RemoveNodeFilterFromInput:
+                          filter: RelativePathDoesContain
+                          case_sensitive: false
                       - SetInputBuffer: ""
-                      - ResetNodeFilters
                       - Explore
 
                   ctrl-c:
@@ -553,8 +561,10 @@ impl Default for Config {
 
                 default:
                   messages:
+                    - RemoveNodeFilterFromInput:
+                        filter: RelativePathDoesContain
+                        case_sensitive: false
                     - BufferInputFromKey
-                    - ResetNodeFilters
                     - AddNodeFilterFromInput:
                         filter: RelativePathDoesContain
                         case_sensitive: false
