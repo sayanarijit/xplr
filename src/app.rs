@@ -97,8 +97,6 @@ impl Node {
     pub fn new(parent: String, relative_path: String) -> Self {
         let absolute_path = PathBuf::from(&parent)
             .join(&relative_path)
-            .canonicalize()
-            .unwrap_or_default()
             .to_string_lossy()
             .to_string();
 
@@ -109,7 +107,7 @@ impl Node {
             .map(|e| e.to_string_lossy().to_string())
             .unwrap_or_default();
 
-        let maybe_metadata = path.metadata().ok();
+        let maybe_metadata = path.symlink_metadata().ok();
 
         let is_symlink = maybe_metadata
             .clone()
