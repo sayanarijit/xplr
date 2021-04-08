@@ -354,9 +354,7 @@ impl Default for KeyBindings {
                 help: global help menu
                 messages:
                   - BashExec: |
-                      cat "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
-                      echo
-                      read -p "[enter to continue]"
+                      ${PAGER:-less} "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
 
               ctrl-c:
                 help: cancel & quit [q|esc]
@@ -578,7 +576,8 @@ impl Default for Config {
                     help: open in gui
                     messages:
                       - BashExec: |
-                          xdg-open "${XPLR_FOCUS_PATH:?}" &> /dev/null
+                          OPENER="$(which xdg-open)"
+                          ${OPENER:-open} "${XPLR_FOCUS_PATH:?}" &> /dev/null
                       - SwitchMode: default
 
                   ctrl-c:
