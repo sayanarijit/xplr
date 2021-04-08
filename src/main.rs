@@ -17,11 +17,13 @@ use xplr::auto_refresher;
 use xplr::event_reader;
 use xplr::explorer;
 use xplr::pipe_reader;
+use xplr::pwd_watcher;
 use xplr::ui;
 
 fn main() -> Result<()> {
     let (tx_msg_in, rx_msg_in) = mpsc::channel();
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
+    let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
     let mut pwd = PathBuf::from(env::args().nth(1).unwrap_or_else(|| ".".into()))
         .canonicalize()
@@ -93,15 +95,25 @@ fn main() -> Result<()> {
     auto_refresher::start_auto_refreshing(tx_msg_in.clone());
     pipe_reader::keep_reading(app.pipe().msg_in.clone(), tx_msg_in.clone());
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
+    pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
 
-    let mut last_app = app.clone();
-    'outer: while result.is_ok() {
+    'outer: for task in rx_msg_in {
+        let last_app = app.clone();
+
+        let (new_app, new_result) = match app.handle_task(task) {
+            Ok(a) => (a, Ok(())),
+            Err(err) => (last_app.clone(), Err(err)),
+        };
+
+        app = new_app;
+        result = new_result;
+
+        if result.is_err() {
+            break;
+        }
+
         while let Some(msg) = app.pop_msg_out() {
             match msg {
-                app::MsgOut::Debug(path) => {
-                    fs::write(&path, serde_yaml::to_string(&app)?)?;
-                }
-
                 app::MsgOut::PrintResultAndQuit => {
                     output = Some(app.result_str());
                     break 'outer;
@@ -111,6 +123,10 @@ fn main() -> Result<()> {
                     let out = serde_yaml::to_string(&app)?;
                     output = Some(out);
                     break 'outer;
+                }
+
+                app::MsgOut::Debug(path) => {
+                    fs::write(&path, serde_yaml::to_string(&app)?)?;
                 }
 
                 app::MsgOut::ClearScreen => {
@@ -129,6 +145,7 @@ fn main() -> Result<()> {
                 app::MsgOut::Refresh => {
                     app = app.refresh_selection()?;
                     if app.pwd() != last_app.pwd() {
+                        tx_pwd_watcher.send(app.pwd().clone())?;
                         explorer::explore(
                             app.explorer_config().clone(),
                             app.pwd().clone(),
@@ -162,7 +179,7 @@ fn main() -> Result<()> {
 
                     if app.result() != last_app.result() {
                         fs::write(&app.pipe().result_out, app.result_str())?;
-                    }
+                    };
                 }
 
                 app::MsgOut::Call(cmd) => {
@@ -230,20 +247,11 @@ fn main() -> Result<()> {
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
             };
-            last_app = app.clone();
         }
 
-        for task in rx_msg_in.try_iter() {
-            app = app.enqueue(task);
+        while let Some(task) = app.pop_task_out() {
+            tx_msg_in.send(task)?;
         }
-
-        let (new_app, new_result) = match app.clone().mutate_or_sleep() {
-            Ok(a) => (a, Ok(())),
-            Err(e) => (app, Err(e)),
-        };
-
-        app = new_app;
-        result = new_result;
     }
 
     terminal.clear()?;
