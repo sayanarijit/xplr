@@ -9,4 +9,5 @@ pub mod event_reader;
 pub mod explorer;
 pub mod input;
 pub mod pipe_reader;
+pub mod pwd_watcher;
 pub mod ui;

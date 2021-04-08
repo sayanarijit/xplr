@@ -22,6 +22,7 @@ handlebars = "3.5"
 mime_guess = "2.0.3"
 anyhow = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
+notify = "4.0.12"
 
 [dev-dependencies]
 criterion = "0.3"

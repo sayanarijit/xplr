@@ -12,7 +12,6 @@ use std::collections::VecDeque;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
-use std::time::Duration;
 
 pub const VERSION: &str = "v0.3.9"; // Update Cargo.toml and default.nix
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
@@ -826,15 +825,10 @@ impl App {
         self
     }
 
-    pub fn mutate_or_sleep(mut self) -> Result<Self> {
-        if let Some(task) = self.tasks.pop() {
-            match task.msg {
-                MsgIn::Internal(msg) => self.handle_internal(msg),
-                MsgIn::External(msg) => self.handle_external(msg, task.key),
-            }
-        } else {
-            std::thread::sleep(Duration::from_millis(5));
-            Ok(self)
+    pub fn handle_task(self, task: Task) -> Result<Self> {
+        match task.msg {
+            MsgIn::Internal(msg) => self.handle_internal(msg),
+            MsgIn::External(msg) => self.handle_external(msg, task.key),
         }
     }
 
@@ -1429,5 +1423,10 @@ impl App {
     /// Get a reference to the app's version.
     pub fn version(&self) -> &String {
         &self.version
+    }
+
+    /// Get a reference to the app's tasks.
+    pub fn pop_task_out(&mut self) -> Option<Task> {
+        self.tasks.pop()
     }
 }
