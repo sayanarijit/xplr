@@ -246,6 +246,7 @@ fn main() -> Result<()> {
         result = new_result;
     }
 
+    terminal.clear()?;
     term::disable_raw_mode()?;
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
     terminal.show_cursor()?;
