@@ -51,3 +51,6 @@ different run modes, and also the way it looks by modifying one single configura
 
 If you come up with something cool, or if you feel it's lacking somewhere in portability, flexibility or performance, don't hesitate to
 [start a conversation](https://github.com/sayanarijit/xplr/discussions/2).
+
+### Backers
+<a href="https://opencollective.com/xplr#backer"><img src="https://opencollective.com/xplr/tiers/backer.svg?width=890" /></a>
