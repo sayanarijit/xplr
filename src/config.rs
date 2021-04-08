@@ -362,10 +362,6 @@ impl Default for KeyBindings {
               q:
                 messages:
                   - Terminate
-
-              esc:
-                messages:
-                  - Terminate
             "###,
         )
         .unwrap();
