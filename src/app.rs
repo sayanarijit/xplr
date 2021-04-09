@@ -643,37 +643,13 @@ pub enum MsgOut {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Task {
-    priority: usize,
     msg: MsgIn,
     key: Option<Key>,
-    created_at: DateTime<Utc>,
 }
 
 impl Task {
-    pub fn new(priority: usize, msg: MsgIn, key: Option<Key>) -> Self {
-        Self {
-            priority,
-            msg,
-            key,
-            created_at: Utc::now(),
-        }
-    }
-}
-
-impl Ord for Task {
-    fn cmp(&self, other: &Self) -> Ordering {
-        // Notice that the we flip the ordering on costs.
-        // In case of a tie we compare positions - this step is necessary
-        // to make implementations of `PartialEq` and `Ord` consistent.
-        other
-            .priority
-            .cmp(&self.priority)
-            .then_with(|| other.created_at.cmp(&self.created_at))
-    }
-}
-impl PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+    pub fn new(msg: MsgIn, key: Option<Key>) -> Self {
+        Self { msg, key }
     }
 }
 
@@ -926,7 +902,7 @@ impl App {
             .unwrap_or_else(|| default.map(|a| a.messages).unwrap_or_default());
 
         for msg in msgs {
-            self = self.enqueue(Task::new(0, MsgIn::External(msg), Some(key)));
+            self = self.enqueue(Task::new(MsgIn::External(msg), Some(key)));
         }
 
         Ok(self)

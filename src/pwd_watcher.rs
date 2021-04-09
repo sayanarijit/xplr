@@ -29,7 +29,7 @@ pub fn keep_watching(
 
         if rx.try_recv().is_ok() {
             let msg = MsgIn::External(ExternalMsg::Explore);
-            tx_msg_in.send(Task::new(3, msg, None)).unwrap();
+            tx_msg_in.send(Task::new(msg, None)).unwrap();
         } else {
             thread::sleep(Duration::from_secs(1));
         }

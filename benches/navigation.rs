@@ -11,7 +11,6 @@ fn criterion_benchmark(c: &mut Criterion) {
     let app = app::App::create("/tmp/xplr_bench".into())
         .expect("failed to create app")
         .handle_task(app::Task::new(
-            1,
             app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
             None,
         ))
@@ -21,7 +20,6 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             app.clone()
                 .handle_task(app::Task::new(
-                    1,
                     app::MsgIn::External(app::ExternalMsg::FocusNext),
                     None,
                 ))
@@ -33,7 +31,6 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             app.clone()
                 .handle_task(app::Task::new(
-                    1,
                     app::MsgIn::External(app::ExternalMsg::FocusPrevious),
                     None,
                 ))
@@ -45,7 +42,6 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             app.clone()
                 .handle_task(app::Task::new(
-                    1,
                     app::MsgIn::External(app::ExternalMsg::FocusFirst),
                     None,
                 ))
@@ -57,7 +53,6 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             app.clone()
                 .handle_task(app::Task::new(
-                    1,
                     app::MsgIn::External(app::ExternalMsg::FocusLast),
                     None,
                 ))
@@ -69,13 +64,11 @@ fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| {
             app.clone()
                 .handle_task(app::Task::new(
-                    1,
                     app::MsgIn::External(app::ExternalMsg::Back),
                     None,
                 ))
                 .unwrap()
                 .handle_task(app::Task::new(
-                    1,
                     app::MsgIn::External(app::ExternalMsg::Enter),
                     None,
                 ))

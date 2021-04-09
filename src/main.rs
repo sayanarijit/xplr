@@ -101,7 +101,6 @@ fn main() -> Result<()> {
         );
 
         tx_msg_in.send(app::Task::new(
-            0,
             app::MsgIn::External(app::ExternalMsg::LogInfo(msg)),
             None,
         ))?;
@@ -228,7 +227,7 @@ fn main() -> Result<()> {
 
                     if let Err(e) = status {
                         let msg = app::MsgIn::External(app::ExternalMsg::LogError(e));
-                        tx_msg_in.send(app::Task::new(1, msg, None))?;
+                        tx_msg_in.send(app::Task::new(msg, None))?;
                     };
 
                     tx_event_reader.send(false)?;
@@ -254,7 +253,7 @@ fn main() -> Result<()> {
 
                     if let Err(e) = status {
                         let msg = app::MsgIn::External(app::ExternalMsg::LogError(e));
-                        tx_msg_in.send(app::Task::new(1, msg, None))?;
+                        tx_msg_in.send(app::Task::new(msg, None))?;
                     };
 
                     terminal.hide_cursor()?;

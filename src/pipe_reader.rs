@@ -15,11 +15,10 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
 
             msgs.for_each(|msg| match msg {
                 Ok(m) => {
-                    tx.send(Task::new(2, MsgIn::External(m), None)).unwrap();
+                    tx.send(Task::new(MsgIn::External(m), None)).unwrap();
                 }
                 Err(e) => {
                     tx.send(Task::new(
-                        0,
                         MsgIn::External(ExternalMsg::LogError(e.to_string())),
                         None,
                     ))

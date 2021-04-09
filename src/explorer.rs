@@ -45,7 +45,6 @@ pub fn explore(
                 let dir = DirectoryBuffer::new(parent.clone(), nodes, focus_index);
 
                 tx.send(Task::new(
-                    1,
                     MsgIn::Internal(InternalMsg::AddDirectory(parent, dir)),
                     None,
                 ))
@@ -53,7 +52,6 @@ pub fn explore(
             })
             .unwrap_or_else(|e| {
                 tx.send(Task::new(
-                    1,
                     MsgIn::External(ExternalMsg::LogError(e.to_string())),
                     None,
                 ))
