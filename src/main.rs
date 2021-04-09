@@ -6,8 +6,10 @@ use crossterm::terminal as term;
 use handlebars::Handlebars;
 use std::env;
 use std::fs;
+use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
+use std::process::{Command, ExitStatus, Stdio};
 use std::sync::mpsc;
 use termion::get_tty;
 use tui::backend::CrosstermBackend;
@@ -19,6 +21,55 @@ use xplr::explorer;
 use xplr::pipe_reader;
 use xplr::pwd_watcher;
 use xplr::ui;
+
+fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
+    let input_buffer = app.input_buffer().unwrap_or_default();
+
+    let focus_index = app
+        .directory_buffer()
+        .map(|d| d.focus)
+        .unwrap_or_default()
+        .to_string();
+
+    let pipe_msg_in = app.pipe().msg_in.clone();
+    let pipe_mode_out = app.pipe().mode_out.clone();
+    let pipe_focus_out = app.pipe().focus_out.clone();
+    let pipe_selection_out = app.pipe().selection_out.clone();
+    let pipe_result_out = app.pipe().result_out.clone();
+    let pipe_directory_nodes_out = app.pipe().directory_nodes_out.clone();
+    let pipe_global_help_menu_out = app.pipe().global_help_menu_out.clone();
+    let pipe_logs_out = app.pipe().logs_out.clone();
+    let session_path = app.session_path();
+
+    let (stdin, stdout, stderr) = if silent {
+        (Stdio::null(), Stdio::null(), Stdio::null())
+    } else {
+        (Stdio::inherit(), Stdio::inherit(), Stdio::inherit())
+    };
+
+    Command::new(cmd.command.clone())
+        .current_dir(app.pwd())
+        .env("XPLR_APP_VERSION", app.version())
+        .env("XPLR_CONFIG_VERSION", &app.config().version)
+        .env("XPLR_PID", &app.pid().to_string())
+        .env("XPLR_INPUT_BUFFER", input_buffer)
+        .env("XPLR_FOCUS_PATH", app.focused_node_str())
+        .env("XPLR_FOCUS_INDEX", focus_index)
+        .env("XPLR_SESSION_PATH", session_path)
+        .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
+        .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
+        .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
+        .env("XPLR_PIPE_MODE_OUT", pipe_mode_out)
+        .env("XPLR_PIPE_RESULT_OUT", pipe_result_out)
+        .env("XPLR_PIPE_GLOBAL_HELP_MENU_OUT", pipe_global_help_menu_out)
+        .env("XPLR_PIPE_DIRECTORY_NODES_OUT", pipe_directory_nodes_out)
+        .env("XPLR_PIPE_LOGS_OUT", pipe_logs_out)
+        .stdin(stdin)
+        .stdout(stdout)
+        .stderr(stderr)
+        .args(cmd.args)
+        .status()
+}
 
 fn main() -> Result<()> {
     let (tx_msg_in, rx_msg_in) = mpsc::channel();
@@ -114,6 +165,10 @@ fn main() -> Result<()> {
 
         while let Some(msg) = app.pop_msg_out() {
             match msg {
+                app::MsgOut::Enque(task) => {
+                    tx_msg_in.send(task)?;
+                }
+
                 app::MsgOut::PrintResultAndQuit => {
                     output = Some(app.result_str());
                     break 'outer;
@@ -158,50 +213,36 @@ fn main() -> Result<()> {
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
 
+                app::MsgOut::CallSilently(cmd) => {
+                    tx_event_reader.send(true)?;
+
+                    let status = call(&app, cmd, false)
+                        .map(|s| {
+                            if s.success() {
+                                Ok(())
+                            } else {
+                                Err(format!("process exited with code {}", &s))
+                            }
+                        })
+                        .unwrap_or_else(|e| Err(e.to_string()));
+
+                    if let Err(e) = status {
+                        let msg = app::MsgIn::External(app::ExternalMsg::LogError(e));
+                        tx_msg_in.send(app::Task::new(1, msg, None))?;
+                    };
+
+                    tx_event_reader.send(false)?;
+                }
+
                 app::MsgOut::Call(cmd) => {
                     tx_event_reader.send(true)?;
+
                     terminal.clear()?;
                     term::disable_raw_mode()?;
                     terminal.set_cursor(0, 0)?;
                     terminal.show_cursor()?;
 
-                    let input_buffer = app.input_buffer().unwrap_or_default();
-
-                    let focus_index = app
-                        .directory_buffer()
-                        .map(|d| d.focus)
-                        .unwrap_or_default()
-                        .to_string();
-
-                    let pipe_msg_in = app.pipe().msg_in.clone();
-                    let pipe_mode_out = app.pipe().mode_out.clone();
-                    let pipe_focus_out = app.pipe().focus_out.clone();
-                    let pipe_selection_out = app.pipe().selection_out.clone();
-                    let pipe_result_out = app.pipe().result_out.clone();
-                    let pipe_directory_nodes_out = app.pipe().directory_nodes_out.clone();
-                    let pipe_global_help_menu_out = app.pipe().global_help_menu_out.clone();
-                    let pipe_logs_out = app.pipe().logs_out.clone();
-                    let session_path = app.session_path();
-
-                    let status = std::process::Command::new(cmd.command.clone())
-                        .current_dir(app.pwd())
-                        .env("XPLR_APP_VERSION", app.version())
-                        .env("XPLR_CONFIG_VERSION", &app.config().version)
-                        .env("XPLR_PID", &app.pid().to_string())
-                        .env("XPLR_INPUT_BUFFER", input_buffer)
-                        .env("XPLR_FOCUS_PATH", app.focused_node_str())
-                        .env("XPLR_FOCUS_INDEX", focus_index)
-                        .env("XPLR_SESSION_PATH", session_path)
-                        .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
-                        .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
-                        .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
-                        .env("XPLR_PIPE_MODE_OUT", pipe_mode_out)
-                        .env("XPLR_PIPE_RESULT_OUT", pipe_result_out)
-                        .env("XPLR_PIPE_GLOBAL_HELP_MENU_OUT", pipe_global_help_menu_out)
-                        .env("XPLR_PIPE_DIRECTORY_NODES_OUT", pipe_directory_nodes_out)
-                        .env("XPLR_PIPE_LOGS_OUT", pipe_logs_out)
-                        .args(cmd.args.clone())
-                        .status()
+                    let status = call(&app, cmd, false)
                         .map(|s| {
                             if s.success() {
                                 Ok(())
@@ -222,10 +263,6 @@ fn main() -> Result<()> {
                     tx_event_reader.send(false)?;
                 }
             };
-        }
-
-        while let Some(task) = app.pop_task_out() {
-            tx_msg_in.send(task)?;
         }
 
         if app.focused_node() != last_app.focused_node() {
@@ -254,6 +291,7 @@ fn main() -> Result<()> {
     }
 
     terminal.clear()?;
+    terminal.set_cursor(0, 0)?;
     term::disable_raw_mode()?;
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
     terminal.show_cursor()?;

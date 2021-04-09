@@ -5,7 +5,6 @@ use anyhow::{bail, Result};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::VecDeque;
@@ -528,11 +527,23 @@ pub enum ExternalMsg {
     /// Example: `Call: {command: bash, args: ["-c", "read -p test"]}`
     Call(Command),
 
-    /// An alias to `Call: {command: bash, args: ["-c", "${command}"]}`
+    /// Like `Call` but without the flicker. The stdin, stdout
+    /// stderr will be piped to null. So it's non-interactive.
+    ///
+    /// Example: `CallSilently: {command: tput, args: ["bell"]}`
+    CallSilently(Command),
+
+    /// An alias to `Call: {command: bash, args: ["-c", "${command}"], silent: false}`
     /// where ${command} is the given value.
     ///
     /// Example: `BashExec: "read -p test"`
     BashExec(String),
+
+    /// Like `BashExec` but without the flicker. The stdin, stdout
+    /// stderr will be piped to null. So it's non-interactive.
+    ///
+    /// Example: `BashExecSilently: "tput bell"`
+    BashExecSilently(String),
 
     /// Select the focused node.
     Select,
@@ -626,6 +637,8 @@ pub enum MsgOut {
     PrintAppStateAndQuit,
     Debug(String),
     Call(Command),
+    CallSilently(Command),
+    Enque(Task),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -727,7 +740,6 @@ pub struct App {
     config: Config,
     pwd: String,
     directory_buffers: HashMap<String, DirectoryBuffer>,
-    tasks: BinaryHeap<Task>,
     selection: Vec<Node>,
     msg_out: VecDeque<MsgOut>,
     mode: Mode,
@@ -795,7 +807,6 @@ impl App {
             config,
             pwd: pwd.to_string_lossy().to_string(),
             directory_buffers: Default::default(),
-            tasks: Default::default(),
             selection: Default::default(),
             msg_out: Default::default(),
             mode,
@@ -819,7 +830,7 @@ impl App {
     }
 
     pub fn enqueue(mut self, task: Task) -> Self {
-        self.tasks.push(task);
+        self.msg_out.push_back(MsgOut::Enque(task));
         self
     }
 
@@ -871,7 +882,9 @@ impl App {
             ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
             ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
             ExternalMsg::Call(cmd) => self.call(cmd),
+            ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
             ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
+            ExternalMsg::BashExecSilently(cmd) => self.bash_exec_silently(cmd),
             ExternalMsg::Select => self.select(),
             ExternalMsg::UnSelect => self.un_select(),
             ExternalMsg::ToggleSelection => self.toggle_selection(),
@@ -1093,10 +1106,10 @@ impl App {
                 self.change_directory(&parent.to_string_lossy().to_string())?
                     .focus_by_file_name(&filename.to_string_lossy().to_string())
             } else {
-                Ok(self)
+                bail!("invalid path {}", path)
             }
         } else {
-            Ok(self)
+            self.change_directory("/")
         }
     }
 
@@ -1122,8 +1135,20 @@ impl App {
         Ok(self)
     }
 
+    fn call_silently(mut self, command: Command) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::CallSilently(command));
+        Ok(self)
+    }
+
     fn bash_exec(self, script: String) -> Result<Self> {
         self.call(Command {
+            command: "bash".into(),
+            args: vec!["-c".into(), script],
+        })
+    }
+
+    fn bash_exec_silently(self, script: String) -> Result<Self> {
+        self.call_silently(Command {
             command: "bash".into(),
             args: vec!["-c".into(), script],
         })
@@ -1420,10 +1445,5 @@ impl App {
     /// Get a reference to the app's version.
     pub fn version(&self) -> &String {
         &self.version
-    }
-
-    /// Get a reference to the app's tasks.
-    pub fn pop_task_out(&mut self) -> Option<Task> {
-        self.tasks.pop()
     }
 }
