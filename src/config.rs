@@ -24,6 +24,8 @@ pub struct FileTypeConfig {
     pub icon: String,
     #[serde(default)]
     pub style: Style,
+    #[serde(default)]
+    pub custom: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -50,11 +52,13 @@ impl Default for FileTypesConfig {
                 style: Style::default()
                     .add_modifier(Modifier::BOLD)
                     .fg(Color::Cyan),
+                custom: Default::default(),
             },
 
             file: FileTypeConfig {
                 icon: "ƒ".into(),
                 style: Default::default(),
+                custom: Default::default(),
             },
 
             symlink: FileTypeConfig {
@@ -62,6 +66,7 @@ impl Default for FileTypesConfig {
                 style: Style::default()
                     .add_modifier(Modifier::ITALIC)
                     .fg(Color::Cyan),
+                custom: Default::default(),
             },
 
             mime_essence: Default::default(),
