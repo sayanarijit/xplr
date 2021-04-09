@@ -1331,6 +1331,7 @@ impl App {
     pub fn refresh_selection(mut self) -> Result<Self> {
         self.selection = self
             .selection
+            .clone()
             .into_iter()
             .filter(|n| PathBuf::from(&n.absolute_path).exists())
             .collect();
