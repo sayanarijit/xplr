@@ -5,6 +5,7 @@
 pub mod app;
 pub mod auto_refresher;
 pub mod config;
+pub mod default_config;
 pub mod event_reader;
 pub mod explorer;
 pub mod input;

@@ -1,0 +1,723 @@
+version: v0.3.13
+general:
+  show_hidden: false
+  table:
+    header:
+      cols:
+        - format: │     path
+          style:
+            fg: null
+            bg: null
+            add_modifier:
+              bits: 0
+            sub_modifier:
+              bits: 0
+        - format: type
+          style:
+            fg: null
+            bg: null
+            add_modifier:
+              bits: 0
+            sub_modifier:
+              bits: 0
+        - format: ' index'
+          style:
+            fg: null
+            bg: null
+            add_modifier:
+              bits: 0
+            sub_modifier:
+              bits: 0
+      style:
+        fg: null
+        bg: null
+        add_modifier:
+          bits: 1
+        sub_modifier:
+          bits: 0
+      height: 1
+    row:
+      cols:
+        - format: '{{{tree}}}{{{prefix}}}{{{icon}}} {{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}'
+          style:
+            fg: null
+            bg: null
+            add_modifier:
+              bits: 0
+            sub_modifier:
+              bits: 0
+        - format: '{{{mimeEssence}}}'
+          style:
+            fg: null
+            bg: null
+            add_modifier:
+              bits: 0
+            sub_modifier:
+              bits: 0
+        - format: '{{#if isBeforeFocus}}-{{else}} {{/if}}{{{relativeIndex}}}/{{{index}}}/{{{total}}}'
+          style:
+            fg: null
+            bg: null
+            add_modifier:
+              bits: 0
+            sub_modifier:
+              bits: 0
+      style:
+        fg: null
+        bg: null
+        add_modifier:
+          bits: 0
+        sub_modifier:
+          bits: 0
+      height: 0
+    style:
+      fg: null
+      bg: null
+      add_modifier:
+        bits: 0
+      sub_modifier:
+        bits: 0
+    tree:
+      - format: ├─
+        style:
+          fg: null
+          bg: null
+          add_modifier:
+            bits: 0
+          sub_modifier:
+            bits: 0
+      - format: ├─
+        style:
+          fg: null
+          bg: null
+          add_modifier:
+            bits: 0
+          sub_modifier:
+            bits: 0
+      - format: ╰─
+        style:
+          fg: null
+          bg: null
+          add_modifier:
+            bits: 0
+          sub_modifier:
+            bits: 0
+    col_spacing: 3
+    col_widths:
+      - percentage: 60
+      - percentage: 20
+      - percentage: 20
+  normal_ui:
+    prefix: '  '
+    suffix: ''
+    style:
+      fg: null
+      bg: null
+      add_modifier:
+        bits: 0
+      sub_modifier:
+        bits: 0
+  focused_ui:
+    prefix: ▸[
+    suffix: ']'
+    style:
+      fg: Blue
+      bg: null
+      add_modifier:
+        bits: 1
+      sub_modifier:
+        bits: 0
+  selection_ui:
+    prefix: ' {'
+    suffix: '}'
+    style:
+      fg: LightGreen
+      bg: null
+      add_modifier:
+        bits: 1
+      sub_modifier:
+        bits: 0
+filetypes:
+  directory:
+    icon: ð
+    style:
+      fg: Cyan
+      bg: null
+      add_modifier:
+        bits: 1
+      sub_modifier:
+        bits: 0
+    custom: {}
+  file:
+    icon: ƒ
+    style:
+      fg: null
+      bg: null
+      add_modifier:
+        bits: 0
+      sub_modifier:
+        bits: 0
+    custom: {}
+  symlink:
+    icon: §
+    style:
+      fg: Cyan
+      bg: null
+      add_modifier:
+        bits: 4
+      sub_modifier:
+        bits: 0
+    custom: {}
+  mime_essence: {}
+  extension: {}
+  special: {}
+modes:
+  selection ops:
+    name: selection ops
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        c:
+          help: copy here
+          messages:
+            - BashExec: |
+                (while IFS= read -r line; do
+                  if cp -vr "${line:?}" ./; then
+                    echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                  else
+                    echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                  fi
+                done < "${XPLR_PIPE_SELECTION_OUT:?}")
+                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
+                read -p "[enter to continue]"
+            - SwitchMode: default
+
+        m:
+          help: move here
+          messages:
+            - BashExec: |
+                (while IFS= read -r line; do
+                  if mv -v "${line:?}" ./; then
+                    echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                  else
+                    echo "LogError: failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                  fi
+                done < "${XPLR_PIPE_SELECTION_OUT:?}")
+                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                read -p "[enter to continue]"
+            - SwitchMode: default
+
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+
+      default:
+        messages:
+          - SwitchMode: default
+
+  create file:
+    name: create file
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        enter:
+          help: create file
+          messages:
+            - BashExecSilently: |
+                PTH="${XPLR_INPUT_BUFFER:?}"
+                if touch "${PTH:?}"; then
+                  echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                else
+                  echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+                fi
+            - SwitchMode: default
+
+        backspace:
+          help: clear
+          messages:
+            - SetInputBuffer: ""
+
+        esc:
+          help: cancel
+          messages:
+            - SwitchMode: default
+
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+
+      default:
+        messages:
+          - BufferInputFromKey
+
+  create:
+    name: create
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+        d:
+          help: create directory
+          messages:
+            - SwitchMode: create directory
+            - SetInputBuffer: ''
+        esc:
+          help: cancel
+          messages:
+            - SwitchMode: default
+        f:
+          help: create file
+          messages:
+            - SwitchMode: create file
+            - SetInputBuffer: ''
+      on_alphabet: null
+      on_number: null
+      on_special_character: null
+      default:
+        help: null
+        messages:
+          - SwitchMode: default
+  rename:
+    name: rename
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        enter:
+          help: rename
+          messages:
+            - BashExecSilently: |
+                SRC="${XPLR_FOCUS_PATH:?}"
+                TARGET="${XPLR_INPUT_BUFFER:?}"
+                if mv -v "${SRC:?}" "${TARGET:?}"; then
+                  echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo "FocusPath: $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                else
+                  echo "LogError: failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                fi
+            - SwitchMode: default
+
+        backspace:
+          help: clear
+          messages:
+            - SetInputBuffer: ""
+
+        esc:
+          help: cancel
+          messages:
+            - SwitchMode: default
+
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+
+      default:
+        messages:
+          - BufferInputFromKey
+
+  default:
+    name: default
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        '#':
+          help: null
+          messages:
+            - PrintAppStateAndQuit
+        .:
+          help: show hidden
+          messages:
+            - ToggleNodeFilter:
+                filter: RelativePathDoesNotStartWith
+                input: .
+                case_sensitive: false
+            - Explore
+        /:
+          help: null
+          messages:
+            - SwitchMode: search
+            - SetInputBuffer: ''
+            - Explore
+        ':':
+          help: action
+          messages:
+            - SwitchMode: action
+        '?':
+          help: global help menu
+          messages:
+            - BashExec: |
+                ${PAGER:-less} "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
+        G:
+          help: go to bottom
+          messages:
+            - FocusLast
+        ctrl-c:
+          help: cancel & quit [q]
+          messages:
+            - Terminate
+        ctrl-f:
+          help: search [/]
+          messages:
+            - SwitchMode: search
+            - SetInputBuffer: ''
+            - Explore
+        d:
+          help: delete
+          messages:
+            - SwitchMode: delete
+        down:
+          help: down [j]
+          messages:
+            - FocusNext
+        enter:
+          help: quit with result
+          messages:
+            - PrintResultAndQuit
+        g:
+          help: go to
+          messages:
+            - SwitchMode: go to
+        h:
+          help: null
+          messages:
+            - Back
+        j:
+          help: null
+          messages:
+            - FocusNext
+        k:
+          help: null
+          messages:
+            - FocusPrevious
+        l:
+          help: null
+          messages:
+            - Enter
+        left:
+          help: back [h]
+          messages:
+            - Back
+        q:
+          help: null
+          messages:
+            - Terminate
+        r:
+          help: rename
+          messages:
+            - SwitchMode: rename
+            - BashExecSilently: |
+                echo "SetInputBuffer: $(basename ${XPLR_FOCUS_PATH})" >> "${XPLR_PIPE_MSG_IN:?}"
+
+        right:
+          help: enter [l]
+          messages:
+            - Enter
+        space:
+          help: toggle selection [v]
+          messages:
+            - ToggleSelection
+            - FocusNext
+        up:
+          help: up [k]
+          messages:
+            - FocusPrevious
+        v:
+          help: null
+          messages:
+            - ToggleSelection
+            - FocusNext
+      on_alphabet: null
+      on_number:
+        help: input
+        messages:
+          - ResetInputBuffer
+          - SwitchMode: number
+          - BufferInputFromKey
+      on_special_character: null
+      default:
+        help: null
+        messages:
+          - SwitchMode: default
+  go to:
+    name: go to
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+        g:
+          help: top
+          messages:
+            - FocusFirst
+            - SwitchMode: default
+        x:
+          help: open in gui
+          messages:
+            - BashExecSilently: |
+                OPENER="$(which xdg-open)"
+                ${OPENER:-open} "${XPLR_FOCUS_PATH:?}" &> /dev/null
+            - SwitchMode: default
+
+      on_alphabet: null
+      on_number: null
+      on_special_character: null
+      default:
+        help: null
+        messages:
+          - SwitchMode: default
+
+  number:
+    name: number
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        backspace:
+          help: clear
+          messages:
+            - ResetInputBuffer
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+        down:
+          help: to down [j]
+          messages:
+            - FocusNextByRelativeIndexFromInput
+            - SwitchMode: default
+        enter:
+          help: to index
+          messages:
+            - FocusByIndexFromInput
+            - SwitchMode: default
+        j:
+          help: null
+          messages:
+            - FocusNextByRelativeIndexFromInput
+            - SwitchMode: default
+        k:
+          help: null
+          messages:
+            - FocusPreviousByRelativeIndexFromInput
+            - SwitchMode: default
+        up:
+          help: to up [k]
+          messages:
+            - FocusPreviousByRelativeIndexFromInput
+            - SwitchMode: default
+      on_alphabet: null
+      on_number:
+        help: input
+        messages:
+          - BufferInputFromKey
+      on_special_character: null
+      default:
+        help: null
+        messages:
+          - SwitchMode: default
+  delete:
+    name: delete
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        d:
+          help: delete
+          messages:
+            - BashExec: |
+                (while IFS= read -r line; do
+                  if [ -d "$line" ]; then
+                    if rmdir -v "${line:?}"; then
+                      echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                    else
+                      echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                    fi
+                  else
+                    if rm -v "${line:?}"; then
+                      echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                    else
+                      echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                    fi
+                  fi
+                done < "${XPLR_PIPE_RESULT_OUT:?}")
+                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                read -p "[enter to continue]"
+            - SwitchMode: default
+
+        D:
+          help: force delete
+          messages:
+            - BashExec: |
+                (while IFS= read -r line; do
+                  if rm -rfv "${line:?}"; then
+                    echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
+                    echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                  else
+                    echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                  fi
+                done < "${XPLR_PIPE_RESULT_OUT:?}")
+                echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                read -p "[enter to continue]"
+            - SwitchMode: default
+            - Explore
+
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+      
+      default:
+        messages:
+          - SwitchMode: default
+
+  action:
+    name: action to
+    help: null
+    extra_help: null
+    key_bindings:
+      on_number:
+        help: go to index
+        messages:
+          - ResetInputBuffer
+          - SwitchMode: number
+          - BufferInputFromKey
+
+      on_key:
+        "!":
+          help: shell
+          messages:
+            - Call:
+                command: bash
+            - Explore
+            - SwitchMode: default
+
+        c:
+          help: create
+          messages:
+            - SwitchMode: create
+
+        e:
+          help: open in editor
+          messages:
+            - BashExec: |
+                ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
+            - SwitchMode: default
+
+        s:
+          help: selection operations
+          messages:
+            - SwitchMode: selection ops
+
+        l:
+          help: logs
+          messages:
+            - BashExec: |
+                cat "${XPLR_PIPE_LOGS_OUT}"
+                read -p "[enter to continue]"
+            - SwitchMode: default
+
+        ctrl-c:
+          help: cancel & quit [q]
+          messages:
+            - Terminate
+
+        q:
+          messages:
+            - Terminate
+
+      default:
+        messages:
+          - SwitchMode: default
+  search:
+    name: search
+    help: null
+    extra_help: null
+    key_bindings:
+      on_key:
+        backspace:
+          help: clear
+          messages:
+            - RemoveNodeFilterFromInput:
+                filter: RelativePathDoesContain
+                case_sensitive: false
+            - SetInputBuffer: ''
+            - Explore
+        ctrl-c:
+          help: cancel & quit
+          messages:
+            - Terminate
+        down:
+          help: down
+          messages:
+            - FocusNext
+        enter:
+          help: focus
+          messages:
+            - RemoveNodeFilterFromInput:
+                filter: RelativePathDoesContain
+                case_sensitive: false
+            - SwitchMode: default
+            - Explore
+        esc:
+          help: cancel
+          messages:
+            - RemoveNodeFilterFromInput:
+                filter: RelativePathDoesContain
+                case_sensitive: false
+            - SwitchMode: default
+            - Explore
+        left:
+          help: back
+          messages:
+            - RemoveNodeFilterFromInput:
+                filter: RelativePathDoesContain
+                case_sensitive: false
+            - Back
+            - SetInputBuffer: ''
+            - Explore
+        right:
+          help: enter
+          messages:
+            - RemoveNodeFilterFromInput:
+                filter: RelativePathDoesContain
+                case_sensitive: false
+            - Enter
+            - SetInputBuffer: ''
+            - Explore
+        up:
+          help: up
+          messages:
+            - FocusPrevious
+      on_alphabet: null
+      on_number: null
+      on_special_character: null
+      default:
+        help: null
+        messages:
+          - RemoveNodeFilterFromInput:
+              filter: RelativePathDoesContain
+              case_sensitive: false
+          - BufferInputFromKey
+          - AddNodeFilterFromInput:
+              filter: RelativePathDoesContain
+              case_sensitive: false
+          - Explore

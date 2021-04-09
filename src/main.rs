@@ -95,7 +95,8 @@ fn main() -> Result<()> {
 
     if app.version() != &app.config().version {
         let msg = format!(
-            "version mismatch, to update your config file to {}, visit {}",
+            "you can update your config file version from {} to {}, visit {} for more info.",
+            app.config().version,
             app.version(),
             app::UPGRADE_GUIDE_LINK,
         );
