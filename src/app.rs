@@ -1,5 +1,6 @@
 use crate::config::Config;
 use crate::config::Mode;
+use crate::default_config::DEFAULT_CONFIG;
 use crate::input::Key;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Utc};
@@ -12,7 +13,6 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-pub const VERSION: &str = "v0.3.13"; // Update Cargo.toml and default.nix
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
@@ -695,19 +695,35 @@ pub enum HelpMenuLine {
     Paragraph(String),
 }
 
-pub fn is_compatible(existing: &str, required: &str) -> bool {
-    let mut existing = existing.split('.');
-    let mut required = required.split('.');
+/// Major version should be the same.
+/// Config minor version should be lower.
+/// Patch/fix version can be anything.
+pub fn is_compatible(configv: &str, appv: &str) -> bool {
+    let mut configv = configv
+        .strip_prefix('v')
+        .unwrap_or_default()
+        .split('.')
+        .map(|c| c.parse::<u64>().unwrap());
 
-    let mut major_existing = existing.next().unwrap_or_default();
-    let mut major_required = required.next().unwrap_or_default();
+    let mut appv = appv
+        .strip_prefix('v')
+        .unwrap_or_default()
+        .split('.')
+        .map(|c| c.parse::<u64>().unwrap());
 
-    if major_existing == "v0" && major_required == "v0" {
-        major_existing = existing.next().unwrap_or_default();
-        major_required = required.next().unwrap_or_default();
+    let mut major_configv = configv.next().unwrap_or_default();
+    let mut minor_configv = configv.next().unwrap_or_default();
+    let mut major_appv = appv.next().unwrap_or_default();
+    let mut minor_appv = appv.next().unwrap_or_default();
+
+    if major_configv == 0 && major_appv == 0 {
+        major_configv = minor_configv;
+        minor_configv = configv.next().unwrap_or_default();
+        major_appv = minor_appv;
+        minor_appv = appv.next().unwrap_or_default();
     };
 
-    major_existing == major_required
+    major_configv == major_appv && minor_configv <= minor_appv
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -741,7 +757,9 @@ impl App {
             Config::default()
         };
 
-        if config.version != VERSION && !is_compatible(&config.version, VERSION) {
+        if config.version != DEFAULT_CONFIG.version
+            && !is_compatible(&config.version, &DEFAULT_CONFIG.version)
+        {
             bail!(
                 "incompatible configuration version in {}
                 You config version is : {}
@@ -749,16 +767,17 @@ impl App {
                 Visit {}",
                 config_file.to_string_lossy().to_string(),
                 config.version,
-                VERSION,
+                DEFAULT_CONFIG.version,
                 UPGRADE_GUIDE_LINK,
             )
         };
 
-        let mode = config
-            .modes
-            .get(&"default".to_string())
-            .map(|k| k.to_owned())
-            .unwrap_or_default();
+        let mode = match config.modes.get(&"default".to_string()) {
+            Some(m) => m.clone(),
+            None => {
+                bail!("'default' mode is missing")
+            }
+        };
 
         let pid = std::process::id();
         let session_path = dirs::runtime_dir()
@@ -779,7 +798,7 @@ impl App {
         }
 
         Ok(Self {
-            version: VERSION.to_string(),
+            version: DEFAULT_CONFIG.version.clone(),
             config,
             pwd: pwd.to_string_lossy().to_string(),
             directory_buffers: Default::default(),
