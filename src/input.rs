@@ -370,7 +370,7 @@ impl Key {
                 | Self::Num6
                 | Self::Num7
                 | Self::Num8
-                | Self::Num9,
+                | Self::Num9
         )
     }
 
