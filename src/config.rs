@@ -674,7 +674,7 @@ impl Default for Config {
                     messages:
                       - BashExec: |
                           (while IFS= read -r line; do
-                            if cp -v "${line:?}" ./; then
+                            if cp -vr "${line:?}" ./; then
                               echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                             else
                               echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
