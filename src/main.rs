@@ -156,30 +156,6 @@ fn main() -> Result<()> {
 
                     // UI
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
-
-                    if app.focused_node() != last_app.focused_node() {
-                        fs::write(&app.pipe().focus_out, app.focused_node_str())?;
-                    };
-
-                    if app.selection() != last_app.selection() {
-                        fs::write(&app.pipe().selection_out, app.selection_str())?;
-                    };
-
-                    if app.mode_str() != last_app.mode_str() {
-                        fs::write(&app.pipe().mode_out, app.mode_str())?;
-                    };
-
-                    if app.directory_buffer() != last_app.directory_buffer() {
-                        fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
-                    };
-
-                    if app.logs() != last_app.logs() {
-                        fs::write(&app.pipe().logs_out, app.logs_str())?;
-                    };
-
-                    if app.result() != last_app.result() {
-                        fs::write(&app.pipe().result_out, app.result_str())?;
-                    };
                 }
 
                 app::MsgOut::Call(cmd) => {
@@ -251,6 +227,30 @@ fn main() -> Result<()> {
         while let Some(task) = app.pop_task_out() {
             tx_msg_in.send(task)?;
         }
+
+        if app.focused_node() != last_app.focused_node() {
+            fs::write(&app.pipe().focus_out, app.focused_node_str())?;
+        };
+
+        if app.selection() != last_app.selection() {
+            fs::write(&app.pipe().selection_out, app.selection_str())?;
+        };
+
+        if app.mode_str() != last_app.mode_str() {
+            fs::write(&app.pipe().mode_out, app.mode_str())?;
+        };
+
+        if app.directory_buffer() != last_app.directory_buffer() {
+            fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
+        };
+
+        if app.logs() != last_app.logs() {
+            fs::write(&app.pipe().logs_out, app.logs_str())?;
+        };
+
+        if app.result() != last_app.result() {
+            fs::write(&app.pipe().result_out, app.result_str())?;
+        };
     }
 
     terminal.clear()?;
