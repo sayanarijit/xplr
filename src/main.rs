@@ -237,8 +237,8 @@ fn main() -> Result<()> {
                     tx_event_reader.send(true)?;
 
                     terminal.clear()?;
-                    term::disable_raw_mode()?;
                     terminal.set_cursor(0, 0)?;
+                    term::disable_raw_mode()?;
                     terminal.show_cursor()?;
 
                     let status = call(&app, cmd, false)
@@ -256,9 +256,9 @@ fn main() -> Result<()> {
                         tx_msg_in.send(app::Task::new(msg, None))?;
                     };
 
-                    terminal.hide_cursor()?;
                     terminal.clear()?;
                     term::enable_raw_mode()?;
+                    terminal.hide_cursor()?;
                     tx_event_reader.send(false)?;
                 }
             };
@@ -291,8 +291,8 @@ fn main() -> Result<()> {
 
     terminal.clear()?;
     terminal.set_cursor(0, 0)?;
-    term::disable_raw_mode()?;
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
+    term::disable_raw_mode()?;
     terminal.show_cursor()?;
 
     fs::remove_dir_all(app.session_path())?;
