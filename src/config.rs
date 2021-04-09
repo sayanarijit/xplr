@@ -355,7 +355,7 @@ impl Default for KeyBindings {
                       ${PAGER:-less} "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
 
               ctrl-c:
-                help: cancel & quit [q|esc]
+                help: cancel & quit [q]
                 messages:
                   - Terminate
 
