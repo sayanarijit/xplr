@@ -244,7 +244,6 @@ fn main() -> Result<()> {
                     terminal.clear()?;
                     term::enable_raw_mode()?;
                     tx_event_reader.send(false)?;
-                    terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
             };
         }
