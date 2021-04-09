@@ -333,7 +333,7 @@ impl Default for KeyBindings {
                 help: rename
                 messages:
                   - SwitchMode: rename
-                  - BashExec: |
+                  - BashExecSilently: |
                       echo "SetInputBuffer: $(basename ${XPLR_FOCUS_PATH})" >> "${XPLR_PIPE_MSG_IN:?}"
 
               ".":
@@ -586,7 +586,7 @@ impl Default for Config {
                   x:
                     help: open in gui
                     messages:
-                      - BashExec: |
+                      - BashExecSilently: |
                           OPENER="$(which xdg-open)"
                           ${OPENER:-open} "${XPLR_FOCUS_PATH:?}" &> /dev/null
                       - SwitchMode: default
@@ -809,11 +809,12 @@ impl Default for Config {
                   enter:
                     help: create file
                     messages:
-                      - BashExec: |
+                      - BashExecSilently: |
                           PTH="${XPLR_INPUT_BUFFER:?}"
                           if touch "${PTH:?}"; then
-                            echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
                             echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                           else
                             echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                             echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
@@ -850,11 +851,12 @@ impl Default for Config {
                   enter:
                     help: create directory
                     messages:
-                      - BashExec: |
+                      - BashExecSilently: |
                           PTH="${XPLR_INPUT_BUFFER:?}"
                           if mkdir -p "$PTH"; then
                             echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                             echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                           else
                             echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                           fi
@@ -890,12 +892,13 @@ impl Default for Config {
                   enter:
                     help: rename
                     messages:
-                      - BashExec: |
+                      - BashExecSilently: |
                           SRC="${XPLR_FOCUS_PATH:?}"
                           TARGET="${XPLR_INPUT_BUFFER:?}"
                           if mv -v "${SRC:?}" "${TARGET:?}"; then
-                            echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                             echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                            echo "FocusPath: $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                           else
                             echo "LogError: failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                           fi
@@ -941,6 +944,7 @@ impl Default for Config {
                               fi
                             else
                               if rm -v "${line:?}"; then
+                                echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
                                 echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                               else
                                 echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
@@ -957,6 +961,7 @@ impl Default for Config {
                       - BashExec: |
                           (while IFS= read -r line; do
                             if rm -rfv "${line:?}"; then
+                              echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
                               echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                             else
                               echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
