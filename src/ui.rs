@@ -4,6 +4,7 @@ use crate::app::Node;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout};
@@ -41,6 +42,7 @@ struct NodeUiMetadata {
     pub is_selected: bool,
     pub is_focused: bool,
     pub total: usize,
+    pub custom: HashMap<String, String>,
 }
 
 impl NodeUiMetadata {
@@ -57,6 +59,7 @@ impl NodeUiMetadata {
         is_selected: bool,
         is_focused: bool,
         total: usize,
+        custom: HashMap<String, String>,
     ) -> Self {
         Self {
             parent: node.parent.clone(),
@@ -79,6 +82,7 @@ impl NodeUiMetadata {
             is_selected,
             is_focused,
             total,
+            custom,
         }
     }
 }
@@ -168,6 +172,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         is_selected,
                         is_focused,
                         dir.total,
+                        filetype.custom.clone(),
                     );
 
                     let cols = hb
