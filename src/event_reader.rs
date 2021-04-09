@@ -19,18 +19,17 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                     Ok(Event::Key(key)) => {
                         let key = Key::from_event(key);
                         let msg = MsgIn::Internal(InternalMsg::HandleKey(key));
-                        tx_msg_in.send(Task::new(0, msg, Some(key))).unwrap();
+                        tx_msg_in.send(Task::new(msg, Some(key))).unwrap();
                     }
 
                     Ok(Event::Resize(_, _)) => {
                         let msg = MsgIn::External(ExternalMsg::Refresh);
-                        tx_msg_in.send(Task::new(0, msg, None)).unwrap();
+                        tx_msg_in.send(Task::new(msg, None)).unwrap();
                     }
                     Ok(_) => {}
                     Err(e) => {
                         tx_msg_in
                             .send(Task::new(
-                                0,
                                 MsgIn::External(ExternalMsg::LogError(e.to_string())),
                                 None,
                             ))
