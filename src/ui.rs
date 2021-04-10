@@ -36,13 +36,12 @@ struct NodeUiMetadata {
     pub is_before_focus: bool,
     pub is_after_focus: bool,
     pub tree: String,
-    pub icon: String,
     pub prefix: String,
     pub suffix: String,
     pub is_selected: bool,
     pub is_focused: bool,
     pub total: usize,
-    pub custom: HashMap<String, String>,
+    pub meta: HashMap<String, String>,
 }
 
 impl NodeUiMetadata {
@@ -53,13 +52,12 @@ impl NodeUiMetadata {
         is_before_focus: bool,
         is_after_focus: bool,
         tree: String,
-        icon: String,
         prefix: String,
         suffix: String,
         is_selected: bool,
         is_focused: bool,
         total: usize,
-        custom: HashMap<String, String>,
+        meta: HashMap<String, String>,
     ) -> Self {
         Self {
             parent: node.parent.clone(),
@@ -76,13 +74,12 @@ impl NodeUiMetadata {
             is_before_focus,
             is_after_focus,
             tree,
-            icon,
             prefix,
             suffix,
             is_selected,
             is_focused,
             total,
-            custom,
+            meta,
         }
     }
 }
@@ -110,11 +107,11 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let is_selected = app.selection().contains(&node);
 
                     let ui = if is_focused {
-                        &config.general.focused_ui
+                        &config.general.focus_ui
                     } else if is_selected {
                         &config.general.selection_ui
                     } else {
-                        &config.general.normal_ui
+                        &config.general.default_ui
                     };
 
                     let is_first = index == 0;
@@ -136,19 +133,19 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         })
                         .unwrap_or_default();
 
-                    let filetype = config
-                        .filetypes
+                    let node_type = config
+                        .node_types
                         .special
                         .get(&node.relative_path)
-                        .or_else(|| config.filetypes.extension.get(&node.extension))
-                        .or_else(|| config.filetypes.mime_essence.get(&node.mime_essence))
+                        .or_else(|| config.node_types.extension.get(&node.extension))
+                        .or_else(|| config.node_types.mime_essence.get(&node.mime_essence))
                         .unwrap_or_else(|| {
                             if node.is_symlink {
-                                &config.filetypes.symlink
+                                &config.node_types.symlink
                             } else if node.is_dir {
-                                &config.filetypes.directory
+                                &config.node_types.directory
                             } else {
-                                &config.filetypes.file
+                                &config.node_types.file
                             }
                         });
 
@@ -165,14 +162,13 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         relative_index,
                         is_before_focus,
                         is_after_focus,
-                        tree,
-                        filetype.icon.clone(),
-                        ui.prefix.clone(),
-                        ui.suffix.clone(),
+                        tree.unwrap_or_default(),
+                        ui.prefix.to_owned().unwrap_or_default(),
+                        ui.suffix.to_owned().unwrap_or_default(),
                         is_selected,
                         is_focused,
                         dir.total,
-                        filetype.custom.clone(),
+                        node_type.meta.clone(),
                     );
 
                     let cols = hb
@@ -184,29 +180,29 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         .collect::<Vec<Cell>>();
 
                     let style = if is_focused {
-                        config.general.focused_ui.style
+                        config.general.focus_ui.style
                     } else if is_selected {
                         config.general.selection_ui.style
                     } else {
                         config
-                            .filetypes
+                            .node_types
                             .special
                             .get(&node.relative_path)
-                            .or_else(|| config.filetypes.extension.get(&node.extension))
-                            .or_else(|| config.filetypes.mime_essence.get(&node.mime_essence))
+                            .or_else(|| config.node_types.extension.get(&node.extension))
+                            .or_else(|| config.node_types.mime_essence.get(&node.mime_essence))
                             .unwrap_or_else(|| {
                                 if node.is_symlink {
-                                    &config.filetypes.symlink
+                                    &config.node_types.symlink
                                 } else if node.is_dir {
-                                    &config.filetypes.directory
+                                    &config.node_types.directory
                                 } else {
-                                    &config.filetypes.file
+                                    &config.node_types.file
                                 }
                             })
                             .style
                     };
 
-                    Row::new(cols).style(style)
+                    Row::new(cols).style(style.into())
                 })
                 .collect::<Vec<Row>>()
         })
@@ -217,39 +213,37 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
         .table
         .col_widths
         .clone()
+        .unwrap_or_default()
         .into_iter()
         .map(|c| c.into())
         .collect();
 
     let table = Table::new(rows)
         .widths(&table_constraints)
-        .style(config.general.table.style)
-        .highlight_style(config.general.focused_ui.style)
-        .column_spacing(config.general.table.col_spacing)
+        .style(config.general.table.style.into())
+        .highlight_style(config.general.focus_ui.style.into())
+        .column_spacing(config.general.table.col_spacing.unwrap_or_default())
         .block(
             Block::default()
                 .borders(Borders::ALL)
                 .title(format!(" {} ", app.pwd())),
         );
 
-    let table = config
-        .general
-        .table
-        .header
-        .clone()
-        .map(|h| {
-            table.clone().header(
-                Row::new(
-                    h.cols
-                        .iter()
-                        .map(|c| Cell::from(c.format.to_owned()))
-                        .collect::<Vec<Cell>>(),
-                )
-                .height(h.height)
-                .style(h.style),
-            )
-        })
-        .unwrap_or_else(|| table.clone());
+    let table = table.clone().header(
+        Row::new(
+            config
+                .general
+                .table
+                .header
+                .cols
+                .unwrap_or_default()
+                .iter()
+                .map(|c| Cell::from(c.format.to_owned().unwrap_or_default()))
+                .collect::<Vec<Cell>>(),
+        )
+        .height(config.general.table.header.height.unwrap_or_default())
+        .style(config.general.table.header.style.into()),
+    );
 
     let mut table_state = TableState::default();
     table_state.select(app.directory_buffer().map(|dir| dir.focus));
