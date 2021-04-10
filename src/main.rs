@@ -124,8 +124,10 @@ fn main() -> Result<()> {
             .table
             .row
             .cols
+            .to_owned()
+            .unwrap_or_default()
             .iter()
-            .map(|c| c.format.to_string())
+            .map(|c| c.format.clone().unwrap_or_default())
             .collect::<Vec<String>>()
             .join("\t"),
     )?;

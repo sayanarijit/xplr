@@ -1,6 +1,5 @@
 use crate::config::Config;
 use crate::config::Mode;
-use crate::default_config::DEFAULT_CONFIG;
 use crate::input::Key;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Utc};
@@ -185,6 +184,7 @@ pub enum InternalMsg {
 }
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum NodeFilter {
     RelativePathIs,
     RelativePathIsNot,
@@ -376,6 +376,7 @@ impl NodeFilter {
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NodeFilterApplicable {
     filter: NodeFilter,
     input: String,
@@ -398,6 +399,7 @@ impl NodeFilterApplicable {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NodeFilterFromInput {
     filter: NodeFilter,
     #[serde(default)]
@@ -621,6 +623,7 @@ pub enum MsgIn {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Command {
     pub command: String,
 
@@ -698,32 +701,24 @@ pub enum HelpMenuLine {
 /// Major version should be the same.
 /// Config minor version should be lower.
 /// Patch/fix version can be anything.
-pub fn is_compatible(configv: &str, appv: &str) -> bool {
-    let mut configv = configv
-        .strip_prefix('v')
-        .unwrap_or_default()
-        .split('.')
-        .map(|c| c.parse::<u64>().unwrap());
+pub fn is_compatible(configv: &str, appv: &str) -> Result<bool> {
+    let mut configv = configv.strip_prefix('v').unwrap_or_default().split('.');
 
-    let mut appv = appv
-        .strip_prefix('v')
-        .unwrap_or_default()
-        .split('.')
-        .map(|c| c.parse::<u64>().unwrap());
+    let mut appv = appv.strip_prefix('v').unwrap_or_default().split('.');
 
-    let mut major_configv = configv.next().unwrap_or_default();
-    let mut minor_configv = configv.next().unwrap_or_default();
-    let mut major_appv = appv.next().unwrap_or_default();
-    let mut minor_appv = appv.next().unwrap_or_default();
+    let mut major_configv = configv.next().unwrap_or_default().parse::<u16>()?;
+    let mut minor_configv = configv.next().unwrap_or_default().parse::<u16>()?;
+    let mut major_appv = appv.next().unwrap_or_default().parse::<u16>()?;
+    let mut minor_appv = appv.next().unwrap_or_default().parse::<u16>()?;
 
     if major_configv == 0 && major_appv == 0 {
         major_configv = minor_configv;
-        minor_configv = configv.next().unwrap_or_default();
+        minor_configv = configv.next().unwrap_or_default().parse::<u16>()?;
         major_appv = minor_appv;
-        minor_appv = appv.next().unwrap_or_default();
+        minor_appv = appv.next().unwrap_or_default().parse::<u16>()?;
     };
 
-    major_configv == major_appv && minor_configv <= minor_appv
+    Ok(major_configv == major_appv && minor_configv <= minor_appv)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -750,15 +745,19 @@ impl App {
             .join("xplr");
 
         let config_file = config_dir.join("config.yml");
+        let default_config = Config::default();
+        let default_config_version = default_config.version.clone();
 
         let config: Config = if config_file.exists() {
-            serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?
+            let c: Config =
+                serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?;
+            c.extended()
         } else {
-            Config::default()
+            default_config
         };
 
-        if config.version != DEFAULT_CONFIG.version
-            && !is_compatible(&config.version, &DEFAULT_CONFIG.version)
+        if config.version != default_config_version
+            && !is_compatible(&config.version, &default_config_version)?
         {
             bail!(
                 "incompatible configuration version in {}
@@ -767,12 +766,12 @@ impl App {
                 Visit {}",
                 config_file.to_string_lossy().to_string(),
                 config.version,
-                DEFAULT_CONFIG.version,
+                default_config_version,
                 UPGRADE_GUIDE_LINK,
             )
         };
 
-        let mode = match config.modes.get(&"default".to_string()) {
+        let mode = match config.modes.builtin.get(&"default".to_string()) {
             Some(m) => m.clone(),
             None => {
                 bail!("'default' mode is missing")
@@ -789,7 +788,7 @@ impl App {
             .to_string();
 
         let mut explorer_config = ExplorerConfig::default();
-        if !config.general.show_hidden {
+        if !config.general.show_hidden.unwrap_or_default() {
             explorer_config.filters.insert(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
@@ -798,7 +797,7 @@ impl App {
         }
 
         Ok(Self {
-            version: DEFAULT_CONFIG.version.clone(),
+            version: Config::default().version,
             config,
             pwd: pwd.to_string_lossy().to_string(),
             directory_buffers: Default::default(),
@@ -1244,7 +1243,7 @@ impl App {
     fn reset_node_filters(mut self) -> Result<Self> {
         self.explorer_config.filters.clear();
 
-        if !self.config.general.show_hidden {
+        if !self.config.general.show_hidden.unwrap_or_default() {
             self.add_node_filter(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
@@ -1412,29 +1411,47 @@ impl App {
     }
 
     pub fn global_help_menu_str(&self) -> String {
-        self.config()
-            .modes
-            .iter()
-            .map(|(name, mode)| {
-                let help = mode
-                    .help_menu()
-                    .iter()
-                    .map(|l| match l {
-                        HelpMenuLine::Paragraph(p) => format!("\t{}\n", p),
-                        HelpMenuLine::KeyMap(k, h) => {
-                            format!(" {:15} | {}\n", k, h)
-                        }
-                    })
-                    .collect::<Vec<String>>()
-                    .join("");
+        let builtin = self.config().modes.builtin.clone();
+        let custom = self.config().modes.custom.clone();
 
-                format!(
-                    "### {}\n\n key             | action\n --------------- | ------\n{}\n",
-                    name, help
-                )
-            })
-            .collect::<Vec<String>>()
-            .join("\n")
+        [
+            (builtin.default.name.clone(), builtin.default),
+            (builtin.number.name.clone(), builtin.number),
+            (builtin.go_to.name.clone(), builtin.go_to),
+            (builtin.search.name.clone(), builtin.search),
+            (builtin.selection_ops.name.clone(), builtin.selection_ops),
+            (builtin.action.name.clone(), builtin.action),
+            (builtin.create.name.clone(), builtin.create),
+            (builtin.create_file.name.clone(), builtin.create_file),
+            (
+                builtin.create_directory.name.clone(),
+                builtin.create_directory,
+            ),
+            (builtin.rename.name.clone(), builtin.rename),
+            (builtin.delete.name.clone(), builtin.delete),
+        ]
+        .iter()
+        .chain(custom.into_iter().collect::<Vec<(String, Mode)>>().iter())
+        .map(|(name, mode)| {
+            let help = mode
+                .help_menu()
+                .iter()
+                .map(|l| match l {
+                    HelpMenuLine::Paragraph(p) => format!("\t{}\n", p),
+                    HelpMenuLine::KeyMap(k, h) => {
+                        format!(" {:15} | {}\n", k, h)
+                    }
+                })
+                .collect::<Vec<String>>()
+                .join("");
+
+            format!(
+                "### {}\n\n key             | action\n --------------- | ------\n{}\n",
+                name, help
+            )
+        })
+        .collect::<Vec<String>>()
+        .join("\n")
     }
 
     /// Get a reference to the app's version.
