@@ -889,10 +889,12 @@ impl App {
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
         let kb = self.mode.key_bindings.clone();
+        let key_str = key.to_string();
         let default = kb.default.clone();
         let msgs = kb
             .on_key
-            .get(&key.to_string())
+            .get(&key_str)
+            .or_else(|| kb.remaps.get(&key_str).and_then(|k| kb.on_key.get(k)))
             .map(|a| Some(a.messages.clone()))
             .unwrap_or_else(|| {
                 if key.is_alphabet() {
@@ -1419,14 +1421,23 @@ impl App {
                 .map(|l| match l {
                     HelpMenuLine::Paragraph(p) => format!("\t{}\n", p),
                     HelpMenuLine::KeyMap(k, h) => {
-                        format!(" {:15} | {}\n", k, h)
+                        let remaps = self
+                            .mode()
+                            .key_bindings
+                            .remaps
+                            .iter()
+                            .filter(|(_, t)| t == &k)
+                            .map(|(f, _)| f.clone())
+                            .collect::<Vec<String>>()
+                            .join(", ");
+                        format!(" {:15} | {:25} | {}\n", k, remaps, h)
                     }
                 })
                 .collect::<Vec<String>>()
                 .join("");
 
             format!(
-                "### {}\n\n key             | action\n --------------- | ------\n{}\n",
+                "### {}\n\n key             | remaps                    | action\n --------------- | ------------------------- |------\n{}\n",
                 name, help
             )
         })

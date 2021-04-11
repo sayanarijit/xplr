@@ -160,6 +160,14 @@ pub struct UiElement {
     pub style: Style,
 }
 
+impl UiElement {
+    fn extend(mut self, other: Self) -> Self {
+        self.format = other.format.or(self.format);
+        self.style = other.style.extend(self.style);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TableRowConfig {
@@ -251,6 +259,12 @@ pub struct GeneralConfig {
     pub show_hidden: Option<bool>,
 
     #[serde(default)]
+    pub cursor: UiElement,
+
+    #[serde(default)]
+    pub prompt: UiElement,
+
+    #[serde(default)]
     pub table: TableConfig,
 
     #[serde(default)]
@@ -266,6 +280,8 @@ pub struct GeneralConfig {
 impl GeneralConfig {
     pub fn extend(mut self, other: Self) -> Self {
         self.show_hidden = other.show_hidden.or(self.show_hidden);
+        self.cursor = other.cursor.extend(self.cursor);
+        self.prompt = other.prompt.extend(self.prompt);
         self.table = other.table.extend(self.table);
         self.default_ui = other.default_ui.extend(self.default_ui);
         self.focus_ui = other.focus_ui.extend(self.focus_ui);
@@ -277,6 +293,9 @@ impl GeneralConfig {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
+    #[serde(default)]
+    pub remaps: BTreeMap<String, String>,
+
     #[serde(default)]
     pub on_key: BTreeMap<String, Action>,
 
@@ -295,6 +314,8 @@ pub struct KeyBindings {
 
 impl KeyBindings {
     pub fn extend(mut self, mut other: Self) -> Self {
+        other.remaps.extend(self.remaps);
+        self.remaps = other.remaps;
         other.on_key.extend(self.on_key);
         self.on_key = other.on_key;
         self.on_alphabet = other.on_alphabet.or(self.on_alphabet);
