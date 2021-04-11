@@ -1,4 +1,4 @@
-version: v0.3.13
+version: v0.4.0
 general:
   show_hidden: false
   table:
@@ -189,7 +189,7 @@ modes:
                     if cp -vr "${line:?}" ./; then
                       echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                     else
-                      echo "LogError: failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo "LogError: Failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
@@ -205,7 +205,7 @@ modes:
                     if mv -v "${line:?}" ./; then
                       echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                     else
-                      echo "LogError: failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo "LogError: Failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
@@ -237,7 +237,7 @@ modes:
                     echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                   else
-                    echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                    echo "LogError: Failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
               - SwitchMode: default
@@ -277,7 +277,7 @@ modes:
                     echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                   else
-                    echo "LogError: failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                    echo "LogError: Failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
               - SwitchMode: default
@@ -349,7 +349,7 @@ modes:
                     echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "FocusPath: $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                   else
-                    echo "LogError: failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
+                    echo "LogError: Failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
               - SwitchMode: default
 
@@ -591,14 +591,14 @@ modes:
                       if rmdir -v "${line:?}"; then
                         echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                       else
-                        echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                       fi
                     else
                       if rm -v "${line:?}"; then
                         echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
                         echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                       else
-                        echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                       fi
                     fi
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
@@ -615,7 +615,7 @@ modes:
                       echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
                       echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                     else
-                      echo "LogError: failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"

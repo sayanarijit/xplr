@@ -314,13 +314,13 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
         .rev()
         .map(|l| match &l.level {
             app::LogLevel::Info => {
-                ListItem::new(l.to_string()).style(Style::default().fg(Color::Gray))
+                ListItem::new(l.message.clone()).style(Style::default().fg(Color::Gray))
             }
             app::LogLevel::Success => {
-                ListItem::new(l.to_string()).style(Style::default().fg(Color::Green))
+                ListItem::new(l.message.clone()).style(Style::default().fg(Color::Green))
             }
             app::LogLevel::Error => {
-                ListItem::new(l.to_string()).style(Style::default().fg(Color::Red))
+                ListItem::new(l.message.clone()).style(Style::default().fg(Color::Red))
             }
         })
         .collect::<Vec<ListItem>>();

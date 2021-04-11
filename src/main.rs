@@ -283,8 +283,20 @@ fn main() -> Result<()> {
             fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
         };
 
-        if app.logs() != last_app.logs() {
-            fs::write(&app.pipe().logs_out, app.logs_str())?;
+        if app.logs().len() != last_app.logs().len() {
+            let new_logs = app
+                .logs()
+                .iter()
+                .skip(last_app.logs().len())
+                .map(|l| format!("{}\n", l))
+                .collect::<Vec<String>>()
+                .join("");
+
+            let mut file = fs::OpenOptions::new()
+                .append(true)
+                .open(&app.pipe().logs_out)?;
+
+            file.write_all(new_logs.as_bytes())?;
         };
 
         if app.result() != last_app.result() {
