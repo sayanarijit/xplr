@@ -9,6 +9,7 @@ use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout};
 use tui::style::{Color, Style};
+use tui::text::{Span, Spans};
 use tui::widgets::{
     Block, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, TableState,
 };
@@ -282,7 +283,18 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
         .into_iter()
         .map(|l| match l {
             HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
-            HelpMenuLine::KeyMap(k, h) => Row::new([Cell::from(k), Cell::from(h)].to_vec()),
+            HelpMenuLine::KeyMap(k, h) => {
+                let remaps = app
+                    .mode()
+                    .key_bindings
+                    .remaps
+                    .iter()
+                    .filter(|(_, t)| t == &&k)
+                    .map(|(f, _)| f.clone())
+                    .collect::<Vec<String>>()
+                    .join("|");
+                Row::new([Cell::from(k), Cell::from(remaps), Cell::from(h)].to_vec())
+            }
         })
         .collect::<Vec<Row>>();
 
@@ -292,15 +304,36 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
                 .borders(Borders::ALL)
                 .title(format!(" Help [{}] ", &app.mode().name)),
         )
-        .widths(&[TuiConstraint::Percentage(30), TuiConstraint::Percentage(70)]);
+        .widths(&[
+            TuiConstraint::Percentage(20),
+            TuiConstraint::Percentage(20),
+            TuiConstraint::Percentage(60),
+        ]);
     f.render_widget(help_menu, rect);
 }
 
 fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let input_buf = Paragraph::new(format!(
-        "> {}",
-        app.input_buffer().unwrap_or_else(|| "".into())
-    ))
+    let input_buf = Paragraph::new(Spans::from(vec![
+        Span::styled(
+            app.config()
+                .general
+                .prompt
+                .format
+                .clone()
+                .unwrap_or_default(),
+            app.config().general.prompt.style.into(),
+        ),
+        Span::raw(app.input_buffer().unwrap_or_else(|| "".into())),
+        Span::styled(
+            app.config()
+                .general
+                .cursor
+                .format
+                .clone()
+                .unwrap_or_default(),
+            app.config().general.cursor.style.into(),
+        ),
+    ]))
     .block(Block::default().borders(Borders::ALL).title(" Input "));
     f.render_widget(input_buf, rect);
 }

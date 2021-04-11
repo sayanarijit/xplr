@@ -1,6 +1,10 @@
 version: v0.4.0
 general:
   show_hidden: false
+  prompt:
+    format: "> "
+  cursor:
+    format: █
   table:
     header:
       cols:
@@ -180,6 +184,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           c:
             help: copy here
@@ -226,6 +231,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           enter:
             help: create file
@@ -266,6 +272,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           enter:
             help: create directory
@@ -306,6 +313,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           ctrl-c:
             help: cancel & quit
@@ -337,6 +345,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           enter:
             help: rename
@@ -377,6 +386,15 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps:
+          /: ctrl-f
+          h: left
+          j: down
+          k: up
+          l: right
+          v: space
+          q: ctrl-c
+
         on_key:
           '#':
             help: null
@@ -390,12 +408,6 @@ modes:
                   input: .
                   case_sensitive: false
               - Explore
-          /:
-            help: null
-            messages:
-              - SwitchMode: search
-              - SetInputBuffer: ''
-              - Explore
           ':':
             help: action
             messages:
@@ -405,16 +417,22 @@ modes:
             messages:
               - BashExec: |
                   ${PAGER:-less} "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
+          '~':
+            help: go home
+            messages:
+              - BashExecSilently: |
+                  echo "ChangeDirectory: ${HOME:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo "Explore" >> "${XPLR_PIPE_MSG_IN:?}"
           G:
             help: go to bottom
             messages:
               - FocusLast
           ctrl-c:
-            help: cancel & quit [q]
+            help: cancel & quit
             messages:
               - Terminate
           ctrl-f:
-            help: search [/]
+            help: search
             messages:
               - SwitchMode: search
               - SetInputBuffer: ''
@@ -424,7 +442,7 @@ modes:
             messages:
               - SwitchMode: delete
           down:
-            help: down [j]
+            help: down
             messages:
               - FocusNext
           enter:
@@ -435,55 +453,29 @@ modes:
             help: go to
             messages:
               - SwitchMode: go to
-          h:
-            help: null
-            messages:
-              - Back
-          j:
-            help: null
-            messages:
-              - FocusNext
-          k:
-            help: null
-            messages:
-              - FocusPrevious
-          l:
-            help: null
-            messages:
-              - Enter
           left:
-            help: back [h]
+            help: back
             messages:
               - Back
-          q:
-            help: null
-            messages:
-              - Terminate
           r:
             help: rename
             messages:
               - SwitchMode: rename
               - BashExecSilently: |
                   echo "SetInputBuffer: $(basename ${XPLR_FOCUS_PATH})" >> "${XPLR_PIPE_MSG_IN:?}"
-
           right:
-            help: enter [l]
+            help: enter
             messages:
               - Enter
           space:
-            help: toggle selection [v]
+            help: toggle selection
             messages:
               - ToggleSelection
               - FocusNext
           up:
-            help: up [k]
+            help: up
             messages:
               - FocusPrevious
-          v:
-            help: null
-            messages:
-              - ToggleSelection
-              - FocusNext
         on_alphabet: null
         on_number:
           help: input
@@ -501,6 +493,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           ctrl-c:
             help: cancel & quit
@@ -532,6 +525,9 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps:
+          j: down
+          k: up
         on_key:
           backspace:
             help: clear
@@ -542,7 +538,7 @@ modes:
             messages:
               - Terminate
           down:
-            help: to down [j]
+            help: to down
             messages:
               - FocusNextByRelativeIndexFromInput
               - SwitchMode: default
@@ -551,18 +547,8 @@ modes:
             messages:
               - FocusByIndexFromInput
               - SwitchMode: default
-          j:
-            help: null
-            messages:
-              - FocusNextByRelativeIndexFromInput
-              - SwitchMode: default
-          k:
-            help: null
-            messages:
-              - FocusPreviousByRelativeIndexFromInput
-              - SwitchMode: default
           up:
-            help: to up [k]
+            help: to up
             messages:
               - FocusPreviousByRelativeIndexFromInput
               - SwitchMode: default
@@ -581,6 +567,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           d:
             help: delete
@@ -637,6 +624,9 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps:
+          q: ctrl-c
+
         on_number:
           help: go to index
           messages:
@@ -679,11 +669,7 @@ modes:
               - SwitchMode: default
 
           ctrl-c:
-            help: cancel & quit [q]
-            messages:
-              - Terminate
-
-          q:
+            help: cancel & quit
             messages:
               - Terminate
 
@@ -695,6 +681,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
+        remaps: {}
         on_key:
           backspace:
             help: clear
