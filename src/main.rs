@@ -93,20 +93,6 @@ fn main() -> Result<()> {
 
     let mut app = app::App::create(pwd)?;
 
-    if app.version() != &app.config().version {
-        let msg = format!(
-            "you can update your config file version from {} to {}, visit {} for more info.",
-            app.config().version,
-            app.version(),
-            app::UPGRADE_GUIDE_LINK,
-        );
-
-        tx_msg_in.send(app::Task::new(
-            app::MsgIn::External(app::ExternalMsg::LogInfo(msg)),
-            None,
-        ))?;
-    };
-
     fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
 
     explorer::explore(

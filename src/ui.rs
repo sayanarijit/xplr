@@ -345,15 +345,15 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
         .rev()
         .take(1)
         .rev()
-        .map(|l| match &l.level {
-            app::LogLevel::Info => {
-                ListItem::new(l.message.clone()).style(Style::default().fg(Color::Gray))
-            }
-            app::LogLevel::Success => {
-                ListItem::new(l.message.clone()).style(Style::default().fg(Color::Green))
-            }
-            app::LogLevel::Error => {
-                ListItem::new(l.message.clone()).style(Style::default().fg(Color::Red))
+        .map(|l| {
+            let time = l.created_at.format("%r");
+            let log = format!("{} | {}", &time, l.message);
+            match &l.level {
+                app::LogLevel::Info => ListItem::new(log).style(Style::default().fg(Color::Gray)),
+                app::LogLevel::Success => {
+                    ListItem::new(log).style(Style::default().fg(Color::Green))
+                }
+                app::LogLevel::Error => ListItem::new(log).style(Style::default().fg(Color::Red)),
             }
         })
         .collect::<Vec<ListItem>>();
