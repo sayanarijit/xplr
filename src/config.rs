@@ -1,6 +1,7 @@
 use crate::app::ExternalMsg;
 use crate::app::HelpMenuLine;
 use crate::default_config;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -472,8 +473,10 @@ impl ModesConfig {
         self.builtin.get(name).or_else(|| self.custom.get(name))
     }
 
-    pub fn extend(mut self, other: Self) -> Self {
+    pub fn extend(mut self, mut other: Self) -> Self {
         self.builtin = other.builtin.extend(self.builtin);
+        other.custom.extend(self.custom);
+        self.custom = other.custom;
         self
     }
 }
@@ -511,5 +514,37 @@ impl Config {
         self.node_types = default.node_types.extend(self.node_types);
         self.modes = default.modes.extend(self.modes);
         self
+    }
+
+    fn parsed_version(&self) -> Result<(u16, u16, u16)> {
+        let mut configv = self
+            .version
+            .strip_prefix('v')
+            .unwrap_or_default()
+            .split('.');
+
+        let major = configv.next().unwrap_or_default().parse::<u16>()?;
+        let minor = configv.next().unwrap_or_default().parse::<u16>()?;
+        let bugfix = configv.next().unwrap_or_default().parse::<u16>()?;
+
+        Ok((major, minor, bugfix))
+    }
+
+    pub fn is_compatible(&self) -> Result<bool> {
+        let result = match self.parsed_version()? {
+            (0, 4, 0) => true,
+            (_, _, _) => false,
+        };
+
+        Ok(result)
+    }
+
+    pub fn upgrade_notification(&self) -> Result<Option<&str>> {
+        let result = match self.parsed_version()? {
+            (0, 4, 0) => None,
+            (_, _, _) => Some("New version available"),
+        };
+
+        Ok(result)
     }
 }

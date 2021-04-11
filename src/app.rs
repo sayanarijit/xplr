@@ -698,29 +698,6 @@ pub enum HelpMenuLine {
     Paragraph(String),
 }
 
-/// Major version should be the same.
-/// Config minor version should be lower.
-/// Patch/fix version can be anything.
-pub fn is_compatible(configv: &str, appv: &str) -> Result<bool> {
-    let mut configv = configv.strip_prefix('v').unwrap_or_default().split('.');
-
-    let mut appv = appv.strip_prefix('v').unwrap_or_default().split('.');
-
-    let mut major_configv = configv.next().unwrap_or_default().parse::<u16>()?;
-    let mut minor_configv = configv.next().unwrap_or_default().parse::<u16>()?;
-    let mut major_appv = appv.next().unwrap_or_default().parse::<u16>()?;
-    let mut minor_appv = appv.next().unwrap_or_default().parse::<u16>()?;
-
-    if major_configv == 0 && major_appv == 0 {
-        major_configv = minor_configv;
-        minor_configv = configv.next().unwrap_or_default().parse::<u16>()?;
-        major_appv = minor_appv;
-        minor_appv = appv.next().unwrap_or_default().parse::<u16>()?;
-    };
-
-    Ok(major_configv == major_appv && minor_configv <= minor_appv)
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     version: String,
@@ -756,9 +733,7 @@ impl App {
             default_config
         };
 
-        if config.version != default_config_version
-            && !is_compatible(&config.version, &default_config_version)?
-        {
+        if !config.is_compatible()? {
             bail!(
                 "incompatible configuration version in {}
                 You config version is : {}
@@ -796,9 +771,9 @@ impl App {
             ));
         }
 
-        Ok(Self {
+        let mut app = Self {
             version: Config::default().version,
-            config,
+            config: config.clone(),
             pwd: pwd.to_string_lossy().to_string(),
             directory_buffers: Default::default(),
             selection: Default::default(),
@@ -810,7 +785,20 @@ impl App {
             pipe: Pipe::from_session_path(&session_path)?,
             explorer_config,
             logs: Default::default(),
-        })
+        };
+
+        if let Some(notif) = config.upgrade_notification()? {
+            let notif = format!(
+                "{}. To stop seeing this log, update your config version from {} to {}.",
+                &notif, &config.version, &app.version
+            );
+            app = app.enqueue(Task::new(
+                MsgIn::External(ExternalMsg::LogInfo(notif)),
+                None,
+            ));
+        }
+
+        Ok(app)
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
@@ -1374,14 +1362,6 @@ impl App {
                     .join("")
             })
             .unwrap_or_default()
-    }
-
-    pub fn logs_str(&self) -> String {
-        self.logs()
-            .iter()
-            .map(|l| format!("{}\n", l))
-            .collect::<Vec<String>>()
-            .join("")
     }
 
     pub fn selection_str(&self) -> String {
