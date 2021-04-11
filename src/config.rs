@@ -368,9 +368,15 @@ impl Mode {
                 extra_help_lines
                     .unwrap_or_default()
                     .into_iter()
-                    .chain(self.key_bindings.on_key.iter().filter_map(|(k, a)| {
-                        a.help.clone().map(|h| HelpMenuLine::KeyMap(k.into(), h))
-                    }))
+                    .chain(
+                        self.key_bindings
+                            .on_key
+                            .iter()
+                            .filter(|(k, _)| !self.key_bindings.remaps.contains_key(&k.to_string()))
+                            .filter_map(|(k, a)| {
+                                a.help.clone().map(|h| HelpMenuLine::KeyMap(k.into(), h))
+                            }),
+                    )
                     .chain(
                         self.key_bindings
                             .on_alphabet
@@ -553,6 +559,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 4, 1) => true,
             (0, 4, 0) => true,
             (_, _, _) => false,
         };
@@ -562,7 +569,7 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 4, 0) => None,
+            (0, 4, 1) => None,
             (_, _, _) => Some("New version available"),
         };
 

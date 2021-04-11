@@ -2,7 +2,7 @@ use crate::config::Config;
 use crate::config::Mode;
 use crate::input::Key;
 use anyhow::{bail, Result};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -668,7 +668,7 @@ pub enum LogLevel {
 pub struct Log {
     pub level: LogLevel,
     pub message: String,
-    pub created_at: DateTime<Utc>,
+    pub created_at: DateTime<Local>,
 }
 
 impl Log {
@@ -676,7 +676,7 @@ impl Log {
         Self {
             level,
             message,
-            created_at: Utc::now(),
+            created_at: Local::now(),
         }
     }
 }
@@ -892,9 +892,10 @@ impl App {
         let key_str = key.to_string();
         let default = kb.default.clone();
         let msgs = kb
-            .on_key
+            .remaps
             .get(&key_str)
-            .or_else(|| kb.remaps.get(&key_str).and_then(|k| kb.on_key.get(k)))
+            .and_then(|k| kb.on_key.get(k))
+            .or_else(|| kb.on_key.get(&key_str))
             .map(|a| Some(a.messages.clone()))
             .unwrap_or_else(|| {
                 if key.is_alphabet() {
