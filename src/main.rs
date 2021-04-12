@@ -71,7 +71,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .status()
 }
 
-fn main() -> Result<()> {
+fn run() -> Result<Option<String>> {
     let (tx_msg_in, rx_msg_in) = mpsc::channel();
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
@@ -118,8 +118,7 @@ fn main() -> Result<()> {
             .join("\t"),
     )?;
 
-    let mut result = Ok(());
-    let mut output = None;
+    let mut result = Ok(None);
 
     term::enable_raw_mode()?;
     let mut stdout = get_tty()?;
@@ -140,7 +139,7 @@ fn main() -> Result<()> {
         let last_app = app.clone();
 
         let (new_app, new_result) = match app.handle_task(task) {
-            Ok(a) => (a, Ok(())),
+            Ok(a) => (a, Ok(None)),
             Err(err) => (last_app.clone(), Err(err)),
         };
 
@@ -157,14 +156,19 @@ fn main() -> Result<()> {
                     tx_msg_in.send(task)?;
                 }
 
+                app::MsgOut::Quit => {
+                    result = Ok(None);
+                    break 'outer;
+                }
+
                 app::MsgOut::PrintResultAndQuit => {
-                    output = Some(app.result_str());
+                    result = Ok(Some(app.result_str()));
                     break 'outer;
                 }
 
                 app::MsgOut::PrintAppStateAndQuit => {
                     let out = serde_yaml::to_string(&app)?;
-                    output = Some(out);
+                    result = Ok(Some(out));
                     break 'outer;
                 }
 
@@ -298,9 +302,19 @@ fn main() -> Result<()> {
 
     fs::remove_dir_all(app.session_path())?;
 
-    if let Some(out) = output {
-        print!("{}", out);
-    }
-
     result
+}
+
+fn main() {
+    match run() {
+        Ok(Some(out)) => print!("{}", out),
+        Ok(None) => {}
+        Err(err) => {
+            if !err.to_string().is_empty() {
+                eprintln!("error: {}", err);
+            };
+
+            std::process::exit(1)
+        }
+    }
 }

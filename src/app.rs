@@ -608,6 +608,9 @@ pub enum ExternalMsg {
     /// Example: `LogError: satellite crashed`
     LogError(String),
 
+    /// Quit with returncode zero (success).
+    Quit,
+
     /// Print selected paths if it's not empty, else, print the focused node's path.
     PrintResultAndQuit,
 
@@ -642,6 +645,7 @@ pub enum MsgOut {
     Explore,
     Refresh,
     ClearScreen,
+    Quit,
     PrintResultAndQuit,
     PrintAppStateAndQuit,
     Debug(String),
@@ -922,10 +926,11 @@ impl App {
             ExternalMsg::LogInfo(l) => self.log_info(l),
             ExternalMsg::LogSuccess(l) => self.log_success(l),
             ExternalMsg::LogError(l) => self.log_error(l),
+            ExternalMsg::Quit => self.quit(),
             ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
             ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
             ExternalMsg::Debug(path) => self.debug(path),
-            ExternalMsg::Terminate => bail!("terminated"),
+            ExternalMsg::Terminate => bail!(""),
         }
     }
 
@@ -1320,6 +1325,11 @@ impl App {
 
     fn log_error(mut self, message: String) -> Result<Self> {
         self.logs.push(Log::new(LogLevel::Error, message));
+        Ok(self)
+    }
+
+    fn quit(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::Quit);
         Ok(self)
     }
 
