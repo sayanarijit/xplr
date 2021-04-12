@@ -495,6 +495,12 @@ pub enum ExternalMsg {
     /// Go back to the parent directory.
     Back,
 
+    /// Go to the last path visited.
+    LastVisitedPath,
+
+    /// Go to the next path visited.
+    NextVisitedPath,
+
     /// Append/buffer the given string into the input buffer.
     ///
     /// Example: `BufferInput: foo`
@@ -698,6 +704,35 @@ pub enum HelpMenuLine {
     Paragraph(String),
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct History {
+    loc: usize,
+    paths: Vec<String>,
+}
+
+impl History {
+    pub fn push(mut self, path: String) -> Self {
+        self.paths = self.paths.into_iter().take(self.loc + 1).collect();
+        self.paths.push(path);
+        self.loc = self.paths.len().max(1) - 1;
+        self
+    }
+
+    pub fn visit_last(mut self) -> Self {
+        self.loc = self.loc.max(1) - 1;
+        self
+    }
+
+    pub fn visit_next(mut self) -> Self {
+        self.loc = (self.loc + 1).min(self.paths.len().max(1) - 1);
+        self
+    }
+
+    pub fn peek(&self) -> Option<&String> {
+        self.paths.get(self.loc)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     version: String,
@@ -713,6 +748,7 @@ pub struct App {
     pipe: Pipe,
     explorer_config: ExplorerConfig,
     logs: Vec<Log>,
+    history: History,
 }
 
 impl App {
@@ -771,6 +807,9 @@ impl App {
             ));
         }
 
+        let mut history = History::default();
+        history = history.push(pwd.to_string_lossy().to_string());
+
         let mut app = Self {
             version: Config::default().version,
             config: config.clone(),
@@ -785,6 +824,7 @@ impl App {
             pipe: Pipe::from_session_path(&session_path)?,
             explorer_config,
             logs: Default::default(),
+            history,
         };
 
         if let Some(notif) = config.upgrade_notification()? {
@@ -858,6 +898,8 @@ impl App {
             ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir),
             ExternalMsg::Enter => self.enter(),
             ExternalMsg::Back => self.back(),
+            ExternalMsg::LastVisitedPath => self.last_visited_path(),
+            ExternalMsg::NextVisitedPath => self.next_visited_path(),
             ExternalMsg::BufferInput(input) => self.buffer_input(&input),
             ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
             ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
@@ -999,6 +1041,7 @@ impl App {
     fn change_directory(mut self, dir: &str) -> Result<Self> {
         if PathBuf::from(dir).is_dir() {
             self.pwd = dir.to_owned();
+            self.history = self.history.push(self.pwd.clone());
             self.msg_out.push_back(MsgOut::Refresh);
         };
         Ok(self)
@@ -1021,14 +1064,33 @@ impl App {
             .unwrap_or(Ok(self))
     }
 
+    fn last_visited_path(mut self) -> Result<Self> {
+        self.history = self.history.visit_last();
+        self.pwd = self
+            .history
+            .peek()
+            .map(|p| p.to_owned())
+            .unwrap_or(self.pwd);
+        self.refresh()
+    }
+
+    fn next_visited_path(mut self) -> Result<Self> {
+        self.history = self.history.visit_next();
+        self.pwd = self
+            .history
+            .peek()
+            .map(|p| p.to_owned())
+            .unwrap_or(self.pwd);
+        self.refresh()
+    }
+
     fn buffer_input(mut self, input: &str) -> Result<Self> {
         if let Some(buf) = self.input_buffer.as_mut() {
             buf.push_str(input)
         } else {
             self.input_buffer = Some(input.to_owned());
         };
-        self.msg_out.push_back(MsgOut::Refresh);
-        Ok(self)
+        self.refresh()
     }
 
     fn buffer_input_from_key(self, key: Option<Key>) -> Result<Self> {
