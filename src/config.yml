@@ -394,6 +394,7 @@ modes:
           l: right
           v: space
           q: ctrl-c
+          tab: ctrl-i
 
         on_key:
           '#':
@@ -476,6 +477,17 @@ modes:
             help: up
             messages:
               - FocusPrevious
+
+          ctrl-o:
+            help: last visited path
+            messages:
+              - LastVisitedPath
+
+          ctrl-i:  # Actually means tab
+            help: next visited path
+            messages:
+              - NextVisitedPath
+
         on_alphabet: null
         on_number:
           help: input
