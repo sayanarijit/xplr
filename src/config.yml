@@ -544,7 +544,7 @@ modes:
           backspace:
             help: clear
             messages:
-              - ResetInputBuffer
+              - SetInputBuffer: ""
           ctrl-c:
             help: terminate
             messages:
