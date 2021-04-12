@@ -10,12 +10,8 @@ use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout};
 use tui::style::{Color, Style};
 use tui::text::{Span, Spans};
-use tui::widgets::{
-    Block, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, TableState,
-};
+use tui::widgets::{Block, Borders, Cell, List, ListItem, Paragraph, Row, Table};
 use tui::Frame;
-
-const TOTAL_ROWS: usize = 50;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -87,20 +83,17 @@ impl NodeUiMetadata {
 
 fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Handlebars) {
     let config = app.config().to_owned();
+    let header_height = config.general.table.header.height.unwrap_or(1);
+    let height: usize = (rect.height.max(header_height + 2) - (header_height + 2)).into();
 
     let rows = app
         .directory_buffer()
         .map(|dir| {
-            let offset = (
-                dir.focus.max(TOTAL_ROWS) - TOTAL_ROWS,
-                dir.focus.max(TOTAL_ROWS),
-            );
-
             dir.nodes
                 .iter()
                 .enumerate()
-                .skip_while(|(i, _)| *i < offset.0)
-                .take_while(|(i, _)| *i <= offset.1)
+                .skip(height * (dir.focus / height))
+                .take(height)
                 .map(|(index, node)| {
                     let is_focused = dir.focus == index;
 
@@ -242,20 +235,20 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                 .map(|c| Cell::from(c.format.to_owned().unwrap_or_default()))
                 .collect::<Vec<Cell>>(),
         )
-        .height(config.general.table.header.height.unwrap_or_default())
+        .height(header_height)
         .style(config.general.table.header.style.into()),
     );
 
-    let mut table_state = TableState::default();
-    table_state.select(app.directory_buffer().map(|dir| dir.focus));
-
-    f.render_stateful_widget(table, rect, &mut table_state);
+    f.render_widget(table, rect);
 }
 
 fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     let selection: Vec<ListItem> = app
         .selection()
         .iter()
+        .rev()
+        .take((rect.height.max(2) - 2).into())
+        .rev()
         .map(|n| n.absolute_path.clone())
         .map(ListItem::new)
         .collect();
@@ -269,11 +262,7 @@ fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
             .title(format!(" Selection ({}) ", selection_count)),
     );
 
-    let mut list_state = ListState::default();
-    if selection_count > 0 {
-        list_state.select(Some(selection_count.max(1) - 1));
-    }
-    f.render_stateful_widget(selection_list, rect, &mut list_state);
+    f.render_widget(selection_list, rect);
 }
 
 fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
