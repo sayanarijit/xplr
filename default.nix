@@ -4,9 +4,9 @@ with import <nixpkgs> {};
 
 rustPlatform.buildRustPackage rec {
   name = "xplr";
-  version = "0.4.1";
+  version = "0.4.2";
   src = fetchTarball
-    ("https://github.com/sayanarijit/xplr/archive/refs/tags/v0.4.1.tar.gz");
+    ("https://github.com/sayanarijit/xplr/archive/refs/tags/v0.4.2.tar.gz");
   buildInputs = [ cargo ];
   checkPhase = "";
   cargoSha256 = "0000000000000000000000000000000000000000000000000000";

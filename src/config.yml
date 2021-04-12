@@ -1,4 +1,4 @@
-version: v0.4.1
+version: v0.4.2
 general:
   show_hidden: false
   prompt:
@@ -218,7 +218,7 @@ modes:
               - SwitchMode: default
 
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
 
@@ -259,7 +259,7 @@ modes:
               - SwitchMode: default
 
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
 
@@ -300,7 +300,7 @@ modes:
               - SwitchMode: default
 
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
 
@@ -316,7 +316,7 @@ modes:
         remaps: {}
         on_key:
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
           d:
@@ -373,7 +373,7 @@ modes:
               - SwitchMode: default
 
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
 
@@ -393,9 +393,7 @@ modes:
           k: up
           l: right
           v: space
-          q: ctrl-c
           tab: ctrl-i
-
         on_key:
           '#':
             help: null
@@ -423,13 +421,12 @@ modes:
             messages:
               - BashExecSilently: |
                   echo "ChangeDirectory: ${HOME:?}" >> "${XPLR_PIPE_MSG_IN:?}"
-                  echo "Explore" >> "${XPLR_PIPE_MSG_IN:?}"
           G:
             help: go to bottom
             messages:
               - FocusLast
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
           ctrl-f:
@@ -477,7 +474,6 @@ modes:
             help: up
             messages:
               - FocusPrevious
-
           ctrl-o:
             help: last visited path
             messages:
@@ -487,6 +483,10 @@ modes:
             help: next visited path
             messages:
               - NextVisitedPath
+          q:
+            help: quit
+            messages:
+              - Quit
 
         on_alphabet: null
         on_number:
@@ -508,7 +508,7 @@ modes:
         remaps: {}
         on_key:
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
           g:
@@ -546,7 +546,7 @@ modes:
             messages:
               - ResetInputBuffer
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
           down:
@@ -623,7 +623,7 @@ modes:
               - Explore
 
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
         
@@ -636,9 +636,7 @@ modes:
       help: null
       extra_help: null
       key_bindings:
-        remaps:
-          q: ctrl-c
-
+        remaps: {}
         on_number:
           help: go to index
           messages:
@@ -681,7 +679,7 @@ modes:
               - SwitchMode: default
 
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
 
@@ -704,7 +702,7 @@ modes:
               - SetInputBuffer: ''
               - Explore
           ctrl-c:
-            help: cancel & quit
+            help: terminate
             messages:
               - Terminate
           down:
