@@ -42,7 +42,11 @@ general:
       height: 1
     row:
       cols:
-        - format: '{{{tree}}}{{{prefix}}}{{{meta.icon}}} {{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}'
+        - format: >
+            {{{tree}}}{{{prefix}}}{{{meta.icon}}}
+            {{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}
+            {{#if isSymlink}}-> {{#if isBroken}}×{{else}}{{{symlink.absolutePath}}}{{/if}}{{#if symlink.isDir}}/{{/if}}{{/if}}
+
           style:
             fg: null
             bg: null
@@ -50,7 +54,7 @@ general:
               bits: 0
             sub_modifier:
               bits: 0
-        - format: '{{{mimeEssence}}}'
+        - format: '{{#if isSymlink}}{{{symlink.mimeEssence}}}{{else}}{{{mimeEssence}}}{{/if}}'
           style:
             fg: null
             bg: null

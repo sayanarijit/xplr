@@ -79,16 +79,61 @@ impl Pipe {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct SymlinkNode {
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
+}
+
+impl SymlinkNode {
+    pub fn from(path: PathBuf) -> Self {
+        let extension = path
+            .extension()
+            .map(|e| e.to_string_lossy().to_string())
+            .unwrap_or_default();
+
+        let maybe_metadata = path.metadata().ok();
+
+        let is_dir = maybe_metadata.clone().map(|m| m.is_dir()).unwrap_or(false);
+
+        let is_file = maybe_metadata.clone().map(|m| m.is_file()).unwrap_or(false);
+
+        let is_readonly = maybe_metadata
+            .map(|m| m.permissions().readonly())
+            .unwrap_or(false);
+
+        let mime_essence = mime_guess::from_path(&path)
+            .first()
+            .map(|m| m.essence_str().to_string())
+            .unwrap_or_default();
+
+        Self {
+            absolute_path: path.to_string_lossy().to_string(),
+            extension,
+            is_dir,
+            is_file,
+            is_readonly,
+            mime_essence,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Node {
     pub parent: String,
     pub relative_path: String,
     pub absolute_path: String,
     pub extension: String,
-    pub is_symlink: bool,
     pub is_dir: bool,
     pub is_file: bool,
+    pub is_symlink: bool,
+    pub is_broken: bool,
     pub is_readonly: bool,
     pub mime_essence: String,
+    pub symlink: Option<SymlinkNode>,
 }
 
 impl Node {
@@ -112,6 +157,14 @@ impl Node {
             .map(|m| m.file_type().is_symlink())
             .unwrap_or(false);
 
+        let (is_broken, maybe_symlink_meta) = if is_symlink {
+            path.canonicalize()
+                .map(|p| (false, Some(SymlinkNode::from(p))))
+                .unwrap_or_else(|_| (true, None))
+        } else {
+            (false, None)
+        };
+
         let is_dir = maybe_metadata.clone().map(|m| m.is_dir()).unwrap_or(false);
 
         let is_file = maybe_metadata.clone().map(|m| m.is_file()).unwrap_or(false);
@@ -130,11 +183,13 @@ impl Node {
             relative_path,
             absolute_path,
             extension,
-            is_symlink,
             is_dir,
             is_file,
+            is_symlink,
+            is_broken,
             is_readonly,
             mime_essence,
+            symlink: maybe_symlink_meta,
         }
     }
 }
