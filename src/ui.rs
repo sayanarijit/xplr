@@ -1,6 +1,6 @@
 use crate::app;
 use crate::app::HelpMenuLine;
-use crate::app::Node;
+use crate::app::{Node, SymlinkNode};
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -15,6 +15,30 @@ use tui::Frame;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SymlinkNodeUiMetadata {
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
+}
+
+impl From<SymlinkNode> for SymlinkNodeUiMetadata {
+    fn from(node: SymlinkNode) -> Self {
+        Self {
+            absolute_path: node.absolute_path.clone(),
+            extension: node.extension.clone(),
+            is_dir: node.is_dir,
+            is_file: node.is_file,
+            is_readonly: node.is_readonly,
+            mime_essence: node.mime_essence,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct NodeUiMetadata {
     // From Node
     pub parent: String,
@@ -22,10 +46,12 @@ struct NodeUiMetadata {
     pub absolute_path: String,
     pub extension: String,
     pub is_symlink: bool,
+    pub is_broken: bool,
     pub is_dir: bool,
     pub is_file: bool,
     pub is_readonly: bool,
     pub mime_essence: String,
+    pub symlink: Option<SymlinkNodeUiMetadata>,
 
     // Extra
     pub index: usize,
@@ -62,10 +88,12 @@ impl NodeUiMetadata {
             absolute_path: node.absolute_path.clone(),
             extension: node.extension.clone(),
             is_symlink: node.is_symlink,
+            is_broken: node.is_broken,
             is_dir: node.is_dir,
             is_file: node.is_file,
             is_readonly: node.is_readonly,
             mime_essence: node.mime_essence.clone(),
+            symlink: node.symlink.to_owned().map(|s| s.into()),
             index,
             relative_index,
             is_before_focus,
