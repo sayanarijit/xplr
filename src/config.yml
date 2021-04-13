@@ -165,7 +165,7 @@ node_types:
       icon: ƒ
   symlink:
     style:
-      fg: Cyan
+      fg: Magenta
       bg: null
       add_modifier:
         bits: 4
