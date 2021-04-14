@@ -2,16 +2,68 @@ use crate::app;
 use crate::app::HelpMenuLine;
 use crate::app::{Node, SymlinkNode};
 use handlebars::Handlebars;
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::env;
 use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout};
-use tui::style::{Color, Style};
+use tui::style::{Color, Modifier, Style as TuiStyle};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, Cell, List, ListItem, Paragraph, Row, Table};
 use tui::Frame;
+
+lazy_static! {
+    pub static ref NO_COLOR: bool = env::var("NO_COLOR").ok().map(|_| true).unwrap_or(false);
+    pub static ref DEFAULT_STYLE: TuiStyle = TuiStyle::default();
+}
+
+#[derive(Debug, Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Style {
+    pub fg: Option<Color>,
+    pub bg: Option<Color>,
+    pub add_modifier: Option<Modifier>,
+    pub sub_modifier: Option<Modifier>,
+}
+
+impl Style {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.fg = other.fg.or(self.fg);
+        self.bg = other.bg.or(self.bg);
+        self.add_modifier = other.add_modifier.or(self.add_modifier);
+        self.sub_modifier = other.sub_modifier.or(self.sub_modifier);
+        self
+    }
+}
+
+impl From<TuiStyle> for Style {
+    fn from(s: TuiStyle) -> Self {
+        Self {
+            fg: s.fg,
+            bg: s.bg,
+            add_modifier: Some(s.add_modifier),
+            sub_modifier: Some(s.sub_modifier),
+        }
+    }
+}
+
+impl Into<TuiStyle> for Style {
+    fn into(self) -> TuiStyle {
+        if *NO_COLOR {
+            *DEFAULT_STYLE
+        } else {
+            TuiStyle {
+                fg: self.fg,
+                bg: self.bg,
+                add_modifier: self.add_modifier.unwrap_or_else(Modifier::empty),
+                sub_modifier: self.sub_modifier.unwrap_or_else(Modifier::empty),
+            }
+        }
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -356,6 +408,7 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
 }
 
 fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+    let config = app.config().general.logs.clone();
     let logs = app
         .logs()
         .iter()
@@ -364,18 +417,37 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
         .rev()
         .map(|l| {
             let time = l.created_at.format("%r");
-            let log = format!("{} | {}", &time, l.message);
             match &l.level {
-                app::LogLevel::Info => ListItem::new(log).style(Style::default().fg(Color::Gray)),
-                app::LogLevel::Success => {
-                    ListItem::new(log).style(Style::default().fg(Color::Green))
-                }
-                app::LogLevel::Error => ListItem::new(log).style(Style::default().fg(Color::Red)),
+                app::LogLevel::Info => ListItem::new(format!(
+                    "{} | {} | {}",
+                    &time,
+                    &config.info.format.to_owned().unwrap_or_default(),
+                    &l.message
+                ))
+                .style(config.info.style.into()),
+                app::LogLevel::Success => ListItem::new(format!(
+                    "{} | {} | {}",
+                    &time,
+                    &config.success.format.to_owned().unwrap_or_default(),
+                    &l.message
+                ))
+                .style(config.success.style.into()),
+                app::LogLevel::Error => ListItem::new(format!(
+                    "{} | {} | {}",
+                    &time,
+                    &config.error.format.to_owned().unwrap_or_default(),
+                    &l.message
+                ))
+                .style(config.error.style.into()),
             }
         })
         .collect::<Vec<ListItem>>();
 
-    let logs_list = List::new(logs).block(Block::default().borders(Borders::ALL).title(" Logs "));
+    let logs_list = List::new(logs).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title(format!(" Logs ({}) ", app.logs().len())),
+    );
 
     f.render_widget(logs_list, rect);
 }

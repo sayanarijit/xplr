@@ -1,54 +1,12 @@
 use crate::app::ExternalMsg;
 use crate::app::HelpMenuLine;
 use crate::default_config;
+use crate::ui::Style;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use tui::layout::Constraint as TuiConstraint;
-use tui::style::Style as TuiStyle;
-use tui::style::{Color, Modifier};
-
-#[derive(Debug, Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Style {
-    fg: Option<Color>,
-    bg: Option<Color>,
-    add_modifier: Option<Modifier>,
-    sub_modifier: Option<Modifier>,
-}
-
-impl Style {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.fg = other.fg.or(self.fg);
-        self.bg = other.bg.or(self.bg);
-        self.add_modifier = other.add_modifier.or(self.add_modifier);
-        self.sub_modifier = other.sub_modifier.or(self.sub_modifier);
-        self
-    }
-}
-
-impl From<TuiStyle> for Style {
-    fn from(s: TuiStyle) -> Self {
-        Self {
-            fg: s.fg,
-            bg: s.bg,
-            add_modifier: Some(s.add_modifier),
-            sub_modifier: Some(s.sub_modifier),
-        }
-    }
-}
-
-impl Into<TuiStyle> for Style {
-    fn into(self) -> TuiStyle {
-        TuiStyle {
-            fg: self.fg,
-            bg: self.bg,
-            add_modifier: self.add_modifier.unwrap_or_else(Modifier::empty),
-            sub_modifier: self.sub_modifier.unwrap_or_else(Modifier::empty),
-        }
-    }
-}
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -254,6 +212,28 @@ impl TableConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct LogsConfig {
+    #[serde(default)]
+    pub info: UiElement,
+
+    #[serde(default)]
+    pub success: UiElement,
+
+    #[serde(default)]
+    pub error: UiElement,
+}
+
+impl LogsConfig {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.info = other.info.extend(self.info);
+        self.success = other.success.extend(self.success);
+        self.error = other.error.extend(self.error);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GeneralConfig {
     #[serde(default)]
     pub show_hidden: Option<bool>,
@@ -263,6 +243,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub prompt: UiElement,
+
+    #[serde(default)]
+    pub logs: LogsConfig,
 
     #[serde(default)]
     pub table: TableConfig,
@@ -282,6 +265,7 @@ impl GeneralConfig {
         self.show_hidden = other.show_hidden.or(self.show_hidden);
         self.cursor = other.cursor.extend(self.cursor);
         self.prompt = other.prompt.extend(self.prompt);
+        self.logs = other.logs.extend(self.logs);
         self.table = other.table.extend(self.table);
         self.default_ui = other.default_ui.extend(self.default_ui);
         self.focus_ui = other.focus_ui.extend(self.focus_ui);
@@ -559,6 +543,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 4, 4) => true,
             (0, 4, 3) => true,
             (0, 4, 2) => true,
             (0, 4, 1) => true,
@@ -571,7 +556,7 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 4, 3) => None,
+            (0, 4, 4) => None,
             (_, _, _) => Some("App version updated"),
         };
 
