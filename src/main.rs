@@ -39,6 +39,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
     let pipe_directory_nodes_out = app.pipe().directory_nodes_out.clone();
     let pipe_global_help_menu_out = app.pipe().global_help_menu_out.clone();
     let pipe_logs_out = app.pipe().logs_out.clone();
+    let pipe_history_out = app.pipe().history_out.clone();
     let session_path = app.session_path();
 
     let (stdin, stdout, stderr) = if silent {
@@ -58,6 +59,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .env("XPLR_SESSION_PATH", session_path)
         .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
         .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
+        .env("XPLR_PIPE_HISTORY_OUT", pipe_history_out)
         .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
         .env("XPLR_PIPE_MODE_OUT", pipe_mode_out)
         .env("XPLR_PIPE_RESULT_OUT", pipe_result_out)
@@ -263,6 +265,10 @@ fn run() -> Result<Option<String>> {
 
         if app.selection() != last_app.selection() {
             fs::write(&app.pipe().selection_out, app.selection_str())?;
+        };
+
+        if app.history_str() != last_app.history_str() {
+            fs::write(&app.pipe().history_out, app.history_str())?;
         };
 
         if app.mode_str() != last_app.mode_str() {
