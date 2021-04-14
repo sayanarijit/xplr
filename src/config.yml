@@ -1,10 +1,23 @@
-version: v0.4.3
+version: v0.4.4
 general:
   show_hidden: false
   prompt:
     format: "> "
   cursor:
     format: █
+  logs:
+    info:
+      format: "INFO"
+      style:
+        fg: LightBlue
+    success:
+      format: "SUCCESS"
+      style:
+        fg: Green
+    error:
+      format: "ERROR"
+      style:
+        fg: Red
   table:
     header:
       cols:
