@@ -26,6 +26,7 @@ pub struct Pipe {
     pub directory_nodes_out: String,
     pub global_help_menu_out: String,
     pub logs_out: String,
+    pub history_out: String,
 }
 
 impl Pipe {
@@ -56,6 +57,8 @@ impl Pipe {
 
         let logs_out = pipesdir.join("logs_out").to_string_lossy().to_string();
 
+        let history_out = pipesdir.join("history_out").to_string_lossy().to_string();
+
         fs::write(&msg_in, "")?;
         fs::write(&focus_out, "")?;
         fs::write(&selection_out, "")?;
@@ -64,6 +67,7 @@ impl Pipe {
         fs::write(&global_help_menu_out, "")?;
         fs::write(&result_out, "")?;
         fs::write(&logs_out, "")?;
+        fs::write(&history_out, "")?;
 
         Ok(Self {
             msg_in,
@@ -74,6 +78,7 @@ impl Pipe {
             directory_nodes_out,
             global_help_menu_out,
             logs_out,
+            history_out,
         })
     }
 }
@@ -1576,5 +1581,19 @@ impl App {
     /// Get a reference to the app's version.
     pub fn version(&self) -> &String {
         &self.version
+    }
+
+    /// Get a reference to the app's history.
+    pub fn history(&self) -> &History {
+        &self.history
+    }
+
+    pub fn history_str(&self) -> String {
+        self.history
+            .paths
+            .iter()
+            .map(|p| format!("{}\n", &p))
+            .collect::<Vec<String>>()
+            .join("")
     }
 }
