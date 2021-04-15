@@ -487,6 +487,10 @@ modes:
             messages:
               - ToggleSelection
               - FocusNext
+          ctrl-a:
+            help: select all
+            messages:
+              - ToggleSelectAll
           up:
             help: up
             messages:
