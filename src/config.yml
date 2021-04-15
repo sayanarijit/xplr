@@ -410,6 +410,7 @@ modes:
           k: up
           l: right
           v: space
+          V: ctrl-a
           tab: ctrl-i
         on_key:
           '#':
