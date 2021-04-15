@@ -180,14 +180,6 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     // TODO : Optimize
                     let is_selected = app.selection().contains(&node);
 
-                    let ui = if is_focused {
-                        &config.general.focus_ui
-                    } else if is_selected {
-                        &config.general.selection_ui
-                    } else {
-                        &config.general.default_ui
-                    };
-
                     let is_first = index == 0;
                     let is_last = index == dir.total.max(1) - 1;
 
@@ -230,6 +222,25 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                             Ordering::Equal => (0, false, false),
                         };
 
+                    let (mut prefix, mut suffix, mut style) = {
+                        let ui = config.general.default_ui.clone();
+                        (ui.prefix, ui.suffix, ui.style.extend(node_type.style))
+                    };
+
+                    if is_selected {
+                        let ui = config.general.selection_ui.clone();
+                        prefix = ui.prefix.or(prefix);
+                        suffix = ui.suffix.or(suffix);
+                        style = style.extend(ui.style);
+                    };
+
+                    if is_focused {
+                        let ui = config.general.focus_ui.clone();
+                        prefix = ui.prefix.or(prefix);
+                        suffix = ui.suffix.or(suffix);
+                        style = style.extend(ui.style);
+                    };
+
                     let meta = NodeUiMetadata::new(
                         &node,
                         index,
@@ -237,8 +248,8 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         is_before_focus,
                         is_after_focus,
                         tree.unwrap_or_default(),
-                        ui.prefix.to_owned().unwrap_or_default(),
-                        ui.suffix.to_owned().unwrap_or_default(),
+                        prefix.unwrap_or_default(),
+                        suffix.unwrap_or_default(),
                         is_selected,
                         is_focused,
                         dir.total,
@@ -252,14 +263,6 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         .split('\t')
                         .map(|x| Cell::from(x.to_string()))
                         .collect::<Vec<Cell>>();
-
-                    let style = if is_focused {
-                        config.general.focus_ui.style.extend(node_type.style)
-                    } else if is_selected {
-                        config.general.selection_ui.style.extend(node_type.style)
-                    } else {
-                        config.general.default_ui.style.extend(node_type.style)
-                    };
 
                     Row::new(cols).style(style.into())
                 })
