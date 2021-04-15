@@ -38,7 +38,7 @@ pub struct NodeTypeConfig {
 
 impl NodeTypeConfig {
     pub fn extend(mut self, other: Self) -> Self {
-        self.style = other.style.extend(self.style);
+        self.style = self.style.extend(other.style);
         self.meta.extend(other.meta);
         self
     }
