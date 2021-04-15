@@ -254,26 +254,11 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         .collect::<Vec<Cell>>();
 
                     let style = if is_focused {
-                        config.general.focus_ui.style
+                        config.general.focus_ui.style.extend(node_type.style)
                     } else if is_selected {
-                        config.general.selection_ui.style
+                        config.general.selection_ui.style.extend(node_type.style)
                     } else {
-                        config
-                            .node_types
-                            .special
-                            .get(&node.relative_path)
-                            .or_else(|| config.node_types.extension.get(&node.extension))
-                            .or_else(|| config.node_types.mime_essence.get(&node.mime_essence))
-                            .unwrap_or_else(|| {
-                                if node.is_symlink {
-                                    &config.node_types.symlink
-                                } else if node.is_dir {
-                                    &config.node_types.directory
-                                } else {
-                                    &config.node_types.file
-                                }
-                            })
-                            .style
+                        config.general.default_ui.style.extend(node_type.style)
                     };
 
                     Row::new(cols).style(style.into())
