@@ -616,13 +616,37 @@ pub enum ExternalMsg {
     /// Select the focused node.
     Select,
 
+    /// Select all the visible nodes.
+    SelectAll,
+
+    /// Select the given path.
+    ///
+    /// Example: `SelectPath: "/tmp"`
+    SelectPath(String),
+
     /// Unselect the focused node.
     UnSelect,
+
+    /// Unselect all the visible nodes.
+    UnSelectAll,
+
+    /// UnSelect the given path.
+    ///
+    /// Example: `UnSelectPath: "/tmp"`
+    UnSelectPath(String),
 
     /// Toggle selection on the focused node.
     ToggleSelection,
 
-    /// Clear the selection
+    /// Toggle between select all and unselect all.
+    ToggleSelectAll,
+
+    /// Toggle selection by file path.
+    ///
+    /// Example: `ToggleSelectionByPath: "/tmp"`
+    ToggleSelectionByPath(String),
+
+    /// Clear the selection.
     ClearSelection,
 
     /// Add a filter to explude nodes while exploring directories.
@@ -974,8 +998,14 @@ impl App {
             ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
             ExternalMsg::BashExecSilently(cmd) => self.bash_exec_silently(cmd),
             ExternalMsg::Select => self.select(),
+            ExternalMsg::SelectAll => self.select_all(),
+            ExternalMsg::SelectPath(p) => self.select_path(p),
             ExternalMsg::UnSelect => self.un_select(),
+            ExternalMsg::UnSelectAll => self.un_select_all(),
+            ExternalMsg::UnSelectPath(p) => self.un_select_path(p),
             ExternalMsg::ToggleSelection => self.toggle_selection(),
+            ExternalMsg::ToggleSelectAll => self.toggle_select_all(),
+            ExternalMsg::ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
             ExternalMsg::ClearSelection => self.clear_selection(),
             ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
             ExternalMsg::AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
@@ -1280,16 +1310,57 @@ impl App {
         Ok(self)
     }
 
-    fn un_select(mut self) -> Result<Self> {
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
-            self.selection = self
-                .selection
+    fn select_path(mut self, path: String) -> Result<Self> {
+        let path = PathBuf::from(path);
+        let parent = path.parent().map(|p| p.to_string_lossy().to_string());
+        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
+        if let (Some(p), Some(n)) = (parent, filename) {
+            self.selection.push(Node::new(p, n));
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn select_all(mut self) -> Result<Self> {
+        if let Some(d) = self.directory_buffer() {
+            d.nodes
                 .clone()
                 .into_iter()
-                .filter(|s| s != &n)
-                .collect();
+                .for_each(|n| self.selection.push(n));
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+
+        Ok(self)
+    }
+
+    fn un_select(mut self) -> Result<Self> {
+        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+            self.selection.retain(|s| s != &n);
             self.msg_out.push_back(MsgOut::Refresh);
         }
+        Ok(self)
+    }
+
+    fn un_select_path(mut self, path: String) -> Result<Self> {
+        let path = PathBuf::from(path);
+        let parent = path.parent().map(|p| p.to_string_lossy().to_string());
+        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
+        if let (Some(p), Some(n)) = (parent, filename) {
+            let node = Node::new(p, n);
+            self.selection.retain(|n| n != &node);
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+        Ok(self)
+    }
+
+    fn un_select_all(mut self) -> Result<Self> {
+        if let Some(d) = self.directory_buffer() {
+            d.nodes.clone().into_iter().for_each(|n| {
+                self.selection.retain(|s| s != &n);
+            });
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
+
         Ok(self)
     }
 
@@ -1301,6 +1372,34 @@ impl App {
                 self = self.select()?;
             }
         }
+        Ok(self)
+    }
+
+    fn toggle_select_all(self) -> Result<Self> {
+        if let Some(d) = self.directory_buffer() {
+            if d.nodes.iter().all(|n| self.selection.contains(n)) {
+                self.un_select_all()
+            } else {
+                self.select_all()
+            }
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn toggle_selection_by_path(mut self, path: String) -> Result<Self> {
+        let path = PathBuf::from(path);
+        let parent = path.parent().map(|p| p.to_string_lossy().to_string());
+        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
+        if let (Some(p), Some(n)) = (parent, filename) {
+            let node = Node::new(p, n);
+            if self.selection.contains(&node) {
+                self.selection.retain(|n| n != &node);
+            } else {
+                self.selection.push(node);
+            }
+            self.msg_out.push_back(MsgOut::Refresh);
+        };
         Ok(self)
     }
 
