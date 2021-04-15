@@ -37,10 +37,9 @@ pub struct NodeTypeConfig {
 }
 
 impl NodeTypeConfig {
-    pub fn extend(mut self, mut other: Self) -> Self {
+    pub fn extend(mut self, other: Self) -> Self {
         self.style = other.style.extend(self.style);
-        other.meta.extend(self.meta);
-        self.meta = other.meta;
+        self.meta.extend(other.meta);
         self
     }
 }
@@ -68,25 +67,18 @@ pub struct NodeTypesConfig {
 }
 
 impl NodeTypesConfig {
-    fn extend(mut self, mut other: Self) -> Self {
-        self.directory = other.directory.extend(self.directory);
-        self.file = other.file.extend(self.file);
-        self.symlink = other.symlink.extend(self.symlink);
-
-        other.mime_essence.extend(self.mime_essence);
-        self.mime_essence = other.mime_essence;
-
-        other.extension.extend(self.extension);
-        self.extension = other.extension;
-
-        other.special.extend(self.special);
-        self.special = other.special;
-
+    fn extend(mut self, other: Self) -> Self {
+        self.directory = self.directory.extend(other.directory);
+        self.file = self.file.extend(other.file);
+        self.symlink = self.symlink.extend(other.symlink);
+        self.mime_essence.extend(other.mime_essence);
+        self.extension.extend(other.extension);
+        self.special.extend(other.special);
         self
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct UiConfig {
     #[serde(default)]
@@ -100,10 +92,10 @@ pub struct UiConfig {
 }
 
 impl UiConfig {
-    fn extend(mut self, other: Self) -> Self {
+    pub fn extend(mut self, other: Self) -> Self {
         self.prefix = other.prefix.or(self.prefix);
         self.suffix = other.suffix.or(self.suffix);
-        self.style = other.style.extend(self.style);
+        self.style = self.style.extend(other.style);
         self
     }
 }
@@ -121,7 +113,7 @@ pub struct UiElement {
 impl UiElement {
     fn extend(mut self, other: Self) -> Self {
         self.format = other.format.or(self.format);
-        self.style = other.style.extend(self.style);
+        self.style = self.style.extend(other.style);
         self
     }
 }
@@ -142,7 +134,7 @@ pub struct TableRowConfig {
 impl TableRowConfig {
     fn extend(mut self, other: Self) -> Self {
         self.cols = other.cols.or(self.cols);
-        self.style = other.style.extend(self.style);
+        self.style = self.style.extend(other.style);
         self.height = other.height.or(self.height);
         self
     }
@@ -200,9 +192,9 @@ pub struct TableConfig {
 
 impl TableConfig {
     pub fn extend(mut self, other: Self) -> Self {
-        self.header = other.header.extend(self.header);
-        self.row = other.row.extend(self.row);
-        self.style = other.style.extend(self.style);
+        self.header = self.header.extend(other.header);
+        self.row = self.row.extend(other.row);
+        self.style = self.style.extend(other.style);
         self.tree = other.tree.or(self.tree);
         self.col_spacing = other.col_spacing.or(self.col_spacing);
         self.col_widths = other.col_widths.or(self.col_widths);
@@ -225,9 +217,9 @@ pub struct LogsConfig {
 
 impl LogsConfig {
     pub fn extend(mut self, other: Self) -> Self {
-        self.info = other.info.extend(self.info);
-        self.success = other.success.extend(self.success);
-        self.error = other.error.extend(self.error);
+        self.info = self.info.extend(other.info);
+        self.success = self.success.extend(other.success);
+        self.error = self.error.extend(other.error);
         self
     }
 }
@@ -263,13 +255,13 @@ pub struct GeneralConfig {
 impl GeneralConfig {
     pub fn extend(mut self, other: Self) -> Self {
         self.show_hidden = other.show_hidden.or(self.show_hidden);
-        self.cursor = other.cursor.extend(self.cursor);
-        self.prompt = other.prompt.extend(self.prompt);
-        self.logs = other.logs.extend(self.logs);
-        self.table = other.table.extend(self.table);
-        self.default_ui = other.default_ui.extend(self.default_ui);
-        self.focus_ui = other.focus_ui.extend(self.focus_ui);
-        self.selection_ui = other.selection_ui.extend(self.selection_ui);
+        self.cursor = self.cursor.extend(other.cursor);
+        self.prompt = self.prompt.extend(other.prompt);
+        self.logs = self.logs.extend(other.logs);
+        self.table = self.table.extend(other.table);
+        self.default_ui = self.default_ui.extend(other.default_ui);
+        self.focus_ui = self.focus_ui.extend(other.focus_ui);
+        self.selection_ui = self.selection_ui.extend(other.selection_ui);
         self
     }
 }
@@ -297,11 +289,9 @@ pub struct KeyBindings {
 }
 
 impl KeyBindings {
-    pub fn extend(mut self, mut other: Self) -> Self {
-        other.remaps.extend(self.remaps);
-        self.remaps = other.remaps;
-        other.on_key.extend(self.on_key);
-        self.on_key = other.on_key;
+    pub fn extend(mut self, other: Self) -> Self {
+        self.remaps.extend(other.remaps);
+        self.on_key.extend(other.on_key);
         self.on_alphabet = other.on_alphabet.or(self.on_alphabet);
         self.on_number = other.on_number.or(self.on_number);
         self.on_special_character = other.on_special_character.or(self.on_special_character);
@@ -330,7 +320,7 @@ impl Mode {
     pub fn extend(mut self, other: Self) -> Self {
         self.help = other.help.or(self.help);
         self.extra_help = other.extra_help.or(self.extra_help);
-        self.key_bindings = other.key_bindings.extend(self.key_bindings);
+        self.key_bindings = self.key_bindings.extend(other.key_bindings);
         self
     }
 
@@ -433,17 +423,17 @@ pub struct BuiltinModesConfig {
 
 impl BuiltinModesConfig {
     pub fn extend(mut self, other: Self) -> Self {
-        self.default = other.default.extend(self.default);
-        self.selection_ops = other.selection_ops.extend(self.selection_ops);
-        self.go_to = other.go_to.extend(self.go_to);
-        self.create = other.create.extend(self.create);
-        self.create_file = other.create_file.extend(self.create_file);
-        self.create_directory = other.create_directory.extend(self.create_directory);
-        self.rename = other.rename.extend(self.rename);
-        self.delete = other.delete.extend(self.delete);
-        self.number = other.number.extend(self.number);
-        self.action = other.action.extend(self.action);
-        self.search = other.search.extend(self.search);
+        self.default = self.default.extend(other.default);
+        self.selection_ops = self.selection_ops.extend(other.selection_ops);
+        self.go_to = self.go_to.extend(other.go_to);
+        self.create = self.create.extend(other.create);
+        self.create_file = self.create_file.extend(other.create_file);
+        self.create_directory = self.create_directory.extend(other.create_directory);
+        self.rename = self.rename.extend(other.rename);
+        self.delete = self.delete.extend(other.delete);
+        self.number = self.number.extend(other.number);
+        self.action = self.action.extend(other.action);
+        self.search = self.search.extend(other.search);
         self
     }
 
@@ -484,10 +474,9 @@ impl ModesConfig {
         self.builtin.get(name).or_else(|| self.custom.get(name))
     }
 
-    pub fn extend(mut self, mut other: Self) -> Self {
-        self.builtin = other.builtin.extend(self.builtin);
-        other.custom.extend(self.custom);
-        self.custom = other.custom;
+    pub fn extend(mut self, other: Self) -> Self {
+        self.builtin = self.builtin.extend(other.builtin);
+        self.custom.extend(other.custom);
         self
     }
 }
@@ -557,7 +546,7 @@ impl Config {
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
             (0, 4, 4) => None,
-            (_, _, _) => Some("App version updated"),
+            (_, _, _) => Some("App version updated. New: check out some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
         };
 
         Ok(result)
