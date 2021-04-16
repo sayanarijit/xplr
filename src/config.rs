@@ -1,8 +1,12 @@
 use crate::app::ExternalMsg;
 use crate::app::HelpMenuLine;
+use crate::app::NodeFilter;
+use crate::app::NodeSorter;
+use crate::app::NodeSorterApplicable;
 use crate::default_config;
 use crate::ui::Style;
 use anyhow::Result;
+use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -226,6 +230,52 @@ impl LogsConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct SortDirectionIdentifiersUi {
+    #[serde(default)]
+    pub forward: UiElement,
+
+    #[serde(default)]
+    pub reverse: UiElement,
+}
+
+impl SortDirectionIdentifiersUi {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.forward = self.forward.extend(other.forward);
+        self.reverse = self.reverse.extend(other.reverse);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SortAndFilterUi {
+    #[serde(default)]
+    pub separator: UiElement,
+
+    #[serde(default)]
+    pub sort_direction_identifiers: SortDirectionIdentifiersUi,
+
+    #[serde(default)]
+    pub sorter_identifiers: HashMap<NodeSorter, UiElement>,
+
+    #[serde(default)]
+    pub filter_identifiers: HashMap<NodeFilter, UiElement>,
+}
+
+impl SortAndFilterUi {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.separator = self.separator.extend(other.separator);
+        self.sort_direction_identifiers = self
+            .sort_direction_identifiers
+            .extend(other.sort_direction_identifiers);
+        self.sorter_identifiers.extend(other.sorter_identifiers);
+        self.filter_identifiers.extend(other.filter_identifiers);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GeneralConfig {
     #[serde(default)]
     pub show_hidden: Option<bool>,
@@ -250,6 +300,12 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub selection_ui: UiConfig,
+
+    #[serde(default)]
+    pub sort_and_filter_ui: SortAndFilterUi,
+
+    #[serde(default)]
+    pub initial_sorting: Option<IndexSet<NodeSorterApplicable>>,
 }
 
 impl GeneralConfig {
@@ -262,6 +318,8 @@ impl GeneralConfig {
         self.default_ui = self.default_ui.extend(other.default_ui);
         self.focus_ui = self.focus_ui.extend(other.focus_ui);
         self.selection_ui = self.selection_ui.extend(other.selection_ui);
+        self.sort_and_filter_ui = self.sort_and_filter_ui.extend(other.sort_and_filter_ui);
+        self.initial_sorting = other.initial_sorting.or(self.initial_sorting);
         self
     }
 }
@@ -419,6 +477,9 @@ pub struct BuiltinModesConfig {
 
     #[serde(default)]
     pub search: Mode,
+
+    #[serde(default)]
+    pub sort: Mode,
 }
 
 impl BuiltinModesConfig {
@@ -434,6 +495,7 @@ impl BuiltinModesConfig {
         self.number = self.number.extend(other.number);
         self.action = self.action.extend(other.action);
         self.search = self.search.extend(other.search);
+        self.sort = self.sort.extend(other.sort);
         self
     }
 
@@ -454,6 +516,7 @@ impl BuiltinModesConfig {
             "delete" => Some(&self.delete),
             "action" => Some(&self.action),
             "search" => Some(&self.search),
+            "sort" => Some(&self.sort),
             _ => None,
         }
     }
@@ -532,11 +595,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
-            (0, 4, 4) => true,
-            (0, 4, 3) => true,
-            (0, 4, 2) => true,
-            (0, 4, 1) => true,
-            (0, 4, 0) => true,
+            (0, 5, 0) => true,
             (_, _, _) => false,
         };
 
@@ -544,11 +603,12 @@ impl Config {
     }
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
-        let result = match self.parsed_version()? {
-            (0, 4, 4) => None,
-            (_, _, _) => Some("App version updated. New: check out some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
+        Ok(None)
+        /* let result = match self.parsed_version()? {
+            (0, 5, 0) => None,
+            (_, _, _) => Some("App version updated. New: added sorting support and some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
         };
 
-        Ok(result)
+        Ok(result) */
     }
 }
