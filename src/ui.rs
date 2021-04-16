@@ -1,6 +1,6 @@
 use crate::app;
 use crate::app::HelpMenuLine;
-use crate::app::{Node, SymlinkNode};
+use crate::app::{Node, ResolvedNode};
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -67,7 +67,7 @@ impl Into<TuiStyle> for Style {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SymlinkNodeUiMetadata {
+pub struct ResolvedNodeUiMetadata {
     pub absolute_path: String,
     pub extension: String,
     pub is_dir: bool,
@@ -76,8 +76,8 @@ pub struct SymlinkNodeUiMetadata {
     pub mime_essence: String,
 }
 
-impl From<SymlinkNode> for SymlinkNodeUiMetadata {
-    fn from(node: SymlinkNode) -> Self {
+impl From<ResolvedNode> for ResolvedNodeUiMetadata {
+    fn from(node: ResolvedNode) -> Self {
         Self {
             absolute_path: node.absolute_path.clone(),
             extension: node.extension.clone(),
@@ -103,7 +103,8 @@ struct NodeUiMetadata {
     pub is_file: bool,
     pub is_readonly: bool,
     pub mime_essence: String,
-    pub symlink: Option<SymlinkNodeUiMetadata>,
+    pub canonical: Option<ResolvedNodeUiMetadata>,
+    pub symlink: Option<ResolvedNodeUiMetadata>,
 
     // Extra
     pub index: usize,
@@ -145,6 +146,7 @@ impl NodeUiMetadata {
             is_file: node.is_file,
             is_readonly: node.is_readonly,
             mime_essence: node.mime_essence.clone(),
+            canonical: node.canonical.to_owned().map(|s| s.into()),
             symlink: node.symlink.to_owned().map(|s| s.into()),
             index,
             relative_index,
@@ -395,6 +397,74 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
     f.render_widget(input_buf, rect);
 }
 
+fn draw_sort_n_filter_by<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+    let ui = app.config().general.sort_and_filter_ui.clone();
+    let filter_by = app.explorer_config().filters();
+    let sort_by = app.explorer_config().sorters();
+    let forward = Span::styled(
+        ui.sort_direction_identifiers
+            .forward
+            .format
+            .to_owned()
+            .unwrap_or_default(),
+        ui.sort_direction_identifiers.forward.style.into(),
+    );
+
+    let reverse = Span::styled(
+        ui.sort_direction_identifiers
+            .reverse
+            .format
+            .to_owned()
+            .unwrap_or_default(),
+        ui.sort_direction_identifiers.reverse.style.into(),
+    );
+
+    let mut spans = filter_by
+        .iter()
+        .map(|f| {
+            ui.filter_identifiers
+                .get(&f.filter)
+                .map(|u| {
+                    (
+                        Span::styled(u.format.to_owned().unwrap_or_default(), u.style.into()),
+                        Span::raw(f.input.clone()),
+                    )
+                })
+                .unwrap_or_else(|| (Span::raw("f"), Span::raw("")))
+        })
+        .chain(sort_by.iter().map(|s| {
+            let direction = if s.reverse {
+                reverse.clone()
+            } else {
+                forward.clone()
+            };
+
+            ui.sorter_identifiers
+                .get(&s.sorter)
+                .map(|u| {
+                    (
+                        Span::styled(u.format.to_owned().unwrap_or_default(), u.style.into()),
+                        direction.clone(),
+                    )
+                })
+                .unwrap_or_else(|| (Span::raw("s"), direction.clone()))
+        }))
+        .zip(std::iter::repeat(Span::styled(
+            ui.separator.format.to_owned().unwrap_or_default(),
+            ui.separator.style.into(),
+        )))
+        .map(|((a, b), c)| vec![a, b, c])
+        .flatten()
+        .collect::<Vec<Span>>();
+    spans.pop();
+
+    let p = Paragraph::new(Spans::from(spans)).block(Block::default().borders(Borders::ALL).title(
+        format!(" Sort & filter ({}) ", filter_by.len() + sort_by.len()),
+    ));
+
+    f.render_widget(p, rect);
+}
+
 fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     let config = app.config().general.logs.clone();
     let logs = app
@@ -452,19 +522,21 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
         .direction(Direction::Vertical)
         .constraints(
             [
-                TuiConstraint::Length(rect.height - 3),
+                TuiConstraint::Length(3),
+                TuiConstraint::Length(rect.height - 6),
                 TuiConstraint::Length(3),
             ]
             .as_ref(),
         )
         .split(chunks[0]);
 
-    draw_table(f, left_chunks[0], app, hb);
+    draw_sort_n_filter_by(f, left_chunks[0], app, hb);
+    draw_table(f, left_chunks[1], app, hb);
 
     if app.input_buffer().is_some() {
-        draw_input_buffer(f, left_chunks[1], app, hb);
+        draw_input_buffer(f, left_chunks[2], app, hb);
     } else {
-        draw_logs(f, left_chunks[1], app, hb);
+        draw_logs(f, left_chunks[2], app, hb);
     };
 
     let right_chunks = Layout::default()

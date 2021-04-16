@@ -3,10 +3,10 @@ use crate::config::Mode;
 use crate::input::Key;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
+use indexmap::set::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::fs;
 use std::io;
@@ -84,7 +84,7 @@ impl Pipe {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub struct SymlinkNode {
+pub struct ResolvedNode {
     pub absolute_path: String,
     pub extension: String,
     pub is_dir: bool,
@@ -93,7 +93,7 @@ pub struct SymlinkNode {
     pub mime_essence: String,
 }
 
-impl SymlinkNode {
+impl ResolvedNode {
     pub fn from(path: PathBuf) -> Self {
         let extension = path
             .extension()
@@ -138,7 +138,8 @@ pub struct Node {
     pub is_broken: bool,
     pub is_readonly: bool,
     pub mime_essence: String,
-    pub symlink: Option<SymlinkNode>,
+    pub canonical: Option<ResolvedNode>,
+    pub symlink: Option<ResolvedNode>,
 }
 
 impl Node {
@@ -162,13 +163,10 @@ impl Node {
             .map(|m| m.file_type().is_symlink())
             .unwrap_or(false);
 
-        let (is_broken, maybe_symlink_meta) = if is_symlink {
-            path.canonicalize()
-                .map(|p| (false, Some(SymlinkNode::from(p))))
-                .unwrap_or_else(|_| (true, None))
-        } else {
-            (false, None)
-        };
+        let (is_broken, maybe_canonical_meta) = path
+            .canonicalize()
+            .map(|p| (false, Some(ResolvedNode::from(p))))
+            .unwrap_or_else(|_| (true, None));
 
         let is_dir = maybe_metadata.clone().map(|m| m.is_dir()).unwrap_or(false);
 
@@ -194,7 +192,12 @@ impl Node {
             is_broken,
             is_readonly,
             mime_essence,
-            symlink: maybe_symlink_meta,
+            canonical: maybe_canonical_meta.clone(),
+            symlink: if is_symlink {
+                maybe_canonical_meta
+            } else {
+                None
+            },
         }
     }
 }
@@ -245,192 +248,439 @@ pub enum InternalMsg {
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub enum NodeSorter {
+    ByRelativePath,
+    ByIRelativePath,
+    ByExtension,
+    ByIsDir,
+    ByIsFile,
+    ByIsSymlink,
+    ByIsBroken,
+    ByIsReadonly,
+    ByMimeEssence,
+
+    ByCanonicalAbsolutePath,
+    ByICanonicalAbsolutePath,
+    ByCanonicalExtension,
+    ByCanonicalIsDir,
+    ByCanonicalIsFile,
+    ByCanonicalIsReadonly,
+    ByCanonicalMimeEssence,
+
+    BySymlinkAbsolutePath,
+    ByISymlinkAbsolutePath,
+    BySymlinkExtension,
+    BySymlinkIsDir,
+    BySymlinkIsFile,
+    BySymlinkIsReadonly,
+    BySymlinkMimeEssence,
+}
+
+#[derive(Debug, Clone, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NodeSorterApplicable {
+    pub sorter: NodeSorter,
+    #[serde(default)]
+    pub reverse: bool,
+}
+
+impl PartialEq for NodeSorterApplicable {
+    fn eq(&self, other: &NodeSorterApplicable) -> bool {
+        self.sorter == other.sorter
+    }
+}
+
+impl std::hash::Hash for NodeSorterApplicable {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.sorter.hash(state);
+    }
+}
+
+impl NodeSorterApplicable {
+    fn reversed(mut self) -> Self {
+        self.reverse = !self.reverse;
+        self
+    }
+
+    fn apply(&self, a: &Node, b: &Node) -> Ordering {
+        match (self.sorter, self.reverse) {
+            (NodeSorter::ByRelativePath, false) => {
+                natord::compare(&a.relative_path, &b.relative_path)
+            }
+            (NodeSorter::ByIRelativePath, false) => {
+                natord::compare_ignore_case(&a.relative_path, &b.relative_path)
+            }
+            (NodeSorter::ByRelativePath, true) => {
+                natord::compare(&b.relative_path, &a.relative_path)
+            }
+            (NodeSorter::ByIRelativePath, true) => {
+                natord::compare_ignore_case(&b.relative_path, &a.relative_path)
+            }
+            (NodeSorter::ByExtension, false) => a.extension.cmp(&b.extension),
+            (NodeSorter::ByExtension, true) => b.extension.cmp(&a.extension),
+            (NodeSorter::ByIsDir, false) => a.is_dir.cmp(&b.is_dir),
+            (NodeSorter::ByIsDir, true) => b.is_dir.cmp(&a.is_dir),
+            (NodeSorter::ByIsFile, false) => a.is_file.cmp(&b.is_file),
+            (NodeSorter::ByIsFile, true) => b.is_file.cmp(&a.is_file),
+            (NodeSorter::ByIsSymlink, false) => a.is_symlink.cmp(&b.is_symlink),
+            (NodeSorter::ByIsSymlink, true) => b.is_symlink.cmp(&a.is_symlink),
+            (NodeSorter::ByIsBroken, false) => a.is_broken.cmp(&b.is_broken),
+            (NodeSorter::ByIsBroken, true) => b.is_broken.cmp(&a.is_broken),
+            (NodeSorter::ByIsReadonly, false) => a.is_readonly.cmp(&b.is_readonly),
+            (NodeSorter::ByIsReadonly, true) => b.is_readonly.cmp(&a.is_readonly),
+            (NodeSorter::ByMimeEssence, false) => a.mime_essence.cmp(&b.mime_essence),
+            (NodeSorter::ByMimeEssence, true) => b.mime_essence.cmp(&a.mime_essence),
+
+            (NodeSorter::ByCanonicalAbsolutePath, false) => natord::compare(
+                &a.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &b.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::ByICanonicalAbsolutePath, false) => natord::compare_ignore_case(
+                &a.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &b.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::ByCanonicalAbsolutePath, true) => natord::compare(
+                &b.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &a.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::ByICanonicalAbsolutePath, true) => natord::compare_ignore_case(
+                &b.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &a.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::ByCanonicalExtension, false) => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.extension)
+                .cmp(&b.canonical.as_ref().map(|s| &s.extension)),
+
+            (NodeSorter::ByCanonicalExtension, true) => b
+                .canonical
+                .as_ref()
+                .map(|s| &s.extension)
+                .cmp(&a.canonical.as_ref().map(|s| &s.extension)),
+
+            (NodeSorter::ByCanonicalIsDir, false) => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.is_dir)
+                .cmp(&b.canonical.as_ref().map(|s| &s.is_dir)),
+
+            (NodeSorter::ByCanonicalIsFile, true) => b
+                .canonical
+                .as_ref()
+                .map(|s| &s.is_file)
+                .cmp(&a.canonical.as_ref().map(|s| &s.is_file)),
+
+            (NodeSorter::ByCanonicalIsDir, true) => b
+                .canonical
+                .as_ref()
+                .map(|s| &s.is_dir)
+                .cmp(&a.canonical.as_ref().map(|s| &s.is_dir)),
+
+            (NodeSorter::ByCanonicalIsReadonly, true) => b
+                .canonical
+                .as_ref()
+                .map(|s| &s.is_readonly)
+                .cmp(&a.canonical.as_ref().map(|s| &s.is_readonly)),
+
+            (NodeSorter::ByCanonicalIsFile, false) => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.is_file)
+                .cmp(&b.canonical.as_ref().map(|s| &s.is_file)),
+
+            (NodeSorter::ByCanonicalMimeEssence, true) => b
+                .canonical
+                .as_ref()
+                .map(|s| &s.mime_essence)
+                .cmp(&a.canonical.as_ref().map(|s| &s.mime_essence)),
+
+            (NodeSorter::ByCanonicalIsReadonly, false) => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.is_readonly)
+                .cmp(&b.canonical.as_ref().map(|s| &s.is_readonly)),
+
+            (NodeSorter::ByCanonicalMimeEssence, false) => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.mime_essence)
+                .cmp(&b.canonical.as_ref().map(|s| &s.mime_essence)),
+
+            (NodeSorter::BySymlinkAbsolutePath, false) => natord::compare(
+                &a.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &b.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::ByISymlinkAbsolutePath, false) => natord::compare_ignore_case(
+                &a.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &b.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::BySymlinkAbsolutePath, true) => natord::compare(
+                &b.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &a.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::ByISymlinkAbsolutePath, true) => natord::compare_ignore_case(
+                &b.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &a.symlink
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
+
+            (NodeSorter::BySymlinkExtension, true) => b
+                .symlink
+                .as_ref()
+                .map(|s| &s.extension)
+                .cmp(&a.symlink.as_ref().map(|s| &s.extension)),
+
+            (NodeSorter::BySymlinkExtension, false) => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.extension)
+                .cmp(&b.symlink.as_ref().map(|s| &s.extension)),
+
+            (NodeSorter::BySymlinkIsDir, true) => b
+                .symlink
+                .as_ref()
+                .map(|s| &s.is_dir)
+                .cmp(&a.symlink.as_ref().map(|s| &s.is_dir)),
+
+            (NodeSorter::BySymlinkIsDir, false) => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.is_dir)
+                .cmp(&b.symlink.as_ref().map(|s| &s.is_dir)),
+
+            (NodeSorter::BySymlinkIsFile, true) => b
+                .symlink
+                .as_ref()
+                .map(|s| &s.is_file)
+                .cmp(&a.symlink.as_ref().map(|s| &s.is_file)),
+
+            (NodeSorter::BySymlinkIsFile, false) => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.is_file)
+                .cmp(&b.symlink.as_ref().map(|s| &s.is_file)),
+
+            (NodeSorter::BySymlinkIsReadonly, true) => b
+                .symlink
+                .as_ref()
+                .map(|s| &s.is_readonly)
+                .cmp(&a.symlink.as_ref().map(|s| &s.is_readonly)),
+
+            (NodeSorter::BySymlinkIsReadonly, false) => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.is_readonly)
+                .cmp(&b.symlink.as_ref().map(|s| &s.is_readonly)),
+
+            (NodeSorter::BySymlinkMimeEssence, true) => b
+                .symlink
+                .as_ref()
+                .map(|s| &s.mime_essence)
+                .cmp(&a.symlink.as_ref().map(|s| &s.mime_essence)),
+
+            (NodeSorter::BySymlinkMimeEssence, false) => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.mime_essence)
+                .cmp(&b.symlink.as_ref().map(|s| &s.mime_essence)),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum NodeFilter {
     RelativePathIs,
     RelativePathIsNot,
 
+    IRelativePathIs,
+    IRelativePathIsNot,
+
     RelativePathDoesStartWith,
     RelativePathDoesNotStartWith,
+
+    IRelativePathDoesStartWith,
+    IRelativePathDoesNotStartWith,
 
     RelativePathDoesContain,
     RelativePathDoesNotContain,
 
+    IRelativePathDoesContain,
+    IRelativePathDoesNotContain,
+
     RelativePathDoesEndWith,
     RelativePathDoesNotEndWith,
+
+    IRelativePathDoesEndWith,
+    IRelativePathDoesNotEndWith,
 
     AbsolutePathIs,
     AbsolutePathIsNot,
 
+    IAbsolutePathIs,
+    IAbsolutePathIsNot,
+
     AbsolutePathDoesStartWith,
     AbsolutePathDoesNotStartWith,
+
+    IAbsolutePathDoesStartWith,
+    IAbsolutePathDoesNotStartWith,
 
     AbsolutePathDoesContain,
     AbsolutePathDoesNotContain,
 
+    IAbsolutePathDoesContain,
+    IAbsolutePathDoesNotContain,
+
     AbsolutePathDoesEndWith,
     AbsolutePathDoesNotEndWith,
+
+    IAbsolutePathDoesEndWith,
+    IAbsolutePathDoesNotEndWith,
 }
 
 impl NodeFilter {
-    fn apply(&self, node: &Node, input: &str, case_sensitive: bool) -> bool {
+    fn apply(&self, node: &Node, input: &str) -> bool {
         match self {
-            Self::RelativePathIs => {
-                if case_sensitive {
-                    node.relative_path == input
-                } else {
-                    node.relative_path.to_lowercase() == input.to_lowercase()
-                }
-            }
+            Self::RelativePathIs => node.relative_path.eq(input),
+            Self::IRelativePathIs => node.relative_path.eq_ignore_ascii_case(input),
 
-            Self::RelativePathIsNot => {
-                if case_sensitive {
-                    node.relative_path != input
-                } else {
-                    node.relative_path.to_lowercase() != input.to_lowercase()
-                }
-            }
+            Self::RelativePathIsNot => !node.relative_path.eq(input),
+            Self::IRelativePathIsNot => !node.relative_path.eq_ignore_ascii_case(input),
 
-            Self::RelativePathDoesStartWith => {
-                if case_sensitive {
-                    node.relative_path.starts_with(input)
-                } else {
-                    node.relative_path
-                        .to_lowercase()
-                        .starts_with(&input.to_lowercase())
-                }
-            }
+            Self::RelativePathDoesStartWith => node.relative_path.starts_with(input),
+            Self::IRelativePathDoesStartWith => node
+                .relative_path
+                .to_lowercase()
+                .starts_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotStartWith => {
-                if case_sensitive {
-                    !node.relative_path.starts_with(input)
-                } else {
-                    !node
-                        .relative_path
-                        .to_lowercase()
-                        .starts_with(&input.to_lowercase())
-                }
-            }
+            Self::RelativePathDoesNotStartWith => !node.relative_path.starts_with(input),
 
-            Self::RelativePathDoesContain => {
-                if case_sensitive {
-                    node.relative_path.contains(input)
-                } else {
-                    node.relative_path
-                        .to_lowercase()
-                        .contains(&input.to_lowercase())
-                }
-            }
+            Self::IRelativePathDoesNotStartWith => !node
+                .relative_path
+                .to_lowercase()
+                .starts_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotContain => {
-                if case_sensitive {
-                    !node.relative_path.contains(input)
-                } else {
-                    !node
-                        .relative_path
-                        .to_lowercase()
-                        .contains(&input.to_lowercase())
-                }
-            }
+            Self::RelativePathDoesContain => node.relative_path.contains(input),
+            Self::IRelativePathDoesContain => node
+                .relative_path
+                .to_lowercase()
+                .contains(&input.to_lowercase()),
 
-            Self::RelativePathDoesEndWith => {
-                if case_sensitive {
-                    node.relative_path.ends_with(input)
-                } else {
-                    node.relative_path
-                        .to_lowercase()
-                        .ends_with(&input.to_lowercase())
-                }
-            }
+            Self::RelativePathDoesNotContain => !node.relative_path.contains(input),
+            Self::IRelativePathDoesNotContain => !node
+                .relative_path
+                .to_lowercase()
+                .contains(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotEndWith => {
-                if case_sensitive {
-                    !node.relative_path.ends_with(input)
-                } else {
-                    !node
-                        .relative_path
-                        .to_lowercase()
-                        .ends_with(&input.to_lowercase())
-                }
-            }
+            Self::RelativePathDoesEndWith => node.relative_path.ends_with(input),
+            Self::IRelativePathDoesEndWith => node
+                .relative_path
+                .to_lowercase()
+                .ends_with(&input.to_lowercase()),
 
-            Self::AbsolutePathIs => {
-                if case_sensitive {
-                    node.absolute_path == input
-                } else {
-                    node.absolute_path.to_lowercase() == input.to_lowercase()
-                }
-            }
+            Self::RelativePathDoesNotEndWith => !node.relative_path.ends_with(input),
+            Self::IRelativePathDoesNotEndWith => !node
+                .relative_path
+                .to_lowercase()
+                .ends_with(&input.to_lowercase()),
 
-            Self::AbsolutePathIsNot => {
-                if case_sensitive {
-                    node.absolute_path != input
-                } else {
-                    node.absolute_path.to_lowercase() != input.to_lowercase()
-                }
-            }
+            Self::AbsolutePathIs => node.absolute_path.eq(input),
+            Self::IAbsolutePathIs => node.absolute_path.eq_ignore_ascii_case(input),
 
-            Self::AbsolutePathDoesStartWith => {
-                if case_sensitive {
-                    node.absolute_path.starts_with(input)
-                } else {
-                    node.absolute_path
-                        .to_lowercase()
-                        .starts_with(&input.to_lowercase())
-                }
-            }
+            Self::AbsolutePathIsNot => !node.absolute_path.eq(input),
+            Self::IAbsolutePathIsNot => !node.absolute_path.eq_ignore_ascii_case(input),
 
-            Self::AbsolutePathDoesNotStartWith => {
-                if case_sensitive {
-                    !node.absolute_path.starts_with(input)
-                } else {
-                    !node
-                        .absolute_path
-                        .to_lowercase()
-                        .starts_with(&input.to_lowercase())
-                }
-            }
+            Self::AbsolutePathDoesStartWith => node.absolute_path.starts_with(input),
+            Self::IAbsolutePathDoesStartWith => node
+                .absolute_path
+                .to_lowercase()
+                .starts_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesContain => {
-                if case_sensitive {
-                    node.absolute_path.contains(input)
-                } else {
-                    node.absolute_path
-                        .to_lowercase()
-                        .contains(&input.to_lowercase())
-                }
-            }
+            Self::AbsolutePathDoesNotStartWith => !node.absolute_path.starts_with(input),
+            Self::IAbsolutePathDoesNotStartWith => !node
+                .absolute_path
+                .to_lowercase()
+                .starts_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotContain => {
-                if case_sensitive {
-                    !node.absolute_path.contains(input)
-                } else {
-                    !node
-                        .absolute_path
-                        .to_lowercase()
-                        .contains(&input.to_lowercase())
-                }
-            }
+            Self::AbsolutePathDoesContain => node.absolute_path.contains(input),
+            Self::IAbsolutePathDoesContain => node
+                .absolute_path
+                .to_lowercase()
+                .contains(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesEndWith => {
-                if case_sensitive {
-                    node.absolute_path.ends_with(input)
-                } else {
-                    node.absolute_path
-                        .to_lowercase()
-                        .ends_with(&input.to_lowercase())
-                }
-            }
+            Self::AbsolutePathDoesNotContain => !node.absolute_path.contains(input),
+            Self::IAbsolutePathDoesNotContain => !node
+                .absolute_path
+                .to_lowercase()
+                .contains(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotEndWith => {
-                if case_sensitive {
-                    !node.absolute_path.ends_with(input)
-                } else {
-                    !node
-                        .absolute_path
-                        .to_lowercase()
-                        .ends_with(&input.to_lowercase())
-                }
-            }
+            Self::AbsolutePathDoesEndWith => node.absolute_path.ends_with(input),
+            Self::IAbsolutePathDoesEndWith => node
+                .absolute_path
+                .to_lowercase()
+                .ends_with(&input.to_lowercase()),
+
+            Self::AbsolutePathDoesNotEndWith => !node.absolute_path.ends_with(input),
+            Self::IAbsolutePathDoesNotEndWith => !node
+                .absolute_path
+                .to_lowercase()
+                .ends_with(&input.to_lowercase()),
         }
     }
 }
@@ -438,42 +688,47 @@ impl NodeFilter {
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeFilterApplicable {
-    filter: NodeFilter,
-    input: String,
-    #[serde(default)]
-    case_sensitive: bool,
+    pub filter: NodeFilter,
+    pub input: String,
 }
 
 impl NodeFilterApplicable {
-    pub fn new(filter: NodeFilter, input: String, case_sensitive: bool) -> Self {
-        Self {
-            filter,
-            input,
-            case_sensitive,
-        }
+    pub fn new(filter: NodeFilter, input: String) -> Self {
+        Self { filter, input }
     }
 
     fn apply(&self, node: &Node) -> bool {
-        self.filter.apply(node, &self.input, self.case_sensitive)
+        self.filter.apply(node, &self.input)
     }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct NodeFilterFromInput {
-    filter: NodeFilter,
-    #[serde(default)]
-    case_sensitive: bool,
 }
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ExplorerConfig {
-    filters: HashSet<NodeFilterApplicable>,
+    filters: IndexSet<NodeFilterApplicable>,
+    sorters: IndexSet<NodeSorterApplicable>,
 }
 
 impl ExplorerConfig {
     pub fn filter(&self, node: &Node) -> bool {
         self.filters.iter().all(|f| f.apply(node))
+    }
+
+    pub fn sort(&self, a: &Node, b: &Node) -> Ordering {
+        let mut ord = Ordering::Equal;
+        for s in self.sorters.iter() {
+            ord = ord.then(s.apply(a, b));
+        }
+        ord
+    }
+
+    /// Get a reference to the explorer config's filters.
+    pub fn filters(&self) -> &IndexSet<NodeFilterApplicable> {
+        &self.filters
+    }
+
+    /// Get a reference to the explorer config's sorters.
+    pub fn sorters(&self) -> &IndexSet<NodeSorterApplicable> {
+        &self.sorters
     }
 }
 
@@ -649,7 +904,7 @@ pub enum ExternalMsg {
     /// Clear the selection.
     ClearSelection,
 
-    /// Add a filter to explude nodes while exploring directories.
+    /// Add a filter to exclude nodes while exploring directories.
     ///
     /// Example: `AddNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     AddNodeFilter(NodeFilterApplicable),
@@ -666,16 +921,48 @@ pub enum ExternalMsg {
 
     /// Add a node filter reading the input from the buffer.
     ///
-    /// Example: `AddNodeFilterFromInput: {filter: RelativePathDoesStartWith}`
-    AddNodeFilterFromInput(NodeFilterFromInput),
+    /// Example: `AddNodeFilterFromInput: RelativePathDoesStartWith`
+    AddNodeFilterFromInput(NodeFilter),
 
     /// Remove a node filter reading the input from the buffer.
     ///
-    /// Example: `RemoveNodeFilterFromInput: {filter: RelativePathDoesStartWith}`
-    RemoveNodeFilterFromInput(NodeFilterFromInput),
+    /// Example: `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
+    RemoveNodeFilterFromInput(NodeFilter),
 
     /// Reset the node filters back to the default configuration.
     ResetNodeFilters,
+
+    /// Clear all the node filters.
+    ClearNodeFilters,
+
+    /// Add a sorter to sort nodes while exploring directories.
+    ///
+    /// Example: `AddNodeSorter: {sorter: ByRelativePath, reverse: false}`
+    AddNodeSorter(NodeSorterApplicable),
+
+    /// Remove an existing sorter.
+    ///
+    /// Example: `RemoveNodeSorter: ByRelativePath`
+    RemoveNodeSorter(NodeSorter),
+
+    /// Reverse a node sorter.
+    ///
+    /// Example: `ReverseNodeSorter: ByRelativePath`
+    ReverseNodeSorter(NodeSorter),
+
+    /// Remove a sorter if it exists, else, add a it.
+    ///
+    /// Example: `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false}`
+    ToggleNodeSorter(NodeSorterApplicable),
+
+    /// Reverse the node sorters.
+    ReverseNodeSorters,
+
+    /// Reset the node sorters back to the default configuration.
+    ResetNodeSorters,
+
+    /// Clear all the node sorters.
+    ClearNodeSorters,
 
     /// Log information message.
     ///
@@ -888,12 +1175,15 @@ impl App {
 
         let mut explorer_config = ExplorerConfig::default();
         if !config.general.show_hidden.unwrap_or_default() {
-            explorer_config.filters.insert(NodeFilterApplicable::new(
+            explorer_config.filters.replace(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
-                Default::default(),
             ));
         }
+
+        if let Some(sorters) = &config.general.initial_sorting {
+            explorer_config.sorters = sorters.clone();
+        };
 
         let mut history = History::default();
         history = history.push(pwd.to_string_lossy().to_string());
@@ -1013,6 +1303,14 @@ impl App {
             ExternalMsg::RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
             ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
             ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
+            ExternalMsg::ClearNodeFilters => self.clear_node_filters(),
+            ExternalMsg::AddNodeSorter(f) => self.add_node_sorter(f),
+            ExternalMsg::RemoveNodeSorter(f) => self.remove_node_sorter(f),
+            ExternalMsg::ReverseNodeSorter(f) => self.reverse_node_sorter(f),
+            ExternalMsg::ToggleNodeSorter(f) => self.toggle_node_sorter(f),
+            ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
+            ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
+            ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
             ExternalMsg::LogInfo(l) => self.log_info(l),
             ExternalMsg::LogSuccess(l) => self.log_success(l),
             ExternalMsg::LogError(l) => self.log_error(l),
@@ -1342,14 +1640,8 @@ impl App {
     }
 
     fn un_select_path(mut self, path: String) -> Result<Self> {
-        let path = PathBuf::from(path);
-        let parent = path.parent().map(|p| p.to_string_lossy().to_string());
-        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
-        if let (Some(p), Some(n)) = (parent, filename) {
-            let node = Node::new(p, n);
-            self.selection.retain(|n| n != &node);
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
+        self.selection.retain(|n| n.absolute_path != path);
+        self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
@@ -1387,20 +1679,12 @@ impl App {
         }
     }
 
-    fn toggle_selection_by_path(mut self, path: String) -> Result<Self> {
-        let path = PathBuf::from(path);
-        let parent = path.parent().map(|p| p.to_string_lossy().to_string());
-        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
-        if let (Some(p), Some(n)) = (parent, filename) {
-            let node = Node::new(p, n);
-            if self.selection.contains(&node) {
-                self.selection.retain(|n| n != &node);
-            } else {
-                self.selection.push(node);
-            }
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+    fn toggle_selection_by_path(self, path: String) -> Result<Self> {
+        if self.selection.iter().any(|n| n.absolute_path == path) {
+            self.select_path(path)
+        } else {
+            self.un_select_path(path)
+        }
     }
 
     fn clear_selection(mut self) -> Result<Self> {
@@ -1410,41 +1694,28 @@ impl App {
     }
 
     fn add_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
-        self.explorer_config.filters.insert(filter);
-        self.msg_out.push_back(MsgOut::Refresh);
+        self.explorer_config.filters.replace(filter);
         Ok(self)
     }
 
-    fn add_node_filter_from_input(mut self, filter: NodeFilterFromInput) -> Result<Self> {
+    fn add_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
         if let Some(input) = self.input_buffer() {
             self.explorer_config
                 .filters
-                .insert(NodeFilterApplicable::new(
-                    filter.filter,
-                    input,
-                    filter.case_sensitive,
-                ));
-            self.msg_out.push_back(MsgOut::Refresh);
+                .insert(NodeFilterApplicable::new(filter, input));
         };
         Ok(self)
     }
 
     fn remove_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
-        self.explorer_config.filters.remove(&filter);
-        self.msg_out.push_back(MsgOut::Refresh);
+        self.explorer_config.filters.retain(|f| f != &filter);
         Ok(self)
     }
 
-    fn remove_node_filter_from_input(mut self, filter: NodeFilterFromInput) -> Result<Self> {
+    fn remove_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
         if let Some(input) = self.input_buffer() {
-            self.explorer_config
-                .filters
-                .remove(&NodeFilterApplicable::new(
-                    filter.filter,
-                    input,
-                    filter.case_sensitive,
-                ));
-            self.msg_out.push_back(MsgOut::Refresh);
+            let nfa = NodeFilterApplicable::new(filter, input);
+            self.explorer_config.filters.retain(|f| f != &nfa);
         };
         Ok(self)
     }
@@ -1464,12 +1735,67 @@ impl App {
             self.add_node_filter(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
-                Default::default(),
             ))
         } else {
-            self.msg_out.push_back(MsgOut::Refresh);
             Ok(self)
         }
+    }
+    fn clear_node_filters(mut self) -> Result<Self> {
+        self.explorer_config.filters.clear();
+        Ok(self)
+    }
+
+    fn add_node_sorter(mut self, sorter: NodeSorterApplicable) -> Result<Self> {
+        self.explorer_config.sorters.replace(sorter);
+        Ok(self)
+    }
+
+    fn remove_node_sorter(mut self, sorter: NodeSorter) -> Result<Self> {
+        self.explorer_config.sorters.retain(|s| s.sorter != sorter);
+        Ok(self)
+    }
+
+    fn reverse_node_sorter(mut self, sorter: NodeSorter) -> Result<Self> {
+        self.explorer_config.sorters = self
+            .explorer_config
+            .sorters
+            .into_iter()
+            .map(|s| if s.sorter == sorter { s.reversed() } else { s })
+            .collect();
+        Ok(self)
+    }
+
+    fn toggle_node_sorter(self, sorter: NodeSorterApplicable) -> Result<Self> {
+        if self.explorer_config.sorters.contains(&sorter) {
+            self.remove_node_sorter(sorter.sorter)
+        } else {
+            self.add_node_sorter(sorter)
+        }
+    }
+
+    fn reverse_node_sorters(mut self) -> Result<Self> {
+        self.explorer_config.sorters = self
+            .explorer_config
+            .sorters
+            .into_iter()
+            .map(|s| s.reversed())
+            .collect();
+        Ok(self)
+    }
+
+    fn reset_node_sorters(mut self) -> Result<Self> {
+        self.explorer_config.sorters = self
+            .config
+            .general
+            .initial_sorting
+            .to_owned()
+            .unwrap_or_default();
+        Ok(self)
+    }
+
+    fn clear_node_sorters(mut self) -> Result<Self> {
+        self.explorer_config.sorters.clear();
+        Ok(self)
     }
 
     fn log_info(mut self, message: String) -> Result<Self> {

@@ -1,6 +1,11 @@
-version: v0.4.4
+version: v0.5.0
 general:
   show_hidden: false
+  initial_sorting:
+    - sorter: ByCanonicalIsDir
+      reverse: true
+    - sorter: ByIRelativePath
+      reverse: false
   prompt:
     format: "> "
   cursor:
@@ -158,6 +163,129 @@ general:
         bits: 1
       sub_modifier:
         bits: 0
+
+  sort_and_filter_ui:
+    separator:
+      format: " › "
+    sort_direction_identifiers:
+      forward:
+        format: "↓"
+      reverse:
+        format: "↑"
+
+    sorter_identifiers:
+      ByRelativePath:
+        format: "rel"
+      ByIRelativePath:
+        format: "[i]rel"
+      ByExtension:
+        format: "ext"
+      ByIsDir:
+        format: "dir"
+      ByIsFile:
+        format: "file"
+      ByIsSymlink:
+        format: "sym"
+      ByIsBroken:
+        format: "⨯"
+      ByIsReadonly:
+        format: "ro"
+      ByMimeEssence:
+        format: "mime"
+      ByCanonicalAbsolutePath:
+        format: "[c]abs"
+      ByICanonicalAbsolutePath:
+        format: "[ci]abs"
+      ByCanonicalExtension:
+        format: "[c]ext"
+      ByCanonicalIsDir:
+        format: "[c]dir"
+      ByCanonicalIsFile:
+        format: "[c]file"
+      ByCanonicalIsReadonly:
+        format: "[c]ro"
+      ByCanonicalMimeEssence:
+        format: "[c]mime"
+      BySymlinkAbsolutePath:
+        format: "[s]abs"
+      ByISymlinkAbsolutePath:
+        format: "[si]abs"
+      BySymlinkExtension:
+        format: "[s]ext"
+      BySymlinkIsDir:
+        format: "[s]dir"
+      BySymlinkIsFile:
+        format: "[s]file"
+      BySymlinkIsReadonly:
+        format: "[s]ro"
+      BySymlinkMimeEssence:
+        format: "[s]mime"
+
+    filter_identifiers:
+      RelativePathIs:
+        format: "rel=="
+      IRelativePathIs:
+        format: "[i]rel=="
+      RelativePathIsNot:
+        format: "rel!="
+      IRelativePathIsNot:
+        format: "[i]rel!="
+      RelativePathDoesStartWith:
+        format: "rel=^"
+      IRelativePathDoesStartWith:
+        format: "[i]rel=^"
+      RelativePathDoesNotStartWith:
+        format: "rel!^"
+      IRelativePathDoesNotStartWith:
+        format: "[i]rel!^"
+      RelativePathDoesContain:
+        format: "rel=~"
+      IRelativePathDoesContain:
+        format: "[i]rel=~"
+      RelativePathDoesNotContain:
+        format: "rel!~"
+      IRelativePathDoesNotContain:
+        format: "[i]rel!~"
+      RelativePathDoesEndWith:
+        format: "rel=$"
+      IRelativePathDoesEndWith:
+        format: "[i]rel=$"
+      RelativePathDoesNotEndWith:
+        format: "rel!$"
+      IRelativePathDoesNotEndWith:
+        format: "[i]rel!$"
+      AbsolutePathIs:
+        format: "abs=="
+      IAbsolutePathIs:
+        format: "[i]abs=="
+      AbsolutePathIsNot:
+        format: "abs!="
+      IAbsolutePathIsNot:
+        format: "[i]abs!="
+      AbsolutePathDoesStartWith:
+        format: "abs=^"
+      IAbsolutePathDoesStartWith:
+        format: "[i]abs=^"
+      AbsolutePathDoesNotStartWith:
+        format: "abs!^"
+      IAbsolutePathDoesNotStartWith:
+        format: "[i]abs!^"
+      AbsolutePathDoesContain:
+        format: "abs=~"
+      IAbsolutePathDoesContain:
+        format: "[i]abs=~"
+      AbsolutePathDoesNotContain:
+        format: "abs!~"
+      IAbsolutePathDoesNotContain:
+        format: "[i]abs!~"
+      AbsolutePathDoesEndWith:
+        format: "abs=$"
+      IAbsolutePathDoesEndWith:
+        format: "[i]abs=$"
+      AbsolutePathDoesNotEndWith:
+        format: "abs!$"
+      IAbsolutePathDoesNotEndWith:
+        format: "[i]abs!$"
 
 node_types:
   directory:
@@ -398,6 +526,102 @@ modes:
           messages:
             - BufferInputFromKey
 
+    sort:
+      name: sort
+      help: null
+      extra_help: null
+      key_bindings:
+        remaps: {}
+        on_key:
+          backspace:
+            help: clear
+            messages:
+              - ClearNodeSorters
+              - Explore
+          '!':
+            help: reverse all
+            messages:
+              - ReverseNodeSorters
+              - Explore
+          ctrl-r:
+            help: reset
+            messages:
+              - ResetNodeSorters
+              - Explore
+          r:
+            help: by relative path
+            messages:
+              - AddNodeSorter:
+                  sorter: ByIRelativePath
+              - Explore
+          R:
+            help: by relative path reverse
+            messages:
+              - AddNodeSorter:
+                  sorter: ByIRelativePath
+                  reverse: true
+              - Explore
+
+          e:
+            help: by canonical extension
+            messages:
+              - AddNodeSorter:
+                  sorter: ByCanonicalExtension
+              - Explore
+          E:
+            help: by canonical extension reverse
+            messages:
+              - AddNodeSorter:
+                  sorter: ByCanonicalExtension
+                  reverse: true
+              - Explore
+          n:
+            help: by node type
+            messages:
+              - AddNodeSorter:
+                  sorter: ByCanonicalIsDir
+              - AddNodeSorter:
+                  sorter: ByCanonicalIsFile
+              - AddNodeSorter:
+                  sorter: ByIsSymlink
+              - Explore
+          N:
+            help: by node type reverse
+            messages:
+              - AddNodeSorter:
+                  sorter: ByCanonicalIsDir
+                  reverse: true
+              - AddNodeSorter:
+                  sorter: ByCanonicalIsFile
+                  reverse: true
+              - AddNodeSorter:
+                  sorter: ByIsSymlink
+                  reverse: true
+              - Explore
+
+          m:
+            help: by canonical mime essence
+            messages:
+              - AddNodeSorter:
+                  sorter: ByCanonicalMimeEssence
+              - Explore
+
+          M:
+            help: by canonical mime essence reverse
+            messages:
+              - AddNodeSorter:
+                  sorter: ByCanonicalMimeEssence
+                  reverse: true
+              - Explore
+          ctrl-c:
+            help: terminate
+            messages:
+              - Terminate
+
+        default:
+          messages:
+            - SwitchMode: default
+
     default:
       name: default
       help: null
@@ -417,13 +641,16 @@ modes:
             help: null
             messages:
               - PrintAppStateAndQuit
+          s:
+            help: sort
+            messages:
+              - SwitchMode: sort
           .:
             help: show hidden
             messages:
               - ToggleNodeFilter:
                   filter: RelativePathDoesNotStartWith
                   input: .
-                  case_sensitive: false
               - Explore
           ':':
             help: action
@@ -718,9 +945,7 @@ modes:
           backspace:
             help: clear
             messages:
-              - RemoveNodeFilterFromInput:
-                  filter: RelativePathDoesContain
-                  case_sensitive: false
+              - RemoveNodeFilterFromInput: RelativePathDoesContain
               - SetInputBuffer: ''
               - Explore
           ctrl-c:
@@ -734,34 +959,26 @@ modes:
           enter:
             help: focus
             messages:
-              - RemoveNodeFilterFromInput:
-                  filter: RelativePathDoesContain
-                  case_sensitive: false
+              - RemoveNodeFilterFromInput: RelativePathDoesContain
               - SwitchMode: default
               - Explore
           esc:
             help: cancel
             messages:
-              - RemoveNodeFilterFromInput:
-                  filter: RelativePathDoesContain
-                  case_sensitive: false
+              - RemoveNodeFilterFromInput: RelativePathDoesContain
               - SwitchMode: default
               - Explore
           left:
             help: back
             messages:
-              - RemoveNodeFilterFromInput:
-                  filter: RelativePathDoesContain
-                  case_sensitive: false
+              - RemoveNodeFilterFromInput: RelativePathDoesContain
               - Back
               - SetInputBuffer: ''
               - Explore
           right:
             help: enter
             messages:
-              - RemoveNodeFilterFromInput:
-                  filter: RelativePathDoesContain
-                  case_sensitive: false
+              - RemoveNodeFilterFromInput: RelativePathDoesContain
               - Enter
               - SetInputBuffer: ''
               - Explore
@@ -775,13 +992,9 @@ modes:
         default:
           help: null
           messages:
-            - RemoveNodeFilterFromInput:
-                filter: RelativePathDoesContain
-                case_sensitive: false
+            - RemoveNodeFilterFromInput: RelativePathDoesContain
             - BufferInputFromKey
-            - AddNodeFilterFromInput:
-                filter: RelativePathDoesContain
-                case_sensitive: false
+            - AddNodeFilterFromInput: RelativePathDoesContain
             - Explore
 
   custom: {}

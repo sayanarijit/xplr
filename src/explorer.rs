@@ -18,17 +18,20 @@ pub fn explore(
     thread::spawn(move || {
         fs::read_dir(&path)
             .map(|dirs| {
-                dirs.filter_map(|d| {
-                    d.ok().map(|e| {
-                        e.path()
-                            .file_name()
-                            .map(|n| n.to_string_lossy().to_string())
-                            .unwrap_or_default()
+                let mut nodes = dirs
+                    .filter_map(|d| {
+                        d.ok().map(|e| {
+                            e.path()
+                                .file_name()
+                                .map(|n| n.to_string_lossy().to_string())
+                                .unwrap_or_default()
+                        })
                     })
-                })
-                .map(|name| Node::new(parent.clone(), name))
-                .filter(|n| config.filter(n))
-                .collect::<Vec<Node>>()
+                    .map(|name| Node::new(parent.clone(), name))
+                    .filter(|n| config.filter(n))
+                    .collect::<Vec<Node>>();
+                nodes.sort_by(|a, b| config.sort(a, b));
+                nodes
             })
             .map(|nodes| {
                 let focus_index = if let Some(focus) = focused_path {
