@@ -553,9 +553,9 @@ modes:
         default:
           help: null
           messages:
-            - RemoveNodeFilterFromInput: RelativePathDoesContain
+            - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
-            - AddNodeFilterFromInput: RelativePathDoesContain
+            - AddNodeFilterFromInput: IRelativePathDoesContain
             - Explore
 
     sort:
@@ -983,7 +983,7 @@ modes:
           backspace:
             help: clear
             messages:
-              - RemoveNodeFilterFromInput: RelativePathDoesContain
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SetInputBuffer: ''
               - Explore
           ctrl-c:
@@ -997,26 +997,26 @@ modes:
           enter:
             help: focus
             messages:
-              - RemoveNodeFilterFromInput: RelativePathDoesContain
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchMode: default
               - Explore
           esc:
             help: cancel
             messages:
-              - RemoveNodeFilterFromInput: RelativePathDoesContain
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchMode: default
               - Explore
           left:
             help: back
             messages:
-              - RemoveNodeFilterFromInput: RelativePathDoesContain
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - Back
               - SetInputBuffer: ''
               - Explore
           right:
             help: enter
             messages:
-              - RemoveNodeFilterFromInput: RelativePathDoesContain
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - Enter
               - SetInputBuffer: ''
               - Explore
@@ -1030,9 +1030,9 @@ modes:
         default:
           help: null
           messages:
-            - RemoveNodeFilterFromInput: RelativePathDoesContain
+            - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
-            - AddNodeFilterFromInput: RelativePathDoesContain
+            - AddNodeFilterFromInput: IRelativePathDoesContain
             - Explore
 
   custom: {}
