@@ -172,12 +172,18 @@ pub enum Key {
 
 impl std::fmt::Display for Key {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let key_str = self.to_char().map(|c| c.to_string()).unwrap_or_else(|| {
-            serde_yaml::to_value(self)
-                .ok()
-                .and_then(|v| v.as_str().map(|v| v.to_string()))
-                .unwrap_or_default()
-        });
+        let key_str = self
+            .to_char()
+            .map(|c| match c {
+                ' ' => "space".into(),
+                _ => c.to_string(),
+            })
+            .unwrap_or_else(|| {
+                serde_yaml::to_value(self)
+                    .ok()
+                    .and_then(|v| v.as_str().map(|v| v.to_string()))
+                    .unwrap_or_default()
+            });
 
         write!(f, "{}", key_str)
     }
