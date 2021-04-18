@@ -479,6 +479,9 @@ pub struct BuiltinModesConfig {
     pub search: Mode,
 
     #[serde(default)]
+    pub filter: Mode,
+
+    #[serde(default)]
     pub sort: Mode,
 }
 
@@ -495,6 +498,7 @@ impl BuiltinModesConfig {
         self.number = self.number.extend(other.number);
         self.action = self.action.extend(other.action);
         self.search = self.search.extend(other.search);
+        self.filter = self.filter.extend(other.filter);
         self.sort = self.sort.extend(other.sort);
         self
     }
@@ -517,6 +521,7 @@ impl BuiltinModesConfig {
             "action" => Some(&self.action),
             "search" => Some(&self.search),
             "sort" => Some(&self.sort),
+            "filter" => Some(&self.filter),
             _ => None,
         }
     }

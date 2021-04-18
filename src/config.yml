@@ -526,6 +526,38 @@ modes:
           messages:
             - BufferInputFromKey
 
+    filter:
+      name: filter
+      key_bindings:
+        on_key:
+          backspace:
+            help: clear
+            messages:
+              - SetInputBuffer: ""
+              - ClearNodeFilters
+              - Explore
+          ctrl-r:
+            help: reset
+            messages:
+              - SetInputBuffer: ""
+              - ResetNodeFilters
+              - Explore
+          enter:
+            help: apply
+            messages:
+              - SwitchMode: default
+          esc:
+            help: cancel
+            messages:
+              - SwitchMode: default
+        default:
+          help: null
+          messages:
+            - RemoveNodeFilterFromInput: RelativePathDoesContain
+            - BufferInputFromKey
+            - AddNodeFilterFromInput: RelativePathDoesContain
+            - Explore
+
     sort:
       name: sort
       help: null
@@ -645,6 +677,12 @@ modes:
             help: sort
             messages:
               - SwitchMode: sort
+          f:
+            help: filter
+            messages:
+              - SwitchMode: filter
+              - SetInputBuffer: ''
+              - Explore
           .:
             help: show hidden
             messages:
