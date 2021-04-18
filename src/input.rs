@@ -445,6 +445,7 @@ impl Key {
             Self::ShiftY => Some('Y'),
             Self::ShiftZ => Some('Z'),
 
+            Self::Space => Some(' '),
             Self::Special(c) => Some(c.to_owned()),
 
             _ => None,
