@@ -832,7 +832,11 @@ modes:
             messages:
               - NextVisitedPath
           ctrl-l:
-            help: clear screen
+            help: clear selection
+            messages:
+              - ClearSelection
+          ctrl-r:
+            help: refresh screen
             messages:
               - ClearScreen
               - Refresh
