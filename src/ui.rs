@@ -180,7 +180,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let is_focused = dir.focus == index;
 
                     // TODO : Optimize
-                    let is_selected = app.selection().contains(&node);
+                    let is_selected = app.selection().contains(node);
 
                     let is_first = index == 0;
                     let is_last = index == dir.total.max(1) - 1;
