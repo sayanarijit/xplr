@@ -832,6 +832,12 @@ pub enum ExternalMsg {
     /// Example: `SetInputBuffer: foo`
     SetInputBuffer(String),
 
+    /// Remove input buffer's last character.
+    RemoveInputBufferLastCharacter,
+
+    /// Remove input buffer's last word.
+    RemoveInputBufferLastWord,
+
     /// Reset the input buffer back to null. It will not show in the UI.
     ResetInputBuffer,
 
@@ -929,6 +935,9 @@ pub enum ExternalMsg {
     /// Example: `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
     RemoveNodeFilterFromInput(NodeFilter),
 
+    /// Remove the last node filter.
+    RemoveLastNodeFilter,
+
     /// Reset the node filters back to the default configuration.
     ResetNodeFilters,
 
@@ -957,6 +966,9 @@ pub enum ExternalMsg {
 
     /// Reverse the node sorters.
     ReverseNodeSorters,
+
+    /// Remove the last node sorter.
+    RemoveLastNodeSorter,
 
     /// Reset the node sorters back to the default configuration.
     ResetNodeSorters,
@@ -1281,6 +1293,10 @@ impl App {
             ExternalMsg::BufferInput(input) => self.buffer_input(&input),
             ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
             ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
+            ExternalMsg::RemoveInputBufferLastCharacter => {
+                self.remove_input_buffer_last_character()
+            }
+            ExternalMsg::RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
             ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
             ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
             ExternalMsg::Call(cmd) => self.call(cmd),
@@ -1302,12 +1318,14 @@ impl App {
             ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
             ExternalMsg::RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
             ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
+            ExternalMsg::RemoveLastNodeFilter => self.remove_last_node_filter(),
             ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
             ExternalMsg::ClearNodeFilters => self.clear_node_filters(),
             ExternalMsg::AddNodeSorter(f) => self.add_node_sorter(f),
             ExternalMsg::RemoveNodeSorter(f) => self.remove_node_sorter(f),
             ExternalMsg::ReverseNodeSorter(f) => self.reverse_node_sorter(f),
             ExternalMsg::ToggleNodeSorter(f) => self.toggle_node_sorter(f),
+            ExternalMsg::RemoveLastNodeSorter => self.remove_last_node_sorter(),
             ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
             ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
             ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
@@ -1496,6 +1514,34 @@ impl App {
 
     fn set_input_buffer(mut self, string: String) -> Result<Self> {
         self.input_buffer = Some(string);
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn remove_input_buffer_last_character(mut self) -> Result<Self> {
+        if let Some(mut buf) = self.input_buffer {
+            buf.pop();
+            self.input_buffer = Some(buf);
+        };
+        self.msg_out.push_back(MsgOut::Refresh);
+        Ok(self)
+    }
+
+    fn remove_input_buffer_last_word(mut self) -> Result<Self> {
+        if let Some(buf) = self.input_buffer {
+            let buf = buf
+                .chars()
+                .into_iter()
+                .rev()
+                .skip_while(|c| !c.is_ascii_alphanumeric())
+                .skip_while(|c| c.is_ascii_alphanumeric())
+                .collect::<Vec<char>>()
+                .into_iter()
+                .rev()
+                .collect::<String>();
+
+            self.input_buffer = Some(buf);
+        };
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
@@ -1728,6 +1774,11 @@ impl App {
         }
     }
 
+    fn remove_last_node_filter(mut self) -> Result<Self> {
+        self.explorer_config.filters.pop();
+        Ok(self)
+    }
+
     fn reset_node_filters(mut self) -> Result<Self> {
         self.explorer_config.filters.clear();
 
@@ -1771,6 +1822,11 @@ impl App {
         } else {
             self.add_node_sorter(sorter)
         }
+    }
+
+    fn remove_last_node_sorter(mut self) -> Result<Self> {
+        self.explorer_config.sorters.pop();
+        Ok(self)
     }
 
     fn reverse_node_sorters(mut self) -> Result<Self> {

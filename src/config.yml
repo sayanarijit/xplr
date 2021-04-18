@@ -391,22 +391,26 @@ modes:
                     echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
               - SwitchMode: default
-
           backspace:
-            help: clear
+            help: remove last character
+            messages:
+              - RemoveInputBufferLastCharacter
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveInputBufferLastWord
+          ctrl-u:
+            help: remove line
             messages:
               - SetInputBuffer: ""
-
           esc:
             help: cancel
             messages:
               - SwitchMode: default
-
           ctrl-c:
             help: terminate
             messages:
               - Terminate
-
         default:
           messages:
             - BufferInputFromKey
@@ -434,7 +438,17 @@ modes:
               - SwitchMode: default
 
           backspace:
-            help: clear
+            help: remove last character
+            messages:
+              - RemoveInputBufferLastCharacter
+
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveInputBufferLastWord
+
+          ctrl-u:
+            help: remove line
             messages:
               - SetInputBuffer: ""
 
@@ -507,7 +521,17 @@ modes:
               - SwitchMode: default
 
           backspace:
-            help: clear
+            help: remove last character
+            messages:
+              - RemoveInputBufferLastCharacter
+
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveInputBufferLastWord
+
+          ctrl-u:
+            help: remove line
             messages:
               - SetInputBuffer: ""
 
@@ -529,26 +553,59 @@ modes:
       name: filter
       key_bindings:
         on_key:
-          backspace:
-            help: clear
+          ctrl-x:
+            help: remove last filter
             messages:
+              - RemoveLastNodeFilter
               - SetInputBuffer: ""
-              - ClearNodeFilters
+              - Explore
+          backspace:
+            help: remove last character
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
+              - RemoveInputBufferLastCharacter
+              - AddNodeFilterFromInput: IRelativePathDoesContain
+              - Explore
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
+              - RemoveInputBufferLastWord
+              - AddNodeFilterFromInput: IRelativePathDoesContain
+              - Explore
+          ctrl-u:
+            help: remove line
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
+              - SetInputBuffer: ""
+              - AddNodeFilterFromInput: IRelativePathDoesContain
               - Explore
           ctrl-r:
-            help: reset
+            help: reset filters
             messages:
               - SetInputBuffer: ""
               - ResetNodeFilters
               - Explore
+          ctrl-l:
+            help: clear filters
+            messages:
+              - SetInputBuffer: ""
+              - ClearNodeFilters
+              - Explore
           enter:
-            help: apply
+            help: apply filter
             messages:
               - SwitchMode: default
           esc:
             help: cancel
             messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchMode: default
+              - Explore
+          ctrl-c:
+            help: terminate
+            messages:
+              - Terminate
         default:
           help: null
           messages:
@@ -565,19 +622,24 @@ modes:
         remaps: {}
         on_key:
           backspace:
-            help: clear
+            help: remove last sorter
             messages:
-              - ClearNodeSorters
+              - RemoveLastNodeSorter
               - Explore
           '!':
-            help: reverse all
+            help: reverse sorters
             messages:
               - ReverseNodeSorters
               - Explore
           ctrl-r:
-            help: reset
+            help: reset sorters
             messages:
               - ResetNodeSorters
+              - Explore
+          ctrl-l:
+            help: clear sorters
+            messages:
+              - ClearNodeSorters
               - Explore
           r:
             help: by relative path
@@ -769,6 +831,11 @@ modes:
             help: next visited path
             messages:
               - NextVisitedPath
+          ctrl-l:
+            help: clear screen
+            messages:
+              - ClearScreen
+              - Refresh
           q:
             help: quit
             messages:
@@ -828,7 +895,15 @@ modes:
           k: up
         on_key:
           backspace:
-            help: clear
+            help: remove last character
+            messages:
+              - RemoveInputBufferLastCharacter
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveInputBufferLastWord
+          ctrl-u:
+            help: remove line
             messages:
               - SetInputBuffer: ""
           ctrl-c:
@@ -980,10 +1055,25 @@ modes:
         remaps: {}
         on_key:
           backspace:
-            help: clear
+            help: remove last character
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SetInputBuffer: ''
+              - RemoveInputBufferLastCharacter
+              - AddNodeFilterFromInput: IRelativePathDoesContain
+              - Explore
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
+              - RemoveInputBufferLastWord
+              - AddNodeFilterFromInput: IRelativePathDoesContain
+              - Explore
+          ctrl-u:
+            help: remove line
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesContain
+              - SetInputBuffer: ""
+              - AddNodeFilterFromInput: IRelativePathDoesContain
               - Explore
           ctrl-c:
             help: terminate
