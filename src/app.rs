@@ -83,7 +83,7 @@ impl Pipe {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct ResolvedNode {
     pub absolute_path: String,
     pub extension: String,
@@ -126,7 +126,7 @@ impl ResolvedNode {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct Node {
     pub parent: String,
     pub relative_path: String,
@@ -1126,7 +1126,7 @@ pub struct App {
     config: Config,
     pwd: String,
     directory_buffers: HashMap<String, DirectoryBuffer>,
-    selection: Vec<Node>,
+    selection: IndexSet<Node>,
     msg_out: VecDeque<MsgOut>,
     mode: Mode,
     input_buffer: Option<String>,
@@ -1648,7 +1648,7 @@ impl App {
 
     fn select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
-            self.selection.push(n);
+            self.selection.insert(n);
             self.msg_out.push_back(MsgOut::Refresh);
         }
         Ok(self)
@@ -1659,7 +1659,7 @@ impl App {
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
-            self.selection.push(Node::new(p, n));
+            self.selection.insert(Node::new(p, n));
             self.msg_out.push_back(MsgOut::Refresh);
         };
         Ok(self)
@@ -1667,10 +1667,9 @@ impl App {
 
     fn select_all(mut self) -> Result<Self> {
         if let Some(d) = self.directory_buffer() {
-            d.nodes
-                .clone()
-                .into_iter()
-                .for_each(|n| self.selection.push(n));
+            d.nodes.clone().into_iter().for_each(|n| {
+                self.selection.insert(n);
+            });
             self.msg_out.push_back(MsgOut::Refresh);
         };
 
@@ -1909,7 +1908,7 @@ impl App {
     }
 
     /// Get a reference to the app's selection.
-    pub fn selection(&self) -> &Vec<Node> {
+    pub fn selection(&self) -> &IndexSet<Node> {
         &self.selection
     }
 
