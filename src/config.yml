@@ -61,8 +61,7 @@ general:
     row:
       cols:
         - format: >
-            {{{tree}}}{{{prefix}}}{{{meta.icon}}}
-            {{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}
+            {{{tree}}}{{{prefix}}}{{{meta.icon}}}{{#if (ne meta.icon "")}} {{/if}}{{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}
             {{#if isSymlink}}-> {{#if isBroken}}×{{else}}{{{symlink.absolutePath}}}{{/if}}{{#if symlink.isDir}}/{{/if}}{{/if}}
 
           style:
