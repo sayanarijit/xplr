@@ -1008,6 +1008,15 @@ pub enum ExternalMsg {
     Terminate,
 }
 
+impl ExternalMsg {
+    pub fn is_read_only(&self) -> bool {
+        !matches!(
+            self,
+            Self::Call(_) | Self::CallSilently(_) | Self::BashExec(_) | Self::BashExecSilently(_)
+        )
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgIn {
     Internal(InternalMsg),
@@ -1170,7 +1179,9 @@ impl App {
         };
 
         let mode = match config.modes.builtin.get(&"default".to_string()) {
-            Some(m) => m.clone(),
+            Some(m) => m
+                .clone()
+                .sanitized(config.general.read_only.unwrap_or_default()),
             None => {
                 bail!("'default' mode is missing")
             }
@@ -1261,82 +1272,86 @@ impl App {
     }
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
-        match msg {
-            ExternalMsg::Explore => self.explore(),
-            ExternalMsg::Refresh => self.refresh(),
-            ExternalMsg::ClearScreen => self.clear_screen(),
-            ExternalMsg::FocusFirst => self.focus_first(),
-            ExternalMsg::FocusLast => self.focus_last(),
-            ExternalMsg::FocusPrevious => self.focus_previous(),
-            ExternalMsg::FocusPreviousByRelativeIndex(i) => {
-                self.focus_previous_by_relative_index(i)
-            }
+        if self.config().general.read_only.unwrap_or_default() && !msg.is_read_only() {
+            self.log_error("Cannot call shell command in read-only mode.".into())
+        } else {
+            match msg {
+                ExternalMsg::Explore => self.explore(),
+                ExternalMsg::Refresh => self.refresh(),
+                ExternalMsg::ClearScreen => self.clear_screen(),
+                ExternalMsg::FocusFirst => self.focus_first(),
+                ExternalMsg::FocusLast => self.focus_last(),
+                ExternalMsg::FocusPrevious => self.focus_previous(),
+                ExternalMsg::FocusPreviousByRelativeIndex(i) => {
+                    self.focus_previous_by_relative_index(i)
+                }
 
-            ExternalMsg::FocusPreviousByRelativeIndexFromInput => {
-                self.focus_previous_by_relative_index_from_input()
+                ExternalMsg::FocusPreviousByRelativeIndexFromInput => {
+                    self.focus_previous_by_relative_index_from_input()
+                }
+                ExternalMsg::FocusNext => self.focus_next(),
+                ExternalMsg::FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
+                ExternalMsg::FocusNextByRelativeIndexFromInput => {
+                    self.focus_next_by_relative_index_from_input()
+                }
+                ExternalMsg::FocusPath(p) => self.focus_path(&p),
+                ExternalMsg::FocusPathFromInput => self.focus_path_from_input(),
+                ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
+                ExternalMsg::FocusByIndexFromInput => self.focus_by_index_from_input(),
+                ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n),
+                ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir),
+                ExternalMsg::Enter => self.enter(),
+                ExternalMsg::Back => self.back(),
+                ExternalMsg::LastVisitedPath => self.last_visited_path(),
+                ExternalMsg::NextVisitedPath => self.next_visited_path(),
+                ExternalMsg::BufferInput(input) => self.buffer_input(&input),
+                ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
+                ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
+                ExternalMsg::RemoveInputBufferLastCharacter => {
+                    self.remove_input_buffer_last_character()
+                }
+                ExternalMsg::RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
+                ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
+                ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
+                ExternalMsg::Call(cmd) => self.call(cmd),
+                ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
+                ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
+                ExternalMsg::BashExecSilently(cmd) => self.bash_exec_silently(cmd),
+                ExternalMsg::Select => self.select(),
+                ExternalMsg::SelectAll => self.select_all(),
+                ExternalMsg::SelectPath(p) => self.select_path(p),
+                ExternalMsg::UnSelect => self.un_select(),
+                ExternalMsg::UnSelectAll => self.un_select_all(),
+                ExternalMsg::UnSelectPath(p) => self.un_select_path(p),
+                ExternalMsg::ToggleSelection => self.toggle_selection(),
+                ExternalMsg::ToggleSelectAll => self.toggle_select_all(),
+                ExternalMsg::ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
+                ExternalMsg::ClearSelection => self.clear_selection(),
+                ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
+                ExternalMsg::AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
+                ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
+                ExternalMsg::RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
+                ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
+                ExternalMsg::RemoveLastNodeFilter => self.remove_last_node_filter(),
+                ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
+                ExternalMsg::ClearNodeFilters => self.clear_node_filters(),
+                ExternalMsg::AddNodeSorter(f) => self.add_node_sorter(f),
+                ExternalMsg::RemoveNodeSorter(f) => self.remove_node_sorter(f),
+                ExternalMsg::ReverseNodeSorter(f) => self.reverse_node_sorter(f),
+                ExternalMsg::ToggleNodeSorter(f) => self.toggle_node_sorter(f),
+                ExternalMsg::RemoveLastNodeSorter => self.remove_last_node_sorter(),
+                ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
+                ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
+                ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
+                ExternalMsg::LogInfo(l) => self.log_info(l),
+                ExternalMsg::LogSuccess(l) => self.log_success(l),
+                ExternalMsg::LogError(l) => self.log_error(l),
+                ExternalMsg::Quit => self.quit(),
+                ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
+                ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
+                ExternalMsg::Debug(path) => self.debug(path),
+                ExternalMsg::Terminate => bail!(""),
             }
-            ExternalMsg::FocusNext => self.focus_next(),
-            ExternalMsg::FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
-            ExternalMsg::FocusNextByRelativeIndexFromInput => {
-                self.focus_next_by_relative_index_from_input()
-            }
-            ExternalMsg::FocusPath(p) => self.focus_path(&p),
-            ExternalMsg::FocusPathFromInput => self.focus_path_from_input(),
-            ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
-            ExternalMsg::FocusByIndexFromInput => self.focus_by_index_from_input(),
-            ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n),
-            ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir),
-            ExternalMsg::Enter => self.enter(),
-            ExternalMsg::Back => self.back(),
-            ExternalMsg::LastVisitedPath => self.last_visited_path(),
-            ExternalMsg::NextVisitedPath => self.next_visited_path(),
-            ExternalMsg::BufferInput(input) => self.buffer_input(&input),
-            ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
-            ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
-            ExternalMsg::RemoveInputBufferLastCharacter => {
-                self.remove_input_buffer_last_character()
-            }
-            ExternalMsg::RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
-            ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
-            ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
-            ExternalMsg::Call(cmd) => self.call(cmd),
-            ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
-            ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
-            ExternalMsg::BashExecSilently(cmd) => self.bash_exec_silently(cmd),
-            ExternalMsg::Select => self.select(),
-            ExternalMsg::SelectAll => self.select_all(),
-            ExternalMsg::SelectPath(p) => self.select_path(p),
-            ExternalMsg::UnSelect => self.un_select(),
-            ExternalMsg::UnSelectAll => self.un_select_all(),
-            ExternalMsg::UnSelectPath(p) => self.un_select_path(p),
-            ExternalMsg::ToggleSelection => self.toggle_selection(),
-            ExternalMsg::ToggleSelectAll => self.toggle_select_all(),
-            ExternalMsg::ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
-            ExternalMsg::ClearSelection => self.clear_selection(),
-            ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
-            ExternalMsg::AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
-            ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
-            ExternalMsg::RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
-            ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
-            ExternalMsg::RemoveLastNodeFilter => self.remove_last_node_filter(),
-            ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
-            ExternalMsg::ClearNodeFilters => self.clear_node_filters(),
-            ExternalMsg::AddNodeSorter(f) => self.add_node_sorter(f),
-            ExternalMsg::RemoveNodeSorter(f) => self.remove_node_sorter(f),
-            ExternalMsg::ReverseNodeSorter(f) => self.reverse_node_sorter(f),
-            ExternalMsg::ToggleNodeSorter(f) => self.toggle_node_sorter(f),
-            ExternalMsg::RemoveLastNodeSorter => self.remove_last_node_sorter(),
-            ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
-            ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
-            ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
-            ExternalMsg::LogInfo(l) => self.log_info(l),
-            ExternalMsg::LogSuccess(l) => self.log_success(l),
-            ExternalMsg::LogError(l) => self.log_error(l),
-            ExternalMsg::Quit => self.quit(),
-            ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
-            ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
-            ExternalMsg::Debug(path) => self.debug(path),
-            ExternalMsg::Terminate => bail!(""),
         }
     }
 
@@ -1610,28 +1625,22 @@ impl App {
     fn switch_mode(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.get(mode) {
             self.input_buffer = None;
-            self.mode = mode.to_owned();
+            self.mode = mode
+                .to_owned()
+                .sanitized(self.config.general.read_only.unwrap_or_default());
             self.msg_out.push_back(MsgOut::Refresh);
         };
         Ok(self)
     }
 
     fn call(mut self, command: Command) -> Result<Self> {
-        if self.config.general.read_only.unwrap_or_default() {
-            self.log_error("Cannot call command in read-only mode.".into())
-        } else {
-            self.msg_out.push_back(MsgOut::Call(command));
-            Ok(self)
-        }
+        self.msg_out.push_back(MsgOut::Call(command));
+        Ok(self)
     }
 
     fn call_silently(mut self, command: Command) -> Result<Self> {
-        if self.config.general.read_only.unwrap_or_default() {
-            self.log_error("Cannot call command in read-only mode.".into())
-        } else {
-            self.msg_out.push_back(MsgOut::CallSilently(command));
-            Ok(self)
-        }
+        self.msg_out.push_back(MsgOut::CallSilently(command));
+        Ok(self)
     }
 
     fn bash_exec(self, script: String) -> Result<Self> {

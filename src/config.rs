@@ -23,6 +23,20 @@ pub struct Action {
 }
 
 impl Action {
+    pub fn sanitized(self, read_only: bool) -> Option<Self> {
+        if self.messages.is_empty() {
+            None
+        } else if read_only {
+            if self.messages.iter().all(|m| m.is_read_only()) {
+                Some(self)
+            } else {
+                None
+            }
+        } else {
+            Some(self)
+        }
+    }
+
     pub fn extend(mut self, other: Self) -> Self {
         self.help = other.help.or(self.help);
         self.messages = other.messages;
@@ -351,6 +365,32 @@ pub struct KeyBindings {
 }
 
 impl KeyBindings {
+    pub fn sanitized(mut self, read_only: bool) -> Self {
+        if read_only {
+            self.on_key = self
+                .on_key
+                .into_iter()
+                .filter_map(|(k, a)| a.sanitized(read_only).map(|a| (k, a)))
+                .collect();
+
+            self.on_alphabet = self.on_alphabet.and_then(|a| a.sanitized(read_only));
+            self.on_number = self.on_number.and_then(|a| a.sanitized(read_only));
+            self.on_special_character = self
+                .on_special_character
+                .and_then(|a| a.sanitized(read_only));
+            self.default = self.default.and_then(|a| a.sanitized(read_only));
+            self.remaps = self
+                .remaps
+                .clone()
+                .into_iter()
+                .filter(|(_, v)| self.on_key.contains_key(v))
+                .collect();
+            self
+        } else {
+            self
+        }
+    }
+
     pub fn extend(mut self, other: Self) -> Self {
         self.remaps.extend(other.remaps);
         self.on_key.extend(other.on_key);
@@ -379,6 +419,11 @@ pub struct Mode {
 }
 
 impl Mode {
+    pub fn sanitized(mut self, read_only: bool) -> Self {
+        self.key_bindings = self.key_bindings.sanitized(read_only);
+        self
+    }
+
     pub fn extend(mut self, other: Self) -> Self {
         self.help = other.help.or(self.help);
         self.extra_help = other.extra_help.or(self.extra_help);
