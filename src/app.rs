@@ -2078,6 +2078,10 @@ impl App {
             ),
             (builtin.rename.name.clone(), builtin.rename),
             (builtin.delete.name.clone(), builtin.delete),
+            (builtin.sort.name.clone(), builtin.sort),
+            (builtin.filter.name.clone(), builtin.filter),
+            (builtin.relative_path_does_contain.name.clone(), builtin.relative_path_does_contain),
+            (builtin.relative_path_does_not_contain.name.clone(), builtin.relative_path_does_not_contain),
         ]
         .iter()
         .chain(custom.into_iter().collect::<Vec<(String, Mode)>>().iter())
