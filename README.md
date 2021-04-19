@@ -1,57 +1,65 @@
 <h1 align="center">xplr</h1>
 
 <p align="center">
-A hackable, minimal, fast TUI file explorer, stealing ideas from <a href="https://github.com/jarun/nnn">nnn</a> and <a href="https://github.com/junegunn/fzf">fzf</a>.
+A hackable, minimal, fast TUI file explorer
 </p>
 
 <p align="center">
-
 <a href="https://crates.io/crates/xplr" target="_blank">
 <img src="https://img.shields.io/crates/v/xplr.svg" />
 </a>
-
-<a href="https://github.com/sayanarijit/xplr/actions/workflows/ci.yml" target="_blank">
-<img src="https://github.com/sayanarijit/xplr/actions/workflows/ci.yml/badge.svg" />
-</a>
-
-<a href="https://github.com/sayanarijit/xplr/actions/workflows/cd.yml" target="_blank">
-<img src="https://github.com/sayanarijit/xplr/actions/workflows/cd.yml/badge.svg" />
-</a>
 </p>
 
 <p align="center">
-<a href="https://asciinema.org/a/3THQPXNVi801Yu8nWxO6qfUa4" target="_blank">
-<img src="https://s4.gifyu.com/images/xplr.gif" />
-</a>
+<img src="https://s3.gifyu.com/images/xplr-0.5.0.gif" />
 </p>
-
-<h3 align="center">
-[<a href="https://github.com/sayanarijit/xplr/wiki/Quickstart">Quickstart</a>]
-[<a href="https://github.com/sayanarijit/xplr/wiki/Features">Features</a>]
-[<a href="https://github.com/sayanarijit/xplr/wiki/Plugins">Plugins</a>]
-[<a href="https://github.com/sayanarijit/xplr/wiki">Documentation</a>]
-[<a href="https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide">Upgrade Guide</a>]
-[<a href="https://github.com/sayanarijit/xplr/wiki/TODO">TODO</a>]
-</h3>
-
-<br>
 
 Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, its speciality is its hackability.
 
 Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you should be able to configure the key bindings,
 different run modes, and also the way it looks by modifying one single configuration file.
 
+
+- ### [Quickstart](https://github.com/sayanarijit/xplr/wiki/Quickstart)
+
+- ### [Features](https://github.com/sayanarijit/xplr/wiki/Features)
+
+- ### [Plugins](https://github.com/sayanarijit/xplr/wiki/Plugins)
+
+- ### [Hacks](https://github.com/sayanarijit/xplr/wiki/Hacks)
+
+- ### [Themes](https://github.com/sayanarijit/xplr/wiki/Themes)
+
+- ### [TODO](https://github.com/sayanarijit/xplr/wiki/TODO)
+
+- ### [Upgrade Guide](https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide)
+
+- ### [Alternatives](https://github.com/sayanarijit/xplr/wiki/Alternatives)
+
+
+## Demo
+
 <p align="center">
 
-<a href="https://asciinema.org/a/404815" target="_blank">
-<img src="https://s4.gifyu.com/images/xplr9d8b7b05c6bc39ae.gif" />
+<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#fuzzy-search-with-preview" target="_blank">
+<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-fzf.gif" />
+</a>
+
+<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#batch-rename" target="_blank">
+<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-rename.gif" />
+</a>
+
+<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#serve-pwd" target="_blank">
+<img height=240 width=360 src="https://s3.gifyu.com/images/xplr-serve.gif" />
+</a>
+
+<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#disk-usage-dua-cli" target="_blank">
+<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-dua.gif" />
 </a>
 
 </p>
 
-If you come up with something cool, or if you feel it's lacking somewhere in portability, flexibility or performance, don't hesitate to
-[start a conversation](https://github.com/sayanarijit/xplr/discussions/2).
 
-<h3 align="center">Backers</h3>
+## Backers
 
 <a href="https://opencollective.com/xplr#backer"><img src="https://opencollective.com/xplr/tiers/backer.svg?width=890" /></a>
