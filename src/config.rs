@@ -281,6 +281,9 @@ pub struct GeneralConfig {
     pub show_hidden: Option<bool>,
 
     #[serde(default)]
+    pub read_only: Option<bool>,
+
+    #[serde(default)]
     pub cursor: UiElement,
 
     #[serde(default)]
@@ -311,6 +314,7 @@ pub struct GeneralConfig {
 impl GeneralConfig {
     pub fn extend(mut self, other: Self) -> Self {
         self.show_hidden = other.show_hidden.or(self.show_hidden);
+        self.read_only = other.read_only.or(self.read_only);
         self.cursor = self.cursor.extend(other.cursor);
         self.prompt = self.prompt.extend(other.prompt);
         self.logs = self.logs.extend(other.logs);
