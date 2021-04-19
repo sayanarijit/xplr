@@ -1,4 +1,4 @@
-version: v0.5.1
+version: v0.5.2
 general:
   show_hidden: false
   read_only: false
@@ -916,6 +916,11 @@ modes:
             help: top
             messages:
               - FocusFirst
+              - SwitchMode: default
+          f:
+            help: follow symlink
+            messages:
+              - FollowSymlink
               - SwitchMode: default
           x:
             help: open in gui
