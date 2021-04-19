@@ -842,6 +842,9 @@ pub enum ExternalMsg {
     /// Go to the next path visited.
     NextVisitedPath,
 
+    /// Follow the symlink under focus to its actual location.
+    FollowSymlink,
+
     /// Append/buffer the given string into the input buffer.
     ///
     /// Example: `BufferInput: foo`
@@ -1330,6 +1333,7 @@ impl App {
                 ExternalMsg::Back => self.back(),
                 ExternalMsg::LastVisitedPath => self.last_visited_path(),
                 ExternalMsg::NextVisitedPath => self.next_visited_path(),
+                ExternalMsg::FollowSymlink => self.follow_symlink(),
                 ExternalMsg::BufferInput(input) => self.buffer_input(&input),
                 ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
                 ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
@@ -1490,19 +1494,19 @@ impl App {
         }
     }
 
+    fn follow_symlink(self) -> Result<Self> {
+        if let Some(pth) = self
+            .focused_node()
+            .and_then(|n| n.symlink.to_owned().map(|s| s.absolute_path))
+        {
+            self.focus_path(&pth)
+        } else {
+            Ok(self)
+        }
+    }
+
     fn change_directory(mut self, dir: &str) -> Result<Self> {
-        let path = PathBuf::from(dir);
-        if let Some(ft) = path.symlink_metadata().ok().map(|m| m.file_type()) {
-            if ft.is_dir() {
-                self.pwd = dir.to_owned();
-                self.history = self.history.push(self.pwd.clone());
-                self.msg_out.push_back(MsgOut::Refresh);
-            } else if ft.is_symlink() {
-                if let Ok(s) = path.canonicalize() {
-                    self = self.focus_path(&s.to_string_lossy().to_string())?;
-                }
-            }
-        } else if path.is_dir() {
+        if PathBuf::from(dir).is_dir() {
             self.pwd = dir.to_owned();
             self.history = self.history.push(self.pwd.clone());
             self.msg_out.push_back(MsgOut::Refresh);
