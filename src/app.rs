@@ -1617,13 +1617,21 @@ impl App {
     }
 
     fn call(mut self, command: Command) -> Result<Self> {
-        self.msg_out.push_back(MsgOut::Call(command));
-        Ok(self)
+        if self.config.general.read_only.unwrap_or_default() {
+            self.log_error("Cannot call command in read-only mode.".into())
+        } else {
+            self.msg_out.push_back(MsgOut::Call(command));
+            Ok(self)
+        }
     }
 
     fn call_silently(mut self, command: Command) -> Result<Self> {
-        self.msg_out.push_back(MsgOut::CallSilently(command));
-        Ok(self)
+        if self.config.general.read_only.unwrap_or_default() {
+            self.log_error("Cannot call command in read-only mode.".into())
+        } else {
+            self.msg_out.push_back(MsgOut::CallSilently(command));
+            Ok(self)
+        }
     }
 
     fn bash_exec(self, script: String) -> Result<Self> {
