@@ -74,6 +74,7 @@ pub struct ResolvedNodeUiMetadata {
     pub is_file: bool,
     pub is_readonly: bool,
     pub mime_essence: String,
+    pub size: u64,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
@@ -85,6 +86,7 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
             is_file: node.is_file,
             is_readonly: node.is_readonly,
             mime_essence: node.mime_essence,
+            size: node.size,
         }
     }
 }
@@ -103,6 +105,7 @@ struct NodeUiMetadata {
     pub is_file: bool,
     pub is_readonly: bool,
     pub mime_essence: String,
+    pub size: u64,
     pub canonical: Option<ResolvedNodeUiMetadata>,
     pub symlink: Option<ResolvedNodeUiMetadata>,
 
@@ -146,6 +149,7 @@ impl NodeUiMetadata {
             is_file: node.is_file,
             is_readonly: node.is_readonly,
             mime_essence: node.mime_essence.clone(),
+            size: node.size,
             canonical: node.canonical.to_owned().map(|s| s.into()),
             symlink: node.symlink.to_owned().map(|s| s.into()),
             index,
@@ -287,11 +291,11 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
         .style(config.general.table.style.into())
         .highlight_style(config.general.focus_ui.style.into())
         .column_spacing(config.general.table.col_spacing.unwrap_or_default())
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(format!(" {} ", app.pwd())),
-        );
+        .block(Block::default().borders(Borders::ALL).title(format!(
+            " {} ({}) ",
+            app.pwd(),
+            app.directory_buffer().map(|d| d.total).unwrap_or_default()
+        )));
 
     let table = table.clone().header(
         Row::new(

@@ -10,7 +10,8 @@ use crate::ui;
 use anyhow::Result;
 use crossterm::execute;
 use crossterm::terminal as term;
-use handlebars::Handlebars;
+use handlebars::{handlebars_helper, Handlebars};
+use humansize::{file_size_opts as options, FileSize};
 use std::fs;
 use std::io;
 use std::io::prelude::*;
@@ -19,6 +20,8 @@ use std::sync::mpsc;
 use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
+
+handlebars_helper!(to_humansize: |size: i64| size.file_size(options::CONVENTIONAL).unwrap_or_default());
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
     let input_buffer = app.input_buffer().unwrap_or_default();
@@ -86,6 +89,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     );
 
     let mut hb = Handlebars::new();
+    hb.register_helper("humansize", Box::new(to_humansize));
     hb.register_template_string(
         app::TEMPLATE_TABLE_ROW,
         &app.config()
