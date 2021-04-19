@@ -26,22 +26,6 @@ general:
   table:
     header:
       cols:
-        - format: │     path
-          style:
-            fg: null
-            bg: null
-            add_modifier:
-              bits: 0
-            sub_modifier:
-              bits: 0
-        - format: type
-          style:
-            fg: null
-            bg: null
-            add_modifier:
-              bits: 0
-            sub_modifier:
-              bits: 0
         - format: ' index'
           style:
             fg: null
@@ -50,6 +34,9 @@ general:
               bits: 0
             sub_modifier:
               bits: 0
+        - format: '╭─    path'
+        - format: size
+        - format: type
       style:
         fg: null
         bg: null
@@ -60,10 +47,10 @@ general:
       height: 1
     row:
       cols:
+        - format: '{{#if isBeforeFocus}}-{{else}} {{/if}}{{{relativeIndex}}}│{{{index}}}'
         - format: >
             {{{tree}}}{{{prefix}}}{{{meta.icon}}}{{#if (ne meta.icon "")}} {{/if}}{{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}
             {{#if isSymlink}}-> {{#if isBroken}}×{{else}}{{{symlink.absolutePath}}}{{/if}}{{#if symlink.isDir}}/{{/if}}{{/if}}
-
           style:
             fg: null
             bg: null
@@ -71,22 +58,8 @@ general:
               bits: 0
             sub_modifier:
               bits: 0
+        - format: '{{humansize size}}'
         - format: '{{#if isSymlink}}{{{symlink.mimeEssence}}}{{else}}{{{mimeEssence}}}{{/if}}'
-          style:
-            fg: null
-            bg: null
-            add_modifier:
-              bits: 0
-            sub_modifier:
-              bits: 0
-        - format: '{{#if isBeforeFocus}}-{{else}} {{/if}}{{{relativeIndex}}}/{{{index}}}/{{{total}}}'
-          style:
-            fg: null
-            bg: null
-            add_modifier:
-              bits: 0
-            sub_modifier:
-              bits: 0
       style:
         fg: null
         bg: null
@@ -112,24 +85,11 @@ general:
           sub_modifier:
             bits: 0
       - format: ├─
-        style:
-          fg: null
-          bg: null
-          add_modifier:
-            bits: 0
-          sub_modifier:
-            bits: 0
       - format: ╰─
-        style:
-          fg: null
-          bg: null
-          add_modifier:
-            bits: 0
-          sub_modifier:
-            bits: 0
     col_spacing: 3
     col_widths:
-      - percentage: 60
+      - percentage: 10
+      - percentage: 50
       - percentage: 20
       - percentage: 20
   default_ui:
@@ -191,6 +151,8 @@ general:
         format: "ro"
       ByMimeEssence:
         format: "mime"
+      BySize:
+        format: "size"
       ByCanonicalAbsolutePath:
         format: "[c]abs"
       ByICanonicalAbsolutePath:
@@ -205,6 +167,8 @@ general:
         format: "[c]ro"
       ByCanonicalMimeEssence:
         format: "[c]mime"
+      ByCanonicalSize:
+        format: "[c]size"
       BySymlinkAbsolutePath:
         format: "[s]abs"
       ByISymlinkAbsolutePath:
@@ -219,6 +183,8 @@ general:
         format: "[s]ro"
       BySymlinkMimeEssence:
         format: "[s]mime"
+      BySymlinkSize:
+        format: "[s]size"
 
     filter_identifiers:
       RelativePathIs:
@@ -691,14 +657,12 @@ modes:
                   sorter: ByIsSymlink
                   reverse: true
               - Explore
-
           m:
             help: by canonical mime essence
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalMimeEssence
               - Explore
-
           M:
             help: by canonical mime essence reverse
             messages:
@@ -706,11 +670,23 @@ modes:
                   sorter: ByCanonicalMimeEssence
                   reverse: true
               - Explore
+          s:
+            help: by size
+            messages:
+              - AddNodeSorter:
+                  sorter: BySize
+              - Explore
+          S:
+            help: by size reverse
+            messages:
+              - AddNodeSorter:
+                  sorter: BySize
+                  reverse: true
+              - Explore
           ctrl-c:
             help: terminate
             messages:
               - Terminate
-
         default:
           messages:
             - SwitchMode: default
