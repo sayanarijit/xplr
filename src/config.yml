@@ -516,16 +516,56 @@ modes:
           messages:
             - BufferInputFromKey
 
-    filter:
-      name: filter
+    relative_path_does_not_contain:
+      name: relative path does not contain
       key_bindings:
         on_key:
-          ctrl-x:
-            help: remove last filter
+          backspace:
+            help: remove last character
             messages:
-              - RemoveLastNodeFilter
-              - SetInputBuffer: ""
+              - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
+              - RemoveInputBufferLastCharacter
+              - AddNodeFilterFromInput: IRelativePathDoesNotContain
               - Explore
+          ctrl-w:
+            help: remove last word
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
+              - RemoveInputBufferLastWord
+              - AddNodeFilterFromInput: IRelativePathDoesNotContain
+              - Explore
+          ctrl-u:
+            help: remove line
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
+              - SetInputBuffer: ""
+              - AddNodeFilterFromInput: IRelativePathDoesNotContain
+              - Explore
+          enter:
+            help: apply filter
+            messages:
+              - SwitchMode: default
+          esc:
+            help: cancel
+            messages:
+              - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
+              - SwitchMode: default
+              - Explore
+          ctrl-c:
+            help: terminate
+            messages:
+              - Terminate
+        default:
+          messages:
+            - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
+            - BufferInputFromKey
+            - AddNodeFilterFromInput: IRelativePathDoesNotContain
+            - Explore
+
+    relative_path_does_contain:
+      name: relative path does contain
+      key_bindings:
+        on_key:
           backspace:
             help: remove last character
             messages:
@@ -546,18 +586,6 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
-          ctrl-r:
-            help: reset filters
-            messages:
-              - SetInputBuffer: ""
-              - ResetNodeFilters
-              - Explore
-          ctrl-l:
-            help: clear filters
-            messages:
-              - SetInputBuffer: ""
-              - ClearNodeFilters
               - Explore
           enter:
             help: apply filter
@@ -581,6 +609,47 @@ modes:
             - AddNodeFilterFromInput: IRelativePathDoesContain
             - Explore
 
+    filter:
+      name: filter
+      key_bindings:
+        on_key:
+          backspace:
+            help: remove last filter
+            messages:
+              - RemoveLastNodeFilter
+              - Explore
+          r:
+            help: relative does contain
+            messages:
+              - SwitchMode: relative_path_does_contain
+              - SetInputBuffer: ""
+              - AddNodeFilterFromInput: IRelativePathDoesContain
+              - Explore
+          R:
+            help: relative does not contain
+            messages:
+              - SwitchMode: relative_path_does_not_contain
+              - SetInputBuffer: ""
+              - AddNodeFilterFromInput: IRelativePathDoesNotContain
+              - Explore
+          ctrl-r:
+            help: reset filters
+            messages:
+              - ResetNodeFilters
+              - Explore
+          ctrl-u:
+            help: clear filters
+            messages:
+              - ClearNodeFilters
+              - Explore
+          ctrl-c:
+            help: terminate
+            messages:
+              - Terminate
+        default:
+          messages:
+            - SwitchMode: default
+
     sort:
       name: sort
       help: null
@@ -603,7 +672,7 @@ modes:
             messages:
               - ResetNodeSorters
               - Explore
-          ctrl-l:
+          ctrl-u:
             help: clear sorters
             messages:
               - ClearNodeSorters
@@ -719,8 +788,6 @@ modes:
             help: filter
             messages:
               - SwitchMode: filter
-              - SetInputBuffer: ''
-              - Explore
           .:
             help: show hidden
             messages:
@@ -808,7 +875,7 @@ modes:
             help: next visited path
             messages:
               - NextVisitedPath
-          ctrl-l:
+          ctrl-u:
             help: clear selection
             messages:
               - ClearSelection

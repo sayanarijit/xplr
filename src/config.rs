@@ -531,6 +531,12 @@ pub struct BuiltinModesConfig {
     pub filter: Mode,
 
     #[serde(default)]
+    pub relative_path_does_contain: Mode,
+
+    #[serde(default)]
+    pub relative_path_does_not_contain: Mode,
+
+    #[serde(default)]
     pub sort: Mode,
 }
 
@@ -548,6 +554,12 @@ impl BuiltinModesConfig {
         self.action = self.action.extend(other.action);
         self.search = self.search.extend(other.search);
         self.filter = self.filter.extend(other.filter);
+        self.relative_path_does_contain = self
+            .relative_path_does_contain
+            .extend(other.relative_path_does_contain);
+        self.relative_path_does_not_contain = self
+            .relative_path_does_not_contain
+            .extend(other.relative_path_does_not_contain);
         self.sort = self.sort.extend(other.sort);
         self
     }
@@ -571,6 +583,10 @@ impl BuiltinModesConfig {
             "search" => Some(&self.search),
             "sort" => Some(&self.sort),
             "filter" => Some(&self.filter),
+            "relative_path_does_contain" => Some(&self.relative_path_does_contain),
+            "relative path does contain" => Some(&self.relative_path_does_contain),
+            "relative_path_does_not_contain" => Some(&self.relative_path_does_not_contain),
+            "relative path does not contain" => Some(&self.relative_path_does_not_contain),
             _ => None,
         }
     }
