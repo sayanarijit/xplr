@@ -357,12 +357,18 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
         })
         .collect::<Vec<Row>>();
 
+    let read_only_indicator = if app.config().general.read_only.unwrap_or_default() {
+        "(r)"
+    } else {
+        ""
+    };
+
     let help_menu = Table::new(help_menu_rows)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(format!(" Help [{}] ", &app.mode().name)),
-        )
+        .block(Block::default().borders(Borders::ALL).title(format!(
+            " Help [{}{}] ",
+            &app.mode().name,
+            read_only_indicator
+        )))
         .widths(&[
             TuiConstraint::Percentage(20),
             TuiConstraint::Percentage(20),
