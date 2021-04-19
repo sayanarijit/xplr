@@ -665,6 +665,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 5, 1) => true,
             (0, 5, 0) => true,
             (_, _, _) => false,
         };
@@ -673,12 +674,11 @@ impl Config {
     }
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
-        Ok(None)
-        /* let result = match self.parsed_version()? {
-            (0, 5, 0) => None,
-            (_, _, _) => Some("App version updated. New: added sorting support and some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
+        let result = match self.parsed_version()? {
+            (0, 5, 1) => None,
+            (_, _, _) => Some("App version updated. New: added sort and filter support and some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
         };
 
-        Ok(result) */
+        Ok(result)
     }
 }
