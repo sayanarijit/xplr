@@ -1491,7 +1491,18 @@ impl App {
     }
 
     fn change_directory(mut self, dir: &str) -> Result<Self> {
-        if PathBuf::from(dir).is_dir() {
+        let path = PathBuf::from(dir);
+        if let Some(ft) = path.symlink_metadata().ok().map(|m| m.file_type()) {
+            if ft.is_dir() {
+                self.pwd = dir.to_owned();
+                self.history = self.history.push(self.pwd.clone());
+                self.msg_out.push_back(MsgOut::Refresh);
+            } else if ft.is_symlink() {
+                if let Ok(s) = path.canonicalize() {
+                    self = self.focus_path(&s.to_string_lossy().to_string())?;
+                }
+            }
+        } else if path.is_dir() {
             self.pwd = dir.to_owned();
             self.history = self.history.push(self.pwd.clone());
             self.msg_out.push_back(MsgOut::Refresh);

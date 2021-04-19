@@ -59,7 +59,7 @@ general:
               bits: 0
             sub_modifier:
               bits: 0
-        - format: '{{humansize size}}'
+        - format: '{{#unless isDir}}{{humansize size}}{{/unless}}'
         - format: '{{#if isSymlink}}{{{symlink.mimeEssence}}}{{else}}{{{mimeEssence}}}{{/if}}'
       style:
         fg: null
