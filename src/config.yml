@@ -35,7 +35,7 @@ general:
               bits: 0
             sub_modifier:
               bits: 0
-        - format: '╭─    path'
+        - format: '╭──── path'
         - format: size
         - format: type
       style:
