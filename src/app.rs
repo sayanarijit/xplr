@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::env;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
@@ -1508,6 +1509,7 @@ impl App {
     fn change_directory(mut self, dir: &str) -> Result<Self> {
         if PathBuf::from(dir).is_dir() {
             self.pwd = dir.to_owned();
+            env::set_current_dir(&self.pwd)?;
             self.history = self.history.push(self.pwd.clone());
             self.msg_out.push_back(MsgOut::Refresh);
         };
@@ -1538,6 +1540,7 @@ impl App {
             .peek()
             .map(|p| p.to_owned())
             .unwrap_or(self.pwd);
+        env::set_current_dir(&self.pwd)?;
         self.refresh()
     }
 
@@ -1548,6 +1551,7 @@ impl App {
             .peek()
             .map(|p| p.to_owned())
             .unwrap_or(self.pwd);
+        env::set_current_dir(&self.pwd)?;
         self.refresh()
     }
 
