@@ -665,6 +665,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 5, 3) => true,
             (0, 5, 2) => true,
             (0, 5, 1) => true,
             (0, 5, 0) => true,
@@ -676,8 +677,9 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 5, 2) => None,
-            (0, 5, 1) => Some("App version updated. Now follow symlinks using 'gf'."),
+            (0, 5, 3) => None,
+            (0, 5, 2) => Some("App version updated. Now pwd is synced with your terminal session"),
+            (0, 5, 1) => Some("App version updated. Now follow symlinks using 'gf'"),
             (_, _, _) => Some("App version updated. New: added sort and filter support and some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
         };
 
