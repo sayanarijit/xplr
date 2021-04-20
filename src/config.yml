@@ -1064,6 +1064,8 @@ modes:
             messages:
               - Call:
                   command: bash
+                  args:
+                    - "-i"
               - Explore
               - SwitchMode: default
 

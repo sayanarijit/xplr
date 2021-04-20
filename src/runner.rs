@@ -50,7 +50,6 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
     };
 
     Command::new(cmd.command.clone())
-        .current_dir(app.pwd())
         .env("XPLR_APP_VERSION", app.version())
         .env("XPLR_CONFIG_VERSION", &app.config().version)
         .env("XPLR_PID", &app.pid().to_string())
