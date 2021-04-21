@@ -1508,12 +1508,18 @@ impl App {
 
     fn change_directory(mut self, dir: &str) -> Result<Self> {
         if PathBuf::from(dir).is_dir() {
-            self.pwd = dir.to_owned();
-            env::set_current_dir(&self.pwd)?;
-            self.history = self.history.push(self.pwd.clone());
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            match env::set_current_dir(dir) {
+                Ok(()) => {
+                    self.pwd = dir.to_owned();
+                    self.history = self.history.push(self.pwd.clone());
+                    self.msg_out.push_back(MsgOut::Refresh);
+                    Ok(self)
+                }
+                Err(e) => self.log_error(e.to_string()),
+            }
+        } else {
+            Ok(self)
+        }
     }
 
     fn enter(self) -> Result<Self> {
