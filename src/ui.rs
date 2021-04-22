@@ -178,7 +178,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
             dir.nodes
                 .iter()
                 .enumerate()
-                .skip(height * (dir.focus / height))
+                .skip(height * (dir.focus / height.max(1)))
                 .take(height)
                 .map(|(index, node)| {
                     let is_focused = dir.focus == index;
