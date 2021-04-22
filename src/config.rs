@@ -678,7 +678,8 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 5, 4) => None,
+            (0, 5, 5) => None,
+            (0, 5, 4) => Some("App version updated. Significant reduction in CPU usage"),
             (0, 5, 3) => Some("App version updated. Fixed exit on permission denied"),
             (0, 5, 2) => Some("App version updated. Now pwd is synced with your terminal session"),
             (0, 5, 1) => Some("App version updated. Now follow symlinks using 'gf'"),

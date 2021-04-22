@@ -1,4 +1,4 @@
-version: v0.5.4
+version: v0.5.5
 general:
   show_hidden: false
   read_only: false
