@@ -37,7 +37,7 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                     }
                 }
             } else {
-                thread::sleep(Duration::from_millis(1));
+                thread::sleep(Duration::from_millis(50));
             }
         }
     });
