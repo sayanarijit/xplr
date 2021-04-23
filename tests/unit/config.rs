@@ -4,6 +4,13 @@ use tui::style::Modifier;
 use xplr::*;
 
 #[test]
+fn test_compatibility() {
+    let config = config::Config::default();
+    assert!(config.is_compatible().unwrap());
+    assert_eq!(config.upgrade_notification().unwrap(), None);
+}
+
+#[test]
 fn test_extend_hashmap() {
     let mut a = HashMap::new();
     let mut b = HashMap::new();
