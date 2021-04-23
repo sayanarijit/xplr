@@ -87,7 +87,7 @@ general:
             bits: 0
       - format: ├─
       - format: ╰─
-    col_spacing: 3
+    col_spacing: 1
     col_widths:
       - percentage: 10
       - percentage: 50
