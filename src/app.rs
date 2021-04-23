@@ -11,6 +11,7 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs;
 use std::io;
+use std::io::prelude::*;
 use std::path::PathBuf;
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
@@ -1269,6 +1270,8 @@ impl App {
             ));
         }
 
+        fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
+
         Ok(app)
     }
 
@@ -1287,10 +1290,10 @@ impl App {
         self
     }
 
-    pub fn handle_task(self, task: Task) -> Result<Self> {
+    pub fn handle_task(self, task: Task, last_app: &Self) -> Result<Self> {
         match task.msg {
             MsgIn::Internal(msg) => self.handle_internal(msg),
-            MsgIn::External(msg) => self.handle_external(msg, task.key),
+            MsgIn::External(msg) => self.handle_external(msg, task.key, last_app),
         }
     }
 
@@ -1301,7 +1304,7 @@ impl App {
         }
     }
 
-    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
+    fn handle_external(self, msg: ExternalMsg, key: Option<Key>, last_app: &Self) -> Result<Self> {
         if self.config().general.read_only.unwrap_or_default() && !msg.is_read_only() {
             self.log_error("Cannot call shell command in read-only mode.".into())
         } else {
@@ -1383,7 +1386,9 @@ impl App {
                 ExternalMsg::Debug(path) => self.debug(path),
                 ExternalMsg::Terminate => bail!(""),
             }
-        }
+        }?
+        .refresh_selection()
+        .write_pipes(&last_app)
     }
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
@@ -2018,13 +2023,10 @@ impl App {
         &self.session_path
     }
 
-    pub fn refresh_selection(mut self) -> Result<Self> {
-        self.selection = self
-            .selection
-            .into_iter()
-            .filter(|n| PathBuf::from(&n.absolute_path).exists())
-            .collect();
-        Ok(self)
+    fn refresh_selection(mut self) -> Self {
+        self.selection
+            .retain(|n| PathBuf::from(&n.absolute_path).exists());
+        self
     }
 
     pub fn result(&self) -> Vec<&Node> {
@@ -2147,5 +2149,48 @@ impl App {
             .map(|p| format!("{}\n", &p))
             .collect::<Vec<String>>()
             .join("")
+    }
+
+    pub fn write_pipes(self, last_app: &Self) -> Result<Self> {
+        if self.focused_node() != last_app.focused_node() {
+            fs::write(&self.pipe().focus_out, self.focused_node_str())?;
+        };
+
+        if self.selection() != last_app.selection() {
+            fs::write(&self.pipe().selection_out, self.selection_str())?;
+        };
+
+        if self.history_str() != last_app.history_str() {
+            fs::write(&self.pipe().history_out, self.history_str())?;
+        };
+
+        if self.mode_str() != last_app.mode_str() {
+            fs::write(&self.pipe().mode_out, self.mode_str())?;
+        };
+
+        if self.directory_buffer() != last_app.directory_buffer() {
+            fs::write(&self.pipe().directory_nodes_out, self.directory_nodes_str())?;
+        };
+
+        if self.logs().len() != last_app.logs().len() {
+            let new_logs = self
+                .logs()
+                .iter()
+                .skip(last_app.logs().len())
+                .map(|l| format!("{}\n", l))
+                .collect::<Vec<String>>()
+                .join("");
+
+            let mut file = fs::OpenOptions::new()
+                .append(true)
+                .open(&self.pipe().logs_out)?;
+
+            file.write_all(new_logs.as_bytes())?;
+        };
+
+        if self.result() != last_app.result() {
+            fs::write(&self.pipe().result_out, self.result_str())?;
+        };
+        Ok(self)
     }
 }

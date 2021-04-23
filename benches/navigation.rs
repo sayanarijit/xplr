@@ -8,21 +8,26 @@ fn criterion_benchmark(c: &mut Criterion) {
         fs::File::create(format!("/tmp/xplr_bench/{}", i)).unwrap();
     });
 
-    let app = app::App::create("/tmp/xplr_bench".into())
-        .expect("failed to create app")
-        .handle_task(app::Task::new(
-            app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
-            None,
-        ))
+    let mut app = app::App::create("/tmp/xplr_bench".into()).expect("failed to create app");
+
+    app = app
+        .clone()
+        .handle_task(
+            app::Task::new(
+                app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
+                None,
+            ),
+            &app.clone(),
+        )
         .unwrap();
 
     c.bench_function("focus next item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::FocusNext),
-                    None,
-                ))
+                .handle_task(
+                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusNext), None),
+                    &app.clone(),
+                )
                 .unwrap()
         })
     });
@@ -30,10 +35,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus previous item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::FocusPrevious),
-                    None,
-                ))
+                .handle_task(
+                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusPrevious), None),
+                    &app.clone(),
+                )
                 .unwrap()
         })
     });
@@ -41,10 +46,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus first item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::FocusFirst),
-                    None,
-                ))
+                .handle_task(
+                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusFirst), None),
+                    &app.clone(),
+                )
                 .unwrap()
         })
     });
@@ -52,10 +57,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus last item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::FocusLast),
-                    None,
-                ))
+                .handle_task(
+                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusLast), None),
+                    &app.clone(),
+                )
                 .unwrap()
         })
     });
@@ -63,15 +68,15 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("leave and enter directory", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::Back),
-                    None,
-                ))
+                .handle_task(
+                    app::Task::new(app::MsgIn::External(app::ExternalMsg::Back), None),
+                    &app.clone(),
+                )
                 .unwrap()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::Enter),
-                    None,
-                ))
+                .handle_task(
+                    app::Task::new(app::MsgIn::External(app::ExternalMsg::Enter), None),
+                    &app.clone(),
+                )
                 .unwrap()
         })
     });
