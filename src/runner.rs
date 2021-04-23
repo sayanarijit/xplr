@@ -78,8 +78,6 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
-    fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
-
     explorer::explore(
         app.explorer_config().clone(),
         app.pwd().clone(),
@@ -124,7 +122,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     'outer: for task in rx_msg_in {
         let last_app = app.clone();
 
-        let (new_app, new_result) = match app.handle_task(task) {
+        let (new_app, new_result) = match app.handle_task(task, &last_app) {
             Ok(a) => (a, Ok(None)),
             Err(err) => (last_app.clone(), Err(err)),
         };
@@ -176,7 +174,6 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                 }
 
                 app::MsgOut::Refresh => {
-                    app = app.refresh_selection()?;
                     if app.pwd() != last_app.pwd() {
                         tx_pwd_watcher.send(app.pwd().clone())?;
                         explorer::explore(
@@ -242,46 +239,6 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                 }
             };
         }
-
-        if app.focused_node() != last_app.focused_node() {
-            fs::write(&app.pipe().focus_out, app.focused_node_str())?;
-        };
-
-        if app.selection() != last_app.selection() {
-            fs::write(&app.pipe().selection_out, app.selection_str())?;
-        };
-
-        if app.history_str() != last_app.history_str() {
-            fs::write(&app.pipe().history_out, app.history_str())?;
-        };
-
-        if app.mode_str() != last_app.mode_str() {
-            fs::write(&app.pipe().mode_out, app.mode_str())?;
-        };
-
-        if app.directory_buffer() != last_app.directory_buffer() {
-            fs::write(&app.pipe().directory_nodes_out, app.directory_nodes_str())?;
-        };
-
-        if app.logs().len() != last_app.logs().len() {
-            let new_logs = app
-                .logs()
-                .iter()
-                .skip(last_app.logs().len())
-                .map(|l| format!("{}\n", l))
-                .collect::<Vec<String>>()
-                .join("");
-
-            let mut file = fs::OpenOptions::new()
-                .append(true)
-                .open(&app.pipe().logs_out)?;
-
-            file.write_all(new_logs.as_bytes())?;
-        };
-
-        if app.result() != last_app.result() {
-            fs::write(&app.pipe().result_out, app.result_str())?;
-        };
     }
 
     terminal.clear()?;
