@@ -5,12 +5,15 @@ A hackable, minimal, fast TUI file explorer
 </p>
 
 <p align="center">
+
 <a href="https://crates.io/crates/xplr" target="_blank">
 <img src="https://img.shields.io/crates/v/xplr.svg" />
 </a>
+
 <a href="https://discord.gg/p8UPpgAx" target="_blank">
 <img src="https://img.shields.io/discord/834369918312382485?logo=discord&style=social" />
 </a>
+
 </p>
 
 <p align="center">
@@ -62,6 +65,9 @@ different run modes, and also the way it looks by modifying one single configura
 
 </p>
 
+## Packaging
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/xplr.svg)](https://repology.org/project/xplr/versions)
 
 ## Backers
 
