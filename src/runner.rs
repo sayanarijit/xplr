@@ -46,7 +46,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
     let (stdin, stdout, stderr) = if silent {
         (Stdio::null(), Stdio::null(), Stdio::null())
     } else {
-        (Stdio::inherit(), Stdio::inherit(), Stdio::inherit())
+        (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
     };
 
     Command::new(cmd.command.clone())
