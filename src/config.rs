@@ -694,3 +694,35 @@ impl Config {
         Ok(result)
     }
 }
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_compatibility() {
+        let config = Config::default();
+        assert!(config.is_compatible().unwrap());
+        assert_eq!(config.upgrade_notification().unwrap(), None);
+    }
+
+    #[test]
+    fn test_extend_hashmap() {
+        let mut a = HashMap::new();
+        let mut b = HashMap::new();
+
+        a.insert("a", "a");
+        a.insert("b", "a");
+
+        b.insert("b", "b");
+        b.insert("c", "b");
+
+        a.extend(b);
+
+        assert_eq!(a.get("a"), Some(&"a"));
+        assert_eq!(a.get("b"), Some(&"b"));
+        assert_eq!(a.get("c"), Some(&"b"));
+    }
+}
