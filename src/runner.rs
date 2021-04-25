@@ -24,24 +24,11 @@ use tui::Terminal;
 handlebars_helper!(to_humansize: |size: i64| size.file_size(options::CONVENTIONAL).unwrap_or_default());
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
-    let input_buffer = app.input_buffer().unwrap_or_default();
-
     let focus_index = app
         .directory_buffer()
-        .map(|d| d.focus)
+        .map(|d| d.focus())
         .unwrap_or_default()
         .to_string();
-
-    let pipe_msg_in = app.pipe().msg_in.clone();
-    let pipe_mode_out = app.pipe().mode_out.clone();
-    let pipe_focus_out = app.pipe().focus_out.clone();
-    let pipe_selection_out = app.pipe().selection_out.clone();
-    let pipe_result_out = app.pipe().result_out.clone();
-    let pipe_directory_nodes_out = app.pipe().directory_nodes_out.clone();
-    let pipe_global_help_menu_out = app.pipe().global_help_menu_out.clone();
-    let pipe_logs_out = app.pipe().logs_out.clone();
-    let pipe_history_out = app.pipe().history_out.clone();
-    let session_path = app.session_path();
 
     let (stdin, stdout, stderr) = if silent {
         (Stdio::null(), Stdio::null(), Stdio::null())
@@ -49,27 +36,33 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
     };
 
-    Command::new(cmd.command.clone())
+    Command::new(cmd.command().clone())
         .env("XPLR_APP_VERSION", app.version())
         .env("XPLR_CONFIG_VERSION", &app.config().version)
         .env("XPLR_PID", &app.pid().to_string())
-        .env("XPLR_INPUT_BUFFER", input_buffer)
+        .env("XPLR_INPUT_BUFFER", app.input_buffer().unwrap_or_default())
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
         .env("XPLR_FOCUS_INDEX", focus_index)
-        .env("XPLR_SESSION_PATH", session_path)
-        .env("XPLR_PIPE_MSG_IN", pipe_msg_in)
-        .env("XPLR_PIPE_SELECTION_OUT", pipe_selection_out)
-        .env("XPLR_PIPE_HISTORY_OUT", pipe_history_out)
-        .env("XPLR_PIPE_FOCUS_OUT", pipe_focus_out)
-        .env("XPLR_PIPE_MODE_OUT", pipe_mode_out)
-        .env("XPLR_PIPE_RESULT_OUT", pipe_result_out)
-        .env("XPLR_PIPE_GLOBAL_HELP_MENU_OUT", pipe_global_help_menu_out)
-        .env("XPLR_PIPE_DIRECTORY_NODES_OUT", pipe_directory_nodes_out)
-        .env("XPLR_PIPE_LOGS_OUT", pipe_logs_out)
+        .env("XPLR_SESSION_PATH", app.session_path())
+        .env("XPLR_PIPE_MSG_IN", app.pipe().msg_in())
+        .env("XPLR_PIPE_SELECTION_OUT", app.pipe().selection_out())
+        .env("XPLR_PIPE_HISTORY_OUT", app.pipe().history_out())
+        .env("XPLR_PIPE_FOCUS_OUT", app.pipe().focus_out())
+        .env("XPLR_PIPE_MODE_OUT", app.pipe().mode_out())
+        .env("XPLR_PIPE_RESULT_OUT", app.pipe().result_out())
+        .env(
+            "XPLR_PIPE_GLOBAL_HELP_MENU_OUT",
+            app.pipe().global_help_menu_out(),
+        )
+        .env(
+            "XPLR_PIPE_DIRECTORY_NODES_OUT",
+            app.pipe().directory_nodes_out(),
+        )
+        .env("XPLR_PIPE_LOGS_OUT", app.pipe().logs_out())
         .stdin(stdin)
         .stdout(stdout)
         .stderr(stderr)
-        .args(cmd.args)
+        .args(cmd.args())
         .status()
 }
 
@@ -115,7 +108,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
 
     // Threads
     auto_refresher::start_auto_refreshing(tx_msg_in.clone());
-    pipe_reader::keep_reading(app.pipe().msg_in.clone(), tx_msg_in.clone());
+    pipe_reader::keep_reading(app.pipe().msg_in().clone(), tx_msg_in.clone());
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
     pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
 
@@ -168,7 +161,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                     explorer::explore(
                         app.explorer_config().clone(),
                         app.pwd().clone(),
-                        app.focused_node().map(|n| n.relative_path.clone()),
+                        app.focused_node().map(|n| n.relative_path().clone()),
                         tx_msg_in.clone(),
                     );
                 }
@@ -179,7 +172,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                         explorer::explore(
                             app.explorer_config().clone(),
                             app.pwd().clone(),
-                            app.focused_node().map(|n| n.relative_path.clone()),
+                            app.focused_node().map(|n| n.relative_path().clone()),
                             tx_msg_in.clone(),
                         );
                     };

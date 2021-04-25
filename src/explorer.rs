@@ -38,7 +38,7 @@ pub fn explore(
                     nodes
                         .iter()
                         .enumerate()
-                        .find(|(_, n)| n.relative_path == focus)
+                        .find(|(_, n)| n.relative_path() == &focus)
                         .map(|(i, _)| i)
                         .unwrap_or(0)
                 } else {

@@ -20,15 +20,15 @@ pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/U
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
-    pub msg_in: String,
-    pub focus_out: String,
-    pub selection_out: String,
-    pub result_out: String,
-    pub mode_out: String,
-    pub directory_nodes_out: String,
-    pub global_help_menu_out: String,
-    pub logs_out: String,
-    pub history_out: String,
+    msg_in: String,
+    focus_out: String,
+    selection_out: String,
+    result_out: String,
+    mode_out: String,
+    directory_nodes_out: String,
+    global_help_menu_out: String,
+    logs_out: String,
+    history_out: String,
 }
 
 impl Pipe {
@@ -83,17 +83,62 @@ impl Pipe {
             history_out,
         })
     }
+
+    /// Get a reference to the pipe's msg in.
+    pub fn msg_in(&self) -> &String {
+        &self.msg_in
+    }
+
+    /// Get a reference to the pipe's focus out.
+    pub fn focus_out(&self) -> &String {
+        &self.focus_out
+    }
+
+    /// Get a reference to the pipe's selection out.
+    pub fn selection_out(&self) -> &String {
+        &self.selection_out
+    }
+
+    /// Get a reference to the pipe's result out.
+    pub fn result_out(&self) -> &String {
+        &self.result_out
+    }
+
+    /// Get a reference to the pipe's mode out.
+    pub fn mode_out(&self) -> &String {
+        &self.mode_out
+    }
+
+    /// Get a reference to the pipe's directory nodes out.
+    pub fn directory_nodes_out(&self) -> &String {
+        &self.directory_nodes_out
+    }
+
+    /// Get a reference to the pipe's global help menu out.
+    pub fn global_help_menu_out(&self) -> &String {
+        &self.global_help_menu_out
+    }
+
+    /// Get a reference to the pipe's logs out.
+    pub fn logs_out(&self) -> &String {
+        &self.logs_out
+    }
+
+    /// Get a reference to the pipe's history out.
+    pub fn history_out(&self) -> &String {
+        &self.history_out
+    }
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct ResolvedNode {
-    pub absolute_path: String,
-    pub extension: String,
-    pub is_dir: bool,
-    pub is_file: bool,
-    pub is_readonly: bool,
-    pub mime_essence: String,
-    pub size: u64,
+    absolute_path: String,
+    extension: String,
+    is_dir: bool,
+    is_file: bool,
+    is_readonly: bool,
+    mime_essence: String,
+    size: u64,
 }
 
 impl ResolvedNode {
@@ -123,23 +168,58 @@ impl ResolvedNode {
             size,
         }
     }
+
+    /// Get a reference to the resolved node's absolute path.
+    pub fn absolute_path(&self) -> &String {
+        &self.absolute_path
+    }
+
+    /// Get a reference to the resolved node's extension.
+    pub fn extension(&self) -> &String {
+        &self.extension
+    }
+
+    /// Get a reference to the resolved node's is dir.
+    pub fn is_dir(&self) -> bool {
+        self.is_dir
+    }
+
+    /// Get a reference to the resolved node's is file.
+    pub fn is_file(&self) -> bool {
+        self.is_file
+    }
+
+    /// Get a reference to the resolved node's is readonly.
+    pub fn is_readonly(&self) -> bool {
+        self.is_readonly
+    }
+
+    /// Get a reference to the resolved node's mime essence.
+    pub fn mime_essence(&self) -> &String {
+        &self.mime_essence
+    }
+
+    /// Get a reference to the resolved node's size.
+    pub fn size(&self) -> u64 {
+        self.size
+    }
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct Node {
-    pub parent: String,
-    pub relative_path: String,
-    pub absolute_path: String,
-    pub extension: String,
-    pub is_dir: bool,
-    pub is_file: bool,
-    pub is_symlink: bool,
-    pub is_broken: bool,
-    pub is_readonly: bool,
-    pub mime_essence: String,
-    pub size: u64,
-    pub canonical: Option<ResolvedNode>,
-    pub symlink: Option<ResolvedNode>,
+    parent: String,
+    relative_path: String,
+    absolute_path: String,
+    extension: String,
+    is_dir: bool,
+    is_file: bool,
+    is_symlink: bool,
+    is_broken: bool,
+    is_readonly: bool,
+    mime_essence: String,
+    size: u64,
+    canonical: Option<ResolvedNode>,
+    symlink: Option<ResolvedNode>,
 }
 
 impl Node {
@@ -199,6 +279,71 @@ impl Node {
             },
         }
     }
+
+    /// Get a reference to the node's parent.
+    pub fn parent(&self) -> &String {
+        &self.parent
+    }
+
+    /// Get a reference to the node's relative path.
+    pub fn relative_path(&self) -> &String {
+        &self.relative_path
+    }
+
+    /// Get a reference to the node's extension.
+    pub fn extension(&self) -> &String {
+        &self.extension
+    }
+
+    /// Get a reference to the node's is dir.
+    pub fn is_dir(&self) -> bool {
+        self.is_dir
+    }
+
+    /// Get a reference to the node's is file.
+    pub fn is_file(&self) -> bool {
+        self.is_file
+    }
+
+    /// Get a reference to the node's is symlink.
+    pub fn is_symlink(&self) -> bool {
+        self.is_symlink
+    }
+
+    /// Get a reference to the node's is broken.
+    pub fn is_broken(&self) -> bool {
+        self.is_broken
+    }
+
+    /// Get a reference to the node's is readonly.
+    pub fn is_readonly(&self) -> bool {
+        self.is_readonly
+    }
+
+    /// Get a reference to the node's mime essence.
+    pub fn mime_essence(&self) -> &String {
+        &self.mime_essence
+    }
+
+    /// Get a reference to the node's size.
+    pub fn size(&self) -> u64 {
+        self.size
+    }
+
+    /// Get a reference to the node's canonical.
+    pub fn canonical(&self) -> &Option<ResolvedNode> {
+        &self.canonical
+    }
+
+    /// Get a reference to the node's symlink.
+    pub fn symlink(&self) -> &Option<ResolvedNode> {
+        &self.symlink
+    }
+
+    /// Get a reference to the node's absolute path.
+    pub fn absolute_path(&self) -> &String {
+        &self.absolute_path
+    }
 }
 
 impl Ord for Node {
@@ -217,10 +362,10 @@ impl PartialOrd for Node {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DirectoryBuffer {
-    pub parent: String,
-    pub nodes: Vec<Node>,
-    pub total: usize,
-    pub focus: usize,
+    parent: String,
+    nodes: Vec<Node>,
+    total: usize,
+    focus: usize,
 }
 
 impl DirectoryBuffer {
@@ -236,6 +381,26 @@ impl DirectoryBuffer {
 
     pub fn focused_node(&self) -> Option<&Node> {
         self.nodes.get(self.focus)
+    }
+
+    /// Get a reference to the directory buffer's parent.
+    pub fn parent(&self) -> &String {
+        &self.parent
+    }
+
+    /// Get a reference to the directory buffer's nodes.
+    pub fn nodes(&self) -> &Vec<Node> {
+        &self.nodes
+    }
+
+    /// Get a reference to the directory buffer's total.
+    pub fn total(&self) -> usize {
+        self.total
+    }
+
+    /// Get a reference to the directory buffer's focus.
+    pub fn focus(&self) -> usize {
+        self.focus
     }
 }
 
@@ -281,9 +446,9 @@ pub enum NodeSorter {
 #[derive(Debug, Clone, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeSorterApplicable {
-    pub sorter: NodeSorter,
+    sorter: NodeSorter,
     #[serde(default)]
-    pub reverse: bool,
+    reverse: bool,
 }
 
 impl PartialEq for NodeSorterApplicable {
@@ -568,6 +733,16 @@ impl NodeSorterApplicable {
                 .cmp(&a.symlink.as_ref().map(|s| &s.size)),
         }
     }
+
+    /// Get a reference to the node sorter applicable's sorter.
+    pub fn sorter(&self) -> &NodeSorter {
+        &self.sorter
+    }
+
+    /// Get a reference to the node sorter applicable's reverse.
+    pub fn reverse(&self) -> bool {
+        self.reverse
+    }
 }
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
@@ -716,8 +891,8 @@ impl NodeFilter {
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeFilterApplicable {
-    pub filter: NodeFilter,
-    pub input: String,
+    filter: NodeFilter,
+    input: String,
 }
 
 impl NodeFilterApplicable {
@@ -727,6 +902,16 @@ impl NodeFilterApplicable {
 
     fn apply(&self, node: &Node) -> bool {
         self.filter.apply(node, &self.input)
+    }
+
+    /// Get a reference to the node filter applicable's filter.
+    pub fn filter(&self) -> &NodeFilter {
+        &self.filter
+    }
+
+    /// Get a reference to the node filter applicable's input.
+    pub fn input(&self) -> &String {
+        &self.input
     }
 }
 
@@ -1057,10 +1242,22 @@ pub enum MsgIn {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Command {
-    pub command: String,
+    command: String,
 
     #[serde(default)]
-    pub args: Vec<String>,
+    args: Vec<String>,
+}
+
+impl Command {
+    /// Get a reference to the command's command.
+    pub fn command(&self) -> &String {
+        &self.command
+    }
+
+    /// Get a reference to the command's args.
+    pub fn args(&self) -> &Vec<String> {
+        &self.args
+    }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1099,9 +1296,9 @@ pub enum LogLevel {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Log {
-    pub level: LogLevel,
-    pub message: String,
-    pub created_at: DateTime<Local>,
+    level: LogLevel,
+    message: String,
+    created_at: DateTime<Local>,
 }
 
 impl Log {
@@ -1111,6 +1308,21 @@ impl Log {
             message,
             created_at: Local::now(),
         }
+    }
+
+    /// Get a reference to the log's created at.
+    pub fn created_at(&self) -> &DateTime<Local> {
+        &self.created_at
+    }
+
+    /// Get a reference to the log's message.
+    pub fn message(&self) -> &String {
+        &self.message
+    }
+
+    /// Get a reference to the log's level.
+    pub fn level(&self) -> &LogLevel {
+        &self.level
     }
 }
 
@@ -1138,24 +1350,24 @@ pub struct History {
 }
 
 impl History {
-    pub fn push(mut self, path: String) -> Self {
+    fn push(mut self, path: String) -> Self {
         self.paths = self.paths.into_iter().take(self.loc + 1).collect();
         self.paths.push(path);
         self.loc = self.paths.len().max(1) - 1;
         self
     }
 
-    pub fn visit_last(mut self) -> Self {
+    fn visit_last(mut self) -> Self {
         self.loc = self.loc.max(1) - 1;
         self
     }
 
-    pub fn visit_next(mut self) -> Self {
+    fn visit_next(mut self) -> Self {
         self.loc = (self.loc + 1).min(self.paths.len().max(1) - 1);
         self
     }
 
-    pub fn peek(&self) -> Option<&String> {
+    fn peek(&self) -> Option<&String> {
         self.paths.get(self.loc)
     }
 }
@@ -1285,7 +1497,7 @@ impl App {
             .unwrap_or_default()
     }
 
-    pub fn enqueue(mut self, task: Task) -> Self {
+    fn enqueue(mut self, task: Task) -> Self {
         self.msg_out.push_back(MsgOut::Enque(task));
         self
     }
@@ -2151,7 +2363,7 @@ impl App {
             .join("")
     }
 
-    pub fn write_pipes(self, last_app: &Self) -> Result<Self> {
+    fn write_pipes(self, last_app: &Self) -> Result<Self> {
         if self.focused_node() != last_app.focused_node() {
             fs::write(&self.pipe().focus_out, self.focused_node_str())?;
         };
