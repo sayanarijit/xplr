@@ -23,10 +23,10 @@ lazy_static! {
 #[derive(Debug, Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
-    pub fg: Option<Color>,
-    pub bg: Option<Color>,
-    pub add_modifier: Option<Modifier>,
-    pub sub_modifier: Option<Modifier>,
+    fg: Option<Color>,
+    bg: Option<Color>,
+    add_modifier: Option<Modifier>,
+    sub_modifier: Option<Modifier>,
 }
 
 impl Style {
@@ -68,25 +68,25 @@ impl Into<TuiStyle> for Style {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolvedNodeUiMetadata {
-    pub absolute_path: String,
-    pub extension: String,
-    pub is_dir: bool,
-    pub is_file: bool,
-    pub is_readonly: bool,
-    pub mime_essence: String,
-    pub size: u64,
+    absolute_path: String,
+    extension: String,
+    is_dir: bool,
+    is_file: bool,
+    is_readonly: bool,
+    mime_essence: String,
+    size: u64,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
     fn from(node: ResolvedNode) -> Self {
         Self {
-            absolute_path: node.absolute_path.clone(),
-            extension: node.extension.clone(),
-            is_dir: node.is_dir,
-            is_file: node.is_file,
-            is_readonly: node.is_readonly,
-            mime_essence: node.mime_essence,
-            size: node.size,
+            absolute_path: node.absolute_path().clone(),
+            extension: node.extension().clone(),
+            is_dir: node.is_dir(),
+            is_file: node.is_file(),
+            is_readonly: node.is_readonly(),
+            mime_essence: node.mime_essence().clone(),
+            size: node.size(),
         }
     }
 }
@@ -95,32 +95,32 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
 #[serde(rename_all = "camelCase")]
 struct NodeUiMetadata {
     // From Node
-    pub parent: String,
-    pub relative_path: String,
-    pub absolute_path: String,
-    pub extension: String,
-    pub is_symlink: bool,
-    pub is_broken: bool,
-    pub is_dir: bool,
-    pub is_file: bool,
-    pub is_readonly: bool,
-    pub mime_essence: String,
-    pub size: u64,
-    pub canonical: Option<ResolvedNodeUiMetadata>,
-    pub symlink: Option<ResolvedNodeUiMetadata>,
+    parent: String,
+    relative_path: String,
+    absolute_path: String,
+    extension: String,
+    is_symlink: bool,
+    is_broken: bool,
+    is_dir: bool,
+    is_file: bool,
+    is_readonly: bool,
+    mime_essence: String,
+    size: u64,
+    canonical: Option<ResolvedNodeUiMetadata>,
+    symlink: Option<ResolvedNodeUiMetadata>,
 
     // Extra
-    pub index: usize,
-    pub relative_index: usize,
-    pub is_before_focus: bool,
-    pub is_after_focus: bool,
-    pub tree: String,
-    pub prefix: String,
-    pub suffix: String,
-    pub is_selected: bool,
-    pub is_focused: bool,
-    pub total: usize,
-    pub meta: HashMap<String, String>,
+    index: usize,
+    relative_index: usize,
+    is_before_focus: bool,
+    is_after_focus: bool,
+    tree: String,
+    prefix: String,
+    suffix: String,
+    is_selected: bool,
+    is_focused: bool,
+    total: usize,
+    meta: HashMap<String, String>,
 }
 
 impl NodeUiMetadata {
@@ -139,19 +139,19 @@ impl NodeUiMetadata {
         meta: HashMap<String, String>,
     ) -> Self {
         Self {
-            parent: node.parent.clone(),
-            relative_path: node.relative_path.clone(),
-            absolute_path: node.absolute_path.clone(),
-            extension: node.extension.clone(),
-            is_symlink: node.is_symlink,
-            is_broken: node.is_broken,
-            is_dir: node.is_dir,
-            is_file: node.is_file,
-            is_readonly: node.is_readonly,
-            mime_essence: node.mime_essence.clone(),
-            size: node.size,
-            canonical: node.canonical.to_owned().map(|s| s.into()),
-            symlink: node.symlink.to_owned().map(|s| s.into()),
+            parent: node.parent().clone(),
+            relative_path: node.relative_path().clone(),
+            absolute_path: node.absolute_path().clone(),
+            extension: node.extension().clone(),
+            is_symlink: node.is_symlink(),
+            is_broken: node.is_broken(),
+            is_dir: node.is_dir(),
+            is_file: node.is_file(),
+            is_readonly: node.is_readonly(),
+            mime_essence: node.mime_essence().clone(),
+            size: node.size(),
+            canonical: node.canonical().to_owned().map(|s| s.into()),
+            symlink: node.symlink().to_owned().map(|s| s.into()),
             index,
             relative_index,
             is_before_focus,
@@ -175,19 +175,19 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
     let rows = app
         .directory_buffer()
         .map(|dir| {
-            dir.nodes
+            dir.nodes()
                 .iter()
                 .enumerate()
-                .skip(height * (dir.focus / height.max(1)))
+                .skip(height * (dir.focus() / height.max(1)))
                 .take(height)
                 .map(|(index, node)| {
-                    let is_focused = dir.focus == index;
+                    let is_focused = dir.focus() == index;
 
                     // TODO : Optimize
                     let is_selected = app.selection().contains(node);
 
                     let is_first = index == 0;
-                    let is_last = index == dir.total.max(1) - 1;
+                    let is_last = index == dir.total().max(1) - 1;
 
                     let tree = config
                         .general
@@ -208,13 +208,13 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let node_type = config
                         .node_types
                         .special
-                        .get(&node.relative_path)
-                        .or_else(|| config.node_types.extension.get(&node.extension))
-                        .or_else(|| config.node_types.mime_essence.get(&node.mime_essence))
+                        .get(node.relative_path())
+                        .or_else(|| config.node_types.extension.get(node.extension()))
+                        .or_else(|| config.node_types.mime_essence.get(node.mime_essence()))
                         .unwrap_or_else(|| {
-                            if node.is_symlink {
+                            if node.is_symlink() {
                                 &config.node_types.symlink
-                            } else if node.is_dir {
+                            } else if node.is_dir() {
                                 &config.node_types.directory
                             } else {
                                 &config.node_types.file
@@ -222,9 +222,9 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         });
 
                     let (relative_index, is_before_focus, is_after_focus) =
-                        match dir.focus.cmp(&index) {
-                            Ordering::Greater => (dir.focus - index, true, false),
-                            Ordering::Less => (index - dir.focus, false, true),
+                        match dir.focus().cmp(&index) {
+                            Ordering::Greater => (dir.focus() - index, true, false),
+                            Ordering::Less => (index - dir.focus(), false, true),
                             Ordering::Equal => (0, false, false),
                         };
 
@@ -258,7 +258,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         suffix.unwrap_or_default(),
                         is_selected,
                         is_focused,
-                        dir.total,
+                        dir.total(),
                         node_type.meta.clone(),
                     );
 
@@ -294,7 +294,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
         .block(Block::default().borders(Borders::ALL).title(format!(
             " {} ({}) ",
             app.pwd(),
-            app.directory_buffer().map(|d| d.total).unwrap_or_default()
+            app.directory_buffer().map(|d| d.total()).unwrap_or_default()
         )));
 
     let table = table.clone().header(
@@ -323,7 +323,7 @@ fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
         .rev()
         .take((rect.height.max(2) - 2).into())
         .rev()
-        .map(|n| n.absolute_path.clone())
+        .map(|n| n.absolute_path().clone())
         .map(ListItem::new)
         .collect();
 
@@ -433,24 +433,24 @@ fn draw_sort_n_filter_by<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::Ap
         .iter()
         .map(|f| {
             ui.filter_identifiers
-                .get(&f.filter)
+                .get(&f.filter())
                 .map(|u| {
                     (
                         Span::styled(u.format.to_owned().unwrap_or_default(), u.style.into()),
-                        Span::raw(f.input.clone()),
+                        Span::raw(f.input().clone()),
                     )
                 })
                 .unwrap_or_else(|| (Span::raw("f"), Span::raw("")))
         })
         .chain(sort_by.iter().map(|s| {
-            let direction = if s.reverse {
+            let direction = if s.reverse() {
                 reverse.clone()
             } else {
                 forward.clone()
             };
 
             ui.sorter_identifiers
-                .get(&s.sorter)
+                .get(&s.sorter())
                 .map(|u| {
                     (
                         Span::styled(u.format.to_owned().unwrap_or_default(), u.style.into()),
@@ -484,27 +484,27 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
         .take(1)
         .rev()
         .map(|l| {
-            let time = l.created_at.format("%r");
-            match &l.level {
+            let time = l.created_at().format("%r");
+            match l.level() {
                 app::LogLevel::Info => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
                     &config.info.format.to_owned().unwrap_or_default(),
-                    &l.message
+                    l.message()
                 ))
                 .style(config.info.style.into()),
                 app::LogLevel::Success => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
                     &config.success.format.to_owned().unwrap_or_default(),
-                    &l.message
+                    l.message()
                 ))
                 .style(config.success.style.into()),
                 app::LogLevel::Error => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
                     &config.error.format.to_owned().unwrap_or_default(),
-                    &l.message
+                    l.message()
                 ))
                 .style(config.error.style.into()),
             }
