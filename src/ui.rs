@@ -557,3 +557,153 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
     draw_selection(f, right_chunks[0], app, hb);
     draw_help_menu(f, right_chunks[1], app, hb);
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::config;
+    use tui::style::Color;
+    use tui::style::Modifier;
+
+    #[test]
+    fn test_extend_style() {
+        let a = Style {
+            fg: Some(Color::Red),
+            bg: None,
+            add_modifier: Some(Modifier::BOLD),
+            sub_modifier: None,
+        };
+
+        let b = Style {
+            fg: None,
+            bg: Some(Color::Blue),
+            add_modifier: None,
+            sub_modifier: Some(Modifier::DIM),
+        };
+
+        let c = Style {
+            fg: Some(Color::Cyan),
+            bg: Some(Color::Magenta),
+            add_modifier: Some(Modifier::CROSSED_OUT),
+            sub_modifier: Some(Modifier::ITALIC),
+        };
+
+        assert_eq!(
+            a.clone().extend(b.clone()),
+            Style {
+                fg: Some(Color::Red),
+                bg: Some(Color::Blue),
+                add_modifier: Some(Modifier::BOLD),
+                sub_modifier: Some(Modifier::DIM),
+            }
+        );
+
+        assert_eq!(
+            b.clone().extend(a.clone()),
+            Style {
+                fg: Some(Color::Red),
+                bg: Some(Color::Blue),
+                add_modifier: Some(Modifier::BOLD),
+                sub_modifier: Some(Modifier::DIM),
+            }
+        );
+
+        assert_eq!(
+            a.clone().extend(c.clone()),
+            Style {
+                fg: Some(Color::Cyan),
+                bg: Some(Color::Magenta),
+                add_modifier: Some(Modifier::CROSSED_OUT),
+                sub_modifier: Some(Modifier::ITALIC),
+            }
+        );
+
+        assert_eq!(
+            c.clone().extend(a.clone()),
+            Style {
+                fg: Some(Color::Red),
+                bg: Some(Color::Magenta),
+                add_modifier: Some(Modifier::BOLD),
+                sub_modifier: Some(Modifier::ITALIC),
+            }
+        );
+    }
+
+    #[test]
+    fn test_extend_ui_config() {
+        let a = config::UiConfig {
+            prefix: Some("a".to_string()),
+            suffix: None,
+            style: Style {
+                fg: Some(Color::Red),
+                bg: None,
+                add_modifier: Some(Modifier::BOLD),
+                sub_modifier: None,
+            },
+        };
+
+        let b = config::UiConfig {
+            prefix: None,
+            suffix: Some("b".to_string()),
+            style: Style {
+                fg: None,
+                bg: Some(Color::Blue),
+                add_modifier: None,
+                sub_modifier: Some(Modifier::DIM),
+            },
+        };
+
+        let c = config::UiConfig {
+            prefix: Some("cp".to_string()),
+            suffix: Some("cs".to_string()),
+            style: Style {
+                fg: Some(Color::Cyan),
+                bg: Some(Color::Magenta),
+                add_modifier: Some(Modifier::CROSSED_OUT),
+                sub_modifier: Some(Modifier::ITALIC),
+            },
+        };
+
+        assert_eq!(
+            a.clone().extend(b.clone()),
+            config::UiConfig {
+                prefix: Some("a".to_string()),
+                suffix: Some("b".to_string()),
+                style: Style {
+                    fg: Some(Color::Red),
+                    bg: Some(Color::Blue),
+                    add_modifier: Some(Modifier::BOLD),
+                    sub_modifier: Some(Modifier::DIM),
+                },
+            }
+        );
+
+        assert_eq!(
+            b.clone().extend(a.clone()),
+            config::UiConfig {
+                prefix: Some("a".to_string()),
+                suffix: Some("b".to_string()),
+                style: Style {
+                    fg: Some(Color::Red),
+                    bg: Some(Color::Blue),
+                    add_modifier: Some(Modifier::BOLD),
+                    sub_modifier: Some(Modifier::DIM),
+                },
+            }
+        );
+
+        assert_eq!(
+            a.clone().extend(c.clone()),
+            config::UiConfig {
+                prefix: Some("cp".to_string()),
+                suffix: Some("cs".to_string()),
+                style: Style {
+                    fg: Some(Color::Cyan),
+                    bg: Some(Color::Magenta),
+                    add_modifier: Some(Modifier::CROSSED_OUT),
+                    sub_modifier: Some(Modifier::ITALIC),
+                },
+            }
+        );
+    }
+}
