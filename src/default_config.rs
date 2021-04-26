@@ -8,17 +8,17 @@ lazy_static! {
 }
 
 pub fn version() -> String {
-    DEFAULT_CONFIG.version.clone()
+    DEFAULT_CONFIG.version().clone()
 }
 
 pub fn general() -> config::GeneralConfig {
-    DEFAULT_CONFIG.general.clone()
+    DEFAULT_CONFIG.general().clone()
 }
 
 pub fn node_types() -> config::NodeTypesConfig {
-    DEFAULT_CONFIG.node_types.clone()
+    DEFAULT_CONFIG.node_types().clone()
 }
 
 pub fn modes() -> config::ModesConfig {
-    DEFAULT_CONFIG.modes.clone()
+    DEFAULT_CONFIG.modes().clone()
 }

@@ -1398,7 +1398,7 @@ impl App {
 
         let config_file = config_dir.join("config.yml");
         let default_config = Config::default();
-        let default_config_version = default_config.version.clone();
+        let default_config_version = default_config.version().clone();
 
         let config: Config = if config_file.exists() {
             let c: Config =
@@ -1415,16 +1415,16 @@ impl App {
                 Required version is   : {}
                 Visit {}",
                 config_file.to_string_lossy().to_string(),
-                config.version,
+                config.version(),
                 default_config_version,
                 UPGRADE_GUIDE_LINK,
             )
         };
 
-        let mode = match config.modes.builtin.get(&"default".to_string()) {
+        let mode = match config.modes().builtin().get(&"default".to_string()) {
             Some(m) => m
                 .clone()
-                .sanitized(config.general.read_only.unwrap_or_default()),
+                .sanitized(config.general().read_only().unwrap_or_default()),
             None => {
                 bail!("'default' mode is missing")
             }
@@ -1440,14 +1440,14 @@ impl App {
             .to_string();
 
         let mut explorer_config = ExplorerConfig::default();
-        if !config.general.show_hidden.unwrap_or_default() {
+        if !config.general().show_hidden().unwrap_or_default() {
             explorer_config.filters.replace(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
             ));
         }
 
-        if let Some(sorters) = &config.general.initial_sorting {
+        if let Some(sorters) = &config.general().initial_sorting() {
             explorer_config.sorters = sorters.clone();
         };
 
@@ -1455,7 +1455,7 @@ impl App {
         history = history.push(pwd.to_string_lossy().to_string());
 
         let mut app = Self {
-            version: Config::default().version,
+            version: Config::default().version().clone(),
             config: config.clone(),
             pwd: pwd.to_string_lossy().to_string(),
             directory_buffers: Default::default(),
@@ -1474,7 +1474,9 @@ impl App {
         if let Some(notif) = config.upgrade_notification()? {
             let notif = format!(
                 "{}. To stop seeing this log, update your config version from {} to {}.",
-                &notif, &config.version, &app.version
+                &notif,
+                config.version(),
+                app.version()
             );
             app = app.enqueue(Task::new(
                 MsgIn::External(ExternalMsg::LogInfo(notif)),
@@ -1517,7 +1519,7 @@ impl App {
     }
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>, last_app: &Self) -> Result<Self> {
-        if self.config().general.read_only.unwrap_or_default() && !msg.is_read_only() {
+        if self.config().general().read_only().unwrap_or_default() && !msg.is_read_only() {
             self.log_error("Cannot call shell command in read-only mode.".into())
         } else {
             match msg {
@@ -1604,27 +1606,29 @@ impl App {
     }
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
-        let kb = self.mode.key_bindings.clone();
+        let kb = self.mode().key_bindings().clone();
         let key_str = key.to_string();
-        let default = kb.default.clone();
+        let default = kb.default().clone();
         let msgs = kb
-            .remaps
+            .remaps()
             .get(&key_str)
-            .and_then(|k| kb.on_key.get(k))
-            .or_else(|| kb.on_key.get(&key_str))
-            .map(|a| Some(a.messages.clone()))
+            .and_then(|k| kb.on_key().get(k))
+            .or_else(|| kb.on_key().get(&key_str))
+            .map(|a| Some(a.messages().clone()))
             .unwrap_or_else(|| {
                 if key.is_alphabet() {
-                    kb.on_alphabet.map(|a| a.messages)
+                    kb.on_alphabet().clone().map(|a| a.messages().clone())
                 } else if key.is_number() {
-                    kb.on_number.map(|a| a.messages)
+                    kb.on_number().clone().map(|a| a.messages().clone())
                 } else if key.is_special_character() {
-                    kb.on_special_character.map(|a| a.messages)
+                    kb.on_special_character()
+                        .clone()
+                        .map(|a| a.messages().clone())
                 } else {
                     None
                 }
             })
-            .unwrap_or_else(|| default.map(|a| a.messages).unwrap_or_default());
+            .unwrap_or_else(|| default.map(|a| a.messages().clone()).unwrap_or_default());
 
         for msg in msgs {
             self = self.enqueue(Task::new(MsgIn::External(msg), Some(key)));
@@ -1891,11 +1895,11 @@ impl App {
     }
 
     fn switch_mode(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config.modes.get(mode) {
+        if let Some(mode) = self.config().modes().clone().get(mode) {
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config.general.read_only.unwrap_or_default());
+                .sanitized(self.config().general().read_only().unwrap_or_default());
             self.msg_out.push_back(MsgOut::Refresh);
         };
         Ok(self)
@@ -2066,7 +2070,7 @@ impl App {
     fn reset_node_filters(mut self) -> Result<Self> {
         self.explorer_config.filters.clear();
 
-        if !self.config.general.show_hidden.unwrap_or_default() {
+        if !self.config().general().show_hidden().unwrap_or_default() {
             self.add_node_filter(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
@@ -2125,9 +2129,9 @@ impl App {
 
     fn reset_node_sorters(mut self) -> Result<Self> {
         self.explorer_config.sorters = self
-            .config
-            .general
-            .initial_sorting
+            .config()
+            .general()
+            .initial_sorting()
             .to_owned()
             .unwrap_or_default();
         Ok(self)
@@ -2207,7 +2211,7 @@ impl App {
     }
 
     pub fn mode_str(&self) -> String {
-        format!("{}\n", &self.mode.name)
+        format!("{}\n", &self.mode.name())
     }
 
     /// Get a reference to the app's directory buffers.
@@ -2288,28 +2292,28 @@ impl App {
     }
 
     pub fn global_help_menu_str(&self) -> String {
-        let builtin = self.config().modes.builtin.clone();
-        let custom = self.config().modes.custom.clone();
+        let builtin = self.config().modes().builtin().clone();
+        let custom = self.config().modes().custom().clone();
 
         [
-            (builtin.default.name.clone(), builtin.default),
-            (builtin.number.name.clone(), builtin.number),
-            (builtin.go_to.name.clone(), builtin.go_to),
-            (builtin.search.name.clone(), builtin.search),
-            (builtin.selection_ops.name.clone(), builtin.selection_ops),
-            (builtin.action.name.clone(), builtin.action),
-            (builtin.create.name.clone(), builtin.create),
-            (builtin.create_file.name.clone(), builtin.create_file),
+            (builtin.default().name().clone(), builtin.default().clone()),
+            (builtin.number().name().clone(), builtin.number().clone()),
+            (builtin.go_to().name().clone(), builtin.go_to().clone()),
+            (builtin.search().name().clone(), builtin.search().clone()),
+            (builtin.selection_ops().name().clone(), builtin.selection_ops().clone()),
+            (builtin.action().name().clone(), builtin.action().clone()),
+            (builtin.create().name().clone(), builtin.create().clone()),
+            (builtin.create_file().name().clone(), builtin.create_file().clone()),
             (
-                builtin.create_directory.name.clone(),
-                builtin.create_directory,
+                builtin.create_directory().name().clone(),
+                builtin.create_directory().clone(),
             ),
-            (builtin.rename.name.clone(), builtin.rename),
-            (builtin.delete.name.clone(), builtin.delete),
-            (builtin.sort.name.clone(), builtin.sort),
-            (builtin.filter.name.clone(), builtin.filter),
-            (builtin.relative_path_does_contain.name.clone(), builtin.relative_path_does_contain),
-            (builtin.relative_path_does_not_contain.name.clone(), builtin.relative_path_does_not_contain),
+            (builtin.rename().name().clone(), builtin.rename().clone()),
+            (builtin.delete().name().clone(), builtin.delete().clone()),
+            (builtin.sort().name().clone(), builtin.sort().clone()),
+            (builtin.filter().name().clone(), builtin.filter().clone()),
+            (builtin.relative_path_does_contain().name().clone(), builtin.relative_path_does_contain().clone()),
+            (builtin.relative_path_does_not_contain().name().clone(), builtin.relative_path_does_not_contain().clone()),
         ]
         .iter()
         .chain(custom.into_iter().collect::<Vec<(String, Mode)>>().iter())
@@ -2322,8 +2326,8 @@ impl App {
                     HelpMenuLine::KeyMap(k, h) => {
                         let remaps = self
                             .mode()
-                            .key_bindings
-                            .remaps
+                            .key_bindings()
+                            .remaps()
                             .iter()
                             .filter(|(_, t)| t == &k)
                             .map(|(f, _)| f.clone())
