@@ -169,7 +169,7 @@ impl NodeUiMetadata {
 
 fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Handlebars) {
     let config = app.config().to_owned();
-    let header_height = config.general.table.header.height.unwrap_or(1);
+    let header_height = config.general().table().header().height().unwrap_or(1);
     let height: usize = (rect.height.max(header_height + 2) - (header_height + 2)).into();
 
     let rows = app
@@ -190,34 +190,34 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let is_last = index == dir.total().max(1) - 1;
 
                     let tree = config
-                        .general
-                        .table
-                        .tree
+                        .general()
+                        .table()
+                        .tree()
                         .clone()
                         .map(|t| {
                             if is_last {
-                                t.2.format
+                                t.2.format().clone()
                             } else if is_first {
-                                t.0.format
+                                t.0.format().clone()
                             } else {
-                                t.1.format
+                                t.1.format().clone()
                             }
                         })
                         .unwrap_or_default();
 
                     let node_type = config
-                        .node_types
-                        .special
+                        .node_types()
+                        .special()
                         .get(node.relative_path())
-                        .or_else(|| config.node_types.extension.get(node.extension()))
-                        .or_else(|| config.node_types.mime_essence.get(node.mime_essence()))
+                        .or_else(|| config.node_types().extension().get(node.extension()))
+                        .or_else(|| config.node_types().mime_essence().get(node.mime_essence()))
                         .unwrap_or_else(|| {
                             if node.is_symlink() {
-                                &config.node_types.symlink
+                                &config.node_types().symlink()
                             } else if node.is_dir() {
-                                &config.node_types.directory
+                                &config.node_types().directory()
                             } else {
-                                &config.node_types.file
+                                &config.node_types().file()
                             }
                         });
 
@@ -229,22 +229,26 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         };
 
                     let (mut prefix, mut suffix, mut style) = {
-                        let ui = config.general.default_ui.clone();
-                        (ui.prefix, ui.suffix, ui.style.extend(node_type.style))
+                        let ui = config.general().default_ui().clone();
+                        (
+                            ui.prefix().clone(),
+                            ui.suffix().clone(),
+                            ui.style().extend(node_type.style()),
+                        )
                     };
 
                     if is_selected {
-                        let ui = config.general.selection_ui.clone();
-                        prefix = ui.prefix.or(prefix);
-                        suffix = ui.suffix.or(suffix);
-                        style = style.extend(ui.style);
+                        let ui = config.general().selection_ui().clone();
+                        prefix = ui.prefix().clone().or(prefix);
+                        suffix = ui.suffix().clone().or(suffix);
+                        style = style.extend(ui.style());
                     };
 
                     if is_focused {
-                        let ui = config.general.focus_ui.clone();
-                        prefix = ui.prefix.or(prefix);
-                        suffix = ui.suffix.or(suffix);
-                        style = style.extend(ui.style);
+                        let ui = config.general().focus_ui().clone();
+                        prefix = ui.prefix().clone().or(prefix);
+                        suffix = ui.suffix().clone().or(suffix);
+                        style = style.extend(ui.style());
                     };
 
                     let meta = NodeUiMetadata::new(
@@ -259,7 +263,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         is_selected,
                         is_focused,
                         dir.total(),
-                        node_type.meta.clone(),
+                        node_type.meta().clone(),
                     );
 
                     let cols = hb
@@ -277,9 +281,9 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
         .unwrap_or_default();
 
     let table_constraints: Vec<TuiConstraint> = config
-        .general
-        .table
-        .col_widths
+        .general()
+        .table()
+        .col_widths()
         .clone()
         .unwrap_or_default()
         .into_iter()
@@ -288,9 +292,9 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
 
     let table = Table::new(rows)
         .widths(&table_constraints)
-        .style(config.general.table.style.into())
-        .highlight_style(config.general.focus_ui.style.into())
-        .column_spacing(config.general.table.col_spacing.unwrap_or_default())
+        .style(config.general().table().style().into())
+        .highlight_style(config.general().focus_ui().style().into())
+        .column_spacing(config.general().table().col_spacing().unwrap_or_default())
         .block(Block::default().borders(Borders::ALL).title(format!(
             " {} ({}) ",
             app.pwd(),
@@ -300,17 +304,18 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
     let table = table.clone().header(
         Row::new(
             config
-                .general
-                .table
-                .header
-                .cols
+                .general()
+                .table()
+                .header()
+                .cols()
+                .clone()
                 .unwrap_or_default()
                 .iter()
-                .map(|c| Cell::from(c.format.to_owned().unwrap_or_default()))
+                .map(|c| Cell::from(c.format().to_owned().unwrap_or_default()))
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
-        .style(config.general.table.header.style.into()),
+        .style(config.general().table().header().style().into()),
     );
 
     f.render_widget(table, rect);
@@ -349,8 +354,8 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
             HelpMenuLine::KeyMap(k, h) => {
                 let remaps = app
                     .mode()
-                    .key_bindings
-                    .remaps
+                    .key_bindings()
+                    .remaps()
                     .iter()
                     .filter(|(_, t)| t == &&k)
                     .map(|(f, _)| f.clone())
@@ -361,7 +366,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
         })
         .collect::<Vec<Row>>();
 
-    let read_only_indicator = if app.config().general.read_only.unwrap_or_default() {
+    let read_only_indicator = if app.config().general().read_only().unwrap_or_default() {
         "(r)"
     } else {
         ""
@@ -370,7 +375,7 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
     let help_menu = Table::new(help_menu_rows)
         .block(Block::default().borders(Borders::ALL).title(format!(
             " Help [{}{}] ",
-            &app.mode().name,
+            &app.mode().name(),
             read_only_indicator
         )))
         .widths(&[
@@ -385,22 +390,22 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
     let input_buf = Paragraph::new(Spans::from(vec![
         Span::styled(
             app.config()
-                .general
-                .prompt
-                .format
+                .general()
+                .prompt()
+                .format()
                 .clone()
                 .unwrap_or_default(),
-            app.config().general.prompt.style.into(),
+            app.config().general().prompt().style().into(),
         ),
         Span::raw(app.input_buffer().unwrap_or_else(|| "".into())),
         Span::styled(
             app.config()
-                .general
-                .cursor
-                .format
+                .general()
+                .cursor()
+                .format()
                 .clone()
                 .unwrap_or_default(),
-            app.config().general.cursor.style.into(),
+            app.config().general().cursor().style().into(),
         ),
     ]))
     .block(Block::default().borders(Borders::ALL).title(" Input "));
@@ -408,35 +413,35 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
 }
 
 fn draw_sort_n_filter_by<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let ui = app.config().general.sort_and_filter_ui.clone();
+    let ui = app.config().general().sort_and_filter_ui().clone();
     let filter_by = app.explorer_config().filters();
     let sort_by = app.explorer_config().sorters();
     let forward = Span::styled(
-        ui.sort_direction_identifiers
-            .forward
-            .format
+        ui.sort_direction_identifiers()
+            .forward()
+            .format()
             .to_owned()
             .unwrap_or_default(),
-        ui.sort_direction_identifiers.forward.style.into(),
+        ui.sort_direction_identifiers().forward().style().into(),
     );
 
     let reverse = Span::styled(
-        ui.sort_direction_identifiers
-            .reverse
-            .format
+        ui.sort_direction_identifiers()
+            .reverse()
+            .format()
             .to_owned()
             .unwrap_or_default(),
-        ui.sort_direction_identifiers.reverse.style.into(),
+        ui.sort_direction_identifiers().reverse().style().into(),
     );
 
     let mut spans = filter_by
         .iter()
         .map(|f| {
-            ui.filter_identifiers
+            ui.filter_identifiers()
                 .get(&f.filter())
                 .map(|u| {
                     (
-                        Span::styled(u.format.to_owned().unwrap_or_default(), u.style.into()),
+                        Span::styled(u.format().to_owned().unwrap_or_default(), u.style().into()),
                         Span::raw(f.input().clone()),
                     )
                 })
@@ -449,19 +454,19 @@ fn draw_sort_n_filter_by<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::Ap
                 forward.clone()
             };
 
-            ui.sorter_identifiers
+            ui.sorter_identifiers()
                 .get(&s.sorter())
                 .map(|u| {
                     (
-                        Span::styled(u.format.to_owned().unwrap_or_default(), u.style.into()),
+                        Span::styled(u.format().to_owned().unwrap_or_default(), u.style().into()),
                         direction.clone(),
                     )
                 })
                 .unwrap_or_else(|| (Span::raw("s"), direction.clone()))
         }))
         .zip(std::iter::repeat(Span::styled(
-            ui.separator.format.to_owned().unwrap_or_default(),
-            ui.separator.style.into(),
+            ui.separator().format().to_owned().unwrap_or_default(),
+            ui.separator().style().into(),
         )))
         .map(|((a, b), c)| vec![a, b, c])
         .flatten()
@@ -476,7 +481,7 @@ fn draw_sort_n_filter_by<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::Ap
 }
 
 fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let config = app.config().general.logs.clone();
+    let config = app.config().general().logs().clone();
     let logs = app
         .logs()
         .iter()
@@ -489,24 +494,24 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
                 app::LogLevel::Info => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
-                    &config.info.format.to_owned().unwrap_or_default(),
+                    &config.info().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(config.info.style.into()),
+                .style(config.info().style().into()),
                 app::LogLevel::Success => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
-                    &config.success.format.to_owned().unwrap_or_default(),
+                    &config.success().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(config.success.style.into()),
+                .style(config.success().style().into()),
                 app::LogLevel::Error => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
-                    &config.error.format.to_owned().unwrap_or_default(),
+                    &config.error().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(config.error.style.into()),
+                .style(config.error().style().into()),
             }
         })
         .collect::<Vec<ListItem>>();

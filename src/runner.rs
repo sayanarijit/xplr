@@ -38,7 +38,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
 
     Command::new(cmd.command().clone())
         .env("XPLR_APP_VERSION", app.version())
-        .env("XPLR_CONFIG_VERSION", &app.config().version)
+        .env("XPLR_CONFIG_VERSION", app.config().version())
         .env("XPLR_PID", &app.pid().to_string())
         .env("XPLR_INPUT_BUFFER", app.input_buffer().unwrap_or_default())
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
@@ -83,14 +83,14 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     hb.register_template_string(
         app::TEMPLATE_TABLE_ROW,
         &app.config()
-            .general
-            .table
-            .row
-            .cols
-            .to_owned()
+            .general()
+            .table()
+            .row()
+            .cols()
+            .clone()
             .unwrap_or_default()
             .iter()
-            .map(|c| c.format.clone().unwrap_or_default())
+            .map(|c| c.format().clone().unwrap_or_default())
             .collect::<Vec<String>>()
             .join("\t"),
     )?;
