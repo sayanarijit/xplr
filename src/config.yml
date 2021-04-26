@@ -927,7 +927,8 @@ modes:
             messages:
               - BashExecSilently: |
                   OPENER="$(which xdg-open)"
-                  ${OPENER:-open} "${XPLR_FOCUS_PATH:?}" &> /dev/null
+                  ${OPENER:-open} "${XPLR_FOCUS_PATH:?}" &> /dev/null &
+                  disown || true
               - SwitchMode: default
 
         on_alphabet: null
