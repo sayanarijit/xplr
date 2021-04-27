@@ -1,4 +1,4 @@
-version: v0.5.7
+version: v0.5.8
 general:
   show_hidden: false
   read_only: false
@@ -926,9 +926,20 @@ modes:
             help: open in gui
             messages:
               - BashExecSilently: |
-                  OPENER="$(which xdg-open)"
-                  ${OPENER:-open} "${XPLR_FOCUS_PATH:?}" &> /dev/null
+                  if [ -z "$OPENER" ]; then
+                    if command -v xdg-open; then
+                      OPENER=xdg-open
+                    elif command -v open; then
+                      OPENER=open
+                    else
+                      echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                      exit 1
+                    fi
+                  fi
+                  $OPENER "${XPLR_FOCUS_PATH:?}" &> /dev/null &
               - SwitchMode: default
+              - ClearScreen
+              - Refresh
 
         on_alphabet: null
         on_number: null
