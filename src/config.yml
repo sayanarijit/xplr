@@ -1,4 +1,4 @@
-version: v0.5.8
+version: v0.5.9
 general:
   show_hidden: false
   read_only: false
@@ -302,7 +302,7 @@ modes:
             messages:
               - BashExec: |
                   (while IFS= read -r line; do
-                    if cp -vr "${line:?}" ./; then
+                    if cp -vr -- "${line:?}" ./; then
                       echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                     else
                       echo "LogError: Failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
@@ -318,7 +318,7 @@ modes:
             messages:
               - BashExec: |
                   (while IFS= read -r line; do
-                    if mv -v "${line:?}" ./; then
+                    if mv -v -- "${line:?}" ./; then
                       echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
                     else
                       echo "LogError: Failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
@@ -349,7 +349,7 @@ modes:
             messages:
               - BashExecSilently: |
                   PTH="${XPLR_INPUT_BUFFER:?}"
-                  if touch "${PTH:?}"; then
+                  if touch -- "${PTH:?}"; then
                     echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
@@ -394,7 +394,7 @@ modes:
             messages:
               - BashExecSilently: |
                   PTH="${XPLR_INPUT_BUFFER:?}"
-                  if mkdir -p "${PTH:?}"; then
+                  if mkdir -p -- "${PTH:?}"; then
                     echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
@@ -478,7 +478,7 @@ modes:
               - BashExecSilently: |
                   SRC="${XPLR_FOCUS_PATH:?}"
                   TARGET="${XPLR_INPUT_BUFFER:?}"
-                  if mv -v "${SRC:?}" "${TARGET:?}"; then
+                  if mv -v -- "${SRC:?}" "${TARGET:?}"; then
                     echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo "FocusPath: $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
@@ -1012,13 +1012,13 @@ modes:
               - BashExec: |
                   (while IFS= read -r line; do
                     if [ -d "$line" ]; then
-                      if rmdir -v "${line:?}"; then
+                      if rmdir -v -- "${line:?}"; then
                         echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                       else
                         echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                       fi
                     else
-                      if rm -v "${line:?}"; then
+                      if rm -v -- "${line:?}"; then
                         echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
                         echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                       else
@@ -1035,7 +1035,7 @@ modes:
             messages:
               - BashExec: |
                   (while IFS= read -r line; do
-                    if rm -rfv "${line:?}"; then
+                    if rm -rfv -- "${line:?}"; then
                       echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
                       echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                     else
@@ -1089,7 +1089,7 @@ modes:
             help: open in editor
             messages:
               - BashExec: |
-                  ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
+                  ${EDITOR:-vi} -- "${XPLR_FOCUS_PATH:?}"
               - SwitchMode: default
 
           s:
@@ -1101,7 +1101,7 @@ modes:
             help: logs
             messages:
               - BashExec: |
-                  cat "${XPLR_PIPE_LOGS_OUT}"
+                  cat -- "${XPLR_PIPE_LOGS_OUT}"
                   read -p "[enter to continue]"
               - SwitchMode: default
 
