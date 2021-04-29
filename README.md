@@ -26,6 +26,9 @@ Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you
 different run modes, and also the way it looks by modifying one single configuration file.
 
 
+Table of content
+----------------
+
 - ### [Quickstart](https://github.com/sayanarijit/xplr/wiki/Quickstart)
 
 - ### [Features](https://github.com/sayanarijit/xplr/wiki/Features)
@@ -41,6 +44,10 @@ different run modes, and also the way it looks by modifying one single configura
 - ### [Upgrade Guide](https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide)
 
 - ### [Alternatives](https://github.com/sayanarijit/xplr/wiki/Alternatives)
+
+- ### [Community](https://github.com/sayanarijit/xplr/wiki/Community)
+
+- ### [Contribute](https://github.com/sayanarijit/xplr/wiki/Contribute)
 
 
 ## Demo
