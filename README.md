@@ -63,6 +63,14 @@ different run modes, and also the way it looks by modifying one single configura
 <img height=240 width=360 src="https://s4.gifyu.com/images/xplr-dua.gif" />
 </a>
 
+<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#sendreceive-files-via-qr-code-on-lan" target="_blank">
+<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-qr.gif" />
+</a>
+
+<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#spawn-multiple-sessions-in-different-windows" target="_blank">
+<img height=240 width=360 src="https://s3.gifyu.com/images/xplr-sessions.gif" />
+</a>
+
 </p>
 
 ## Packaging
