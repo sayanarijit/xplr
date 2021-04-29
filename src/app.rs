@@ -1485,8 +1485,7 @@ impl App {
         }
 
         fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
-
-        Ok(app)
+        app.write_pipes(None)
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
@@ -1602,7 +1601,7 @@ impl App {
             }
         }?
         .refresh_selection()
-        .write_pipes(&last_app)
+        .write_pipes(Some(&last_app))
     }
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
@@ -2367,46 +2366,72 @@ impl App {
             .join("")
     }
 
-    fn write_pipes(self, last_app: &Self) -> Result<Self> {
-        if self.focused_node() != last_app.focused_node() {
-            fs::write(&self.pipe().focus_out, self.focused_node_str())?;
-        };
+    fn write_pipes(self, last_app: Option<&Self>) -> Result<Self> {
+        // TODO optimize and test
 
-        if self.selection() != last_app.selection() {
-            fs::write(&self.pipe().selection_out, self.selection_str())?;
-        };
+        let focused_node_str = self.focused_node_str();
+        // if last_app
+        //     .map(|a| a.focused_node_str() != focused_node_str)
+        //     .unwrap_or(true)
+        // {
+        fs::write(&self.pipe().focus_out, focused_node_str)?;
+        // };
 
-        if self.history_str() != last_app.history_str() {
-            fs::write(&self.pipe().history_out, self.history_str())?;
-        };
+        let selection_str = self.selection_str();
+        // if last_app
+        //     .map(|a| a.selection_str() != selection_str)
+        //     .unwrap_or(true)
+        // {
+        fs::write(&self.pipe().selection_out, selection_str)?;
+        // };
 
-        if self.mode_str() != last_app.mode_str() {
-            fs::write(&self.pipe().mode_out, self.mode_str())?;
-        };
+        let history_str = self.history_str();
+        // if last_app
+        //     .map(|a| a.history_str() != history_str)
+        //     .unwrap_or(true)
+        // {
+        fs::write(&self.pipe().history_out, history_str)?;
+        // };
 
-        if self.directory_buffer() != last_app.directory_buffer() {
-            fs::write(&self.pipe().directory_nodes_out, self.directory_nodes_str())?;
-        };
+        let mode_str = self.mode_str();
+        // if last_app.map(|a| a.mode_str() != mode_str).unwrap_or(true) {
+        fs::write(&self.pipe().mode_out, mode_str)?;
+        // };
 
-        if self.logs().len() != last_app.logs().len() {
-            let new_logs = self
-                .logs()
-                .iter()
-                .skip(last_app.logs().len())
-                .map(|l| format!("{}\n", l))
-                .collect::<Vec<String>>()
-                .join("");
+        let directory_nodes_str = self.directory_nodes_str();
+        // if last_app
+        //     .map(|a| a.directory_nodes_str() != directory_nodes_str)
+        //     .unwrap_or(true)
+        // {
+        fs::write(&self.pipe().directory_nodes_out, directory_nodes_str)?;
+        // };
 
-            let mut file = fs::OpenOptions::new()
-                .append(true)
-                .open(&self.pipe().logs_out)?;
+        // if last_app
+        //     .map(|a| a.logs().len() != self.logs().len())
+        //     .unwrap_or(true)
+        // {
+        let new_logs = self
+            .logs()
+            .iter()
+            .skip(last_app.map(|a| a.logs().len()).unwrap_or(0))
+            .map(|l| format!("{}\n", l))
+            .collect::<Vec<String>>()
+            .join("");
 
-            file.write_all(new_logs.as_bytes())?;
-        };
+        let mut file = fs::OpenOptions::new()
+            .append(true)
+            .open(&self.pipe().logs_out)?;
 
-        if self.result() != last_app.result() {
-            fs::write(&self.pipe().result_out, self.result_str())?;
-        };
+        file.write_all(new_logs.as_bytes())?;
+        // };
+
+        let result_str = self.result_str();
+        // if last_app
+        //     .map(|a| a.result_str() != result_str)
+        //     .unwrap_or(true)
+        // {
+        fs::write(&self.pipe().result_out, result_str)?;
+        // };
         Ok(self)
     }
 }
