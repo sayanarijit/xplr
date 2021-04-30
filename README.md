@@ -1,4 +1,6 @@
-<h1 align="center">xplr</h1>
+<p align="center">
+<img src="https://s3.gifyu.com/images/icon2194563908b29554.png" />
+</p>
 
 <p align="center">
 A hackable, minimal, fast TUI file explorer
