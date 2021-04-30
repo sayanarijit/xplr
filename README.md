@@ -1,5 +1,5 @@
 <h1 align="center">
-  ▸[<a href="https://github.com/sayanarijit/xplr/blob/main/assets/icon/xplr.svg" target="_blank"><img src="https://github.com/sayanarijit/xplr/blob/main/assets/icon/xplr.svg" alt="▓▓" height="20" width="20" /></a> xplr]
+  ▸[<a href="https://github.com/sayanarijit/xplr/blob/main/assets/icon/xplr.svg" target="_blank"><img src="https://github.com/sayanarijit/xplr/blob/main/assets/icon/xplr32.png" alt="▓▓" height="20" width="20" /></a> xplr]
 </h1>
 
 <p align="center">
