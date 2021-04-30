@@ -1,6 +1,6 @@
-<p align="center">
-  <a href="https://paste.rs/1Eo" target="_blank"><img src="https://s3.gifyu.com/images/icon2194563908b29554.png" /></a>
-</p>
+<h1 align="center">
+  ▸[<a href="https://github.com/sayanarijit/xplr/blob/main/assets/icon/xplr.svg" target="_blank"><img src="https://github.com/sayanarijit/xplr/blob/main/assets/icon/xplr.svg" alt="▓▓" height="20" width="20" /></a> xplr]
+</h1>
 
 <p align="center">
 A hackable, minimal, fast TUI file explorer
