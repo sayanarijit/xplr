@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://s3.gifyu.com/images/icon2194563908b29554.png" />
+  <a href="https://paste.rs/1Eo" target="_blank"><img src="https://s3.gifyu.com/images/icon2194563908b29554.png" /></a>
 </p>
 
 <p align="center">
@@ -84,8 +84,8 @@ Table of content
 
 ## Packaging
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/xplr.svg)](https://repology.org/project/xplr/versions)
+<a href="https://repology.org/project/xplr/versions" target="_blank"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" /></a>
 
 ## Backers
 
-<a href="https://opencollective.com/xplr#backer"><img src="https://opencollective.com/xplr/tiers/backer.svg?width=890" /></a>
+<a href="https://opencollective.com/xplr#backer" target="_blank"><img src="https://opencollective.com/xplr/tiers/backer.svg?width=890" /></a>
