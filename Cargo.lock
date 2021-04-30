@@ -1630,7 +1630,7 @@ dependencies = [
 
 [[package]]
 name = "xplr"
-version = "0.5.10"
+version = "0.5.11"
 dependencies = [
  "anyhow",
  "chrono",

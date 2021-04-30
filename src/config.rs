@@ -1020,6 +1020,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 5, 11) => true,
             (0, 5, 10) => true,
             (0, 5, 9) => true,
             (0, 5, 8) => true,
@@ -1039,7 +1040,8 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 5, 10) => None,
+            (0, 5, 11) => None,
+            (0, 5, 10) => Some("App version updated. Added xplr desktop icon and search navigation"),
             (0, 5, 9) => Some("App version updated. Fixed pipes not updating properly"),
             (0, 5, 8) => Some("App version updated. Fixed support for filenames starting with - (hiphen)"),
             (0, 5, 7) => Some("App version updated. Fixed distorted screen when opening files in GUI"),
