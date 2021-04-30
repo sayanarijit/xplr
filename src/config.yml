@@ -1119,8 +1119,8 @@ modes:
       extra_help: null
       key_bindings:
         remaps: 
-                ctrl-n: down
-                ctrl-p: up
+          ctrl-n: down
+          ctrl-p: up
         on_key:
           backspace:
             help: remove last character
