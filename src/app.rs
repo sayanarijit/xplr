@@ -1451,13 +1451,12 @@ impl App {
             explorer_config.sorters = sorters.clone();
         };
 
-        let mut history = History::default();
-        history = history.push(pwd.to_string_lossy().to_string());
+        let pwd = pwd.to_string_lossy().to_string();
 
         let mut app = Self {
             version: Config::default().version().clone(),
             config: config.clone(),
-            pwd: pwd.to_string_lossy().to_string(),
+            pwd: pwd.clone(),
             directory_buffers: Default::default(),
             selection: Default::default(),
             msg_out: Default::default(),
@@ -1468,8 +1467,9 @@ impl App {
             pipe: Pipe::from_session_path(&session_path)?,
             explorer_config,
             logs: Default::default(),
-            history,
-        };
+            history: Default::default(),
+        }
+        .change_directory(&pwd)?;
 
         if let Some(notif) = config.upgrade_notification()? {
             let notif = format!(
