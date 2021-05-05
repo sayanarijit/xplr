@@ -937,6 +937,7 @@ modes:
                     fi
                   fi
                   $OPENER "${XPLR_FOCUS_PATH:?}" &> /dev/null &
+                  disown
               - SwitchMode: default
               - ClearScreen
               - Refresh
