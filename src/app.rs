@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::config::Layout;
 use crate::config::Mode;
 use crate::input::Key;
 use anyhow::{bail, Result};
@@ -1078,6 +1079,27 @@ pub enum ExternalMsg {
     /// **Example:** `SwitchModeCustom: my_custom_mode`
     SwitchModeCustom(String),
 
+    /// Switch layout.
+    /// This will call `Refresh` automatically.
+    ///
+    /// > **NOTE:** To be specific about which layout to switch to, use `SwitchLayoutBuiltin` or
+    /// `SwitchLayoutCustom` instead.
+    ///
+    /// **Example:** `SwitchLayout: default`
+    SwitchLayout(String),
+
+    /// Switch to a builtin layout.
+    /// This will call `Refresh` automatically.
+    ///
+    /// **Example:** `SwitchLayoutBuiltin: default`
+    SwitchLayoutBuiltin(String),
+
+    /// Switch to a custom layout.
+    /// This will call `Refresh` automatically.
+    ///
+    /// **Example:** `SwitchLayoutCustom: my_custom_layout`
+    SwitchLayoutCustom(String),
+
     /// Call a shell command with the given arguments.
     /// Note that the arguments will be shell-escaped.
     /// So to read the variables, the `-c` option of the shell
@@ -1396,6 +1418,7 @@ pub struct App {
     selection: IndexSet<Node>,
     msg_out: VecDeque<MsgOut>,
     mode: Mode,
+    layout: Layout,
     input_buffer: Option<String>,
     pid: u32,
     session_path: String,
@@ -1436,12 +1459,31 @@ impl App {
             )
         };
 
-        let mode = match config.modes().builtin().get(&"default".to_string()) {
+        let mode = match config.modes().get(
+            &config
+                .general()
+                .initial_mode()
+                .to_owned()
+                .unwrap_or_else(|| "default".into()),
+        ) {
             Some(m) => m
                 .clone()
                 .sanitized(config.general().read_only().unwrap_or_default()),
             None => {
                 bail!("'default' mode is missing")
+            }
+        };
+
+        let layout = match config.layouts().get(
+            &config
+                .general()
+                .initial_layout()
+                .to_owned()
+                .unwrap_or_else(|| "default".into()),
+        ) {
+            Some(l) => l.clone(),
+            None => {
+                bail!("'default' layout is missing")
             }
         };
 
@@ -1476,6 +1518,7 @@ impl App {
             selection: Default::default(),
             msg_out: Default::default(),
             mode,
+            layout,
             input_buffer: Default::default(),
             pid,
             session_path: session_path.clone(),
@@ -1577,6 +1620,9 @@ impl App {
                 ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
                 ExternalMsg::SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
                 ExternalMsg::SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
+                ExternalMsg::SwitchLayout(mode) => self.switch_layout(&mode),
+                ExternalMsg::SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
+                ExternalMsg::SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
                 ExternalMsg::Call(cmd) => self.call(cmd),
                 ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
                 ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
@@ -1946,6 +1992,36 @@ impl App {
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
+        }
+    }
+
+    fn switch_layout(mut self, layout: &str) -> Result<Self> {
+        if let Some(l) = self.config().layouts().get(layout) {
+            self.layout = l.to_owned();
+            self.msg_out.push_back(MsgOut::Refresh);
+            Ok(self)
+        } else {
+            self.log_error(format!("Layout not found: {}", layout))
+        }
+    }
+
+    fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
+        if let Some(l) = self.config().layouts().get_builtin(layout) {
+            self.layout = l.to_owned();
+            self.msg_out.push_back(MsgOut::Refresh);
+            Ok(self)
+        } else {
+            self.log_error(format!("Builtin layout not found: {}", layout))
+        }
+    }
+
+    fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
+        if let Some(l) = self.config().layouts().get_custom(layout) {
+            self.layout = l.to_owned();
+            self.msg_out.push_back(MsgOut::Refresh);
+            Ok(self)
+        } else {
+            self.log_error(format!("Custom layout not found: {}", layout))
         }
     }
 
@@ -2478,5 +2554,10 @@ impl App {
         fs::write(&self.pipe().result_out, result_str)?;
         // };
         Ok(self)
+    }
+
+    /// Get a reference to the app's layout.
+    pub fn layout(&self) -> &Layout {
+        &self.layout
     }
 }

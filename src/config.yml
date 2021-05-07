@@ -1,7 +1,89 @@
-version: v0.5.13
+version: v0.6.0
+layouts:
+  builtin:
+    default:
+      Horizontal:
+        config:
+          horizontal_margin: 0
+          vertical_margin: 0
+          constraints:
+            - Percentage: 70
+            - Percentage: 30
+        splits:
+          - Vertical:
+              config:
+                margin: 0
+                constraints:
+                  - Length: 3
+                  - Min: 1
+                  - Length: 3
+              splits:
+                - SortAndFilter
+                - Table
+                - InputAndLogs
+          - Vertical:
+              config:
+                constraints:
+                  - Percentage: 50
+                  - Percentage: 50
+              splits:
+                - Selection
+                - HelpMenu
+    no_help:
+      Horizontal:
+        config:
+          constraints:
+            - Percentage: 70
+            - Percentage: 30
+        splits:
+          - Vertical:
+              config:
+                constraints:
+                  - Length: 3
+                  - Min: 1
+                  - Length: 3
+              splits:
+                - SortAndFilter
+                - Table
+                - InputAndLogs
+          - Selection
+
+    no_selection:
+      Horizontal:
+        config:
+          constraints:
+            - Percentage: 70
+            - Percentage: 30
+        splits:
+          - Vertical:
+              config:
+                constraints:
+                  - Length: 3
+                  - Min: 1
+                  - Length: 3
+              splits:
+                - SortAndFilter
+                - Table
+                - InputAndLogs
+          - HelpMenu
+
+    no_help_no_selection:
+      Vertical:
+        config:
+          constraints:
+            - Length: 3
+            - Min: 1
+            - Length: 3
+        splits:
+          - SortAndFilter
+          - Table
+          - InputAndLogs
+
 general:
   show_hidden: false
   read_only: false
+  initial_layout: default
+  initial_mode: default
   initial_sorting:
     - sorter: ByCanonicalIsDir
       reverse: true
@@ -89,10 +171,10 @@ general:
       - format: ╰─
     col_spacing: 1
     col_widths:
-      - percentage: 10
-      - percentage: 50
-      - percentage: 20
-      - percentage: 20
+      - Percentage: 10
+      - Percentage: 50
+      - Percentage: 20
+      - Percentage: 20
   default_ui:
     prefix: '  '
     suffix: ''
@@ -823,6 +905,10 @@ modes:
               - SwitchModeBuiltin: search
               - SetInputBuffer: ''
               - Explore
+          ctrl-w:
+            help: switch layout
+            messages:
+              - SwitchModeBuiltin: switch_layout
           d:
             help: delete
             messages:
@@ -1095,7 +1181,7 @@ modes:
           s:
             help: selection operations
             messages:
-              - SwitchModeBuiltin: selection ops
+              - SwitchModeBuiltin: selection_ops
 
           l:
             help: logs
@@ -1191,5 +1277,39 @@ modes:
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesContain
             - Explore
+
+    switch_layout:
+      name: switch layout
+      help: null
+      extra_help: null
+      key_bindings:
+        on_key:
+          1:
+            help: default
+            messages:
+              - SwitchLayoutBuiltin: default
+              - SwitchMode: default
+          2:
+            help: no help menu
+            messages:
+              - SwitchLayoutBuiltin: no_help
+              - SwitchMode: default
+          3:
+            help: no selection panel
+            messages:
+              - SwitchLayoutBuiltin: no_selection
+              - SwitchMode: default
+          4:
+            help: no help or selection
+            messages:
+              - SwitchLayoutBuiltin: no_help_no_selection
+              - SwitchMode: default
+          ctrl-c:
+            help: terminate
+            messages:
+              - Terminate
+        default:
+          messages:
+            - SwitchMode: default
 
   custom: {}
