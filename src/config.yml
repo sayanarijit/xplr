@@ -1,5 +1,6 @@
 version: v0.6.0
 layouts:
+  custom: {}
   builtin:
     default:
       Horizontal:
