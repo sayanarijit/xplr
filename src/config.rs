@@ -1045,6 +1045,7 @@ impl LayoutOptions {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum Layout {
+    Nothing,
     Table,
     InputAndLogs,
     Selection,
@@ -1062,7 +1063,7 @@ pub enum Layout {
 
 impl Default for Layout {
     fn default() -> Self {
-        Self::Table
+        Self::Nothing
     }
 }
 
@@ -1096,6 +1097,7 @@ impl Layout {
                 config: sc.extend(oc),
                 splits: os,
             },
+            (s, Self::Nothing) => s,
             (_, other) => other,
         }
     }

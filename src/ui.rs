@@ -534,6 +534,7 @@ pub fn draw_layout<B: Backend>(
     hb: &Handlebars,
 ) {
     match layout {
+        Layout::Nothing => {}
         Layout::Table => draw_table(f, rect, app, hb),
         Layout::SortAndFilter => draw_sort_n_filter(f, rect, app, hb),
         Layout::HelpMenu => draw_help_menu(f, rect, app, hb),
