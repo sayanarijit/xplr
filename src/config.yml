@@ -1,4 +1,4 @@
-version: v0.5.12
+version: v0.5.13
 general:
   show_hidden: false
   read_only: false
@@ -311,7 +311,7 @@ modes:
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                   echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           m:
             help: move here
@@ -326,7 +326,7 @@ modes:
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           ctrl-c:
             help: terminate
@@ -335,7 +335,7 @@ modes:
 
         default:
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
 
     create_file:
       name: create file
@@ -357,7 +357,7 @@ modes:
                     echo "LogError: Failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           backspace:
             help: remove last character
             messages:
@@ -373,7 +373,7 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           ctrl-c:
             help: terminate
             messages:
@@ -402,7 +402,7 @@ modes:
                     echo "LogError: Failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
                     echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           backspace:
             help: remove last character
@@ -422,7 +422,7 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           ctrl-c:
             help: terminate
@@ -447,16 +447,16 @@ modes:
           d:
             help: create directory
             messages:
-              - SwitchMode: create directory
+              - SwitchModeBuiltin: create directory
               - SetInputBuffer: ''
           esc:
             help: cancel
             messages:
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           f:
             help: create file
             messages:
-              - SwitchMode: create file
+              - SwitchModeBuiltin: create file
               - SetInputBuffer: ''
         on_alphabet: null
         on_number: null
@@ -464,7 +464,7 @@ modes:
         default:
           help: null
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
     rename:
       name: rename
       help: null
@@ -485,7 +485,7 @@ modes:
                   else
                     echo "LogError: Failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           backspace:
             help: remove last character
@@ -505,7 +505,7 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           ctrl-c:
             help: terminate
@@ -544,12 +544,12 @@ modes:
           enter:
             help: apply filter
             messages:
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
               - Explore
           ctrl-c:
             help: terminate
@@ -590,12 +590,12 @@ modes:
           enter:
             help: apply filter
             messages:
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
               - Explore
           ctrl-c:
             help: terminate
@@ -621,14 +621,14 @@ modes:
           r:
             help: relative does contain
             messages:
-              - SwitchMode: relative_path_does_contain
+              - SwitchModeBuiltin: relative_path_does_contain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
               - Explore
           R:
             help: relative does not contain
             messages:
-              - SwitchMode: relative_path_does_not_contain
+              - SwitchModeBuiltin: relative_path_does_not_contain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
               - Explore
@@ -648,7 +648,7 @@ modes:
               - Terminate
         default:
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
 
     sort:
       name: sort
@@ -759,7 +759,7 @@ modes:
               - Terminate
         default:
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
 
     default:
       name: default
@@ -783,11 +783,11 @@ modes:
           s:
             help: sort
             messages:
-              - SwitchMode: sort
+              - SwitchModeBuiltin: sort
           f:
             help: filter
             messages:
-              - SwitchMode: filter
+              - SwitchModeBuiltin: filter
           .:
             help: show hidden
             messages:
@@ -798,7 +798,7 @@ modes:
           ':':
             help: action
             messages:
-              - SwitchMode: action
+              - SwitchModeBuiltin: action
           '?':
             help: global help menu
             messages:
@@ -820,13 +820,13 @@ modes:
           ctrl-f:
             help: search
             messages:
-              - SwitchMode: search
+              - SwitchModeBuiltin: search
               - SetInputBuffer: ''
               - Explore
           d:
             help: delete
             messages:
-              - SwitchMode: delete
+              - SwitchModeBuiltin: delete
           down:
             help: down
             messages:
@@ -838,7 +838,7 @@ modes:
           g:
             help: go to
             messages:
-              - SwitchMode: go to
+              - SwitchModeBuiltin: go to
           left:
             help: back
             messages:
@@ -846,7 +846,7 @@ modes:
           r:
             help: rename
             messages:
-              - SwitchMode: rename
+              - SwitchModeBuiltin: rename
               - BashExecSilently: |
                   echo "SetInputBuffer: $(basename ${XPLR_FOCUS_PATH})" >> "${XPLR_PIPE_MSG_IN:?}"
           right:
@@ -894,13 +894,13 @@ modes:
           help: input
           messages:
             - ResetInputBuffer
-            - SwitchMode: number
+            - SwitchModeBuiltin: number
             - BufferInputFromKey
         on_special_character: null
         default:
           help: null
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
     go_to:
       name: go to
       help: null
@@ -916,12 +916,12 @@ modes:
             help: top
             messages:
               - FocusFirst
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           f:
             help: follow symlink
             messages:
               - FollowSymlink
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           x:
             help: open in gui
             messages:
@@ -937,7 +937,7 @@ modes:
                     fi
                   fi
                   $OPENER "${XPLR_FOCUS_PATH:?}" &> /dev/null &
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
               - ClearScreen
               - Refresh
 
@@ -947,7 +947,7 @@ modes:
         default:
           help: null
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
 
     number:
       name: number
@@ -978,17 +978,17 @@ modes:
             help: to down
             messages:
               - FocusNextByRelativeIndexFromInput
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           enter:
             help: to index
             messages:
               - FocusByIndexFromInput
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
           up:
             help: to up
             messages:
               - FocusPreviousByRelativeIndexFromInput
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
         on_alphabet: null
         on_number:
           help: input
@@ -998,7 +998,7 @@ modes:
         default:
           help: null
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
     delete:
       name: delete
       help: null
@@ -1028,7 +1028,7 @@ modes:
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           D:
             help: force delete
@@ -1044,7 +1044,7 @@ modes:
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
                   echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
               - Explore
 
           ctrl-c:
@@ -1054,7 +1054,7 @@ modes:
         
         default:
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
 
     action:
       name: action to
@@ -1066,7 +1066,7 @@ modes:
           help: go to index
           messages:
             - ResetInputBuffer
-            - SwitchMode: number
+            - SwitchModeBuiltin: number
             - BufferInputFromKey
 
         on_key:
@@ -1078,24 +1078,24 @@ modes:
                   args:
                     - "-i"
               - Explore
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           c:
             help: create
             messages:
-              - SwitchMode: create
+              - SwitchModeBuiltin: create
 
           e:
             help: open in editor
             messages:
               - BashExec: |
                   ${EDITOR:-vi} -- "${XPLR_FOCUS_PATH:?}"
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           s:
             help: selection operations
             messages:
-              - SwitchMode: selection ops
+              - SwitchModeBuiltin: selection ops
 
           l:
             help: logs
@@ -1103,7 +1103,7 @@ modes:
               - BashExec: |
                   cat -- "${XPLR_PIPE_LOGS_OUT}"
                   read -p "[enter to continue]"
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
 
           ctrl-c:
             help: terminate
@@ -1112,7 +1112,7 @@ modes:
 
         default:
           messages:
-            - SwitchMode: default
+            - SwitchModeBuiltin: default
     search:
       name: search
       help: null
@@ -1155,13 +1155,13 @@ modes:
             help: focus
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
               - Explore
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchMode: default
+              - SwitchModeBuiltin: default
               - Explore
           left:
             help: back

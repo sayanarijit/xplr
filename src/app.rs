@@ -966,7 +966,7 @@ pub enum ExternalMsg {
 
     /// Focus on the `n`th node relative to the current focus where `n` is a given value.
     ///
-    /// Example: `FocusNextByRelativeIndex: 2`
+    /// **Example:** `FocusNextByRelativeIndex: 2`
     FocusNextByRelativeIndex(usize),
 
     /// Focus on the `n`th node relative to the current focus where `n` is read from
@@ -978,7 +978,7 @@ pub enum ExternalMsg {
 
     /// Focus on the `-n`th node relative to the current focus where `n` is a given value.
     ///
-    /// Example: `FocusPreviousByRelativeIndex: 2`
+    /// **Example:** `FocusPreviousByRelativeIndex: 2`
     FocusPreviousByRelativeIndex(usize),
 
     /// Focus on the `-n`th node relative to the current focus where `n` is read from
@@ -993,7 +993,7 @@ pub enum ExternalMsg {
 
     /// Focus on the given path.
     ///
-    /// Example: `FocusPath: /tmp`
+    /// **Example:** `FocusPath: /tmp`
     FocusPath(String),
 
     /// Focus on the path read from input buffer.
@@ -1001,7 +1001,7 @@ pub enum ExternalMsg {
 
     /// Focus on the absolute `n`th node where `n` is a given value.
     ///
-    /// Example: `FocusByIndex: 2`
+    /// **Example:** `FocusByIndex: 2`
     FocusByIndex(usize),
 
     /// Focus on the absolute `n`th node where `n` is read from the input buffer.
@@ -1009,12 +1009,12 @@ pub enum ExternalMsg {
 
     /// Focus on the file by name from the present working directory.
     ///
-    /// Example: `FocusByFileName: README.md`
+    /// **Example:** `FocusByFileName: README.md`
     FocusByFileName(String),
 
     /// Change the present working directory ($PWD)
     ///
-    /// Example: `ChangeDirectory: /tmp`
+    /// **Example:** `ChangeDirectory: /tmp`
     ChangeDirectory(String),
 
     /// Enter into the currently focused path if it's a directory.
@@ -1034,7 +1034,7 @@ pub enum ExternalMsg {
 
     /// Append/buffer the given string into the input buffer.
     ///
-    /// Example: `BufferInput: foo`
+    /// **Example:** `BufferInput: foo`
     BufferInput(String),
 
     /// Append/buffer the characted read from a keyboard input into the
@@ -1045,7 +1045,7 @@ pub enum ExternalMsg {
     /// When the input buffer is not-null (even if empty string)
     /// it will show in the UI.
     ///
-    /// Example: `SetInputBuffer: foo`
+    /// **Example:** `SetInputBuffer: foo`
     SetInputBuffer(String),
 
     /// Remove input buffer's last character.
@@ -1060,8 +1060,23 @@ pub enum ExternalMsg {
     /// Switch input mode.
     /// This will reset the input buffer and call `Refresh` automatically.
     ///
-    /// Example: `SwitchMode: default`
+    /// > **NOTE:** To be specific about which mode to switch to, use `SwitchModeBuiltin` or
+    /// `SwitchModeCustom` instead.
+    ///
+    /// **Example:** `SwitchMode: default`
     SwitchMode(String),
+
+    /// Switch to a builtin mode.
+    /// This will reset the input buffer and call `Refresh` automatically.
+    ///
+    /// **Example:** `SwitchModeBuiltin: default`
+    SwitchModeBuiltin(String),
+
+    /// Switch to a custom mode.
+    /// This will reset the input buffer and call `Refresh` automatically.
+    ///
+    /// **Example:** `SwitchModeCustom: my_custom_mode`
+    SwitchModeCustom(String),
 
     /// Call a shell command with the given arguments.
     /// Note that the arguments will be shell-escaped.
@@ -1069,25 +1084,25 @@ pub enum ExternalMsg {
     /// can be used.
     /// You may need to pass `Refresh` or `Explore` depening on the expectation.
     ///
-    /// Example: `Call: {command: bash, args: ["-c", "read -p test"]}`
+    /// **Example:** `Call: {command: bash, args: ["-c", "read -p test"]}`
     Call(Command),
 
     /// Like `Call` but without the flicker. The stdin, stdout
     /// stderr will be piped to null. So it's non-interactive.
     ///
-    /// Example: `CallSilently: {command: tput, args: ["bell"]}`
+    /// **Example:** `CallSilently: {command: tput, args: ["bell"]}`
     CallSilently(Command),
 
     /// An alias to `Call: {command: bash, args: ["-c", "${command}"], silent: false}`
     /// where ${command} is the given value.
     ///
-    /// Example: `BashExec: "read -p test"`
+    /// **Example:** `BashExec: "read -p test"`
     BashExec(String),
 
     /// Like `BashExec` but without the flicker. The stdin, stdout
     /// stderr will be piped to null. So it's non-interactive.
     ///
-    /// Example: `BashExecSilently: "tput bell"`
+    /// **Example:** `BashExecSilently: "tput bell"`
     BashExecSilently(String),
 
     /// Select the focused node.
@@ -1098,7 +1113,7 @@ pub enum ExternalMsg {
 
     /// Select the given path.
     ///
-    /// Example: `SelectPath: "/tmp"`
+    /// **Example:** `SelectPath: "/tmp"`
     SelectPath(String),
 
     /// Unselect the focused node.
@@ -1109,7 +1124,7 @@ pub enum ExternalMsg {
 
     /// UnSelect the given path.
     ///
-    /// Example: `UnSelectPath: "/tmp"`
+    /// **Example:** `UnSelectPath: "/tmp"`
     UnSelectPath(String),
 
     /// Toggle selection on the focused node.
@@ -1120,7 +1135,7 @@ pub enum ExternalMsg {
 
     /// Toggle selection by file path.
     ///
-    /// Example: `ToggleSelectionByPath: "/tmp"`
+    /// **Example:** `ToggleSelectionByPath: "/tmp"`
     ToggleSelectionByPath(String),
 
     /// Clear the selection.
@@ -1128,27 +1143,27 @@ pub enum ExternalMsg {
 
     /// Add a filter to exclude nodes while exploring directories.
     ///
-    /// Example: `AddNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
+    /// **Example:** `AddNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     AddNodeFilter(NodeFilterApplicable),
 
     /// Remove an existing filter.
     ///
-    /// Example: `RemoveNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
+    /// **Example:** `RemoveNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     RemoveNodeFilter(NodeFilterApplicable),
 
     /// Remove a filter if it exists, else, add a it.
     ///
-    /// Example: `ToggleNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
+    /// **Example:** `ToggleNodeFilter: {filter: RelativePathDoesStartWith, input: foo}`
     ToggleNodeFilter(NodeFilterApplicable),
 
     /// Add a node filter reading the input from the buffer.
     ///
-    /// Example: `AddNodeFilterFromInput: RelativePathDoesStartWith`
+    /// **Example:** `AddNodeFilterFromInput: RelativePathDoesStartWith`
     AddNodeFilterFromInput(NodeFilter),
 
     /// Remove a node filter reading the input from the buffer.
     ///
-    /// Example: `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
+    /// **Example:** `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
     RemoveNodeFilterFromInput(NodeFilter),
 
     /// Remove the last node filter.
@@ -1162,22 +1177,22 @@ pub enum ExternalMsg {
 
     /// Add a sorter to sort nodes while exploring directories.
     ///
-    /// Example: `AddNodeSorter: {sorter: ByRelativePath, reverse: false}`
+    /// **Example:** `AddNodeSorter: {sorter: ByRelativePath, reverse: false}`
     AddNodeSorter(NodeSorterApplicable),
 
     /// Remove an existing sorter.
     ///
-    /// Example: `RemoveNodeSorter: ByRelativePath`
+    /// **Example:** `RemoveNodeSorter: ByRelativePath`
     RemoveNodeSorter(NodeSorter),
 
     /// Reverse a node sorter.
     ///
-    /// Example: `ReverseNodeSorter: ByRelativePath`
+    /// **Example:** `ReverseNodeSorter: ByRelativePath`
     ReverseNodeSorter(NodeSorter),
 
     /// Remove a sorter if it exists, else, add a it.
     ///
-    /// Example: `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false}`
+    /// **Example:** `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false}`
     ToggleNodeSorter(NodeSorterApplicable),
 
     /// Reverse the node sorters.
@@ -1194,17 +1209,17 @@ pub enum ExternalMsg {
 
     /// Log information message.
     ///
-    /// Example: `LogInfo: launching satellite`
+    /// **Example:** `LogInfo: launching satellite`
     LogInfo(String),
 
     /// Log a success message.
     ///
-    /// Example: `LogSuccess: satellite reached destination`.
+    /// **Example:** `LogSuccess: satellite reached destination`.
     LogSuccess(String),
 
     /// Log an error message.
     ///
-    /// Example: `LogError: satellite crashed`
+    /// **Example:** `LogError: satellite crashed`
     LogError(String),
 
     /// Quit with returncode zero (success).
@@ -1560,6 +1575,8 @@ impl App {
                 ExternalMsg::RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
                 ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
                 ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
+                ExternalMsg::SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
+                ExternalMsg::SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
                 ExternalMsg::Call(cmd) => self.call(cmd),
                 ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
                 ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
@@ -1900,8 +1917,36 @@ impl App {
                 .to_owned()
                 .sanitized(self.config().general().read_only().unwrap_or_default());
             self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            Ok(self)
+        } else {
+            self.log_error(format!("Mode not found: {}", mode))
+        }
+    }
+
+    fn switch_mode_builtin(mut self, mode: &str) -> Result<Self> {
+        if let Some(mode) = self.config().modes().clone().get_builtin(mode) {
+            self.input_buffer = None;
+            self.mode = mode
+                .to_owned()
+                .sanitized(self.config().general().read_only().unwrap_or_default());
+            self.msg_out.push_back(MsgOut::Refresh);
+            Ok(self)
+        } else {
+            self.log_error(format!("Builtin mode not found: {}", mode))
+        }
+    }
+
+    fn switch_mode_custom(mut self, mode: &str) -> Result<Self> {
+        if let Some(mode) = self.config().modes().clone().get(mode) {
+            self.input_buffer = None;
+            self.mode = mode
+                .to_owned()
+                .sanitized(self.config().general().read_only().unwrap_or_default());
+            self.msg_out.push_back(MsgOut::Refresh);
+            Ok(self)
+        } else {
+            self.log_error(format!("Custom mode not found: {}", mode))
+        }
     }
 
     fn call(mut self, command: Command) -> Result<Self> {

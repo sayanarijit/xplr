@@ -948,8 +948,16 @@ pub struct ModesConfig {
 }
 
 impl ModesConfig {
+    pub fn get_builtin(&self, name: &str) -> Option<&Mode> {
+        self.builtin.get(name)
+    }
+
+    pub fn get_custom(&self, name: &str) -> Option<&Mode> {
+        self.custom.get(name)
+    }
+
     pub fn get(&self, name: &str) -> Option<&Mode> {
-        self.builtin.get(name).or_else(|| self.custom.get(name))
+        self.get_builtin(name).or_else(|| self.get_custom(name))
     }
 
     pub fn extend(mut self, other: Self) -> Self {
@@ -1020,6 +1028,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 5, 13) => true,
             (0, 5, 12) => true,
             (0, 5, 11) => true,
             (0, 5, 10) => true,
@@ -1041,7 +1050,8 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 5, 12) => None,
+            (0, 5, 13) => None,
+            (0, 5, 12) => Some("App version updated. Added new messages for switching mode."),
             (0, 5, 11) => Some("App version updated. Fixed changing directory on focus using argument"),
             (0, 5, 10) => Some("App version updated. Added xplr desktop icon and search navigation"),
             (0, 5, 9) => Some("App version updated. Fixed pipes not updating properly"),
