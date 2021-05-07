@@ -1937,7 +1937,7 @@ impl App {
     }
 
     fn switch_mode_custom(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config().modes().clone().get(mode) {
+        if let Some(mode) = self.config().modes().clone().get_custom(mode) {
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
