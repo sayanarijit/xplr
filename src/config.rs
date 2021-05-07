@@ -249,7 +249,7 @@ impl TableRowConfig {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub enum Constraint {
     Percentage(u16),
     Ratio(u32, u32),
@@ -488,6 +488,12 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     initial_sorting: Option<IndexSet<NodeSorterApplicable>>,
+
+    #[serde(default)]
+    initial_mode: Option<String>,
+
+    #[serde(default)]
+    initial_layout: Option<String>,
 }
 
 impl GeneralConfig {
@@ -503,6 +509,8 @@ impl GeneralConfig {
         self.selection_ui = self.selection_ui.extend(other.selection_ui);
         self.sort_and_filter_ui = self.sort_and_filter_ui.extend(other.sort_and_filter_ui);
         self.initial_sorting = other.initial_sorting.or(self.initial_sorting);
+        self.initial_layout = other.initial_layout.or(self.initial_layout);
+        self.initial_mode = other.initial_mode.or(self.initial_mode);
         self
     }
 
@@ -560,6 +568,16 @@ impl GeneralConfig {
     pub fn initial_sorting(&self) -> &Option<IndexSet<NodeSorterApplicable>> {
         &self.initial_sorting
     }
+
+    /// Get a reference to the general config's initial mode.
+    pub fn initial_mode(&self) -> &Option<String> {
+        &self.initial_mode
+    }
+
+    /// Get a reference to the general config's initial layout.
+    pub fn initial_layout(&self) -> &Option<String> {
+        &self.initial_layout
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -605,10 +623,8 @@ impl KeyBindings {
                 .into_iter()
                 .filter(|(_, v)| self.on_key.contains_key(v))
                 .collect();
-            self
-        } else {
-            self
-        }
+        };
+        self
     }
 
     fn extend(mut self, other: Self) -> Self {
@@ -808,6 +824,9 @@ pub struct BuiltinModesConfig {
 
     #[serde(default)]
     sort: Mode,
+
+    #[serde(default)]
+    switch_layout: Mode,
 }
 
 impl BuiltinModesConfig {
@@ -831,6 +850,7 @@ impl BuiltinModesConfig {
             .relative_path_does_not_contain
             .extend(other.relative_path_does_not_contain);
         self.sort = self.sort.extend(other.sort);
+        self.switch_layout = self.switch_layout.extend(other.switch_layout);
         self
     }
 
@@ -857,6 +877,8 @@ impl BuiltinModesConfig {
             "relative path does contain" => Some(&self.relative_path_does_contain),
             "relative_path_does_not_contain" => Some(&self.relative_path_does_not_contain),
             "relative path does not contain" => Some(&self.relative_path_does_not_contain),
+            "switch layout" => Some(&self.switch_layout),
+            "switch_layout" => Some(&self.switch_layout),
             _ => None,
         }
     }
@@ -977,10 +999,199 @@ impl ModesConfig {
     }
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LayoutOptions {
+    #[serde(default)]
+    margin: Option<u16>,
+    #[serde(default)]
+    horizontal_margin: Option<u16>,
+    #[serde(default)]
+    vertical_margin: Option<u16>,
+    #[serde(default)]
+    constraints: Vec<Constraint>,
+}
+
+impl LayoutOptions {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.margin = other.margin.or(self.margin);
+        self.horizontal_margin = other.horizontal_margin.or(self.horizontal_margin);
+        self.vertical_margin = other.vertical_margin.or(self.vertical_margin);
+        self.constraints = other.constraints;
+        self
+    }
+
+    /// Get a reference to the layout options's constraints.
+    pub fn constraints(&self) -> &Vec<Constraint> {
+        &self.constraints
+    }
+
+    /// Get a reference to the layout options's margin.
+    pub fn margin(&self) -> Option<u16> {
+        self.margin
+    }
+
+    /// Get a reference to the layout options's horizontal margin.
+    pub fn horizontal_margin(&self) -> Option<u16> {
+        self.horizontal_margin
+    }
+
+    /// Get a reference to the layout options's vertical margin.
+    pub fn vertical_margin(&self) -> Option<u16> {
+        self.vertical_margin
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub enum Layout {
+    Table,
+    InputAndLogs,
+    Selection,
+    HelpMenu,
+    SortAndFilter,
+    Horizontal {
+        config: LayoutOptions,
+        splits: Vec<Layout>,
+    },
+    Vertical {
+        config: LayoutOptions,
+        splits: Vec<Layout>,
+    },
+}
+
+impl Default for Layout {
+    fn default() -> Self {
+        Self::Table
+    }
+}
+
+impl Layout {
+    pub fn extend(self, other: Self) -> Self {
+        match (self, other) {
+            (
+                Self::Horizontal {
+                    config: sc,
+                    splits: _,
+                },
+                Self::Horizontal {
+                    config: oc,
+                    splits: os,
+                },
+            ) => Self::Horizontal {
+                config: sc.extend(oc),
+                splits: os,
+            },
+
+            (
+                Self::Vertical {
+                    config: sc,
+                    splits: _,
+                },
+                Self::Vertical {
+                    config: oc,
+                    splits: os,
+                },
+            ) => Self::Vertical {
+                config: sc.extend(oc),
+                splits: os,
+            },
+            (_, other) => other,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BuiltinLayoutsConfig {
+    #[serde(default)]
+    default: Layout,
+
+    #[serde(default)]
+    no_help: Layout,
+
+    #[serde(default)]
+    no_selection: Layout,
+
+    #[serde(default)]
+    no_help_no_selection: Layout,
+}
+
+impl BuiltinLayoutsConfig {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.default = self.default.extend(other.default);
+        self.no_help = self.no_help.extend(other.no_help);
+        self.no_selection = self.no_selection.extend(other.no_selection);
+        self.no_help_no_selection = self.no_help_no_selection.extend(other.no_help_no_selection);
+        self
+    }
+
+    pub fn get(&self, name: &str) -> Option<&Layout> {
+        match name {
+            "default" => Some(&self.default),
+            "no_help" => Some(&self.no_help),
+            "no help" => Some(&self.no_help),
+            "no_selection" => Some(&self.no_selection),
+            "no selection" => Some(&self.no_selection),
+            "no_help_no_selection" => Some(&self.no_help_no_selection),
+            "no help no selection" => Some(&self.no_help_no_selection),
+            _ => None,
+        }
+    }
+
+    /// Get a reference to the builtin layouts config's default.
+    pub fn default(&self) -> &Layout {
+        &self.default
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LayoutsConfig {
+    #[serde(default)]
+    builtin: BuiltinLayoutsConfig,
+
+    #[serde(default)]
+    custom: HashMap<String, Layout>,
+}
+
+impl LayoutsConfig {
+    pub fn get_builtin(&self, name: &str) -> Option<&Layout> {
+        self.builtin.get(name)
+    }
+
+    pub fn get_custom(&self, name: &str) -> Option<&Layout> {
+        self.custom.get(name)
+    }
+
+    pub fn get(&self, name: &str) -> Option<&Layout> {
+        self.get_builtin(name).or_else(|| self.get_custom(name))
+    }
+
+    pub fn extend(mut self, other: Self) -> Self {
+        self.builtin = self.builtin.extend(other.builtin);
+        self.custom.extend(other.custom);
+        self
+    }
+
+    /// Get a reference to the layouts config's builtin.
+    pub fn builtin(&self) -> &BuiltinLayoutsConfig {
+        &self.builtin
+    }
+
+    /// Get a reference to the layouts config's custom.
+    pub fn custom(&self) -> &HashMap<String, Layout> {
+        &self.custom
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
     version: String,
+
+    #[serde(default)]
+    layouts: LayoutsConfig,
 
     #[serde(default)]
     general: GeneralConfig,
@@ -996,6 +1207,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             version: default_config::version(),
+            layouts: default_config::layouts(),
             general: default_config::general(),
             node_types: default_config::node_types(),
             modes: default_config::modes(),
@@ -1006,6 +1218,7 @@ impl Default for Config {
 impl Config {
     pub fn extended(mut self) -> Self {
         let default = Self::default();
+        self.layouts = default.layouts.extend(self.layouts);
         self.general = default.general.extend(self.general);
         self.node_types = default.node_types.extend(self.node_types);
         self.modes = default.modes.extend(self.modes);
@@ -1028,20 +1241,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
-            (0, 5, 13) => true,
-            (0, 5, 12) => true,
-            (0, 5, 11) => true,
-            (0, 5, 10) => true,
-            (0, 5, 9) => true,
-            (0, 5, 8) => true,
-            (0, 5, 7) => true,
-            (0, 5, 6) => true,
-            (0, 5, 5) => true,
-            (0, 5, 4) => true,
-            (0, 5, 3) => true,
-            (0, 5, 2) => true,
-            (0, 5, 1) => true,
-            (0, 5, 0) => true,
+            (0, 6, 0) => true,
             (_, _, _) => false,
         };
 
@@ -1050,20 +1250,8 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 5, 13) => None,
-            (0, 5, 12) => Some("App version updated. Added new messages for switching mode."),
-            (0, 5, 11) => Some("App version updated. Fixed changing directory on focus using argument"),
-            (0, 5, 10) => Some("App version updated. Added xplr desktop icon and search navigation"),
-            (0, 5, 9) => Some("App version updated. Fixed pipes not updating properly"),
-            (0, 5, 8) => Some("App version updated. Fixed support for filenames starting with - (hiphen)"),
-            (0, 5, 7) => Some("App version updated. Fixed distorted screen when opening files in GUI"),
-            (0, 5, 6) => Some("App version updated. Fixed piping and in-built terminal support"),
-            (0, 5, 5) => Some("App version updated. Significant reduction in CPU usage"),
-            (0, 5, 4) => Some("App version updated. Significant reduction in CPU usage"),
-            (0, 5, 3) => Some("App version updated. Fixed exit on permission denied"),
-            (0, 5, 2) => Some("App version updated. Now pwd is synced with your terminal session"),
-            (0, 5, 1) => Some("App version updated. Now follow symlinks using 'gf'"),
-            (_, _, _) => Some("App version updated. New: added sort and filter support and some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
+            (_, _, _) => None,
+            // (_, _, _) => Some("App version updated. New: added sort and filter support and some hacks: https://github.com/sayanarijit/xplr/wiki/Hacks"),
         };
 
         Ok(result)
@@ -1072,6 +1260,11 @@ impl Config {
     /// Get a reference to the config's version.
     pub fn version(&self) -> &String {
         &self.version
+    }
+
+    /// Get a reference to the config's layouts.
+    pub fn layouts(&self) -> &LayoutsConfig {
+        &self.layouts
     }
 
     /// Get a reference to the config's general.

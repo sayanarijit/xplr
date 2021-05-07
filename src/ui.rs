@@ -1,6 +1,7 @@
 use crate::app;
 use crate::app::HelpMenuLine;
 use crate::app::{Node, ResolvedNode};
+use crate::config::Layout;
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -9,7 +10,7 @@ use std::collections::HashMap;
 use std::env;
 use tui::backend::Backend;
 use tui::layout::Rect;
-use tui::layout::{Constraint as TuiConstraint, Direction, Layout};
+use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color, Modifier, Style as TuiStyle};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, Cell, List, ListItem, Paragraph, Row, Table};
@@ -412,7 +413,7 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
     f.render_widget(input_buf, rect);
 }
 
-fn draw_sort_n_filter_by<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+fn draw_sort_n_filter<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
     let ui = app.config().general().sort_and_filter_ui().clone();
     let filter_by = app.explorer_config().filters();
     let sort_by = app.explorer_config().sorters();
@@ -525,42 +526,72 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
     f.render_widget(logs_list, rect);
 }
 
+pub fn draw_layout<B: Backend>(
+    layout: Layout,
+    f: &mut Frame<B>,
+    rect: Rect,
+    app: &app::App,
+    hb: &Handlebars,
+) {
+    match layout {
+        Layout::Table => draw_table(f, rect, app, hb),
+        Layout::SortAndFilter => draw_sort_n_filter(f, rect, app, hb),
+        Layout::HelpMenu => draw_help_menu(f, rect, app, hb),
+        Layout::Selection => draw_selection(f, rect, app, hb),
+        Layout::InputAndLogs => {
+            if app.input_buffer().is_some() {
+                draw_input_buffer(f, rect, app, hb);
+            } else {
+                draw_logs(f, rect, app, hb);
+            };
+        }
+        Layout::Horizontal { config, splits } => {
+            let chunks = TuiLayout::default()
+                .direction(Direction::Horizontal)
+                .constraints(
+                    config
+                        .constraints()
+                        .iter()
+                        .map(|c| (*c).into())
+                        .collect::<Vec<TuiConstraint>>(),
+                )
+                .margin(config.margin().unwrap_or_default())
+                .horizontal_margin(config.horizontal_margin().unwrap_or_default())
+                .vertical_margin(config.vertical_margin().unwrap_or_default())
+                .split(rect);
+            splits
+                .into_iter()
+                .enumerate()
+                .for_each(|(i, s)| draw_layout(s, f, chunks[i], app, hb));
+        }
+
+        Layout::Vertical { config, splits } => {
+            let chunks = TuiLayout::default()
+                .direction(Direction::Vertical)
+                .constraints(
+                    config
+                        .constraints()
+                        .iter()
+                        .map(|c| (*c).into())
+                        .collect::<Vec<TuiConstraint>>(),
+                )
+                .margin(config.margin().unwrap_or_default())
+                .horizontal_margin(config.horizontal_margin().unwrap_or_default())
+                .vertical_margin(config.vertical_margin().unwrap_or_default())
+                .split(rect);
+            splits
+                .into_iter()
+                .enumerate()
+                .for_each(|(i, s)| draw_layout(s, f, chunks[i], app, hb));
+        }
+    }
+}
+
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
     let rect = f.size();
+    let layout = app.layout().clone();
 
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([TuiConstraint::Percentage(70), TuiConstraint::Percentage(30)].as_ref())
-        .split(rect);
-
-    let left_chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints(
-            [
-                TuiConstraint::Length(3),
-                TuiConstraint::Length(rect.height - 6),
-                TuiConstraint::Length(3),
-            ]
-            .as_ref(),
-        )
-        .split(chunks[0]);
-
-    draw_sort_n_filter_by(f, left_chunks[0], app, hb);
-    draw_table(f, left_chunks[1], app, hb);
-
-    if app.input_buffer().is_some() {
-        draw_input_buffer(f, left_chunks[2], app, hb);
-    } else {
-        draw_logs(f, left_chunks[2], app, hb);
-    };
-
-    let right_chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([TuiConstraint::Percentage(50), TuiConstraint::Percentage(50)].as_ref())
-        .split(chunks[1]);
-
-    draw_selection(f, right_chunks[0], app, hb);
-    draw_help_menu(f, right_chunks[1], app, hb);
+    draw_layout(layout, f, rect, app, hb);
 }
 
 #[cfg(test)]

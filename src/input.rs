@@ -384,7 +384,7 @@ impl Key {
         matches!(self, Self::Special(_))
     }
 
-    pub fn to_char(&self) -> Option<char> {
+    pub fn to_char(self) -> Option<char> {
         match self {
             Self::Num0 => Some('0'),
             Self::Num1 => Some('1'),

@@ -11,6 +11,10 @@ pub fn version() -> String {
     DEFAULT_CONFIG.version().clone()
 }
 
+pub fn layouts() -> config::LayoutsConfig {
+    DEFAULT_CONFIG.layouts().clone()
+}
+
 pub fn general() -> config::GeneralConfig {
     DEFAULT_CONFIG.general().clone()
 }
