@@ -11,6 +11,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use tui::layout::Constraint as TuiConstraint;
+use tui::layout::Rect;
+use tui::widgets::Borders as TuiBorders;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -254,24 +256,50 @@ pub enum Constraint {
     Percentage(u16),
     Ratio(u32, u32),
     Length(u16),
+    LengthLessThanScreenHeight(u16),
+    LengthLessThanScreenWidth(u16),
+    LengthLessThanLayoutHeight(u16),
+    LengthLessThanLayoutWidth(u16),
     Max(u16),
+    MaxLessThanScreenHeight(u16),
+    MaxLessThanScreenWidth(u16),
+    MaxLessThanLayoutHeight(u16),
+    MaxthLessThanLayoutWidth(u16),
     Min(u16),
+    MinLessThanScreenHeight(u16),
+    MinLessThanScreenWidth(u16),
+    MinLessThanLayoutHeight(u16),
+    MinLessThanLayoutWidth(u16),
 }
 
-impl Default for Constraint {
-    fn default() -> Self {
-        Self::Min(1)
-    }
-}
-
-impl Into<TuiConstraint> for Constraint {
-    fn into(self) -> TuiConstraint {
+impl Constraint {
+    pub fn to_tui(self, screen_size: Rect, layout_size: Rect) -> TuiConstraint {
         match self {
-            Self::Length(n) => TuiConstraint::Length(n),
             Self::Percentage(n) => TuiConstraint::Percentage(n),
             Self::Ratio(x, y) => TuiConstraint::Ratio(x, y),
+            Self::Length(n) => TuiConstraint::Length(n),
+            Self::LengthLessThanScreenHeight(n) => {
+                TuiConstraint::Length(screen_size.height.max(n) - n)
+            }
+            Self::LengthLessThanScreenWidth(n) => {
+                TuiConstraint::Length(screen_size.width.max(n) - n)
+            }
+            Self::LengthLessThanLayoutHeight(n) => {
+                TuiConstraint::Length(layout_size.height.max(n) - n)
+            }
+            Self::LengthLessThanLayoutWidth(n) => {
+                TuiConstraint::Length(layout_size.width.max(n) - n)
+            }
             Self::Max(n) => TuiConstraint::Max(n),
+            Self::MaxLessThanScreenHeight(n) => TuiConstraint::Max(screen_size.height.max(n) - n),
+            Self::MaxLessThanScreenWidth(n) => TuiConstraint::Max(screen_size.width.max(n) - n),
+            Self::MaxLessThanLayoutHeight(n) => TuiConstraint::Max(layout_size.height.max(n) - n),
+            Self::MaxthLessThanLayoutWidth(n) => TuiConstraint::Max(layout_size.width.max(n) - n),
             Self::Min(n) => TuiConstraint::Min(n),
+            Self::MinLessThanScreenHeight(n) => TuiConstraint::Min(screen_size.height.max(n) - n),
+            Self::MinLessThanScreenWidth(n) => TuiConstraint::Min(screen_size.width.max(n) - n),
+            Self::MinLessThanLayoutHeight(n) => TuiConstraint::Min(layout_size.height.max(n) - n),
+            Self::MinLessThanLayoutWidth(n) => TuiConstraint::Min(layout_size.width.max(n) - n),
         }
     }
 }
@@ -999,6 +1027,26 @@ impl ModesConfig {
     }
 }
 
+#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub enum Border {
+    Top,
+    Right,
+    Bottom,
+    Left,
+}
+
+impl Border {
+    pub fn bits(self) -> u32 {
+        match self {
+            Self::Top => TuiBorders::TOP.bits(),
+            Self::Right => TuiBorders::RIGHT.bits(),
+            Self::Bottom => TuiBorders::BOTTOM.bits(),
+            Self::Left => TuiBorders::LEFT.bits(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct LayoutOptions {
@@ -1009,7 +1057,7 @@ pub struct LayoutOptions {
     #[serde(default)]
     vertical_margin: Option<u16>,
     #[serde(default)]
-    constraints: Vec<Constraint>,
+    constraints: Option<Vec<Constraint>>,
 }
 
 impl LayoutOptions {
@@ -1017,12 +1065,12 @@ impl LayoutOptions {
         self.margin = other.margin.or(self.margin);
         self.horizontal_margin = other.horizontal_margin.or(self.horizontal_margin);
         self.vertical_margin = other.vertical_margin.or(self.vertical_margin);
-        self.constraints = other.constraints;
+        self.constraints = other.constraints.or(self.constraints);
         self
     }
 
     /// Get a reference to the layout options's constraints.
-    pub fn constraints(&self) -> &Vec<Constraint> {
+    pub fn constraints(&self) -> &Option<Vec<Constraint>> {
         &self.constraints
     }
 
@@ -1042,15 +1090,45 @@ impl LayoutOptions {
     }
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BlockConfig {
+    #[serde(default)]
+    title: UiElement,
+
+    #[serde(default)]
+    borders: Option<IndexSet<Border>>,
+
+    #[serde(default)]
+    style: Style,
+}
+
+impl BlockConfig {
+    /// Get a reference to the block config's borders.
+    pub fn borders(&self) -> &Option<IndexSet<Border>> {
+        &self.borders
+    }
+
+    /// Get a reference to the block config's title.
+    pub fn title(&self) -> &UiElement {
+        &self.title
+    }
+
+    /// Get a reference to the block config's style.
+    pub fn style(&self) -> Style {
+        self.style
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum Layout {
-    Nothing,
-    Table,
-    InputAndLogs,
-    Selection,
-    HelpMenu,
-    SortAndFilter,
+    Nothing(BlockConfig),
+    Table(BlockConfig),
+    InputAndLogs(BlockConfig),
+    Selection(BlockConfig),
+    HelpMenu(BlockConfig),
+    SortAndFilter(BlockConfig),
     Horizontal {
         config: LayoutOptions,
         splits: Vec<Layout>,
@@ -1063,41 +1141,14 @@ pub enum Layout {
 
 impl Default for Layout {
     fn default() -> Self {
-        Self::Nothing
+        Self::Nothing(Default::default())
     }
 }
 
 impl Layout {
     pub fn extend(self, other: Self) -> Self {
         match (self, other) {
-            (
-                Self::Horizontal {
-                    config: sc,
-                    splits: _,
-                },
-                Self::Horizontal {
-                    config: oc,
-                    splits: os,
-                },
-            ) => Self::Horizontal {
-                config: sc.extend(oc),
-                splits: os,
-            },
-
-            (
-                Self::Vertical {
-                    config: sc,
-                    splits: _,
-                },
-                Self::Vertical {
-                    config: oc,
-                    splits: os,
-                },
-            ) => Self::Vertical {
-                config: sc.extend(oc),
-                splits: os,
-            },
-            (s, Self::Nothing) => s,
+            (s, Self::Nothing(_)) => s,
             (_, other) => other,
         }
     }
