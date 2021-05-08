@@ -12,22 +12,19 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     app = app
         .clone()
-        .handle_task(
-            app::Task::new(
-                app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
-                None,
-            ),
-            &app.clone(),
-        )
+        .handle_task(app::Task::new(
+            app::MsgIn::External(app::ExternalMsg::ChangeDirectory("/tmp/xplr_bench".into())),
+            None,
+        ))
         .unwrap();
 
     c.bench_function("focus next item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(
-                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusNext), None),
-                    &app.clone(),
-                )
+                .handle_task(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::FocusNext),
+                    None,
+                ))
                 .unwrap()
         })
     });
@@ -35,10 +32,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus previous item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(
-                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusPrevious), None),
-                    &app.clone(),
-                )
+                .handle_task(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::FocusPrevious),
+                    None,
+                ))
                 .unwrap()
         })
     });
@@ -46,10 +43,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus first item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(
-                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusFirst), None),
-                    &app.clone(),
-                )
+                .handle_task(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::FocusFirst),
+                    None,
+                ))
                 .unwrap()
         })
     });
@@ -57,10 +54,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("focus last item", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(
-                    app::Task::new(app::MsgIn::External(app::ExternalMsg::FocusLast), None),
-                    &app.clone(),
-                )
+                .handle_task(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::FocusLast),
+                    None,
+                ))
                 .unwrap()
         })
     });
@@ -68,15 +65,15 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("leave and enter directory", |b| {
         b.iter(|| {
             app.clone()
-                .handle_task(
-                    app::Task::new(app::MsgIn::External(app::ExternalMsg::Back), None),
-                    &app.clone(),
-                )
+                .handle_task(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::Back),
+                    None,
+                ))
                 .unwrap()
-                .handle_task(
-                    app::Task::new(app::MsgIn::External(app::ExternalMsg::Enter), None),
-                    &app.clone(),
-                )
+                .handle_task(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::Enter),
+                    None,
+                ))
                 .unwrap()
         })
     });

@@ -48,7 +48,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .env("XPLR_PIPE_SELECTION_OUT", app.pipe().selection_out())
         .env("XPLR_PIPE_HISTORY_OUT", app.pipe().history_out())
         .env("XPLR_PIPE_FOCUS_OUT", app.pipe().focus_out())
-        .env("XPLR_PIPE_MODE_OUT", app.pipe().mode_out())
+        .env("XPLR_MODE", app.mode_str())
         .env("XPLR_PIPE_RESULT_OUT", app.pipe().result_out())
         .env(
             "XPLR_PIPE_GLOBAL_HELP_MENU_OUT",
@@ -115,7 +115,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     'outer: for task in rx_msg_in {
         let last_app = app.clone();
 
-        let (new_app, new_result) = match app.handle_task(task, &last_app) {
+        let (new_app, new_result) = match app.handle_task(task) {
             Ok(a) => (a, Ok(None)),
             Err(err) => (last_app.clone(), Err(err)),
         };
@@ -184,6 +184,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                 app::MsgOut::CallSilently(cmd) => {
                     tx_event_reader.send(true)?;
 
+                    app.write_pipes()?;
                     let status = call(&app, cmd, false)
                         .map(|s| {
                             if s.success() {
@@ -210,6 +211,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                     term::disable_raw_mode()?;
                     terminal.show_cursor()?;
 
+                    app.write_pipes()?;
                     let status = call(&app, cmd, false)
                         .map(|s| {
                             if s.success() {
