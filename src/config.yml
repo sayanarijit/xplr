@@ -22,9 +22,6 @@ layouts:
                 - SortAndFilter:
                     borders: [Top, Right, Bottom, Left]
                 - Table:
-                    title:
-                      style:
-                        fg: Red
                     borders: [Top, Right, Bottom, Left]
                 - InputAndLogs:
                     borders: [Top, Right, Bottom, Left]
@@ -110,7 +107,7 @@ general:
     - sorter: ByIRelativePath
       reverse: false
   prompt:
-    format: "> "
+    format: "❯ "
   cursor:
     format: █
   logs:
@@ -133,20 +130,13 @@ general:
           style:
             fg: null
             bg: null
-            add_modifier:
-              bits: 0
-            sub_modifier:
-              bits: 0
+            add_modifiers: null
+            sub_modifiers: null
         - format: '╭──── path'
         - format: size
         - format: type
       style:
-        fg: null
-        bg: null
-        add_modifier:
-          bits: 1
-        sub_modifier:
-          bits: 0
+        add_modifiers: [Bold]
       height: 1
     row:
       cols:
@@ -154,78 +144,35 @@ general:
         - format: >
             {{{tree}}}{{{prefix}}}{{{meta.icon}}}{{#if (ne meta.icon "")}} {{/if}}{{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}
             {{#if isSymlink}}-> {{#if isBroken}}×{{else}}{{{symlink.absolutePath}}}{{/if}}{{#if symlink.isDir}}/{{/if}}{{/if}}
-          style:
-            fg: null
-            bg: null
-            add_modifier:
-              bits: 0
-            sub_modifier:
-              bits: 0
         - format: '{{#unless isDir}}{{humansize size}}{{/unless}}'
         - format: '{{#if isSymlink}}{{{symlink.mimeEssence}}}{{else}}{{{mimeEssence}}}{{/if}}'
-      style:
-        fg: null
-        bg: null
-        add_modifier:
-          bits: 0
-        sub_modifier:
-          bits: 0
       height: 0
-    style:
-      fg: null
-      bg: null
-      add_modifier:
-        bits: 0
-      sub_modifier:
-        bits: 0
     tree:
       - format: ├─
-        style:
-          fg: null
-          bg: null
-          add_modifier:
-            bits: 0
-          sub_modifier:
-            bits: 0
       - format: ├─
       - format: ╰─
-    col_spacing: 1
+    col_spacing: 0
     col_widths:
       - Percentage: 10
       - Percentage: 50
       - Percentage: 20
       - Percentage: 20
+
   default_ui:
     prefix: '  '
     suffix: ''
-    style:
-      fg: null
-      bg: null
-      add_modifier:
-        bits: 0
-      sub_modifier:
-        bits: 0
   focus_ui:
     prefix: ▸[
     suffix: ']'
     style:
       fg: Blue
-      bg: null
-      add_modifier:
-        bits: 1
-      sub_modifier:
-        bits: 0
+      add_modifiers: [Bold]
   selection_ui:
     prefix: ' {'
     suffix: '}'
     style:
       fg: LightGreen
-      bg: null
-      add_modifier:
-        bits: 1
-      sub_modifier:
-        bits: 0
-
+      add_modifiers: [Bold]
   sort_and_filter_ui:
     separator:
       format: " › "
@@ -359,31 +306,16 @@ node_types:
   directory:
     style:
       fg: Cyan
-      bg: null
-      add_modifier:
-        bits: 1
-      sub_modifier:
-        bits: 0
+      add_modifiers: [Bold]
     meta:
       icon: ð
   file:
-    style:
-      fg: null
-      bg: null
-      add_modifier:
-        bits: 0
-      sub_modifier:
-        bits: 0
     meta:
       icon: ƒ
   symlink:
     style:
       fg: Magenta
-      bg: null
-      add_modifier:
-        bits: 4
-      sub_modifier:
-        bits: 0
+      add_modifiers: [Italic]
     meta:
       icon: §
   mime_essence: {}
