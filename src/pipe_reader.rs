@@ -24,14 +24,15 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
 
                 msgs.for_each(|msg| match msg {
                     Ok(m) => {
-                        tx.send(Task::new(MsgIn::External(m), None)).unwrap();
+                        tx.send(Task::new(MsgIn::External(m), None))
+                            .unwrap_or_default();
                     }
                     Err(e) => {
                         tx.send(Task::new(
                             MsgIn::External(ExternalMsg::LogError(e.to_string())),
                             None,
                         ))
-                        .unwrap();
+                        .unwrap_or_default();
                     }
                 });
             } else {
@@ -45,7 +46,7 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
                 ))),
                 None,
             ))
-            .unwrap();
+            .unwrap_or_default();
             thread::sleep(Duration::from_secs(3));
         }
     });

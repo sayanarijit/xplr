@@ -14,17 +14,19 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                 is_paused = paused;
             };
 
-            if !is_paused && event::poll(std::time::Duration::from_millis(1)).unwrap() {
+            if !is_paused && event::poll(std::time::Duration::from_millis(1)).unwrap_or_default() {
                 match event::read() {
                     Ok(Event::Key(key)) => {
                         let key = Key::from_event(key);
                         let msg = MsgIn::Internal(InternalMsg::HandleKey(key));
-                        tx_msg_in.send(Task::new(msg, Some(key))).unwrap();
+                        tx_msg_in
+                            .send(Task::new(msg, Some(key)))
+                            .unwrap_or_default();
                     }
 
                     Ok(Event::Resize(_, _)) => {
                         let msg = MsgIn::External(ExternalMsg::Refresh);
-                        tx_msg_in.send(Task::new(msg, None)).unwrap();
+                        tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
                     }
                     Ok(_) => {}
                     Err(e) => {
@@ -33,7 +35,7 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                                 MsgIn::External(ExternalMsg::LogError(e.to_string())),
                                 None,
                             ))
-                            .unwrap();
+                            .unwrap_or_default();
                     }
                 }
             } else {

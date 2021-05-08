@@ -24,7 +24,7 @@ pub fn keep_watching(
                         MsgIn::External(ExternalMsg::LogError(e.to_string())),
                         None,
                     ))
-                    .unwrap();
+                    .unwrap_or_default();
             });
             watcher
                 .watch(&new_pwd, RecursiveMode::NonRecursive)
@@ -34,7 +34,7 @@ pub fn keep_watching(
                             MsgIn::External(ExternalMsg::LogError(e.to_string())),
                             None,
                         ))
-                        .unwrap();
+                        .unwrap_or_default();
                 });
             last_pwd = new_pwd;
         } else {
@@ -43,7 +43,7 @@ pub fn keep_watching(
 
         if rx.try_recv().is_ok() {
             let msg = MsgIn::External(ExternalMsg::Explore);
-            tx_msg_in.send(Task::new(msg, None)).unwrap();
+            tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
         } else {
             thread::sleep(Duration::from_secs(1));
         }
