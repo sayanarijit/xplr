@@ -1,4 +1,4 @@
-version: v0.7.1
+version: v0.7.2
 layouts:
   custom: {}
   builtin:
@@ -832,7 +832,7 @@ modes:
             help: global help menu
             messages:
               - BashExec: |
-                  ${PAGER:-less} "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}"
+                  cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:-less}
           '~':
             help: go home
             messages:
@@ -892,7 +892,7 @@ modes:
               - ToggleSelection
               - FocusNext
           ctrl-a:
-            help: select all
+            help: select/unselect all
             messages:
               - ToggleSelectAll
           up:
@@ -1134,8 +1134,7 @@ modes:
             help: logs
             messages:
               - BashExec: |
-                  cat -- "${XPLR_PIPE_LOGS_OUT}"
-                  read -p "[enter to continue]"
+                  cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:-less}
               - SwitchModeBuiltin: default
 
           ctrl-c:
@@ -1156,9 +1155,9 @@ modes:
           ctrl-p: up
         on_key:
           tab:
-            help: select
+            help: toggle selection
             messages:
-              - Select
+              - ToggleSelection
               - FocusNext
           backspace:
             help: remove last character

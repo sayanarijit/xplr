@@ -2545,6 +2545,13 @@ impl App {
         // {
         fs::write(&self.pipe().result_out, result_str)?;
         // };
+        let global_help_menu_str = self.global_help_menu_str();
+        // if last_app
+        //     .map(|a| a.global_help_menu_str() != global_help_menu_str)
+        //     .unwrap_or(true)
+        // {
+        fs::write(&self.pipe().global_help_menu_out, global_help_menu_str)?;
+        // };
         Ok(())
     }
 
