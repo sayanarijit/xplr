@@ -556,9 +556,18 @@ pub fn draw_layout<B: Backend>(
                         .map(|c| (*c).into())
                         .collect::<Vec<TuiConstraint>>(),
                 )
-                .margin(config.margin().unwrap_or_default())
-                .horizontal_margin(config.horizontal_margin().unwrap_or_default())
-                .vertical_margin(config.vertical_margin().unwrap_or_default())
+                .horizontal_margin(
+                    config
+                        .horizontal_margin()
+                        .or_else(|| config.margin())
+                        .unwrap_or_default(),
+                )
+                .vertical_margin(
+                    config
+                        .vertical_margin()
+                        .or_else(|| config.margin())
+                        .unwrap_or_default(),
+                )
                 .split(rect);
             splits
                 .into_iter()
@@ -576,9 +585,18 @@ pub fn draw_layout<B: Backend>(
                         .map(|c| (*c).into())
                         .collect::<Vec<TuiConstraint>>(),
                 )
-                .margin(config.margin().unwrap_or_default())
-                .horizontal_margin(config.horizontal_margin().unwrap_or_default())
-                .vertical_margin(config.vertical_margin().unwrap_or_default())
+                .horizontal_margin(
+                    config
+                        .horizontal_margin()
+                        .or_else(|| config.margin())
+                        .unwrap_or_default(),
+                )
+                .vertical_margin(
+                    config
+                        .vertical_margin()
+                        .or_else(|| config.margin())
+                        .unwrap_or_default(),
+                )
                 .split(rect);
             splits
                 .into_iter()
