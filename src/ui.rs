@@ -1,8 +1,8 @@
 use crate::app;
 use crate::app::HelpMenuLine;
 use crate::app::{Node, ResolvedNode};
-use crate::config::BlockConfig;
 use crate::config::Layout;
+use crate::config::PanelUiConfig;
 use handlebars::Handlebars;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
@@ -233,7 +233,7 @@ impl NodeUiMetadata {
     }
 }
 
-fn block<'a>(config: BlockConfig, default_title: String) -> Block<'a> {
+fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
     Block::default()
         .borders(TuiBorders::from_bits_truncate(
             config
@@ -253,13 +253,21 @@ fn block<'a>(config: BlockConfig, default_title: String) -> Block<'a> {
 }
 
 fn draw_table<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
     hb: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config
+        .default()
+        .clone()
+        .extend(panel_config.table().clone());
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let app_config = app.config().to_owned();
     let header_height = app_config.general().table().header().height().unwrap_or(1);
     let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
@@ -430,13 +438,21 @@ fn draw_table<B: Backend>(
 }
 
 fn draw_selection<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
     _: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config
+        .default()
+        .clone()
+        .extend(panel_config.selection().clone());
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let selection: Vec<ListItem> = app
         .selection()
         .iter()
@@ -457,13 +473,21 @@ fn draw_selection<B: Backend>(
 }
 
 fn draw_help_menu<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
     _: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config
+        .default()
+        .clone()
+        .extend(panel_config.help_menu().clone());
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let help_menu_rows = app
         .mode()
         .help_menu()
@@ -505,13 +529,21 @@ fn draw_help_menu<B: Backend>(
 }
 
 fn draw_input_buffer<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
     _: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config
+        .default()
+        .clone()
+        .extend(panel_config.input_and_logs().clone());
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let input_buf = Paragraph::new(Spans::from(vec![
         Span::styled(
             app.config()
@@ -538,41 +570,31 @@ fn draw_input_buffer<B: Backend>(
 }
 
 fn draw_sort_n_filter<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
     _: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config
+        .default()
+        .clone()
+        .extend(panel_config.sort_and_filter().clone());
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let ui = app.config().general().sort_and_filter_ui().clone();
     let filter_by = app.explorer_config().filters();
     let sort_by = app.explorer_config().sorters();
-    let forward = Span::styled(
-        ui.sort_direction_identifiers()
-            .forward()
-            .format()
-            .to_owned()
-            .unwrap_or_default(),
-        ui.sort_direction_identifiers()
-            .forward()
-            .style()
-            .clone()
-            .into(),
-    );
-
-    let reverse = Span::styled(
-        ui.sort_direction_identifiers()
-            .reverse()
-            .format()
-            .to_owned()
-            .unwrap_or_default(),
-        ui.sort_direction_identifiers()
-            .reverse()
-            .style()
-            .clone()
-            .into(),
-    );
+    let defaultui = ui.default_identifier();
+    let forwardui = defaultui
+        .clone()
+        .extend(ui.sort_direction_identifiers().forward().clone());
+    let reverseui = defaultui
+        .clone()
+        .extend(ui.sort_direction_identifiers().reverse().clone());
 
     let mut spans = filter_by
         .iter()
@@ -580,35 +602,36 @@ fn draw_sort_n_filter<B: Backend>(
             ui.filter_identifiers()
                 .get(&f.filter())
                 .map(|u| {
+                    let ui = defaultui.clone().extend(u.clone());
                     (
                         Span::styled(
-                            u.format().to_owned().unwrap_or_default(),
-                            u.style().clone().into(),
+                            ui.format().to_owned().unwrap_or_default(),
+                            ui.style().clone().into(),
                         ),
-                        Span::raw(f.input().clone()),
+                        Span::styled(f.input().clone(), ui.style().clone().into()),
                     )
                 })
                 .unwrap_or_else(|| (Span::raw("f"), Span::raw("")))
         })
         .chain(sort_by.iter().map(|s| {
-            let direction = if s.reverse() {
-                reverse.clone()
-            } else {
-                forward.clone()
-            };
+            let direction = if s.reverse() { &reverseui } else { &forwardui };
 
             ui.sorter_identifiers()
                 .get(&s.sorter())
                 .map(|u| {
+                    let ui = defaultui.clone().extend(u.clone());
                     (
                         Span::styled(
-                            u.format().to_owned().unwrap_or_default(),
-                            u.style().clone().into(),
+                            ui.format().to_owned().unwrap_or_default(),
+                            ui.style().clone().into(),
                         ),
-                        direction.clone(),
+                        Span::styled(
+                            direction.format().to_owned().unwrap_or_default(),
+                            direction.style().clone().into(),
+                        ),
                     )
                 })
-                .unwrap_or_else(|| (Span::raw("s"), direction.clone()))
+                .unwrap_or_else(|| (Span::raw("s"), Span::raw("")))
         }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator().format().to_owned().unwrap_or_default(),
@@ -628,13 +651,21 @@ fn draw_sort_n_filter<B: Backend>(
 }
 
 fn draw_logs<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
     _: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config
+        .default()
+        .clone()
+        .extend(panel_config.input_and_logs().clone());
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let logs_config = app.config().general().logs().clone();
     let logs = app
         .logs()
@@ -680,13 +711,18 @@ fn draw_logs<B: Backend>(
 }
 
 pub fn draw_nothing<B: Backend>(
-    config: BlockConfig,
+    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
-    _app: &app::App,
+    app: &app::App,
     _hb: &Handlebars,
 ) {
+    let panel_config = app.config().general().panel_ui();
+    let default_panel_config = panel_config.default().clone();
+    let config = config
+        .map(|c| default_panel_config.clone().extend(c))
+        .unwrap_or(default_panel_config);
     let nothing = Paragraph::new("").block(block(config, "".into()));
     f.render_widget(nothing, layout_size);
 }

@@ -1,4 +1,4 @@
-version: v0.6.0
+version: v0.7.0
 layouts:
   custom: {}
   builtin:
@@ -19,22 +19,17 @@ layouts:
                   - Min: 1
                   - Length: 3
               splits:
-                - SortAndFilter:
-                    borders: [Top, Right, Bottom, Left]
-                - Table:
-                    borders: [Top, Right, Bottom, Left]
-                - InputAndLogs:
-                    borders: [Top, Right, Bottom, Left]
+                - SortAndFilter: ~
+                - Table: ~
+                - InputAndLogs: ~
           - Vertical:
               config:
                 constraints:
                   - Percentage: 50
                   - Percentage: 50
               splits:
-                - Selection:
-                    borders: [Top, Right, Bottom, Left]
-                - HelpMenu:
-                    borders: [Top, Right, Bottom, Left]
+                - Selection: ~
+                - HelpMenu: ~
     no_help:
       Horizontal:
         config:
@@ -49,14 +44,10 @@ layouts:
                   - Min: 1
                   - Length: 3
               splits:
-                - SortAndFilter:
-                    borders: [Top, Right, Bottom, Left]
-                - Table:
-                    borders: [Top, Right, Bottom, Left]
-                - InputAndLogs:
-                    borders: [Top, Right, Bottom, Left]
-          - Selection:
-              borders: [Top, Right, Bottom, Left]
+                - SortAndFilter: ~
+                - Table: ~
+                - InputAndLogs: ~
+          - Selection: ~
 
     no_selection:
       Horizontal:
@@ -72,14 +63,10 @@ layouts:
                   - Min: 1
                   - Length: 3
               splits:
-                - SortAndFilter:
-                    borders: [Top, Right, Bottom, Left]
-                - Table:
-                    borders: [Top, Right, Bottom, Left]
-                - InputAndLogs:
-                    borders: [Top, Right, Bottom, Left]
-          - HelpMenu:
-              borders: [Top, Right, Bottom, Left]
+                - SortAndFilter: ~
+                - Table: ~
+                - InputAndLogs: ~
+          - HelpMenu: ~
 
     no_help_no_selection:
       Vertical:
@@ -89,12 +76,9 @@ layouts:
             - Min: 1
             - Length: 3
         splits:
-          - SortAndFilter:
-              borders: [Top, Right, Bottom, Left]
-          - Table:
-              borders: [Top, Right, Bottom, Left]
-          - InputAndLogs:
-              borders: [Top, Right, Bottom, Left]
+          - SortAndFilter: ~
+          - Table: ~
+          - InputAndLogs: ~
 
 general:
   show_hidden: false
@@ -161,27 +145,38 @@ general:
   default_ui:
     prefix: '  '
     suffix: ''
+
   focus_ui:
     prefix: ▸[
     suffix: ']'
     style:
       fg: Blue
       add_modifiers: [Bold]
+
   selection_ui:
     prefix: ' {'
     suffix: '}'
     style:
       fg: LightGreen
       add_modifiers: [Bold]
+
+  panel_ui:
+    default:
+      borders: [Top, Right, Bottom, Left]
+
   sort_and_filter_ui:
     separator:
       format: " › "
+      style:
+        add_modifiers: [Dim]
+    default_identifier:
+      style:
+        add_modifiers: [Bold]
     sort_direction_identifiers:
       forward:
         format: "↓"
       reverse:
         format: "↑"
-
     sorter_identifiers:
       ByRelativePath:
         format: "rel"
