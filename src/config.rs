@@ -4,6 +4,7 @@ use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
 use crate::default_config;
+use crate::ui::Border;
 use crate::ui::Style;
 use anyhow::Result;
 use indexmap::IndexSet;
@@ -12,7 +13,6 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 use tui::layout::Constraint as TuiConstraint;
 use tui::layout::Rect;
-use tui::widgets::Borders as TuiBorders;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -74,8 +74,8 @@ impl NodeTypeConfig {
     }
 
     /// Get a reference to the node type config's style.
-    pub fn style(&self) -> Style {
-        self.style
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 
     /// Get a reference to the node type config's meta.
@@ -180,8 +180,8 @@ impl UiConfig {
     }
 
     /// Get a reference to the ui config's style.
-    pub fn style(&self) -> Style {
-        self.style
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 }
 
@@ -208,8 +208,8 @@ impl UiElement {
     }
 
     /// Get a reference to the ui element's style.
-    pub fn style(&self) -> Style {
-        self.style
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 }
 
@@ -240,8 +240,8 @@ impl TableRowConfig {
     }
 
     /// Get a reference to the table row config's style.
-    pub fn style(&self) -> Style {
-        self.style
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 
     /// Get a reference to the table row config's height.
@@ -348,8 +348,8 @@ impl TableConfig {
     }
 
     /// Get a reference to the table config's style.
-    pub fn style(&self) -> Style {
-        self.style
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 
     /// Get a reference to the table config's tree.
@@ -1027,26 +1027,6 @@ impl ModesConfig {
     }
 }
 
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub enum Border {
-    Top,
-    Right,
-    Bottom,
-    Left,
-}
-
-impl Border {
-    pub fn bits(self) -> u32 {
-        match self {
-            Self::Top => TuiBorders::TOP.bits(),
-            Self::Right => TuiBorders::RIGHT.bits(),
-            Self::Bottom => TuiBorders::BOTTOM.bits(),
-            Self::Left => TuiBorders::LEFT.bits(),
-        }
-    }
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct LayoutOptions {
@@ -1115,8 +1095,8 @@ impl BlockConfig {
     }
 
     /// Get a reference to the block config's style.
-    pub fn style(&self) -> Style {
-        self.style
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 }
 

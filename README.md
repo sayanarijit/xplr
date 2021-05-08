@@ -68,8 +68,8 @@ Table of content
 <img height=240 width=360 src="https://s3.gifyu.com/images/xplr-serve.gif" />
 </a>
 
-<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#disk-usage-dua-cli" target="_blank">
-<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-dua.gif" />
+<a href="https://github.com/sayanarijit/xplr/wiki/Themes#material-landscape" target="_blank">
+<img height=240 width=360 src="https://s3.gifyu.com/images/theaming.gif" />
 </a>
 
 <a href="https://github.com/sayanarijit/xplr/wiki/Hacks#sendreceive-files-via-qr-code-on-lan" target="_blank">

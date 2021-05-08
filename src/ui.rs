@@ -4,6 +4,7 @@ use crate::app::{Node, ResolvedNode};
 use crate::config::BlockConfig;
 use crate::config::Layout;
 use handlebars::Handlebars;
+use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -12,7 +13,7 @@ use std::env;
 use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
-use tui::style::{Color, Modifier, Style as TuiStyle};
+use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph, Row, Table};
 use tui::Frame;
@@ -22,33 +23,81 @@ lazy_static! {
     pub static ref DEFAULT_STYLE: TuiStyle = TuiStyle::default();
 }
 
-#[derive(Debug, Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub enum Border {
+    Top,
+    Right,
+    Bottom,
+    Left,
+}
+
+impl Border {
+    pub fn bits(self) -> u32 {
+        match self {
+            Self::Top => TuiBorders::TOP.bits(),
+            Self::Right => TuiBorders::RIGHT.bits(),
+            Self::Bottom => TuiBorders::BOTTOM.bits(),
+            Self::Left => TuiBorders::LEFT.bits(),
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub enum Modifier {
+    Bold,
+    Dim,
+    Italic,
+    Underlined,
+    SlowBlink,
+    RapidBlink,
+    Reversed,
+    Hidden,
+    CrossedOut,
+}
+
+impl Modifier {
+    pub fn bits(self) -> u16 {
+        match self {
+            Self::Bold => TuiModifier::BOLD.bits(),
+            Self::Dim => TuiModifier::DIM.bits(),
+            Self::Italic => TuiModifier::ITALIC.bits(),
+            Self::Underlined => TuiModifier::UNDERLINED.bits(),
+            Self::SlowBlink => TuiModifier::SLOW_BLINK.bits(),
+            Self::RapidBlink => TuiModifier::RAPID_BLINK.bits(),
+            Self::Reversed => TuiModifier::REVERSED.bits(),
+            Self::Hidden => TuiModifier::HIDDEN.bits(),
+            Self::CrossedOut => TuiModifier::CROSSED_OUT.bits(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
     fg: Option<Color>,
     bg: Option<Color>,
-    add_modifier: Option<Modifier>,
-    sub_modifier: Option<Modifier>,
+    add_modifiers: Option<IndexSet<Modifier>>,
+    sub_modifiers: Option<IndexSet<Modifier>>,
+}
+
+impl PartialEq for Style {
+    fn eq(&self, other: &Self) -> bool {
+        self.fg == other.fg
+            && self.bg == other.bg
+            && self.add_modifiers == other.add_modifiers
+            && self.sub_modifiers == other.sub_modifiers
+    }
 }
 
 impl Style {
     pub fn extend(mut self, other: Self) -> Self {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.add_modifier = other.add_modifier.or(self.add_modifier);
-        self.sub_modifier = other.sub_modifier.or(self.sub_modifier);
+        self.add_modifiers = other.add_modifiers.or(self.add_modifiers);
+        self.sub_modifiers = other.sub_modifiers.or(self.sub_modifiers);
         self
-    }
-}
-
-impl From<TuiStyle> for Style {
-    fn from(s: TuiStyle) -> Self {
-        Self {
-            fg: s.fg,
-            bg: s.bg,
-            add_modifier: Some(s.add_modifier),
-            sub_modifier: Some(s.sub_modifier),
-        }
     }
 }
 
@@ -60,8 +109,23 @@ impl Into<TuiStyle> for Style {
             TuiStyle {
                 fg: self.fg,
                 bg: self.bg,
-                add_modifier: self.add_modifier.unwrap_or_else(Modifier::empty),
-                sub_modifier: self.sub_modifier.unwrap_or_else(Modifier::empty),
+                add_modifier: TuiModifier::from_bits_truncate(
+                    self.add_modifiers
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|m| m.bits())
+                        .reduce(|a, b| (a ^ b))
+                        .unwrap_or_else(|| TuiModifier::empty().bits()),
+                ),
+
+                sub_modifier: TuiModifier::from_bits_truncate(
+                    self.sub_modifiers
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|m| m.bits())
+                        .reduce(|a, b| (a ^ b))
+                        .unwrap_or_else(|| TuiModifier::empty().bits()),
+                ),
             }
         }
     }
@@ -183,9 +247,9 @@ fn block<'a>(config: BlockConfig, default_title: String) -> Block<'a> {
         ))
         .title(Span::styled(
             config.title().format().clone().unwrap_or(default_title),
-            config.title().style().into(),
+            config.title().style().clone().into(),
         ))
-        .style(config.style().into())
+        .style(config.style().clone().into())
 }
 
 fn draw_table<B: Backend>(
@@ -266,7 +330,7 @@ fn draw_table<B: Backend>(
                         (
                             ui.prefix().clone(),
                             ui.suffix().clone(),
-                            ui.style().extend(node_type.style()),
+                            ui.style().clone().extend(node_type.style().clone()),
                         )
                     };
 
@@ -274,14 +338,14 @@ fn draw_table<B: Backend>(
                         let ui = app_config.general().selection_ui().clone();
                         prefix = ui.prefix().clone().or(prefix);
                         suffix = ui.suffix().clone().or(suffix);
-                        style = style.extend(ui.style());
+                        style = style.extend(ui.style().clone());
                     };
 
                     if is_focused {
                         let ui = app_config.general().focus_ui().clone();
                         prefix = ui.prefix().clone().or(prefix);
                         suffix = ui.suffix().clone().or(suffix);
-                        style = style.extend(ui.style());
+                        style = style.extend(ui.style().clone());
                     };
 
                     let meta = NodeUiMetadata::new(
@@ -325,8 +389,8 @@ fn draw_table<B: Backend>(
 
     let table = Table::new(rows)
         .widths(&table_constraints)
-        .style(app_config.general().table().style().into())
-        .highlight_style(app_config.general().focus_ui().style().into())
+        .style(app_config.general().table().style().clone().into())
+        .highlight_style(app_config.general().focus_ui().style().clone().into())
         .column_spacing(
             app_config
                 .general()
@@ -359,7 +423,7 @@ fn draw_table<B: Backend>(
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
-        .style(app_config.general().table().header().style().into()),
+        .style(app_config.general().table().header().style().clone().into()),
     );
 
     f.render_widget(table, layout_size);
@@ -456,7 +520,7 @@ fn draw_input_buffer<B: Backend>(
                 .format()
                 .clone()
                 .unwrap_or_default(),
-            app.config().general().prompt().style().into(),
+            app.config().general().prompt().style().clone().into(),
         ),
         Span::raw(app.input_buffer().unwrap_or_else(|| "".into())),
         Span::styled(
@@ -466,7 +530,7 @@ fn draw_input_buffer<B: Backend>(
                 .format()
                 .clone()
                 .unwrap_or_default(),
-            app.config().general().cursor().style().into(),
+            app.config().general().cursor().style().clone().into(),
         ),
     ]))
     .block(block(config, " Input ".into()));
@@ -490,7 +554,11 @@ fn draw_sort_n_filter<B: Backend>(
             .format()
             .to_owned()
             .unwrap_or_default(),
-        ui.sort_direction_identifiers().forward().style().into(),
+        ui.sort_direction_identifiers()
+            .forward()
+            .style()
+            .clone()
+            .into(),
     );
 
     let reverse = Span::styled(
@@ -499,7 +567,11 @@ fn draw_sort_n_filter<B: Backend>(
             .format()
             .to_owned()
             .unwrap_or_default(),
-        ui.sort_direction_identifiers().reverse().style().into(),
+        ui.sort_direction_identifiers()
+            .reverse()
+            .style()
+            .clone()
+            .into(),
     );
 
     let mut spans = filter_by
@@ -509,7 +581,10 @@ fn draw_sort_n_filter<B: Backend>(
                 .get(&f.filter())
                 .map(|u| {
                     (
-                        Span::styled(u.format().to_owned().unwrap_or_default(), u.style().into()),
+                        Span::styled(
+                            u.format().to_owned().unwrap_or_default(),
+                            u.style().clone().into(),
+                        ),
                         Span::raw(f.input().clone()),
                     )
                 })
@@ -526,7 +601,10 @@ fn draw_sort_n_filter<B: Backend>(
                 .get(&s.sorter())
                 .map(|u| {
                     (
-                        Span::styled(u.format().to_owned().unwrap_or_default(), u.style().into()),
+                        Span::styled(
+                            u.format().to_owned().unwrap_or_default(),
+                            u.style().clone().into(),
+                        ),
                         direction.clone(),
                     )
                 })
@@ -534,7 +612,7 @@ fn draw_sort_n_filter<B: Backend>(
         }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator().format().to_owned().unwrap_or_default(),
-            ui.separator().style().into(),
+            ui.separator().style().clone().into(),
         )))
         .map(|((a, b), c)| vec![a, b, c])
         .flatten()
@@ -573,7 +651,7 @@ fn draw_logs<B: Backend>(
                     &logs_config.info().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(logs_config.info().style().into()),
+                .style(logs_config.info().style().clone().into()),
                 app::LogLevel::Success => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
@@ -584,14 +662,14 @@ fn draw_logs<B: Backend>(
                         .unwrap_or_default(),
                     l.message()
                 ))
-                .style(logs_config.success().style().into()),
+                .style(logs_config.success().style().clone().into()),
                 app::LogLevel::Error => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
                     &logs_config.error().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(logs_config.error().style().into()),
+                .style(logs_config.error().style().clone().into()),
             }
         })
         .collect::<Vec<ListItem>>();
@@ -714,29 +792,34 @@ mod test {
     use super::*;
     use crate::config;
     use tui::style::Color;
-    use tui::style::Modifier;
+
+    fn modifier(m: Modifier) -> Option<IndexSet<Modifier>> {
+        let mut x = IndexSet::new();
+        x.insert(m);
+        Some(x)
+    }
 
     #[test]
     fn test_extend_style() {
         let a = Style {
             fg: Some(Color::Red),
             bg: None,
-            add_modifier: Some(Modifier::BOLD),
-            sub_modifier: None,
+            add_modifiers: modifier(Modifier::Bold),
+            sub_modifiers: None,
         };
 
         let b = Style {
             fg: None,
             bg: Some(Color::Blue),
-            add_modifier: None,
-            sub_modifier: Some(Modifier::DIM),
+            add_modifiers: None,
+            sub_modifiers: modifier(Modifier::Dim),
         };
 
         let c = Style {
             fg: Some(Color::Cyan),
             bg: Some(Color::Magenta),
-            add_modifier: Some(Modifier::CROSSED_OUT),
-            sub_modifier: Some(Modifier::ITALIC),
+            add_modifiers: modifier(Modifier::CrossedOut),
+            sub_modifiers: modifier(Modifier::Italic),
         };
 
         assert_eq!(
@@ -744,8 +827,8 @@ mod test {
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
-                add_modifier: Some(Modifier::BOLD),
-                sub_modifier: Some(Modifier::DIM),
+                add_modifiers: modifier(Modifier::Bold),
+                sub_modifiers: modifier(Modifier::Dim),
             }
         );
 
@@ -754,8 +837,8 @@ mod test {
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
-                add_modifier: Some(Modifier::BOLD),
-                sub_modifier: Some(Modifier::DIM),
+                add_modifiers: modifier(Modifier::Bold),
+                sub_modifiers: modifier(Modifier::Dim),
             }
         );
 
@@ -764,8 +847,8 @@ mod test {
             Style {
                 fg: Some(Color::Cyan),
                 bg: Some(Color::Magenta),
-                add_modifier: Some(Modifier::CROSSED_OUT),
-                sub_modifier: Some(Modifier::ITALIC),
+                add_modifiers: modifier(Modifier::CrossedOut),
+                sub_modifiers: modifier(Modifier::Italic),
             }
         );
 
@@ -774,8 +857,8 @@ mod test {
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Magenta),
-                add_modifier: Some(Modifier::BOLD),
-                sub_modifier: Some(Modifier::ITALIC),
+                add_modifiers: modifier(Modifier::Bold),
+                sub_modifiers: modifier(Modifier::Italic),
             }
         );
     }
@@ -788,8 +871,8 @@ mod test {
             style: Style {
                 fg: Some(Color::Red),
                 bg: None,
-                add_modifier: Some(Modifier::BOLD),
-                sub_modifier: None,
+                add_modifiers: modifier(Modifier::Bold),
+                sub_modifiers: None,
             },
         };
 
@@ -799,8 +882,8 @@ mod test {
             style: Style {
                 fg: None,
                 bg: Some(Color::Blue),
-                add_modifier: None,
-                sub_modifier: Some(Modifier::DIM),
+                add_modifiers: None,
+                sub_modifiers: modifier(Modifier::Dim),
             },
         };
 
@@ -810,8 +893,8 @@ mod test {
             style: Style {
                 fg: Some(Color::Cyan),
                 bg: Some(Color::Magenta),
-                add_modifier: Some(Modifier::CROSSED_OUT),
-                sub_modifier: Some(Modifier::ITALIC),
+                add_modifiers: modifier(Modifier::CrossedOut),
+                sub_modifiers: modifier(Modifier::Italic),
             },
         };
 
@@ -823,8 +906,8 @@ mod test {
                 style: Style {
                     fg: Some(Color::Red),
                     bg: Some(Color::Blue),
-                    add_modifier: Some(Modifier::BOLD),
-                    sub_modifier: Some(Modifier::DIM),
+                    add_modifiers: modifier(Modifier::Bold),
+                    sub_modifiers: modifier(Modifier::Dim),
                 },
             }
         );
@@ -837,8 +920,8 @@ mod test {
                 style: Style {
                     fg: Some(Color::Red),
                     bg: Some(Color::Blue),
-                    add_modifier: Some(Modifier::BOLD),
-                    sub_modifier: Some(Modifier::DIM),
+                    add_modifiers: modifier(Modifier::Bold),
+                    sub_modifiers: modifier(Modifier::Dim),
                 },
             }
         );
@@ -851,8 +934,8 @@ mod test {
                 style: Style {
                     fg: Some(Color::Cyan),
                     bg: Some(Color::Magenta),
-                    add_modifier: Some(Modifier::CROSSED_OUT),
-                    sub_modifier: Some(Modifier::ITALIC),
+                    add_modifiers: modifier(Modifier::CrossedOut),
+                    sub_modifiers: modifier(Modifier::Italic),
                 },
             }
         );
