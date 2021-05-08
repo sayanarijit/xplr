@@ -1,6 +1,7 @@
 use crate::app;
 use crate::app::HelpMenuLine;
 use crate::app::{Node, ResolvedNode};
+use crate::config::BlockConfig;
 use crate::config::Layout;
 use handlebars::Handlebars;
 use lazy_static::lazy_static;
@@ -13,7 +14,7 @@ use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color, Modifier, Style as TuiStyle};
 use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, Cell, List, ListItem, Paragraph, Row, Table};
+use tui::widgets::{Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph, Row, Table};
 use tui::Frame;
 
 lazy_static! {
@@ -168,10 +169,36 @@ impl NodeUiMetadata {
     }
 }
 
-fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Handlebars) {
-    let config = app.config().to_owned();
-    let header_height = config.general().table().header().height().unwrap_or(1);
-    let height: usize = (rect.height.max(header_height + 2) - (header_height + 2)).into();
+fn block<'a>(config: BlockConfig, default_title: String) -> Block<'a> {
+    Block::default()
+        .borders(TuiBorders::from_bits_truncate(
+            config
+                .borders()
+                .clone()
+                .unwrap_or_default()
+                .iter()
+                .map(|b| b.bits())
+                .reduce(|a, b| (a ^ b))
+                .unwrap_or_else(|| TuiBorders::NONE.bits()),
+        ))
+        .title(Span::styled(
+            config.title().format().clone().unwrap_or(default_title),
+            config.title().style().into(),
+        ))
+        .style(config.style().into())
+}
+
+fn draw_table<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    screen_size: Rect,
+    layout_size: Rect,
+    app: &app::App,
+    hb: &Handlebars,
+) {
+    let app_config = app.config().to_owned();
+    let header_height = app_config.general().table().header().height().unwrap_or(1);
+    let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
 
     let rows = app
         .directory_buffer()
@@ -190,7 +217,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     let is_first = index == 0;
                     let is_last = index == dir.total().max(1) - 1;
 
-                    let tree = config
+                    let tree = app_config
                         .general()
                         .table()
                         .tree()
@@ -206,19 +233,24 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         })
                         .unwrap_or_default();
 
-                    let node_type = config
+                    let node_type = app_config
                         .node_types()
                         .special()
                         .get(node.relative_path())
-                        .or_else(|| config.node_types().extension().get(node.extension()))
-                        .or_else(|| config.node_types().mime_essence().get(node.mime_essence()))
+                        .or_else(|| app_config.node_types().extension().get(node.extension()))
+                        .or_else(|| {
+                            app_config
+                                .node_types()
+                                .mime_essence()
+                                .get(node.mime_essence())
+                        })
                         .unwrap_or_else(|| {
                             if node.is_symlink() {
-                                &config.node_types().symlink()
+                                &app_config.node_types().symlink()
                             } else if node.is_dir() {
-                                &config.node_types().directory()
+                                &app_config.node_types().directory()
                             } else {
-                                &config.node_types().file()
+                                &app_config.node_types().file()
                             }
                         });
 
@@ -230,7 +262,7 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                         };
 
                     let (mut prefix, mut suffix, mut style) = {
-                        let ui = config.general().default_ui().clone();
+                        let ui = app_config.general().default_ui().clone();
                         (
                             ui.prefix().clone(),
                             ui.suffix().clone(),
@@ -239,14 +271,14 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                     };
 
                     if is_selected {
-                        let ui = config.general().selection_ui().clone();
+                        let ui = app_config.general().selection_ui().clone();
                         prefix = ui.prefix().clone().or(prefix);
                         suffix = ui.suffix().clone().or(suffix);
                         style = style.extend(ui.style());
                     };
 
                     if is_focused {
-                        let ui = config.general().focus_ui().clone();
+                        let ui = app_config.general().focus_ui().clone();
                         prefix = ui.prefix().clone().or(prefix);
                         suffix = ui.suffix().clone().or(suffix);
                         style = style.extend(ui.style());
@@ -281,30 +313,41 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
         })
         .unwrap_or_default();
 
-    let table_constraints: Vec<TuiConstraint> = config
+    let table_constraints: Vec<TuiConstraint> = app_config
         .general()
         .table()
         .col_widths()
         .clone()
         .unwrap_or_default()
         .into_iter()
-        .map(|c| c.into())
+        .map(|c| c.to_tui(screen_size, layout_size))
         .collect();
 
     let table = Table::new(rows)
         .widths(&table_constraints)
-        .style(config.general().table().style().into())
-        .highlight_style(config.general().focus_ui().style().into())
-        .column_spacing(config.general().table().col_spacing().unwrap_or_default())
-        .block(Block::default().borders(Borders::ALL).title(format!(
-            " {} ({}) ",
-            app.pwd(),
-            app.directory_buffer().map(|d| d.total()).unwrap_or_default()
-        )));
+        .style(app_config.general().table().style().into())
+        .highlight_style(app_config.general().focus_ui().style().into())
+        .column_spacing(
+            app_config
+                .general()
+                .table()
+                .col_spacing()
+                .unwrap_or_default(),
+        )
+        .block(block(
+            config,
+            format!(
+                " {} ({}) ",
+                app.pwd(),
+                app.directory_buffer()
+                    .map(|d| d.total())
+                    .unwrap_or_default()
+            ),
+        ));
 
     let table = table.clone().header(
         Row::new(
-            config
+            app_config
                 .general()
                 .table()
                 .header()
@@ -316,18 +359,25 @@ fn draw_table<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, hb: &Han
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
-        .style(config.general().table().header().style().into()),
+        .style(app_config.general().table().header().style().into()),
     );
 
-    f.render_widget(table, rect);
+    f.render_widget(table, layout_size);
 }
 
-fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+fn draw_selection<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    _screen_size: Rect,
+    layout_size: Rect,
+    app: &app::App,
+    _: &Handlebars,
+) {
     let selection: Vec<ListItem> = app
         .selection()
         .iter()
         .rev()
-        .take((rect.height.max(2) - 2).into())
+        .take((layout_size.height.max(2) - 2).into())
         .rev()
         .map(|n| n.absolute_path().clone())
         .map(ListItem::new)
@@ -336,16 +386,20 @@ fn draw_selection<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
     let selection_count = selection.len();
 
     // Selected items
-    let selection_list = List::new(selection).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title(format!(" Selection ({}) ", selection_count)),
-    );
+    let selection_list =
+        List::new(selection).block(block(config, format!(" Selection ({}) ", selection_count)));
 
-    f.render_widget(selection_list, rect);
+    f.render_widget(selection_list, layout_size);
 }
 
-fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+fn draw_help_menu<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    _screen_size: Rect,
+    layout_size: Rect,
+    app: &app::App,
+    _: &Handlebars,
+) {
     let help_menu_rows = app
         .mode()
         .help_menu()
@@ -374,20 +428,26 @@ fn draw_help_menu<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &
     };
 
     let help_menu = Table::new(help_menu_rows)
-        .block(Block::default().borders(Borders::ALL).title(format!(
-            " Help [{}{}] ",
-            &app.mode().name(),
-            read_only_indicator
-        )))
+        .block(block(
+            config,
+            format!(" Help [{}{}] ", &app.mode().name(), read_only_indicator),
+        ))
         .widths(&[
             TuiConstraint::Percentage(20),
             TuiConstraint::Percentage(20),
             TuiConstraint::Percentage(60),
         ]);
-    f.render_widget(help_menu, rect);
+    f.render_widget(help_menu, layout_size);
 }
 
-fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+fn draw_input_buffer<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    _screen_size: Rect,
+    layout_size: Rect,
+    app: &app::App,
+    _: &Handlebars,
+) {
     let input_buf = Paragraph::new(Spans::from(vec![
         Span::styled(
             app.config()
@@ -409,11 +469,18 @@ fn draw_input_buffer<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _
             app.config().general().cursor().style().into(),
         ),
     ]))
-    .block(Block::default().borders(Borders::ALL).title(" Input "));
-    f.render_widget(input_buf, rect);
+    .block(block(config, " Input ".into()));
+    f.render_widget(input_buf, layout_size);
 }
 
-fn draw_sort_n_filter<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
+fn draw_sort_n_filter<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    _screen_size: Rect,
+    layout_size: Rect,
+    app: &app::App,
+    _: &Handlebars,
+) {
     let ui = app.config().general().sort_and_filter_ui().clone();
     let filter_by = app.explorer_config().filters();
     let sort_by = app.explorer_config().sorters();
@@ -474,15 +541,23 @@ fn draw_sort_n_filter<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, 
         .collect::<Vec<Span>>();
     spans.pop();
 
-    let p = Paragraph::new(Spans::from(spans)).block(Block::default().borders(Borders::ALL).title(
+    let p = Paragraph::new(Spans::from(spans)).block(block(
+        config,
         format!(" Sort & filter ({}) ", filter_by.len() + sort_by.len()),
     ));
 
-    f.render_widget(p, rect);
+    f.render_widget(p, layout_size);
 }
 
-fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handlebars) {
-    let config = app.config().general().logs().clone();
+fn draw_logs<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    _screen_size: Rect,
+    layout_size: Rect,
+    app: &app::App,
+    _: &Handlebars,
+) {
+    let logs_config = app.config().general().logs().clone();
     let logs = app
         .logs()
         .iter()
@@ -495,55 +570,70 @@ fn draw_logs<B: Backend>(f: &mut Frame<B>, rect: Rect, app: &app::App, _: &Handl
                 app::LogLevel::Info => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
-                    &config.info().format().to_owned().unwrap_or_default(),
+                    &logs_config.info().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(config.info().style().into()),
+                .style(logs_config.info().style().into()),
                 app::LogLevel::Success => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
-                    &config.success().format().to_owned().unwrap_or_default(),
+                    &logs_config
+                        .success()
+                        .format()
+                        .to_owned()
+                        .unwrap_or_default(),
                     l.message()
                 ))
-                .style(config.success().style().into()),
+                .style(logs_config.success().style().into()),
                 app::LogLevel::Error => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
-                    &config.error().format().to_owned().unwrap_or_default(),
+                    &logs_config.error().format().to_owned().unwrap_or_default(),
                     l.message()
                 ))
-                .style(config.error().style().into()),
+                .style(logs_config.error().style().into()),
             }
         })
         .collect::<Vec<ListItem>>();
 
-    let logs_list = List::new(logs).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title(format!(" Logs ({}) ", app.logs().len())),
-    );
+    let logs_list = List::new(logs).block(block(config, format!(" Logs ({}) ", app.logs().len())));
 
-    f.render_widget(logs_list, rect);
+    f.render_widget(logs_list, layout_size);
+}
+
+pub fn draw_nothing<B: Backend>(
+    config: BlockConfig,
+    f: &mut Frame<B>,
+    _screen_size: Rect,
+    layout_size: Rect,
+    _app: &app::App,
+    _hb: &Handlebars,
+) {
+    let nothing = Paragraph::new("").block(block(config, "".into()));
+    f.render_widget(nothing, layout_size);
 }
 
 pub fn draw_layout<B: Backend>(
     layout: Layout,
     f: &mut Frame<B>,
-    rect: Rect,
+    screen_size: Rect,
+    layout_size: Rect,
     app: &app::App,
     hb: &Handlebars,
 ) {
     match layout {
-        Layout::Nothing => {}
-        Layout::Table => draw_table(f, rect, app, hb),
-        Layout::SortAndFilter => draw_sort_n_filter(f, rect, app, hb),
-        Layout::HelpMenu => draw_help_menu(f, rect, app, hb),
-        Layout::Selection => draw_selection(f, rect, app, hb),
-        Layout::InputAndLogs => {
+        Layout::Nothing(config) => draw_nothing(config, f, screen_size, layout_size, app, hb),
+        Layout::Table(config) => draw_table(config, f, screen_size, layout_size, app, hb),
+        Layout::SortAndFilter(config) => {
+            draw_sort_n_filter(config, f, screen_size, layout_size, app, hb)
+        }
+        Layout::HelpMenu(config) => draw_help_menu(config, f, screen_size, layout_size, app, hb),
+        Layout::Selection(config) => draw_selection(config, f, screen_size, layout_size, app, hb),
+        Layout::InputAndLogs(config) => {
             if app.input_buffer().is_some() {
-                draw_input_buffer(f, rect, app, hb);
+                draw_input_buffer(config, f, screen_size, layout_size, app, hb);
             } else {
-                draw_logs(f, rect, app, hb);
+                draw_logs(config, f, screen_size, layout_size, app, hb);
             };
         }
         Layout::Horizontal { config, splits } => {
@@ -552,8 +642,10 @@ pub fn draw_layout<B: Backend>(
                 .constraints(
                     config
                         .constraints()
+                        .clone()
+                        .unwrap_or_default()
                         .iter()
-                        .map(|c| (*c).into())
+                        .map(|c| c.to_tui(screen_size, layout_size))
                         .collect::<Vec<TuiConstraint>>(),
                 )
                 .horizontal_margin(
@@ -568,11 +660,12 @@ pub fn draw_layout<B: Backend>(
                         .or_else(|| config.margin())
                         .unwrap_or_default(),
                 )
-                .split(rect);
+                .split(layout_size);
+
             splits
                 .into_iter()
-                .enumerate()
-                .for_each(|(i, s)| draw_layout(s, f, chunks[i], app, hb));
+                .zip(chunks.into_iter())
+                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, hb));
         }
 
         Layout::Vertical { config, splits } => {
@@ -581,8 +674,10 @@ pub fn draw_layout<B: Backend>(
                 .constraints(
                     config
                         .constraints()
+                        .clone()
+                        .unwrap_or_default()
                         .iter()
-                        .map(|c| (*c).into())
+                        .map(|c| c.to_tui(screen_size, layout_size))
                         .collect::<Vec<TuiConstraint>>(),
                 )
                 .horizontal_margin(
@@ -597,20 +692,21 @@ pub fn draw_layout<B: Backend>(
                         .or_else(|| config.margin())
                         .unwrap_or_default(),
                 )
-                .split(rect);
+                .split(layout_size);
+
             splits
                 .into_iter()
-                .enumerate()
-                .for_each(|(i, s)| draw_layout(s, f, chunks[i], app, hb));
+                .zip(chunks.into_iter())
+                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, hb));
         }
     }
 }
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
-    let rect = f.size();
+    let screen_size = f.size();
     let layout = app.layout().clone();
 
-    draw_layout(layout, f, rect, app, hb);
+    draw_layout(layout, f, screen_size, screen_size, app, hb);
 }
 
 #[cfg(test)]
