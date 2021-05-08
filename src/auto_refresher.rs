@@ -6,7 +6,7 @@ use std::time::Duration;
 pub fn start_auto_refreshing(tx: Sender<Task>) {
     thread::spawn(move || loop {
         tx.send(Task::new(MsgIn::External(ExternalMsg::Refresh), None))
-            .unwrap();
+            .unwrap_or_default();
         thread::sleep(Duration::from_secs(1));
     });
 }

@@ -51,14 +51,14 @@ pub fn explore(
                     MsgIn::Internal(InternalMsg::AddDirectory(parent, dir)),
                     None,
                 ))
-                .unwrap();
+                .unwrap_or_default();
             })
             .unwrap_or_else(|e| {
                 tx.send(Task::new(
                     MsgIn::External(ExternalMsg::LogError(e.to_string())),
                     None,
                 ))
-                .unwrap();
+                .unwrap_or_default();
             })
     });
 

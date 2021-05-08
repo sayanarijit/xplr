@@ -1,4 +1,4 @@
-version: v0.7.0
+version: v0.7.1
 layouts:
   custom: {}
   builtin:
@@ -1155,6 +1155,11 @@ modes:
           ctrl-n: down
           ctrl-p: up
         on_key:
+          tab:
+            help: select
+            messages:
+              - Select
+              - FocusNext
           backspace:
             help: remove last character
             messages:
