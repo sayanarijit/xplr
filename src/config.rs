@@ -1394,6 +1394,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 7, 2) => true,
             (0, 7, 1) => true,
             (0, 7, 0) => true,
             (_, _, _) => false,
@@ -1404,7 +1405,8 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 7, 1) => None,
+            (0, 7, 2) => None,
+            (0, 7, 1) => Some("App version updated. Fixed global help menu"),
             (0, 7, 0) => {
                 Some("App version updated. Use `tab` to select files while in search mode")
             }
