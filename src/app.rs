@@ -12,7 +12,6 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs;
 use std::io;
-use std::io::prelude::*;
 use std::path::PathBuf;
 
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
@@ -25,7 +24,6 @@ pub struct Pipe {
     focus_out: String,
     selection_out: String,
     result_out: String,
-    mode_out: String,
     directory_nodes_out: String,
     global_help_menu_out: String,
     logs_out: String,
@@ -46,8 +44,6 @@ impl Pipe {
 
         let result_out = pipesdir.join("result_out").to_string_lossy().to_string();
 
-        let mode_out = pipesdir.join("mode_out").to_string_lossy().to_string();
-
         let directory_nodes_out = pipesdir
             .join("directory_nodes_out")
             .to_string_lossy()
@@ -65,7 +61,6 @@ impl Pipe {
         fs::write(&msg_in, "")?;
         fs::write(&focus_out, "")?;
         fs::write(&selection_out, "")?;
-        fs::write(&mode_out, "")?;
         fs::write(&directory_nodes_out, "")?;
         fs::write(&global_help_menu_out, "")?;
         fs::write(&result_out, "")?;
@@ -77,7 +72,6 @@ impl Pipe {
             focus_out,
             selection_out,
             result_out,
-            mode_out,
             directory_nodes_out,
             global_help_menu_out,
             logs_out,
@@ -103,11 +97,6 @@ impl Pipe {
     /// Get a reference to the pipe's result out.
     pub fn result_out(&self) -> &String {
         &self.result_out
-    }
-
-    /// Get a reference to the pipe's mode out.
-    pub fn mode_out(&self) -> &String {
-        &self.mode_out
     }
 
     /// Get a reference to the pipe's directory nodes out.
@@ -1542,8 +1531,8 @@ impl App {
             ));
         }
 
-        fs::write(&app.pipe().global_help_menu_out, app.global_help_menu_str())?;
-        app.write_pipes(None)
+        app.write_pipes()?;
+        Ok(app)
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
@@ -1561,10 +1550,10 @@ impl App {
         self
     }
 
-    pub fn handle_task(self, task: Task, last_app: &Self) -> Result<Self> {
+    pub fn handle_task(self, task: Task) -> Result<Self> {
         match task.msg {
             MsgIn::Internal(msg) => self.handle_internal(msg),
-            MsgIn::External(msg) => self.handle_external(msg, task.key, last_app),
+            MsgIn::External(msg) => self.handle_external(msg, task.key),
         }
     }
 
@@ -1575,7 +1564,7 @@ impl App {
         }
     }
 
-    fn handle_external(self, msg: ExternalMsg, key: Option<Key>, last_app: &Self) -> Result<Self> {
+    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
         if self.config().general().read_only().unwrap_or_default() && !msg.is_read_only() {
             self.log_error("Cannot call shell command in read-only mode.".into())
         } else {
@@ -1664,7 +1653,6 @@ impl App {
             }
         }?
         .refresh_selection()
-        .write_pipes(Some(&last_app))
     }
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
@@ -2359,10 +2347,10 @@ impl App {
         &self.session_path
     }
 
-    fn refresh_selection(mut self) -> Self {
+    fn refresh_selection(mut self) -> Result<Self> {
         self.selection
             .retain(|n| PathBuf::from(&n.absolute_path).exists());
-        self
+        Ok(self)
     }
 
     pub fn result(&self) -> Vec<&Node> {
@@ -2409,6 +2397,14 @@ impl App {
     /// Get a reference to the app's logs.
     pub fn logs(&self) -> &Vec<Log> {
         &self.logs
+    }
+
+    pub fn logs_str(&self) -> String {
+        self.logs()
+            .iter()
+            .map(|l| format!("{}\n", l))
+            .collect::<Vec<String>>()
+            .join("")
     }
 
     pub fn global_help_menu_str(&self) -> String {
@@ -2487,7 +2483,7 @@ impl App {
             .join("")
     }
 
-    fn write_pipes(self, last_app: Option<&Self>) -> Result<Self> {
+    pub fn write_pipes(&self) -> Result<()> {
         // TODO optimize and test
 
         let focused_node_str = self.focused_node_str();
@@ -2514,11 +2510,6 @@ impl App {
         fs::write(&self.pipe().history_out, history_str)?;
         // };
 
-        let mode_str = self.mode_str();
-        // if last_app.map(|a| a.mode_str() != mode_str).unwrap_or(true) {
-        fs::write(&self.pipe().mode_out, mode_str)?;
-        // };
-
         let directory_nodes_str = self.directory_nodes_str();
         // if last_app
         //     .map(|a| a.directory_nodes_str() != directory_nodes_str)
@@ -2531,20 +2522,21 @@ impl App {
         //     .map(|a| a.logs().len() != self.logs().len())
         //     .unwrap_or(true)
         // {
-        let new_logs = self
-            .logs()
-            .iter()
-            .skip(last_app.map(|a| a.logs().len()).unwrap_or(0))
-            .map(|l| format!("{}\n", l))
-            .collect::<Vec<String>>()
-            .join("");
+        // let new_logs = self
+        //     .logs()
+        //     .iter()
+        //     .skip(last_app.map(|a| a.logs().len()).unwrap_or(0))
+        //     .map(|l| format!("{}\n", l))
+        //     .collect::<Vec<String>>()
+        //     .join("");
 
-        let mut file = fs::OpenOptions::new()
-            .append(true)
-            .open(&self.pipe().logs_out)?;
-
-        file.write_all(new_logs.as_bytes())?;
+        // let mut file = fs::OpenOptions::new()
+        //     .append(true)
+        //     .open(&self.pipe().logs_out)?;
+        // file.write_all(new_logs.as_bytes())?;
         // };
+        let logs_str = self.logs_str();
+        fs::write(&self.pipe().logs_out, logs_str)?;
 
         let result_str = self.result_str();
         // if last_app
@@ -2553,7 +2545,7 @@ impl App {
         // {
         fs::write(&self.pipe().result_out, result_str)?;
         // };
-        Ok(self)
+        Ok(())
     }
 
     /// Get a reference to the app's layout.
