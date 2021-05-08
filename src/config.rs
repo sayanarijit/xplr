@@ -196,7 +196,7 @@ pub struct UiElement {
 }
 
 impl UiElement {
-    fn extend(mut self, other: Self) -> Self {
+    pub fn extend(mut self, other: Self) -> Self {
         self.format = other.format.or(self.format);
         self.style = self.style.extend(other.style);
         self
@@ -440,6 +440,9 @@ pub struct SortAndFilterUi {
     separator: UiElement,
 
     #[serde(default)]
+    default_identifier: UiElement,
+
+    #[serde(default)]
     sort_direction_identifiers: SortDirectionIdentifiersUi,
 
     #[serde(default)]
@@ -452,6 +455,7 @@ pub struct SortAndFilterUi {
 impl SortAndFilterUi {
     pub fn extend(mut self, other: Self) -> Self {
         self.separator = self.separator.extend(other.separator);
+        self.default_identifier = self.default_identifier.extend(other.default_identifier);
         self.sort_direction_identifiers = self
             .sort_direction_identifiers
             .extend(other.sort_direction_identifiers);
@@ -478,6 +482,75 @@ impl SortAndFilterUi {
     /// Get a reference to the sort and filter ui's filter identifiers.
     pub fn filter_identifiers(&self) -> &HashMap<NodeFilter, UiElement> {
         &self.filter_identifiers
+    }
+
+    /// Get a reference to the sort and filter ui's default identifier.
+    pub fn default_identifier(&self) -> &UiElement {
+        &self.default_identifier
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PanelUi {
+    #[serde(default)]
+    default: PanelUiConfig,
+
+    #[serde(default)]
+    table: PanelUiConfig,
+
+    #[serde(default)]
+    sort_and_filter: PanelUiConfig,
+
+    #[serde(default)]
+    selection: PanelUiConfig,
+
+    #[serde(default)]
+    input_and_logs: PanelUiConfig,
+
+    #[serde(default)]
+    help_menu: PanelUiConfig,
+}
+
+impl PanelUi {
+    fn extend(mut self, other: Self) -> Self {
+        self.default = self.default.extend(other.default);
+        self.table = self.table.extend(other.table);
+        self.sort_and_filter = self.sort_and_filter.extend(other.sort_and_filter);
+        self.selection = self.selection.extend(other.selection);
+        self.input_and_logs = self.input_and_logs.extend(other.input_and_logs);
+        self.help_menu = self.help_menu.extend(other.help_menu);
+        self
+    }
+
+    /// Get a reference to the panel ui's default.
+    pub fn default(&self) -> &PanelUiConfig {
+        &self.default
+    }
+
+    /// Get a reference to the panel ui's table.
+    pub fn table(&self) -> &PanelUiConfig {
+        &self.table
+    }
+
+    /// Get a reference to the panel ui's sort and filter.
+    pub fn sort_and_filter(&self) -> &PanelUiConfig {
+        &self.sort_and_filter
+    }
+
+    /// Get a reference to the panel ui's selection.
+    pub fn selection(&self) -> &PanelUiConfig {
+        &self.selection
+    }
+
+    /// Get a reference to the panel ui's input and log.
+    pub fn input_and_logs(&self) -> &PanelUiConfig {
+        &self.input_and_logs
+    }
+
+    /// Get a reference to the panel ui's help menu.
+    pub fn help_menu(&self) -> &PanelUiConfig {
+        &self.help_menu
     }
 }
 
@@ -515,6 +588,9 @@ pub struct GeneralConfig {
     sort_and_filter_ui: SortAndFilterUi,
 
     #[serde(default)]
+    panel_ui: PanelUi,
+
+    #[serde(default)]
     initial_sorting: Option<IndexSet<NodeSorterApplicable>>,
 
     #[serde(default)]
@@ -536,6 +612,7 @@ impl GeneralConfig {
         self.focus_ui = self.focus_ui.extend(other.focus_ui);
         self.selection_ui = self.selection_ui.extend(other.selection_ui);
         self.sort_and_filter_ui = self.sort_and_filter_ui.extend(other.sort_and_filter_ui);
+        self.panel_ui = self.panel_ui.extend(other.panel_ui);
         self.initial_sorting = other.initial_sorting.or(self.initial_sorting);
         self.initial_layout = other.initial_layout.or(self.initial_layout);
         self.initial_mode = other.initial_mode.or(self.initial_mode);
@@ -605,6 +682,11 @@ impl GeneralConfig {
     /// Get a reference to the general config's initial layout.
     pub fn initial_layout(&self) -> &Option<String> {
         &self.initial_layout
+    }
+
+    /// Get a reference to the general config's panel ui.
+    pub fn panel_ui(&self) -> &PanelUi {
+        &self.panel_ui
     }
 }
 
@@ -1072,7 +1154,7 @@ impl LayoutOptions {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct BlockConfig {
+pub struct PanelUiConfig {
     #[serde(default)]
     title: UiElement,
 
@@ -1083,7 +1165,13 @@ pub struct BlockConfig {
     style: Style,
 }
 
-impl BlockConfig {
+impl PanelUiConfig {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.title = self.title.extend(other.title);
+        self.borders = other.borders.or(self.borders);
+        self.style = self.style.extend(other.style);
+        self
+    }
     /// Get a reference to the block config's borders.
     pub fn borders(&self) -> &Option<IndexSet<Border>> {
         &self.borders
@@ -1103,12 +1191,12 @@ impl BlockConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum Layout {
-    Nothing(BlockConfig),
-    Table(BlockConfig),
-    InputAndLogs(BlockConfig),
-    Selection(BlockConfig),
-    HelpMenu(BlockConfig),
-    SortAndFilter(BlockConfig),
+    Nothing(Option<PanelUiConfig>),
+    Table(Option<PanelUiConfig>),
+    InputAndLogs(Option<PanelUiConfig>),
+    Selection(Option<PanelUiConfig>),
+    HelpMenu(Option<PanelUiConfig>),
+    SortAndFilter(Option<PanelUiConfig>),
     Horizontal {
         config: LayoutOptions,
         splits: Vec<Layout>,
@@ -1129,6 +1217,38 @@ impl Layout {
     pub fn extend(self, other: Self) -> Self {
         match (self, other) {
             (s, Self::Nothing(_)) => s,
+            (Self::Table(s), Self::Table(o)) => Self::Table(o.or(s)),
+            (Self::InputAndLogs(s), Self::InputAndLogs(o)) => Self::InputAndLogs(o.or(s)),
+            (Self::Selection(s), Self::Selection(o)) => Self::Selection(o.or(s)),
+            (Self::HelpMenu(s), Self::HelpMenu(o)) => Self::HelpMenu(o.or(s)),
+            (Self::SortAndFilter(s), Self::SortAndFilter(o)) => Self::SortAndFilter(o.or(s)),
+            (
+                Self::Horizontal {
+                    config: sconfig,
+                    splits: _,
+                },
+                Self::Horizontal {
+                    config: oconfig,
+                    splits: osplits,
+                },
+            ) => Self::Horizontal {
+                config: sconfig.extend(oconfig),
+                splits: osplits,
+            },
+
+            (
+                Self::Vertical {
+                    config: sconfig,
+                    splits: _,
+                },
+                Self::Vertical {
+                    config: oconfig,
+                    splits: osplits,
+                },
+            ) => Self::Vertical {
+                config: sconfig.extend(oconfig),
+                splits: osplits,
+            },
             (_, other) => other,
         }
     }
@@ -1274,7 +1394,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
-            (0, 6, 0) => true,
+            (0, 7, 0) => true,
             (_, _, _) => false,
         };
 
