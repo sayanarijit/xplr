@@ -1236,6 +1236,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 8, 4) => true,
             (0, 8, 3) => true,
             (0, 8, 2) => true,
             (0, 8, 1) => true,
@@ -1248,9 +1249,10 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 8, 3) => None,
-            (0, 8, 2) => None,
-            (0, 8, 1) => None,
+            (0, 8, 4) => None,
+            (0, 8, 3) => Some("App version updated. Fixed search"),
+            (0, 8, 2) => Some("App version updated. Fixed search"),
+            (0, 8, 1) => Some("App version updated. Fixed search"),
             (0, 8, 0) => Some("App version updated. Fixed breaking UI after rename"),
             (_, _, _) => None,
         };

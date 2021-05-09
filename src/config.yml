@@ -1,4 +1,4 @@
-version: v0.8.3
+version: v0.8.4
 layouts:
   custom: {}
   builtin:
@@ -337,7 +337,7 @@ modes:
                       echo LogError: Failed to copy $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
-                  echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
 
@@ -352,7 +352,7 @@ modes:
                       echo LogError: Failed to move $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
-                  echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
 
@@ -543,21 +543,21 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - RemoveInputBufferLastCharacter
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-w:
             help: remove last word
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - RemoveInputBufferLastWord
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-u:
             help: remove line
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - ExplorePwd
+              - ExplorePwdAsync
           enter:
             help: apply filter
             messages:
@@ -567,7 +567,7 @@ modes:
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - SwitchModeBuiltin: default
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-c:
             help: terminate
             messages:
@@ -577,7 +577,7 @@ modes:
             - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesNotContain
-            - ExplorePwd
+            - ExplorePwdAsync
 
     relative_path_does_contain:
       name: relative path does contain
@@ -589,21 +589,21 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastCharacter
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-w:
             help: remove last word
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastWord
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-u:
             help: remove line
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           enter:
             help: apply filter
             messages:
@@ -613,7 +613,7 @@ modes:
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-c:
             help: terminate
             messages:
@@ -624,7 +624,7 @@ modes:
             - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesContain
-            - ExplorePwd
+            - ExplorePwdAsync
 
     filter:
       name: filter
@@ -634,31 +634,31 @@ modes:
             help: remove last filter
             messages:
               - RemoveLastNodeFilter
-              - ExplorePwd
+              - ExplorePwdAsync
           r:
             help: relative does contain
             messages:
               - SwitchModeBuiltin: relative_path_does_contain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           R:
             help: relative does not contain
             messages:
               - SwitchModeBuiltin: relative_path_does_not_contain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-r:
             help: reset filters
             messages:
               - ResetNodeFilters
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-u:
             help: clear filters
             messages:
               - ClearNodeFilters
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-c:
             help: terminate
             messages:
@@ -678,49 +678,49 @@ modes:
             help: remove last sorter
             messages:
               - RemoveLastNodeSorter
-              - ExplorePwd
+              - ExplorePwdAsync
           '!':
             help: reverse sorters
             messages:
               - ReverseNodeSorters
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-r:
             help: reset sorters
             messages:
               - ResetNodeSorters
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-u:
             help: clear sorters
             messages:
               - ClearNodeSorters
-              - ExplorePwd
+              - ExplorePwdAsync
           r:
             help: by relative path
             messages:
               - AddNodeSorter:
                   sorter: ByIRelativePath
-              - ExplorePwd
+              - ExplorePwdAsync
           R:
             help: by relative path reverse
             messages:
               - AddNodeSorter:
                   sorter: ByIRelativePath
                   reverse: true
-              - ExplorePwd
+              - ExplorePwdAsync
 
           e:
             help: by canonical extension
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalExtension
-              - ExplorePwd
+              - ExplorePwdAsync
           E:
             help: by canonical extension reverse
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalExtension
                   reverse: true
-              - ExplorePwd
+              - ExplorePwdAsync
           n:
             help: by node type
             messages:
@@ -730,7 +730,7 @@ modes:
                   sorter: ByCanonicalIsFile
               - AddNodeSorter:
                   sorter: ByIsSymlink
-              - ExplorePwd
+              - ExplorePwdAsync
           N:
             help: by node type reverse
             messages:
@@ -743,33 +743,33 @@ modes:
               - AddNodeSorter:
                   sorter: ByIsSymlink
                   reverse: true
-              - ExplorePwd
+              - ExplorePwdAsync
           m:
             help: by canonical mime essence
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalMimeEssence
-              - ExplorePwd
+              - ExplorePwdAsync
           M:
             help: by canonical mime essence reverse
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalMimeEssence
                   reverse: true
-              - ExplorePwd
+              - ExplorePwdAsync
           s:
             help: by size
             messages:
               - AddNodeSorter:
                   sorter: BySize
-              - ExplorePwd
+              - ExplorePwdAsync
           S:
             help: by size reverse
             messages:
               - AddNodeSorter:
                   sorter: BySize
                   reverse: true
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-c:
             help: terminate
             messages:
@@ -811,7 +811,7 @@ modes:
               - ToggleNodeFilter:
                   filter: RelativePathDoesNotStartWith
                   input: .
-              - ExplorePwd
+              - ExplorePwdAsync
           ':':
             help: action
             messages:
@@ -839,7 +839,7 @@ modes:
             messages:
               - SwitchModeBuiltin: search
               - SetInputBuffer: ''
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-w:
             help: switch layout
             messages:
@@ -1068,7 +1068,7 @@ modes:
                   echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
-              - ExplorePwd
+              - ExplorePwdAsync
 
           ctrl-c:
             help: terminate
@@ -1100,7 +1100,7 @@ modes:
                   command: bash
                   args:
                     - "-i"
-              - ExplorePwd
+              - ExplorePwdAsync
               - SwitchModeBuiltin: default
 
           c:
@@ -1157,21 +1157,21 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastCharacter
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-w:
             help: remove last word
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastWord
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-u:
             help: remove line
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - ExplorePwd
+              - ExplorePwdAsync
           ctrl-c:
             help: terminate
             messages:
@@ -1185,27 +1185,27 @@ modes:
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
-              - ExplorePwd
+              - ExplorePwdAsync
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
-              - ExplorePwd
+              - ExplorePwdAsync
           left:
             help: back
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - Back
               - SetInputBuffer: ''
-              - ExplorePwd
+              - ExplorePwdAsync
           right:
             help: enter
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - Enter
               - SetInputBuffer: ''
-              - ExplorePwd
+              - ExplorePwdAsync
           up:
             help: up
             messages:
@@ -1219,7 +1219,7 @@ modes:
             - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesContain
-            - ExplorePwd
+            - ExplorePwdAsync
 
     switch_layout:
       name: switch layout
