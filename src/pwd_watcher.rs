@@ -42,7 +42,7 @@ pub fn keep_watching(
         }
 
         if rx.try_recv().is_ok() {
-            let msg = MsgIn::External(ExternalMsg::Explore);
+            let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
             tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
         } else {
             thread::sleep(Duration::from_secs(1));

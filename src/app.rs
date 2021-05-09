@@ -1,7 +1,8 @@
 use crate::config::Config;
-use crate::config::Layout;
 use crate::config::Mode;
+use crate::explorer;
 use crate::input::Key;
+use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
 use indexmap::set::IndexSet;
@@ -82,11 +83,6 @@ impl Pipe {
     /// Get a reference to the pipe's msg in.
     pub fn msg_in(&self) -> &String {
         &self.msg_in
-    }
-
-    /// Get a reference to the pipe's focus out.
-    pub fn focus_out(&self) -> &String {
-        &self.focus_out
     }
 
     /// Get a reference to the pipe's selection out.
@@ -938,9 +934,23 @@ impl ExplorerConfig {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
     /// Explore the present working directory and register the filtered nodes.
-    /// This operation is expensive. So, try avoiding using it too often.
+    /// This operation is expensive. So, try to avoid using it too often.
     /// Once exploration is done, it will auto `Refresh` the state.
-    Explore,
+    ExplorePwd,
+
+    /// Explore the present working directory and register the filtered nodes asynchronously.
+    /// This operation happens asynchronously. That means, the xplr directory buffers won't be updated
+    /// immediately. Hence, it needs to be used with care and probably with special checks in place.
+    /// To explore `$PWD` synchronously, use `ExplorePwd` instead.
+    /// Once exploration is done, it will auto `Refresh` the state.
+    ExplorePwdAsync,
+
+    /// Explore the present working directory along with its parents and register the filtered nodes.
+    /// This operation happens asynchronously. That means, the xplr directory buffers won't be updated
+    /// immediately. Hence, it needs to be used with care and probably with special checks in place.
+    /// To explore just the `$PWD` synchronously, use `ExplorePwd` instead.
+    /// Once exploration is done, it will auto `Refresh` the state.
+    ExploreParentsAsync,
 
     /// Refresh the app state (uncluding UI).
     /// But it will not re-explore the directory if the working directory is the same.
@@ -1288,7 +1298,8 @@ impl Command {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
-    Explore,
+    ExplorePwdAsync,
+    ExploreParentsAsync,
     Refresh,
     ClearScreen,
     Quit,
@@ -1569,7 +1580,9 @@ impl App {
             self.log_error("Cannot call shell command in read-only mode.".into())
         } else {
             match msg {
-                ExternalMsg::Explore => self.explore(),
+                ExternalMsg::ExplorePwd => self.explore_pwd(),
+                ExternalMsg::ExploreParentsAsync => self.explore_parents_async(),
+                ExternalMsg::ExplorePwdAsync => self.explore_pwd_async(),
                 ExternalMsg::Refresh => self.refresh(),
                 ExternalMsg::ClearScreen => self.clear_screen(),
                 ExternalMsg::FocusFirst => self.focus_first(),
@@ -1687,8 +1700,22 @@ impl App {
         Ok(self)
     }
 
-    fn explore(mut self) -> Result<Self> {
-        self.msg_out.push_back(MsgOut::Explore);
+    fn explore_pwd(self) -> Result<Self> {
+        let dirbuf = explorer::explore_sync(
+            self.explorer_config().clone(),
+            self.pwd().clone(),
+            self.focused_node().map(|n| n.absolute_path().clone()),
+        )?;
+        self.add_directory(dirbuf.parent().clone(), dirbuf)
+    }
+
+    fn explore_pwd_async(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ExplorePwdAsync);
+        Ok(self)
+    }
+
+    fn explore_parents_async(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ExploreParentsAsync);
         Ok(self)
     }
 
@@ -1917,7 +1944,9 @@ impl App {
             {
                 dir_buf.focus = focus;
                 self.msg_out.push_back(MsgOut::Refresh);
-            };
+            } else {
+                self = self.log_error(format!("{} not found in $PWD", name))?;
+            }
         };
         Ok(self)
     }
@@ -1929,10 +1958,10 @@ impl App {
                 self.change_directory(&parent.to_string_lossy().to_string())?
                     .focus_by_file_name(&filename.to_string_lossy().to_string())
             } else {
-                bail!("invalid path {}", path)
+                self.log_error(format!("{} not found", path))
             }
         } else {
-            self.change_directory("/")
+            self.log_error(format!("Cannot focus on {}", path))
         }
     }
 
@@ -2408,31 +2437,30 @@ impl App {
     }
 
     pub fn global_help_menu_str(&self) -> String {
-        let builtin = self.config().modes().builtin().clone();
-        let custom = self.config().modes().custom().clone();
+        let builtin = self.config().modes().builtin();
+        let custom = self.config().modes().custom();
 
         [
-            (builtin.default().name().clone(), builtin.default().clone()),
-            (builtin.number().name().clone(), builtin.number().clone()),
-            (builtin.go_to().name().clone(), builtin.go_to().clone()),
-            (builtin.search().name().clone(), builtin.search().clone()),
-            (builtin.selection_ops().name().clone(), builtin.selection_ops().clone()),
-            (builtin.action().name().clone(), builtin.action().clone()),
-            (builtin.create().name().clone(), builtin.create().clone()),
-            (builtin.create_file().name().clone(), builtin.create_file().clone()),
-            (
-                builtin.create_directory().name().clone(),
-                builtin.create_directory().clone(),
-            ),
-            (builtin.rename().name().clone(), builtin.rename().clone()),
-            (builtin.delete().name().clone(), builtin.delete().clone()),
-            (builtin.sort().name().clone(), builtin.sort().clone()),
-            (builtin.filter().name().clone(), builtin.filter().clone()),
-            (builtin.relative_path_does_contain().name().clone(), builtin.relative_path_does_contain().clone()),
-            (builtin.relative_path_does_not_contain().name().clone(), builtin.relative_path_does_not_contain().clone()),
+            builtin.default(),
+            builtin.filter(),
+            builtin.number(),
+            builtin.go_to(),
+            builtin.search(),
+            builtin.selection_ops(),
+            builtin.action(),
+            builtin.create(),
+            builtin.create_file(),
+            builtin.create_directory(),
+            builtin.rename(),
+            builtin.delete(),
+            builtin.sort(),
+            builtin.filter(),
+            builtin.relative_path_does_contain(),
+            builtin.relative_path_does_not_contain(),
+            builtin.switch_layout(),
         ]
-        .iter()
-        .chain(custom.into_iter().collect::<Vec<(String, Mode)>>().iter())
+        .iter().map(|m| (m.name(), m.to_owned()))
+        .chain(custom.iter())
         .map(|(name, mode)| {
             let help = mode
                 .help_menu()

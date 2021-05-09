@@ -1,4 +1,4 @@
-version: v0.7.2
+version: v0.8.0
 layouts:
   custom: {}
   builtin:
@@ -332,13 +332,12 @@ modes:
               - BashExec: |
                   (while IFS= read -r line; do
                     if cp -vr -- "${line:?}" ./; then
-                      echo "LogSuccess: $line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo LogSuccess: $line copied to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
                     else
-                      echo "LogError: Failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo LogError: Failed to copy $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
-                  echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                  echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
 
@@ -348,12 +347,12 @@ modes:
               - BashExec: |
                   (while IFS= read -r line; do
                     if mv -v -- "${line:?}" ./; then
-                      echo "LogSuccess: $line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo LogSuccess: $line moved to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
                     else
-                      echo "LogError: Failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo LogError: Failed to move $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
-                  echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
 
@@ -378,14 +377,10 @@ modes:
             messages:
               - BashExecSilently: |
                   PTH="${XPLR_INPUT_BUFFER:?}"
-                  if touch -- "${PTH:?}"; then
-                    echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
-                  else
-                    echo "LogError: Failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
-                  fi
+                  touch -- "${PTH:?}" \
+                    && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+                    && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                    && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
               - SwitchModeBuiltin: default
           backspace:
             help: remove last character
@@ -423,14 +418,10 @@ modes:
             messages:
               - BashExecSilently: |
                   PTH="${XPLR_INPUT_BUFFER:?}"
-                  if mkdir -p -- "${PTH:?}"; then
-                    echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo "LogSuccess: $PTH created" >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo "FocusPath: $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
-                  else
-                    echo "LogError: Failed to create $PTH" >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
-                  fi
+                  mkdir -p -- "${PTH:?}" \
+                    && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                    && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+                    && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
               - SwitchModeBuiltin: default
 
           backspace:
@@ -507,13 +498,10 @@ modes:
               - BashExecSilently: |
                   SRC="${XPLR_FOCUS_PATH:?}"
                   TARGET="${XPLR_INPUT_BUFFER:?}"
-                  if mv -v -- "${SRC:?}" "${TARGET:?}"; then
-                    echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo "LogSuccess: $SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
-                    echo "FocusPath: $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
-                  else
-                    echo "LogError: Failed to rename $SRC to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
-                  fi
+                  mv -v -- "${SRC:?}" "${TARGET:?}" \
+                    && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                    && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
+                    && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
               - SwitchModeBuiltin: default
 
           backspace:
@@ -555,21 +543,21 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - RemoveInputBufferLastCharacter
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - Explore
+              - ExplorePwd
           ctrl-w:
             help: remove last word
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - RemoveInputBufferLastWord
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - Explore
+              - ExplorePwd
           ctrl-u:
             help: remove line
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - Explore
+              - ExplorePwd
           enter:
             help: apply filter
             messages:
@@ -579,7 +567,7 @@ modes:
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
               - SwitchModeBuiltin: default
-              - Explore
+              - ExplorePwd
           ctrl-c:
             help: terminate
             messages:
@@ -589,7 +577,7 @@ modes:
             - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesNotContain
-            - Explore
+            - ExplorePwd
 
     relative_path_does_contain:
       name: relative path does contain
@@ -601,21 +589,21 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastCharacter
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           ctrl-w:
             help: remove last word
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastWord
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           ctrl-u:
             help: remove line
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           enter:
             help: apply filter
             messages:
@@ -625,7 +613,7 @@ modes:
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
-              - Explore
+              - ExplorePwd
           ctrl-c:
             help: terminate
             messages:
@@ -636,7 +624,7 @@ modes:
             - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesContain
-            - Explore
+            - ExplorePwd
 
     filter:
       name: filter
@@ -646,31 +634,31 @@ modes:
             help: remove last filter
             messages:
               - RemoveLastNodeFilter
-              - Explore
+              - ExplorePwd
           r:
             help: relative does contain
             messages:
               - SwitchModeBuiltin: relative_path_does_contain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           R:
             help: relative does not contain
             messages:
               - SwitchModeBuiltin: relative_path_does_not_contain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesNotContain
-              - Explore
+              - ExplorePwd
           ctrl-r:
             help: reset filters
             messages:
               - ResetNodeFilters
-              - Explore
+              - ExplorePwd
           ctrl-u:
             help: clear filters
             messages:
               - ClearNodeFilters
-              - Explore
+              - ExplorePwd
           ctrl-c:
             help: terminate
             messages:
@@ -690,49 +678,49 @@ modes:
             help: remove last sorter
             messages:
               - RemoveLastNodeSorter
-              - Explore
+              - ExplorePwd
           '!':
             help: reverse sorters
             messages:
               - ReverseNodeSorters
-              - Explore
+              - ExplorePwd
           ctrl-r:
             help: reset sorters
             messages:
               - ResetNodeSorters
-              - Explore
+              - ExplorePwd
           ctrl-u:
             help: clear sorters
             messages:
               - ClearNodeSorters
-              - Explore
+              - ExplorePwd
           r:
             help: by relative path
             messages:
               - AddNodeSorter:
                   sorter: ByIRelativePath
-              - Explore
+              - ExplorePwd
           R:
             help: by relative path reverse
             messages:
               - AddNodeSorter:
                   sorter: ByIRelativePath
                   reverse: true
-              - Explore
+              - ExplorePwd
 
           e:
             help: by canonical extension
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalExtension
-              - Explore
+              - ExplorePwd
           E:
             help: by canonical extension reverse
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalExtension
                   reverse: true
-              - Explore
+              - ExplorePwd
           n:
             help: by node type
             messages:
@@ -742,7 +730,7 @@ modes:
                   sorter: ByCanonicalIsFile
               - AddNodeSorter:
                   sorter: ByIsSymlink
-              - Explore
+              - ExplorePwd
           N:
             help: by node type reverse
             messages:
@@ -755,33 +743,33 @@ modes:
               - AddNodeSorter:
                   sorter: ByIsSymlink
                   reverse: true
-              - Explore
+              - ExplorePwd
           m:
             help: by canonical mime essence
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalMimeEssence
-              - Explore
+              - ExplorePwd
           M:
             help: by canonical mime essence reverse
             messages:
               - AddNodeSorter:
                   sorter: ByCanonicalMimeEssence
                   reverse: true
-              - Explore
+              - ExplorePwd
           s:
             help: by size
             messages:
               - AddNodeSorter:
                   sorter: BySize
-              - Explore
+              - ExplorePwd
           S:
             help: by size reverse
             messages:
               - AddNodeSorter:
                   sorter: BySize
                   reverse: true
-              - Explore
+              - ExplorePwd
           ctrl-c:
             help: terminate
             messages:
@@ -823,7 +811,7 @@ modes:
               - ToggleNodeFilter:
                   filter: RelativePathDoesNotStartWith
                   input: .
-              - Explore
+              - ExplorePwd
           ':':
             help: action
             messages:
@@ -837,7 +825,7 @@ modes:
             help: go home
             messages:
               - BashExecSilently: |
-                  echo "ChangeDirectory: ${HOME:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ChangeDirectory: "'"${HOME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
           G:
             help: go to bottom
             messages:
@@ -851,7 +839,7 @@ modes:
             messages:
               - SwitchModeBuiltin: search
               - SetInputBuffer: ''
-              - Explore
+              - ExplorePwd
           ctrl-w:
             help: switch layout
             messages:
@@ -881,7 +869,7 @@ modes:
             messages:
               - SwitchModeBuiltin: rename
               - BashExecSilently: |
-                  echo "SetInputBuffer: $(basename ${XPLR_FOCUS_PATH})" >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
           right:
             help: enter
             messages:
@@ -969,7 +957,9 @@ modes:
                       exit 1
                     fi
                   fi
-                  $OPENER "${XPLR_FOCUS_PATH:?}" &> /dev/null &
+                  (while IFS= read -r line; do
+                    $OPENER "${line:?}" &> /dev/null &
+                   done < "${XPLR_PIPE_RESULT_OUT:?}")
               - SwitchModeBuiltin: default
               - ClearScreen
               - Refresh
@@ -1046,20 +1036,20 @@ modes:
                   (while IFS= read -r line; do
                     if [ -d "$line" ]; then
                       if rmdir -v -- "${line:?}"; then
-                        echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo FocusNext >> "${XPLR_PIPE_MSG_IN:?}"
                       else
-                        echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
                       fi
                     else
                       if rm -v -- "${line:?}"; then
-                        echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
-                        echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
                       else
-                        echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                        echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
                       fi
                     fi
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
-                  echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
 
@@ -1069,16 +1059,16 @@ modes:
               - BashExec: |
                   (while IFS= read -r line; do
                     if rm -rfv -- "${line:?}"; then
-                      echo "FocusNext" >> "${XPLR_PIPE_MSG_IN:?}"
-                      echo "LogSuccess: $line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo FocusNext >> "${XPLR_PIPE_MSG_IN:?}"
                     else
-                      echo "LogError: Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
-                  echo Explore >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
-              - Explore
+              - ExplorePwd
 
           ctrl-c:
             help: terminate
@@ -1110,7 +1100,7 @@ modes:
                   command: bash
                   args:
                     - "-i"
-              - Explore
+              - ExplorePwd
               - SwitchModeBuiltin: default
 
           c:
@@ -1122,7 +1112,9 @@ modes:
             help: open in editor
             messages:
               - BashExec: |
-                  ${EDITOR:-vi} -- "${XPLR_FOCUS_PATH:?}"
+                  (while IFS= read -r line; do
+                    ${EDITOR:-vi} "${line:?}"
+                   done < "${XPLR_PIPE_RESULT_OUT:?}")
               - SwitchModeBuiltin: default
 
           s:
@@ -1165,21 +1157,21 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastCharacter
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           ctrl-w:
             help: remove last word
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - RemoveInputBufferLastWord
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           ctrl-u:
             help: remove line
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SetInputBuffer: ""
               - AddNodeFilterFromInput: IRelativePathDoesContain
-              - Explore
+              - ExplorePwd
           ctrl-c:
             help: terminate
             messages:
@@ -1193,27 +1185,27 @@ modes:
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
-              - Explore
+              - ExplorePwd
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
-              - Explore
+              - ExplorePwd
           left:
             help: back
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - Back
               - SetInputBuffer: ''
-              - Explore
+              - ExplorePwd
           right:
             help: enter
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - Enter
               - SetInputBuffer: ''
-              - Explore
+              - ExplorePwd
           up:
             help: up
             messages:
@@ -1227,7 +1219,7 @@ modes:
             - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
             - AddNodeFilterFromInput: IRelativePathDoesContain
-            - Explore
+            - ExplorePwd
 
     switch_layout:
       name: switch layout
