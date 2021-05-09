@@ -1,4 +1,4 @@
-version: v0.8.0
+version: v0.8.1
 layouts:
   custom: {}
   builtin:
@@ -498,7 +498,7 @@ modes:
               - BashExecSilently: |
                   SRC="${XPLR_FOCUS_PATH:?}"
                   TARGET="${XPLR_INPUT_BUFFER:?}"
-                  mv -v -- "${SRC:?}" "${TARGET:?}" \
+                  mv -- "${SRC:?}" "${TARGET:?}" \
                     && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
