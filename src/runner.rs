@@ -47,7 +47,6 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .env("XPLR_PIPE_MSG_IN", app.pipe().msg_in())
         .env("XPLR_PIPE_SELECTION_OUT", app.pipe().selection_out())
         .env("XPLR_PIPE_HISTORY_OUT", app.pipe().history_out())
-        .env("XPLR_PIPE_FOCUS_OUT", app.pipe().focus_out())
         .env("XPLR_MODE", app.mode_str())
         .env("XPLR_PIPE_RESULT_OUT", app.pipe().result_out())
         .env(
@@ -71,7 +70,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
-    explorer::explore(
+    explorer::explore_recursive_async(
         app.explorer_config().clone(),
         app.pwd().clone(),
         focused_path,
@@ -157,8 +156,17 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                     terminal.clear()?;
                 }
 
-                app::MsgOut::Explore => {
-                    explorer::explore(
+                app::MsgOut::ExplorePwdAsync => {
+                    explorer::explore_async(
+                        app.explorer_config().clone(),
+                        app.pwd().clone(),
+                        app.focused_node().map(|n| n.relative_path().clone()),
+                        tx_msg_in.clone(),
+                    );
+                }
+
+                app::MsgOut::ExploreParentsAsync => {
+                    explorer::explore_recursive_async(
                         app.explorer_config().clone(),
                         app.pwd().clone(),
                         app.focused_node().map(|n| n.relative_path().clone()),
@@ -169,7 +177,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                 app::MsgOut::Refresh => {
                     if app.pwd() != last_app.pwd() {
                         tx_pwd_watcher.send(app.pwd().clone())?;
-                        explorer::explore(
+                        explorer::explore_recursive_async(
                             app.explorer_config().clone(),
                             app.pwd().clone(),
                             app.focused_node().map(|n| n.relative_path().clone()),

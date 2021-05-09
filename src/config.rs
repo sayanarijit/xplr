@@ -5,14 +5,14 @@ use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
 use crate::default_config;
 use crate::ui::Border;
+use crate::ui::Constraint;
+use crate::ui::Layout;
 use crate::ui::Style;
 use anyhow::Result;
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-use tui::layout::Constraint as TuiConstraint;
-use tui::layout::Rect;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -247,60 +247,6 @@ impl TableRowConfig {
     /// Get a reference to the table row config's height.
     pub fn height(&self) -> Option<u16> {
         self.height
-    }
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub enum Constraint {
-    Percentage(u16),
-    Ratio(u32, u32),
-    Length(u16),
-    LengthLessThanScreenHeight(u16),
-    LengthLessThanScreenWidth(u16),
-    LengthLessThanLayoutHeight(u16),
-    LengthLessThanLayoutWidth(u16),
-    Max(u16),
-    MaxLessThanScreenHeight(u16),
-    MaxLessThanScreenWidth(u16),
-    MaxLessThanLayoutHeight(u16),
-    MaxthLessThanLayoutWidth(u16),
-    Min(u16),
-    MinLessThanScreenHeight(u16),
-    MinLessThanScreenWidth(u16),
-    MinLessThanLayoutHeight(u16),
-    MinLessThanLayoutWidth(u16),
-}
-
-impl Constraint {
-    pub fn to_tui(self, screen_size: Rect, layout_size: Rect) -> TuiConstraint {
-        match self {
-            Self::Percentage(n) => TuiConstraint::Percentage(n),
-            Self::Ratio(x, y) => TuiConstraint::Ratio(x, y),
-            Self::Length(n) => TuiConstraint::Length(n),
-            Self::LengthLessThanScreenHeight(n) => {
-                TuiConstraint::Length(screen_size.height.max(n) - n)
-            }
-            Self::LengthLessThanScreenWidth(n) => {
-                TuiConstraint::Length(screen_size.width.max(n) - n)
-            }
-            Self::LengthLessThanLayoutHeight(n) => {
-                TuiConstraint::Length(layout_size.height.max(n) - n)
-            }
-            Self::LengthLessThanLayoutWidth(n) => {
-                TuiConstraint::Length(layout_size.width.max(n) - n)
-            }
-            Self::Max(n) => TuiConstraint::Max(n),
-            Self::MaxLessThanScreenHeight(n) => TuiConstraint::Max(screen_size.height.max(n) - n),
-            Self::MaxLessThanScreenWidth(n) => TuiConstraint::Max(screen_size.width.max(n) - n),
-            Self::MaxLessThanLayoutHeight(n) => TuiConstraint::Max(layout_size.height.max(n) - n),
-            Self::MaxthLessThanLayoutWidth(n) => TuiConstraint::Max(layout_size.width.max(n) - n),
-            Self::Min(n) => TuiConstraint::Min(n),
-            Self::MinLessThanScreenHeight(n) => TuiConstraint::Min(screen_size.height.max(n) - n),
-            Self::MinLessThanScreenWidth(n) => TuiConstraint::Min(screen_size.width.max(n) - n),
-            Self::MinLessThanLayoutHeight(n) => TuiConstraint::Min(layout_size.height.max(n) - n),
-            Self::MinLessThanLayoutWidth(n) => TuiConstraint::Min(layout_size.width.max(n) - n),
-        }
     }
 }
 
@@ -1067,6 +1013,11 @@ impl BuiltinModesConfig {
     pub fn sort(&self) -> &Mode {
         &self.sort
     }
+
+    /// Get a reference to the builtin modes config's switch layout.
+    pub fn switch_layout(&self) -> &Mode {
+        &self.switch_layout
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -1111,49 +1062,6 @@ impl ModesConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct LayoutOptions {
-    #[serde(default)]
-    margin: Option<u16>,
-    #[serde(default)]
-    horizontal_margin: Option<u16>,
-    #[serde(default)]
-    vertical_margin: Option<u16>,
-    #[serde(default)]
-    constraints: Option<Vec<Constraint>>,
-}
-
-impl LayoutOptions {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.margin = other.margin.or(self.margin);
-        self.horizontal_margin = other.horizontal_margin.or(self.horizontal_margin);
-        self.vertical_margin = other.vertical_margin.or(self.vertical_margin);
-        self.constraints = other.constraints.or(self.constraints);
-        self
-    }
-
-    /// Get a reference to the layout options's constraints.
-    pub fn constraints(&self) -> &Option<Vec<Constraint>> {
-        &self.constraints
-    }
-
-    /// Get a reference to the layout options's margin.
-    pub fn margin(&self) -> Option<u16> {
-        self.margin
-    }
-
-    /// Get a reference to the layout options's horizontal margin.
-    pub fn horizontal_margin(&self) -> Option<u16> {
-        self.horizontal_margin
-    }
-
-    /// Get a reference to the layout options's vertical margin.
-    pub fn vertical_margin(&self) -> Option<u16> {
-        self.vertical_margin
-    }
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct PanelUiConfig {
     #[serde(default)]
     title: UiElement,
@@ -1185,72 +1093,6 @@ impl PanelUiConfig {
     /// Get a reference to the block config's style.
     pub fn style(&self) -> &Style {
         &self.style
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub enum Layout {
-    Nothing(Option<PanelUiConfig>),
-    Table(Option<PanelUiConfig>),
-    InputAndLogs(Option<PanelUiConfig>),
-    Selection(Option<PanelUiConfig>),
-    HelpMenu(Option<PanelUiConfig>),
-    SortAndFilter(Option<PanelUiConfig>),
-    Horizontal {
-        config: LayoutOptions,
-        splits: Vec<Layout>,
-    },
-    Vertical {
-        config: LayoutOptions,
-        splits: Vec<Layout>,
-    },
-}
-
-impl Default for Layout {
-    fn default() -> Self {
-        Self::Nothing(Default::default())
-    }
-}
-
-impl Layout {
-    pub fn extend(self, other: Self) -> Self {
-        match (self, other) {
-            (s, Self::Nothing(_)) => s,
-            (Self::Table(s), Self::Table(o)) => Self::Table(o.or(s)),
-            (Self::InputAndLogs(s), Self::InputAndLogs(o)) => Self::InputAndLogs(o.or(s)),
-            (Self::Selection(s), Self::Selection(o)) => Self::Selection(o.or(s)),
-            (Self::HelpMenu(s), Self::HelpMenu(o)) => Self::HelpMenu(o.or(s)),
-            (Self::SortAndFilter(s), Self::SortAndFilter(o)) => Self::SortAndFilter(o.or(s)),
-            (
-                Self::Horizontal {
-                    config: sconfig,
-                    splits: _,
-                },
-                Self::Horizontal {
-                    config: oconfig,
-                    splits: osplits,
-                },
-            ) => Self::Horizontal {
-                config: sconfig.extend(oconfig),
-                splits: osplits,
-            },
-
-            (
-                Self::Vertical {
-                    config: sconfig,
-                    splits: _,
-                },
-                Self::Vertical {
-                    config: oconfig,
-                    splits: osplits,
-                },
-            ) => Self::Vertical {
-                config: sconfig.extend(oconfig),
-                splits: osplits,
-            },
-            (_, other) => other,
-        }
     }
 }
 
@@ -1394,9 +1236,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
-            (0, 7, 2) => true,
-            (0, 7, 1) => true,
-            (0, 7, 0) => true,
+            (0, 8, 0) => true,
             (_, _, _) => false,
         };
 
@@ -1405,11 +1245,7 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 7, 2) => None,
-            (0, 7, 1) => Some("App version updated. Fixed global help menu"),
-            (0, 7, 0) => {
-                Some("App version updated. Use `tab` to select files while in search mode")
-            }
+            (0, 8, 0) => None,
             (_, _, _) => None,
         };
 
