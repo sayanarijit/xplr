@@ -36,3 +36,9 @@ criterion = "0.3"
 [[bench]]
 name = "criterion"
 harness = false
+
+# https://github.com/johnthagen/min-sized-rust
+[profile.release]
+lto = true
+codegen-units = 1
+panic = 'abort'
