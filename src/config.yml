@@ -1,4 +1,4 @@
-version: v0.8.4
+version: v0.8.5
 layouts:
   custom: {}
   builtin:
@@ -340,7 +340,6 @@ modes:
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
-
           m:
             help: move here
             messages:
@@ -355,15 +354,14 @@ modes:
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
-
           ctrl-c:
             help: terminate
             messages:
               - Terminate
-
-        default:
-          messages:
-            - SwitchModeBuiltin: default
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
 
     create_file:
       name: create file
@@ -423,32 +421,26 @@ modes:
                     && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
               - SwitchModeBuiltin: default
-
           backspace:
             help: remove last character
             messages:
               - RemoveInputBufferLastCharacter
-
           ctrl-w:
             help: remove last word
             messages:
               - RemoveInputBufferLastWord
-
           ctrl-u:
             help: remove line
             messages:
               - SetInputBuffer: ""
-
           esc:
             help: cancel
             messages:
               - SwitchModeBuiltin: default
-
           ctrl-c:
             help: terminate
             messages:
               - Terminate
-
         default:
           messages:
             - BufferInputFromKey
@@ -478,13 +470,11 @@ modes:
             messages:
               - SwitchModeBuiltin: create file
               - SetInputBuffer: ''
-        on_alphabet: null
-        on_number: null
-        on_special_character: null
-        default:
-          help: null
-          messages:
-            - SwitchModeBuiltin: default
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
+
     rename:
       name: rename
       help: null
@@ -503,35 +493,26 @@ modes:
                     && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
               - SwitchModeBuiltin: default
-
           backspace:
             help: remove last character
             messages:
               - RemoveInputBufferLastCharacter
-
           ctrl-w:
             help: remove last word
             messages:
               - RemoveInputBufferLastWord
-
           ctrl-u:
             help: remove line
             messages:
               - SetInputBuffer: ""
-
           esc:
             help: cancel
             messages:
               - SwitchModeBuiltin: default
-
           ctrl-c:
             help: terminate
             messages:
               - Terminate
-
-        default:
-          messages:
-            - BufferInputFromKey
 
     relative_path_does_not_contain:
       name: relative path does not contain
@@ -629,6 +610,8 @@ modes:
     filter:
       name: filter
       key_bindings:
+        remaps:
+          esc: enter
         on_key:
           backspace:
             help: remove last filter
@@ -663,16 +646,18 @@ modes:
             help: terminate
             messages:
               - Terminate
-        default:
-          messages:
-            - SwitchModeBuiltin: default
+          enter:
+            help: done
+            messages:
+              - SwitchModeBuiltin: default
 
     sort:
       name: sort
       help: null
       extra_help: null
       key_bindings:
-        remaps: {}
+        remaps:
+          esc: enter
         on_key:
           backspace:
             help: remove last sorter
@@ -774,9 +759,10 @@ modes:
             help: terminate
             messages:
               - Terminate
-        default:
-          messages:
-            - SwitchModeBuiltin: default
+          enter:
+            help: done
+            messages:
+              - SwitchModeBuiltin: default
 
     default:
       name: default
@@ -922,6 +908,7 @@ modes:
           help: null
           messages:
             - SwitchModeBuiltin: default
+
     go_to:
       name: go to
       help: null
@@ -963,14 +950,10 @@ modes:
               - SwitchModeBuiltin: default
               - ClearScreen
               - Refresh
-
-        on_alphabet: null
-        on_number: null
-        on_special_character: null
-        default:
-          help: null
-          messages:
-            - SwitchModeBuiltin: default
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
 
     number:
       name: number
@@ -1012,16 +995,15 @@ modes:
             messages:
               - FocusPreviousByRelativeIndexFromInput
               - SwitchModeBuiltin: default
-        on_alphabet: null
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
         on_number:
           help: input
           messages:
             - BufferInputFromKey
-        on_special_character: null
-        default:
-          help: null
-          messages:
-            - SwitchModeBuiltin: default
+
     delete:
       name: delete
       help: null
@@ -1052,7 +1034,6 @@ modes:
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
-
           D:
             help: force delete
             messages:
@@ -1069,15 +1050,14 @@ modes:
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
               - ExplorePwdAsync
-
           ctrl-c:
             help: terminate
             messages:
               - Terminate
-        
-        default:
-          messages:
-            - SwitchModeBuiltin: default
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
 
     action:
       name: action to
@@ -1091,7 +1071,6 @@ modes:
             - ResetInputBuffer
             - SwitchModeBuiltin: number
             - BufferInputFromKey
-
         on_key:
           "!":
             help: shell
@@ -1102,12 +1081,10 @@ modes:
                     - "-i"
               - ExplorePwdAsync
               - SwitchModeBuiltin: default
-
           c:
             help: create
             messages:
               - SwitchModeBuiltin: create
-
           e:
             help: open in editor
             messages:
@@ -1116,27 +1093,25 @@ modes:
                     ${EDITOR:-vi} "${line:?}"
                    done < "${XPLR_PIPE_RESULT_OUT:?}")
               - SwitchModeBuiltin: default
-
           s:
             help: selection operations
             messages:
               - SwitchModeBuiltin: selection_ops
-
           l:
             help: logs
             messages:
               - BashExec: |
                   cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:-less}
               - SwitchModeBuiltin: default
-
           ctrl-c:
             help: terminate
             messages:
               - Terminate
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
 
-        default:
-          messages:
-            - SwitchModeBuiltin: default
     search:
       name: search
       help: null
@@ -1145,6 +1120,7 @@ modes:
         remaps: 
           ctrl-n: down
           ctrl-p: up
+          esc: enter
         on_key:
           tab:
             help: toggle selection
@@ -1186,12 +1162,6 @@ modes:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
               - SwitchModeBuiltin: default
               - ExplorePwdAsync
-          esc:
-            help: cancel
-            messages:
-              - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchModeBuiltin: default
-              - ExplorePwdAsync
           left:
             help: back
             messages:
@@ -1210,11 +1180,7 @@ modes:
             help: up
             messages:
               - FocusPrevious
-        on_alphabet: null
-        on_number: null
-        on_special_character: null
         default:
-          help: null
           messages:
             - RemoveNodeFilterFromInput: IRelativePathDoesContain
             - BufferInputFromKey
@@ -1223,8 +1189,6 @@ modes:
 
     switch_layout:
       name: switch layout
-      help: null
-      extra_help: null
       key_bindings:
         on_key:
           1:
@@ -1251,8 +1215,9 @@ modes:
             help: terminate
             messages:
               - Terminate
-        default:
-          messages:
-            - SwitchMode: default
+          esc:
+            help: cancel
+            messages:
+              - SwitchModeBuiltin: default
 
   custom: {}
