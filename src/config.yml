@@ -338,6 +338,7 @@ modes:
                     fi
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - SwitchModeBuiltin: default
           m:
