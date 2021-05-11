@@ -17,10 +17,6 @@ pub fn keep_watching(
     thread::spawn(move || loop {
         if let Ok(new_pwd) = rx_pwd_watcher.try_recv() {
             pwd = PathBuf::from(new_pwd);
-            last_modified = pwd
-                .metadata()
-                .and_then(|m| m.modified())
-                .unwrap_or(last_modified);
         } else {
             pwd.metadata()
                 .and_then(|m| m.modified())

@@ -2057,7 +2057,7 @@ impl App {
         })
     }
 
-    fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
+    pub fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
         self.directory_buffers.insert(parent, dir);
         self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
@@ -2270,17 +2270,17 @@ impl App {
         Ok(self)
     }
 
-    fn log_info(mut self, message: String) -> Result<Self> {
+    pub fn log_info(mut self, message: String) -> Result<Self> {
         self.logs.push(Log::new(LogLevel::Info, message));
         Ok(self)
     }
 
-    fn log_success(mut self, message: String) -> Result<Self> {
+    pub fn log_success(mut self, message: String) -> Result<Self> {
         self.logs.push(Log::new(LogLevel::Success, message));
         Ok(self)
     }
 
-    fn log_error(mut self, message: String) -> Result<Self> {
+    pub fn log_error(mut self, message: String) -> Result<Self> {
         self.logs.push(Log::new(LogLevel::Error, message));
         Ok(self)
     }
