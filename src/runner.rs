@@ -75,8 +75,8 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
         app.pwd().clone(),
         focused_path,
         tx_msg_in.clone(),
-        tx_pwd_watcher.clone(),
     );
+    tx_pwd_watcher.send(app.pwd().clone())?;
 
     let mut hb = Handlebars::new();
     hb.register_helper("humansize", Box::new(to_humansize));
@@ -129,6 +129,8 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
 
         while let Some(msg) = app.pop_msg_out() {
             match msg {
+                // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
+                // Try handling them immediately.
                 app::MsgOut::Enque(task) => {
                     tx_msg_in.send(task)?;
                 }
@@ -164,19 +166,14 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                         app.focused_node().map(|n| n.relative_path().clone()),
                     ) {
                         Ok(buf) => {
-                            tx_pwd_watcher.send(buf.parent().clone())?;
-                            let msg = app::MsgIn::Internal(app::InternalMsg::AddDirectory(
-                                buf.parent().clone(),
-                                buf,
-                            ));
-                            tx_msg_in.send(app::Task::new(msg, None))?;
+                            let pwd = buf.parent().clone();
+                            app = app.add_directory(pwd.clone(), buf)?;
                         }
                         Err(e) => {
-                            let msg =
-                                app::MsgIn::External(app::ExternalMsg::LogError(e.to_string()));
-                            tx_msg_in.send(app::Task::new(msg, None))?;
+                            app = app.log_error(e.to_string())?;
                         }
-                    }
+                    };
+                    tx_pwd_watcher.send(app.pwd().clone())?;
                 }
 
                 app::MsgOut::ExplorePwdAsync => {
@@ -185,8 +182,8 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                         app.pwd().clone(),
                         app.focused_node().map(|n| n.relative_path().clone()),
                         tx_msg_in.clone(),
-                        tx_pwd_watcher.clone(),
                     );
+                    tx_pwd_watcher.send(app.pwd().clone())?;
                 }
 
                 app::MsgOut::ExploreParentsAsync => {
@@ -195,12 +192,13 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                         app.pwd().clone(),
                         app.focused_node().map(|n| n.relative_path().clone()),
                         tx_msg_in.clone(),
-                        tx_pwd_watcher.clone(),
                     );
                     tx_pwd_watcher.send(app.pwd().clone())?;
                 }
 
                 app::MsgOut::Refresh => {
+                    // $PWD watcher
+                    tx_pwd_watcher.send(app.pwd().clone())?;
                     // UI
                     terminal.draw(|f| ui::draw(f, &app, &hb))?;
                 }
@@ -220,8 +218,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                         .unwrap_or_else(|e| Err(e.to_string()));
 
                     if let Err(e) = status {
-                        let msg = app::MsgIn::External(app::ExternalMsg::LogError(e));
-                        tx_msg_in.send(app::Task::new(msg, None))?;
+                        app = app.log_error(e.to_string())?;
                     };
 
                     tx_event_reader.send(false)?;
@@ -247,8 +244,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                         .unwrap_or_else(|e| Err(e.to_string()));
 
                     if let Err(e) = status {
-                        let msg = app::MsgIn::External(app::ExternalMsg::LogError(e));
-                        tx_msg_in.send(app::Task::new(msg, None))?;
+                        app = app.log_error(e.to_string())?;
                     };
 
                     terminal.clear()?;

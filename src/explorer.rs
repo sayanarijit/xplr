@@ -47,14 +47,10 @@ pub fn explore_async(
     parent: String,
     focused_path: Option<String>,
     tx_msg_in: Sender<Task>,
-    tx_pwd_watcher: Sender<String>,
 ) {
     thread::spawn(move || {
         explore_sync(config, parent.clone(), focused_path)
             .map(|buf| {
-                tx_pwd_watcher
-                    .send(buf.parent().clone())
-                    .unwrap_or_default();
                 tx_msg_in
                     .send(Task::new(
                         MsgIn::Internal(InternalMsg::AddDirectory(parent.clone(), buf)),
@@ -78,23 +74,15 @@ pub fn explore_recursive_async(
     parent: String,
     focused_path: Option<String>,
     tx_msg_in: Sender<Task>,
-    tx_pwd_watcher: Sender<String>,
 ) {
     let path = PathBuf::from(&parent);
-    explore_async(
-        config.clone(),
-        parent,
-        focused_path,
-        tx_msg_in.clone(),
-        tx_pwd_watcher.clone(),
-    );
+    explore_async(config.clone(), parent, focused_path, tx_msg_in.clone());
     if let Some(grand_parent) = path.parent() {
         explore_recursive_async(
             config,
             grand_parent.to_string_lossy().to_string(),
             path.file_name().map(|f| f.to_string_lossy().to_string()),
             tx_msg_in,
-            tx_pwd_watcher,
         );
     }
 }
