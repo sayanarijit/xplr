@@ -1,6 +1,5 @@
 use crate::config::Config;
 use crate::config::Mode;
-use crate::explorer;
 use crate::input::Key;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
@@ -1298,6 +1297,7 @@ impl Command {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
+    ExplorePwd,
     ExplorePwdAsync,
     ExploreParentsAsync,
     Refresh,
@@ -1700,13 +1700,9 @@ impl App {
         Ok(self)
     }
 
-    fn explore_pwd(self) -> Result<Self> {
-        let dirbuf = explorer::explore_sync(
-            self.explorer_config().clone(),
-            self.pwd().clone(),
-            self.focused_node().map(|n| n.absolute_path().clone()),
-        )?;
-        self.add_directory(dirbuf.parent().clone(), dirbuf)
+    fn explore_pwd(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ExplorePwd);
+        Ok(self)
     }
 
     fn explore_pwd_async(mut self) -> Result<Self> {
@@ -1805,18 +1801,13 @@ impl App {
     }
 
     fn change_directory(mut self, dir: &str) -> Result<Self> {
-        if PathBuf::from(dir).is_dir() {
-            match env::set_current_dir(dir) {
-                Ok(()) => {
-                    self.pwd = dir.to_owned();
-                    self.history = self.history.push(self.pwd.clone());
-                    self.msg_out.push_back(MsgOut::Refresh);
-                    Ok(self)
-                }
-                Err(e) => self.log_error(e.to_string()),
+        match env::set_current_dir(dir) {
+            Ok(()) => {
+                self.pwd = dir.to_owned();
+                self.history = self.history.push(self.pwd.clone());
+                self.explore_pwd_async()
             }
-        } else {
-            Ok(self)
+            Err(e) => self.log_error(e.to_string()),
         }
     }
 
@@ -1845,7 +1836,7 @@ impl App {
             .map(|p| p.to_owned())
             .unwrap_or(self.pwd);
         env::set_current_dir(&self.pwd)?;
-        self.refresh()
+        self.explore_pwd_async()
     }
 
     fn next_visited_path(mut self) -> Result<Self> {
@@ -1856,7 +1847,7 @@ impl App {
             .map(|p| p.to_owned())
             .unwrap_or(self.pwd);
         env::set_current_dir(&self.pwd)?;
-        self.refresh()
+        self.explore_pwd_async()
     }
 
     fn buffer_input(mut self, input: &str) -> Result<Self> {
