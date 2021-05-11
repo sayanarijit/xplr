@@ -1,12 +1,12 @@
-- If you are new to GitHub, visit the [first-contributions instructions](https://github.com/firstcontributions/first-contributions/blob/master/README.md) to learn how to contribute on GitHub.
+If you are new to GitHub, visit the [first-contributions instructions](https://github.com/firstcontributions/first-contributions/blob/master/README.md) to learn how to contribute on GitHub.
 
-- If you are new to Rust, I recommend you to go through [the book](https://doc.rust-lang.org/book).
+If you are new to Rust, I recommend you to go through [the book](https://doc.rust-lang.org/book).
 
-- To find issues you can help with, go though list of [good first issues](https://github.com/sayanarijit/xplr/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or [help wanted](https://github.com/sayanarijit/xplr/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
+To find issues you can help with, go though list of [good first issues](https://github.com/sayanarijit/xplr/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) or [help wanted](https://github.com/sayanarijit/xplr/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
 
-- If you have something to suggest or issues to report, you can [create a new issue](https://github.com/sayanarijit/xplr/issues/new). Be sure to explain in details the context and the outcome that you are lookign for. If reporting bugs, provide basic information like you OS version, `xplr` version, window manager and the terminal.
+If you have something to suggest or issues to report, you can [create a new issue](https://github.com/sayanarijit/xplr/issues/new). Be sure to explain in details the context and the outcome that you are lookign for. If reporting bugs, provide basic information like you OS version, `xplr` version, window manager and the terminal.
 
-- Once found or created an issue, let us know you want to work it by commenting in the issue.
+Once found or created an issue, let us know you want to work it by commenting in the issue.
 
 
 Development Guideline
