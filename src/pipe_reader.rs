@@ -1,13 +1,22 @@
 use crate::app::{ExternalMsg, MsgIn, Task};
 use std::fs;
 use std::io::prelude::*;
+use std::path::PathBuf;
 use std::sync::mpsc::Sender;
 use std::thread;
 use std::time::Duration;
 
 pub fn keep_reading(pipe: String, tx: Sender<Task>) {
+    let mut last_modified = None;
     thread::spawn(move || loop {
-        if let Ok(mut file) = fs::OpenOptions::new()
+        let modified = PathBuf::from(&pipe)
+            .metadata()
+            .and_then(|m| m.modified())
+            .ok();
+
+        if modified == last_modified {
+            thread::sleep(Duration::from_millis(50));
+        } else if let Ok(mut file) = fs::OpenOptions::new()
             .read(true)
             .write(true)
             .create(true)
@@ -35,9 +44,7 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
                         .unwrap_or_default();
                     }
                 });
-            } else {
-                thread::sleep(Duration::from_millis(50));
-            }
+            };
         } else {
             tx.send(Task::new(
                 MsgIn::External(ExternalMsg::LogError(format!(
@@ -49,5 +56,7 @@ pub fn keep_reading(pipe: String, tx: Sender<Task>) {
             .unwrap_or_default();
             thread::sleep(Duration::from_secs(3));
         }
+
+        last_modified = modified;
     });
 }
