@@ -842,6 +842,19 @@ fn draw_logs<B: Backend>(
                     l.message()
                 ))
                 .style(logs_config.info().style().clone().into()),
+
+                app::LogLevel::Warning => ListItem::new(format!(
+                    "{} | {} | {}",
+                    &time,
+                    &logs_config
+                        .warning()
+                        .format()
+                        .to_owned()
+                        .unwrap_or_default(),
+                    l.message()
+                ))
+                .style(logs_config.warning().style().clone().into()),
+
                 app::LogLevel::Success => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,
@@ -853,6 +866,7 @@ fn draw_logs<B: Backend>(
                     l.message()
                 ))
                 .style(logs_config.success().style().clone().into()),
+
                 app::LogLevel::Error => ListItem::new(format!(
                     "{} | {} | {}",
                     &time,

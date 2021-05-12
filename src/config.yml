@@ -103,6 +103,10 @@ general:
       format: "SUCCESS"
       style:
         fg: Green
+    warning:
+      format: "WARNING"
+      style:
+        fg: Yellow
     error:
       format: "ERROR"
       style:
@@ -896,19 +900,25 @@ modes:
             help: quit
             messages:
               - Quit
-
-        on_alphabet: null
         on_number:
           help: input
           messages:
             - ResetInputBuffer
             - SwitchModeBuiltin: number
             - BufferInputFromKey
-        on_special_character: null
-        default:
-          help: null
-          messages:
-            - SwitchModeBuiltin: default
+
+    reckless:
+      name: reckless
+      key_bindings:
+        on_key:
+          esc:
+            help: back to default mode
+            messages:
+              - SwitchModeBuiltin: default
+          ctrl-c:
+            help: terminate
+            messages:
+              - Terminate
 
     go_to:
       name: go to

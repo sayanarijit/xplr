@@ -324,6 +324,9 @@ pub struct LogsConfig {
     success: UiElement,
 
     #[serde(default)]
+    warning: UiElement,
+
+    #[serde(default)]
     error: UiElement,
 }
 
@@ -331,6 +334,7 @@ impl LogsConfig {
     pub fn extend(mut self, other: Self) -> Self {
         self.info = self.info.extend(other.info);
         self.success = self.success.extend(other.success);
+        self.warning = self.warning.extend(other.warning);
         self.error = self.error.extend(other.error);
         self
     }
@@ -348,6 +352,11 @@ impl LogsConfig {
     /// Get a reference to the logs config's error.
     pub fn error(&self) -> &UiElement {
         &self.error
+    }
+
+    /// Get a reference to the logs config's warning.
+    pub fn warning(&self) -> &UiElement {
+        &self.warning
     }
 }
 
@@ -840,6 +849,9 @@ pub struct BuiltinModesConfig {
     default: Mode,
 
     #[serde(default)]
+    reckless: Mode,
+
+    #[serde(default)]
     selection_ops: Mode,
 
     #[serde(default)]
@@ -888,6 +900,7 @@ pub struct BuiltinModesConfig {
 impl BuiltinModesConfig {
     pub fn extend(mut self, other: Self) -> Self {
         self.default = self.default.extend(other.default);
+        self.reckless = self.reckless.extend(other.reckless);
         self.selection_ops = self.selection_ops.extend(other.selection_ops);
         self.go_to = self.go_to.extend(other.go_to);
         self.create = self.create.extend(other.create);
@@ -913,6 +926,7 @@ impl BuiltinModesConfig {
     pub fn get(&self, name: &str) -> Option<&Mode> {
         match name {
             "default" => Some(&self.default),
+            "reckless" => Some(&self.reckless),
             "selection ops" => Some(&self.selection_ops),
             "selection_ops" => Some(&self.selection_ops),
             "create" => Some(&self.create),
@@ -1017,6 +1031,11 @@ impl BuiltinModesConfig {
     /// Get a reference to the builtin modes config's switch layout.
     pub fn switch_layout(&self) -> &Mode {
         &self.switch_layout
+    }
+
+    /// Get a reference to the builtin modes config's reckless.
+    pub fn reckless(&self) -> &Mode {
+        &self.reckless
     }
 }
 
