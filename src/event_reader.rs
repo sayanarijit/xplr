@@ -14,7 +14,8 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                 is_paused = paused;
             };
 
-            if !is_paused && event::poll(std::time::Duration::from_millis(1)).unwrap_or_default() {
+            if !is_paused && event::poll(std::time::Duration::from_millis(200)).unwrap_or_default()
+            {
                 match event::read() {
                     Ok(Event::Key(key)) => {
                         let key = Key::from_event(key);

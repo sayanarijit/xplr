@@ -96,6 +96,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     )?;
 
     let mut result = Ok(None);
+    let session_path = app.session_path().to_owned();
 
     term::enable_raw_mode()?;
     let mut stdout = get_tty()?;
@@ -113,146 +114,142 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
 
     'outer: for task in rx_msg_in {
-        let last_app = app.clone();
-
-        let (new_app, new_result) = match app.handle_task(task) {
-            Ok(a) => (a, Ok(None)),
-            Err(err) => (last_app.clone(), Err(err)),
-        };
-
-        app = new_app;
-        result = new_result;
-
-        if result.is_err() {
-            break;
-        }
-
-        while let Some(msg) = app.pop_msg_out() {
-            match msg {
-                // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
-                // Try handling them immediately.
-                app::MsgOut::Enque(task) => {
-                    tx_msg_in.send(task)?;
-                }
-
-                app::MsgOut::Quit => {
-                    result = Ok(None);
-                    break 'outer;
-                }
-
-                app::MsgOut::PrintResultAndQuit => {
-                    result = Ok(Some(app.result_str()));
-                    break 'outer;
-                }
-
-                app::MsgOut::PrintAppStateAndQuit => {
-                    let out = serde_yaml::to_string(&app)?;
-                    result = Ok(Some(out));
-                    break 'outer;
-                }
-
-                app::MsgOut::Debug(path) => {
-                    fs::write(&path, serde_yaml::to_string(&app)?)?;
-                }
-
-                app::MsgOut::ClearScreen => {
-                    terminal.clear()?;
-                }
-
-                app::MsgOut::ExplorePwd => {
-                    match explorer::explore_sync(
-                        app.explorer_config().clone(),
-                        app.pwd().clone(),
-                        app.focused_node().map(|n| n.relative_path().clone()),
-                    ) {
-                        Ok(buf) => {
-                            let pwd = buf.parent().clone();
-                            app = app.add_directory(pwd.clone(), buf)?;
+        match app.handle_task(task) {
+            Ok(a) => {
+                app = a;
+                while let Some(msg) = app.pop_msg_out() {
+                    match msg {
+                        // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
+                        // Try handling them immediately.
+                        app::MsgOut::Enque(task) => {
+                            tx_msg_in.send(task)?;
                         }
-                        Err(e) => {
-                            app = app.log_error(e.to_string())?;
+
+                        app::MsgOut::Quit => {
+                            result = Ok(None);
+                            break 'outer;
+                        }
+
+                        app::MsgOut::PrintResultAndQuit => {
+                            result = Ok(Some(app.result_str()));
+                            break 'outer;
+                        }
+
+                        app::MsgOut::PrintAppStateAndQuit => {
+                            let out = serde_yaml::to_string(&app)?;
+                            result = Ok(Some(out));
+                            break 'outer;
+                        }
+
+                        app::MsgOut::Debug(path) => {
+                            fs::write(&path, serde_yaml::to_string(&app)?)?;
+                        }
+
+                        app::MsgOut::ClearScreen => {
+                            terminal.clear()?;
+                        }
+
+                        app::MsgOut::ExplorePwd => {
+                            match explorer::explore_sync(
+                                app.explorer_config().clone(),
+                                app.pwd().clone(),
+                                app.focused_node().map(|n| n.relative_path().clone()),
+                            ) {
+                                Ok(buf) => {
+                                    let pwd = buf.parent().clone();
+                                    app = app.add_directory(pwd.clone(), buf)?;
+                                }
+                                Err(e) => {
+                                    app = app.log_error(e.to_string())?;
+                                }
+                            };
+                            tx_pwd_watcher.send(app.pwd().clone())?;
+                        }
+
+                        app::MsgOut::ExplorePwdAsync => {
+                            explorer::explore_async(
+                                app.explorer_config().clone(),
+                                app.pwd().clone(),
+                                app.focused_node().map(|n| n.relative_path().clone()),
+                                tx_msg_in.clone(),
+                            );
+                            tx_pwd_watcher.send(app.pwd().clone())?;
+                        }
+
+                        app::MsgOut::ExploreParentsAsync => {
+                            explorer::explore_recursive_async(
+                                app.explorer_config().clone(),
+                                app.pwd().clone(),
+                                app.focused_node().map(|n| n.relative_path().clone()),
+                                tx_msg_in.clone(),
+                            );
+                            tx_pwd_watcher.send(app.pwd().clone())?;
+                        }
+
+                        app::MsgOut::Refresh => {
+                            // $PWD watcher
+                            tx_pwd_watcher.send(app.pwd().clone())?;
+                            // UI
+                            terminal.draw(|f| ui::draw(f, &app, &hb))?;
+                        }
+
+                        app::MsgOut::CallSilently(cmd) => {
+                            tx_event_reader.send(true)?;
+
+                            app.write_pipes()?;
+                            let status = call(&app, cmd, false)
+                                .map(|s| {
+                                    if s.success() {
+                                        Ok(())
+                                    } else {
+                                        Err(format!("process exited with code {}", &s))
+                                    }
+                                })
+                                .unwrap_or_else(|e| Err(e.to_string()));
+
+                            if let Err(e) = status {
+                                app = app.log_error(e.to_string())?;
+                            };
+
+                            tx_event_reader.send(false)?;
+                        }
+
+                        app::MsgOut::Call(cmd) => {
+                            tx_event_reader.send(true)?;
+
+                            terminal.clear()?;
+                            terminal.set_cursor(0, 0)?;
+                            term::disable_raw_mode()?;
+                            terminal.show_cursor()?;
+
+                            app.write_pipes()?;
+                            let status = call(&app, cmd, false)
+                                .map(|s| {
+                                    if s.success() {
+                                        Ok(())
+                                    } else {
+                                        Err(format!("process exited with code {}", &s))
+                                    }
+                                })
+                                .unwrap_or_else(|e| Err(e.to_string()));
+
+                            if let Err(e) = status {
+                                app = app.log_error(e.to_string())?;
+                            };
+
+                            terminal.clear()?;
+                            term::enable_raw_mode()?;
+                            terminal.hide_cursor()?;
+                            tx_event_reader.send(false)?;
                         }
                     };
-                    tx_pwd_watcher.send(app.pwd().clone())?;
                 }
+            }
 
-                app::MsgOut::ExplorePwdAsync => {
-                    explorer::explore_async(
-                        app.explorer_config().clone(),
-                        app.pwd().clone(),
-                        app.focused_node().map(|n| n.relative_path().clone()),
-                        tx_msg_in.clone(),
-                    );
-                    tx_pwd_watcher.send(app.pwd().clone())?;
-                }
-
-                app::MsgOut::ExploreParentsAsync => {
-                    explorer::explore_recursive_async(
-                        app.explorer_config().clone(),
-                        app.pwd().clone(),
-                        app.focused_node().map(|n| n.relative_path().clone()),
-                        tx_msg_in.clone(),
-                    );
-                    tx_pwd_watcher.send(app.pwd().clone())?;
-                }
-
-                app::MsgOut::Refresh => {
-                    // $PWD watcher
-                    tx_pwd_watcher.send(app.pwd().clone())?;
-                    // UI
-                    terminal.draw(|f| ui::draw(f, &app, &hb))?;
-                }
-
-                app::MsgOut::CallSilently(cmd) => {
-                    tx_event_reader.send(true)?;
-
-                    app.write_pipes()?;
-                    let status = call(&app, cmd, false)
-                        .map(|s| {
-                            if s.success() {
-                                Ok(())
-                            } else {
-                                Err(format!("process exited with code {}", &s))
-                            }
-                        })
-                        .unwrap_or_else(|e| Err(e.to_string()));
-
-                    if let Err(e) = status {
-                        app = app.log_error(e.to_string())?;
-                    };
-
-                    tx_event_reader.send(false)?;
-                }
-
-                app::MsgOut::Call(cmd) => {
-                    tx_event_reader.send(true)?;
-
-                    terminal.clear()?;
-                    terminal.set_cursor(0, 0)?;
-                    term::disable_raw_mode()?;
-                    terminal.show_cursor()?;
-
-                    app.write_pipes()?;
-                    let status = call(&app, cmd, false)
-                        .map(|s| {
-                            if s.success() {
-                                Ok(())
-                            } else {
-                                Err(format!("process exited with code {}", &s))
-                            }
-                        })
-                        .unwrap_or_else(|e| Err(e.to_string()));
-
-                    if let Err(e) = status {
-                        app = app.log_error(e.to_string())?;
-                    };
-
-                    terminal.clear()?;
-                    term::enable_raw_mode()?;
-                    terminal.hide_cursor()?;
-                    tx_event_reader.send(false)?;
-                }
-            };
+            Err(e) => {
+                result = Err(e);
+                break;
+            }
         }
     }
 
@@ -262,7 +259,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
     term::disable_raw_mode()?;
     terminal.show_cursor()?;
 
-    fs::remove_dir_all(app.session_path())?;
+    fs::remove_dir_all(session_path)?;
 
     result
 }
