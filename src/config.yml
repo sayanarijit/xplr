@@ -384,7 +384,7 @@ modes:
                     && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
-              - SwitchModeBuiltin: default
+              - SetInputBuffer: ""
           backspace:
             help: remove last character
             messages:
@@ -425,7 +425,7 @@ modes:
                     && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
-              - SwitchModeBuiltin: default
+              - SetInputBuffer: ""
           backspace:
             help: remove last character
             messages:
@@ -547,12 +547,12 @@ modes:
           enter:
             help: apply filter
             messages:
-              - SwitchModeBuiltin: default
+              - SwitchModeBuiltin: filter
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
-              - SwitchModeBuiltin: default
+              - SwitchModeBuiltin: filter
               - ExplorePwdAsync
           ctrl-c:
             help: terminate
@@ -593,12 +593,12 @@ modes:
           enter:
             help: apply filter
             messages:
-              - SwitchModeBuiltin: default
+              - SwitchModeBuiltin: filter
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchModeBuiltin: default
+              - SwitchModeBuiltin: filter
               - ExplorePwdAsync
           ctrl-c:
             help: terminate
@@ -900,6 +900,9 @@ modes:
             help: quit
             messages:
               - Quit
+          esc:
+            messages:
+              - SwitchModeBuiltin: default
         on_number:
           help: input
           messages:
