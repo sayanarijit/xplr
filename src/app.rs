@@ -1237,6 +1237,11 @@ pub enum ExternalMsg {
     /// **Example:** `LogSuccess: satellite reached destination`.
     LogSuccess(String),
 
+    /// Log an warning message.
+    ///
+    /// **Example:** `LogWarning: satellite is heating`
+    LogWarning(String),
+
     /// Log an error message.
     ///
     /// **Example:** `LogError: satellite crashed`
@@ -1327,6 +1332,7 @@ impl Task {
 #[serde(rename_all = "UPPERCASE")]
 pub enum LogLevel {
     Info,
+    Warning,
     Success,
     Error,
 }
@@ -1367,6 +1373,7 @@ impl std::fmt::Display for Log {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let level_str = match self.level {
             LogLevel::Info => "INFO   ",
+            LogLevel::Warning => "WARNING",
             LogLevel::Success => "SUCCESS",
             LogLevel::Error => "ERROR  ",
         };
@@ -1657,6 +1664,7 @@ impl App {
                 ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
                 ExternalMsg::LogInfo(l) => self.log_info(l),
                 ExternalMsg::LogSuccess(l) => self.log_success(l),
+                ExternalMsg::LogWarning(l) => self.log_warning(l),
                 ExternalMsg::LogError(l) => self.log_error(l),
                 ExternalMsg::Quit => self.quit(),
                 ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
@@ -1691,7 +1699,15 @@ impl App {
                     None
                 }
             })
-            .unwrap_or_else(|| default.map(|a| a.messages().clone()).unwrap_or_default());
+            .or_else(|| default.map(|a| a.messages().clone()))
+            .unwrap_or_else(|| {
+                vec![
+                    ExternalMsg::SwitchModeBuiltin("reckless".into()),
+                    ExternalMsg::LogWarning(
+                        "You're being reckless. Let's calm down, escape, and try again.".into(),
+                    ),
+                ]
+            });
 
         for msg in msgs {
             self = self.enqueue(Task::new(MsgIn::External(msg), Some(key)));
@@ -2280,6 +2296,11 @@ impl App {
         Ok(self)
     }
 
+    pub fn log_warning(mut self, message: String) -> Result<Self> {
+        self.logs.push(Log::new(LogLevel::Warning, message));
+        Ok(self)
+    }
+
     pub fn log_error(mut self, message: String) -> Result<Self> {
         self.logs.push(Log::new(LogLevel::Error, message));
         Ok(self)
@@ -2433,6 +2454,7 @@ impl App {
 
         [
             builtin.default(),
+            builtin.reckless(),
             builtin.filter(),
             builtin.number(),
             builtin.go_to(),
