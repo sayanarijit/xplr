@@ -13,8 +13,11 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                 is_paused = paused;
             };
 
-            if !is_paused && event::poll(std::time::Duration::from_millis(200)).unwrap_or_default()
-            {
+            if is_paused {
+                thread::sleep(std::time::Duration::from_millis(200));
+            } else if event::poll(std::time::Duration::from_millis(50)).unwrap_or_default() {
+                // NOTE: The poll timeout need to stay low, else spawning sub subshell
+                // and start typing immediately will cause panic.
                 match event::read() {
                     Ok(Event::Key(key)) => {
                         let key = Key::from_event(key);
