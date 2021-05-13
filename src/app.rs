@@ -2080,11 +2080,13 @@ impl App {
     }
 
     fn call(mut self, command: Command) -> Result<Self> {
+        self.logs_hidden = true;
         self.msg_out.push_back(MsgOut::Call(command));
         Ok(self)
     }
 
     fn call_silently(mut self, command: Command) -> Result<Self> {
+        self.logs_hidden = true;
         self.msg_out.push_back(MsgOut::CallSilently(command));
         Ok(self)
     }
