@@ -1432,6 +1432,7 @@ pub struct App {
     pipe: Pipe,
     explorer_config: ExplorerConfig,
     logs: Vec<Log>,
+    logs_hidden: bool,
     history: History,
 }
 
@@ -1532,6 +1533,7 @@ impl App {
             pipe: Pipe::from_session_path(&session_path)?,
             explorer_config,
             logs: Default::default(),
+            logs_hidden: Default::default(),
             history: Default::default(),
         }
         .change_directory(&pwd)?;
@@ -1872,6 +1874,7 @@ impl App {
         } else {
             self.input_buffer = Some(input.to_owned());
         };
+        self.logs_hidden = true;
         self.refresh()
     }
 
@@ -1885,17 +1888,19 @@ impl App {
 
     fn set_input_buffer(mut self, string: String) -> Result<Self> {
         self.input_buffer = Some(string);
-        self.msg_out.push_back(MsgOut::Refresh);
-        Ok(self)
+        self.logs_hidden = true;
+        self.refresh()
     }
 
     fn remove_input_buffer_last_character(mut self) -> Result<Self> {
         if let Some(mut buf) = self.input_buffer {
             buf.pop();
             self.input_buffer = Some(buf);
-        };
-        self.msg_out.push_back(MsgOut::Refresh);
-        Ok(self)
+            self.logs_hidden = true;
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn remove_input_buffer_last_word(mut self) -> Result<Self> {
@@ -1912,23 +1917,26 @@ impl App {
                 .collect::<String>();
 
             self.input_buffer = Some(buf);
-        };
-        self.msg_out.push_back(MsgOut::Refresh);
-        Ok(self)
+            self.logs_hidden = true;
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn reset_input_buffer(mut self) -> Result<Self> {
         self.input_buffer = None;
-        self.msg_out.push_back(MsgOut::Refresh);
-        Ok(self)
+        self.logs_hidden = true;
+        self.refresh()
     }
 
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = index.min(dir.total.max(1) - 1);
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_by_index_from_input(self) -> Result<Self> {
@@ -1950,12 +1958,13 @@ impl App {
                 .map(|(i, _)| i)
             {
                 dir_buf.focus = focus;
-                self.msg_out.push_back(MsgOut::Refresh);
+                self.refresh()
             } else {
-                self = self.log_error(format!("{} not found in $PWD", name))?;
+                self.log_error(format!("{} not found in $PWD", name))
             }
-        };
-        Ok(self)
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_path(self, path: &str) -> Result<Self> {
@@ -2287,21 +2296,25 @@ impl App {
     }
 
     pub fn log_info(mut self, message: String) -> Result<Self> {
+        self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Info, message));
         Ok(self)
     }
 
     pub fn log_success(mut self, message: String) -> Result<Self> {
+        self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Success, message));
         Ok(self)
     }
 
     pub fn log_warning(mut self, message: String) -> Result<Self> {
+        self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Warning, message));
         Ok(self)
     }
 
     pub fn log_error(mut self, message: String) -> Result<Self> {
+        self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Error, message));
         Ok(self)
     }
@@ -2599,5 +2612,10 @@ impl App {
     /// Get a reference to the app's layout.
     pub fn layout(&self) -> &Layout {
         &self.layout
+    }
+
+    /// Get a reference to the app's logs hidden.
+    pub fn logs_hidden(&self) -> bool {
+        self.logs_hidden
     }
 }
