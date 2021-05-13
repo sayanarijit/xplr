@@ -645,7 +645,7 @@ impl GeneralConfig {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
     #[serde(default)]
@@ -733,7 +733,7 @@ impl KeyBindings {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Mode {
     #[serde(default)]
@@ -1255,12 +1255,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
-            (0, 8, 5) => true,
-            (0, 8, 4) => true,
-            (0, 8, 3) => true,
-            (0, 8, 2) => true,
-            (0, 8, 1) => true,
-            (0, 8, 0) => true,
+            (0, 9, 0) => true,
             (_, _, _) => false,
         };
 
@@ -1269,12 +1264,7 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 8, 5) => None,
-            (0, 8, 4) => Some("App version updated. Improved key bindings"),
-            (0, 8, 3) => Some("App version updated. Fixed search"),
-            (0, 8, 2) => Some("App version updated. Fixed search"),
-            (0, 8, 1) => Some("App version updated. Fixed search"),
-            (0, 8, 0) => Some("App version updated. Fixed breaking UI after rename"),
+            (0, 9, 0) => None,
             (_, _, _) => None,
         };
 

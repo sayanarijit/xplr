@@ -1057,7 +1057,6 @@ pub enum ExternalMsg {
     ResetInputBuffer,
 
     /// Switch input mode.
-    /// This will reset the input buffer and call `Refresh` automatically.
     ///
     /// > **NOTE:** To be specific about which mode to switch to, use `SwitchModeBuiltin` or
     /// `SwitchModeCustom` instead.
@@ -1066,16 +1065,17 @@ pub enum ExternalMsg {
     SwitchMode(String),
 
     /// Switch to a builtin mode.
-    /// This will reset the input buffer and call `Refresh` automatically.
     ///
     /// **Example:** `SwitchModeBuiltin: default`
     SwitchModeBuiltin(String),
 
     /// Switch to a custom mode.
-    /// This will reset the input buffer and call `Refresh` automatically.
     ///
     /// **Example:** `SwitchModeCustom: my_custom_mode`
     SwitchModeCustom(String),
+
+    /// Pop the last mode from the history and switch to it.
+    PopMode,
 
     /// Switch layout.
     /// This will call `Refresh` automatically.
@@ -1434,6 +1434,7 @@ pub struct App {
     logs: Vec<Log>,
     logs_hidden: bool,
     history: History,
+    last_modes: Vec<Mode>,
 }
 
 impl App {
@@ -1535,6 +1536,7 @@ impl App {
             logs: Default::default(),
             logs_hidden: Default::default(),
             history: Default::default(),
+            last_modes: Default::default(),
         }
         .change_directory(&pwd)?;
 
@@ -1631,6 +1633,7 @@ impl App {
                 ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
                 ExternalMsg::SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
                 ExternalMsg::SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
+                ExternalMsg::PopMode => self.pop_mode(),
                 ExternalMsg::SwitchLayout(mode) => self.switch_layout(&mode),
                 ExternalMsg::SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
                 ExternalMsg::SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
@@ -1708,6 +1711,7 @@ impl App {
                     ExternalMsg::LogWarning(
                         "You're being reckless. Let's calm down, escape, and try again.".into(),
                     ),
+                    ExternalMsg::Refresh,
                 ]
             });
 
@@ -1926,7 +1930,6 @@ impl App {
 
     fn reset_input_buffer(mut self) -> Result<Self> {
         self.input_buffer = None;
-        self.logs_hidden = true;
         self.refresh()
     }
 
@@ -1989,13 +1992,34 @@ impl App {
         }
     }
 
+    fn push_mode(mut self) -> Self {
+        if self.mode() != self.config().modes().builtin().reckless()
+            && self
+                .last_modes
+                .last()
+                .map(|m| m != self.mode())
+                .unwrap_or(true)
+        {
+            self.last_modes.push(self.mode.clone())
+        }
+        self
+    }
+
+    fn pop_mode(mut self) -> Result<Self> {
+        if let Some(mode) = self.last_modes.pop() {
+            self.input_buffer = None;
+            self.mode = mode;
+        };
+        Ok(self)
+    }
+
     fn switch_mode(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config().modes().clone().get(mode) {
+            self = self.push_mode();
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
                 .sanitized(self.config().general().read_only().unwrap_or_default());
-            self.msg_out.push_back(MsgOut::Refresh);
             Ok(self)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
@@ -2004,11 +2028,11 @@ impl App {
 
     fn switch_mode_builtin(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config().modes().clone().get_builtin(mode) {
+            self = self.push_mode();
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
                 .sanitized(self.config().general().read_only().unwrap_or_default());
-            self.msg_out.push_back(MsgOut::Refresh);
             Ok(self)
         } else {
             self.log_error(format!("Builtin mode not found: {}", mode))
@@ -2017,11 +2041,11 @@ impl App {
 
     fn switch_mode_custom(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config().modes().clone().get_custom(mode) {
+            self = self.push_mode();
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
                 .sanitized(self.config().general().read_only().unwrap_or_default());
-            self.msg_out.push_back(MsgOut::Refresh);
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
@@ -2031,8 +2055,7 @@ impl App {
     fn switch_layout(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config().layouts().get(layout) {
             self.layout = l.to_owned();
-            self.msg_out.push_back(MsgOut::Refresh);
-            Ok(self)
+            self.refresh()
         } else {
             self.log_error(format!("Layout not found: {}", layout))
         }
@@ -2041,8 +2064,7 @@ impl App {
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config().layouts().get_builtin(layout) {
             self.layout = l.to_owned();
-            self.msg_out.push_back(MsgOut::Refresh);
-            Ok(self)
+            self.refresh()
         } else {
             self.log_error(format!("Builtin layout not found: {}", layout))
         }
@@ -2051,8 +2073,7 @@ impl App {
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config().layouts().get_custom(layout) {
             self.layout = l.to_owned();
-            self.msg_out.push_back(MsgOut::Refresh);
-            Ok(self)
+            self.refresh()
         } else {
             self.log_error(format!("Custom layout not found: {}", layout))
         }

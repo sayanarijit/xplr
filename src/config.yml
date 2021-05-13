@@ -1,4 +1,4 @@
-version: v0.8.5
+version: v0.9.0
 layouts:
   custom: {}
   builtin:
@@ -344,7 +344,8 @@ modes:
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           m:
             help: move here
             messages:
@@ -358,7 +359,8 @@ modes:
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -366,7 +368,8 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     create_file:
       name: create file
@@ -400,7 +403,8 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -441,7 +445,8 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -464,21 +469,20 @@ modes:
           d:
             help: create directory
             messages:
+              - PopMode
               - SwitchModeBuiltin: create directory
               - SetInputBuffer: ''
-          esc:
-            help: cancel
-            messages:
-              - SwitchModeBuiltin: default
           f:
             help: create file
             messages:
+              - PopMode
               - SwitchModeBuiltin: create file
               - SetInputBuffer: ''
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     rename:
       name: rename
@@ -497,7 +501,8 @@ modes:
                     && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
                     && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           backspace:
             help: remove last character
             messages:
@@ -513,11 +518,15 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
               - Terminate
+        default:
+          messages:
+            - BufferInputFromKey
 
     relative_path_does_not_contain:
       name: relative path does not contain
@@ -547,12 +556,13 @@ modes:
           enter:
             help: apply filter
             messages:
-              - SwitchModeBuiltin: filter
+              - PopMode
+              - Refresh
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesNotContain
-              - SwitchModeBuiltin: filter
+              - PopMode
               - ExplorePwdAsync
           ctrl-c:
             help: terminate
@@ -593,13 +603,15 @@ modes:
           enter:
             help: apply filter
             messages:
-              - SwitchModeBuiltin: filter
+              - PopMode
+              - Refresh
           esc:
             help: cancel
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchModeBuiltin: filter
+              - PopMode
               - ExplorePwdAsync
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -654,7 +666,8 @@ modes:
           enter:
             help: done
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     sort:
       name: sort
@@ -767,7 +780,8 @@ modes:
           enter:
             help: done
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     default:
       name: default
@@ -791,11 +805,15 @@ modes:
           s:
             help: sort
             messages:
+              - PopMode
               - SwitchModeBuiltin: sort
+              - Refresh
           f:
             help: filter
             messages:
+              - PopMode
               - SwitchModeBuiltin: filter
+              - Refresh
           .:
             help: show hidden
             messages:
@@ -806,7 +824,9 @@ modes:
           ':':
             help: action
             messages:
+              - PopMode
               - SwitchModeBuiltin: action
+              - Refresh
           '?':
             help: global help menu
             messages:
@@ -828,6 +848,7 @@ modes:
           ctrl-f:
             help: search
             messages:
+              - PopMode
               - SwitchModeBuiltin: search
               - SetInputBuffer: ''
               - ExplorePwdAsync
@@ -838,7 +859,9 @@ modes:
           d:
             help: delete
             messages:
+              - PopMode
               - SwitchModeBuiltin: delete
+              - Refresh
           down:
             help: down
             messages:
@@ -850,7 +873,9 @@ modes:
           g:
             help: go to
             messages:
+              - PopMode
               - SwitchModeBuiltin: go to
+              - Refresh
           left:
             help: back
             messages:
@@ -858,9 +883,11 @@ modes:
           r:
             help: rename
             messages:
+              - PopMode
               - SwitchModeBuiltin: rename
               - BashExecSilently: |
                   echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              - Refresh
           right:
             help: enter
             messages:
@@ -901,12 +928,11 @@ modes:
             messages:
               - Quit
           esc:
-            messages:
-              - SwitchModeBuiltin: default
+            messages: []
         on_number:
           help: input
           messages:
-            - ResetInputBuffer
+            - PopMode
             - SwitchModeBuiltin: number
             - BufferInputFromKey
 
@@ -915,9 +941,10 @@ modes:
       key_bindings:
         on_key:
           esc:
-            help: back to default mode
+            help: escape
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -938,12 +965,14 @@ modes:
             help: top
             messages:
               - FocusFirst
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           f:
             help: follow symlink
             messages:
               - FollowSymlink
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           x:
             help: open in gui
             messages:
@@ -961,13 +990,14 @@ modes:
                   (while IFS= read -r line; do
                     $OPENER "${line:?}" &> /dev/null &
                    done < "${XPLR_PIPE_RESULT_OUT:?}")
-              - SwitchModeBuiltin: default
               - ClearScreen
+              - PopMode
               - Refresh
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     number:
       name: number
@@ -998,21 +1028,25 @@ modes:
             help: to down
             messages:
               - FocusNextByRelativeIndexFromInput
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           enter:
             help: to index
             messages:
               - FocusByIndexFromInput
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           up:
             help: to up
             messages:
               - FocusPreviousByRelativeIndexFromInput
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
         on_number:
           help: input
           messages:
@@ -1047,7 +1081,8 @@ modes:
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           D:
             help: force delete
             messages:
@@ -1062,7 +1097,8 @@ modes:
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
                   echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
               - ExplorePwdAsync
           ctrl-c:
             help: terminate
@@ -1071,7 +1107,8 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     action:
       name: action to
@@ -1082,7 +1119,7 @@ modes:
         on_number:
           help: go to index
           messages:
-            - ResetInputBuffer
+            - PopMode
             - SwitchModeBuiltin: number
             - BufferInputFromKey
         on_key:
@@ -1094,11 +1131,14 @@ modes:
                   args:
                     - "-i"
               - ExplorePwdAsync
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           c:
             help: create
             messages:
+              - PopMode
               - SwitchModeBuiltin: create
+              - Refresh
           e:
             help: open in editor
             messages:
@@ -1106,17 +1146,21 @@ modes:
                   (while IFS= read -r line; do
                     ${EDITOR:-vi} "${line:?}"
                    done < "${XPLR_PIPE_RESULT_OUT:?}")
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           s:
             help: selection operations
             messages:
+              - PopMode
               - SwitchModeBuiltin: selection_ops
+              - Refresh
           l:
             help: logs
             messages:
               - BashExec: |
                   cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:-less}
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -1124,7 +1168,8 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
     search:
       name: search
@@ -1174,8 +1219,9 @@ modes:
             help: focus
             messages:
               - RemoveNodeFilterFromInput: IRelativePathDoesContain
-              - SwitchModeBuiltin: default
+              - PopMode
               - ExplorePwdAsync
+              - Refresh
           left:
             help: back
             messages:
@@ -1209,22 +1255,26 @@ modes:
             help: default
             messages:
               - SwitchLayoutBuiltin: default
-              - SwitchMode: default
+              - PopMode
+              - Refresh
           2:
             help: no help menu
             messages:
               - SwitchLayoutBuiltin: no_help
-              - SwitchMode: default
+              - PopMode
+              - Refresh
           3:
             help: no selection panel
             messages:
               - SwitchLayoutBuiltin: no_selection
-              - SwitchMode: default
+              - PopMode
+              - Refresh
           4:
             help: no help or selection
             messages:
               - SwitchLayoutBuiltin: no_help_no_selection
-              - SwitchMode: default
+              - PopMode
+              - Refresh
           ctrl-c:
             help: terminate
             messages:
@@ -1232,6 +1282,7 @@ modes:
           esc:
             help: cancel
             messages:
-              - SwitchModeBuiltin: default
+              - PopMode
+              - Refresh
 
   custom: {}
