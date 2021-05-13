@@ -1707,9 +1707,9 @@ impl App {
             .or_else(|| default.map(|a| a.messages().clone()))
             .unwrap_or_else(|| {
                 vec![
-                    ExternalMsg::SwitchModeBuiltin("reckless".into()),
+                    ExternalMsg::SwitchModeBuiltin("recover".into()),
                     ExternalMsg::LogWarning(
-                        "You're being reckless. Let's calm down, escape, and try again.".into(),
+                        "Key map not found. Let's calm down, escape, and try again.".into(),
                     ),
                     ExternalMsg::Refresh,
                 ]
@@ -1993,7 +1993,7 @@ impl App {
     }
 
     fn push_mode(mut self) -> Self {
-        if self.mode() != self.config().modes().builtin().reckless()
+        if self.mode() != self.config().modes().builtin().recover()
             && self
                 .last_modes
                 .last()
@@ -2488,7 +2488,7 @@ impl App {
 
         [
             builtin.default(),
-            builtin.reckless(),
+            builtin.recover(),
             builtin.filter(),
             builtin.number(),
             builtin.go_to(),
