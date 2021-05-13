@@ -382,12 +382,17 @@ modes:
             help: create file
             messages:
               - BashExecSilently: |
-                  PTH="${XPLR_INPUT_BUFFER:?}"
-                  touch -- "${PTH:?}" \
-                    && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
-                    && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                    && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
-              - SetInputBuffer: ""
+                  PTH="$XPLR_INPUT_BUFFER"
+                  if [ "${PTH}" ]; then
+                    touch -- "${PTH:?}" \
+                      && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
+                      && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+                      && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                      && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  else
+                      echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+                  fi
           backspace:
             help: remove last character
             messages:
@@ -424,12 +429,17 @@ modes:
             help: create directory
             messages:
               - BashExecSilently: |
-                  PTH="${XPLR_INPUT_BUFFER:?}"
-                  mkdir -p -- "${PTH:?}" \
-                    && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                    && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
-                    && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
-              - SetInputBuffer: ""
+                  PTH="$XPLR_INPUT_BUFFER"
+                  if [ "${PTH}" ]; then
+                    mkdir -p -- "${PTH:?}" \
+                      && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
+                      && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                      && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+                      && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  else
+                      echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
+                      echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+                  fi
           backspace:
             help: remove last character
             messages:
@@ -1069,7 +1079,6 @@ modes:
                     if [ -d "$line" ]; then
                       if rmdir -v -- "${line:?}"; then
                         echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
-                        echo FocusNext >> "${XPLR_PIPE_MSG_IN:?}"
                       else
                         echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
                       fi
@@ -1092,16 +1101,14 @@ modes:
                   (while IFS= read -r line; do
                     if rm -rfv -- "${line:?}"; then
                       echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
-                      echo FocusNext >> "${XPLR_PIPE_MSG_IN:?}"
                     else
                       echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
                     fi
                   done < "${XPLR_PIPE_RESULT_OUT:?}")
-                  echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
               - PopMode
               - Refresh
-              - ExplorePwdAsync
           ctrl-c:
             help: terminate
             messages:
