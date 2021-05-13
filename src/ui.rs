@@ -826,57 +826,60 @@ fn draw_logs<B: Backend>(
         .map(|c| default_panel_config.clone().extend(c))
         .unwrap_or(default_panel_config);
     let logs_config = app.config().general().logs().clone();
-    let logs = app
-        .logs()
-        .iter()
-        .rev()
-        .take(1)
-        .rev()
-        .map(|l| {
-            let time = l.created_at().format("%r");
-            match l.level() {
-                app::LogLevel::Info => ListItem::new(format!(
-                    "{} | {} | {}",
-                    &time,
-                    &logs_config.info().format().to_owned().unwrap_or_default(),
-                    l.message()
-                ))
-                .style(logs_config.info().style().clone().into()),
+    let logs = if app.logs_hidden() {
+        vec![]
+    } else {
+        app.logs()
+            .iter()
+            .rev()
+            .take(1)
+            .rev()
+            .map(|l| {
+                let time = l.created_at().format("%r");
+                match l.level() {
+                    app::LogLevel::Info => ListItem::new(format!(
+                        "{} | {} | {}",
+                        &time,
+                        &logs_config.info().format().to_owned().unwrap_or_default(),
+                        l.message()
+                    ))
+                    .style(logs_config.info().style().clone().into()),
 
-                app::LogLevel::Warning => ListItem::new(format!(
-                    "{} | {} | {}",
-                    &time,
-                    &logs_config
-                        .warning()
-                        .format()
-                        .to_owned()
-                        .unwrap_or_default(),
-                    l.message()
-                ))
-                .style(logs_config.warning().style().clone().into()),
+                    app::LogLevel::Warning => ListItem::new(format!(
+                        "{} | {} | {}",
+                        &time,
+                        &logs_config
+                            .warning()
+                            .format()
+                            .to_owned()
+                            .unwrap_or_default(),
+                        l.message()
+                    ))
+                    .style(logs_config.warning().style().clone().into()),
 
-                app::LogLevel::Success => ListItem::new(format!(
-                    "{} | {} | {}",
-                    &time,
-                    &logs_config
-                        .success()
-                        .format()
-                        .to_owned()
-                        .unwrap_or_default(),
-                    l.message()
-                ))
-                .style(logs_config.success().style().clone().into()),
+                    app::LogLevel::Success => ListItem::new(format!(
+                        "{} | {} | {}",
+                        &time,
+                        &logs_config
+                            .success()
+                            .format()
+                            .to_owned()
+                            .unwrap_or_default(),
+                        l.message()
+                    ))
+                    .style(logs_config.success().style().clone().into()),
 
-                app::LogLevel::Error => ListItem::new(format!(
-                    "{} | {} | {}",
-                    &time,
-                    &logs_config.error().format().to_owned().unwrap_or_default(),
-                    l.message()
-                ))
-                .style(logs_config.error().style().clone().into()),
-            }
-        })
-        .collect::<Vec<ListItem>>();
+                    app::LogLevel::Error => ListItem::new(format!(
+                        "{} | {} | {}",
+                        &time,
+                        &logs_config.error().format().to_owned().unwrap_or_default(),
+                        l.message()
+                    ))
+                    .style(logs_config.error().style().clone().into()),
+                }
+            })
+            .collect::<Vec<ListItem>>()
+    };
 
     let logs_list = List::new(logs).block(block(config, format!(" Logs ({}) ", app.logs().len())));
 
