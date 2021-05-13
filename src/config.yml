@@ -936,8 +936,8 @@ modes:
             - SwitchModeBuiltin: number
             - BufferInputFromKey
 
-    reckless:
-      name: reckless
+    recover:
+      name: recover
       key_bindings:
         on_key:
           esc:
@@ -949,6 +949,8 @@ modes:
             help: terminate
             messages:
               - Terminate
+        default:
+          messages: []
 
     go_to:
       name: go to

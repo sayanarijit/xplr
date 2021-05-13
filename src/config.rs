@@ -849,7 +849,7 @@ pub struct BuiltinModesConfig {
     default: Mode,
 
     #[serde(default)]
-    reckless: Mode,
+    recover: Mode,
 
     #[serde(default)]
     selection_ops: Mode,
@@ -900,7 +900,7 @@ pub struct BuiltinModesConfig {
 impl BuiltinModesConfig {
     pub fn extend(mut self, other: Self) -> Self {
         self.default = self.default.extend(other.default);
-        self.reckless = self.reckless.extend(other.reckless);
+        self.recover = self.recover.extend(other.recover);
         self.selection_ops = self.selection_ops.extend(other.selection_ops);
         self.go_to = self.go_to.extend(other.go_to);
         self.create = self.create.extend(other.create);
@@ -926,7 +926,7 @@ impl BuiltinModesConfig {
     pub fn get(&self, name: &str) -> Option<&Mode> {
         match name {
             "default" => Some(&self.default),
-            "reckless" => Some(&self.reckless),
+            "recover" => Some(&self.recover),
             "selection ops" => Some(&self.selection_ops),
             "selection_ops" => Some(&self.selection_ops),
             "create" => Some(&self.create),
@@ -1033,9 +1033,9 @@ impl BuiltinModesConfig {
         &self.switch_layout
     }
 
-    /// Get a reference to the builtin modes config's reckless.
-    pub fn reckless(&self) -> &Mode {
-        &self.reckless
+    /// Get a reference to the builtin modes config's recover.
+    pub fn recover(&self) -> &Mode {
+        &self.recover
     }
 }
 
