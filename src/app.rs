@@ -1686,10 +1686,9 @@ impl App {
         let key_str = key.to_string();
         let default = kb.default().clone();
         let msgs = kb
-            .remaps()
+            .on_key()
             .get(&key_str)
-            .and_then(|k| kb.on_key().get(k))
-            .or_else(|| kb.on_key().get(&key_str))
+            .to_owned()
             .map(|a| Some(a.messages().clone()))
             .unwrap_or_else(|| {
                 if key.is_alphabet() {
@@ -2522,7 +2521,7 @@ impl App {
                             .key_bindings()
                             .remaps()
                             .iter()
-                            .filter(|(_, t)| t == &k)
+                            .filter(|(_, maybeto)| maybeto.as_ref().map(|to| to == k).unwrap_or(false))
                             .map(|(f, _)| f.clone())
                             .collect::<Vec<String>>()
                             .join(", ");

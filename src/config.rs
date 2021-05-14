@@ -9,6 +9,7 @@ use crate::ui::Constraint;
 use crate::ui::Layout;
 use crate::ui::Style;
 use anyhow::Result;
+use indexmap::IndexMap;
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -649,7 +650,7 @@ impl GeneralConfig {
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
     #[serde(default)]
-    remaps: BTreeMap<String, String>,
+    remaps: IndexMap<String, Option<String>>,
 
     #[serde(default)]
     on_key: BTreeMap<String, Action>,
@@ -682,13 +683,22 @@ impl KeyBindings {
                 .on_special_character
                 .and_then(|a| a.sanitized(read_only));
             self.default = self.default.and_then(|a| a.sanitized(read_only));
-            self.remaps = self
-                .remaps
-                .clone()
-                .into_iter()
-                .filter(|(_, v)| self.on_key.contains_key(v))
-                .collect();
         };
+
+        let mut remaps = IndexMap::new();
+        for (from, maybe_to) in self.remaps.into_iter() {
+            if let Some(to) = maybe_to.as_ref() {
+                let mapped = self.on_key.get(to).cloned();
+                if let Some(a) = mapped {
+                    self.on_key.insert(from.clone(), a.clone());
+                    remaps.insert(from, maybe_to);
+                }
+            } else {
+                self.on_key.remove(&from);
+            }
+        }
+
+        self.remaps = remaps;
         self
     }
 
@@ -703,7 +713,7 @@ impl KeyBindings {
     }
 
     /// Get a reference to the key bindings's remaps.
-    pub fn remaps(&self) -> &BTreeMap<String, String> {
+    pub fn remaps(&self) -> &IndexMap<String, Option<String>> {
         &self.remaps
     }
 
@@ -784,7 +794,17 @@ impl Mode {
                         self.key_bindings
                             .on_key
                             .iter()
-                            .filter(|(k, _)| !self.key_bindings.remaps.contains_key(&k.to_string()))
+                            .filter(|(k, v)| {
+                                !self
+                                    .key_bindings
+                                    .remaps
+                                    .get(*k)
+                                    .and_then(|mt| {
+                                        mt.as_ref()
+                                            .map(|t| self.key_bindings.on_key.get(t) == Some(v))
+                                    })
+                                    .unwrap_or(false)
+                            })
                             .filter_map(|(k, a)| {
                                 a.help.clone().map(|h| HelpMenuLine::KeyMap(k.into(), h))
                             }),
@@ -1255,6 +1275,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 9, 1) => true,
             (0, 9, 0) => true,
             (_, _, _) => false,
         };
@@ -1264,7 +1285,8 @@ impl Config {
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
         let result = match self.parsed_version()? {
-            (0, 9, 0) => None,
+            (0, 9, 1) => None,
+            (0, 9, 0) => Some("App version updated. Improved remap feature"),
             (_, _, _) => None,
         };
 

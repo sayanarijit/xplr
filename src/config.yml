@@ -1,4 +1,4 @@
-version: v0.9.0
+version: v0.9.1
 layouts:
   custom: {}
   builtin:
@@ -139,7 +139,7 @@ general:
       - format: ├─
       - format: ├─
       - format: ╰─
-    col_spacing: 0
+    col_spacing: 1
     col_widths:
       - Percentage: 10
       - Percentage: 50
@@ -359,6 +359,26 @@ modes:
                   done < "${XPLR_PIPE_SELECTION_OUT:?}")
                   echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
                   read -p "[enter to continue]"
+              - PopMode
+              - Refresh
+          x:
+            help: open in gui
+            messages:
+              - BashExecSilently: |
+                  if [ -z "$OPENER" ]; then
+                    if command -v xdg-open; then
+                      OPENER=xdg-open
+                    elif command -v open; then
+                      OPENER=open
+                    else
+                      echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                      exit 1
+                    fi
+                  fi
+                  (while IFS= read -r line; do
+                    $OPENER "${line:?}" > /dev/null 2>&1
+                   done < "${XPLR_PIPE_RESULT_OUT:?}")
+              - ClearScreen
               - PopMode
               - Refresh
           ctrl-c:
@@ -841,7 +861,8 @@ modes:
             help: global help menu
             messages:
               - BashExec: |
-                  cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:-less}
+                  [ -z "$PAGER" ] && PAGER="less -+F"
+                  cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
           '~':
             help: go home
             messages:
@@ -866,6 +887,7 @@ modes:
             help: switch layout
             messages:
               - SwitchModeBuiltin: switch_layout
+              - Refresh
           d:
             help: delete
             messages:
@@ -884,7 +906,7 @@ modes:
             help: go to
             messages:
               - PopMode
-              - SwitchModeBuiltin: go to
+              - SwitchModeBuiltin: go_to
               - Refresh
           left:
             help: back
@@ -999,9 +1021,7 @@ modes:
                       exit 1
                     fi
                   fi
-                  (while IFS= read -r line; do
-                    $OPENER "${line:?}" &> /dev/null &
-                   done < "${XPLR_PIPE_RESULT_OUT:?}")
+                  $OPENER "${XPLR_FOCUS_PATH:?}" > /dev/null 2>&1
               - ClearScreen
               - PopMode
               - Refresh
@@ -1167,7 +1187,8 @@ modes:
             help: logs
             messages:
               - BashExec: |
-                  cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:-less}
+                  [ -z "$PAGER" ] && PAGER="less -+F"
+                  cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:?}
               - PopMode
               - Refresh
           ctrl-c:
