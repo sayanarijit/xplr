@@ -659,7 +659,7 @@ fn draw_help_menu<B: Backend>(
                     .key_bindings()
                     .remaps()
                     .iter()
-                    .filter(|(_, t)| t == &&k)
+                    .filter(|(_, maybeto)| maybeto.as_ref().map(|to| to == &k).unwrap_or(false))
                     .map(|(f, _)| f.clone())
                     .collect::<Vec<String>>()
                     .join("|");
