@@ -1259,7 +1259,7 @@ impl Config {
         self
     }
 
-    fn parsed_version(&self) -> Result<(u16, u16, u16)> {
+    fn parsed_version(&self) -> Result<(u16, u16, u16, Option<u16>)> {
         let mut configv = self
             .version
             .strip_prefix('v')
@@ -1268,27 +1268,31 @@ impl Config {
 
         let major = configv.next().unwrap_or_default().parse::<u16>()?;
         let minor = configv.next().unwrap_or_default().parse::<u16>()?;
-        let bugfix = configv.next().unwrap_or_default().parse::<u16>()?;
+        let bugfix = configv
+            .next()
+            .and_then(|s| s.split('-').next())
+            .unwrap_or_default()
+            .parse::<u16>()?;
 
-        Ok((major, minor, bugfix))
+        let beta = configv.next().unwrap_or_default().parse::<u16>().ok();
+
+        Ok((major, minor, bugfix, beta))
     }
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
-            (0, 9, 1) => true,
-            (0, 9, 0) => true,
-            (_, _, _) => false,
+            (0, 10, 0, Some(0)) => true,
+            (_, _, _, _) => false,
         };
 
         Ok(result)
     }
 
     pub fn upgrade_notification(&self) -> Result<Option<&str>> {
-        let result = match self.parsed_version()? {
-            (0, 9, 1) => None,
-            (0, 9, 0) => Some("App version updated. Improved remap feature"),
-            (_, _, _) => None,
-        };
+        let result = None;
+        // let result = match self.parsed_version()? {
+        //     (_, _, _, _) => None,
+        // };
 
         Ok(result)
     }
@@ -1316,6 +1320,12 @@ impl Config {
     /// Get a reference to the config's modes.
     pub fn modes(&self) -> &ModesConfig {
         &self.modes
+    }
+
+    /// Set the config's version.
+    pub fn with_version(mut self, version: String) -> Self {
+        self.version = version;
+        self
     }
 }
 

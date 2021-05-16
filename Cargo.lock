@@ -127,6 +127,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "cc"
+version = "1.0.67"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3c69b077ad434294d3ce9f1f6143a2a4b89a8a2d54ef813d85003a4fd1137fd"
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -333,6 +339,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
+name = "erased-serde"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0465971a8cc1fa2455c8465aaa377131e1f1cf4983280f474a13e68793aa770c"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "fake-simd"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -489,6 +504,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "lua-src"
+version = "543.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "029180f994b9b36f47d905f92569b516acf7d073778e2e781c15ee375b1ca27d"
+dependencies = [
+ "cc",
+]
+
+[[package]]
+name = "luajit-src"
+version = "210.1.3+restyfe08842"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36d3de8377d8e0492b646527befb7eb826a9ecd2dc8c1f81ab0e654bc03a029b"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "maplit"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -545,6 +578,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9f1c5b025cda876f66ef43a113f91ebc9f4ccef34843000e0adf6ebbab84e21"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "mlua"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd448d3e7018f2ff38dd732a374045f5b037eb4ee477d9241d9bb8c209528c1c"
+dependencies = [
+ "bstr",
+ "cc",
+ "erased-serde",
+ "lazy_static",
+ "lua-src",
+ "luajit-src",
+ "num-traits",
+ "pkg-config",
+ "serde",
 ]
 
 [[package]]
@@ -676,6 +726,12 @@ dependencies = [
  "pest",
  "sha-1",
 ]
+
+[[package]]
+name = "pkg-config"
+version = "0.3.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3831453b3449ceb48b6d9c7ad7c96d5ea673e9b470a1dc578c2ce6521230884c"
 
 [[package]]
 name = "plotters"
@@ -1193,7 +1249,7 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "xplr"
-version = "0.9.1"
+version = "0.10.0-beta.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1205,6 +1261,7 @@ dependencies = [
  "indexmap",
  "lazy_static",
  "mime_guess",
+ "mlua",
  "natord",
  "serde",
  "serde_yaml",
