@@ -5,6 +5,7 @@ use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
 use indexmap::set::IndexSet;
+use mlua::LuaSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -1417,6 +1418,18 @@ impl History {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LuaData {
+    config: Config,
+}
+
+impl LuaData {
+    pub fn new(config: Config) -> Self {
+        Self { config }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     version: String,
     config: Config,
@@ -1442,14 +1455,16 @@ impl App {
         let config_dir = dirs::config_dir()
             .unwrap_or_else(|| PathBuf::from("."))
             .join("xplr");
+        let yaml_config_file = config_dir.join("config.yml");
+        let lua_script_file = config_dir.join("init.lua");
 
-        let config_file = config_dir.join("config.yml");
         let default_config = Config::default();
         let default_config_version = default_config.version().clone();
 
-        let config: Config = if config_file.exists() {
+        // TODO deprecate this ---------------------------------
+        let config: Config = if yaml_config_file.exists() {
             let c: Config =
-                serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?;
+                serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&yaml_config_file)?))?;
             c.extended()
         } else {
             default_config
@@ -1461,7 +1476,59 @@ impl App {
                 You config version is : {}
                 Required version is   : {}
                 Visit {}",
-                config_file.to_string_lossy().to_string(),
+                yaml_config_file.to_string_lossy().to_string(),
+                config.version(),
+                default_config_version,
+                UPGRADE_GUIDE_LINK,
+            )
+        };
+        // -------------------------------------------------------
+
+        let config: Config = if lua_script_file.exists() {
+            let lua = mlua::Lua::new();
+            let globals = lua.globals();
+            let lua_script = fs::read_to_string(&lua_script_file)?;
+            let luadata = LuaData::new(config);
+
+            // TODO: https://github.com/khvzak/mlua/issues/48
+
+            if let Err(e) = lua.to_value(&luadata).and_then(|v| globals.set("xplr", v)) {
+                bail!(e.to_string())
+            };
+
+            if let Err(e) = lua
+                .load(&lua_script)
+                .set_name("init")
+                .and_then(|l| l.exec())
+            {
+                bail!(e.to_string())
+            }
+
+            let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
+                Ok(v) => v,
+                Err(_) => bail!(format!(
+                    "'version' must globally be defined in {}",
+                    &lua_script_file.to_string_lossy().to_string()
+                )),
+            };
+
+            let luadata: LuaData = match globals.get("xplr").and_then(|v| lua.from_value(v)) {
+                Ok(d) => d,
+                Err(e) => bail!(e.to_string()),
+            };
+
+            luadata.config.with_version(version)
+        } else {
+            config
+        };
+
+        if !config.is_compatible()? {
+            bail!(
+                "incompatible configuration version in {}
+                You config version is : {}
+                Required version is   : {}
+                Visit {}",
+                lua_script_file.to_string_lossy().to_string(),
                 config.version(),
                 default_config_version,
                 UPGRADE_GUIDE_LINK,
@@ -1542,7 +1609,7 @@ impl App {
 
         if let Some(notif) = config.upgrade_notification()? {
             let notif = format!(
-                "{}. To stop seeing this log, update your config version from {} to {}.",
+                "{}. To stop seeing this log, update your config version from {} to {}",
                 &notif,
                 config.version(),
                 app.version()
@@ -1552,6 +1619,18 @@ impl App {
                 None,
             ));
         }
+
+        // if yaml_config_file.exists() && !lua_script_file.exists() {
+        //     let notif = format!(
+        //         "`config.yml` will be deprecated in favor of `init.lua`. To stop this warning, create empty file {}",
+        //         lua_script_file.to_string_lossy().to_string()
+        //     );
+
+        //     app = app.enqueue(Task::new(
+        //         MsgIn::External(ExternalMsg::LogWarning(notif)),
+        //         None,
+        //     ));
+        // }
 
         app.write_pipes()?;
         Ok(app)
