@@ -1172,9 +1172,7 @@ modes:
             help: open in editor
             messages:
               - BashExec: |
-                  (while IFS= read -r line; do
-                    ${EDITOR:-vi} "${line:?}"
-                   done < "${XPLR_PIPE_RESULT_OUT:?}")
+                  ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
               - PopMode
               - Refresh
           s:
