@@ -14,6 +14,10 @@ use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
+use gluon::{Thread, ThreadExt, new_vm};
+use gluon::base::types::ArcType;
+use gluon::vm::api::VmType;
+use gluon::vm::api::de::De;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -1316,6 +1320,15 @@ impl Config {
     /// Get a reference to the config's modes.
     pub fn modes(&self) -> &ModesConfig {
         &self.modes
+    }
+}
+
+impl VmType for Config {
+    type Type = Self;
+
+    fn make_type(thread: &Thread) -> ArcType {
+        // Use the enum type declared in gluon
+        thread.find_type_info("init.config").unwrap().into_type()
     }
 }
 

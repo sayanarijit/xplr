@@ -4,6 +4,8 @@ use crate::input::Key;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
+use gluon::vm::api::*;
+use gluon::*;
 use indexmap::set::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -1443,14 +1445,20 @@ impl App {
             .unwrap_or_else(|| PathBuf::from("."))
             .join("xplr");
 
-        let config_file = config_dir.join("config.yml");
+        let config_file = config_dir.join("config.glu");
         let default_config = Config::default();
         let default_config_version = default_config.version().clone();
 
         let config: Config = if config_file.exists() {
-            let c: Config =
-                serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&config_file)?))?;
-            c.extended()
+            let vm = new_vm();
+            // Ensure that the prelude module is loaded before trying to access something from it
+            vm.run_expr::<OpaqueValue<&Thread, Hole>>("example", r#" import! std.prelude "#)
+                .unwrap();
+            let mut add: FunctionRef<fn(i32, i32) -> i32> =
+                vm.get_global("std.prelude.num_Int.(+)").unwrap();
+            let result = add.call(1, 2);
+            assert_eq!(result, Ok(3));
+            default_config
         } else {
             default_config
         };

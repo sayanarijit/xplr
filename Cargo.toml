@@ -29,6 +29,7 @@ lazy_static = "1.4.0"
 indexmap = { version = "1.6.2", features = ["serde"] }
 natord = "1.0.9"
 humansize = "1.1.0"
+gluon = { version = "*", features = ["serialization"] }
 
 [dev-dependencies]
 criterion = "0.3"
