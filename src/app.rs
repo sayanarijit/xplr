@@ -1490,8 +1490,6 @@ impl App {
             let lua_script = fs::read_to_string(&lua_script_file)?;
             let luadata = LuaData::new(config);
 
-            // TODO: https://github.com/khvzak/mlua/issues/48
-
             lua.to_value(&luadata)
                 .and_then(|v| globals.set("xplr", v))?;
 
