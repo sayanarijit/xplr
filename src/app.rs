@@ -1492,30 +1492,22 @@ impl App {
 
             // TODO: https://github.com/khvzak/mlua/issues/48
 
-            if let Err(e) = lua.to_value(&luadata).and_then(|v| globals.set("xplr", v)) {
-                bail!(e.to_string())
-            };
+            lua.to_value(&luadata)
+                .and_then(|v| globals.set("xplr", v))?;
 
-            if let Err(e) = lua
-                .load(&lua_script)
+            lua.load(&lua_script)
                 .set_name("init")
-                .and_then(|l| l.exec())
-            {
-                bail!(e.to_string())
-            }
+                .and_then(|l| l.exec())?;
 
             let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
                 Ok(v) => v,
                 Err(_) => bail!(format!(
-                    "'version' must globally be defined in {}",
+                    "'version' must be defined globally in {}",
                     &lua_script_file.to_string_lossy().to_string()
                 )),
             };
 
-            let luadata: LuaData = match globals.get("xplr").and_then(|v| lua.from_value(v)) {
-                Ok(d) => d,
-                Err(e) => bail!(e.to_string()),
-            };
+            let luadata: LuaData = globals.get("xplr").and_then(|v| lua.from_value(v))?;
 
             luadata.config.with_version(version)
         } else {
