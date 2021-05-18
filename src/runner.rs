@@ -197,7 +197,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                             tx_event_reader.send(true)?;
 
                             app.write_pipes()?;
-                            let status = call(&app, cmd, false)
+                            let status = call(&app, cmd, true)
                                 .map(|s| {
                                     if s.success() {
                                         Ok(())
