@@ -58,6 +58,9 @@ Table of content
 
 ## Demo
 
+<details>
+<summary>Expand for demo</summary>
+  
 <p align="center">
 
 <a href="https://github.com/sayanarijit/xplr/wiki/Hacks#fuzzy-search-with-preview" target="_blank">
@@ -85,6 +88,8 @@ Table of content
 </a>
 
 </p>
+</details>
+
 
 ## Packaging
 
