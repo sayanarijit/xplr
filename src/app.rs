@@ -1421,9 +1421,11 @@ pub struct History {
 
 impl History {
     fn push(mut self, path: String) -> Self {
-        self.paths = self.paths.into_iter().take(self.loc + 1).collect();
-        self.paths.push(path);
-        self.loc = self.paths.len().max(1) - 1;
+        if self.peek() != Some(&path) {
+            self.paths = self.paths.into_iter().take(self.loc + 1).collect();
+            self.paths.push(path);
+            self.loc = self.paths.len().max(1) - 1;
+        }
         self
     }
 
@@ -1812,11 +1814,19 @@ impl App {
     }
 
     pub fn focus_first(mut self, save_history: bool) -> Result<Self> {
+        let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
+            if save_history {
+                if let Some(n) = dir.focused_node() {
+                    history = history.push(n.absolute_path().clone());
+                }
+            }
+
             dir.focus = 0;
+
             if save_history {
                 if let Some(n) = self.clone().focused_node() {
-                    self.history = self.history.push(n.absolute_path().clone())
+                    self.history = history.push(n.absolute_path().clone())
                 }
             }
             self.refresh()
@@ -1826,11 +1836,15 @@ impl App {
     }
 
     fn focus_last(mut self) -> Result<Self> {
-        let history = self.history.clone();
+        let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
+            if let Some(n) = dir.focused_node() {
+                history = history.push(n.absolute_path().clone());
+            }
+
             dir.focus = dir.total.max(1) - 1;
 
-            if let Some(n) = self.focused_node() {
+            if let Some(n) = dir.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
             }
             self.refresh()
@@ -1849,8 +1863,12 @@ impl App {
     }
 
     fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
-        let history = self.history.clone();
+        let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
+            if let Some(n) = dir.focused_node() {
+                history = history.push(n.absolute_path().clone());
+            }
+
             dir.focus = dir.focus.max(index) - index;
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
@@ -1879,8 +1897,12 @@ impl App {
     }
 
     fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
-        let history = self.history.clone();
+        let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
+            if let Some(n) = dir.focused_node() {
+                history = history.push(n.absolute_path().clone());
+            }
+
             dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
@@ -2055,7 +2077,7 @@ impl App {
     }
 
     pub fn focus_by_file_name(mut self, name: &str, save_history: bool) -> Result<Self> {
-        let history = self.history.clone();
+        let mut history = self.history.clone();
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
                 .clone()
@@ -2065,6 +2087,11 @@ impl App {
                 .find(|(_, n)| n.relative_path == name)
                 .map(|(i, _)| i)
             {
+                if save_history {
+                    if let Some(n) = dir_buf.focused_node() {
+                        history = history.push(n.absolute_path().clone());
+                    }
+                }
                 dir_buf.focus = focus;
                 if save_history {
                     if let Some(n) = dir_buf.focused_node() {
