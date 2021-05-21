@@ -1,4 +1,4 @@
-version = "v0.10.0-beta.2"
+version = "v0.10.0-beta.3"
 
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
     local r = ""
