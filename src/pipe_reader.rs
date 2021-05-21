@@ -9,17 +9,21 @@ use std::time::Duration;
 pub fn keep_reading(pipe: String, tx: Sender<Task>) {
     let mut last_modified = None;
     thread::spawn(move || loop {
-        let modified = PathBuf::from(&pipe)
-            .metadata()
-            .and_then(|m| m.modified())
-            .ok();
+        let path = PathBuf::from(&pipe);
+
+        if !path.exists() {
+            thread::sleep(Duration::from_millis(50));
+            continue;
+        }
+
+        let modified = path.metadata().and_then(|m| m.modified()).ok();
 
         if modified == last_modified {
             thread::sleep(Duration::from_millis(50));
         } else if let Ok(mut file) = fs::OpenOptions::new()
             .read(true)
             .write(true)
-            .create(true)
+            .create(false)
             .open(&pipe)
         {
             let mut in_str = String::new();
