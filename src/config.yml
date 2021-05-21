@@ -1,4 +1,4 @@
-version: v0.10.0-beta.0
+version: v0.10.0-beta.1
 layouts:
   custom: {}
   builtin:
@@ -128,12 +128,10 @@ general:
       height: 1
     row:
       cols:
-        - format: '{{#if isBeforeFocus}}-{{else}} {{/if}}{{{relativeIndex}}}│{{{index}}}'
-        - format: >
-            {{{tree}}}{{{prefix}}}{{{meta.icon}}}{{#if (ne meta.icon "")}} {{/if}}{{{relativePath}}}{{#if isDir}}/{{/if}}{{{suffix}}}
-            {{#if isSymlink}}-> {{#if isBroken}}×{{else}}{{{symlink.absolutePath}}}{{/if}}{{#if symlink.isDir}}/{{/if}}{{/if}}
-        - format: '{{#unless isDir}}{{humansize size}}{{/unless}}'
-        - format: '{{#if isSymlink}}{{{symlink.mimeEssence}}}{{else}}{{{mimeEssence}}}{{/if}}'
+        - format: xplr.fn.builtin.fmt_general_table_row_cols_0
+        - format: xplr.fn.builtin.fmt_general_table_row_cols_1
+        - format: xplr.fn.builtin.fmt_general_table_row_cols_2
+        - format: xplr.fn.builtin.fmt_general_table_row_cols_3
       height: 0
     tree:
       - format: ├─

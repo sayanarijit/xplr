@@ -2,9 +2,11 @@ use crate::app;
 use crate::app::HelpMenuLine;
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
-use handlebars::Handlebars;
+use crate::lua::resolve_fn;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
+use mlua::Lua;
+use mlua::LuaSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -292,7 +294,6 @@ impl Constraint {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ResolvedNodeUiMetadata {
     absolute_path: String,
     extension: String,
@@ -301,6 +302,7 @@ pub struct ResolvedNodeUiMetadata {
     is_readonly: bool,
     mime_essence: String,
     size: u64,
+    human_size: String,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
@@ -313,12 +315,12 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
             is_readonly: node.is_readonly(),
             mime_essence: node.mime_essence().clone(),
             size: node.size(),
+            human_size: node.human_size().clone(),
         }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct NodeUiMetadata {
     // From Node
     parent: String,
@@ -332,6 +334,7 @@ struct NodeUiMetadata {
     is_readonly: bool,
     mime_essence: String,
     size: u64,
+    human_size: String,
     canonical: Option<ResolvedNodeUiMetadata>,
     symlink: Option<ResolvedNodeUiMetadata>,
 
@@ -376,6 +379,7 @@ impl NodeUiMetadata {
             is_readonly: node.is_readonly(),
             mime_essence: node.mime_essence().clone(),
             size: node.size(),
+            human_size: node.human_size().clone(),
             canonical: node.canonical().to_owned().map(|s| s.into()),
             symlink: node.symlink().to_owned().map(|s| s.into()),
             index,
@@ -417,7 +421,7 @@ fn draw_table<B: Backend>(
     screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    hb: &Handlebars,
+    lua: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config
@@ -430,6 +434,8 @@ fn draw_table<B: Backend>(
     let app_config = app.config().to_owned();
     let header_height = app_config.general().table().header().height().unwrap_or(1);
     let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
+
+    let globals = lua.globals();
 
     let rows = app
         .directory_buffer()
@@ -530,12 +536,28 @@ fn draw_table<B: Backend>(
                         node_type.meta().clone(),
                     );
 
-                    let cols = hb
-                        .render(app::TEMPLATE_TABLE_ROW, &meta)
-                        .ok()
-                        .unwrap_or_else(|| app::UNSUPPORTED_STR.into())
-                        .split('\t')
-                        .map(|x| Cell::from(x.to_string()))
+                    let cols = lua
+                        .to_value::<NodeUiMetadata>(&meta)
+                        .map(|v| {
+                            app_config
+                                .general()
+                                .table()
+                                .row()
+                                .cols()
+                                .clone()
+                                .unwrap_or_default()
+                                .iter()
+                                .filter_map(|c| {
+                                    c.format()
+                                        .to_owned()
+                                        .and_then(|f| resolve_fn(&globals, f.split('.')).ok())
+                                })
+                                .map(|f| f.call((v.clone(),)).unwrap_or_else(|e| e.to_string()))
+                                .collect::<Vec<String>>()
+                        })
+                        .unwrap_or_default()
+                        .iter()
+                        .map(|x| Cell::from(x.to_owned()))
                         .collect::<Vec<Cell>>();
 
                     Row::new(cols).style(style.into())
@@ -602,7 +624,7 @@ fn draw_selection<B: Backend>(
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    _: &Handlebars,
+    _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config
@@ -637,7 +659,7 @@ fn draw_help_menu<B: Backend>(
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    _: &Handlebars,
+    _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config
@@ -693,7 +715,7 @@ fn draw_input_buffer<B: Backend>(
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    _: &Handlebars,
+    _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config
@@ -734,7 +756,7 @@ fn draw_sort_n_filter<B: Backend>(
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    _: &Handlebars,
+    _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config
@@ -815,7 +837,7 @@ fn draw_logs<B: Backend>(
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    _: &Handlebars,
+    _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config
@@ -892,7 +914,7 @@ pub fn draw_nothing<B: Backend>(
     _screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    _hb: &Handlebars,
+    _lua: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
     let default_panel_config = panel_config.default().clone();
@@ -909,21 +931,21 @@ pub fn draw_layout<B: Backend>(
     screen_size: Rect,
     layout_size: Rect,
     app: &app::App,
-    hb: &Handlebars,
+    lua: &Lua,
 ) {
     match layout {
-        Layout::Nothing(config) => draw_nothing(config, f, screen_size, layout_size, app, hb),
-        Layout::Table(config) => draw_table(config, f, screen_size, layout_size, app, hb),
+        Layout::Nothing(config) => draw_nothing(config, f, screen_size, layout_size, app, lua),
+        Layout::Table(config) => draw_table(config, f, screen_size, layout_size, app, lua),
         Layout::SortAndFilter(config) => {
-            draw_sort_n_filter(config, f, screen_size, layout_size, app, hb)
+            draw_sort_n_filter(config, f, screen_size, layout_size, app, lua)
         }
-        Layout::HelpMenu(config) => draw_help_menu(config, f, screen_size, layout_size, app, hb),
-        Layout::Selection(config) => draw_selection(config, f, screen_size, layout_size, app, hb),
+        Layout::HelpMenu(config) => draw_help_menu(config, f, screen_size, layout_size, app, lua),
+        Layout::Selection(config) => draw_selection(config, f, screen_size, layout_size, app, lua),
         Layout::InputAndLogs(config) => {
             if app.input_buffer().is_some() {
-                draw_input_buffer(config, f, screen_size, layout_size, app, hb);
+                draw_input_buffer(config, f, screen_size, layout_size, app, lua);
             } else {
-                draw_logs(config, f, screen_size, layout_size, app, hb);
+                draw_logs(config, f, screen_size, layout_size, app, lua);
             };
         }
         Layout::Horizontal { config, splits } => {
@@ -955,7 +977,7 @@ pub fn draw_layout<B: Backend>(
             splits
                 .into_iter()
                 .zip(chunks.into_iter())
-                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, hb));
+                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, lua));
         }
 
         Layout::Vertical { config, splits } => {
@@ -987,16 +1009,16 @@ pub fn draw_layout<B: Backend>(
             splits
                 .into_iter()
                 .zip(chunks.into_iter())
-                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, hb));
+                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, lua));
         }
     }
 }
 
-pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, hb: &Handlebars) {
+pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, lua: &Lua) {
     let screen_size = f.size();
     let layout = app.layout().clone();
 
-    draw_layout(layout, f, screen_size, screen_size, app, hb);
+    draw_layout(layout, f, screen_size, screen_size, app, lua);
 }
 
 #[cfg(test)]

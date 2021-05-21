@@ -4,6 +4,7 @@ use crate::input::Key;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
+use humansize::{file_size_opts as options, FileSize};
 use indexmap::set::IndexSet;
 use mlua::LuaSerdeExt;
 use serde::{Deserialize, Serialize};
@@ -18,6 +19,11 @@ use std::path::PathBuf;
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
+
+fn to_humansize(size: u64) -> String {
+    size.file_size(options::CONVENTIONAL)
+        .unwrap_or_else(|_| format!("{} B", size))
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
@@ -125,6 +131,7 @@ pub struct ResolvedNode {
     is_readonly: bool,
     mime_essence: String,
     size: u64,
+    human_size: String,
 }
 
 impl ResolvedNode {
@@ -144,6 +151,8 @@ impl ResolvedNode {
             .map(|m| m.essence_str().to_string())
             .unwrap_or_default();
 
+        let human_size = to_humansize(size);
+
         Self {
             absolute_path: path.to_string_lossy().to_string(),
             extension,
@@ -152,6 +161,7 @@ impl ResolvedNode {
             is_readonly,
             mime_essence,
             size,
+            human_size,
         }
     }
 
@@ -189,6 +199,11 @@ impl ResolvedNode {
     pub fn size(&self) -> u64 {
         self.size
     }
+
+    /// Get a reference to the resolved node's human size.
+    pub fn human_size(&self) -> &String {
+        &self.human_size
+    }
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
@@ -204,6 +219,7 @@ pub struct Node {
     is_readonly: bool,
     mime_essence: String,
     size: u64,
+    human_size: String,
     canonical: Option<ResolvedNode>,
     symlink: Option<ResolvedNode>,
 }
@@ -245,6 +261,8 @@ impl Node {
             .map(|m| m.essence_str().to_string())
             .unwrap_or_default();
 
+        let human_size = to_humansize(size);
+
         Self {
             parent,
             relative_path,
@@ -257,6 +275,7 @@ impl Node {
             is_readonly,
             mime_essence,
             size,
+            human_size,
             canonical: maybe_canonical_meta.clone(),
             symlink: if is_symlink {
                 maybe_canonical_meta
@@ -329,6 +348,11 @@ impl Node {
     /// Get a reference to the node's absolute path.
     pub fn absolute_path(&self) -> &String {
         &self.absolute_path
+    }
+
+    /// Get a reference to the node's human size.
+    pub fn human_size(&self) -> &String {
+        &self.human_size
     }
 }
 
@@ -1418,18 +1442,6 @@ impl History {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct LuaData {
-    config: Config,
-}
-
-impl LuaData {
-    pub fn new(config: Config) -> Self {
-        Self { config }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     version: String,
     config: Config,
@@ -1451,7 +1463,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn create(pwd: PathBuf) -> Result<Self> {
+    pub fn create(pwd: PathBuf, lua: &mlua::Lua) -> Result<Self> {
         let config_dir = dirs::config_dir()
             .unwrap_or_else(|| PathBuf::from("."))
             .join("xplr");
@@ -1485,17 +1497,22 @@ impl App {
         // -------------------------------------------------------
 
         let config: Config = if lua_script_file.exists() {
-            let lua = mlua::Lua::new();
             let globals = lua.globals();
             let lua_script = fs::read_to_string(&lua_script_file)?;
-            let luadata = LuaData::new(config);
 
-            lua.to_value(&luadata)
-                .and_then(|v| globals.set("xplr", v))?;
+            let lua_xplr = lua.create_table()?;
+            lua_xplr.set("config", lua.to_value(&config)?)?;
 
-            lua.load(&lua_script)
-                .set_name("init")
-                .and_then(|l| l.exec())?;
+            let lua_xplr_fn = lua.create_table()?;
+            let lua_xplr_fn_builtin = lua.create_table()?;
+            let lua_xplr_fn_custom = lua.create_table()?;
+
+            lua_xplr_fn.set("builtin", lua_xplr_fn_builtin)?;
+            lua_xplr_fn.set("custom", lua_xplr_fn_custom)?;
+            lua_xplr.set("fn", lua_xplr_fn)?;
+            globals.set("xplr", lua_xplr)?;
+
+            lua.load(&lua_script).set_name("init")?.exec()?;
 
             let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
                 Ok(v) => v,
@@ -1505,9 +1522,10 @@ impl App {
                 )),
             };
 
-            let luadata: LuaData = globals.get("xplr").and_then(|v| lua.from_value(v))?;
+            let lua_xplr: mlua::Table = globals.get("xplr")?;
 
-            luadata.config.with_version(version)
+            let config: Config = lua.from_value(lua_xplr.get("config")?)?;
+            config.with_version(version)
         } else {
             config
         };

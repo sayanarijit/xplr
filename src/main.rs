@@ -21,12 +21,14 @@ fn main() {
         pwd = pwd.parent().map(|p| p.into()).unwrap_or_default();
     }
 
-    let app = app::App::create(pwd).unwrap_or_else(|e| {
+    let lua = mlua::Lua::new();
+
+    let app = app::App::create(pwd, &lua).unwrap_or_else(|e| {
         eprintln!("error: {}", e);
         std::process::exit(1);
     });
 
-    match runner::run(app, focused_path) {
+    match runner::run(app, focused_path, lua) {
         Ok(Some(out)) => print!("{}", out),
         Ok(None) => {}
         Err(err) => {
