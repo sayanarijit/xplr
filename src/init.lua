@@ -1,9 +1,6 @@
 version = 'v0.10.0-beta.1'
 
-config = xplr.config
-fn = xplr.fn
-
-fn.builtin.fmt_general_table_row_cols_0 = function(m)
+xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
     local r = ""
     if m.is_before_focus then
         r = r .. " -"
@@ -16,7 +13,7 @@ fn.builtin.fmt_general_table_row_cols_0 = function(m)
     return r
 end
 
-fn.builtin.fmt_general_table_row_cols_1 = function(m)
+xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     local r = m.tree .. m.prefix
 
     if m.meta.icon == nil then
@@ -33,7 +30,7 @@ fn.builtin.fmt_general_table_row_cols_1 = function(m)
 
     if m.is_symlink then
         r = r .. "-> "
-        
+
         if m.is_broken then
             r = r .. "×"
         else
@@ -48,7 +45,7 @@ fn.builtin.fmt_general_table_row_cols_1 = function(m)
     return r
 end
 
-fn.builtin.fmt_general_table_row_cols_2 = function(m)
+xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
     if not m.is_dir then
         return m.human_size
     else
@@ -56,7 +53,7 @@ fn.builtin.fmt_general_table_row_cols_2 = function(m)
     end
 end
 
-fn.builtin.fmt_general_table_row_cols_3 = function(m)
+xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
     if m.is_symlink then
         return m.symlink.mime_essence
     else
@@ -64,6 +61,6 @@ fn.builtin.fmt_general_table_row_cols_3 = function(m)
     end
 end
 
-fn.custom.foo = function(a, b)
+xplr.fn.custom.foo = function(a, b)
     return a + b
 end
