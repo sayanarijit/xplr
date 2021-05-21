@@ -1281,6 +1281,7 @@ impl Config {
 
     pub fn is_compatible(&self) -> Result<bool> {
         let result = match self.parsed_version()? {
+            (0, 10, 0, Some(2)) => true,
             (0, 10, 0, Some(1)) => true,
             (_, _, _, _) => false,
         };
