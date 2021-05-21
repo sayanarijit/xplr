@@ -29,8 +29,8 @@ fn to_humansize(size: u64) -> String {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
+    path: String,
     msg_in: String,
-    focus_out: String,
     selection_out: String,
     result_out: String,
     directory_nodes_out: String,
@@ -41,44 +41,31 @@ pub struct Pipe {
 
 impl Pipe {
     fn from_session_path(path: &str) -> Result<Self> {
-        let pipesdir = PathBuf::from(path).join("pipe");
+        let path = PathBuf::from(path).join("pipe");
 
-        fs::create_dir_all(&pipesdir).unwrap();
+        let msg_in = path.join("msg_in").to_string_lossy().to_string();
 
-        let msg_in = pipesdir.join("msg_in").to_string_lossy().to_string();
+        let selection_out = path.join("selection_out").to_string_lossy().to_string();
 
-        let focus_out = pipesdir.join("focus_out").to_string_lossy().to_string();
+        let result_out = path.join("result_out").to_string_lossy().to_string();
 
-        let selection_out = pipesdir.join("selection_out").to_string_lossy().to_string();
-
-        let result_out = pipesdir.join("result_out").to_string_lossy().to_string();
-
-        let directory_nodes_out = pipesdir
+        let directory_nodes_out = path
             .join("directory_nodes_out")
             .to_string_lossy()
             .to_string();
 
-        let global_help_menu_out = pipesdir
+        let global_help_menu_out = path
             .join("global_help_menu_out")
             .to_string_lossy()
             .to_string();
 
-        let logs_out = pipesdir.join("logs_out").to_string_lossy().to_string();
+        let logs_out = path.join("logs_out").to_string_lossy().to_string();
 
-        let history_out = pipesdir.join("history_out").to_string_lossy().to_string();
-
-        fs::write(&msg_in, "")?;
-        fs::write(&focus_out, "")?;
-        fs::write(&selection_out, "")?;
-        fs::write(&directory_nodes_out, "")?;
-        fs::write(&global_help_menu_out, "")?;
-        fs::write(&result_out, "")?;
-        fs::write(&logs_out, "")?;
-        fs::write(&history_out, "")?;
+        let history_out = path.join("history_out").to_string_lossy().to_string();
 
         Ok(Self {
+            path: path.to_string_lossy().to_string(),
             msg_in,
-            focus_out,
             selection_out,
             result_out,
             directory_nodes_out,
@@ -121,6 +108,11 @@ impl Pipe {
     /// Get a reference to the pipe's history out.
     pub fn history_out(&self) -> &String {
         &self.history_out
+    }
+
+    /// Get a reference to the pipe's path.
+    pub fn path(&self) -> &String {
+        &self.path
     }
 }
 
@@ -1616,7 +1608,6 @@ impl App {
         //     ));
         // }
 
-        app.write_pipes()?;
         Ok(app)
     }
 
@@ -2702,13 +2693,9 @@ impl App {
     pub fn write_pipes(&self) -> Result<()> {
         // TODO optimize and test
 
-        let focused_node_str = self.focused_node_str();
-        // if last_app
-        //     .map(|a| a.focused_node_str() != focused_node_str)
-        //     .unwrap_or(true)
-        // {
-        fs::write(&self.pipe().focus_out, focused_node_str)?;
-        // };
+        fs::create_dir_all(self.pipe().path())?;
+
+        fs::write(&self.pipe().msg_in, "")?;
 
         let selection_str = self.selection_str();
         // if last_app
@@ -2768,6 +2755,23 @@ impl App {
         // {
         fs::write(&self.pipe().global_help_menu_out, global_help_menu_str)?;
         // };
+        Ok(())
+    }
+
+    pub fn cleanup_pipes(&self) -> Result<()> {
+        while !fs::read_to_string(self.pipe().msg_in())?.is_empty() {
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+
+        fs::remove_file(self.pipe().msg_in())?;
+        fs::remove_file(self.pipe().selection_out())?;
+        fs::remove_file(self.pipe().result_out())?;
+        fs::remove_file(self.pipe().directory_nodes_out())?;
+        fs::remove_file(self.pipe().global_help_menu_out())?;
+        fs::remove_file(self.pipe().logs_out())?;
+        fs::remove_file(self.pipe().history_out())?;
+
+        fs::remove_dir(self.pipe().path())?;
         Ok(())
     }
 

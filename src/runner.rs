@@ -67,6 +67,8 @@ pub fn run(
     focused_path: Option<String>,
     lua: mlua::Lua,
 ) -> Result<Option<String>> {
+    fs::create_dir_all(app.session_path())?;
+
     let (tx_msg_in, rx_msg_in) = mpsc::channel();
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
@@ -181,6 +183,7 @@ pub fn run(
                                     }
                                 })
                                 .unwrap_or_else(|e| Err(e.to_string()));
+                            app.cleanup_pipes()?;
 
                             if let Err(e) = status {
                                 app = app.log_error(e.to_string())?;
@@ -210,6 +213,7 @@ pub fn run(
                                     }
                                 })
                                 .unwrap_or_else(|e| Err(e.to_string()));
+                            app.cleanup_pipes()?;
 
                             if let Err(e) = status {
                                 app = app.log_error(e.to_string())?;
@@ -241,7 +245,7 @@ pub fn run(
     term::disable_raw_mode()?;
     terminal.show_cursor()?;
 
-    fs::remove_dir_all(session_path)?;
+    fs::remove_dir(session_path)?;
 
     result
 }
