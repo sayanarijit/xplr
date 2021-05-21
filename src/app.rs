@@ -1,6 +1,7 @@
 use crate::config::Config;
 use crate::config::Mode;
 use crate::default_config::DEFAULT_LUA_SCRIPT;
+use crate::explorer;
 use crate::input::Key;
 use crate::lua;
 use crate::ui::Layout;
@@ -1328,7 +1329,6 @@ impl Command {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
-    ExplorePwd,
     ExplorePwdAsync,
     ExploreParentsAsync,
     Refresh,
@@ -1588,7 +1588,9 @@ impl App {
             history: Default::default(),
             last_modes: Default::default(),
         }
-        .change_directory(&pwd)?;
+        .change_directory(&pwd, false)?
+        .explore_pwd()? // Populates the history
+        .focus_first(true)?;
 
         if let Some(notif) = config.upgrade_notification()? {
             let notif = format!(
@@ -1658,7 +1660,7 @@ impl App {
                 ExternalMsg::ExplorePwdAsync => self.explore_pwd_async(),
                 ExternalMsg::Refresh => self.refresh(),
                 ExternalMsg::ClearScreen => self.clear_screen(),
-                ExternalMsg::FocusFirst => self.focus_first(),
+                ExternalMsg::FocusFirst => self.focus_first(true),
                 ExternalMsg::FocusLast => self.focus_last(),
                 ExternalMsg::FocusPrevious => self.focus_previous(),
                 ExternalMsg::FocusPreviousByRelativeIndex(i) => {
@@ -1673,12 +1675,12 @@ impl App {
                 ExternalMsg::FocusNextByRelativeIndexFromInput => {
                     self.focus_next_by_relative_index_from_input()
                 }
-                ExternalMsg::FocusPath(p) => self.focus_path(&p),
+                ExternalMsg::FocusPath(p) => self.focus_path(&p, true),
                 ExternalMsg::FocusPathFromInput => self.focus_path_from_input(),
                 ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
                 ExternalMsg::FocusByIndexFromInput => self.focus_by_index_from_input(),
-                ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n),
-                ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir),
+                ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n, true),
+                ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir, true),
                 ExternalMsg::Enter => self.enter(),
                 ExternalMsg::Back => self.back(),
                 ExternalMsg::LastVisitedPath => self.last_visited_path(),
@@ -1783,9 +1785,13 @@ impl App {
         Ok(self)
     }
 
-    fn explore_pwd(mut self) -> Result<Self> {
-        self.msg_out.push_back(MsgOut::ExplorePwd);
-        Ok(self)
+    fn explore_pwd(self) -> Result<Self> {
+        let dir = explorer::explore_sync(
+            self.explorer_config().clone(),
+            self.pwd().clone(),
+            self.focused_node().map(|n| n.absolute_path().clone()),
+        )?;
+        self.add_directory(dir.parent().clone(), dir)
     }
 
     fn explore_pwd_async(mut self) -> Result<Self> {
@@ -1808,36 +1814,54 @@ impl App {
         Ok(self)
     }
 
-    fn focus_first(mut self) -> Result<Self> {
+    fn focus_first(mut self, save_history: bool) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = 0;
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            if save_history {
+                if let Some(n) = self.clone().focused_node() {
+                    self.history = self.history.push(n.absolute_path().clone())
+                }
+            }
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_last(mut self) -> Result<Self> {
+        let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.total.max(1) - 1;
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+
+            if let Some(n) = self.focused_node() {
+                self.history = history.push(n.absolute_path().clone());
+            }
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_previous(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.focus.max(1) - 1;
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
+        let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.focus.max(index) - index;
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            if let Some(n) = self.focused_node() {
+                self.history = history.push(n.absolute_path().clone());
+            }
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_previous_by_relative_index_from_input(self) -> Result<Self> {
@@ -1851,17 +1875,23 @@ impl App {
     fn focus_next(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = (dir.focus + 1).min(dir.total.max(1) - 1);
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
+        let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            if let Some(n) = self.focused_node() {
+                self.history = history.push(n.absolute_path().clone());
+            }
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn focus_next_by_relative_index_from_input(self) -> Result<Self> {
@@ -1877,17 +1907,19 @@ impl App {
             .focused_node()
             .and_then(|n| n.symlink.to_owned().map(|s| s.absolute_path))
         {
-            self.focus_path(&pth)
+            self.focus_path(&pth, true)
         } else {
             Ok(self)
         }
     }
 
-    fn change_directory(mut self, dir: &str) -> Result<Self> {
+    fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
         match env::set_current_dir(dir) {
             Ok(()) => {
                 self.pwd = dir.to_owned();
-                self.history = self.history.push(self.pwd.clone());
+                if save_history {
+                    self.history = self.history.push(format!("{}/", self.pwd));
+                }
                 self.explore_pwd_async()
             }
             Err(e) => self.log_error(e.to_string()),
@@ -1897,7 +1929,7 @@ impl App {
     fn enter(self) -> Result<Self> {
         self.focused_node()
             .map(|n| n.absolute_path.clone())
-            .map(|p| self.clone().change_directory(&p))
+            .map(|p| self.clone().change_directory(&p, true))
             .unwrap_or(Ok(self))
     }
 
@@ -1906,31 +1938,41 @@ impl App {
             .parent()
             .map(|p| {
                 self.clone()
-                    .change_directory(&p.to_string_lossy().to_string())
+                    .change_directory(&p.to_string_lossy().to_string(), true)
             })
             .unwrap_or(Ok(self))
     }
 
     fn last_visited_path(mut self) -> Result<Self> {
         self.history = self.history.visit_last();
-        self.pwd = self
-            .history
-            .peek()
-            .map(|p| p.to_owned())
-            .unwrap_or(self.pwd);
-        env::set_current_dir(&self.pwd)?;
-        self.explore_pwd_async()
+        if let Some(target) = self.history.peek() {
+            if target.ends_with('/') {
+                target
+                    .strip_suffix('/')
+                    .map(|s| self.clone().change_directory(s, false))
+                    .unwrap_or(Ok(self))
+            } else {
+                self.clone().focus_path(target, false)
+            }
+        } else {
+            Ok(self)
+        }
     }
 
     fn next_visited_path(mut self) -> Result<Self> {
         self.history = self.history.visit_next();
-        self.pwd = self
-            .history
-            .peek()
-            .map(|p| p.to_owned())
-            .unwrap_or(self.pwd);
-        env::set_current_dir(&self.pwd)?;
-        self.explore_pwd_async()
+        if let Some(target) = self.history.peek() {
+            if target.ends_with('/') {
+                target
+                    .strip_suffix('/')
+                    .map(|s| self.clone().change_directory(s, false))
+                    .unwrap_or(Ok(self))
+            } else {
+                self.clone().focus_path(target, false)?.refresh()
+            }
+        } else {
+            Ok(self)
+        }
     }
 
     fn buffer_input(mut self, input: &str) -> Result<Self> {
@@ -1995,8 +2037,12 @@ impl App {
     }
 
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
+        let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = index.min(dir.total.max(1) - 1);
+            if let Some(n) = self.focused_node() {
+                self.history = history.push(n.absolute_path().clone());
+            }
             self.refresh()
         } else {
             Ok(self)
@@ -2011,7 +2057,8 @@ impl App {
         }
     }
 
-    fn focus_by_file_name(mut self, name: &str) -> Result<Self> {
+    fn focus_by_file_name(mut self, name: &str, save_history: bool) -> Result<Self> {
+        let history = self.history.clone();
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
                 .clone()
@@ -2022,6 +2069,11 @@ impl App {
                 .map(|(i, _)| i)
             {
                 dir_buf.focus = focus;
+                if save_history {
+                    if let Some(n) = dir_buf.focused_node() {
+                        self.history = history.push(n.absolute_path().clone());
+                    }
+                }
                 self.refresh()
             } else {
                 self.log_error(format!("{} not found in $PWD", name))
@@ -2031,12 +2083,12 @@ impl App {
         }
     }
 
-    fn focus_path(self, path: &str) -> Result<Self> {
+    fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
         let pathbuf = PathBuf::from(path);
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
-                self.change_directory(&parent.to_string_lossy().to_string())?
-                    .focus_by_file_name(&filename.to_string_lossy().to_string())
+                self.change_directory(&parent.to_string_lossy().to_string(), false)?
+                    .focus_by_file_name(&filename.to_string_lossy().to_string(), save_history)
             } else {
                 self.log_error(format!("{} not found", path))
             }
@@ -2047,7 +2099,7 @@ impl App {
 
     fn focus_path_from_input(self) -> Result<Self> {
         if let Some(p) = self.input_buffer() {
-            self.focus_path(&p)
+            self.focus_path(&p, true)
         } else {
             Ok(self)
         }
