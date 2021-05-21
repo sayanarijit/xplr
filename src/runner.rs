@@ -10,8 +10,6 @@ use crate::ui;
 use anyhow::Result;
 use crossterm::execute;
 use crossterm::terminal as term;
-use handlebars::{handlebars_helper, Handlebars};
-use humansize::{file_size_opts as options, FileSize};
 use std::fs;
 use std::io;
 use std::io::prelude::*;
@@ -20,8 +18,6 @@ use std::sync::mpsc;
 use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
-
-handlebars_helper!(to_humansize: |size: i64| size.file_size(options::CONVENTIONAL).unwrap_or_default());
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
     let focus_index = app
@@ -65,7 +61,11 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .status()
 }
 
-pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<String>> {
+pub fn run(
+    mut app: app::App,
+    focused_path: Option<String>,
+    lua: mlua::Lua,
+) -> Result<Option<String>> {
     let (tx_msg_in, rx_msg_in) = mpsc::channel();
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
@@ -77,23 +77,6 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
         tx_msg_in.clone(),
     );
     tx_pwd_watcher.send(app.pwd().clone())?;
-
-    let mut hb = Handlebars::new();
-    hb.register_helper("humansize", Box::new(to_humansize));
-    hb.register_template_string(
-        app::TEMPLATE_TABLE_ROW,
-        &app.config()
-            .general()
-            .table()
-            .row()
-            .cols()
-            .clone()
-            .unwrap_or_default()
-            .iter()
-            .map(|c| c.format().clone().unwrap_or_default())
-            .collect::<Vec<String>>()
-            .join("\t"),
-    )?;
 
     let mut result = Ok(None);
     let session_path = app.session_path().to_owned();
@@ -190,7 +173,7 @@ pub fn run(mut app: app::App, focused_path: Option<String>) -> Result<Option<Str
                             // $PWD watcher
                             tx_pwd_watcher.send(app.pwd().clone())?;
                             // UI
-                            terminal.draw(|f| ui::draw(f, &app, &hb))?;
+                            terminal.draw(|f| ui::draw(f, &app, &lua))?;
                         }
 
                         app::MsgOut::CallSilently(cmd) => {
