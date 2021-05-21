@@ -133,23 +133,6 @@ pub fn run(
                             terminal.clear()?;
                         }
 
-                        app::MsgOut::ExplorePwd => {
-                            match explorer::explore_sync(
-                                app.explorer_config().clone(),
-                                app.pwd().clone(),
-                                app.focused_node().map(|n| n.relative_path().clone()),
-                            ) {
-                                Ok(buf) => {
-                                    let pwd = buf.parent().clone();
-                                    app = app.add_directory(pwd.clone(), buf)?;
-                                }
-                                Err(e) => {
-                                    app = app.log_error(e.to_string())?;
-                                }
-                            };
-                            tx_pwd_watcher.send(app.pwd().clone())?;
-                        }
-
                         app::MsgOut::ExplorePwdAsync => {
                             explorer::explore_async(
                                 app.explorer_config().clone(),
