@@ -71,6 +71,14 @@ pub fn run(
     let (tx_event_reader, rx_event_reader) = mpsc::channel();
     let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
+    app = app.explore_pwd()?;
+
+    app = if let Some(f) = focused_path.clone() {
+        app.focus_by_file_name(&f, true)?
+    } else {
+        app.focus_first(true)?
+    };
+
     explorer::explore_recursive_async(
         app.explorer_config().clone(),
         app.pwd().clone(),

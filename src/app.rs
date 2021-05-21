@@ -1572,7 +1572,7 @@ impl App {
         let mut app = Self {
             version: Config::default().version().clone(),
             config: config.clone(),
-            pwd: pwd.clone(),
+            pwd,
             directory_buffers: Default::default(),
             selection: Default::default(),
             msg_out: Default::default(),
@@ -1587,10 +1587,7 @@ impl App {
             logs_hidden: Default::default(),
             history: Default::default(),
             last_modes: Default::default(),
-        }
-        .change_directory(&pwd, false)?
-        .explore_pwd()? // Populates the history
-        .focus_first(true)?;
+        };
 
         if let Some(notif) = config.upgrade_notification()? {
             let notif = format!(
@@ -1785,7 +1782,7 @@ impl App {
         Ok(self)
     }
 
-    fn explore_pwd(self) -> Result<Self> {
+    pub fn explore_pwd(self) -> Result<Self> {
         let dir = explorer::explore_sync(
             self.explorer_config().clone(),
             self.pwd().clone(),
@@ -1814,7 +1811,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_first(mut self, save_history: bool) -> Result<Self> {
+    pub fn focus_first(mut self, save_history: bool) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = 0;
             if save_history {
@@ -2057,7 +2054,7 @@ impl App {
         }
     }
 
-    fn focus_by_file_name(mut self, name: &str, save_history: bool) -> Result<Self> {
+    pub fn focus_by_file_name(mut self, name: &str, save_history: bool) -> Result<Self> {
         let history = self.history.clone();
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
@@ -2083,7 +2080,7 @@ impl App {
         }
     }
 
-    fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
+    pub fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
         let pathbuf = PathBuf::from(path);
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
@@ -2220,16 +2217,16 @@ impl App {
 
     pub fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
         self.directory_buffers.insert(parent, dir);
-        self.msg_out.push_back(MsgOut::Refresh);
-        Ok(self)
+        self.refresh()
     }
 
     fn select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection.insert(n);
-            self.msg_out.push_back(MsgOut::Refresh);
+            self.refresh()
+        } else {
+            Ok(self)
         }
-        Ok(self)
     }
 
     fn select_path(mut self, path: String) -> Result<Self> {
@@ -2238,9 +2235,10 @@ impl App {
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
             self.selection.insert(Node::new(p, n));
-            self.msg_out.push_back(MsgOut::Refresh);
-        };
-        Ok(self)
+            self.refresh()
+        } else {
+            Ok(self)
+        }
     }
 
     fn select_all(mut self) -> Result<Self> {
