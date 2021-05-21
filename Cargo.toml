@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.10.0-beta.1"  # Update config.yml, config.rs
+version = "0.10.0-beta.3"  # Update config.yml, config.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "A hackable, minimal, fast TUI file explorer"
