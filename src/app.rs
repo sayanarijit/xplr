@@ -1,12 +1,13 @@
 use crate::config::Config;
 use crate::config::Mode;
+use crate::default_config::DEFAULT_LUA_SCRIPT;
 use crate::input::Key;
+use crate::lua;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
 use humansize::{file_size_opts as options, FileSize};
 use indexmap::set::IndexSet;
-use mlua::LuaSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -1496,36 +1497,10 @@ impl App {
         };
         // -------------------------------------------------------
 
-        let config: Config = if lua_script_file.exists() {
-            let globals = lua.globals();
-            let lua_script = fs::read_to_string(&lua_script_file)?;
+        let config = lua::init(lua, DEFAULT_LUA_SCRIPT, config)?;
 
-            let lua_xplr = lua.create_table()?;
-            lua_xplr.set("config", lua.to_value(&config)?)?;
-
-            let lua_xplr_fn = lua.create_table()?;
-            let lua_xplr_fn_builtin = lua.create_table()?;
-            let lua_xplr_fn_custom = lua.create_table()?;
-
-            lua_xplr_fn.set("builtin", lua_xplr_fn_builtin)?;
-            lua_xplr_fn.set("custom", lua_xplr_fn_custom)?;
-            lua_xplr.set("fn", lua_xplr_fn)?;
-            globals.set("xplr", lua_xplr)?;
-
-            lua.load(&lua_script).set_name("init")?.exec()?;
-
-            let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
-                Ok(v) => v,
-                Err(_) => bail!(format!(
-                    "'version' must be defined globally in {}",
-                    &lua_script_file.to_string_lossy().to_string()
-                )),
-            };
-
-            let lua_xplr: mlua::Table = globals.get("xplr")?;
-
-            let config: Config = lua.from_value(lua_xplr.get("config")?)?;
-            config.with_version(version)
+        let config = if lua_script_file.exists() {
+            lua::extend(lua, &fs::read_to_string(&lua_script_file)?)?
         } else {
             config
         };

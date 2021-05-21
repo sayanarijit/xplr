@@ -1,4 +1,5 @@
 const DEFAULT_CONFIG_YAML: &str = include_str!("config.yml");
+pub const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
 
 use crate::config::{self, Config};
 use lazy_static::lazy_static;
