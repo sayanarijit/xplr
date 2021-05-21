@@ -8,6 +8,7 @@ use crate::pipe_reader;
 use crate::pwd_watcher;
 use crate::ui;
 use anyhow::Result;
+use crossterm::event;
 use crossterm::execute;
 use crossterm::terminal as term;
 use std::fs;
@@ -85,7 +86,7 @@ pub fn run(
     let mut stdout = get_tty()?;
     // let mut stdout = stdout.lock();
     execute!(stdout, term::EnterAlternateScreen)?;
-    // let stdout = MouseTerminal::from(stdout);
+    execute!(stdout, event::EnableMouseCapture).unwrap_or_default(); // Optional
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
@@ -198,6 +199,9 @@ pub fn run(
                         }
 
                         app::MsgOut::Call(cmd) => {
+                            execute!(terminal.backend_mut(), event::DisableMouseCapture)
+                                .unwrap_or_default(); // Optional
+
                             tx_event_reader.send(true)?;
 
                             terminal.clear()?;
@@ -224,6 +228,9 @@ pub fn run(
                             term::enable_raw_mode()?;
                             terminal.hide_cursor()?;
                             tx_event_reader.send(false)?;
+
+                            execute!(terminal.backend_mut(), event::EnableMouseCapture)
+                                .unwrap_or_default(); // Optional
                         }
                     };
                 }
@@ -239,6 +246,7 @@ pub fn run(
     terminal.clear()?;
     terminal.set_cursor(0, 0)?;
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
+    execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default(); // Optional
     term::disable_raw_mode()?;
     terminal.show_cursor()?;
 
