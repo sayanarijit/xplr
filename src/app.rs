@@ -1520,6 +1520,7 @@ impl App {
             explorer_config.sorters = sorters.clone();
         };
 
+        env::set_current_dir(&pwd)?;
         let pwd = pwd.to_string_lossy().to_string();
 
         let app = Self {
