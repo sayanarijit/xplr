@@ -550,7 +550,7 @@ fn draw_table<B: Backend>(
                                 .filter_map(|c| {
                                     c.format()
                                         .to_owned()
-                                        .and_then(|f| resolve_fn(&globals, f.split('.')).ok())
+                                        .and_then(|f| resolve_fn(&globals, &f).ok())
                                 })
                                 .map(|f| f.call((v.clone(),)).unwrap_or_else(|e| e.to_string()))
                                 .collect::<Vec<String>>()
