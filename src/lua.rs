@@ -4,13 +4,13 @@ use anyhow::Result;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
 
-pub fn resolve_fn<'lua, 'a>(
+fn resolve_fn_recursive<'lua, 'a>(
     table: &mlua::Table<'lua>,
     mut path: impl Iterator<Item = &'a str>,
 ) -> Result<mlua::Function<'lua>> {
     if let Some(nxt) = path.next() {
         match table.get(nxt)? {
-            mlua::Value::Table(t) => resolve_fn(&t, path),
+            mlua::Value::Table(t) => resolve_fn_recursive(&t, path),
             mlua::Value::Function(f) => Ok(f),
             t => bail!("{:?} is not a function", t),
         }
@@ -19,7 +19,17 @@ pub fn resolve_fn<'lua, 'a>(
     }
 }
 
+/// This function resolves paths like `builtin.func_foo`, `custom.func_bar` into lua functions.
+pub fn resolve_fn<'lua>(
+    globals: &mlua::Table<'lua>,
+    path: &str,
+) -> Result<mlua::Function<'lua>> {
+    let path = format!("xplr.fn.{}", path);
+    resolve_fn_recursive(&globals, path.split('.'))
+}
+
 // TODO: Remove config input when config.yml is deprecated
+/// Used to initialize Lua globals
 pub fn init(lua: &Lua, lua_script: &str, config: Config) -> Result<Config> {
     let globals = lua.globals();
 
@@ -48,6 +58,7 @@ pub fn init(lua: &Lua, lua_script: &str, config: Config) -> Result<Config> {
     Ok(config.with_version(version))
 }
 
+/// Used to extend Lua globals
 pub fn extend(lua: &Lua, lua_script: &str) -> Result<Config> {
     lua.load(&lua_script).set_name("init")?.exec()?;
 
