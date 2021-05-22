@@ -38,12 +38,6 @@ impl Action {
         }
     }
 
-    pub fn extend(mut self, other: Self) -> Self {
-        self.help = other.help.or(self.help);
-        self.messages = other.messages;
-        self
-    }
-
     /// Get a reference to the action's help.
     pub fn help(&self) -> &Option<String> {
         &self.help
@@ -66,12 +60,6 @@ pub struct NodeTypeConfig {
 }
 
 impl NodeTypeConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.style = self.style.extend(other.style);
-        self.meta.extend(other.meta);
-        self
-    }
-
     /// Get a reference to the node type config's style.
     pub fn style(&self) -> &Style {
         &self.style
@@ -106,16 +94,6 @@ pub struct NodeTypesConfig {
 }
 
 impl NodeTypesConfig {
-    fn extend(mut self, other: Self) -> Self {
-        self.directory = self.directory.extend(other.directory);
-        self.file = self.file.extend(other.file);
-        self.symlink = self.symlink.extend(other.symlink);
-        self.mime_essence.extend(other.mime_essence);
-        self.extension.extend(other.extension);
-        self.special.extend(other.special);
-        self
-    }
-
     /// Get a reference to the node types config's directory.
     pub fn directory(&self) -> &NodeTypeConfig {
         &self.directory
@@ -161,13 +139,6 @@ pub struct UiConfig {
 }
 
 impl UiConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.prefix = other.prefix.or(self.prefix);
-        self.suffix = other.suffix.or(self.suffix);
-        self.style = self.style.extend(other.style);
-        self
-    }
-
     /// Get a reference to the ui config's prefix.
     pub fn prefix(&self) -> &Option<String> {
         &self.prefix
@@ -226,13 +197,6 @@ pub struct TableRowConfig {
 }
 
 impl TableRowConfig {
-    fn extend(mut self, other: Self) -> Self {
-        self.cols = other.cols.or(self.cols);
-        self.style = self.style.extend(other.style);
-        self.height = other.height.or(self.height);
-        self
-    }
-
     /// Get a reference to the table row config's cols.
     pub fn cols(&self) -> &Option<Vec<UiElement>> {
         &self.cols
@@ -272,16 +236,6 @@ pub struct TableConfig {
 }
 
 impl TableConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.header = self.header.extend(other.header);
-        self.row = self.row.extend(other.row);
-        self.style = self.style.extend(other.style);
-        self.tree = other.tree.or(self.tree);
-        self.col_spacing = other.col_spacing.or(self.col_spacing);
-        self.col_widths = other.col_widths.or(self.col_widths);
-        self
-    }
-
     /// Get a reference to the table config's header.
     pub fn header(&self) -> &TableRowConfig {
         &self.header
@@ -330,14 +284,6 @@ pub struct LogsConfig {
 }
 
 impl LogsConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.info = self.info.extend(other.info);
-        self.success = self.success.extend(other.success);
-        self.warning = self.warning.extend(other.warning);
-        self.error = self.error.extend(other.error);
-        self
-    }
-
     /// Get a reference to the logs config's info.
     pub fn info(&self) -> &UiElement {
         &self.info
@@ -370,12 +316,6 @@ pub struct SortDirectionIdentifiersUi {
 }
 
 impl SortDirectionIdentifiersUi {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.forward = self.forward.extend(other.forward);
-        self.reverse = self.reverse.extend(other.reverse);
-        self
-    }
-
     /// Get a reference to the sort direction identifiers ui's forward.
     pub fn forward(&self) -> &UiElement {
         &self.forward
@@ -407,17 +347,6 @@ pub struct SortAndFilterUi {
 }
 
 impl SortAndFilterUi {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.separator = self.separator.extend(other.separator);
-        self.default_identifier = self.default_identifier.extend(other.default_identifier);
-        self.sort_direction_identifiers = self
-            .sort_direction_identifiers
-            .extend(other.sort_direction_identifiers);
-        self.sorter_identifiers.extend(other.sorter_identifiers);
-        self.filter_identifiers.extend(other.filter_identifiers);
-        self
-    }
-
     /// Get a reference to the sort and filter ui's separator.
     pub fn separator(&self) -> &UiElement {
         &self.separator
@@ -467,16 +396,6 @@ pub struct PanelUi {
 }
 
 impl PanelUi {
-    fn extend(mut self, other: Self) -> Self {
-        self.default = self.default.extend(other.default);
-        self.table = self.table.extend(other.table);
-        self.sort_and_filter = self.sort_and_filter.extend(other.sort_and_filter);
-        self.selection = self.selection.extend(other.selection);
-        self.input_and_logs = self.input_and_logs.extend(other.input_and_logs);
-        self.help_menu = self.help_menu.extend(other.help_menu);
-        self
-    }
-
     /// Get a reference to the panel ui's default.
     pub fn default(&self) -> &PanelUiConfig {
         &self.default
@@ -555,24 +474,6 @@ pub struct GeneralConfig {
 }
 
 impl GeneralConfig {
-    fn extend(mut self, other: Self) -> Self {
-        self.show_hidden = other.show_hidden.or(self.show_hidden);
-        self.read_only = other.read_only.or(self.read_only);
-        self.cursor = self.cursor.extend(other.cursor);
-        self.prompt = self.prompt.extend(other.prompt);
-        self.logs = self.logs.extend(other.logs);
-        self.table = self.table.extend(other.table);
-        self.default_ui = self.default_ui.extend(other.default_ui);
-        self.focus_ui = self.focus_ui.extend(other.focus_ui);
-        self.selection_ui = self.selection_ui.extend(other.selection_ui);
-        self.sort_and_filter_ui = self.sort_and_filter_ui.extend(other.sort_and_filter_ui);
-        self.panel_ui = self.panel_ui.extend(other.panel_ui);
-        self.initial_sorting = other.initial_sorting.or(self.initial_sorting);
-        self.initial_layout = other.initial_layout.or(self.initial_layout);
-        self.initial_mode = other.initial_mode.or(self.initial_mode);
-        self
-    }
-
     /// Get a reference to the general config's show hidden.
     pub fn show_hidden(&self) -> Option<bool> {
         self.show_hidden
@@ -700,16 +601,6 @@ impl KeyBindings {
         self
     }
 
-    fn extend(mut self, other: Self) -> Self {
-        self.remaps.extend(other.remaps);
-        self.on_key.extend(other.on_key);
-        self.on_alphabet = other.on_alphabet.or(self.on_alphabet);
-        self.on_number = other.on_number.or(self.on_number);
-        self.on_special_character = other.on_special_character.or(self.on_special_character);
-        self.default = other.default.or(self.default);
-        self
-    }
-
     /// Get a reference to the key bindings's remaps.
     pub fn remaps(&self) -> &IndexMap<String, Option<String>> {
         &self.remaps
@@ -760,13 +651,6 @@ pub struct Mode {
 impl Mode {
     pub fn sanitized(mut self, read_only: bool) -> Self {
         self.key_bindings = self.key_bindings.sanitized(read_only);
-        self
-    }
-
-    fn extend(mut self, other: Self) -> Self {
-        self.help = other.help.or(self.help);
-        self.extra_help = other.extra_help.or(self.extra_help);
-        self.key_bindings = self.key_bindings.extend(other.key_bindings);
         self
     }
 
@@ -916,31 +800,6 @@ pub struct BuiltinModesConfig {
 }
 
 impl BuiltinModesConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.default = self.default.extend(other.default);
-        self.recover = self.recover.extend(other.recover);
-        self.selection_ops = self.selection_ops.extend(other.selection_ops);
-        self.go_to = self.go_to.extend(other.go_to);
-        self.create = self.create.extend(other.create);
-        self.create_file = self.create_file.extend(other.create_file);
-        self.create_directory = self.create_directory.extend(other.create_directory);
-        self.rename = self.rename.extend(other.rename);
-        self.delete = self.delete.extend(other.delete);
-        self.number = self.number.extend(other.number);
-        self.action = self.action.extend(other.action);
-        self.search = self.search.extend(other.search);
-        self.filter = self.filter.extend(other.filter);
-        self.relative_path_does_contain = self
-            .relative_path_does_contain
-            .extend(other.relative_path_does_contain);
-        self.relative_path_does_not_contain = self
-            .relative_path_does_not_contain
-            .extend(other.relative_path_does_not_contain);
-        self.sort = self.sort.extend(other.sort);
-        self.switch_layout = self.switch_layout.extend(other.switch_layout);
-        self
-    }
-
     pub fn get(&self, name: &str) -> Option<&Mode> {
         match name {
             "default" => Some(&self.default),
@@ -1080,12 +939,6 @@ impl ModesConfig {
         self.get_builtin(name).or_else(|| self.get_custom(name))
     }
 
-    pub fn extend(mut self, other: Self) -> Self {
-        self.builtin = self.builtin.extend(other.builtin);
-        self.custom.extend(other.custom);
-        self
-    }
-
     /// Get a reference to the modes config's builtin.
     pub fn builtin(&self) -> &BuiltinModesConfig {
         &self.builtin
@@ -1150,14 +1003,6 @@ pub struct BuiltinLayoutsConfig {
 }
 
 impl BuiltinLayoutsConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.default = self.default.extend(other.default);
-        self.no_help = self.no_help.extend(other.no_help);
-        self.no_selection = self.no_selection.extend(other.no_selection);
-        self.no_help_no_selection = self.no_help_no_selection.extend(other.no_help_no_selection);
-        self
-    }
-
     pub fn get(&self, name: &str) -> Option<&Layout> {
         match name {
             "default" => Some(&self.default),
@@ -1200,12 +1045,6 @@ impl LayoutsConfig {
         self.get_builtin(name).or_else(|| self.get_custom(name))
     }
 
-    pub fn extend(mut self, other: Self) -> Self {
-        self.builtin = self.builtin.extend(other.builtin);
-        self.custom.extend(other.custom);
-        self
-    }
-
     /// Get a reference to the layouts config's builtin.
     pub fn builtin(&self) -> &BuiltinLayoutsConfig {
         &self.builtin
@@ -1234,15 +1073,6 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn extended(mut self) -> Self {
-        let default = Self::default();
-        self.layouts = default.layouts.extend(self.layouts);
-        self.general = default.general.extend(self.general);
-        self.node_types = default.node_types.extend(self.node_types);
-        self.modes = default.modes.extend(self.modes);
-        self
-    }
-
     /// Get a reference to the config's layouts.
     pub fn layouts(&self) -> &LayoutsConfig {
         &self.layouts
