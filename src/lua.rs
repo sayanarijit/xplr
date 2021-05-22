@@ -1,3 +1,5 @@
+use crate::app::App;
+use crate::app::ExternalMsg;
 use crate::app::VERSION;
 use crate::config::Config;
 use anyhow::bail;
@@ -113,6 +115,15 @@ pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
     Ok(config)
 }
 
+/// Used to extend Lua globals
+pub fn call(lua: &Lua, func: &str, args: &App) -> Result<Vec<ExternalMsg>> {
+    let func = resolve_fn(&lua.globals(), func)?;
+    let args = lua.to_value(args)?;
+    let msgs: mlua::Value = func.call((args,))?;
+    let msgs: Vec<ExternalMsg> = lua.from_value(msgs)?;
+    Ok(msgs)
+}
+
 #[cfg(test)]
 mod test {
 
@@ -121,12 +132,12 @@ mod test {
     #[test]
     fn test_compatibility() {
         assert!(check_version(VERSION, "foo path").is_ok());
-        assert!(check_version("0.10.0-beta.5", "foo path").is_ok());
+        assert!(check_version("0.10.0-beta.6", "foo path").is_ok());
 
         assert!(check_version("0.9.0", "foo path").is_err());
         assert!(check_version("0.10.0", "foo path").is_err());
-        assert!(check_version("0.10.0-beta.4", "foo path").is_err());
-        assert!(check_version("0.10.0-beta.6", "foo path").is_err());
-        assert!(check_version("1.10.0-beta.5", "foo path").is_err());
+        assert!(check_version("0.10.0-beta.5", "foo path").is_err());
+        assert!(check_version("0.10.0-beta.7", "foo path").is_err());
+        assert!(check_version("1.10.0-beta.6", "foo path").is_err());
     }
 }

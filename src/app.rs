@@ -1130,6 +1130,17 @@ pub enum ExternalMsg {
     /// **Example:** `CallSilently: {command: tput, args: ["bell"]}`
     CallSilently(Command),
 
+    /// Call a Lua function
+    ///
+    /// **Example:** `CallLua: custom.foo_funtion`
+    CallLua(String),
+
+    /// Like `CallLua` but without the flicker. The stdin, stdout
+    /// stderr will be piped to null. So it's non-interactive.
+    ///
+    /// **Example:** `CallLuaSilently: custom.bar_function`
+    CallLuaSilently(String),
+
     /// An alias to `Call: {command: bash, args: ["-c", "${command}"], silent: false}`
     /// where ${command} is the given value.
     ///
@@ -1329,6 +1340,8 @@ pub enum MsgOut {
     Debug(String),
     Call(Command),
     CallSilently(Command),
+    CallLua(String),
+    CallLuaSilently(String),
     Enque(Task),
 }
 
@@ -1635,6 +1648,8 @@ impl App {
                 ExternalMsg::SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
                 ExternalMsg::Call(cmd) => self.call(cmd),
                 ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
+                ExternalMsg::CallLua(func) => self.call_lua(func),
+                ExternalMsg::CallLuaSilently(func) => self.call_lua_silently(func),
                 ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
                 ExternalMsg::BashExecSilently(cmd) => self.bash_exec_silently(cmd),
                 ExternalMsg::Select => self.select(),
@@ -2158,6 +2173,18 @@ impl App {
     fn call_silently(mut self, command: Command) -> Result<Self> {
         self.logs_hidden = true;
         self.msg_out.push_back(MsgOut::CallSilently(command));
+        Ok(self)
+    }
+
+    fn call_lua(mut self, func: String) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::CallLua(func));
+        Ok(self)
+    }
+
+    fn call_lua_silently(mut self, func: String) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::CallLuaSilently(func));
         Ok(self)
     }
 

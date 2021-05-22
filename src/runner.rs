@@ -4,6 +4,7 @@ use crate::app;
 use crate::auto_refresher;
 use crate::event_reader;
 use crate::explorer;
+use crate::lua;
 use crate::pipe_reader;
 use crate::pwd_watcher;
 use crate::ui;
@@ -19,6 +20,27 @@ use std::sync::mpsc;
 use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
+
+fn call_lua(
+    app: &app::App,
+    lua: &mlua::Lua,
+    func: &str,
+    silent: bool,
+) -> Result<Vec<app::ExternalMsg>> {
+    let _focus_index = app
+        .directory_buffer()
+        .map(|d| d.focus())
+        .unwrap_or_default()
+        .to_string();
+
+    let (_, _, _) = if silent {
+        (Stdio::null(), Stdio::null(), Stdio::null())
+    } else {
+        (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
+    };
+
+    lua::call(lua, func, &app)
+}
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
     let focus_index = app
@@ -169,6 +191,26 @@ pub fn run(
                             terminal.draw(|f| ui::draw(f, &app, &lua))?;
                         }
 
+                        app::MsgOut::CallLuaSilently(func) => {
+                            tx_event_reader.send(true)?;
+
+                            match call_lua(&app, &lua, &func, false) {
+                                Ok(msgs) => {
+                                    for msg in msgs {
+                                        app = app.handle_task(app::Task::new(
+                                            app::MsgIn::External(msg),
+                                            None,
+                                        ))?;
+                                    }
+                                }
+                                Err(err) => {
+                                    app = app.log_error(err.to_string())?;
+                                }
+                            };
+
+                            tx_event_reader.send(false)?;
+                        }
+
                         app::MsgOut::CallSilently(cmd) => {
                             tx_event_reader.send(true)?;
 
@@ -191,6 +233,40 @@ pub fn run(
                             };
 
                             tx_event_reader.send(false)?;
+                        }
+
+                        app::MsgOut::CallLua(func) => {
+                            execute!(terminal.backend_mut(), event::DisableMouseCapture)
+                                .unwrap_or_default(); // Optional
+
+                            tx_event_reader.send(true)?;
+
+                            terminal.clear()?;
+                            terminal.set_cursor(0, 0)?;
+                            term::disable_raw_mode()?;
+                            terminal.show_cursor()?;
+
+                            match call_lua(&app, &lua, &func, false) {
+                                Ok(msgs) => {
+                                    for msg in msgs {
+                                        app = app.handle_task(app::Task::new(
+                                            app::MsgIn::External(msg),
+                                            None,
+                                        ))?;
+                                    }
+                                }
+                                Err(err) => {
+                                    app = app.log_error(err.to_string())?;
+                                }
+                            };
+
+                            terminal.clear()?;
+                            term::enable_raw_mode()?;
+                            terminal.hide_cursor()?;
+                            tx_event_reader.send(false)?;
+
+                            execute!(terminal.backend_mut(), event::EnableMouseCapture)
+                                .unwrap_or_default(); // Optional
                         }
 
                         app::MsgOut::Call(cmd) => {
