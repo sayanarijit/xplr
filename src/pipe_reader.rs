@@ -1,47 +1,28 @@
-use crate::app::{ExternalMsg, MsgIn, Task};
+use crate::app::ExternalMsg;
 use anyhow::Result;
 use std::fs;
 use std::io::prelude::*;
-use std::sync::mpsc::Sender;
 
-pub fn read_all(pipe: &str, tx: Sender<Task>) -> Result<()> {
-    match fs::OpenOptions::new()
+pub fn read_all(pipe: &str) -> Result<Vec<ExternalMsg>> {
+    let mut file = fs::OpenOptions::new()
         .read(true)
         .write(true)
         .create(false)
-        .open(&pipe)
-    {
-        Ok(mut file) => {
-            let mut in_str = String::new();
-            file.read_to_string(&mut in_str)?;
-            file.set_len(0)?;
+        .open(&pipe)?;
 
-            if !in_str.is_empty() {
-                let msgs = in_str
-                    .lines()
-                    .map(|s| serde_yaml::from_str::<ExternalMsg>(s.trim()));
+    let mut in_str = String::new();
+    file.read_to_string(&mut in_str)?;
+    file.set_len(0)?;
 
-                for msg in msgs {
-                    match msg {
-                        Ok(m) => {
-                            tx.send(Task::new(MsgIn::External(m), None))?;
-                        }
-                        Err(e) => tx.send(Task::new(
-                            MsgIn::External(ExternalMsg::LogError(e.to_string())),
-                            None,
-                        ))?,
-                    }
-                }
-            }
+    if !in_str.is_empty() {
+        let mut msgs = vec![];
+        for msg in in_str.lines().map(|s| serde_yaml::from_str(s.trim())) {
+            msgs.push(msg?);
         }
-        Err(err) => {
-            tx.send(Task::new(
-                MsgIn::External(ExternalMsg::LogError(err.to_string())),
-                None,
-            ))?;
-        }
-    };
-    Ok(())
+        Ok(msgs)
+    } else {
+        Ok(vec![])
+    }
 }
 
 // pub fn keep_reading(pipe: String, tx: Sender<Task>) {

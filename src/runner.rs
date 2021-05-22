@@ -225,7 +225,20 @@ pub fn run(
                                 })
                                 .unwrap_or_else(|e| Err(e.to_string()));
 
-                            pipe_reader::read_all(app.pipe().msg_in(), tx_msg_in.clone())?;
+                            match pipe_reader::read_all(app.pipe().msg_in()) {
+                                Ok(msgs) => {
+                                    for msg in msgs {
+                                        app = app.handle_task(app::Task::new(
+                                            app::MsgIn::External(msg),
+                                            None,
+                                        ))?;
+                                    }
+                                }
+                                Err(err) => {
+                                    app = app.log_error(err.to_string())?;
+                                }
+                            };
+
                             app.cleanup_pipes()?;
 
                             if let Err(e) = status {
@@ -291,7 +304,20 @@ pub fn run(
                                 })
                                 .unwrap_or_else(|e| Err(e.to_string()));
 
-                            pipe_reader::read_all(app.pipe().msg_in(), tx_msg_in.clone())?;
+                            match pipe_reader::read_all(app.pipe().msg_in()) {
+                                Ok(msgs) => {
+                                    for msg in msgs {
+                                        app = app.handle_task(app::Task::new(
+                                            app::MsgIn::External(msg),
+                                            None,
+                                        ))?;
+                                    }
+                                }
+                                Err(err) => {
+                                    app = app.log_error(err.to_string())?;
+                                }
+                            };
+
                             app.cleanup_pipes()?;
 
                             if let Err(e) = status {
