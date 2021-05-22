@@ -102,9 +102,9 @@ pub fn run(
 
     // Threads
     auto_refresher::start_auto_refreshing(tx_msg_in.clone());
-    pipe_reader::keep_reading(app.pipe().msg_in().clone(), tx_msg_in.clone());
     event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
     pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
+    // pipe_reader::keep_reading(app.pipe().msg_in().clone(), tx_msg_in.clone());
 
     'outer: for task in rx_msg_in {
         match app.handle_task(task) {
@@ -182,6 +182,8 @@ pub fn run(
                                     }
                                 })
                                 .unwrap_or_else(|e| Err(e.to_string()));
+
+                            pipe_reader::read_all(app.pipe().msg_in(), tx_msg_in.clone())?;
                             app.cleanup_pipes()?;
 
                             if let Err(e) = status {
@@ -212,6 +214,8 @@ pub fn run(
                                     }
                                 })
                                 .unwrap_or_else(|e| Err(e.to_string()));
+
+                            pipe_reader::read_all(app.pipe().msg_in(), tx_msg_in.clone())?;
                             app.cleanup_pipes()?;
 
                             if let Err(e) = status {
