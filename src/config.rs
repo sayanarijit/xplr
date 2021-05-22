@@ -3,12 +3,10 @@ use crate::app::HelpMenuLine;
 use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
-use crate::default_config;
 use crate::ui::Border;
 use crate::ui::Constraint;
 use crate::ui::Layout;
 use crate::ui::Style;
-use anyhow::Result;
 use indexmap::IndexMap;
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
@@ -1219,11 +1217,9 @@ impl LayoutsConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
-    version: String,
-
     #[serde(default)]
     layouts: LayoutsConfig,
 
@@ -1237,18 +1233,6 @@ pub struct Config {
     modes: ModesConfig,
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            version: default_config::version(),
-            layouts: default_config::layouts(),
-            general: default_config::general(),
-            node_types: default_config::node_types(),
-            modes: default_config::modes(),
-        }
-    }
-}
-
 impl Config {
     pub fn extended(mut self) -> Self {
         let default = Self::default();
@@ -1257,51 +1241,6 @@ impl Config {
         self.node_types = default.node_types.extend(self.node_types);
         self.modes = default.modes.extend(self.modes);
         self
-    }
-
-    fn parsed_version(&self) -> Result<(u16, u16, u16, Option<u16>)> {
-        let mut configv = self
-            .version
-            .strip_prefix('v')
-            .unwrap_or_default()
-            .split('.');
-
-        let major = configv.next().unwrap_or_default().parse::<u16>()?;
-        let minor = configv.next().unwrap_or_default().parse::<u16>()?;
-        let bugfix = configv
-            .next()
-            .and_then(|s| s.split('-').next())
-            .unwrap_or_default()
-            .parse::<u16>()?;
-
-        let beta = configv.next().unwrap_or_default().parse::<u16>().ok();
-
-        Ok((major, minor, bugfix, beta))
-    }
-
-    pub fn is_compatible(&self) -> Result<bool> {
-        let result = match self.parsed_version()? {
-            (0, 10, 0, Some(3)) => true,
-            (0, 10, 0, Some(2)) => true,
-            (0, 10, 0, Some(1)) => true,
-            (_, _, _, _) => false,
-        };
-
-        Ok(result)
-    }
-
-    pub fn upgrade_notification(&self) -> Result<Option<&str>> {
-        let result = None;
-        // let result = match self.parsed_version()? {
-        //     (_, _, _, _) => None,
-        // };
-
-        Ok(result)
-    }
-
-    /// Get a reference to the config's version.
-    pub fn version(&self) -> &String {
-        &self.version
     }
 
     /// Get a reference to the config's layouts.
@@ -1322,43 +1261,5 @@ impl Config {
     /// Get a reference to the config's modes.
     pub fn modes(&self) -> &ModesConfig {
         &self.modes
-    }
-
-    /// Set the config's version.
-    pub fn with_version(mut self, version: String) -> Self {
-        self.version = version;
-        self
-    }
-}
-
-#[cfg(test)]
-mod test {
-
-    use super::*;
-    use std::collections::HashMap;
-
-    #[test]
-    fn test_compatibility() {
-        let config = Config::default();
-        assert!(config.is_compatible().unwrap());
-        assert_eq!(config.upgrade_notification().unwrap(), None);
-    }
-
-    #[test]
-    fn test_extend_hashmap() {
-        let mut a = HashMap::new();
-        let mut b = HashMap::new();
-
-        a.insert("a", "a");
-        a.insert("b", "a");
-
-        b.insert("b", "b");
-        b.insert("c", "b");
-
-        a.extend(b);
-
-        assert_eq!(a.get("a"), Some(&"a"));
-        assert_eq!(a.get("b"), Some(&"b"));
-        assert_eq!(a.get("c"), Some(&"b"));
     }
 }
