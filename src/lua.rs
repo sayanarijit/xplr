@@ -132,10 +132,11 @@ mod test {
     #[test]
     fn test_compatibility() {
         assert!(check_version(VERSION, "foo path").is_ok());
-        assert!(check_version("0.10.0-beta.6", "foo path").is_ok());
+        assert!(check_version("0.10.0", "foo path").is_ok());
 
+        assert!(check_version("0.10.0-beta.6", "foo path").is_err());
         assert!(check_version("0.9.0", "foo path").is_err());
-        assert!(check_version("0.10.0", "foo path").is_err());
+        assert!(check_version("0.11.0", "foo path").is_err());
         assert!(check_version("0.10.0-beta.5", "foo path").is_err());
         assert!(check_version("0.10.0-beta.7", "foo path").is_err());
         assert!(check_version("1.10.0-beta.6", "foo path").is_err());

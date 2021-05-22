@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.10.0-beta.6"  # Update lua.rs
+version = "0.10.0"  # Update lua.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "A hackable, minimal, fast TUI file explorer"
