@@ -35,7 +35,6 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
 
     Command::new(cmd.command().clone())
         .env("XPLR_APP_VERSION", app.version())
-        .env("XPLR_CONFIG_VERSION", app.config().version())
         .env("XPLR_PID", &app.pid().to_string())
         .env("XPLR_INPUT_BUFFER", app.input_buffer().unwrap_or_default())
         .env("XPLR_FOCUS_PATH", app.focused_node_str())

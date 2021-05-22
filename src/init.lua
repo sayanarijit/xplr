@@ -1,4 +1,7 @@
-version = "v0.10.0-beta.3"
+-- You need to define the script version for compatibility check.
+-- See https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide.
+--
+-- version = "1.0.0"
 
 -- Config
 ---- General
@@ -347,1458 +350,1650 @@ xplr.config.node_types.extension = {}
 ------ Special
 xplr.config.node_types.special = {}
 
+-- Layouts
+---- Builtin
+------ Default
+xplr.config.layouts.builtin.default = {
+  Horizontal = {
+    config = {
+      margin = nil,
+      horizontal_margin = 0,
+      vertical_margin = 0,
+      constraints = {
+        {
+          Percentage = 70
+        },
+        {
+          Percentage = 30
+        }
+      }
+    },
+    splits = {
+      {
+        Vertical = {
+          config = {
+            margin = 0,
+            horizontal_margin = nil,
+            vertical_margin = nil,
+            constraints = {
+              {
+                Length = 3
+              },
+              {
+                Min = 1
+              },
+              {
+                Length = 3
+              }
+            }
+          },
+          splits = {
+            "SortAndFilter",
+            "Table",
+            "InputAndLogs",
+          }
+        }
+      },
+      {
+        Vertical = {
+          config = {
+            margin = 0,
+            horizontal_margin = nil,
+            vertical_margin = nil,
+            constraints = {
+              {
+                Percentage = 50
+              },
+              {
+                Percentage = 50
+              },
+            }
+          },
+          splits = {
+            "Selection",
+            "HelpMenu",
+          }
+        }
+      }
+    }
+  }
+}
+
+------ No help
+xplr.config.layouts.builtin.no_help = {
+  Horizontal = {
+    config = {
+      margin = nil,
+      horizontal_margin = nil,
+      vertical_margin = nil,
+      constraints = {
+        {
+          Percentage = 70
+        },
+        {
+          Percentage = 30
+        }
+      }
+    },
+    splits = {
+      {
+        Vertical = {
+          config = {
+            margin = nil,
+            horizontal_margin = nil,
+            vertical_margin = nil,
+            constraints = {
+              {
+                Length = 3
+              },
+              {
+                Min = 1
+              },
+              {
+                Length = 3
+              }
+            }
+          },
+          splits = {
+            "SortAndFilter",
+            "Table",
+            "InputAndLogs"
+          }
+        }
+      },
+      "Selection"
+    }
+  }
+}
+
+------ No selection
+xplr.config.layouts.builtin.no_selection = {
+  Horizontal = {
+    config = {
+      margin = nil,
+      horizontal_margin = nil,
+      vertical_margin = nil,
+      constraints = {
+        {
+          Percentage = 70
+        },
+        {
+          Percentage = 30
+        }
+      }
+    },
+    splits = {
+      {
+        Vertical = {
+          config = {
+            margin = nil,
+            horizontal_margin = nil,
+            vertical_margin = nil,
+            constraints = {
+              {
+                Length = 3
+              },
+              {
+                Min = 1
+              },
+              {
+                Length = 3
+              }
+            }
+          },
+          splits = {
+            "SortAndFilter",
+            "Table",
+            "InputAndLogs",
+          }
+        }
+      },
+      "HelpMenu"
+    }
+  }
+}
+
+------ No help, no selection
+xplr.config.layouts.builtin.no_help_no_selection = {
+  Vertical = {
+    config = {
+      margin = nil,
+      horizontal_margin = nil,
+      vertical_margin = nil,
+      constraints = {
+        {
+          Length = 3
+        },
+        {
+          Min = 1
+        },
+        {
+          Length = 3
+        }
+      }
+    },
+    splits = {
+      "SortAndFilter",
+      "Table",
+      "InputAndLogs",
+    }
+  }
+}
+
+---- Custom
+xplr.config.layouts.custom = {}
 
 -- Modes
 ---- Builtin
 ------ Default
 xplr.config.modes.builtin.default = {
-    name = "default",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {
-            ["k"] = "up",
-            tab = "ctrl-i",
-            ["/"] = "ctrl-f",
-            ["V"] = "ctrl-a",
-            ["h"] = "left",
-            ["v"] = "space",
-            ["j"] = "down",
-            ["l"] = "right"
-        },
-        on_key = {
-            ["#"] = {
-                help = nil,
-                messages = {"PrintAppStateAndQuit"}
-            },
-            ["."] = {
-                help = "show hidden",
-                messages = {
-                    {
-                        ToggleNodeFilter = {
-                            filter = "RelativePathDoesNotStartWith",
-                            input = "."
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            [":"] = {
-                help = "action",
-                messages = {
-                    "PopMode",
-                    {
-                        SwitchModeBuiltin = "action"
-                    },
-                    "Refresh"
-                }
-            },
-            ["?"] = {
-                help = "global help menu",
-                messages = {
-                    {
-                        BashExec = [===[
-                        [ -z "$PAGER" ] && PAGER="less -+F"
-                        cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
-                        ]===]
-                    }
-                }
-            },
-            ["G"] = {
-                help = "go to bottom",
-                messages = {"FocusLast"}
-            },
-            ["ctrl-a"] = {
-                help = "select/unselect all",
-                messages = {"ToggleSelectAll"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-f"] = {
-                help = "search",
-                messages = {
-                    "PopMode",
-                    { SwitchModeBuiltin = "search" },
-                    { SetInputBuffer = "" },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-i"] = {
-                help = "next visited path",
-                messages = {"NextVisitedPath"}
-            },
-            ["ctrl-o"] = {
-                help = "last visited path",
-                messages = {"LastVisitedPath"}
-            },
-            ["ctrl-r"] = {
-                help = "refresh screen",
-                messages = {"ClearScreen", "Refresh"}
-            },
-            ["ctrl-u"] = {
-                help = "clear selection",
-                messages = {"ClearSelection"}
-            },
-            ["ctrl-w"] = {
-                help = "switch layout",
-                messages = {
-                    {
-                        SwitchModeBuiltin = "switch_layout"
-                    },
-                    "Refresh"
-                }
-            },
-            ["d"] = {
-                help = "delete",
-                messages = {
-                    "PopMode",
-                    {
-                        SwitchModeBuiltin = "delete"
-                    },
-                    "Refresh"
-                }
-            },
-            down = {
-                help = "down",
-                messages = {"FocusNext"}
-            },
-            enter = {
-                help = "quit with result",
-                messages = { "PrintResultAndQuit" }
-            },
-            esc = {
-                help = nil,
-                messages = {}
-            },
-            ["f"] = {
-                help = "filter",
-                messages = {
-                    "PopMode",
-                    { SwitchModeBuiltin = "filter" },
-                    "Refresh"
-                }
-            },
-            ["g"] = {
-                help = "go to",
-                messages = {
-                    "PopMode",
-                    { SwitchModeBuiltin = "go_to" },
-                    "Refresh"
-                }
-            },
-            left = {
-                help = "back",
-                messages = {"Back"}
-            },
-            ["q"] = {
-                help = "quit",
-                messages = {"Quit"}
-            },
-            ["r"] = {
-                help = "rename",
-                messages = {
-                    "PopMode",
-                    { SwitchModeBuiltin = "rename" },
-                    {
-                        BashExecSilently = [===[
-                        echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
-                        ]===]
-                    },
-                    "Refresh"
-                }
-            },
-            right = {
-                help = "enter",
-                messages = { "Enter" }
-            },
-            ["s"] = {
-                help = "sort",
-                messages = {
-                    "PopMode",
-                    { SwitchModeBuiltin = "sort" },
-                    "Refresh"
-                }
-            },
-            space = {
-                help = "toggle selection",
-                messages = {"ToggleSelection", "FocusNext"}
-            },
-            up = {
-                help = "up",
-                messages = {"FocusPrevious"}
-            },
-            ["~"] = {
-                help = "go home",
-                messages = {
-                    {
-                        BashExecSilently = [===[
-                        echo ChangeDirectory: "'"${HOME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
-                        ]===]
-                    }
-                }
+  name = "default",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {
+      ["k"] = "up",
+      tab = "ctrl-i",
+      ["/"] = "ctrl-f",
+      ["V"] = "ctrl-a",
+      ["h"] = "left",
+      ["v"] = "space",
+      ["j"] = "down",
+      ["l"] = "right"
+    },
+    on_key = {
+      ["#"] = {
+        help = nil,
+        messages = {"PrintAppStateAndQuit"}
+      },
+      ["."] = {
+        help = "show hidden",
+        messages = {
+          {
+            ToggleNodeFilter = {
+              filter = "RelativePathDoesNotStartWith",
+              input = "."
             }
-        },
-        on_alphabet = nil,
-        on_number = {
-            help = "input",
-            messages = {
-                "PopMode",
-                { SwitchModeBuiltin = "number" },
-                "BufferInputFromKey"
-            }
-        },
-        on_special_character = nil,
-        default = nil
-    }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      [":"] = {
+        help = "action",
+        messages = {
+          "PopMode",
+          {
+            SwitchModeBuiltin = "action"
+          },
+          "Refresh"
+        }
+      },
+      ["?"] = {
+        help = "global help menu",
+        messages = {
+          {
+            BashExec = [===[
+            [ -z "$PAGER" ] && PAGER="less -+F"
+            cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
+            ]===]
+          }
+        }
+      },
+      ["G"] = {
+        help = "go to bottom",
+        messages = {"FocusLast"}
+      },
+      ["ctrl-a"] = {
+        help = "select/unselect all",
+        messages = {"ToggleSelectAll"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-f"] = {
+        help = "search",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "search" },
+          { SetInputBuffer = "" },
+          "ExplorePwdAsync"
+        }
+      },
+      ["ctrl-i"] = {
+        help = "next visited path",
+        messages = {"NextVisitedPath"}
+      },
+      ["ctrl-o"] = {
+        help = "last visited path",
+        messages = {"LastVisitedPath"}
+      },
+      ["ctrl-r"] = {
+        help = "refresh screen",
+        messages = {"ClearScreen", "Refresh"}
+      },
+      ["ctrl-u"] = {
+        help = "clear selection",
+        messages = {"ClearSelection"}
+      },
+      ["ctrl-w"] = {
+        help = "switch layout",
+        messages = {
+          {
+            SwitchModeBuiltin = "switch_layout"
+          },
+          "Refresh"
+        }
+      },
+      ["d"] = {
+        help = "delete",
+        messages = {
+          "PopMode",
+          {
+            SwitchModeBuiltin = "delete"
+          },
+          "Refresh"
+        }
+      },
+      down = {
+        help = "down",
+        messages = {"FocusNext"}
+      },
+      enter = {
+        help = "quit with result",
+        messages = { "PrintResultAndQuit" }
+      },
+      esc = {
+        help = nil,
+        messages = {}
+      },
+      ["f"] = {
+        help = "filter",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "filter" },
+          "Refresh"
+        }
+      },
+      ["g"] = {
+        help = "go to",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "go_to" },
+          "Refresh"
+        }
+      },
+      left = {
+        help = "back",
+        messages = {"Back"}
+      },
+      ["q"] = {
+        help = "quit",
+        messages = {"Quit"}
+      },
+      ["r"] = {
+        help = "rename",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "rename" },
+          {
+            BashExecSilently = [===[
+            echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
+            ]===]
+          },
+          "Refresh"
+        }
+      },
+      right = {
+        help = "enter",
+        messages = { "Enter" }
+      },
+      ["s"] = {
+        help = "sort",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "sort" },
+          "Refresh"
+        }
+      },
+      space = {
+        help = "toggle selection",
+        messages = {"ToggleSelection", "FocusNext"}
+      },
+      up = {
+        help = "up",
+        messages = {"FocusPrevious"}
+      },
+      ["~"] = {
+        help = "go home",
+        messages = {
+          {
+            BashExecSilently = [===[
+            echo ChangeDirectory: "'"${HOME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+            ]===]
+          }
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = {
+      help = "input",
+      messages = {
+        "PopMode",
+        { SwitchModeBuiltin = "number" },
+        "BufferInputFromKey"
+      }
+    },
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Recover
 xplr.config.modes.builtin.recover = {
-    name = "recover",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            esc = {
-                help = "escape",
-                messages = {"PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {}
-        }
+  name = "recover",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      esc = {
+        help = "escape",
+        messages = {"PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {}
     }
+  }
 }
 
 ------ Selection ops
 xplr.config.modes.builtin.selection_ops = {
-    name = "selection ops",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["c"] = {
-                help = "copy here",
-                messages = {
-                    {
-                        BashExec = [===[
-                        (while IFS= read -r line; do
-                        if cp -vr -- "${line:?}" ./; then
-                            echo LogSuccess: $line copied to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-                        else
-                            echo LogError: Failed to copy $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-                        fi
-                        done < "${XPLR_PIPE_SELECTION_OUT:?}")
-                        echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
-                        echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
-                        read -p "[enter to continue]"
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            },
-            ["m"] = {
-                help = "move here",
-                messages = {
-                    {
-                        BashExec = [===[
-                        (while IFS= read -r line; do
-                        if mv -v -- "${line:?}" ./; then
-                            echo LogSuccess: $line moved to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-                        else
-                            echo LogError: Failed to move $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-                            fi
-                        done < "${XPLR_PIPE_SELECTION_OUT:?}")
-                        echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
-                        read -p "[enter to continue]"
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["x"] = {
-                help = "open in gui",
-                messages = {
-                    {
-                        BashExecSilently = [===[
-                        if [ -z "$OPENER" ]; then
-                            if command -v xdg-open; then
-                                OPENER=xdg-open
-                                elif command -v open; then
-                                OPENER=open
-                            else
-                                echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
-                                exit 1
-                            fi
-                        fi
-                        (while IFS= read -r line; do
-                        $OPENER "${line:?}" > /dev/null 2>&1
-                        done < "${XPLR_PIPE_RESULT_OUT:?}")
-                        ]===]
-                    },
-                    "ClearScreen",
-                    "PopMode",
-                    "Refresh"
-                }
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+  name = "selection ops",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["c"] = {
+        help = "copy here",
+        messages = {
+          {
+            BashExec = [===[
+            (while IFS= read -r line; do
+            if cp -vr -- "${line:?}" ./; then
+              echo LogSuccess: $line copied to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
+            else
+              echo LogError: Failed to copy $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
+            fi
+            done < "${XPLR_PIPE_SELECTION_OUT:?}")
+            echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+            echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
+            read -p "[enter to continue]"
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      },
+      ["m"] = {
+        help = "move here",
+        messages = {
+          {
+            BashExec = [===[
+            (while IFS= read -r line; do
+            if mv -v -- "${line:?}" ./; then
+              echo LogSuccess: $line moved to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
+            else
+              echo LogError: Failed to move $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
+            fi
+            done < "${XPLR_PIPE_SELECTION_OUT:?}")
+            echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+            read -p "[enter to continue]"
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["x"] = {
+        help = "open in gui",
+        messages = {
+          {
+            BashExecSilently = [===[
+            if [ -z "$OPENER" ]; then
+              if command -v xdg-open; then
+                OPENER=xdg-open
+                elif command -v open; then
+                OPENER=open
+              else
+                echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                exit 1
+              fi
+            fi
+            (while IFS= read -r line; do
+            $OPENER "${line:?}" > /dev/null 2>&1
+            done < "${XPLR_PIPE_RESULT_OUT:?}")
+            ]===]
+          },
+          "ClearScreen",
+          "PopMode",
+          "Refresh"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Create
 xplr.config.modes.builtin.create = {
-    name = "create",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["d"] = {
-                help = "create directory",
-                messages = {
-                    "PopMode",
-                    {
-                        SwitchModeBuiltin = "create directory"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    }
-                }
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            },
-            ["f"] = {
-                help = "create file",
-                messages = {
-                    "PopMode",
-                    {
-                        SwitchModeBuiltin = "create file"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    }
-                }
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+  name = "create",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["d"] = {
+        help = "create directory",
+        messages = {
+          "PopMode",
+          {
+            SwitchModeBuiltin = "create directory"
+          },
+          {
+            SetInputBuffer = ""
+          }
+        }
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      },
+      ["f"] = {
+        help = "create file",
+        messages = {
+          "PopMode",
+          {
+            SwitchModeBuiltin = "create file"
+          },
+          {
+            SetInputBuffer = ""
+          }
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Create directory
 xplr.config.modes.builtin.create_directory = {
-    name = "create directory",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {"RemoveInputBufferLastCharacter"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        SetInputBuffer = ""
-                    }
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {"RemoveInputBufferLastWord"}
-            },
-            enter = {
-                help = "create directory",
-                messages = {
-                    {
-                        BashExecSilently = [===[
-                        PTH="$XPLR_INPUT_BUFFER"
-                        if [ "${PTH}" ]; then
-                            mkdir -p -- "${PTH:?}" \
-                            && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
-                        else
-                            echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
-                            echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
-                        fi
-                        ]===]
-                    }
-                }
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {"BufferInputFromKey"}
+  name = "create directory",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {"RemoveInputBufferLastCharacter"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            SetInputBuffer = ""
+          }
         }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {"RemoveInputBufferLastWord"}
+      },
+      enter = {
+        help = "create directory",
+        messages = {
+          {
+            BashExecSilently = [===[
+            PTH="$XPLR_INPUT_BUFFER"
+            if [ "${PTH}" ]; then
+              mkdir -p -- "${PTH:?}" \
+              && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+            else
+              echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
+              echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+            fi
+            ]===]
+          }
+        }
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {"BufferInputFromKey"}
     }
+  }
 }
 
 ------ Create file
 xplr.config.modes.builtin.create_file = {
-    name = "create file",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {"RemoveInputBufferLastCharacter"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        SetInputBuffer = ""
-                    }
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {"RemoveInputBufferLastWord"}
-            },
-            enter = {
-                help = "create file",
-                messages = {
-                    {
-                        BashExecSilently = [===[
-                        PTH="$XPLR_INPUT_BUFFER"
-                        if [ "${PTH}" ]; then
-                            touch -- "${PTH:?}" \
-                            && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
-                        else
-                            echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
-                            echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
-                        fi
-                        ]===]
-                    }
-                }
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {"BufferInputFromKey"}
+  name = "create file",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {"RemoveInputBufferLastCharacter"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            SetInputBuffer = ""
+          }
         }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {"RemoveInputBufferLastWord"}
+      },
+      enter = {
+        help = "create file",
+        messages = {
+          {
+            BashExecSilently = [===[
+            PTH="$XPLR_INPUT_BUFFER"
+            if [ "${PTH}" ]; then
+              touch -- "${PTH:?}" \
+              && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+            else
+              echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
+              echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
+            fi
+            ]===]
+          }
+        }
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {"BufferInputFromKey"}
     }
+  }
 }
 
 ------ Number
 xplr.config.modes.builtin.number = {
-    name = "number",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {
-            ["j"] = "down",
-            ["k"] = "up"
-        },
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {"RemoveInputBufferLastCharacter"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        SetInputBuffer = ""
-                    }
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {"RemoveInputBufferLastWord"}
-            },
-            down = {
-                help = "to down",
-                messages = {"FocusNextByRelativeIndexFromInput", "PopMode", "Refresh"}
-            },
-            enter = {
-                help = "to index",
-                messages = {"FocusByIndexFromInput", "PopMode", "Refresh"}
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            },
-            up = {
-                help = "to up",
-                messages = {"FocusPreviousByRelativeIndexFromInput", "PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = {
-            help = "input",
-            messages = {"BufferInputFromKey"}
-        },
-        on_special_character = nil,
-        default = nil
-    }
+  name = "number",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {
+      ["j"] = "down",
+      ["k"] = "up"
+    },
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {"RemoveInputBufferLastCharacter"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            SetInputBuffer = ""
+          }
+        }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {"RemoveInputBufferLastWord"}
+      },
+      down = {
+        help = "to down",
+        messages = {"FocusNextByRelativeIndexFromInput", "PopMode", "Refresh"}
+      },
+      enter = {
+        help = "to index",
+        messages = {"FocusByIndexFromInput", "PopMode", "Refresh"}
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      },
+      up = {
+        help = "to up",
+        messages = {"FocusPreviousByRelativeIndexFromInput", "PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = {
+      help = "input",
+      messages = {"BufferInputFromKey"}
+    },
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Go to
 xplr.config.modes.builtin.go_to = {
-    name = "go to",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            },
-            ["f"] = {
-                help = "follow symlink",
-                messages = {"FollowSymlink", "PopMode", "Refresh"}
-            },
-            ["g"] = {
-                help = "top",
-                messages = {"FocusFirst", "PopMode", "Refresh"}
-            },
-            ["x"] = {
-                help = "open in gui",
-                messages = {
-                    {
-                        BashExecSilently = [===[
-                        if [ -z "$OPENER" ]; then
-                            if command -v xdg-open; then
-                                OPENER=xdg-open
-                                elif command -v open; then
-                                OPENER=open
-                            else
-                                echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
-                                exit 1
-                            fi
-                        fi
-                        $OPENER "${XPLR_FOCUS_PATH:?}" > /dev/null 2>&1
-                        ]===]
-                    },
-                    "ClearScreen",
-                    "PopMode",
-                    "Refresh"
-                }
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+  name = "go to",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      },
+      ["f"] = {
+        help = "follow symlink",
+        messages = {"FollowSymlink", "PopMode", "Refresh"}
+      },
+      ["g"] = {
+        help = "top",
+        messages = {"FocusFirst", "PopMode", "Refresh"}
+      },
+      ["x"] = {
+        help = "open in gui",
+        messages = {
+          {
+            BashExecSilently = [===[
+            if [ -z "$OPENER" ]; then
+              if command -v xdg-open; then
+                OPENER=xdg-open
+                elif command -v open; then
+                OPENER=open
+              else
+                echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                exit 1
+              fi
+            fi
+            $OPENER "${XPLR_FOCUS_PATH:?}" > /dev/null 2>&1
+            ]===]
+          },
+          "ClearScreen",
+          "PopMode",
+          "Refresh"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Rename
 xplr.config.modes.builtin.rename = {
-    name = "rename",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {"RemoveInputBufferLastCharacter"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        SetInputBuffer = ""
-                    }
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {"RemoveInputBufferLastWord"}
-            },
-            enter = {
-                help = "rename",
-                messages = {
-                    {
-                        BashExecSilently = [===[
-                        SRC="${XPLR_FOCUS_PATH:?}"
-                        TARGET="${XPLR_INPUT_BUFFER:?}"
-                        mv -- "${SRC:?}" "${TARGET:?}" \
-                            && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                            && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {"BufferInputFromKey"}
+  name = "rename",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {"RemoveInputBufferLastCharacter"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            SetInputBuffer = ""
+          }
         }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {"RemoveInputBufferLastWord"}
+      },
+      enter = {
+        help = "rename",
+        messages = {
+          {
+            BashExecSilently = [===[
+            SRC="${XPLR_FOCUS_PATH:?}"
+            TARGET="${XPLR_INPUT_BUFFER:?}"
+            mv -- "${SRC:?}" "${TARGET:?}" \
+              && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
+              && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {"BufferInputFromKey"}
     }
+  }
 }
 
 ------ Delete
 xplr.config.modes.builtin.delete = {
-    name = "delete",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["D"] = {
-                help = "force delete",
-                messages = {
-                    {
-                        BashExec = [===[
-                        (while IFS= read -r line; do
-                        if rm -rfv -- "${line:?}"; then
-                            echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
-                        else
-                            echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
-                        fi
-                        done < "${XPLR_PIPE_RESULT_OUT:?}")
-                        echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
-                        read -p "[enter to continue]"
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["d"] = {
-                help = "delete",
-                messages = {
-                    {
-                        BashExec = [===[
-                        (while IFS= read -r line; do
-                        if [ -d "$line" ]; then
-                            if rmdir -v -- "${line:?}"; then
-                                echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
-                            else
-                                echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
-                            fi
-                        else
-                            if rm -v -- "${line:?}"; then
-                                echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
-                            else
-                                echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
-                            fi
-                        fi
-                        done < "${XPLR_PIPE_RESULT_OUT:?}")
-                        echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
-                        read -p "[enter to continue]"
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+  name = "delete",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["D"] = {
+        help = "force delete",
+        messages = {
+          {
+            BashExec = [===[
+            (while IFS= read -r line; do
+            if rm -rfv -- "${line:?}"; then
+              echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+            else
+              echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
+            fi
+            done < "${XPLR_PIPE_RESULT_OUT:?}")
+            echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+            read -p "[enter to continue]"
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["d"] = {
+        help = "delete",
+        messages = {
+          {
+            BashExec = [===[
+            (while IFS= read -r line; do
+            if [ -d "$line" ]; then
+              if rmdir -v -- "${line:?}"; then
+                echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
+            else
+              if rm -v -- "${line:?}"; then
+                echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
+            fi
+            done < "${XPLR_PIPE_RESULT_OUT:?}")
+            echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+            read -p "[enter to continue]"
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Action
 xplr.config.modes.builtin.action = {
-    name = "action to",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["!"] = {
-                help = "shell",
-                messages = {
-                    {
-                        Call = {
-                            command = "bash",
-                            args = {"-i"}
-                        }
-                    },
-                    "ExplorePwdAsync",
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["c"] = {
-                help = "create",
-                messages = {
-                    "PopMode",
-                    {
-                        SwitchModeBuiltin = "create"
-                    },
-                    "Refresh"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["e"] = {
-                help = "open in editor",
-                messages = {
-                    {
-                        BashExec = [===[
-                        ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            },
-            ["l"] = {
-                help = "logs",
-                messages = {
-                    {
-                        BashExec = [===[
-                        [ -z "$PAGER" ] && PAGER="less -+F"
-                        cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:?}
-                        ]===]
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["s"] = {
-                help = "selection operations",
-                messages = {
-                    "PopMode",
-                    {
-                        SwitchModeBuiltin = "selection_ops"
-                    },
-                    "Refresh"
-                }
+  name = "action to",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["!"] = {
+        help = "shell",
+        messages = {
+          {
+            Call = {
+              command = "bash",
+              args = {"-i"}
             }
+          },
+          "ExplorePwdAsync",
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["c"] = {
+        help = "create",
+        messages = {
+          "PopMode",
+          {
+            SwitchModeBuiltin = "create"
+          },
+          "Refresh"
+        }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["e"] = {
+        help = "open in editor",
+        messages = {
+          {
+            BashExec = [===[
+            ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      },
+      ["l"] = {
+        help = "logs",
+        messages = {
+          {
+            BashExec = [===[
+            [ -z "$PAGER" ] && PAGER="less -+F"
+            cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:?}
+            ]===]
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["s"] = {
+        help = "selection operations",
+        messages = {
+          "PopMode",
+          {
+            SwitchModeBuiltin = "selection_ops"
+          },
+          "Refresh"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = {
+      help = "go to index",
+      messages = {
+        "PopMode",
+        {
+          SwitchModeBuiltin = "number"
         },
-        on_alphabet = nil,
-        on_number = {
-            help = "go to index",
-            messages = {
-                "PopMode",
-                {
-                    SwitchModeBuiltin = "number"
-                },
-                "BufferInputFromKey"
-            }
-        },
-        on_special_character = nil,
-        default = nil
-    }
+        "BufferInputFromKey"
+      }
+    },
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Search
 xplr.config.modes.builtin.search = {
-    name = "search",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {
-            esc = "enter",
-            ["ctrl-n"] = "down",
-            ["ctrl-p"] = "up"
-        },
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "RemoveInputBufferLastCharacter",
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    },
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "RemoveInputBufferLastWord",
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            down = {
-                help = "down",
-                messages = {"FocusNext"}
-            },
-            enter = {
-                help = "focus",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "PopMode",
-                    "ExplorePwdAsync",
-                    "Refresh"
-                }
-            },
-            left = {
-                help = "back",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "Back",
-                    {
-                        SetInputBuffer = ""
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            right = {
-                help = "enter",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "Enter",
-                    {
-                        SetInputBuffer = ""
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            tab = {
-                help = "toggle selection",
-                messages = {"ToggleSelection", "FocusNext"}
-            },
-            up = {
-                help = "up",
-                messages = {"FocusPrevious"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {
-                {
-                    RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                },
-                "BufferInputFromKey",
-                {
-                    AddNodeFilterFromInput = "IRelativePathDoesContain"
-                },
-                "ExplorePwdAsync"
-            }
+  name = "search",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {
+      esc = "enter",
+      ["ctrl-n"] = "down",
+      ["ctrl-p"] = "up"
+    },
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "RemoveInputBufferLastCharacter",
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
         }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          {
+            SetInputBuffer = ""
+          },
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "RemoveInputBufferLastWord",
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      down = {
+        help = "down",
+        messages = {"FocusNext"}
+      },
+      enter = {
+        help = "focus",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "PopMode",
+          "ExplorePwdAsync",
+          "Refresh"
+        }
+      },
+      left = {
+        help = "back",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "Back",
+          {
+            SetInputBuffer = ""
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      right = {
+        help = "enter",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "Enter",
+          {
+            SetInputBuffer = ""
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      tab = {
+        help = "toggle selection",
+        messages = {"ToggleSelection", "FocusNext"}
+      },
+      up = {
+        help = "up",
+        messages = {"FocusPrevious"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {
+        {
+          RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+        },
+        "BufferInputFromKey",
+        {
+          AddNodeFilterFromInput = "IRelativePathDoesContain"
+        },
+        "ExplorePwdAsync"
+      }
     }
+  }
 }
 
 ------ Filter
 xplr.config.modes.builtin.filter = {
-    name = "filter",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {
-            esc = "enter"
-        },
-        on_key = {
-            ["R"] = {
-                help = "relative does not contain",
-                messages = {
-                    {
-                        SwitchModeBuiltin = "relative_path_does_not_contain"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    },
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            backspace = {
-                help = "remove last filter",
-                messages = {"RemoveLastNodeFilter", "ExplorePwdAsync"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-r"] = {
-                help = "reset filters",
-                messages = {"ResetNodeFilters", "ExplorePwdAsync"}
-            },
-            ["ctrl-u"] = {
-                help = "clear filters",
-                messages = {"ClearNodeFilters", "ExplorePwdAsync"}
-            },
-            enter = {
-                help = "done",
-                messages = {"PopMode", "Refresh"}
-            },
-            ["r"] = {
-                help = "relative does contain",
-                messages = {
-                    {
-                        SwitchModeBuiltin = "relative_path_does_contain"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    },
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+  name = "filter",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {
+      esc = "enter"
+    },
+    on_key = {
+      ["R"] = {
+        help = "relative does not contain",
+        messages = {
+          {
+            SwitchModeBuiltin = "relative_path_does_not_contain"
+          },
+          {
+            SetInputBuffer = ""
+          },
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      backspace = {
+        help = "remove last filter",
+        messages = {"RemoveLastNodeFilter", "ExplorePwdAsync"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-r"] = {
+        help = "reset filters",
+        messages = {"ResetNodeFilters", "ExplorePwdAsync"}
+      },
+      ["ctrl-u"] = {
+        help = "clear filters",
+        messages = {"ClearNodeFilters", "ExplorePwdAsync"}
+      },
+      enter = {
+        help = "done",
+        messages = {"PopMode", "Refresh"}
+      },
+      ["r"] = {
+        help = "relative does contain",
+        messages = {
+          {
+            SwitchModeBuiltin = "relative_path_does_contain"
+          },
+          {
+            SetInputBuffer = ""
+          },
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Relative path does contain
 xplr.config.modes.builtin.relative_path_does_contain = {
-    name = "relative path does contain",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "RemoveInputBufferLastCharacter",
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    },
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "RemoveInputBufferLastWord",
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            enter = {
-                help = "apply filter",
-                messages = {"PopMode", "Refresh"}
-            },
-            esc = {
-                help = "cancel",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                    },
-                    "PopMode",
-                    "ExplorePwdAsync",
-                    "Refresh"
-                }
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {
-                {
-                    RemoveNodeFilterFromInput = "IRelativePathDoesContain"
-                },
-                "BufferInputFromKey",
-                {
-                    AddNodeFilterFromInput = "IRelativePathDoesContain"
-                },
-                "ExplorePwdAsync"
-            }
+  name = "relative path does contain",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "RemoveInputBufferLastCharacter",
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
         }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          {
+            SetInputBuffer = ""
+          },
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "RemoveInputBufferLastWord",
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      enter = {
+        help = "apply filter",
+        messages = {"PopMode", "Refresh"}
+      },
+      esc = {
+        help = "cancel",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          },
+          "PopMode",
+          "ExplorePwdAsync",
+          "Refresh"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {
+        {
+          RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+        },
+        "BufferInputFromKey",
+        {
+          AddNodeFilterFromInput = "IRelativePathDoesContain"
+        },
+        "ExplorePwdAsync"
+      }
     }
+  }
 }
 
 ------ Relative path does not contain
 xplr.config.modes.builtin.relative_path_does_not_contain = {
-    name = "relative path does not contain",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            backspace = {
-                help = "remove last character",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "RemoveInputBufferLastCharacter",
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-u"] = {
-                help = "remove line",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    {
-                        SetInputBuffer = ""
-                    },
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["ctrl-w"] = {
-                help = "remove last word",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "RemoveInputBufferLastWord",
-                    {
-                        AddNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            enter = {
-                help = "apply filter",
-                messages = {"PopMode", "Refresh"}
-            },
-            esc = {
-                help = "cancel",
-                messages = {
-                    {
-                        RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
-                    },
-                    "PopMode",
-                    "ExplorePwdAsync"
-                }
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = {
-            help = nil,
-            messages = {
-                {
-                    RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
-                },
-                "BufferInputFromKey",
-                {
-                    AddNodeFilterFromInput = "IRelativePathDoesNotContain"
-                },
-                "ExplorePwdAsync"
-            }
+  name = "relative path does not contain",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      backspace = {
+        help = "remove last character",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "RemoveInputBufferLastCharacter",
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "ExplorePwdAsync"
         }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-u"] = {
+        help = "remove line",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          {
+            SetInputBuffer = ""
+          },
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["ctrl-w"] = {
+        help = "remove last word",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "RemoveInputBufferLastWord",
+          {
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      enter = {
+        help = "apply filter",
+        messages = {"PopMode", "Refresh"}
+      },
+      esc = {
+        help = "cancel",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+          },
+          "PopMode",
+          "ExplorePwdAsync"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {
+        {
+          RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+        },
+        "BufferInputFromKey",
+        {
+          AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+        },
+        "ExplorePwdAsync"
+      }
     }
+  }
 }
 
 ------ Sort
 xplr.config.modes.builtin.sort = {
-    name = "sort",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {
-            esc = "enter"
-        },
-        on_key = {
-            ["!"] = {
-                help = "reverse sorters",
-                messages = {"ReverseNodeSorters", "ExplorePwdAsync"}
-            },
-            ["E"] = {
-                help = "by canonical extension reverse",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalExtension",
-                            reverse = true
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["M"] = {
-                help = "by canonical mime essence reverse",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalMimeEssence",
-                            reverse = true
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["N"] = {
-                help = "by node type reverse",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalIsDir",
-                            reverse = true
-                        }
-                    },
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalIsFile",
-                            reverse = true
-                        }
-                    },
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByIsSymlink",
-                            reverse = true
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["R"] = {
-                help = "by relative path reverse",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByIRelativePath",
-                            reverse = true
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["S"] = {
-                help = "by size reverse",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "BySize",
-                            reverse = true
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            backspace = {
-                help = "remove last sorter",
-                messages = {"RemoveLastNodeSorter", "ExplorePwdAsync"}
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            ["ctrl-r"] = {
-                help = "reset sorters",
-                messages = {"ResetNodeSorters", "ExplorePwdAsync"}
-            },
-            ["ctrl-u"] = {
-                help = "clear sorters",
-                messages = {"ClearNodeSorters", "ExplorePwdAsync"}
-            },
-            ["e"] = {
-                help = "by canonical extension",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalExtension",
-                            reverse = false
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            enter = {
-                help = "done",
-                messages = {"PopMode", "Refresh"}
-            },
-            ["m"] = {
-                help = "by canonical mime essence",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalMimeEssence",
-                            reverse = false
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["n"] = {
-                help = "by node type",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalIsDir",
-                            reverse = false
-                        }
-                    },
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByCanonicalIsFile",
-                            reverse = false
-                        }
-                    },
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByIsSymlink",
-                            reverse = false
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["r"] = {
-                help = "by relative path",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "ByIRelativePath",
-                            reverse = false
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
-            },
-            ["s"] = {
-                help = "by size",
-                messages = {
-                    {
-                        AddNodeSorter = {
-                            sorter = "BySize",
-                            reverse = false
-                        }
-                    },
-                    "ExplorePwdAsync"
-                }
+  name = "sort",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {
+      esc = "enter"
+    },
+    on_key = {
+      ["!"] = {
+        help = "reverse sorters",
+        messages = {"ReverseNodeSorters", "ExplorePwdAsync"}
+      },
+      ["E"] = {
+        help = "by canonical extension reverse",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalExtension",
+              reverse = true
             }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["M"] = {
+        help = "by canonical mime essence reverse",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalMimeEssence",
+              reverse = true
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["N"] = {
+        help = "by node type reverse",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalIsDir",
+              reverse = true
+            }
+          },
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalIsFile",
+              reverse = true
+            }
+          },
+          {
+            AddNodeSorter = {
+              sorter = "ByIsSymlink",
+              reverse = true
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["R"] = {
+        help = "by relative path reverse",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByIRelativePath",
+              reverse = true
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["S"] = {
+        help = "by size reverse",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "BySize",
+              reverse = true
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      backspace = {
+        help = "remove last sorter",
+        messages = {"RemoveLastNodeSorter", "ExplorePwdAsync"}
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      ["ctrl-r"] = {
+        help = "reset sorters",
+        messages = {"ResetNodeSorters", "ExplorePwdAsync"}
+      },
+      ["ctrl-u"] = {
+        help = "clear sorters",
+        messages = {"ClearNodeSorters", "ExplorePwdAsync"}
+      },
+      ["e"] = {
+        help = "by canonical extension",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalExtension",
+              reverse = false
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      enter = {
+        help = "done",
+        messages = {"PopMode", "Refresh"}
+      },
+      ["m"] = {
+        help = "by canonical mime essence",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalMimeEssence",
+              reverse = false
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["n"] = {
+        help = "by node type",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalIsDir",
+              reverse = false
+            }
+          },
+          {
+            AddNodeSorter = {
+              sorter = "ByCanonicalIsFile",
+              reverse = false
+            }
+          },
+          {
+            AddNodeSorter = {
+              sorter = "ByIsSymlink",
+              reverse = false
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["r"] = {
+        help = "by relative path",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "ByIRelativePath",
+              reverse = false
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      },
+      ["s"] = {
+        help = "by size",
+        messages = {
+          {
+            AddNodeSorter = {
+              sorter = "BySize",
+              reverse = false
+            }
+          },
+          "ExplorePwdAsync"
+        }
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ------ Switch layout
 xplr.config.modes.builtin.switch_layout = {
-    name = "switch layout",
-    help = nil,
-    extra_help = nil,
-    key_bindings = {
-        remaps = {},
-        on_key = {
-            ["1"] = {
-                help = "default",
-                messages = {
-                    {
-                        SwitchLayoutBuiltin = "default"
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["2"] = {
-                help = "no help menu",
-                messages = {
-                    {
-                        SwitchLayoutBuiltin = "no_help"
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["3"] = {
-                help = "no selection panel",
-                messages = {
-                    {
-                        SwitchLayoutBuiltin = "no_selection"
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["4"] = {
-                help = "no help or selection",
-                messages = {
-                    {
-                        SwitchLayoutBuiltin = "no_help_no_selection"
-                    },
-                    "PopMode",
-                    "Refresh"
-                }
-            },
-            ["ctrl-c"] = {
-                help = "terminate",
-                messages = {"Terminate"}
-            },
-            esc = {
-                help = "cancel",
-                messages = {"PopMode", "Refresh"}
-            }
-        },
-        on_alphabet = nil,
-        on_number = nil,
-        on_special_character = nil,
-        default = nil
-    }
+  name = "switch layout",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    remaps = {},
+    on_key = {
+      ["1"] = {
+        help = "default",
+        messages = {
+          {
+            SwitchLayoutBuiltin = "default"
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["2"] = {
+        help = "no help menu",
+        messages = {
+          {
+            SwitchLayoutBuiltin = "no_help"
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["3"] = {
+        help = "no selection panel",
+        messages = {
+          {
+            SwitchLayoutBuiltin = "no_selection"
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["4"] = {
+        help = "no help or selection",
+        messages = {
+          {
+            SwitchLayoutBuiltin = "no_help_no_selection"
+          },
+          "PopMode",
+          "Refresh"
+        }
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      esc = {
+        help = "cancel",
+        messages = {"PopMode", "Refresh"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = nil
+  }
 }
 
 ---- Custom
@@ -1808,66 +2003,66 @@ xplr.config.modes.custom = {}
 -- Function
 ---- Formaters
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
-    local r = ""
-    if m.is_before_focus then
-        r = r .. " -"
-    else
-        r = r .. "  "
-    end
+  local r = ""
+  if m.is_before_focus then
+    r = r .. " -"
+  else
+    r = r .. "  "
+  end
 
-    r = r .. m.relative_index .. "│" .. m.index
+  r = r .. m.relative_index .. "│" .. m.index
 
-    return r
+  return r
 end
 
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
-    local r = m.tree .. m.prefix
+  local r = m.tree .. m.prefix
 
-    if m.meta.icon == nil then
-        r = " " .. r
+  if m.meta.icon == nil then
+    r = " " .. r
+  end
+
+  r = r .. m.relative_path
+
+  if m.is_dir then
+    r = r .. "/"
+  end
+
+  r = r .. m.suffix .. " "
+
+  if m.is_symlink then
+    r = r .. "-> "
+
+    if m.is_broken then
+      r = r .. "×"
+    else
+      r = r .. m.absolute_path
     end
 
-    r = r .. m.relative_path
-
-    if m.is_dir then
-        r = r .. "/"
+    if m.symlink.is_dir then
+      r = r .. "/"
     end
+  end
 
-    r = r .. m.suffix .. " "
-
-    if m.is_symlink then
-        r = r .. "-> "
-
-        if m.is_broken then
-            r = r .. "×"
-        else
-            r = r .. m.absolute_path
-        end
-
-        if m.symlink.is_dir then
-            r = r .. "/"
-        end
-    end
-
-    return r
+  return r
 end
 
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
-    if not m.is_dir then
-        return m.human_size
-    else
-        return ""
-    end
+  if not m.is_dir then
+    return m.human_size
+  else
+    return ""
+  end
 end
 
 xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
-    if m.is_symlink then
-        return m.symlink.mime_essence
-    else
-        return m.mime_essence
-    end
+  if m.is_symlink then
+    return m.symlink.mime_essence
+  else
+    return m.mime_essence
+  end
 end
 
 xplr.fn.custom.foo = function(a, b)
-    return a + b
+  return a + b
 end

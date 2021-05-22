@@ -70,12 +70,12 @@ impl LayoutOptions {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum Layout {
-    Nothing(Option<PanelUiConfig>),
-    Table(Option<PanelUiConfig>),
-    InputAndLogs(Option<PanelUiConfig>),
-    Selection(Option<PanelUiConfig>),
-    HelpMenu(Option<PanelUiConfig>),
-    SortAndFilter(Option<PanelUiConfig>),
+    Nothing,
+    Table,
+    InputAndLogs,
+    Selection,
+    HelpMenu,
+    SortAndFilter,
     Horizontal {
         config: LayoutOptions,
         splits: Vec<Layout>,
@@ -88,19 +88,14 @@ pub enum Layout {
 
 impl Default for Layout {
     fn default() -> Self {
-        Self::Nothing(Default::default())
+        Self::Nothing
     }
 }
 
 impl Layout {
     pub fn extend(self, other: Self) -> Self {
         match (self, other) {
-            (s, Self::Nothing(_)) => s,
-            (Self::Table(s), Self::Table(o)) => Self::Table(o.or(s)),
-            (Self::InputAndLogs(s), Self::InputAndLogs(o)) => Self::InputAndLogs(o.or(s)),
-            (Self::Selection(s), Self::Selection(o)) => Self::Selection(o.or(s)),
-            (Self::HelpMenu(s), Self::HelpMenu(o)) => Self::HelpMenu(o.or(s)),
-            (Self::SortAndFilter(s), Self::SortAndFilter(o)) => Self::SortAndFilter(o.or(s)),
+            (s, Self::Nothing) => s,
             (
                 Self::Horizontal {
                     config: sconfig,
@@ -416,7 +411,6 @@ fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
 }
 
 fn draw_table<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     screen_size: Rect,
     layout_size: Rect,
@@ -424,13 +418,10 @@ fn draw_table<B: Backend>(
     lua: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config
+    let config = panel_config
         .default()
         .clone()
         .extend(panel_config.table().clone());
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
     let app_config = app.config().to_owned();
     let header_height = app_config.general().table().header().height().unwrap_or(1);
     let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
@@ -619,7 +610,6 @@ fn draw_table<B: Backend>(
 }
 
 fn draw_selection<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
@@ -627,13 +617,10 @@ fn draw_selection<B: Backend>(
     _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config
+    let config = panel_config
         .default()
         .clone()
         .extend(panel_config.selection().clone());
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
     let selection: Vec<ListItem> = app
         .selection()
         .iter()
@@ -654,7 +641,6 @@ fn draw_selection<B: Backend>(
 }
 
 fn draw_help_menu<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
@@ -662,13 +648,10 @@ fn draw_help_menu<B: Backend>(
     _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config
+    let config = panel_config
         .default()
         .clone()
         .extend(panel_config.help_menu().clone());
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
     let help_menu_rows = app
         .mode()
         .help_menu()
@@ -710,7 +693,6 @@ fn draw_help_menu<B: Backend>(
 }
 
 fn draw_input_buffer<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
@@ -718,13 +700,10 @@ fn draw_input_buffer<B: Backend>(
     _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config
+    let config = panel_config
         .default()
         .clone()
         .extend(panel_config.input_and_logs().clone());
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
     let input_buf = Paragraph::new(Spans::from(vec![
         Span::styled(
             app.config()
@@ -751,7 +730,6 @@ fn draw_input_buffer<B: Backend>(
 }
 
 fn draw_sort_n_filter<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
@@ -759,13 +737,10 @@ fn draw_sort_n_filter<B: Backend>(
     _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config
+    let config = panel_config
         .default()
         .clone()
         .extend(panel_config.sort_and_filter().clone());
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
     let ui = app.config().general().sort_and_filter_ui().clone();
     let filter_by = app.explorer_config().filters();
     let sort_by = app.explorer_config().sorters();
@@ -832,7 +807,6 @@ fn draw_sort_n_filter<B: Backend>(
 }
 
 fn draw_logs<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
@@ -840,13 +814,10 @@ fn draw_logs<B: Backend>(
     _: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config
+    let config = panel_config
         .default()
         .clone()
         .extend(panel_config.input_and_logs().clone());
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
     let logs_config = app.config().general().logs().clone();
     let logs = if app.logs_hidden() {
         vec![]
@@ -909,7 +880,6 @@ fn draw_logs<B: Backend>(
 }
 
 pub fn draw_nothing<B: Backend>(
-    config: Option<PanelUiConfig>,
     f: &mut Frame<B>,
     _screen_size: Rect,
     layout_size: Rect,
@@ -917,10 +887,7 @@ pub fn draw_nothing<B: Backend>(
     _lua: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let default_panel_config = panel_config.default().clone();
-    let config = config
-        .map(|c| default_panel_config.clone().extend(c))
-        .unwrap_or(default_panel_config);
+    let config = panel_config.default().clone();
     let nothing = Paragraph::new("").block(block(config, "".into()));
     f.render_widget(nothing, layout_size);
 }
@@ -934,18 +901,16 @@ pub fn draw_layout<B: Backend>(
     lua: &Lua,
 ) {
     match layout {
-        Layout::Nothing(config) => draw_nothing(config, f, screen_size, layout_size, app, lua),
-        Layout::Table(config) => draw_table(config, f, screen_size, layout_size, app, lua),
-        Layout::SortAndFilter(config) => {
-            draw_sort_n_filter(config, f, screen_size, layout_size, app, lua)
-        }
-        Layout::HelpMenu(config) => draw_help_menu(config, f, screen_size, layout_size, app, lua),
-        Layout::Selection(config) => draw_selection(config, f, screen_size, layout_size, app, lua),
-        Layout::InputAndLogs(config) => {
+        Layout::Nothing => draw_nothing(f, screen_size, layout_size, app, lua),
+        Layout::Table => draw_table(f, screen_size, layout_size, app, lua),
+        Layout::SortAndFilter => draw_sort_n_filter(f, screen_size, layout_size, app, lua),
+        Layout::HelpMenu => draw_help_menu(f, screen_size, layout_size, app, lua),
+        Layout::Selection => draw_selection(f, screen_size, layout_size, app, lua),
+        Layout::InputAndLogs => {
             if app.input_buffer().is_some() {
-                draw_input_buffer(config, f, screen_size, layout_size, app, lua);
+                draw_input_buffer(f, screen_size, layout_size, app, lua);
             } else {
-                draw_logs(config, f, screen_size, layout_size, app, lua);
+                draw_logs(f, screen_size, layout_size, app, lua);
             };
         }
         Layout::Horizontal { config, splits } => {

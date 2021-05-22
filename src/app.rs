@@ -1,6 +1,5 @@
 use crate::config::Config;
 use crate::config::Mode;
-use crate::default_config::DEFAULT_LUA_SCRIPT;
 use crate::explorer;
 use crate::input::Key;
 use crate::lua;
@@ -15,12 +14,11 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
 use std::fs;
-use std::io;
 use std::path::PathBuf;
 
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
-pub const UPGRADE_GUIDE_LINK: &str = "https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide";
 
 fn to_humansize(size: u64) -> String {
     size.file_size(options::CONVENTIONAL)
@@ -1459,57 +1457,18 @@ pub struct App {
 
 impl App {
     pub fn create(pwd: PathBuf, lua: &mlua::Lua) -> Result<Self> {
+        let config = lua::init(lua)?;
+
         let config_dir = dirs::config_dir()
             .unwrap_or_else(|| PathBuf::from("."))
             .join("xplr");
-        let yaml_config_file = config_dir.join("config.yml");
+
         let lua_script_file = config_dir.join("init.lua");
 
-        let default_config = Config::default();
-        let default_config_version = default_config.version().clone();
-
-        // TODO deprecate this ---------------------------------
-        let config: Config = if yaml_config_file.exists() {
-            let c: Config =
-                serde_yaml::from_reader(io::BufReader::new(&fs::File::open(&yaml_config_file)?))?;
-            c.extended()
-        } else {
-            default_config
-        };
-
-        if !config.is_compatible()? {
-            bail!(
-                "incompatible configuration version in {}
-                You config version is : {}
-                Required version is   : {}
-                Visit {}",
-                yaml_config_file.to_string_lossy().to_string(),
-                config.version(),
-                default_config_version,
-                UPGRADE_GUIDE_LINK,
-            )
-        };
-        // -------------------------------------------------------
-
-        let config = lua::init(lua, DEFAULT_LUA_SCRIPT, config)?;
-
         let config = if lua_script_file.exists() {
-            lua::extend(lua, &fs::read_to_string(&lua_script_file)?)?
+            lua::extend(lua, &lua_script_file.to_string_lossy().to_string())?
         } else {
             config
-        };
-
-        if !config.is_compatible()? {
-            bail!(
-                "incompatible configuration version in {}
-                You config version is : {}
-                Required version is   : {}
-                Visit {}",
-                lua_script_file.to_string_lossy().to_string(),
-                config.version(),
-                default_config_version,
-                UPGRADE_GUIDE_LINK,
-            )
         };
 
         let mode = match config.modes().get(
@@ -1563,9 +1522,9 @@ impl App {
 
         let pwd = pwd.to_string_lossy().to_string();
 
-        let mut app = Self {
-            version: Config::default().version().clone(),
-            config: config.clone(),
+        let app = Self {
+            version: VERSION.to_string(),
+            config,
             pwd,
             directory_buffers: Default::default(),
             selection: Default::default(),
@@ -1582,31 +1541,6 @@ impl App {
             history: Default::default(),
             last_modes: Default::default(),
         };
-
-        if let Some(notif) = config.upgrade_notification()? {
-            let notif = format!(
-                "{}. To stop seeing this log, update your config version from {} to {}",
-                &notif,
-                config.version(),
-                app.version()
-            );
-            app = app.enqueue(Task::new(
-                MsgIn::External(ExternalMsg::LogInfo(notif)),
-                None,
-            ));
-        }
-
-        // if yaml_config_file.exists() && !lua_script_file.exists() {
-        //     let notif = format!(
-        //         "`config.yml` will be deprecated in favor of `init.lua`. To stop this warning, create empty file {}",
-        //         lua_script_file.to_string_lossy().to_string()
-        //     );
-
-        //     app = app.enqueue(Task::new(
-        //         MsgIn::External(ExternalMsg::LogWarning(notif)),
-        //         None,
-        //     ));
-        // }
 
         Ok(app)
     }
