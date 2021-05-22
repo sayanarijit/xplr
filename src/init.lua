@@ -2062,7 +2062,3 @@ xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
     return m.mime_essence
   end
 end
-
-xplr.fn.custom.foo = function(a, b)
-  return a + b
-end
