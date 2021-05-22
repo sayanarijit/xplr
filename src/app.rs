@@ -1465,10 +1465,13 @@ impl App {
 
         let lua_script_file = config_dir.join("init.lua");
 
-        let config = if lua_script_file.exists() {
-            lua::extend(lua, &lua_script_file.to_string_lossy().to_string())?
+        let (config, load_err) = if lua_script_file.exists() {
+            match lua::extend(lua, &lua_script_file.to_string_lossy().to_string()) {
+                Ok(c) => (c, None),
+                Err(e) => (config, Some(e.to_string())),
+            }
         } else {
-            config
+            (config, None)
         };
 
         let mode = match config.modes().get(
@@ -1543,7 +1546,11 @@ impl App {
             last_modes: Default::default(),
         };
 
-        Ok(app)
+        if let Some(err) = load_err {
+            app.log_error(err)
+        } else {
+            Ok(app)
+        }
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
