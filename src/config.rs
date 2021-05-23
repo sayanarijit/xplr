@@ -17,10 +17,10 @@ use std::collections::HashMap;
 #[serde(deny_unknown_fields)]
 pub struct Action {
     #[serde(default)]
-    help: Option<String>,
+    pub help: Option<String>,
 
     #[serde(default)]
-    messages: Vec<ExternalMsg>,
+    pub messages: Vec<ExternalMsg>,
 }
 
 impl Action {
@@ -53,10 +53,10 @@ impl Action {
 #[serde(deny_unknown_fields)]
 pub struct NodeTypeConfig {
     #[serde(default)]
-    style: Style,
+    pub style: Style,
 
     #[serde(default)]
-    meta: HashMap<String, String>,
+    pub meta: HashMap<String, String>,
 }
 
 impl NodeTypeConfig {
@@ -75,22 +75,22 @@ impl NodeTypeConfig {
 #[serde(deny_unknown_fields)]
 pub struct NodeTypesConfig {
     #[serde(default)]
-    directory: NodeTypeConfig,
+    pub directory: NodeTypeConfig,
 
     #[serde(default)]
-    file: NodeTypeConfig,
+    pub file: NodeTypeConfig,
 
     #[serde(default)]
-    symlink: NodeTypeConfig,
+    pub symlink: NodeTypeConfig,
 
     #[serde(default)]
-    mime_essence: HashMap<String, NodeTypeConfig>,
+    pub mime_essence: HashMap<String, NodeTypeConfig>,
 
     #[serde(default)]
-    extension: HashMap<String, NodeTypeConfig>,
+    pub extension: HashMap<String, NodeTypeConfig>,
 
     #[serde(default)]
-    special: HashMap<String, NodeTypeConfig>,
+    pub special: HashMap<String, NodeTypeConfig>,
 }
 
 impl NodeTypesConfig {
@@ -129,13 +129,13 @@ impl NodeTypesConfig {
 #[serde(deny_unknown_fields)]
 pub struct UiConfig {
     #[serde(default)]
-    pub(crate) prefix: Option<String>,
+    pub prefix: Option<String>,
 
     #[serde(default)]
-    pub(crate) suffix: Option<String>,
+    pub suffix: Option<String>,
 
     #[serde(default)]
-    pub(crate) style: Style,
+    pub style: Style,
 }
 
 impl UiConfig {
@@ -159,10 +159,10 @@ impl UiConfig {
 #[serde(deny_unknown_fields)]
 pub struct UiElement {
     #[serde(default)]
-    format: Option<String>,
+    pub format: Option<String>,
 
     #[serde(default)]
-    style: Style,
+    pub style: Style,
 }
 
 impl UiElement {
@@ -187,13 +187,13 @@ impl UiElement {
 #[serde(deny_unknown_fields)]
 pub struct TableRowConfig {
     #[serde(default)]
-    cols: Option<Vec<UiElement>>,
+    pub cols: Option<Vec<UiElement>>,
 
     #[serde(default)]
-    style: Style,
+    pub style: Style,
 
     #[serde(default)]
-    height: Option<u16>,
+    pub height: Option<u16>,
 }
 
 impl TableRowConfig {
@@ -217,22 +217,22 @@ impl TableRowConfig {
 #[serde(deny_unknown_fields)]
 pub struct TableConfig {
     #[serde(default)]
-    header: TableRowConfig,
+    pub header: TableRowConfig,
 
     #[serde(default)]
-    row: TableRowConfig,
+    pub row: TableRowConfig,
 
     #[serde(default)]
-    style: Style,
+    pub style: Style,
 
     #[serde(default)]
-    tree: Option<(UiElement, UiElement, UiElement)>,
+    pub tree: Option<(UiElement, UiElement, UiElement)>,
 
     #[serde(default)]
-    col_spacing: Option<u16>,
+    pub col_spacing: Option<u16>,
 
     #[serde(default)]
-    col_widths: Option<Vec<Constraint>>,
+    pub col_widths: Option<Vec<Constraint>>,
 }
 
 impl TableConfig {
@@ -271,16 +271,16 @@ impl TableConfig {
 #[serde(deny_unknown_fields)]
 pub struct LogsConfig {
     #[serde(default)]
-    info: UiElement,
+    pub info: UiElement,
 
     #[serde(default)]
-    success: UiElement,
+    pub success: UiElement,
 
     #[serde(default)]
-    warning: UiElement,
+    pub warning: UiElement,
 
     #[serde(default)]
-    error: UiElement,
+    pub error: UiElement,
 }
 
 impl LogsConfig {
@@ -309,10 +309,10 @@ impl LogsConfig {
 #[serde(deny_unknown_fields)]
 pub struct SortDirectionIdentifiersUi {
     #[serde(default)]
-    forward: UiElement,
+    pub forward: UiElement,
 
     #[serde(default)]
-    reverse: UiElement,
+    pub reverse: UiElement,
 }
 
 impl SortDirectionIdentifiersUi {
@@ -331,19 +331,19 @@ impl SortDirectionIdentifiersUi {
 #[serde(deny_unknown_fields)]
 pub struct SortAndFilterUi {
     #[serde(default)]
-    separator: UiElement,
+    pub separator: UiElement,
 
     #[serde(default)]
-    default_identifier: UiElement,
+    pub default_identifier: UiElement,
 
     #[serde(default)]
-    sort_direction_identifiers: SortDirectionIdentifiersUi,
+    pub sort_direction_identifiers: SortDirectionIdentifiersUi,
 
     #[serde(default)]
-    sorter_identifiers: HashMap<NodeSorter, UiElement>,
+    pub sorter_identifiers: HashMap<NodeSorter, UiElement>,
 
     #[serde(default)]
-    filter_identifiers: HashMap<NodeFilter, UiElement>,
+    pub filter_identifiers: HashMap<NodeFilter, UiElement>,
 }
 
 impl SortAndFilterUi {
@@ -377,22 +377,22 @@ impl SortAndFilterUi {
 #[serde(deny_unknown_fields)]
 pub struct PanelUi {
     #[serde(default)]
-    default: PanelUiConfig,
+    pub default: PanelUiConfig,
 
     #[serde(default)]
-    table: PanelUiConfig,
+    pub table: PanelUiConfig,
 
     #[serde(default)]
-    sort_and_filter: PanelUiConfig,
+    pub sort_and_filter: PanelUiConfig,
 
     #[serde(default)]
-    selection: PanelUiConfig,
+    pub selection: PanelUiConfig,
 
     #[serde(default)]
-    input_and_logs: PanelUiConfig,
+    pub input_and_logs: PanelUiConfig,
 
     #[serde(default)]
-    help_menu: PanelUiConfig,
+    pub help_menu: PanelUiConfig,
 }
 
 impl PanelUi {
@@ -431,46 +431,46 @@ impl PanelUi {
 #[serde(deny_unknown_fields)]
 pub struct GeneralConfig {
     #[serde(default)]
-    show_hidden: Option<bool>,
+    pub show_hidden: Option<bool>,
 
     #[serde(default)]
-    read_only: Option<bool>,
+    pub read_only: Option<bool>,
 
     #[serde(default)]
-    cursor: UiElement,
+    pub cursor: UiElement,
 
     #[serde(default)]
-    prompt: UiElement,
+    pub prompt: UiElement,
 
     #[serde(default)]
-    logs: LogsConfig,
+    pub logs: LogsConfig,
 
     #[serde(default)]
-    table: TableConfig,
+    pub table: TableConfig,
 
     #[serde(default)]
-    default_ui: UiConfig,
+    pub default_ui: UiConfig,
 
     #[serde(default)]
-    focus_ui: UiConfig,
+    pub focus_ui: UiConfig,
 
     #[serde(default)]
-    selection_ui: UiConfig,
+    pub selection_ui: UiConfig,
 
     #[serde(default)]
-    sort_and_filter_ui: SortAndFilterUi,
+    pub sort_and_filter_ui: SortAndFilterUi,
 
     #[serde(default)]
-    panel_ui: PanelUi,
+    pub panel_ui: PanelUi,
 
     #[serde(default)]
-    initial_sorting: Option<IndexSet<NodeSorterApplicable>>,
+    pub initial_sorting: Option<IndexSet<NodeSorterApplicable>>,
 
     #[serde(default)]
-    initial_mode: Option<String>,
+    pub initial_mode: Option<String>,
 
     #[serde(default)]
-    initial_layout: Option<String>,
+    pub initial_layout: Option<String>,
 }
 
 impl GeneralConfig {
@@ -549,22 +549,22 @@ impl GeneralConfig {
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
     #[serde(default)]
-    remaps: IndexMap<String, Option<String>>,
+    pub remaps: IndexMap<String, Option<String>>,
 
     #[serde(default)]
-    on_key: BTreeMap<String, Action>,
+    pub on_key: BTreeMap<String, Action>,
 
     #[serde(default)]
-    on_alphabet: Option<Action>,
+    pub on_alphabet: Option<Action>,
 
     #[serde(default)]
-    on_number: Option<Action>,
+    pub on_number: Option<Action>,
 
     #[serde(default)]
-    on_special_character: Option<Action>,
+    pub on_special_character: Option<Action>,
 
     #[serde(default)]
-    default: Option<Action>,
+    pub default: Option<Action>,
 }
 
 impl KeyBindings {
@@ -636,16 +636,16 @@ impl KeyBindings {
 #[serde(deny_unknown_fields)]
 pub struct Mode {
     #[serde(default)]
-    name: String,
+    pub name: String,
 
     #[serde(default)]
-    help: Option<String>,
+    pub help: Option<String>,
 
     #[serde(default)]
-    extra_help: Option<String>,
+    pub extra_help: Option<String>,
 
     #[serde(default)]
-    key_bindings: KeyBindings,
+    pub key_bindings: KeyBindings,
 }
 
 impl Mode {
@@ -748,55 +748,55 @@ impl Mode {
 #[serde(deny_unknown_fields)]
 pub struct BuiltinModesConfig {
     #[serde(default)]
-    default: Mode,
+    pub default: Mode,
 
     #[serde(default)]
-    recover: Mode,
+    pub recover: Mode,
 
     #[serde(default)]
-    selection_ops: Mode,
+    pub selection_ops: Mode,
 
     #[serde(default)]
-    create: Mode,
+    pub create: Mode,
 
     #[serde(default)]
-    create_directory: Mode,
+    pub create_directory: Mode,
 
     #[serde(default)]
-    create_file: Mode,
+    pub create_file: Mode,
 
     #[serde(default)]
-    number: Mode,
+    pub number: Mode,
 
     #[serde(default)]
-    go_to: Mode,
+    pub go_to: Mode,
 
     #[serde(default)]
-    rename: Mode,
+    pub rename: Mode,
 
     #[serde(default)]
-    delete: Mode,
+    pub delete: Mode,
 
     #[serde(default)]
-    action: Mode,
+    pub action: Mode,
 
     #[serde(default)]
-    search: Mode,
+    pub search: Mode,
 
     #[serde(default)]
-    filter: Mode,
+    pub filter: Mode,
 
     #[serde(default)]
-    relative_path_does_contain: Mode,
+    pub relative_path_does_contain: Mode,
 
     #[serde(default)]
-    relative_path_does_not_contain: Mode,
+    pub relative_path_does_not_contain: Mode,
 
     #[serde(default)]
-    sort: Mode,
+    pub sort: Mode,
 
     #[serde(default)]
-    switch_layout: Mode,
+    pub switch_layout: Mode,
 }
 
 impl BuiltinModesConfig {
@@ -920,10 +920,10 @@ impl BuiltinModesConfig {
 #[serde(deny_unknown_fields)]
 pub struct ModesConfig {
     #[serde(default)]
-    builtin: BuiltinModesConfig,
+    pub builtin: BuiltinModesConfig,
 
     #[serde(default)]
-    custom: HashMap<String, Mode>,
+    pub custom: HashMap<String, Mode>,
 }
 
 impl ModesConfig {
@@ -954,13 +954,13 @@ impl ModesConfig {
 #[serde(deny_unknown_fields)]
 pub struct PanelUiConfig {
     #[serde(default)]
-    title: UiElement,
+    pub title: UiElement,
 
     #[serde(default)]
-    borders: Option<IndexSet<Border>>,
+    pub borders: Option<IndexSet<Border>>,
 
     #[serde(default)]
-    style: Style,
+    pub style: Style,
 }
 
 impl PanelUiConfig {
@@ -990,16 +990,16 @@ impl PanelUiConfig {
 #[serde(deny_unknown_fields)]
 pub struct BuiltinLayoutsConfig {
     #[serde(default)]
-    default: Layout,
+    pub default: Layout,
 
     #[serde(default)]
-    no_help: Layout,
+    pub no_help: Layout,
 
     #[serde(default)]
-    no_selection: Layout,
+    pub no_selection: Layout,
 
     #[serde(default)]
-    no_help_no_selection: Layout,
+    pub no_help_no_selection: Layout,
 }
 
 impl BuiltinLayoutsConfig {
@@ -1026,10 +1026,10 @@ impl BuiltinLayoutsConfig {
 #[serde(deny_unknown_fields)]
 pub struct LayoutsConfig {
     #[serde(default)]
-    builtin: BuiltinLayoutsConfig,
+    pub builtin: BuiltinLayoutsConfig,
 
     #[serde(default)]
-    custom: HashMap<String, Layout>,
+    pub custom: HashMap<String, Layout>,
 }
 
 impl LayoutsConfig {
@@ -1060,16 +1060,16 @@ impl LayoutsConfig {
 #[serde(deny_unknown_fields)]
 pub struct Config {
     #[serde(default)]
-    layouts: LayoutsConfig,
+    pub layouts: LayoutsConfig,
 
     #[serde(default)]
-    general: GeneralConfig,
+    pub general: GeneralConfig,
 
     #[serde(default)]
-    node_types: NodeTypesConfig,
+    pub node_types: NodeTypesConfig,
 
     #[serde(default)]
-    modes: ModesConfig,
+    pub modes: ModesConfig,
 }
 
 impl Config {

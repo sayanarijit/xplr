@@ -28,13 +28,16 @@ lazy_static! {
 #[serde(deny_unknown_fields)]
 pub struct LayoutOptions {
     #[serde(default)]
-    margin: Option<u16>,
+    pub margin: Option<u16>,
+
     #[serde(default)]
-    horizontal_margin: Option<u16>,
+    pub horizontal_margin: Option<u16>,
+
     #[serde(default)]
-    vertical_margin: Option<u16>,
+    pub vertical_margin: Option<u16>,
+
     #[serde(default)]
-    constraints: Option<Vec<Constraint>>,
+    pub constraints: Option<Vec<Constraint>>,
 }
 
 impl LayoutOptions {
@@ -181,10 +184,10 @@ impl Modifier {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
-    fg: Option<Color>,
-    bg: Option<Color>,
-    add_modifiers: Option<IndexSet<Modifier>>,
-    sub_modifiers: Option<IndexSet<Modifier>>,
+    pub fg: Option<Color>,
+    pub bg: Option<Color>,
+    pub add_modifiers: Option<IndexSet<Modifier>>,
+    pub sub_modifiers: Option<IndexSet<Modifier>>,
 }
 
 impl PartialEq for Style {
@@ -290,14 +293,14 @@ impl Constraint {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResolvedNodeUiMetadata {
-    absolute_path: String,
-    extension: String,
-    is_dir: bool,
-    is_file: bool,
-    is_readonly: bool,
-    mime_essence: String,
-    size: u64,
-    human_size: String,
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
+    pub size: u64,
+    pub human_size: String,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
@@ -318,33 +321,33 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct NodeUiMetadata {
     // From Node
-    parent: String,
-    relative_path: String,
-    absolute_path: String,
-    extension: String,
-    is_symlink: bool,
-    is_broken: bool,
-    is_dir: bool,
-    is_file: bool,
-    is_readonly: bool,
-    mime_essence: String,
-    size: u64,
-    human_size: String,
-    canonical: Option<ResolvedNodeUiMetadata>,
-    symlink: Option<ResolvedNodeUiMetadata>,
+    pub parent: String,
+    pub relative_path: String,
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_symlink: bool,
+    pub is_broken: bool,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
+    pub size: u64,
+    pub human_size: String,
+    pub canonical: Option<ResolvedNodeUiMetadata>,
+    pub symlink: Option<ResolvedNodeUiMetadata>,
 
     // Extra
-    index: usize,
-    relative_index: usize,
-    is_before_focus: bool,
-    is_after_focus: bool,
-    tree: String,
-    prefix: String,
-    suffix: String,
-    is_selected: bool,
-    is_focused: bool,
-    total: usize,
-    meta: HashMap<String, String>,
+    pub index: usize,
+    pub relative_index: usize,
+    pub is_before_focus: bool,
+    pub is_after_focus: bool,
+    pub tree: String,
+    pub prefix: String,
+    pub suffix: String,
+    pub is_selected: bool,
+    pub is_focused: bool,
+    pub total: usize,
+    pub meta: HashMap<String, String>,
 }
 
 impl NodeUiMetadata {

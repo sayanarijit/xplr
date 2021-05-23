@@ -27,14 +27,14 @@ fn to_humansize(size: u64) -> String {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
-    path: String,
-    msg_in: String,
-    selection_out: String,
-    result_out: String,
-    directory_nodes_out: String,
-    global_help_menu_out: String,
-    logs_out: String,
-    history_out: String,
+    pub path: String,
+    pub msg_in: String,
+    pub selection_out: String,
+    pub result_out: String,
+    pub directory_nodes_out: String,
+    pub global_help_menu_out: String,
+    pub logs_out: String,
+    pub history_out: String,
 }
 
 impl Pipe {
@@ -116,14 +116,14 @@ impl Pipe {
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct ResolvedNode {
-    absolute_path: String,
-    extension: String,
-    is_dir: bool,
-    is_file: bool,
-    is_readonly: bool,
-    mime_essence: String,
-    size: u64,
-    human_size: String,
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
+    pub size: u64,
+    pub human_size: String,
 }
 
 impl ResolvedNode {
@@ -200,20 +200,20 @@ impl ResolvedNode {
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct Node {
-    parent: String,
-    relative_path: String,
-    absolute_path: String,
-    extension: String,
-    is_dir: bool,
-    is_file: bool,
-    is_symlink: bool,
-    is_broken: bool,
-    is_readonly: bool,
-    mime_essence: String,
-    size: u64,
-    human_size: String,
-    canonical: Option<ResolvedNode>,
-    symlink: Option<ResolvedNode>,
+    pub parent: String,
+    pub relative_path: String,
+    pub absolute_path: String,
+    pub extension: String,
+    pub is_dir: bool,
+    pub is_file: bool,
+    pub is_symlink: bool,
+    pub is_broken: bool,
+    pub is_readonly: bool,
+    pub mime_essence: String,
+    pub size: u64,
+    pub human_size: String,
+    pub canonical: Option<ResolvedNode>,
+    pub symlink: Option<ResolvedNode>,
 }
 
 impl Node {
@@ -364,10 +364,10 @@ impl PartialOrd for Node {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DirectoryBuffer {
-    parent: String,
-    nodes: Vec<Node>,
-    total: usize,
-    focus: usize,
+    pub parent: String,
+    pub nodes: Vec<Node>,
+    pub total: usize,
+    pub focus: usize,
 }
 
 impl DirectoryBuffer {
@@ -448,9 +448,9 @@ pub enum NodeSorter {
 #[derive(Debug, Clone, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeSorterApplicable {
-    sorter: NodeSorter,
+    pub sorter: NodeSorter,
     #[serde(default)]
-    reverse: bool,
+    pub reverse: bool,
 }
 
 impl PartialEq for NodeSorterApplicable {
@@ -893,8 +893,8 @@ impl NodeFilter {
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeFilterApplicable {
-    filter: NodeFilter,
-    input: String,
+    pub filter: NodeFilter,
+    pub input: String,
 }
 
 impl NodeFilterApplicable {
@@ -919,8 +919,8 @@ impl NodeFilterApplicable {
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ExplorerConfig {
-    filters: IndexSet<NodeFilterApplicable>,
-    sorters: IndexSet<NodeSorterApplicable>,
+    pub filters: IndexSet<NodeFilterApplicable>,
+    pub sorters: IndexSet<NodeSorterApplicable>,
 }
 
 impl ExplorerConfig {
@@ -1310,10 +1310,10 @@ pub enum MsgIn {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Command {
-    command: String,
+    pub command: String,
 
     #[serde(default)]
-    args: Vec<String>,
+    pub args: Vec<String>,
 }
 
 impl Command {
@@ -1347,8 +1347,8 @@ pub enum MsgOut {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Task {
-    msg: MsgIn,
-    key: Option<Key>,
+    pub msg: MsgIn,
+    pub key: Option<Key>,
 }
 
 impl Task {
@@ -1368,9 +1368,9 @@ pub enum LogLevel {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Log {
-    level: LogLevel,
-    message: String,
-    created_at: DateTime<Local>,
+    pub level: LogLevel,
+    pub message: String,
+    pub created_at: DateTime<Local>,
 }
 
 impl Log {
@@ -1418,8 +1418,8 @@ pub enum HelpMenuLine {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct History {
-    loc: usize,
-    paths: Vec<String>,
+    pub loc: usize,
+    pub paths: Vec<String>,
 }
 
 impl History {
@@ -1449,23 +1449,23 @@ impl History {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
-    version: String,
-    config: Config,
-    pwd: String,
-    directory_buffers: HashMap<String, DirectoryBuffer>,
-    selection: IndexSet<Node>,
-    msg_out: VecDeque<MsgOut>,
-    mode: Mode,
-    layout: Layout,
-    input_buffer: Option<String>,
-    pid: u32,
-    session_path: String,
-    pipe: Pipe,
-    explorer_config: ExplorerConfig,
-    logs: Vec<Log>,
-    logs_hidden: bool,
-    history: History,
-    last_modes: Vec<Mode>,
+    pub version: String,
+    pub config: Config,
+    pub pwd: String,
+    pub directory_buffers: HashMap<String, DirectoryBuffer>,
+    pub selection: IndexSet<Node>,
+    pub msg_out: VecDeque<MsgOut>,
+    pub mode: Mode,
+    pub layout: Layout,
+    pub input_buffer: Option<String>,
+    pub pid: u32,
+    pub session_path: String,
+    pub pipe: Pipe,
+    pub explorer_config: ExplorerConfig,
+    pub logs: Vec<Log>,
+    pub logs_hidden: bool,
+    pub history: History,
+    pub last_modes: Vec<Mode>,
 }
 
 impl App {
