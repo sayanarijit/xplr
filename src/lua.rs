@@ -135,8 +135,9 @@ mod test {
         assert!(check_version(VERSION, "foo path").is_ok());
         assert!(check_version("0.10.0", "foo path").is_ok());
         assert!(check_version("0.10.1", "foo path").is_ok());
+        assert!(check_version("0.10.2", "foo path").is_ok());
 
-        assert!(check_version("0.10.2", "foo path").is_err());
+        assert!(check_version("0.10.3", "foo path").is_err());
         assert!(check_version("0.9.1", "foo path").is_err());
         assert!(check_version("1.10.1", "foo path").is_err());
     }

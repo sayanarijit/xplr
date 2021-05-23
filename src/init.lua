@@ -1251,7 +1251,7 @@ xplr.config.modes.builtin.delete = {
           {
             BashExec = [===[
             (while IFS= read -r line; do
-            if [ -d "$line" ]; then
+            if [ -d "$line" ] && [ ! -L "$line" ]; then
               if rmdir -v -- "${line:?}"; then
                 echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
               else
@@ -2038,12 +2038,13 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      r = r .. m.absolute_path
+      r = r .. m.symlink.absolute_path
+
+      if m.symlink.is_dir then
+        r = r .. "/"
+      end
     end
 
-    if m.symlink.is_dir then
-      r = r .. "/"
-    end
   end
 
   return r
@@ -2058,7 +2059,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
 end
 
 xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
-  if m.is_symlink then
+  if m.is_symlink and not m.is_broken then
     return m.symlink.mime_essence
   else
     return m.mime_essence
