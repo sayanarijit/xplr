@@ -1,11 +1,11 @@
-use crate::app::App;
-use crate::app::ExternalMsg;
 use crate::app::VERSION;
 use crate::config::Config;
 use anyhow::bail;
 use anyhow::Result;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
+use serde::Deserialize;
+use serde::Serialize;
 use std::fs;
 
 const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
@@ -33,14 +33,11 @@ pub fn check_version(version: &str, path: &str) -> Result<()> {
     let (rmajor, rminor, rbugfix, rbeta) = parse_version(VERSION)?;
     let (smajor, sminor, sbugfix, sbeta) = parse_version(version)?;
 
-    if rmajor == smajor && rminor == sminor && rbugfix <= sbugfix && rbeta == sbeta {
+    if rmajor == smajor && rminor == sminor && rbugfix >= sbugfix && rbeta == sbeta {
         Ok(())
     } else {
         bail!(
-            "incompatible script version in {}
-                The script version is : {}
-                Required version is   : {}
-                Visit {}",
+            "incompatible script version in: {}. The script version is: {}, the required version is: {}. Visit {}",
             path,
             version,
             VERSION.to_string(),
@@ -115,12 +112,16 @@ pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
     Ok(config)
 }
 
-/// Used to extend Lua globals
-pub fn call(lua: &Lua, func: &str, args: &App) -> Result<Vec<ExternalMsg>> {
+/// Used to call lua functions.
+pub fn call<'lua, A: Serialize, R: Deserialize<'lua>>(
+    lua: &'lua Lua,
+    func: &str,
+    args: &A,
+) -> Result<R> {
     let func = resolve_fn(&lua.globals(), func)?;
     let args = lua.to_value(args)?;
-    let msgs: mlua::Value = func.call((args,))?;
-    let msgs: Vec<ExternalMsg> = lua.from_value(msgs)?;
+    let msgs: mlua::Value = func.call(args)?;
+    let msgs: R = lua.from_value(msgs)?;
     Ok(msgs)
 }
 
@@ -134,11 +135,9 @@ mod test {
         assert!(check_version(VERSION, "foo path").is_ok());
         assert!(check_version("0.10.0", "foo path").is_ok());
 
+        assert!(check_version("0.10.1", "foo path").is_err());
         assert!(check_version("0.10.0-beta.6", "foo path").is_err());
         assert!(check_version("0.9.0", "foo path").is_err());
-        assert!(check_version("0.11.0", "foo path").is_err());
-        assert!(check_version("0.10.0-beta.5", "foo path").is_err());
-        assert!(check_version("0.10.0-beta.7", "foo path").is_err());
-        assert!(check_version("1.10.0-beta.6", "foo path").is_err());
+        assert!(check_version("1.10.0", "foo path").is_err());
     }
 }

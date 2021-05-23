@@ -2,7 +2,7 @@ use crate::app;
 use crate::app::HelpMenuLine;
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
-use crate::lua::resolve_fn;
+use crate::lua;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use mlua::Lua;
@@ -426,8 +426,6 @@ fn draw_table<B: Backend>(
     let header_height = app_config.general().table().header().height().unwrap_or(1);
     let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
 
-    let globals = lua.globals();
-
     let rows = app
         .directory_buffer()
         .map(|dir| {
@@ -539,11 +537,10 @@ fn draw_table<B: Backend>(
                                 .unwrap_or_default()
                                 .iter()
                                 .filter_map(|c| {
-                                    c.format()
-                                        .to_owned()
-                                        .and_then(|f| resolve_fn(&globals, &f).ok())
+                                    c.format().as_ref().map(|f| {
+                                        lua::call(lua, f, &v).unwrap_or_else(|e| e.to_string())
+                                    })
                                 })
-                                .map(|f| f.call((v.clone(),)).unwrap_or_else(|e| e.to_string()))
                                 .collect::<Vec<String>>()
                         })
                         .unwrap_or_default()
