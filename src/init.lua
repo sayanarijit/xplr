@@ -1353,6 +1353,12 @@ xplr.config.modes.builtin.action = {
           },
           "Refresh"
         }
+      },
+      ["q"] = {
+        help = "quit",
+        messages = {
+          "Quit",
+        }
       }
     },
     on_alphabet = nil,
