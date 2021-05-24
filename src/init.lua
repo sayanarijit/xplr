@@ -745,6 +745,7 @@ xplr.config.modes.builtin.default = {
   }
 }
 
+xplr.config.modes.builtin.default.key_bindings.on_key["tab"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] = xplr.config.modes.builtin.default.key_bindings.on_key.space
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
