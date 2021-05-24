@@ -2014,7 +2014,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local r = m.tree .. m.prefix
 
   if m.meta.icon == nil then
-    r = r .. "  "
+    r = r .. ""
   else
     r = r .. m.meta.icon .. " "
   end
