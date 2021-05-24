@@ -557,16 +557,6 @@ xplr.config.modes.builtin.default = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {
-      ["k"] = "up",
-      tab = "ctrl-i",
-      ["/"] = "ctrl-f",
-      ["V"] = "ctrl-a",
-      ["h"] = "left",
-      ["v"] = "space",
-      ["j"] = "down",
-      ["l"] = "right"
-    },
     on_key = {
       ["#"] = {
         help = nil,
@@ -607,7 +597,7 @@ xplr.config.modes.builtin.default = {
       },
       ["G"] = {
         help = "go to bottom",
-        messages = {"FocusLast"}
+        messages = {"PopMode", "FocusLast", "Refresh"}
       },
       ["ctrl-a"] = {
         help = "select/unselect all",
@@ -755,13 +745,20 @@ xplr.config.modes.builtin.default = {
   }
 }
 
+xplr.config.modes.builtin.default.key_bindings.on_key["v"] = xplr.config.modes.builtin.default.key_bindings.on_key.space
+xplr.config.modes.builtin.default.key_bindings.on_key["V"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+xplr.config.modes.builtin.default.key_bindings.on_key["/"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+xplr.config.modes.builtin.default.key_bindings.on_key["h"] = xplr.config.modes.builtin.default.key_bindings.on_key.left
+xplr.config.modes.builtin.default.key_bindings.on_key["j"] = xplr.config.modes.builtin.default.key_bindings.on_key.bottom
+xplr.config.modes.builtin.default.key_bindings.on_key["k"] = xplr.config.modes.builtin.default.key_bindings.on_key.up
+xplr.config.modes.builtin.default.key_bindings.on_key["l"] = xplr.config.modes.builtin.default.key_bindings.on_key.right
+
 ------ Recover
 xplr.config.modes.builtin.recover = {
   name = "recover",
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
@@ -788,7 +785,6 @@ xplr.config.modes.builtin.selection_ops = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["c"] = {
         help = "copy here",
@@ -878,7 +874,6 @@ xplr.config.modes.builtin.create = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
@@ -926,7 +921,6 @@ xplr.config.modes.builtin.create_directory = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       backspace = {
         help = "remove last character",
@@ -989,7 +983,6 @@ xplr.config.modes.builtin.create_file = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       backspace = {
         help = "remove last character",
@@ -1052,10 +1045,6 @@ xplr.config.modes.builtin.number = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {
-      ["j"] = "down",
-      ["k"] = "up"
-    },
     on_key = {
       backspace = {
         help = "remove last character",
@@ -1104,13 +1093,15 @@ xplr.config.modes.builtin.number = {
   }
 }
 
+xplr.config.modes.builtin.number.key_bindings.on_key["j"] = xplr.config.modes.builtin.number.key_bindings.on_key.down
+xplr.config.modes.builtin.number.key_bindings.on_key["k"] = xplr.config.modes.builtin.number.key_bindings.on_key.up
+
 ------ Go to
 xplr.config.modes.builtin.go_to = {
   name = "go to",
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
@@ -1165,7 +1156,6 @@ xplr.config.modes.builtin.rename = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       backspace = {
         help = "remove last character",
@@ -1225,7 +1215,6 @@ xplr.config.modes.builtin.delete = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["D"] = {
         help = "force delete",
@@ -1297,7 +1286,6 @@ xplr.config.modes.builtin.action = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["!"] = {
         help = "shell",
@@ -1389,11 +1377,6 @@ xplr.config.modes.builtin.search = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {
-      esc = "enter",
-      ["ctrl-n"] = "down",
-      ["ctrl-p"] = "up"
-    },
     on_key = {
       backspace = {
         help = "remove last character",
@@ -1509,15 +1492,16 @@ xplr.config.modes.builtin.search = {
   }
 }
 
+xplr.config.modes.builtin.search.key_bindings.on_key["esc"] = xplr.config.modes.builtin.search.key_bindings.on_key.enter
+xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] = xplr.config.modes.builtin.search.key_bindings.on_key.down
+xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] = xplr.config.modes.builtin.search.key_bindings.on_key.up
+
 ------ Filter
 xplr.config.modes.builtin.filter = {
   name = "filter",
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {
-      esc = "enter"
-    },
     on_key = {
       ["R"] = {
         help = "relative does not contain",
@@ -1577,13 +1561,14 @@ xplr.config.modes.builtin.filter = {
   }
 }
 
+xplr.config.modes.builtin.filter.key_bindings.on_key["esc"] = xplr.config.modes.builtin.filter.key_bindings.on_key.enter
+
 ------ Relative path does contain
 xplr.config.modes.builtin.relative_path_does_contain = {
   name = "relative path does contain",
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       backspace = {
         help = "remove last character",
@@ -1671,7 +1656,6 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       backspace = {
         help = "remove last character",
@@ -1758,9 +1742,6 @@ xplr.config.modes.builtin.sort = {
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {
-      esc = "enter"
-    },
     on_key = {
       ["!"] = {
         help = "reverse sorters",
@@ -1938,13 +1919,14 @@ xplr.config.modes.builtin.sort = {
   }
 }
 
+xplr.config.modes.builtin.sort.key_bindings.on_key["esc"] = xplr.config.modes.builtin.sort.key_bindings.on_key.enter
+
 ------ Switch layout
 xplr.config.modes.builtin.switch_layout = {
   name = "switch layout",
   help = nil,
   extra_help = nil,
   key_bindings = {
-    remaps = {},
     on_key = {
       ["1"] = {
         help = "default",

@@ -680,17 +680,8 @@ fn draw_help_menu<B: Backend>(
         .into_iter()
         .map(|l| match l {
             HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
-            HelpMenuLine::KeyMap(k, h) => {
-                let remaps = app
-                    .mode()
-                    .key_bindings()
-                    .remaps()
-                    .iter()
-                    .filter(|(_, maybeto)| maybeto.as_ref().map(|to| to == &k).unwrap_or(false))
-                    .map(|(f, _)| f.clone())
-                    .collect::<Vec<String>>()
-                    .join("|");
-                Row::new([Cell::from(k), Cell::from(remaps), Cell::from(h)].to_vec())
+            HelpMenuLine::KeyMap(k, remaps, h) => {
+                Row::new([Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)].to_vec())
             }
         })
         .collect::<Vec<Row>>();

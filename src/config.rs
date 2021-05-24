@@ -7,11 +7,11 @@ use crate::ui::Border;
 use crate::ui::Constraint;
 use crate::ui::Layout;
 use crate::ui::Style;
-use indexmap::IndexMap;
 use indexmap::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -549,9 +549,6 @@ impl GeneralConfig {
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
     #[serde(default)]
-    pub remaps: IndexMap<String, Option<String>>,
-
-    #[serde(default)]
     pub on_key: BTreeMap<String, Action>,
 
     #[serde(default)]
@@ -584,26 +581,7 @@ impl KeyBindings {
             self.default = self.default.and_then(|a| a.sanitized(read_only));
         };
 
-        let mut remaps = IndexMap::new();
-        for (from, maybe_to) in self.remaps.into_iter() {
-            if let Some(to) = maybe_to.as_ref() {
-                let mapped = self.on_key.get(to).cloned();
-                if let Some(a) = mapped {
-                    self.on_key.insert(from.clone(), a.clone());
-                    remaps.insert(from, maybe_to);
-                }
-            } else {
-                self.on_key.remove(&from);
-            }
-        }
-
-        self.remaps = remaps;
         self
-    }
-
-    /// Get a reference to the key bindings's remaps.
-    pub fn remaps(&self) -> &IndexMap<String, Option<String>> {
-        &self.remaps
     }
 
     /// Get a reference to the key bindings's on key.
@@ -669,57 +647,83 @@ impl Mode {
                     .collect()
             })
             .unwrap_or_else(|| {
-                extra_help_lines
+                let lines = extra_help_lines
                     .unwrap_or_default()
                     .into_iter()
-                    .chain(
-                        self.key_bindings
+                    .chain(self.key_bindings.on_key.iter().filter_map(|(k, a)| {
+                        let remaps = self
+                            .key_bindings
                             .on_key
                             .iter()
-                            .filter(|(k, v)| {
-                                !self
-                                    .key_bindings
-                                    .remaps
-                                    .get(*k)
-                                    .and_then(|mt| {
-                                        mt.as_ref()
-                                            .map(|t| self.key_bindings.on_key.get(t) == Some(v))
-                                    })
-                                    .unwrap_or(false)
+                            .filter_map(|(rk, ra)| {
+                                if rk == k {
+                                    None
+                                } else if a == ra {
+                                    Some(rk.clone())
+                                } else {
+                                    None
+                                }
                             })
-                            .filter_map(|(k, a)| {
-                                a.help.clone().map(|h| HelpMenuLine::KeyMap(k.into(), h))
-                            }),
-                    )
+                            .collect::<Vec<String>>();
+                        a.help
+                            .clone()
+                            .map(|h| HelpMenuLine::KeyMap(k.into(), remaps, h))
+                    }))
                     .chain(
                         self.key_bindings
                             .on_alphabet
                             .iter()
                             .map(|a| ("[a-Z]", a.help.clone()))
-                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                            }),
                     )
                     .chain(
                         self.key_bindings
                             .on_number
                             .iter()
                             .map(|a| ("[0-9]", a.help.clone()))
-                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                            }),
                     )
                     .chain(
                         self.key_bindings
                             .on_special_character
                             .iter()
                             .map(|a| ("[spcl chars]", a.help.clone()))
-                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                            }),
                     )
                     .chain(
                         self.key_bindings
                             .default
                             .iter()
                             .map(|a| ("[default]", a.help.clone()))
-                            .filter_map(|(k, mh)| mh.map(|h| HelpMenuLine::KeyMap(k.into(), h))),
-                    )
-                    .collect()
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                            }),
+                    );
+
+                let mut remapped = HashSet::new();
+                let mut result = vec![];
+
+                for line in lines {
+                    match line {
+                        HelpMenuLine::Paragraph(p) => result.push(HelpMenuLine::Paragraph(p)),
+                        HelpMenuLine::KeyMap(k, r, d) => {
+                            if !remapped.contains(&k) {
+                                for k in r.iter() {
+                                    remapped.insert(k.clone());
+                                }
+                                result.push(HelpMenuLine::KeyMap(k, r, d));
+                            }
+                        }
+                    }
+                }
+
+                result
             })
     }
 
