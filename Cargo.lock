@@ -3,6 +3,15 @@
 version = 3
 
 [[package]]
+name = "ansi-to-tui"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5091b918c2bf8daa9031e1cef129eafc45272352b885f114fb36a9aec512fcf2"
+dependencies = [
+ "tui",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -410,9 +419,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.92"
+version = "0.2.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56d855069fafbb9b344c0f962150cd2c1187975cb1c22c1522c240d8c4986714"
+checksum = "18794a8ad5b29321f790b55d93dfba91e125cb1a9edbd4f8e3150acc771c1a5e"
 
 [[package]]
 name = "linked-hash-map"
@@ -1099,8 +1108,9 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "xplr"
-version = "0.10.2"
+version = "0.11.0"
 dependencies = [
+ "ansi-to-tui",
  "anyhow",
  "chrono",
  "criterion",
@@ -1109,6 +1119,7 @@ dependencies = [
  "humansize",
  "indexmap",
  "lazy_static",
+ "libc",
  "mime_guess",
  "mlua",
  "natord",
