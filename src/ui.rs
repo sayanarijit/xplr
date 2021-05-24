@@ -27,6 +27,14 @@ lazy_static! {
     pub static ref DEFAULT_STYLE: TuiStyle = TuiStyle::default();
 }
 
+fn read_only_indicator(app: &app::App) -> &str {
+    if app.config().general().read_only().unwrap_or_default() {
+        "(r)"
+    } else {
+        ""
+    }
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct LayoutOptions {
@@ -686,16 +694,14 @@ fn draw_help_menu<B: Backend>(
         })
         .collect::<Vec<Row>>();
 
-    let read_only_indicator = if app.config().general().read_only().unwrap_or_default() {
-        "(r)"
-    } else {
-        ""
-    };
-
     let help_menu = Table::new(help_menu_rows)
         .block(block(
             config,
-            format!(" Help [{}{}] ", &app.mode().name(), read_only_indicator),
+            format!(
+                " Help [{}{}] ",
+                &app.mode().name(),
+                read_only_indicator(app)
+            ),
         ))
         .widths(&[
             TuiConstraint::Percentage(20),
@@ -738,7 +744,14 @@ fn draw_input_buffer<B: Backend>(
             app.config().general().cursor().style().clone().into(),
         ),
     ]))
-    .block(block(config, " Input ".into()));
+    .block(block(
+        config,
+        format!(
+            " Input [{}{}] ",
+            app.mode().name(),
+            read_only_indicator(app)
+        ),
+    ));
     f.render_widget(input_buf, layout_size);
 }
 
@@ -887,7 +900,15 @@ fn draw_logs<B: Backend>(
             .collect::<Vec<ListItem>>()
     };
 
-    let logs_list = List::new(logs).block(block(config, format!(" Logs ({}) ", app.logs().len())));
+    let logs_list = List::new(logs).block(block(
+        config,
+        format!(
+            " Logs ({}) [{}{}] ",
+            app.logs().len(),
+            app.mode().name(),
+            read_only_indicator(app),
+        ),
+    ));
 
     f.render_widget(logs_list, layout_size);
 }
