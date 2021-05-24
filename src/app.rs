@@ -1421,7 +1421,7 @@ impl std::fmt::Display for Log {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum HelpMenuLine {
-    KeyMap(String, String),
+    KeyMap(String, Vec<String>, String),
     Paragraph(String),
 }
 
@@ -2624,16 +2624,8 @@ impl App {
                 .iter()
                 .map(|l| match l {
                     HelpMenuLine::Paragraph(p) => format!("\t{}\n", p),
-                    HelpMenuLine::KeyMap(k, h) => {
-                        let remaps = self
-                            .mode()
-                            .key_bindings()
-                            .remaps()
-                            .iter()
-                            .filter(|(_, maybeto)| maybeto.as_ref().map(|to| to == k).unwrap_or(false))
-                            .map(|(f, _)| f.clone())
-                            .collect::<Vec<String>>()
-                            .join(", ");
+                    HelpMenuLine::KeyMap(k, remaps, h) => {
+                        let remaps = remaps.join(", ");
                         format!(" {:15} | {:25} | {}\n", k, remaps, h)
                     }
                 })
