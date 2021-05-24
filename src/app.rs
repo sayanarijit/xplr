@@ -3,6 +3,7 @@ use crate::config::Mode;
 use crate::explorer;
 use crate::input::Key;
 use crate::lua;
+use crate::permissions::Permissions;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
@@ -212,6 +213,7 @@ pub struct Node {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
+    pub permissions: Permissions,
     pub canonical: Option<ResolvedNode>,
     pub symlink: Option<ResolvedNode>,
 }
@@ -235,7 +237,7 @@ impl Node {
             .map(|p| (false, Some(ResolvedNode::from(p))))
             .unwrap_or_else(|_| (true, None));
 
-        let (is_symlink, is_dir, is_file, is_readonly, size) = path
+        let (is_symlink, is_dir, is_file, is_readonly, size, permissions) = path
             .symlink_metadata()
             .map(|m| {
                 (
@@ -244,9 +246,10 @@ impl Node {
                     m.is_file(),
                     m.permissions().readonly(),
                     m.len(),
+                    Permissions::from(&m),
                 )
             })
-            .unwrap_or((false, false, false, false, 0));
+            .unwrap_or_else(|_| (false, false, false, false, 0, Permissions::default()));
 
         let mime_essence = mime_guess::from_path(&path)
             .first()
@@ -268,6 +271,7 @@ impl Node {
             mime_essence,
             size,
             human_size,
+            permissions,
             canonical: maybe_canonical_meta.clone(),
             symlink: if is_symlink {
                 maybe_canonical_meta
@@ -345,6 +349,11 @@ impl Node {
     /// Get a reference to the node's human size.
     pub fn human_size(&self) -> &String {
         &self.human_size
+    }
+
+    /// Get a reference to the node's permissions.
+    pub fn permissions(&self) -> &Permissions {
+        &self.permissions
     }
 }
 

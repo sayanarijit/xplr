@@ -3,6 +3,9 @@ use crate::app::HelpMenuLine;
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
+use crate::permissions::Permissions;
+use ansi_to_tui::ansi_to_text;
+use anyhow::Result;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use mlua::Lua;
@@ -15,7 +18,7 @@ use tui::backend::Backend;
 use tui::layout::Rect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
-use tui::text::{Span, Spans};
+use tui::text::{Span, Spans, Text};
 use tui::widgets::{Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph, Row, Table};
 use tui::Frame;
 
@@ -319,7 +322,7 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct NodeUiMetadata {
+pub struct NodeUiMetadata {
     // From Node
     pub parent: String,
     pub relative_path: String,
@@ -333,6 +336,7 @@ struct NodeUiMetadata {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
+    pub permissions: Permissions,
     pub canonical: Option<ResolvedNodeUiMetadata>,
     pub symlink: Option<ResolvedNodeUiMetadata>,
 
@@ -378,6 +382,7 @@ impl NodeUiMetadata {
             mime_essence: node.mime_essence().clone(),
             size: node.size(),
             human_size: node.human_size().clone(),
+            permissions: node.permissions().to_owned(),
             canonical: node.canonical().to_owned().map(|s| s.into()),
             symlink: node.symlink().to_owned().map(|s| s.into()),
             index,
@@ -541,10 +546,27 @@ fn draw_table<B: Backend>(
                                 .iter()
                                 .filter_map(|c| {
                                     c.format().as_ref().map(|f| {
-                                        lua::call(lua, f, &v).unwrap_or_else(|e| e.to_string())
+                                        let out: Result<String> = lua::call(lua, f, &v);
+                                        match out {
+                                            Ok(o) => {
+                                                let text =
+                                                    ansi_to_text(o.bytes()).unwrap_or_else(|e| {
+                                                        Text::raw(format!("{:?}", e))
+                                                    });
+
+                                                // TODO: Track https://github.com/uttarayan21/ansi-to-tui/issues/2
+                                                // And https://github.com/fdehau/tui-rs/issues/304
+                                                if text.lines.is_empty() {
+                                                    Text::raw(o.to_string())
+                                                } else {
+                                                    text
+                                                }
+                                            }
+                                            Err(e) => Text::raw(e.to_string()),
+                                        }
                                     })
                                 })
-                                .collect::<Vec<String>>()
+                                .collect::<Vec<Text>>()
                         })
                         .unwrap_or_default()
                         .iter()

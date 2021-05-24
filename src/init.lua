@@ -270,7 +270,8 @@ xplr.config.general.table.col_spacing = 1
 xplr.config.general.table.col_widths = {
     { Percentage = 10 },
     { Percentage = 50 },
-    { Percentage = 20 },
+    { Percentage = 10 },
+    { Percentage = 10 },
     { Percentage = 20 },
 }
 
@@ -278,6 +279,7 @@ xplr.config.general.table.col_widths = {
 xplr.config.general.table.header.cols = {
     { format = " index", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "╭──── path", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+    { format = "permissions", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "type", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
 }
@@ -303,6 +305,10 @@ xplr.config.general.table.row.cols = {
     },
     {
         format = "builtin.fmt_general_table_row_cols_3",
+        style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
+    },
+    {
+        format = "builtin.fmt_general_table_row_cols_4",
         style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
     },
 }
@@ -1999,9 +2005,9 @@ xplr.config.modes.builtin.switch_layout = {
 ---- Custom
 xplr.config.modes.custom = {}
 
-
 -- Function
 ---- Formaters
+------ Index
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   local r = ""
   if m.is_before_focus then
@@ -2015,11 +2021,12 @@ xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   return r
 end
 
+------ Path
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local r = m.tree .. m.prefix
 
   if m.meta.icon == nil then
-    r = r .. " "
+    r = r .. "  "
   else
     r = r .. m.meta.icon .. " "
   end
@@ -2044,13 +2051,70 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
         r = r .. "/"
       end
     end
-
   end
 
   return r
 end
 
+------ Permissions
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
+
+  local no_color = os.getenv("NO_COLOR")
+
+  local function green(x)
+    if no_color == nil then
+      return "\x1b[32m" .. x .. "\x1b[0m"
+    else
+      return x
+    end
+  end
+
+  local function yellow(x)
+    if no_color == nil then
+      return "\x1b[33m" .. x .. "\x1b[0m"
+    else
+      return x
+    end
+  end
+
+
+  local function red(x)
+    if no_color == nil then
+      return "\x1b[31m" .. x .. "\x1b[0m"
+    else
+      return x
+    end
+  end
+
+  local function bit(x, color, cond)
+    if cond then
+      return color(x)
+    else
+      return color("-")
+    end
+  end
+
+  local r = ""
+  -- User
+  r = r .. bit("r", green, m.permissions.user_read)
+  r = r .. bit("w", yellow, m.permissions.user_write)
+  r = r .. bit("x", red, m.permissions.user_execute)
+
+  -- Group
+  r = r .. bit("r", green, m.permissions.group_read)
+  r = r .. bit("w", yellow, m.permissions.group_write)
+  r = r .. bit("x", red, m.permissions.group_execute)
+
+  -- Other
+  r = r .. bit("r", green, m.permissions.other_read)
+  r = r .. bit("w", yellow, m.permissions.other_write)
+  r = r .. bit("x", red, m.permissions.other_execute)
+
+  return r
+end
+
+------ Size
+xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
   if not m.is_dir then
     return m.human_size
   else
@@ -2058,7 +2122,8 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   end
 end
 
-xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
+------ Mime
+xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   if m.is_symlink and not m.is_broken then
     return m.symlink.mime_essence
   else
