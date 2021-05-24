@@ -749,7 +749,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key["v"] = xplr.config.modes.b
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] = xplr.config.modes.builtin.default.key_bindings.on_key.left
-xplr.config.modes.builtin.default.key_bindings.on_key["j"] = xplr.config.modes.builtin.default.key_bindings.on_key.bottom
+xplr.config.modes.builtin.default.key_bindings.on_key["j"] = xplr.config.modes.builtin.default.key_bindings.on_key.down
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] = xplr.config.modes.builtin.default.key_bindings.on_key.up
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] = xplr.config.modes.builtin.default.key_bindings.on_key.right
 
