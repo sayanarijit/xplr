@@ -6,7 +6,7 @@ To find issues you can help with, go though the list of [good first issues](http
 
 If you have something to suggest or issues to report, you can [create a new issue](https://github.com/sayanarijit/xplr/issues/new). Be sure to explain in details the context and the outcome that you are lookign for. If reporting bugs, provide basic information like you OS version, `xplr` version, window manager and the terminal you are using.
 
-Once found or created an issue, let us know that you want to work it by commenting in the issue.
+Once found or created an issue, let us know that you want to work on it by commenting in the issue.
 
 
 Development Guideline
