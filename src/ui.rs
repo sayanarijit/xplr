@@ -475,8 +475,9 @@ fn draw_table<B: Backend>(
                         })
                         .unwrap_or_default();
 
-                    let (mimetype, mimesub) =
-                        node.mime_essence().split_once("/").unwrap_or_default();
+                    let mut me = node.mime_essence().splitn(2, '/');
+                    let mimetype: String = me.next().map(|s| s.into()).unwrap_or_default();
+                    let mimesub: String = me.next().map(|s| s.into()).unwrap_or_default();
 
                     let node_type = app_config
                         .node_types()
@@ -487,8 +488,8 @@ fn draw_table<B: Backend>(
                             app_config
                                 .node_types()
                                 .mime_essence()
-                                .get(mimetype)
-                                .and_then(|t| t.get(mimesub).or_else(|| t.get("*")))
+                                .get(&mimetype)
+                                .and_then(|t| t.get(&mimesub).or_else(|| t.get("*")))
                         })
                         .unwrap_or_else(|| {
                             if node.is_symlink() {
