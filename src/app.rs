@@ -1139,15 +1139,19 @@ pub enum ExternalMsg {
     /// **Example:** `CallSilently: {command: tput, args: ["bell"]}`
     CallSilently(Command),
 
-    /// Call a Lua function
+    /// Call a Lua function.
+    /// The complete app state (exportable using `PrintAppStateAndQuit` or `Debug`)
+    /// will be passed to the function as argument.
+    /// The function can optionally return a list of messages for xplr to handle
+    /// after the executing the function.
     ///
-    /// **Example:** `CallLua: custom.foo_funtion`
+    /// **Example:** `CallLua: custom.some_custom_funtion`
     CallLua(String),
 
     /// Like `CallLua` but without the flicker. The stdin, stdout
     /// stderr will be piped to null. So it's non-interactive.
     ///
-    /// **Example:** `CallLuaSilently: custom.bar_function`
+    /// **Example:** `CallLuaSilently: custom.some_custom_function`
     CallLuaSilently(String),
 
     /// An alias to `Call: {command: bash, args: ["-c", "${command}"], silent: false}`

@@ -84,7 +84,7 @@ pub struct NodeTypesConfig {
     pub symlink: NodeTypeConfig,
 
     #[serde(default)]
-    pub mime_essence: HashMap<String, NodeTypeConfig>,
+    pub mime_essence: HashMap<String, HashMap<String, NodeTypeConfig>>,
 
     #[serde(default)]
     pub extension: HashMap<String, NodeTypeConfig>,
@@ -110,7 +110,7 @@ impl NodeTypesConfig {
     }
 
     /// Get a reference to the node types config's mime essence.
-    pub fn mime_essence(&self) -> &HashMap<String, NodeTypeConfig> {
+    pub fn mime_essence(&self) -> &HashMap<String, HashMap<String, NodeTypeConfig>> {
         &self.mime_essence
     }
 

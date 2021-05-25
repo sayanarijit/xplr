@@ -120,9 +120,9 @@ pub fn call<'lua, A: Serialize, R: Deserialize<'lua>>(
 ) -> Result<R> {
     let func = resolve_fn(&lua.globals(), func)?;
     let args = lua.to_value(args)?;
-    let msgs: mlua::Value = func.call(args)?;
-    let msgs: R = lua.from_value(msgs)?;
-    Ok(msgs)
+    let res: mlua::Value = func.call(args)?;
+    let res: R = lua.from_value(res)?;
+    Ok(res)
 }
 
 #[cfg(test)]
@@ -133,11 +133,10 @@ mod test {
     #[test]
     fn test_compatibility() {
         assert!(check_version(VERSION, "foo path").is_ok());
-        assert!(check_version("0.11.0", "foo path").is_ok());
-        assert!(check_version("0.11.1", "foo path").is_ok());
+        assert!(check_version("0.12.0", "foo path").is_ok());
 
-        assert!(check_version("0.11.2", "foo path").is_err());
-        assert!(check_version("0.10.1", "foo path").is_err());
-        assert!(check_version("1.12.1", "foo path").is_err());
+        assert!(check_version("0.12.1", "foo path").is_err());
+        assert!(check_version("0.10.0", "foo path").is_err());
+        assert!(check_version("1.12.0", "foo path").is_err());
     }
 }
