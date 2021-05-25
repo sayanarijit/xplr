@@ -475,6 +475,9 @@ fn draw_table<B: Backend>(
                         })
                         .unwrap_or_default();
 
+                    let (mimetype, mimesub) =
+                        node.mime_essence().split_once("/").unwrap_or_default();
+
                     let node_type = app_config
                         .node_types()
                         .special()
@@ -484,7 +487,8 @@ fn draw_table<B: Backend>(
                             app_config
                                 .node_types()
                                 .mime_essence()
-                                .get(node.mime_essence())
+                                .get(mimetype)
+                                .and_then(|t| t.get(mimesub).or_else(|| t.get("*")))
                         })
                         .unwrap_or_else(|| {
                             if node.is_symlink() {
@@ -556,20 +560,8 @@ fn draw_table<B: Backend>(
                                     c.format().as_ref().map(|f| {
                                         let out: Result<String> = lua::call(lua, f, &v);
                                         match out {
-                                            Ok(o) => {
-                                                let text =
-                                                    ansi_to_text(o.bytes()).unwrap_or_else(|e| {
-                                                        Text::raw(format!("{:?}", e))
-                                                    });
-
-                                                // TODO: Track https://github.com/uttarayan21/ansi-to-tui/issues/2
-                                                // And https://github.com/fdehau/tui-rs/issues/304
-                                                if text.lines.is_empty() {
-                                                    Text::raw(o.to_string())
-                                                } else {
-                                                    text
-                                                }
-                                            }
+                                            Ok(o) => ansi_to_text(o.bytes())
+                                                .unwrap_or_else(|e| Text::raw(format!("{:?}", e))),
                                             Err(e) => Text::raw(e.to_string()),
                                         }
                                     })

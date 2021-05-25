@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "ansi-to-tui"
-version = "0.1.9"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5091b918c2bf8daa9031e1cef129eafc45272352b885f114fb36a9aec512fcf2"
+checksum = "bc671d766fb75259578ba58f2e492333693c5b028e6b345cc1ac49dfd4d71b95"
 dependencies = [
  "tui",
 ]
@@ -1108,7 +1108,7 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "xplr"
-version = "0.11.1"
+version = "0.12.0"
 dependencies = [
  "ansi-to-tui",
  "anyhow",

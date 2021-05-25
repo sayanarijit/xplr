@@ -26,7 +26,7 @@ fn call_lua(
     lua: &mlua::Lua,
     func: &str,
     silent: bool,
-) -> Result<Vec<app::ExternalMsg>> {
+) -> Result<Option<Vec<app::ExternalMsg>>> {
     let _focus_index = app
         .directory_buffer()
         .map(|d| d.focus())
@@ -195,7 +195,7 @@ pub fn run(
                             tx_event_reader.send(true)?;
 
                             match call_lua(&app, &lua, &func, false) {
-                                Ok(msgs) => {
+                                Ok(Some(msgs)) => {
                                     for msg in msgs {
                                         app = app.handle_task(app::Task::new(
                                             app::MsgIn::External(msg),
@@ -203,6 +203,7 @@ pub fn run(
                                         ))?;
                                     }
                                 }
+                                Ok(None) => {}
                                 Err(err) => {
                                     app = app.log_error(err.to_string())?;
                                 }
@@ -260,7 +261,7 @@ pub fn run(
                             terminal.show_cursor()?;
 
                             match call_lua(&app, &lua, &func, false) {
-                                Ok(msgs) => {
+                                Ok(Some(msgs)) => {
                                     for msg in msgs {
                                         app = app.handle_task(app::Task::new(
                                             app::MsgIn::External(msg),
@@ -268,6 +269,7 @@ pub fn run(
                                         ))?;
                                     }
                                 }
+                                Ok(None) => {}
                                 Err(err) => {
                                     app = app.log_error(err.to_string())?;
                                 }

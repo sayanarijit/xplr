@@ -279,7 +279,7 @@ xplr.config.general.table.col_widths = {
 xplr.config.general.table.header.cols = {
     { format = " index", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "╭──── path", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "permissions", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+    { format = " permissions", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "type", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
 }
@@ -2083,21 +2083,52 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
     end
   end
 
-  local r = ""
+  local p = m.permissions
+
+  -- TODO: Track https://github.com/uttarayan21/ansi-to-tui/issues/3
+  local r = " "
+
   -- User
-  r = r .. bit("r", green, m.permissions.user_read)
-  r = r .. bit("w", yellow, m.permissions.user_write)
-  r = r .. bit("x", red, m.permissions.user_execute)
+  r = r .. bit("r", green, p.user_read)
+  r = r .. bit("w", yellow, p.user_write)
+
+  if p.user_execute == false and p.setuid == false then
+    r = r .. bit("-", red, p.user_execute)
+  elseif p.user_execute == true and p.setuid == false then
+    r = r .. bit("x", red, p.user_execute)
+  elseif p.user_execute == false and p.setuid == true then
+    r = r .. bit("S", red, p.user_execute)
+  else
+    r = r .. bit("s", red, p.user_execute)
+  end
 
   -- Group
-  r = r .. bit("r", green, m.permissions.group_read)
-  r = r .. bit("w", yellow, m.permissions.group_write)
-  r = r .. bit("x", red, m.permissions.group_execute)
+  r = r .. bit("r", green, p.group_read)
+  r = r .. bit("w", yellow, p.group_write)
+
+  if p.group_execute == false and p.setuid == false then
+    r = r .. bit("-", red, p.group_execute)
+  elseif p.group_execute == true and p.setuid == false then
+    r = r .. bit("x", red, p.group_execute)
+  elseif p.group_execute == false and p.setuid == true then
+    r = r .. bit("S", red, p.group_execute)
+  else
+    r = r .. bit("s", red, p.group_execute)
+  end
 
   -- Other
-  r = r .. bit("r", green, m.permissions.other_read)
-  r = r .. bit("w", yellow, m.permissions.other_write)
-  r = r .. bit("x", red, m.permissions.other_execute)
+  r = r .. bit("r", green, p.other_read)
+  r = r .. bit("w", yellow, p.other_write)
+
+  if p.other_execute == false and p.setuid == false then
+    r = r .. bit("-", red, p.other_execute)
+  elseif p.other_execute == true and p.setuid == false then
+    r = r .. bit("x", red, p.other_execute)
+  elseif p.other_execute == false and p.setuid == true then
+    r = r .. bit("S", red, p.other_execute)
+  else
+    r = r .. bit("s", red, p.other_execute)
+  end
 
   return r
 end
