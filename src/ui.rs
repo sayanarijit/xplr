@@ -52,11 +52,11 @@ pub struct LayoutOptions {
 }
 
 impl LayoutOptions {
-    pub fn extend(mut self, other: Self) -> Self {
+    pub fn extend(mut self, other: &Self) -> Self {
         self.margin = other.margin.or(self.margin);
         self.horizontal_margin = other.horizontal_margin.or(self.horizontal_margin);
         self.vertical_margin = other.vertical_margin.or(self.vertical_margin);
-        self.constraints = other.constraints.or(self.constraints);
+        self.constraints = other.constraints.to_owned().or(self.constraints);
         self
     }
 
@@ -107,7 +107,7 @@ impl Default for Layout {
 }
 
 impl Layout {
-    pub fn extend(self, other: Self) -> Self {
+    pub fn extend(self, other: &Self) -> Self {
         match (self, other) {
             (s, Self::Nothing) => s,
             (
@@ -121,7 +121,7 @@ impl Layout {
                 },
             ) => Self::Horizontal {
                 config: sconfig.extend(oconfig),
-                splits: osplits,
+                splits: osplits.to_owned(),
             },
 
             (
@@ -135,9 +135,9 @@ impl Layout {
                 },
             ) => Self::Vertical {
                 config: sconfig.extend(oconfig),
-                splits: osplits,
+                splits: osplits.to_owned(),
             },
-            (_, other) => other,
+            (_, other) => other.to_owned(),
         }
     }
 }
@@ -211,11 +211,11 @@ impl PartialEq for Style {
 }
 
 impl Style {
-    pub fn extend(mut self, other: Self) -> Self {
+    pub fn extend(mut self, other: &Self) -> Self {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.add_modifiers = other.add_modifiers.or(self.add_modifiers);
-        self.sub_modifiers = other.sub_modifiers.or(self.sub_modifiers);
+        self.add_modifiers = other.add_modifiers.to_owned().or(self.add_modifiers);
+        self.sub_modifiers = other.sub_modifiers.to_owned().or(self.sub_modifiers);
         self
     }
 }
@@ -317,14 +317,14 @@ pub struct ResolvedNodeUiMetadata {
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
     fn from(node: ResolvedNode) -> Self {
         Self {
-            absolute_path: node.absolute_path().clone(),
-            extension: node.extension().clone(),
+            absolute_path: node.absolute_path().to_owned(),
+            extension: node.extension().to_owned(),
             is_dir: node.is_dir(),
             is_file: node.is_file(),
             is_readonly: node.is_readonly(),
-            mime_essence: node.mime_essence().clone(),
+            mime_essence: node.mime_essence().to_owned(),
             size: node.size(),
-            human_size: node.human_size().clone(),
+            human_size: node.human_size().to_owned(),
         }
     }
 }
@@ -378,18 +378,18 @@ impl NodeUiMetadata {
         meta: HashMap<String, String>,
     ) -> Self {
         Self {
-            parent: node.parent().clone(),
-            relative_path: node.relative_path().clone(),
-            absolute_path: node.absolute_path().clone(),
-            extension: node.extension().clone(),
+            parent: node.parent().to_owned(),
+            relative_path: node.relative_path().to_owned(),
+            absolute_path: node.absolute_path().to_owned(),
+            extension: node.extension().to_owned(),
             is_symlink: node.is_symlink(),
             is_broken: node.is_broken(),
             is_dir: node.is_dir(),
             is_file: node.is_file(),
             is_readonly: node.is_readonly(),
-            mime_essence: node.mime_essence().clone(),
+            mime_essence: node.mime_essence().to_owned(),
             size: node.size(),
-            human_size: node.human_size().clone(),
+            human_size: node.human_size().to_owned(),
             permissions: node.permissions().to_owned(),
             canonical: node.canonical().to_owned().map(|s| s.into()),
             symlink: node.symlink().to_owned().map(|s| s.into()),
@@ -413,17 +413,17 @@ fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
         .borders(TuiBorders::from_bits_truncate(
             config
                 .borders()
-                .clone()
+                .to_owned()
                 .unwrap_or_default()
                 .iter()
                 .map(|b| b.bits())
                 .fold(0, |a, b| (a ^ b)),
         ))
         .title(Span::styled(
-            config.title().format().clone().unwrap_or(default_title),
-            config.title().style().clone().into(),
+            config.title().format().to_owned().unwrap_or(default_title),
+            config.title().style().to_owned().into(),
         ))
-        .style(config.style().clone().into())
+        .style(config.style().to_owned().into())
 }
 
 fn draw_table<B: Backend>(
@@ -436,8 +436,8 @@ fn draw_table<B: Backend>(
     let panel_config = app.config().general().panel_ui();
     let config = panel_config
         .default()
-        .clone()
-        .extend(panel_config.table().clone());
+        .to_owned()
+        .extend(panel_config.table());
     let app_config = app.config().to_owned();
     let header_height = app_config.general().table().header().height().unwrap_or(1);
     let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
@@ -463,14 +463,14 @@ fn draw_table<B: Backend>(
                         .general()
                         .table()
                         .tree()
-                        .clone()
+                        .to_owned()
                         .map(|t| {
                             if is_last {
-                                t.2.format().clone()
+                                t.2.format().to_owned()
                             } else if is_first {
-                                t.0.format().clone()
+                                t.0.format().to_owned()
                             } else {
-                                t.1.format().clone()
+                                t.1.format().to_owned()
                             }
                         })
                         .unwrap_or_default();
@@ -479,27 +479,31 @@ fn draw_table<B: Backend>(
                     let mimetype: String = me.next().map(|s| s.into()).unwrap_or_default();
                     let mimesub: String = me.next().map(|s| s.into()).unwrap_or_default();
 
-                    let node_type = app_config
+                    let mut node_type = if node.is_symlink() {
+                        app_config.node_types().symlink().to_owned()
+                    } else if node.is_dir() {
+                        app_config.node_types().directory().to_owned()
+                    } else {
+                        app_config.node_types().file().to_owned()
+                    };
+
+                    if let Some(conf) = app_config
                         .node_types()
-                        .special()
-                        .get(node.relative_path())
-                        .or_else(|| app_config.node_types().extension().get(node.extension()))
-                        .or_else(|| {
-                            app_config
-                                .node_types()
-                                .mime_essence()
-                                .get(&mimetype)
-                                .and_then(|t| t.get(&mimesub).or_else(|| t.get("*")))
-                        })
-                        .unwrap_or_else(|| {
-                            if node.is_symlink() {
-                                &app_config.node_types().symlink()
-                            } else if node.is_dir() {
-                                &app_config.node_types().directory()
-                            } else {
-                                &app_config.node_types().file()
-                            }
-                        });
+                        .mime_essence()
+                        .get(&mimetype)
+                        .and_then(|t| t.get(&mimesub).or_else(|| t.get("*")))
+                    {
+                        node_type = node_type.extend(conf);
+                    }
+
+                    if let Some(conf) = app_config.node_types().extension().get(node.extension()) {
+                        node_type = node_type.extend(conf);
+                    }
+
+                    if let Some(conf) = app_config.node_types().special().get(node.relative_path())
+                    {
+                        node_type = node_type.extend(conf);
+                    }
 
                     let (relative_index, is_before_focus, is_after_focus) =
                         match dir.focus().cmp(&index) {
@@ -509,26 +513,26 @@ fn draw_table<B: Backend>(
                         };
 
                     let (mut prefix, mut suffix, mut style) = {
-                        let ui = app_config.general().default_ui().clone();
+                        let ui = app_config.general().default_ui().to_owned();
                         (
-                            ui.prefix().clone(),
-                            ui.suffix().clone(),
-                            ui.style().clone().extend(node_type.style().clone()),
+                            ui.prefix().to_owned(),
+                            ui.suffix().to_owned(),
+                            ui.style().to_owned().extend(node_type.style()),
                         )
                     };
 
                     if is_selected {
-                        let ui = app_config.general().selection_ui().clone();
-                        prefix = ui.prefix().clone().or(prefix);
-                        suffix = ui.suffix().clone().or(suffix);
-                        style = style.extend(ui.style().clone());
+                        let ui = app_config.general().selection_ui().to_owned();
+                        prefix = ui.prefix().to_owned().or(prefix);
+                        suffix = ui.suffix().to_owned().or(suffix);
+                        style = style.extend(ui.style());
                     };
 
                     if is_focused {
-                        let ui = app_config.general().focus_ui().clone();
-                        prefix = ui.prefix().clone().or(prefix);
-                        suffix = ui.suffix().clone().or(suffix);
-                        style = style.extend(ui.style().clone());
+                        let ui = app_config.general().focus_ui().to_owned();
+                        prefix = ui.prefix().to_owned().or(prefix);
+                        suffix = ui.suffix().to_owned().or(suffix);
+                        style = style.extend(ui.style());
                     };
 
                     let meta = NodeUiMetadata::new(
@@ -543,7 +547,7 @@ fn draw_table<B: Backend>(
                         is_selected,
                         is_focused,
                         dir.total(),
-                        node_type.meta().clone(),
+                        node_type.meta().to_owned(),
                     );
 
                     let cols = lua
@@ -554,7 +558,7 @@ fn draw_table<B: Backend>(
                                 .table()
                                 .row()
                                 .cols()
-                                .clone()
+                                .to_owned()
                                 .unwrap_or_default()
                                 .iter()
                                 .filter_map(|c| {
@@ -584,7 +588,7 @@ fn draw_table<B: Backend>(
         .general()
         .table()
         .col_widths()
-        .clone()
+        .to_owned()
         .unwrap_or_default()
         .into_iter()
         .map(|c| c.to_tui(screen_size, layout_size))
@@ -592,8 +596,8 @@ fn draw_table<B: Backend>(
 
     let table = Table::new(rows)
         .widths(&table_constraints)
-        .style(app_config.general().table().style().clone().into())
-        .highlight_style(app_config.general().focus_ui().style().clone().into())
+        .style(app_config.general().table().style().to_owned().into())
+        .highlight_style(app_config.general().focus_ui().style().to_owned().into())
         .column_spacing(
             app_config
                 .general()
@@ -612,21 +616,29 @@ fn draw_table<B: Backend>(
             ),
         ));
 
-    let table = table.clone().header(
+    let table = table.to_owned().header(
         Row::new(
             app_config
                 .general()
                 .table()
                 .header()
                 .cols()
-                .clone()
+                .to_owned()
                 .unwrap_or_default()
                 .iter()
                 .map(|c| Cell::from(c.format().to_owned().unwrap_or_default()))
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
-        .style(app_config.general().table().header().style().clone().into()),
+        .style(
+            app_config
+                .general()
+                .table()
+                .header()
+                .style()
+                .to_owned()
+                .into(),
+        ),
     );
 
     f.render_widget(table, layout_size);
@@ -642,15 +654,16 @@ fn draw_selection<B: Backend>(
     let panel_config = app.config().general().panel_ui();
     let config = panel_config
         .default()
-        .clone()
-        .extend(panel_config.selection().clone());
+        .to_owned()
+        .extend(panel_config.selection());
+
     let selection: Vec<ListItem> = app
         .selection()
         .iter()
         .rev()
         .take((layout_size.height.max(2) - 2).into())
         .rev()
-        .map(|n| n.absolute_path().clone())
+        .map(|n| n.absolute_path().to_owned())
         .map(ListItem::new)
         .collect();
 
@@ -673,8 +686,8 @@ fn draw_help_menu<B: Backend>(
     let panel_config = app.config().general().panel_ui();
     let config = panel_config
         .default()
-        .clone()
-        .extend(panel_config.help_menu().clone());
+        .to_owned()
+        .extend(panel_config.help_menu());
     let help_menu_rows = app
         .mode()
         .help_menu()
@@ -714,17 +727,17 @@ fn draw_input_buffer<B: Backend>(
     let panel_config = app.config().general().panel_ui();
     let config = panel_config
         .default()
-        .clone()
-        .extend(panel_config.input_and_logs().clone());
+        .to_owned()
+        .extend(panel_config.input_and_logs());
     let input_buf = Paragraph::new(Spans::from(vec![
         Span::styled(
             app.config()
                 .general()
                 .prompt()
                 .format()
-                .clone()
+                .to_owned()
                 .unwrap_or_default(),
-            app.config().general().prompt().style().clone().into(),
+            app.config().general().prompt().style().to_owned().into(),
         ),
         Span::raw(app.input_buffer().unwrap_or_else(|| "".into())),
         Span::styled(
@@ -732,9 +745,9 @@ fn draw_input_buffer<B: Backend>(
                 .general()
                 .cursor()
                 .format()
-                .clone()
+                .to_owned()
                 .unwrap_or_default(),
-            app.config().general().cursor().style().clone().into(),
+            app.config().general().cursor().style().to_owned().into(),
         ),
     ]))
     .block(block(
@@ -758,18 +771,18 @@ fn draw_sort_n_filter<B: Backend>(
     let panel_config = app.config().general().panel_ui();
     let config = panel_config
         .default()
-        .clone()
-        .extend(panel_config.sort_and_filter().clone());
-    let ui = app.config().general().sort_and_filter_ui().clone();
+        .to_owned()
+        .extend(panel_config.sort_and_filter());
+    let ui = app.config().general().sort_and_filter_ui().to_owned();
     let filter_by = app.explorer_config().filters();
     let sort_by = app.explorer_config().sorters();
     let defaultui = ui.default_identifier();
     let forwardui = defaultui
-        .clone()
-        .extend(ui.sort_direction_identifiers().forward().clone());
+        .to_owned()
+        .extend(ui.sort_direction_identifiers().forward());
     let reverseui = defaultui
-        .clone()
-        .extend(ui.sort_direction_identifiers().reverse().clone());
+        .to_owned()
+        .extend(ui.sort_direction_identifiers().reverse());
 
     let mut spans = filter_by
         .iter()
@@ -777,13 +790,13 @@ fn draw_sort_n_filter<B: Backend>(
             ui.filter_identifiers()
                 .get(&f.filter())
                 .map(|u| {
-                    let ui = defaultui.clone().extend(u.clone());
+                    let ui = defaultui.to_owned().extend(u);
                     (
                         Span::styled(
                             ui.format().to_owned().unwrap_or_default(),
-                            ui.style().clone().into(),
+                            ui.style().to_owned().into(),
                         ),
-                        Span::styled(f.input().clone(), ui.style().clone().into()),
+                        Span::styled(f.input().to_owned(), ui.style().to_owned().into()),
                     )
                 })
                 .unwrap_or_else(|| (Span::raw("f"), Span::raw("")))
@@ -794,15 +807,15 @@ fn draw_sort_n_filter<B: Backend>(
             ui.sorter_identifiers()
                 .get(&s.sorter())
                 .map(|u| {
-                    let ui = defaultui.clone().extend(u.clone());
+                    let ui = defaultui.to_owned().extend(u);
                     (
                         Span::styled(
                             ui.format().to_owned().unwrap_or_default(),
-                            ui.style().clone().into(),
+                            ui.style().to_owned().into(),
                         ),
                         Span::styled(
                             direction.format().to_owned().unwrap_or_default(),
-                            direction.style().clone().into(),
+                            direction.style().to_owned().into(),
                         ),
                     )
                 })
@@ -810,7 +823,7 @@ fn draw_sort_n_filter<B: Backend>(
         }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator().format().to_owned().unwrap_or_default(),
-            ui.separator().style().clone().into(),
+            ui.separator().style().to_owned().into(),
         )))
         .map(|((a, b), c)| vec![a, b, c])
         .flatten()
@@ -835,9 +848,9 @@ fn draw_logs<B: Backend>(
     let panel_config = app.config().general().panel_ui();
     let config = panel_config
         .default()
-        .clone()
-        .extend(panel_config.input_and_logs().clone());
-    let logs_config = app.config().general().logs().clone();
+        .to_owned()
+        .extend(panel_config.input_and_logs());
+    let logs_config = app.config().general().logs().to_owned();
     let logs = if app.logs_hidden() {
         vec![]
     } else {
@@ -855,7 +868,7 @@ fn draw_logs<B: Backend>(
                         &logs_config.info().format().to_owned().unwrap_or_default(),
                         l.message()
                     ))
-                    .style(logs_config.info().style().clone().into()),
+                    .style(logs_config.info().style().to_owned().into()),
 
                     app::LogLevel::Warning => ListItem::new(format!(
                         "{} | {} | {}",
@@ -867,7 +880,7 @@ fn draw_logs<B: Backend>(
                             .unwrap_or_default(),
                         l.message()
                     ))
-                    .style(logs_config.warning().style().clone().into()),
+                    .style(logs_config.warning().style().to_owned().into()),
 
                     app::LogLevel::Success => ListItem::new(format!(
                         "{} | {} | {}",
@@ -879,7 +892,7 @@ fn draw_logs<B: Backend>(
                             .unwrap_or_default(),
                         l.message()
                     ))
-                    .style(logs_config.success().style().clone().into()),
+                    .style(logs_config.success().style().to_owned().into()),
 
                     app::LogLevel::Error => ListItem::new(format!(
                         "{} | {} | {}",
@@ -887,7 +900,7 @@ fn draw_logs<B: Backend>(
                         &logs_config.error().format().to_owned().unwrap_or_default(),
                         l.message()
                     ))
-                    .style(logs_config.error().style().clone().into()),
+                    .style(logs_config.error().style().to_owned().into()),
                 }
             })
             .collect::<Vec<ListItem>>()
@@ -914,7 +927,7 @@ pub fn draw_nothing<B: Backend>(
     _lua: &Lua,
 ) {
     let panel_config = app.config().general().panel_ui();
-    let config = panel_config.default().clone();
+    let config = panel_config.default().to_owned();
     let nothing = Paragraph::new("").block(block(config, "".into()));
     f.render_widget(nothing, layout_size);
 }
@@ -946,7 +959,7 @@ pub fn draw_layout<B: Backend>(
                 .constraints(
                     config
                         .constraints()
-                        .clone()
+                        .to_owned()
                         .unwrap_or_default()
                         .iter()
                         .map(|c| c.to_tui(screen_size, layout_size))
@@ -978,7 +991,7 @@ pub fn draw_layout<B: Backend>(
                 .constraints(
                     config
                         .constraints()
-                        .clone()
+                        .to_owned()
                         .unwrap_or_default()
                         .iter()
                         .map(|c| c.to_tui(screen_size, layout_size))
@@ -1008,7 +1021,7 @@ pub fn draw_layout<B: Backend>(
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, lua: &Lua) {
     let screen_size = f.size();
-    let layout = app.layout().clone();
+    let layout = app.layout().to_owned();
 
     draw_layout(layout, f, screen_size, screen_size, app, lua);
 }
@@ -1048,7 +1061,7 @@ mod test {
         };
 
         assert_eq!(
-            a.clone().extend(b.clone()),
+            a.to_owned().extend(&b),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
@@ -1058,7 +1071,7 @@ mod test {
         );
 
         assert_eq!(
-            b.clone().extend(a.clone()),
+            b.to_owned().extend(&a),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
@@ -1068,7 +1081,7 @@ mod test {
         );
 
         assert_eq!(
-            a.clone().extend(c.clone()),
+            a.to_owned().extend(&c),
             Style {
                 fg: Some(Color::Cyan),
                 bg: Some(Color::Magenta),
@@ -1078,7 +1091,7 @@ mod test {
         );
 
         assert_eq!(
-            c.clone().extend(a.clone()),
+            c.to_owned().extend(&a),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Magenta),
