@@ -1461,6 +1461,24 @@ impl History {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CallLuaArg {
+    pub version: String,
+    pub config: Config,
+    pub pwd: String,
+    pub focused_node: Option<Node>,
+    pub directory_buffer: Option<DirectoryBuffer>,
+    pub selection: IndexSet<Node>,
+    pub mode: Mode,
+    pub layout: Layout,
+    pub input_buffer: Option<String>,
+    pub pid: u32,
+    pub session_path: String,
+    pub explorer_config: ExplorerConfig,
+    pub history: History,
+    pub last_modes: Vec<Mode>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
     pub config: Config,
@@ -2757,5 +2775,24 @@ impl App {
     /// Get a reference to the app's logs hidden.
     pub fn logs_hidden(&self) -> bool {
         self.logs_hidden
+    }
+
+    pub fn to_lua_arg(&self) -> CallLuaArg {
+        CallLuaArg {
+            version: self.version.clone(),
+            config: self.config.clone(),
+            pwd: self.pwd.clone(),
+            focused_node: self.focused_node().cloned(),
+            directory_buffer: self.directory_buffer().cloned(),
+            selection: self.selection.clone(),
+            mode: self.mode.clone(),
+            layout: self.layout.clone(),
+            input_buffer: self.input_buffer.clone(),
+            pid: self.pid,
+            session_path: self.session_path.clone(),
+            explorer_config: self.explorer_config.clone(),
+            history: self.history.clone(),
+            last_modes: self.last_modes.clone(),
+        }
     }
 }
