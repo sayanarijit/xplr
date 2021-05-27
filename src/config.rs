@@ -69,6 +69,12 @@ impl NodeTypeConfig {
     pub fn meta(&self) -> &HashMap<String, String> {
         &self.meta
     }
+
+    pub fn extend(mut self, other: &Self) -> Self {
+        self.style = self.style.extend(&other.style);
+        self.meta.extend(other.meta.to_owned());
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -166,9 +172,9 @@ pub struct UiElement {
 }
 
 impl UiElement {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.format = other.format.or(self.format);
-        self.style = self.style.extend(other.style);
+    pub fn extend(mut self, other: &Self) -> Self {
+        self.format = other.format.to_owned().or(self.format);
+        self.style = self.style.extend(&other.style);
         self
     }
 
@@ -968,10 +974,10 @@ pub struct PanelUiConfig {
 }
 
 impl PanelUiConfig {
-    pub fn extend(mut self, other: Self) -> Self {
-        self.title = self.title.extend(other.title);
-        self.borders = other.borders.or(self.borders);
-        self.style = self.style.extend(other.style);
+    pub fn extend(mut self, other: &Self) -> Self {
+        self.title = self.title.extend(&other.title);
+        self.borders = other.borders.to_owned().or(self.borders);
+        self.style = self.style.extend(&other.style);
         self
     }
     /// Get a reference to the block config's borders.
