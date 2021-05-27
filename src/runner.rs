@@ -39,7 +39,7 @@ fn call_lua(
         (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
     };
 
-    lua::call(lua, func, &app)
+    lua::call(lua, func, &app.to_lua_arg())
 }
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
