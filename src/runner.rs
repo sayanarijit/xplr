@@ -12,6 +12,7 @@ use anyhow::Result;
 use crossterm::event;
 use crossterm::execute;
 use crossterm::terminal as term;
+use mlua::LuaSerdeExt;
 use std::fs;
 use std::io;
 use std::io::prelude::*;
@@ -39,7 +40,9 @@ fn call_lua(
         (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
     };
 
-    lua::call(lua, func, &app.to_lua_arg())
+    let arg = app.to_lua_arg();
+    let arg = lua.to_value(&arg)?;
+    lua::call(lua, func, arg)
 }
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {

@@ -563,7 +563,7 @@ fn draw_table<B: Backend>(
                                 .iter()
                                 .filter_map(|c| {
                                     c.format().as_ref().map(|f| {
-                                        let out: Result<String> = lua::call(lua, f, &v);
+                                        let out: Result<String> = lua::call(lua, f, v.clone());
                                         match out {
                                             Ok(o) => ansi_to_text(o.bytes())
                                                 .unwrap_or_else(|e| Text::raw(format!("{:?}", e))),
