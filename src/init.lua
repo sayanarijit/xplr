@@ -1995,8 +1995,9 @@ xplr.config.modes.builtin.switch_layout = {
 xplr.config.modes.custom = {}
 
 -- Function
----- Formaters
------- Index
+---- Builtin
+------ Formaters
+-------- Format index column
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   local r = ""
   if m.is_before_focus then
@@ -2010,7 +2011,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   return r
 end
 
------- Path
+-------- Format path column
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local r = m.tree .. m.prefix
 
@@ -2045,7 +2046,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   return r
 end
 
------- Permissions
+-------- Format permissions column
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
 
   local no_color = os.getenv("NO_COLOR")
@@ -2133,7 +2134,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   return r
 end
 
------- Size
+-------- Format size column
 xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
   if not m.is_dir then
     return m.human_size
@@ -2142,7 +2143,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
   end
 end
 
------- Mime
+-------- Format mime column
 xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   if m.is_symlink and not m.is_broken then
     return m.symlink.mime_essence
@@ -2150,3 +2151,6 @@ xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
     return m.mime_essence
   end
 end
+
+---- Custom
+xplr.fn.custom = {}
