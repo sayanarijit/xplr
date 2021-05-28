@@ -1140,8 +1140,7 @@ pub enum ExternalMsg {
     CallSilently(Command),
 
     /// Call a Lua function.
-    /// The complete app state (exportable using `PrintAppStateAndQuit` or `Debug`)
-    /// will be passed to the function as argument.
+    /// A `CallLuaArg` object will be passed to the function as argument.
     /// The function can optionally return a list of messages for xplr to handle
     /// after the executing the function.
     ///
