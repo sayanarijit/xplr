@@ -4,7 +4,6 @@ use criterion::{criterion_group, criterion_main, Criterion};
 use crossterm::execute;
 use crossterm::terminal as term;
 use std::fs;
-use std::io::prelude::*;
 use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;

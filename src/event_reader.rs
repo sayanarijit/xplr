@@ -1,7 +1,7 @@
 use crate::app::Task;
 use crate::app::{ExternalMsg, InternalMsg, MsgIn};
 use crate::input::Key;
-use crossterm::event::{self, Event, MouseEvent};
+use crossterm::event::{self, Event, MouseEventKind};
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 
@@ -19,16 +19,6 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                 // NOTE: The poll timeout need to stay low, else spawning sub subshell
                 // and start typing immediately will cause panic.
                 match event::read() {
-                    Ok(Event::Mouse(MouseEvent::ScrollUp(_, _, _))) => {
-                        let msg = MsgIn::External(ExternalMsg::FocusPrevious);
-                        tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
-                    }
-
-                    Ok(Event::Mouse(MouseEvent::ScrollDown(_, _, _))) => {
-                        let msg = MsgIn::External(ExternalMsg::FocusNext);
-                        tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
-                    }
-
                     Ok(Event::Key(key)) => {
                         let key = Key::from_event(key);
                         let msg = MsgIn::Internal(InternalMsg::HandleKey(key));
@@ -37,12 +27,23 @@ pub fn keep_reading(tx_msg_in: Sender<Task>, rx_event_reader: Receiver<bool>) {
                             .unwrap_or_default();
                     }
 
+                    Ok(Event::Mouse(evt)) => match evt.kind {
+                        MouseEventKind::ScrollUp => {
+                            let msg = MsgIn::External(ExternalMsg::FocusPrevious);
+                            tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+                        }
+
+                        MouseEventKind::ScrollDown => {
+                            let msg = MsgIn::External(ExternalMsg::FocusNext);
+                            tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+                        }
+                        _ => {}
+                    },
+
                     Ok(Event::Resize(_, _)) => {
                         let msg = MsgIn::External(ExternalMsg::Refresh);
                         tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
                     }
-
-                    Ok(_) => {}
 
                     Err(e) => {
                         tx_msg_in
