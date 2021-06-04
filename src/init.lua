@@ -581,7 +581,6 @@ xplr.config.modes.builtin.default = {
           {
             SwitchModeBuiltin = "action"
           },
-          "Refresh"
         }
       },
       ["?"] = {
@@ -597,7 +596,7 @@ xplr.config.modes.builtin.default = {
       },
       ["G"] = {
         help = "go to bottom",
-        messages = {"PopMode", "FocusLast", "Refresh"}
+        messages = {"PopMode", "FocusLast"}
       },
       ["ctrl-a"] = {
         help = "select/unselect all",
@@ -626,7 +625,7 @@ xplr.config.modes.builtin.default = {
       },
       ["ctrl-r"] = {
         help = "refresh screen",
-        messages = {"ClearScreen", "Refresh"}
+        messages = {"ClearScreen"}
       },
       ["ctrl-u"] = {
         help = "clear selection",
@@ -638,7 +637,6 @@ xplr.config.modes.builtin.default = {
           {
             SwitchModeBuiltin = "switch_layout"
           },
-          "Refresh"
         }
       },
       ["d"] = {
@@ -648,7 +646,6 @@ xplr.config.modes.builtin.default = {
           {
             SwitchModeBuiltin = "delete"
           },
-          "Refresh"
         }
       },
       down = {
@@ -668,7 +665,6 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "filter" },
-          "Refresh"
         }
       },
       ["g"] = {
@@ -676,7 +672,6 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "go_to" },
-          "Refresh"
         }
       },
       left = {
@@ -697,7 +692,6 @@ xplr.config.modes.builtin.default = {
             echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===]
           },
-          "Refresh"
         }
       },
       right = {
@@ -709,7 +703,6 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "sort" },
-          "Refresh"
         }
       },
       space = {
@@ -767,7 +760,7 @@ xplr.config.modes.builtin.recover = {
       },
       esc = {
         help = "escape",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       }
     },
     on_alphabet = nil,
@@ -805,7 +798,6 @@ xplr.config.modes.builtin.selection_ops = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["ctrl-c"] = {
@@ -814,7 +806,7 @@ xplr.config.modes.builtin.selection_ops = {
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       ["m"] = {
         help = "move here",
@@ -833,7 +825,6 @@ xplr.config.modes.builtin.selection_ops = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["x"] = {
@@ -858,7 +849,6 @@ xplr.config.modes.builtin.selection_ops = {
           },
           "ClearScreen",
           "PopMode",
-          "Refresh"
         }
       }
     },
@@ -894,7 +884,7 @@ xplr.config.modes.builtin.create = {
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       ["f"] = {
         help = "create file",
@@ -957,7 +947,6 @@ xplr.config.modes.builtin.create_directory = {
               && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
             else
               echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
-              echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
             fi
             ]===]
           }
@@ -965,7 +954,7 @@ xplr.config.modes.builtin.create_directory = {
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       }
     },
     on_alphabet = nil,
@@ -1019,7 +1008,6 @@ xplr.config.modes.builtin.create_file = {
               && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
             else
               echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
-              echo Refresh >> "${XPLR_PIPE_MSG_IN:?}"
             fi
             ]===]
           }
@@ -1027,7 +1015,7 @@ xplr.config.modes.builtin.create_file = {
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       }
     },
     on_alphabet = nil,
@@ -1069,19 +1057,19 @@ xplr.config.modes.builtin.number = {
       },
       down = {
         help = "to down",
-        messages = {"FocusNextByRelativeIndexFromInput", "PopMode", "Refresh"}
+        messages = {"FocusNextByRelativeIndexFromInput", "PopMode"}
       },
       enter = {
         help = "to index",
-        messages = {"FocusByIndexFromInput", "PopMode", "Refresh"}
+        messages = {"FocusByIndexFromInput", "PopMode"}
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       up = {
         help = "to up",
-        messages = {"FocusPreviousByRelativeIndexFromInput", "PopMode", "Refresh"}
+        messages = {"FocusPreviousByRelativeIndexFromInput", "PopMode"}
       }
     },
     on_alphabet = nil,
@@ -1110,15 +1098,15 @@ xplr.config.modes.builtin.go_to = {
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       ["f"] = {
         help = "follow symlink",
-        messages = {"FollowSymlink", "PopMode", "Refresh"}
+        messages = {"FollowSymlink", "PopMode"}
       },
       ["g"] = {
         help = "top",
-        messages = {"FocusFirst", "PopMode", "Refresh"}
+        messages = {"FocusFirst", "PopMode"}
       },
       ["x"] = {
         help = "open in gui",
@@ -1140,7 +1128,6 @@ xplr.config.modes.builtin.go_to = {
           },
           "ClearScreen",
           "PopMode",
-          "Refresh"
         }
       }
     },
@@ -1192,12 +1179,11 @@ xplr.config.modes.builtin.rename = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       }
     },
     on_alphabet = nil,
@@ -1234,7 +1220,6 @@ xplr.config.modes.builtin.delete = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["ctrl-c"] = {
@@ -1266,12 +1251,11 @@ xplr.config.modes.builtin.delete = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       }
     },
     on_alphabet = nil,
@@ -1299,7 +1283,6 @@ xplr.config.modes.builtin.action = {
           },
           "ExplorePwdAsync",
           "PopMode",
-          "Refresh"
         }
       },
       ["c"] = {
@@ -1309,7 +1292,6 @@ xplr.config.modes.builtin.action = {
           {
             SwitchModeBuiltin = "create"
           },
-          "Refresh"
         }
       },
       ["ctrl-c"] = {
@@ -1325,12 +1307,11 @@ xplr.config.modes.builtin.action = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       ["l"] = {
         help = "logs",
@@ -1342,7 +1323,6 @@ xplr.config.modes.builtin.action = {
             ]===]
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["s"] = {
@@ -1352,7 +1332,6 @@ xplr.config.modes.builtin.action = {
           {
             SwitchModeBuiltin = "selection_ops"
           },
-          "Refresh"
         }
       },
       ["q"] = {
@@ -1442,7 +1421,6 @@ xplr.config.modes.builtin.search = {
           },
           "PopMode",
           "ExplorePwdAsync",
-          "Refresh"
         }
       },
       left = {
@@ -1543,7 +1521,7 @@ xplr.config.modes.builtin.filter = {
       },
       enter = {
         help = "done",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       ["r"] = {
         help = "relative does contain",
@@ -1624,7 +1602,7 @@ xplr.config.modes.builtin.relative_path_does_contain = {
       },
       enter = {
         help = "apply filter",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       esc = {
         help = "cancel",
@@ -1634,7 +1612,6 @@ xplr.config.modes.builtin.relative_path_does_contain = {
           },
           "PopMode",
           "ExplorePwdAsync",
-          "Refresh"
         }
       }
     },
@@ -1711,7 +1688,7 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
       },
       enter = {
         help = "apply filter",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       esc = {
         help = "cancel",
@@ -1856,7 +1833,7 @@ xplr.config.modes.builtin.sort = {
       },
       enter = {
         help = "done",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       },
       ["m"] = {
         help = "by canonical mime essence",
@@ -1942,7 +1919,6 @@ xplr.config.modes.builtin.switch_layout = {
             SwitchLayoutBuiltin = "default"
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["2"] = {
@@ -1952,7 +1928,6 @@ xplr.config.modes.builtin.switch_layout = {
             SwitchLayoutBuiltin = "no_help"
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["3"] = {
@@ -1962,7 +1937,6 @@ xplr.config.modes.builtin.switch_layout = {
             SwitchLayoutBuiltin = "no_selection"
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["4"] = {
@@ -1972,7 +1946,6 @@ xplr.config.modes.builtin.switch_layout = {
             SwitchLayoutBuiltin = "no_help_no_selection"
           },
           "PopMode",
-          "Refresh"
         }
       },
       ["ctrl-c"] = {
@@ -1981,7 +1954,7 @@ xplr.config.modes.builtin.switch_layout = {
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode", "Refresh"}
+        messages = {"PopMode"}
       }
     },
     on_alphabet = nil,
