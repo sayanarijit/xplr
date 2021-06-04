@@ -15,7 +15,6 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
-          # - windows-latest
         rust: [stable]
         include:
           - os: macos-latest
@@ -26,10 +25,6 @@ jobs:
             artifact_prefix: linux
             target: x86_64-unknown-linux-gnu
             binary_postfix: ""
-          # - os: windows-latest
-          #   artifact_prefix: windows
-          #   target: x86_64-pc-windows-msvc
-          #   binary_postfix: ".exe"
 
     steps:
       - name: Installing Rust toolchain
@@ -54,6 +49,11 @@ jobs:
           toolchain: ${{ matrix.rust }}
           args: --locked --release --target ${{ matrix.target }}
 
+      - name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
       - name: Packaging final binary
         shell: bash
         run: |
@@ -62,17 +62,40 @@ jobs:
           strip $BINARY_NAME
           RELEASE_NAME=xplr-${{ matrix.artifact_prefix }}
           tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
-          if [[ ${{ runner.os }} == 'Windows' ]]; then
-            certutil -hashfile $RELEASE_NAME.tar.gz sha256 | grep -E [A-Fa-f0-9]{64} > $RELEASE_NAME.sha256
-          else
-            shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
-          fi
+          shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
+          cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor $RELEASE_NAME.tar.gz
+
       - name: Releasing assets
         uses: softprops/action-gh-release@v1
         with:
           files: |
             target/${{ matrix.target }}/release/xplr-${{ matrix.artifact_prefix }}.tar.gz
             target/${{ matrix.target }}/release/xplr-${{ matrix.artifact_prefix }}.sha256
+            target/${{ matrix.target }}/release/xplr-${{ matrix.artifact_prefix }}.tar.gz.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-gpg-signature:
+    name: Publishing GPG signature
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
+      - name: Signing archive with GPG
+        run: |
+          VERSION=${GITHUB_REF##*/}
+          git archive -o xplr-${VERSION:?}.tar.gz --format tar.gz --prefix "xplr-${VERSION:?}/" "v${VERSION}"
+          cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "xplr-${VERSION:?}.tar.gz"
+
+      - name: Releasing GPG signature
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            xplr-${GITHUB_REF##*/}.tar.gz.asc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
