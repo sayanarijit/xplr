@@ -28,7 +28,7 @@ lazy_static! {
 }
 
 fn read_only_indicator(app: &app::App) -> &str {
-    if app.config().general().read_only().unwrap_or_default() {
+    if app.config().general().read_only() {
         "(r)"
     } else {
         ""

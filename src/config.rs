@@ -437,10 +437,13 @@ impl PanelUi {
 #[serde(deny_unknown_fields)]
 pub struct GeneralConfig {
     #[serde(default)]
-    pub show_hidden: Option<bool>,
+    pub enable_mouse: bool,
 
     #[serde(default)]
-    pub read_only: Option<bool>,
+    pub show_hidden: bool,
+
+    #[serde(default)]
+    pub read_only: bool,
 
     #[serde(default)]
     pub cursor: UiElement,
@@ -481,12 +484,12 @@ pub struct GeneralConfig {
 
 impl GeneralConfig {
     /// Get a reference to the general config's show hidden.
-    pub fn show_hidden(&self) -> Option<bool> {
+    pub fn show_hidden(&self) -> bool {
         self.show_hidden
     }
 
     /// Get a reference to the general config's read only.
-    pub fn read_only(&self) -> Option<bool> {
+    pub fn read_only(&self) -> bool {
         self.read_only
     }
 
@@ -548,6 +551,11 @@ impl GeneralConfig {
     /// Get a reference to the general config's panel ui.
     pub fn panel_ui(&self) -> &PanelUi {
         &self.panel_ui
+    }
+
+    /// Get a reference to the general config's enable mouse.
+    pub fn enable_mouse(&self) -> bool {
+        self.enable_mouse
     }
 }
 

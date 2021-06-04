@@ -1334,6 +1334,13 @@ xplr.config.modes.builtin.action = {
           },
         }
       },
+      ["m"] = {
+        help = "toggle mouse",
+        messages = {
+          "PopMode",
+          "ToggleMouse",
+        }
+      },
       ["q"] = {
         help = "quit",
         messages = {
