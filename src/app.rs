@@ -4,6 +4,7 @@ use crate::explorer;
 use crate::input::Key;
 use crate::lua;
 use crate::permissions::Permissions;
+use crate::runner;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
@@ -1765,8 +1766,8 @@ impl App {
     pub fn explore_pwd(self) -> Result<Self> {
         let dir = explorer::explore_sync(
             self.explorer_config().clone(),
-            self.pwd().clone(),
-            self.focused_node().map(|n| n.absolute_path().clone()),
+            self.pwd().into(),
+            self.focused_node().map(|n| n.absolute_path().into()),
         )?;
         self.add_directory(dir.parent().clone(), dir)
     }
@@ -2794,4 +2795,15 @@ impl App {
             last_modes: self.last_modes.clone(),
         }
     }
+
+    pub fn run(self, focused_path: Option<PathBuf>, lua: &mlua::Lua) -> Result<Option<String>> {
+        runner::run(self, focused_path, lua)
+    }
+}
+
+/// Run xplr TUI
+pub fn run(pwd: PathBuf, focused_path: Option<PathBuf>) -> Result<Option<String>> {
+    let lua = mlua::Lua::new();
+    let app = App::create(pwd, &lua)?;
+    app.run(focused_path, &lua)
 }

@@ -3,7 +3,6 @@
 use std::env;
 use std::path::PathBuf;
 use xplr::app;
-use xplr::runner;
 
 fn main() {
     let mut pwd = PathBuf::from(env::args().nth(1).unwrap_or_else(|| ".".into()))
@@ -12,23 +11,11 @@ fn main() {
     let mut focused_path = None;
 
     if pwd.is_file() {
-        focused_path = Some(
-            pwd.file_name()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .to_string(),
-        );
-        pwd = pwd.parent().map(|p| p.into()).unwrap_or_default();
+        focused_path = pwd.file_name().map(|p| p.into());
+        pwd = pwd.parent().map(|p| p.into()).unwrap_or_else(|| ".".into());
     }
 
-    let lua = mlua::Lua::new();
-
-    let app = app::App::create(pwd, &lua).unwrap_or_else(|e| {
-        eprintln!("error: {}", e);
-        std::process::exit(1);
-    });
-
-    match runner::run(app, focused_path, lua) {
+    match app::run(pwd, focused_path) {
         Ok(Some(out)) => print!("{}", out),
         Ok(None) => {}
         Err(err) => {

@@ -16,6 +16,7 @@ use mlua::LuaSerdeExt;
 use std::fs;
 use std::io;
 use std::io::prelude::*;
+use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
 use std::sync::mpsc;
 use termion::get_tty;
@@ -86,10 +87,10 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .status()
 }
 
-pub fn run(
+pub(crate) fn run(
     mut app: app::App,
-    focused_path: Option<String>,
-    lua: mlua::Lua,
+    focused_path: Option<PathBuf>,
+    lua: &mlua::Lua,
 ) -> Result<Option<String>> {
     fs::create_dir_all(app.session_path())?;
 
@@ -99,7 +100,10 @@ pub fn run(
 
     app = app.explore_pwd()?;
 
-    app = if let Some(f) = focused_path.clone() {
+    app = if let Some(f) = focused_path
+        .clone()
+        .map(|f| f.to_string_lossy().to_string())
+    {
         app.focus_by_file_name(&f, true)?
     } else {
         app.focus_first(true)?
@@ -107,7 +111,7 @@ pub fn run(
 
     explorer::explore_recursive_async(
         app.explorer_config().clone(),
-        app.pwd().clone(),
+        app.pwd().into(),
         focused_path,
         tx_msg_in.clone(),
     );
@@ -170,8 +174,8 @@ pub fn run(
                         app::MsgOut::ExplorePwdAsync => {
                             explorer::explore_async(
                                 app.explorer_config().clone(),
-                                app.pwd().clone(),
-                                app.focused_node().map(|n| n.relative_path().clone()),
+                                app.pwd().into(),
+                                app.focused_node().map(|n| n.relative_path().into()),
                                 tx_msg_in.clone(),
                             );
                             tx_pwd_watcher.send(app.pwd().clone())?;
@@ -180,8 +184,8 @@ pub fn run(
                         app::MsgOut::ExploreParentsAsync => {
                             explorer::explore_recursive_async(
                                 app.explorer_config().clone(),
-                                app.pwd().clone(),
-                                app.focused_node().map(|n| n.relative_path().clone()),
+                                app.pwd().into(),
+                                app.focused_node().map(|n| n.relative_path().into()),
                                 tx_msg_in.clone(),
                             );
                             tx_pwd_watcher.send(app.pwd().clone())?;

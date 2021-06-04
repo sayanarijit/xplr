@@ -5,14 +5,12 @@ use std::path::PathBuf;
 use std::sync::mpsc::Sender;
 use std::thread;
 
-pub fn explore_sync(
+pub(crate) fn explore_sync(
     config: ExplorerConfig,
-    parent: String,
-    focused_path: Option<String>,
+    parent: PathBuf,
+    focused_path: Option<PathBuf>,
 ) -> Result<DirectoryBuffer> {
-    let path = PathBuf::from(&parent);
-
-    let dirs = fs::read_dir(&path)?;
+    let dirs = fs::read_dir(&parent)?;
     let mut nodes = dirs
         .filter_map(|d| {
             d.ok().map(|e| {
@@ -22,30 +20,35 @@ pub fn explore_sync(
                     .unwrap_or_default()
             })
         })
-        .map(|name| Node::new(parent.clone(), name))
+        .map(|name| Node::new(parent.to_string_lossy().to_string(), name))
         .filter(|n| config.filter(n))
         .collect::<Vec<Node>>();
 
     nodes.sort_by(|a, b| config.sort(a, b));
 
     let focus_index = if let Some(focus) = focused_path {
+        let focus_str = focus.to_string_lossy().to_string();
         nodes
             .iter()
             .enumerate()
-            .find(|(_, n)| n.relative_path() == &focus)
+            .find(|(_, n)| n.relative_path() == &focus_str)
             .map(|(i, _)| i)
             .unwrap_or(0)
     } else {
         0
     };
 
-    Ok(DirectoryBuffer::new(parent, nodes, focus_index))
+    Ok(DirectoryBuffer::new(
+        parent.to_string_lossy().to_string(),
+        nodes,
+        focus_index,
+    ))
 }
 
-pub fn explore_async(
+pub(crate) fn explore_async(
     config: ExplorerConfig,
-    parent: String,
-    focused_path: Option<String>,
+    parent: PathBuf,
+    focused_path: Option<PathBuf>,
     tx_msg_in: Sender<Task>,
 ) {
     thread::spawn(move || {
@@ -53,7 +56,10 @@ pub fn explore_async(
             .map(|buf| {
                 tx_msg_in
                     .send(Task::new(
-                        MsgIn::Internal(InternalMsg::AddDirectory(parent.clone(), buf)),
+                        MsgIn::Internal(InternalMsg::AddDirectory(
+                            parent.to_string_lossy().to_string(),
+                            buf,
+                        )),
                         None,
                     ))
                     .unwrap_or_default();
@@ -69,19 +75,23 @@ pub fn explore_async(
     });
 }
 
-pub fn explore_recursive_async(
+pub(crate) fn explore_recursive_async(
     config: ExplorerConfig,
-    parent: String,
-    focused_path: Option<String>,
+    parent: PathBuf,
+    focused_path: Option<PathBuf>,
     tx_msg_in: Sender<Task>,
 ) {
-    let path = PathBuf::from(&parent);
-    explore_async(config.clone(), parent, focused_path, tx_msg_in.clone());
-    if let Some(grand_parent) = path.parent() {
+    explore_async(
+        config.clone(),
+        parent.clone(),
+        focused_path,
+        tx_msg_in.clone(),
+    );
+    if let Some(grand_parent) = parent.parent() {
         explore_recursive_async(
             config,
-            grand_parent.to_string_lossy().to_string(),
-            path.file_name().map(|f| f.to_string_lossy().to_string()),
+            grand_parent.into(),
+            parent.file_name().map(|p| p.into()),
             tx_msg_in,
         );
     }
