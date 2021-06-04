@@ -15,22 +15,22 @@ categories = ["command-line-interface", "command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tui = { version = "0.14", default-features = false, features = ['crossterm', 'serde'] }
-termion = "1.5"
-crossterm = "0.18"
-dirs = "3.0.1"
-serde = { version = "1.0", features = ["derive"] }
-serde_yaml = "0.8"
+tui = { version = "0.15.0", default-features = false, features = ['crossterm', 'serde'] }
+termion = "1.5.6"
+crossterm = "0.19.0"
+dirs = "3.0.2"
+serde = { version = "1.0.126", features = ["derive"] }
+serde_yaml = "0.8.17"
 mime_guess = "2.0.3"
-anyhow = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
+anyhow = "1.0.40"
+chrono = { version = "0.4.19", features = ["serde"] }
 lazy_static = "1.4.0"
 indexmap = { version = "1.6.2", features = ["serde"] }
 natord = "1.0.9"
-humansize = "1.1.0"
+humansize = "1.1.1"
 mlua = { version = "0.5.4", features = ["luajit", "vendored", "serialize", "send"] }
-ansi-to-tui = "0.2.0"
-libc = "0.2.94"
+ansi-to-tui = "0.3.0"
+libc = "0.2.95"
 
 [dev-dependencies]
 criterion = "0.3"

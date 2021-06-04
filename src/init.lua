@@ -279,7 +279,7 @@ xplr.config.general.table.col_widths = {
 xplr.config.general.table.header.cols = {
     { format = " index", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "╭──── path", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = " permissions", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+    { format = "permissions", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
     { format = "type", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
 }
@@ -2066,8 +2066,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
 
   local p = m.permissions
 
-  -- TODO: Track https://github.com/uttarayan21/ansi-to-tui/issues/3
-  local r = " "
+  local r = ""
 
   -- User
   r = r .. bit("r", green, p.user_read)

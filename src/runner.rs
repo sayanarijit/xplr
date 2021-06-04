@@ -15,7 +15,6 @@ use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
 use std::fs;
 use std::io;
-use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
 use std::sync::mpsc;
