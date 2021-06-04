@@ -1263,6 +1263,15 @@ pub enum ExternalMsg {
     /// Clear all the node sorters.
     ClearNodeSorters,
 
+    /// Enable mouse
+    EnableMouse,
+
+    /// Disable mouse
+    DisableMouse,
+
+    /// Toggle mouse
+    ToggleMouse,
+
     /// Log information message.
     ///
     /// **Example:** `LogInfo: launching satellite`
@@ -1351,6 +1360,9 @@ pub enum MsgOut {
     CallLua(String),
     CallLuaSilently(String),
     Enque(Task),
+    EnableMouse,
+    DisableMouse,
+    ToggleMouse,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1520,9 +1532,7 @@ impl App {
                 .to_owned()
                 .unwrap_or_else(|| "default".into()),
         ) {
-            Some(m) => m
-                .clone()
-                .sanitized(config.general().read_only().unwrap_or_default()),
+            Some(m) => m.clone().sanitized(config.general().read_only()),
             None => {
                 bail!("'default' mode is missing")
             }
@@ -1551,7 +1561,7 @@ impl App {
             .to_string();
 
         let mut explorer_config = ExplorerConfig::default();
-        if !config.general().show_hidden().unwrap_or_default() {
+        if !config.general().show_hidden() {
             explorer_config.filters.replace(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
@@ -1623,7 +1633,7 @@ impl App {
     }
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
-        if self.config().general().read_only().unwrap_or_default() && !msg.is_read_only() {
+        if self.config().general().read_only() && !msg.is_read_only() {
             self.log_error("Cannot call shell command in read-only mode.".into())
         } else {
             match msg {
@@ -1705,6 +1715,9 @@ impl App {
                 ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
                 ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
                 ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
+                ExternalMsg::EnableMouse => self.enable_mouse(),
+                ExternalMsg::DisableMouse => self.disable_mouse(),
+                ExternalMsg::ToggleMouse => self.toggle_mouse(),
                 ExternalMsg::LogInfo(l) => self.log_info(l),
                 ExternalMsg::LogSuccess(l) => self.log_success(l),
                 ExternalMsg::LogWarning(l) => self.log_warning(l),
@@ -2112,7 +2125,7 @@ impl App {
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config().general().read_only().unwrap_or_default());
+                .sanitized(self.config().general().read_only());
             Ok(self)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
@@ -2125,7 +2138,7 @@ impl App {
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config().general().read_only().unwrap_or_default());
+                .sanitized(self.config().general().read_only());
             Ok(self)
         } else {
             self.log_error(format!("Builtin mode not found: {}", mode))
@@ -2138,7 +2151,7 @@ impl App {
             self.input_buffer = None;
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config().general().read_only().unwrap_or_default());
+                .sanitized(self.config().general().read_only());
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
@@ -2347,7 +2360,7 @@ impl App {
     fn reset_node_filters(mut self) -> Result<Self> {
         self.explorer_config.filters.clear();
 
-        if !self.config().general().show_hidden().unwrap_or_default() {
+        if !self.config().general().show_hidden() {
             self.add_node_filter(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
@@ -2416,6 +2429,21 @@ impl App {
 
     fn clear_node_sorters(mut self) -> Result<Self> {
         self.explorer_config.sorters.clear();
+        Ok(self)
+    }
+
+    fn enable_mouse(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::EnableMouse);
+        Ok(self)
+    }
+
+    fn disable_mouse(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::DisableMouse);
+        Ok(self)
+    }
+
+    fn toggle_mouse(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ToggleMouse);
         Ok(self)
     }
 

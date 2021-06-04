@@ -124,7 +124,14 @@ pub(crate) fn run(
     let mut stdout = get_tty()?;
     // let mut stdout = stdout.lock();
     execute!(stdout, term::EnterAlternateScreen)?;
-    execute!(stdout, event::EnableMouseCapture).unwrap_or_default(); // Optional
+
+    let mut mouse_enabled = app.config().general().enable_mouse();
+    if mouse_enabled {
+        if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
+            app = app.log_error(e.to_string())?;
+        }
+    }
+
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     terminal.hide_cursor()?;
@@ -198,6 +205,42 @@ pub(crate) fn run(
                             terminal.draw(|f| ui::draw(f, &app, &lua))?;
                         }
 
+                        app::MsgOut::EnableMouse => {
+                            if !mouse_enabled {
+                                match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
+                                    Ok(_) => {
+                                        mouse_enabled = true;
+                                    }
+                                    Err(e) => {
+                                        app = app.log_error(e.to_string())?;
+                                    }
+                                }
+                            }
+                        }
+
+                        app::MsgOut::ToggleMouse => {
+                            let msg = if mouse_enabled {
+                                app::ExternalMsg::DisableMouse
+                            } else {
+                                app::ExternalMsg::EnableMouse
+                            };
+                            app =
+                                app.handle_task(app::Task::new(app::MsgIn::External(msg), None))?;
+                        }
+
+                        app::MsgOut::DisableMouse => {
+                            if mouse_enabled {
+                                match execute!(terminal.backend_mut(), event::DisableMouseCapture) {
+                                    Ok(_) => {
+                                        mouse_enabled = false;
+                                    }
+                                    Err(e) => {
+                                        app = app.log_error(e.to_string())?;
+                                    }
+                                }
+                            }
+                        }
+
                         app::MsgOut::CallLuaSilently(func) => {
                             tx_event_reader.send(true)?;
 
@@ -258,7 +301,7 @@ pub(crate) fn run(
 
                         app::MsgOut::CallLua(func) => {
                             execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                                .unwrap_or_default(); // Optional
+                                .unwrap_or_default();
 
                             tx_event_reader.send(true)?;
 
@@ -287,13 +330,21 @@ pub(crate) fn run(
                             terminal.hide_cursor()?;
                             tx_event_reader.send(false)?;
 
-                            execute!(terminal.backend_mut(), event::EnableMouseCapture)
-                                .unwrap_or_default(); // Optional
+                            if mouse_enabled {
+                                match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
+                                    Ok(_) => {
+                                        mouse_enabled = true;
+                                    }
+                                    Err(e) => {
+                                        app = app.log_error(e.to_string())?;
+                                    }
+                                }
+                            }
                         }
 
                         app::MsgOut::Call(cmd) => {
                             execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                                .unwrap_or_default(); // Optional
+                                .unwrap_or_default();
 
                             tx_event_reader.send(true)?;
 
@@ -338,8 +389,16 @@ pub(crate) fn run(
                             terminal.hide_cursor()?;
                             tx_event_reader.send(false)?;
 
-                            execute!(terminal.backend_mut(), event::EnableMouseCapture)
-                                .unwrap_or_default(); // Optional
+                            if mouse_enabled {
+                                match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
+                                    Ok(_) => {
+                                        mouse_enabled = true;
+                                    }
+                                    Err(e) => {
+                                        app = app.log_error(e.to_string())?;
+                                    }
+                                }
+                            }
                         }
                     };
                 }
@@ -355,7 +414,7 @@ pub(crate) fn run(
     terminal.clear()?;
     terminal.set_cursor(0, 0)?;
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
-    execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default(); // Optional
+    execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
     term::disable_raw_mode()?;
     terminal.show_cursor()?;
 
