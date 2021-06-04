@@ -961,27 +961,25 @@ impl ExplorerConfig {
 pub enum ExternalMsg {
     /// Explore the present working directory and register the filtered nodes.
     /// This operation is expensive. So, try to avoid using it too often.
-    /// Once exploration is done, it will auto `Refresh` the state.
     ExplorePwd,
 
     /// Explore the present working directory and register the filtered nodes asynchronously.
     /// This operation happens asynchronously. That means, the xplr directory buffers won't be updated
     /// immediately. Hence, it needs to be used with care and probably with special checks in place.
     /// To explore `$PWD` synchronously, use `ExplorePwd` instead.
-    /// Once exploration is done, it will auto `Refresh` the state.
     ExplorePwdAsync,
 
     /// Explore the present working directory along with its parents and register the filtered nodes.
     /// This operation happens asynchronously. That means, the xplr directory buffers won't be updated
     /// immediately. Hence, it needs to be used with care and probably with special checks in place.
     /// To explore just the `$PWD` synchronously, use `ExplorePwd` instead.
-    /// Once exploration is done, it will auto `Refresh` the state.
     ExploreParentsAsync,
 
-    /// Refresh the app state (uncluding UI).
+    /// Refresh the UI.
     /// But it will not re-explore the directory if the working directory is the same.
     /// If there is some change in the working directory and you want to re-explore it,
     /// use the `Explore` message instead.
+    /// Also, it will not clear the screen. Use `ClearScreen` for that.
     Refresh,
 
     /// Clears the screen.
@@ -1105,7 +1103,6 @@ pub enum ExternalMsg {
     PopMode,
 
     /// Switch layout.
-    /// This will call `Refresh` automatically.
     ///
     /// > **NOTE:** To be specific about which layout to switch to, use `SwitchLayoutBuiltin` or
     /// `SwitchLayoutCustom` instead.
@@ -1114,13 +1111,11 @@ pub enum ExternalMsg {
     SwitchLayout(String),
 
     /// Switch to a builtin layout.
-    /// This will call `Refresh` automatically.
     ///
     /// **Example:** `SwitchLayoutBuiltin: default`
     SwitchLayoutBuiltin(String),
 
     /// Switch to a custom layout.
-    /// This will call `Refresh` automatically.
     ///
     /// **Example:** `SwitchLayoutCustom: my_custom_layout`
     SwitchLayoutCustom(String),
@@ -1129,7 +1124,7 @@ pub enum ExternalMsg {
     /// Note that the arguments will be shell-escaped.
     /// So to read the variables, the `-c` option of the shell
     /// can be used.
-    /// You may need to pass `Refresh` or `Explore` depening on the expectation.
+    /// You may need to pass `ExplorePwd` depening on the expectation.
     ///
     /// **Example:** `Call: {command: bash, args: ["-c", "read -p test"]}`
     Call(Command),
@@ -1613,10 +1608,11 @@ impl App {
     }
 
     pub fn handle_task(self, task: Task) -> Result<Self> {
-        match task.msg {
-            MsgIn::Internal(msg) => self.handle_internal(msg),
-            MsgIn::External(msg) => self.handle_external(msg, task.key),
-        }
+        let app = match task.msg {
+            MsgIn::Internal(msg) => self.handle_internal(msg)?,
+            MsgIn::External(msg) => self.handle_external(msg, task.key)?,
+        };
+        app.refresh()
     }
 
     fn handle_internal(self, msg: InternalMsg) -> Result<Self> {
@@ -1752,7 +1748,6 @@ impl App {
                     ExternalMsg::LogWarning(
                         "Key map not found. Let's calm down, escape, and try again.".into(),
                     ),
-                    ExternalMsg::Refresh,
                 ]
             });
 
@@ -1808,10 +1803,8 @@ impl App {
                     self.history = history.push(n.absolute_path().clone())
                 }
             }
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_last(mut self) -> Result<Self> {
@@ -1826,19 +1819,15 @@ impl App {
             if let Some(n) = dir.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
             }
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_previous(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = dir.focus.max(1) - 1;
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
@@ -1852,10 +1841,8 @@ impl App {
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
             }
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_previous_by_relative_index_from_input(self) -> Result<Self> {
@@ -1869,10 +1856,8 @@ impl App {
     fn focus_next(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = (dir.focus + 1).min(dir.total.max(1) - 1);
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
@@ -1886,10 +1871,8 @@ impl App {
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
             }
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_next_by_relative_index_from_input(self) -> Result<Self> {
@@ -1966,7 +1949,7 @@ impl App {
                     .map(|s| self.clone().change_directory(s, false))
                     .unwrap_or(Ok(self))
             } else {
-                self.clone().focus_path(target, false)?.refresh()
+                self.clone().focus_path(target, false)
             }
         } else {
             Ok(self)
@@ -1980,7 +1963,7 @@ impl App {
             self.input_buffer = Some(input.to_owned());
         };
         self.logs_hidden = true;
-        self.refresh()
+        Ok(self)
     }
 
     fn buffer_input_from_key(self, key: Option<Key>) -> Result<Self> {
@@ -1994,7 +1977,7 @@ impl App {
     fn set_input_buffer(mut self, string: String) -> Result<Self> {
         self.input_buffer = Some(string);
         self.logs_hidden = true;
-        self.refresh()
+        Ok(self)
     }
 
     fn remove_input_buffer_last_character(mut self) -> Result<Self> {
@@ -2002,10 +1985,8 @@ impl App {
             buf.pop();
             self.input_buffer = Some(buf);
             self.logs_hidden = true;
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn remove_input_buffer_last_word(mut self) -> Result<Self> {
@@ -2023,15 +2004,13 @@ impl App {
 
             self.input_buffer = Some(buf);
             self.logs_hidden = true;
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn reset_input_buffer(mut self) -> Result<Self> {
         self.input_buffer = None;
-        self.refresh()
+        Ok(self)
     }
 
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
@@ -2041,10 +2020,8 @@ impl App {
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path().clone());
             }
-            self.refresh()
-        } else {
-            Ok(self)
-        }
+        };
+        Ok(self)
     }
 
     fn focus_by_index_from_input(self) -> Result<Self> {
@@ -2077,7 +2054,7 @@ impl App {
                         self.history = history.push(n.absolute_path().clone());
                     }
                 }
-                self.refresh()
+                Ok(self)
             } else {
                 self.log_error(format!("{} not found in $PWD", name))
             }
@@ -2171,7 +2148,7 @@ impl App {
     fn switch_layout(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config().layouts().get(layout) {
             self.layout = l.to_owned();
-            self.refresh()
+            Ok(self)
         } else {
             self.log_error(format!("Layout not found: {}", layout))
         }
@@ -2180,7 +2157,7 @@ impl App {
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config().layouts().get_builtin(layout) {
             self.layout = l.to_owned();
-            self.refresh()
+            Ok(self)
         } else {
             self.log_error(format!("Builtin layout not found: {}", layout))
         }
@@ -2189,7 +2166,7 @@ impl App {
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config().layouts().get_custom(layout) {
             self.layout = l.to_owned();
-            self.refresh()
+            Ok(self)
         } else {
             self.log_error(format!("Custom layout not found: {}", layout))
         }
@@ -2235,13 +2212,13 @@ impl App {
 
     pub fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
         self.directory_buffers.insert(parent, dir);
-        self.refresh()
+        Ok(self)
     }
 
     fn select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection.insert(n);
-            self.refresh()
+            Ok(self)
         } else {
             Ok(self)
         }
@@ -2253,7 +2230,7 @@ impl App {
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
             self.selection.insert(Node::new(p, n));
-            self.refresh()
+            Ok(self)
         } else {
             Ok(self)
         }
@@ -2264,7 +2241,6 @@ impl App {
             d.nodes.clone().into_iter().for_each(|n| {
                 self.selection.insert(n);
             });
-            self.msg_out.push_back(MsgOut::Refresh);
         };
 
         Ok(self)
@@ -2273,14 +2249,12 @@ impl App {
     fn un_select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection.retain(|s| s != &n);
-            self.msg_out.push_back(MsgOut::Refresh);
         }
         Ok(self)
     }
 
     fn un_select_path(mut self, path: String) -> Result<Self> {
         self.selection.retain(|n| n.absolute_path != path);
-        self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
@@ -2289,7 +2263,6 @@ impl App {
             d.nodes.clone().into_iter().for_each(|n| {
                 self.selection.retain(|s| s != &n);
             });
-            self.msg_out.push_back(MsgOut::Refresh);
         };
 
         Ok(self)
@@ -2328,7 +2301,6 @@ impl App {
 
     fn clear_selection(mut self) -> Result<Self> {
         self.selection.clear();
-        self.msg_out.push_back(MsgOut::Refresh);
         Ok(self)
     }
 
