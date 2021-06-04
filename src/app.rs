@@ -1776,6 +1776,7 @@ impl App {
             self.explorer_config().clone(),
             self.pwd().into(),
             self.focused_node().map(|n| n.absolute_path().into()),
+            self.directory_buffer().map(|d| d.focus()).unwrap_or(0),
         )?;
         self.add_directory(dir.parent().clone(), dir)
     }

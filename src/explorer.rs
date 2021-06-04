@@ -9,6 +9,7 @@ pub(crate) fn explore_sync(
     config: ExplorerConfig,
     parent: PathBuf,
     focused_path: Option<PathBuf>,
+    fallback_focus: usize,
 ) -> Result<DirectoryBuffer> {
     let dirs = fs::read_dir(&parent)?;
     let mut nodes = dirs
@@ -33,9 +34,9 @@ pub(crate) fn explore_sync(
             .enumerate()
             .find(|(_, n)| n.relative_path() == &focus_str)
             .map(|(i, _)| i)
-            .unwrap_or(0)
+            .unwrap_or_else(|| fallback_focus.min(nodes.len().max(1) - 1))
     } else {
-        0
+        fallback_focus.min(nodes.len().max(1) - 1)
     };
 
     Ok(DirectoryBuffer::new(
@@ -49,10 +50,11 @@ pub(crate) fn explore_async(
     config: ExplorerConfig,
     parent: PathBuf,
     focused_path: Option<PathBuf>,
+    fallback_focus: usize,
     tx_msg_in: Sender<Task>,
 ) {
     thread::spawn(move || {
-        explore_sync(config, parent.clone(), focused_path)
+        explore_sync(config, parent.clone(), focused_path, fallback_focus)
             .map(|buf| {
                 tx_msg_in
                     .send(Task::new(
@@ -79,12 +81,14 @@ pub(crate) fn explore_recursive_async(
     config: ExplorerConfig,
     parent: PathBuf,
     focused_path: Option<PathBuf>,
+    fallback_focus: usize,
     tx_msg_in: Sender<Task>,
 ) {
     explore_async(
         config.clone(),
         parent.clone(),
         focused_path,
+        fallback_focus,
         tx_msg_in.clone(),
     );
     if let Some(grand_parent) = parent.parent() {
@@ -92,6 +96,7 @@ pub(crate) fn explore_recursive_async(
             config,
             grand_parent.into(),
             parent.file_name().map(|p| p.into()),
+            0,
             tx_msg_in,
         );
     }
