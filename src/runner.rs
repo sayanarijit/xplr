@@ -112,6 +112,7 @@ pub(crate) fn run(
         app.explorer_config().clone(),
         app.pwd().into(),
         focused_path,
+        app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
         tx_msg_in.clone(),
     );
     tx_pwd_watcher.send(app.pwd().clone())?;
@@ -182,6 +183,7 @@ pub(crate) fn run(
                                 app.explorer_config().clone(),
                                 app.pwd().into(),
                                 app.focused_node().map(|n| n.relative_path().into()),
+                                app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
                                 tx_msg_in.clone(),
                             );
                             tx_pwd_watcher.send(app.pwd().clone())?;
@@ -192,6 +194,7 @@ pub(crate) fn run(
                                 app.explorer_config().clone(),
                                 app.pwd().into(),
                                 app.focused_node().map(|n| n.relative_path().into()),
+                                app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
                                 tx_msg_in.clone(),
                             );
                             tx_pwd_watcher.send(app.pwd().clone())?;
