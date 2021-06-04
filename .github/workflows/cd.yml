@@ -52,7 +52,7 @@ jobs:
         with:
           command: build
           toolchain: ${{ matrix.rust }}
-          args: --release --target ${{ matrix.target }}
+          args: --locked --release --target ${{ matrix.target }}
 
       - name: Packaging final binary
         shell: bash
