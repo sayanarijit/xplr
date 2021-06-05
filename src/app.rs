@@ -1272,6 +1272,17 @@ pub enum ExternalMsg {
     /// Toggle mouse
     ToggleMouse,
 
+    /// Start piping the focused path to the given fifo path
+    ///
+    /// **Example:** `StartFifo: /tmp/xplr.fifo`
+    StartFifo(String),
+
+    /// Close the active fifo and stop piping.
+    StopFifo,
+
+    /// Toggle betwen {Start|Stop}Fifo
+    ToggleFifo(String),
+
     /// Log information message.
     ///
     /// **Example:** `LogInfo: launching satellite`
@@ -1363,6 +1374,9 @@ pub enum MsgOut {
     EnableMouse,
     DisableMouse,
     ToggleMouse,
+    StartFifo(String),
+    StopFifo,
+    ToggleFifo(String),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1720,6 +1734,9 @@ impl App {
                 ExternalMsg::EnableMouse => self.enable_mouse(),
                 ExternalMsg::DisableMouse => self.disable_mouse(),
                 ExternalMsg::ToggleMouse => self.toggle_mouse(),
+                ExternalMsg::StartFifo(f) => self.start_fifo(f),
+                ExternalMsg::StopFifo => self.stop_fifo(),
+                ExternalMsg::ToggleFifo(f) => self.toggle_fifo(f),
                 ExternalMsg::LogInfo(l) => self.log_info(l),
                 ExternalMsg::LogSuccess(l) => self.log_success(l),
                 ExternalMsg::LogWarning(l) => self.log_warning(l),
@@ -2447,6 +2464,21 @@ impl App {
 
     fn toggle_mouse(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::ToggleMouse);
+        Ok(self)
+    }
+
+    fn start_fifo(mut self, path: String) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::StartFifo(path));
+        Ok(self)
+    }
+
+    fn stop_fifo(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::StopFifo);
+        Ok(self)
+    }
+
+    fn toggle_fifo(mut self, path: String) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ToggleFifo(path));
         Ok(self)
     }
 

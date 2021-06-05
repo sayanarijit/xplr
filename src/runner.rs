@@ -15,6 +15,7 @@ use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
 use std::fs;
 use std::io;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
 use std::sync::mpsc;
@@ -153,6 +154,9 @@ impl Runner {
         // let mut stdout = stdout.lock();
         execute!(stdout, term::EnterAlternateScreen)?;
 
+        let mut fifo: Option<fs::File> = None;
+        let mut last_focus: Option<app::Node> = None;
+
         let mut mouse_enabled = app.config().general().enable_mouse();
         if mouse_enabled {
             if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
@@ -238,6 +242,14 @@ impl Runner {
                                 tx_pwd_watcher.send(app.pwd().clone())?;
                                 // UI
                                 terminal.draw(|f| ui::draw(f, &app, &lua))?;
+                                // Fifo
+                                let focus = app.focused_node();
+                                if focus != last_focus.as_ref() {
+                                    if let Some(ref mut file) = fifo {
+                                        writeln!(file, "{}", app.focused_node_str())?;
+                                    };
+                                    last_focus = focus.cloned();
+                                }
                             }
 
                             app::MsgOut::EnableMouse => {
@@ -275,6 +287,41 @@ impl Runner {
                                         Ok(_) => {
                                             mouse_enabled = false;
                                         }
+                                        Err(e) => {
+                                            app = app.log_error(e.to_string())?;
+                                        }
+                                    }
+                                }
+                            }
+
+                            app::MsgOut::StartFifo(path) => {
+                                if let Some(file) = fifo {
+                                    fifo = None;
+                                    std::mem::drop(file);
+                                }
+
+                                match fs::OpenOptions::new().write(true).open(path) {
+                                    Ok(file) => fifo = Some(file),
+                                    Err(e) => {
+                                        app = app.log_error(e.to_string())?;
+                                    }
+                                }
+                            }
+
+                            app::MsgOut::StopFifo => {
+                                if let Some(file) = fifo {
+                                    fifo = None;
+                                    std::mem::drop(file);
+                                }
+                            }
+
+                            app::MsgOut::ToggleFifo(path) => {
+                                if let Some(file) = fifo {
+                                    fifo = None;
+                                    std::mem::drop(file);
+                                } else {
+                                    match fs::OpenOptions::new().write(true).open(path) {
+                                        Ok(file) => fifo = Some(file),
                                         Err(e) => {
                                             app = app.log_error(e.to_string())?;
                                         }
