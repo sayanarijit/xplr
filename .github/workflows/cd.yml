@@ -87,7 +87,7 @@ jobs:
 
       - name: Signing archive with GPG
         run: |
-          VERSION=${GITHUB_REF##*/}
+          VERSION=${GITHUB_REF##*v}
           git archive -o xplr-${VERSION:?}.tar.gz --format tar.gz --prefix "xplr-${VERSION:?}/" "v${VERSION}"
           cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "xplr-${VERSION:?}.tar.gz"
 
@@ -95,7 +95,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            xplr-${GITHUB_REF##*/}.tar.gz.asc
+            xplr-${GITHUB_REF##*v}.tar.gz.asc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
