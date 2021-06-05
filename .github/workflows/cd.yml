@@ -90,7 +90,7 @@ jobs:
           VERSION=${GITHUB_REF##*v}
           git archive -o xplr-${VERSION:?}.tar.gz --format tar.gz --prefix "xplr-${VERSION:?}/" "v${VERSION}"
           cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "xplr-${VERSION:?}.tar.gz"
-          mv "xplr-${VERSION:?}.tar.gz.ssc" "source.tar.gz.asc"
+          mv "xplr-${VERSION:?}.tar.gz.asc" "source.tar.gz.asc"
 
       - name: Releasing GPG signature
         uses: softprops/action-gh-release@v1

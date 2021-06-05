@@ -136,10 +136,11 @@ mod test {
         assert!(check_version("0.13.2", "foo path").is_ok());
         assert!(check_version("0.13.3", "foo path").is_ok());
         assert!(check_version("0.13.4", "foo path").is_ok());
+        assert!(check_version("0.13.5", "foo path").is_ok());
 
-        assert!(check_version("0.13.5", "foo path").is_err());
-        assert!(check_version("0.14.4", "foo path").is_err());
-        assert!(check_version("0.11.4", "foo path").is_err());
-        assert!(check_version("1.13.4", "foo path").is_err());
+        assert!(check_version("0.13.6", "foo path").is_err());
+        assert!(check_version("0.14.5", "foo path").is_err());
+        assert!(check_version("0.11.5", "foo path").is_err());
+        assert!(check_version("1.13.5", "foo path").is_err());
     }
 }
