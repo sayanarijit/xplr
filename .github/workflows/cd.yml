@@ -47,7 +47,7 @@ jobs:
         with:
           command: build
           toolchain: ${{ matrix.rust }}
-          args: --locked --release --target ${{ matrix.target }}
+          args: --release --target ${{ matrix.target }}
 
       - name: Install gpg secret key
         run: |
