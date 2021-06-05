@@ -2803,8 +2803,17 @@ impl App {
 }
 
 /// Run xplr TUI
-pub fn run(pwd: PathBuf, focused_path: Option<PathBuf>) -> Result<Option<String>> {
+pub fn run(
+    pwd: PathBuf,
+    focused_path: Option<PathBuf>,
+    on_load: Option<Vec<ExternalMsg>>,
+) -> Result<Option<String>> {
     let lua = mlua::Lua::new();
-    let app = App::create(pwd, &lua)?;
+    let mut app = App::create(pwd, &lua)?;
+    if let Some(msgs) = on_load {
+        for msg in msgs {
+            app = app.enqueue(Task::new(MsgIn::External(msg), None));
+        }
+    }
     app.run(focused_path, &lua)
 }

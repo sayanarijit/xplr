@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.13.6"  # Update lua.rs
+version = "0.13.7"  # Update lua.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "A hackable, minimal, fast TUI file explorer"
@@ -13,6 +13,9 @@ keywords = ["terminal", "file", "explorer", "manager", "tui"]
 categories = ["command-line-interface", "command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "xplr"
 
 [dependencies]
 tui = { version = "0.15.0", default-features = false, features = ['crossterm', 'serde'] }
@@ -34,6 +37,7 @@ libc = "0.2.95"
 
 [dev-dependencies]
 criterion = "0.3"
+assert_cmd = "1.0"
 
 [[bench]]
 name = "criterion"

@@ -1,6 +1,6 @@
 fn main() {
     let pwd = std::path::PathBuf::from("/");
-    match xplr::run(pwd, None) {
+    match xplr::run(pwd, None, None) {
         Ok(Some(out)) => print!("{}", out),
         Ok(None) => {}
         Err(err) => {
