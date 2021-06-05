@@ -16,7 +16,7 @@ A hackable, minimal, fast TUI file explorer
 <img src="https://img.shields.io/github/commit-activity/m/sayanarijit/xplr" />
 </a>
 
-<a href="https://discord.gg/p8UPpgAx" target="_blank">
+<a href="https://discord.gg/JmasSPCcz3" target="_blank">
 <img src="https://img.shields.io/discord/834369918312382485?logo=discord&style=social" />
 </a>
 
