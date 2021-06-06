@@ -90,6 +90,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
 pub struct Runner {
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
+    config: Option<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
 }
 
@@ -106,6 +107,7 @@ impl Runner {
         Ok(Self {
             pwd,
             focused_path,
+            config: None,
             on_load: Default::default(),
         })
     }
@@ -115,9 +117,14 @@ impl Runner {
         self
     }
 
+    pub fn with_config(mut self, config: Option<PathBuf>) -> Self {
+        self.config = config;
+        self
+    }
+
     pub fn run(self) -> Result<Option<String>> {
         let lua = mlua::Lua::new();
-        let mut app = app::App::create(self.pwd, &lua)?;
+        let mut app = app::App::create(self.pwd, &lua, self.config)?;
 
         fs::create_dir_all(app.session_path())?;
 
