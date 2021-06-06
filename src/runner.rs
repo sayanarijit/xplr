@@ -92,6 +92,7 @@ pub struct Runner {
     focused_path: Option<PathBuf>,
     config: Option<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
+    read_only: bool,
 }
 
 impl Runner {
@@ -109,6 +110,7 @@ impl Runner {
             focused_path,
             config: None,
             on_load: Default::default(),
+            read_only: Default::default(),
         })
     }
 
@@ -122,9 +124,15 @@ impl Runner {
         self
     }
 
+    pub fn with_read_only(mut self, read_only: bool) -> Self {
+        self.read_only = read_only;
+        self
+    }
+
     pub fn run(self) -> Result<Option<String>> {
         let lua = mlua::Lua::new();
         let mut app = app::App::create(self.pwd, &lua, self.config)?;
+        app.config.general.set_read_only(self.read_only);
 
         fs::create_dir_all(app.session_path())?;
 
