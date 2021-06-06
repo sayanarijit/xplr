@@ -446,6 +446,9 @@ pub struct GeneralConfig {
     pub read_only: bool,
 
     #[serde(default)]
+    pub disable_recover_mode: bool,
+
+    #[serde(default)]
     pub cursor: UiElement,
 
     #[serde(default)]
@@ -556,6 +559,11 @@ impl GeneralConfig {
     /// Get a reference to the general config's enable mouse.
     pub fn enable_mouse(&self) -> bool {
         self.enable_mouse
+    }
+
+    /// Get a reference to the general config's disable recover mode.
+    pub fn disable_recover_mode(&self) -> bool {
+        self.disable_recover_mode
     }
 }
 
