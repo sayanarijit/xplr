@@ -1521,17 +1521,19 @@ pub struct App {
 }
 
 impl App {
-    pub fn create(pwd: PathBuf, lua: &mlua::Lua) -> Result<Self> {
+    pub fn create(pwd: PathBuf, lua: &mlua::Lua, config_file: Option<PathBuf>) -> Result<Self> {
         let config = lua::init(lua)?;
 
-        let config_dir = dirs::config_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("xplr");
+        let config_file = if let Some(path) = config_file {
+            path
+        } else if let Some(dir) = dirs::home_dir() {
+            dir.join(".config").join("xplr").join("init.lua")
+        } else {
+            PathBuf::from("/").join("etc").join("xplr").join("init.lua")
+        };
 
-        let lua_script_file = config_dir.join("init.lua");
-
-        let (config, load_err) = if lua_script_file.exists() {
-            match lua::extend(lua, &lua_script_file.to_string_lossy().to_string()) {
+        let (config, load_err) = if config_file.exists() {
+            match lua::extend(lua, &config_file.to_string_lossy().to_string()) {
                 Ok(c) => (c, None),
                 Err(e) => (config, Some(e.to_string())),
             }

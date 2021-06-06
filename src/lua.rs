@@ -131,18 +131,24 @@ mod test {
     #[test]
     fn test_compatibility() {
         assert!(check_version(VERSION, "foo path").is_ok());
-        assert!(check_version("0.13.0", "foo path").is_ok());
-        assert!(check_version("0.13.1", "foo path").is_ok());
-        assert!(check_version("0.13.2", "foo path").is_ok());
-        assert!(check_version("0.13.3", "foo path").is_ok());
-        assert!(check_version("0.13.4", "foo path").is_ok());
-        assert!(check_version("0.13.5", "foo path").is_ok());
-        assert!(check_version("0.13.6", "foo path").is_ok());
-        assert!(check_version("0.13.7", "foo path").is_ok());
 
-        assert!(check_version("0.13.8", "foo path").is_err());
-        assert!(check_version("0.14.7", "foo path").is_err());
-        assert!(check_version("0.11.7", "foo path").is_err());
-        assert!(check_version("1.13.7", "foo path").is_err());
+        // Current release if OK
+        assert!(check_version("0.14.0", "foo path").is_ok());
+
+        // Prev major release is ERR
+
+        // Prev minor release is ERR (Change when we get to v1)
+        assert!(check_version("0.13.0", "foo path").is_err());
+
+        // Prev bugfix release is OK
+
+        // Next major release is ERR
+        assert!(check_version("1.14.0", "foo path").is_err());
+
+        // Next minor release is ERR
+        assert!(check_version("0.15.0", "foo path").is_err());
+
+        // Next bugfix release is ERR (Change when we get to v1)
+        assert!(check_version("0.14.1", "foo path").is_err());
     }
 }

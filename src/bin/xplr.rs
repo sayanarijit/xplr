@@ -11,7 +11,8 @@ use xplr::app;
 struct Cli {
     version: bool,
     help: bool,
-    path: Option<String>,
+    path: Option<PathBuf>,
+    config: Option<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
 }
 
@@ -41,12 +42,14 @@ impl Cli {
 
                 "--" => {
                     if cli.path.is_none() {
-                        cli.path = args.pop_front();
+                        cli.path = args.pop_front().map(PathBuf::from);
                     }
                     return Ok(cli);
                 }
 
                 // Options
+                "-c" | "--config" => cli.config = args.pop_front().map(PathBuf::from),
+
                 "--on-load" => {
                     while let Some(msg) = args.pop_front() {
                         if msg.starts_with('-') {
@@ -81,13 +84,15 @@ fn main() {
     xplr [FLAG]... [OPTION]... [PATH]"###;
 
         let flags = r###"
-    -                Read PATH from stdin
+    -                Read path from stdin
     --               End of flags and options
     -h, --help       Prints help information
     -V, --version    Prints version information"###;
 
         let options = r###"
-        --on-load <MESSAGE>...    Send messages when xplr loads"###;
+    -c, --config <PATH>           Specifies a custom config file (default is
+                                    "$HOME/.config/xplr/init.lua")
+        --on-load <MESSAGE>...    Sends messages when xplr loads"###;
 
         let args = r###"
     <PATH>    Path to focus on, or enter if directory"###;
@@ -108,8 +113,9 @@ fn main() {
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else {
-        match app::runner(cli.path.as_ref().map(PathBuf::from))
-            .map(|a| a.with_on_load(cli.on_load))
+        match app::runner(cli.path.clone())
+            .map(|a| a.with_on_load(cli.on_load.clone()))
+            .map(|a| a.with_config(cli.config))
             .and_then(|a| a.run())
         {
             Ok(Some(out)) => print!("{}", out),
