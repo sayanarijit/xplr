@@ -86,341 +86,387 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .status()
 }
 
-pub(crate) fn run(
-    mut app: app::App,
+pub struct Runner {
+    pwd: PathBuf,
     focused_path: Option<PathBuf>,
-    lua: &mlua::Lua,
-) -> Result<Option<String>> {
-    fs::create_dir_all(app.session_path())?;
+    on_load: Vec<app::ExternalMsg>,
+}
 
-    let (tx_msg_in, rx_msg_in) = mpsc::channel();
-    let (tx_event_reader, rx_event_reader) = mpsc::channel();
-    let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
+impl Runner {
+    pub(crate) fn new(path: Option<PathBuf>) -> Result<Self> {
+        let mut pwd = path.unwrap_or_else(|| ".".into()).canonicalize()?;
+        let mut focused_path = None;
 
-    app = app.explore_pwd()?;
-
-    app = if let Some(f) = focused_path
-        .clone()
-        .map(|f| f.to_string_lossy().to_string())
-    {
-        app.focus_by_file_name(&f, true)?
-    } else {
-        app.focus_first(true)?
-    };
-
-    explorer::explore_recursive_async(
-        app.explorer_config().clone(),
-        app.pwd().into(),
-        focused_path,
-        app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
-        tx_msg_in.clone(),
-    );
-    tx_pwd_watcher.send(app.pwd().clone())?;
-
-    let mut result = Ok(None);
-    let session_path = app.session_path().to_owned();
-
-    term::enable_raw_mode()?;
-    let mut stdout = get_tty()?;
-    // let mut stdout = stdout.lock();
-    execute!(stdout, term::EnterAlternateScreen)?;
-
-    let mut mouse_enabled = app.config().general().enable_mouse();
-    if mouse_enabled {
-        if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
-            app = app.log_error(e.to_string())?;
+        if pwd.is_file() {
+            focused_path = pwd.file_name().map(|p| p.into());
+            pwd = pwd.parent().map(|p| p.into()).unwrap_or_else(|| ".".into());
         }
+
+        Ok(Self {
+            pwd,
+            focused_path,
+            on_load: Default::default(),
+        })
     }
 
-    let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
-    terminal.hide_cursor()?;
+    pub fn with_on_load(mut self, on_load: Vec<app::ExternalMsg>) -> Self {
+        self.on_load = on_load;
+        self
+    }
 
-    // Threads
-    auto_refresher::start_auto_refreshing(tx_msg_in.clone());
-    event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
-    pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
-    // pipe_reader::keep_reading(app.pipe().msg_in().clone(), tx_msg_in.clone());
+    pub fn run(self) -> Result<Option<String>> {
+        let lua = mlua::Lua::new();
+        let mut app = app::App::create(self.pwd, &lua)?;
 
-    'outer: for task in rx_msg_in {
-        match app.handle_task(task) {
-            Ok(a) => {
-                app = a;
-                while let Some(msg) = app.pop_msg_out() {
-                    match msg {
-                        // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
-                        // Try handling them immediately.
-                        app::MsgOut::Enque(task) => {
-                            tx_msg_in.send(task)?;
-                        }
+        fs::create_dir_all(app.session_path())?;
 
-                        app::MsgOut::Quit => {
-                            result = Ok(None);
-                            break 'outer;
-                        }
+        let (tx_msg_in, rx_msg_in) = mpsc::channel();
+        let (tx_event_reader, rx_event_reader) = mpsc::channel();
+        let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
-                        app::MsgOut::PrintResultAndQuit => {
-                            result = Ok(Some(app.result_str()));
-                            break 'outer;
-                        }
+        app = app.explore_pwd()?;
 
-                        app::MsgOut::PrintAppStateAndQuit => {
-                            let out = serde_yaml::to_string(&app)?;
-                            result = Ok(Some(out));
-                            break 'outer;
-                        }
+        app = if let Some(f) = self
+            .focused_path
+            .clone()
+            .map(|f| f.to_string_lossy().to_string())
+        {
+            app.focus_by_file_name(&f, true)?
+        } else {
+            app.focus_first(true)?
+        };
 
-                        app::MsgOut::Debug(path) => {
-                            fs::write(&path, serde_yaml::to_string(&app)?)?;
-                        }
+        explorer::explore_recursive_async(
+            app.explorer_config().clone(),
+            app.pwd().into(),
+            self.focused_path,
+            app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+            tx_msg_in.clone(),
+        );
+        tx_pwd_watcher.send(app.pwd().clone())?;
 
-                        app::MsgOut::ClearScreen => {
-                            terminal.clear()?;
-                        }
+        let mut result = Ok(None);
+        let session_path = app.session_path().to_owned();
 
-                        app::MsgOut::ExplorePwdAsync => {
-                            explorer::explore_async(
-                                app.explorer_config().clone(),
-                                app.pwd().into(),
-                                app.focused_node().map(|n| n.relative_path().into()),
-                                app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
-                                tx_msg_in.clone(),
-                            );
-                            tx_pwd_watcher.send(app.pwd().clone())?;
-                        }
+        term::enable_raw_mode()?;
+        let mut stdout = get_tty()?;
+        // let mut stdout = stdout.lock();
+        execute!(stdout, term::EnterAlternateScreen)?;
 
-                        app::MsgOut::ExploreParentsAsync => {
-                            explorer::explore_recursive_async(
-                                app.explorer_config().clone(),
-                                app.pwd().into(),
-                                app.focused_node().map(|n| n.relative_path().into()),
-                                app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
-                                tx_msg_in.clone(),
-                            );
-                            tx_pwd_watcher.send(app.pwd().clone())?;
-                        }
+        let mut mouse_enabled = app.config().general().enable_mouse();
+        if mouse_enabled {
+            if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
+                app = app.log_error(e.to_string())?;
+            }
+        }
 
-                        app::MsgOut::Refresh => {
-                            // $PWD watcher
-                            tx_pwd_watcher.send(app.pwd().clone())?;
-                            // UI
-                            terminal.draw(|f| ui::draw(f, &app, &lua))?;
-                        }
+        let backend = CrosstermBackend::new(stdout);
+        let mut terminal = Terminal::new(backend)?;
+        terminal.hide_cursor()?;
 
-                        app::MsgOut::EnableMouse => {
-                            if !mouse_enabled {
-                                match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
-                                    Ok(_) => {
-                                        mouse_enabled = true;
-                                    }
-                                    Err(e) => {
-                                        app = app.log_error(e.to_string())?;
+        // Threads
+        auto_refresher::start_auto_refreshing(tx_msg_in.clone());
+        event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
+        pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
+        // pipe_reader::keep_reading(app.pipe().msg_in().clone(), tx_msg_in.clone());
+
+        // Enqueue on_load messages
+        for msg in self.on_load {
+            tx_msg_in.send(app::Task::new(app::MsgIn::External(msg), None))?;
+        }
+
+        'outer: for task in rx_msg_in {
+            match app.handle_task(task) {
+                Ok(a) => {
+                    app = a;
+                    while let Some(msg) = app.pop_msg_out() {
+                        match msg {
+                            // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
+                            // Try handling them immediately.
+                            app::MsgOut::Enque(task) => {
+                                tx_msg_in.send(task)?;
+                            }
+
+                            app::MsgOut::Quit => {
+                                result = Ok(None);
+                                break 'outer;
+                            }
+
+                            app::MsgOut::PrintResultAndQuit => {
+                                result = Ok(Some(app.result_str()));
+                                break 'outer;
+                            }
+
+                            app::MsgOut::PrintAppStateAndQuit => {
+                                let out = serde_yaml::to_string(&app)?;
+                                result = Ok(Some(out));
+                                break 'outer;
+                            }
+
+                            app::MsgOut::Debug(path) => {
+                                fs::write(&path, serde_yaml::to_string(&app)?)?;
+                            }
+
+                            app::MsgOut::ClearScreen => {
+                                terminal.clear()?;
+                            }
+
+                            app::MsgOut::ExplorePwdAsync => {
+                                explorer::explore_async(
+                                    app.explorer_config().clone(),
+                                    app.pwd().into(),
+                                    app.focused_node().map(|n| n.relative_path().into()),
+                                    app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+                                    tx_msg_in.clone(),
+                                );
+                                tx_pwd_watcher.send(app.pwd().clone())?;
+                            }
+
+                            app::MsgOut::ExploreParentsAsync => {
+                                explorer::explore_recursive_async(
+                                    app.explorer_config().clone(),
+                                    app.pwd().into(),
+                                    app.focused_node().map(|n| n.relative_path().into()),
+                                    app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+                                    tx_msg_in.clone(),
+                                );
+                                tx_pwd_watcher.send(app.pwd().clone())?;
+                            }
+
+                            app::MsgOut::Refresh => {
+                                // $PWD watcher
+                                tx_pwd_watcher.send(app.pwd().clone())?;
+                                // UI
+                                terminal.draw(|f| ui::draw(f, &app, &lua))?;
+                            }
+
+                            app::MsgOut::EnableMouse => {
+                                if !mouse_enabled {
+                                    match execute!(
+                                        terminal.backend_mut(),
+                                        event::EnableMouseCapture
+                                    ) {
+                                        Ok(_) => {
+                                            mouse_enabled = true;
+                                        }
+                                        Err(e) => {
+                                            app = app.log_error(e.to_string())?;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        app::MsgOut::ToggleMouse => {
-                            let msg = if mouse_enabled {
-                                app::ExternalMsg::DisableMouse
-                            } else {
-                                app::ExternalMsg::EnableMouse
-                            };
-                            app =
-                                app.handle_task(app::Task::new(app::MsgIn::External(msg), None))?;
-                        }
+                            app::MsgOut::ToggleMouse => {
+                                let msg = if mouse_enabled {
+                                    app::ExternalMsg::DisableMouse
+                                } else {
+                                    app::ExternalMsg::EnableMouse
+                                };
+                                app = app
+                                    .handle_task(app::Task::new(app::MsgIn::External(msg), None))?;
+                            }
 
-                        app::MsgOut::DisableMouse => {
-                            if mouse_enabled {
-                                match execute!(terminal.backend_mut(), event::DisableMouseCapture) {
-                                    Ok(_) => {
-                                        mouse_enabled = false;
-                                    }
-                                    Err(e) => {
-                                        app = app.log_error(e.to_string())?;
+                            app::MsgOut::DisableMouse => {
+                                if mouse_enabled {
+                                    match execute!(
+                                        terminal.backend_mut(),
+                                        event::DisableMouseCapture
+                                    ) {
+                                        Ok(_) => {
+                                            mouse_enabled = false;
+                                        }
+                                        Err(e) => {
+                                            app = app.log_error(e.to_string())?;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        app::MsgOut::CallLuaSilently(func) => {
-                            tx_event_reader.send(true)?;
+                            app::MsgOut::CallLuaSilently(func) => {
+                                tx_event_reader.send(true)?;
 
-                            match call_lua(&app, &lua, &func, false) {
-                                Ok(Some(msgs)) => {
-                                    for msg in msgs {
-                                        app = app.handle_task(app::Task::new(
-                                            app::MsgIn::External(msg),
-                                            None,
-                                        ))?;
+                                match call_lua(&app, &lua, &func, false) {
+                                    Ok(Some(msgs)) => {
+                                        for msg in msgs {
+                                            app = app.handle_task(app::Task::new(
+                                                app::MsgIn::External(msg),
+                                                None,
+                                            ))?;
+                                        }
                                     }
-                                }
-                                Ok(None) => {}
-                                Err(err) => {
-                                    app = app.log_error(err.to_string())?;
-                                }
-                            };
-
-                            tx_event_reader.send(false)?;
-                        }
-
-                        app::MsgOut::CallSilently(cmd) => {
-                            tx_event_reader.send(true)?;
-
-                            app.write_pipes()?;
-                            let status = call(&app, cmd, true)
-                                .map(|s| {
-                                    if s.success() {
-                                        Ok(())
-                                    } else {
-                                        Err(format!("process exited with code {}", &s))
+                                    Ok(None) => {}
+                                    Err(err) => {
+                                        app = app.log_error(err.to_string())?;
                                     }
-                                })
-                                .unwrap_or_else(|e| Err(e.to_string()));
+                                };
 
-                            match pipe_reader::read_all(app.pipe().msg_in()) {
-                                Ok(msgs) => {
-                                    for msg in msgs {
-                                        app = app.handle_task(app::Task::new(
-                                            app::MsgIn::External(msg),
-                                            None,
-                                        ))?;
+                                tx_event_reader.send(false)?;
+                            }
+
+                            app::MsgOut::CallSilently(cmd) => {
+                                tx_event_reader.send(true)?;
+
+                                app.write_pipes()?;
+                                let status = call(&app, cmd, true)
+                                    .map(|s| {
+                                        if s.success() {
+                                            Ok(())
+                                        } else {
+                                            Err(format!("process exited with code {}", &s))
+                                        }
+                                    })
+                                    .unwrap_or_else(|e| Err(e.to_string()));
+
+                                match pipe_reader::read_all(app.pipe().msg_in()) {
+                                    Ok(msgs) => {
+                                        for msg in msgs {
+                                            app = app.handle_task(app::Task::new(
+                                                app::MsgIn::External(msg),
+                                                None,
+                                            ))?;
+                                        }
                                     }
-                                }
-                                Err(err) => {
-                                    app = app.log_error(err.to_string())?;
-                                }
-                            };
-
-                            app.cleanup_pipes()?;
-
-                            if let Err(e) = status {
-                                app = app.log_error(e.to_string())?;
-                            };
-
-                            tx_event_reader.send(false)?;
-                        }
-
-                        app::MsgOut::CallLua(func) => {
-                            execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                                .unwrap_or_default();
-
-                            tx_event_reader.send(true)?;
-
-                            terminal.clear()?;
-                            terminal.set_cursor(0, 0)?;
-                            term::disable_raw_mode()?;
-                            terminal.show_cursor()?;
-
-                            match call_lua(&app, &lua, &func, false) {
-                                Ok(Some(msgs)) => {
-                                    for msg in msgs {
-                                        app = app.handle_task(app::Task::new(
-                                            app::MsgIn::External(msg),
-                                            None,
-                                        ))?;
+                                    Err(err) => {
+                                        app = app.log_error(err.to_string())?;
                                     }
-                                }
-                                Ok(None) => {}
-                                Err(err) => {
-                                    app = app.log_error(err.to_string())?;
-                                }
-                            };
+                                };
 
-                            terminal.clear()?;
-                            term::enable_raw_mode()?;
-                            terminal.hide_cursor()?;
-                            tx_event_reader.send(false)?;
+                                app.cleanup_pipes()?;
 
-                            if mouse_enabled {
-                                match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
-                                    Ok(_) => {
-                                        mouse_enabled = true;
+                                if let Err(e) = status {
+                                    app = app.log_error(e.to_string())?;
+                                };
+
+                                tx_event_reader.send(false)?;
+                            }
+
+                            app::MsgOut::CallLua(func) => {
+                                execute!(terminal.backend_mut(), event::DisableMouseCapture)
+                                    .unwrap_or_default();
+
+                                tx_event_reader.send(true)?;
+
+                                terminal.clear()?;
+                                terminal.set_cursor(0, 0)?;
+                                term::disable_raw_mode()?;
+                                terminal.show_cursor()?;
+
+                                match call_lua(&app, &lua, &func, false) {
+                                    Ok(Some(msgs)) => {
+                                        for msg in msgs {
+                                            app = app.handle_task(app::Task::new(
+                                                app::MsgIn::External(msg),
+                                                None,
+                                            ))?;
+                                        }
                                     }
-                                    Err(e) => {
-                                        app = app.log_error(e.to_string())?;
+                                    Ok(None) => {}
+                                    Err(err) => {
+                                        app = app.log_error(err.to_string())?;
+                                    }
+                                };
+
+                                terminal.clear()?;
+                                term::enable_raw_mode()?;
+                                terminal.hide_cursor()?;
+                                tx_event_reader.send(false)?;
+
+                                if mouse_enabled {
+                                    match execute!(
+                                        terminal.backend_mut(),
+                                        event::EnableMouseCapture
+                                    ) {
+                                        Ok(_) => {
+                                            mouse_enabled = true;
+                                        }
+                                        Err(e) => {
+                                            app = app.log_error(e.to_string())?;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        app::MsgOut::Call(cmd) => {
-                            execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                                .unwrap_or_default();
+                            app::MsgOut::Call(cmd) => {
+                                execute!(terminal.backend_mut(), event::DisableMouseCapture)
+                                    .unwrap_or_default();
 
-                            tx_event_reader.send(true)?;
+                                tx_event_reader.send(true)?;
 
-                            terminal.clear()?;
-                            terminal.set_cursor(0, 0)?;
-                            term::disable_raw_mode()?;
-                            terminal.show_cursor()?;
+                                terminal.clear()?;
+                                terminal.set_cursor(0, 0)?;
+                                term::disable_raw_mode()?;
+                                terminal.show_cursor()?;
 
-                            app.write_pipes()?;
-                            let status = call(&app, cmd, false)
-                                .map(|s| {
-                                    if s.success() {
-                                        Ok(())
-                                    } else {
-                                        Err(format!("process exited with code {}", &s))
+                                app.write_pipes()?;
+                                let status = call(&app, cmd, false)
+                                    .map(|s| {
+                                        if s.success() {
+                                            Ok(())
+                                        } else {
+                                            Err(format!("process exited with code {}", &s))
+                                        }
+                                    })
+                                    .unwrap_or_else(|e| Err(e.to_string()));
+
+                                match pipe_reader::read_all(app.pipe().msg_in()) {
+                                    Ok(msgs) => {
+                                        for msg in msgs {
+                                            app = app.handle_task(app::Task::new(
+                                                app::MsgIn::External(msg),
+                                                None,
+                                            ))?;
+                                        }
                                     }
-                                })
-                                .unwrap_or_else(|e| Err(e.to_string()));
-
-                            match pipe_reader::read_all(app.pipe().msg_in()) {
-                                Ok(msgs) => {
-                                    for msg in msgs {
-                                        app = app.handle_task(app::Task::new(
-                                            app::MsgIn::External(msg),
-                                            None,
-                                        ))?;
+                                    Err(err) => {
+                                        app = app.log_error(err.to_string())?;
                                     }
-                                }
-                                Err(err) => {
-                                    app = app.log_error(err.to_string())?;
-                                }
-                            };
+                                };
 
-                            app.cleanup_pipes()?;
+                                app.cleanup_pipes()?;
 
-                            if let Err(e) = status {
-                                app = app.log_error(e.to_string())?;
-                            };
+                                if let Err(e) = status {
+                                    app = app.log_error(e.to_string())?;
+                                };
 
-                            terminal.clear()?;
-                            term::enable_raw_mode()?;
-                            terminal.hide_cursor()?;
-                            tx_event_reader.send(false)?;
+                                terminal.clear()?;
+                                term::enable_raw_mode()?;
+                                terminal.hide_cursor()?;
+                                tx_event_reader.send(false)?;
 
-                            if mouse_enabled {
-                                match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
-                                    Ok(_) => {
-                                        mouse_enabled = true;
-                                    }
-                                    Err(e) => {
-                                        app = app.log_error(e.to_string())?;
+                                if mouse_enabled {
+                                    match execute!(
+                                        terminal.backend_mut(),
+                                        event::EnableMouseCapture
+                                    ) {
+                                        Ok(_) => {
+                                            mouse_enabled = true;
+                                        }
+                                        Err(e) => {
+                                            app = app.log_error(e.to_string())?;
+                                        }
                                     }
                                 }
                             }
-                        }
-                    };
+                        };
+                    }
+                }
+
+                Err(e) => {
+                    result = Err(e);
+                    break;
                 }
             }
-
-            Err(e) => {
-                result = Err(e);
-                break;
-            }
         }
+
+        terminal.clear()?;
+        terminal.set_cursor(0, 0)?;
+        execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
+        execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
+        term::disable_raw_mode()?;
+        terminal.show_cursor()?;
+
+        fs::remove_dir(session_path)?;
+
+        result
     }
-
-    terminal.clear()?;
-    terminal.set_cursor(0, 0)?;
-    execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
-    execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
-    term::disable_raw_mode()?;
-    terminal.show_cursor()?;
-
-    fs::remove_dir(session_path)?;
-
-    result
 }

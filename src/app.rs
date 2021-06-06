@@ -4,7 +4,7 @@ use crate::explorer;
 use crate::input::Key;
 use crate::lua;
 use crate::permissions::Permissions;
-use crate::runner;
+use crate::runner::Runner;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
@@ -1595,6 +1595,8 @@ impl App {
             last_modes: Default::default(),
         };
 
+        fs::create_dir_all(app.session_path())?;
+
         if let Some(err) = load_err {
             app.log_error(err)
         } else {
@@ -2796,24 +2798,8 @@ impl App {
             last_modes: self.last_modes.clone(),
         }
     }
-
-    pub fn run(self, focused_path: Option<PathBuf>, lua: &mlua::Lua) -> Result<Option<String>> {
-        runner::run(self, focused_path, lua)
-    }
 }
 
-/// Run xplr TUI
-pub fn run(
-    pwd: PathBuf,
-    focused_path: Option<PathBuf>,
-    on_load: Option<Vec<ExternalMsg>>,
-) -> Result<Option<String>> {
-    let lua = mlua::Lua::new();
-    let mut app = App::create(pwd, &lua)?;
-    if let Some(msgs) = on_load {
-        for msg in msgs {
-            app = app.enqueue(Task::new(MsgIn::External(msg), None));
-        }
-    }
-    app.run(focused_path, &lua)
+pub fn runner(path: Option<PathBuf>) -> Result<Runner> {
+    Runner::new(path)
 }
