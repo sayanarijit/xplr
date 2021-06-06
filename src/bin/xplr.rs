@@ -11,6 +11,7 @@ use xplr::app;
 struct Cli {
     version: bool,
     help: bool,
+    read_only: bool,
     path: Option<PathBuf>,
     config: Option<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
@@ -50,6 +51,8 @@ impl Cli {
                 // Options
                 "-c" | "--config" => cli.config = args.pop_front().map(PathBuf::from),
 
+                "--read-only" => cli.read_only = true,
+
                 "--on-load" => {
                     while let Some(msg) = args.pop_front() {
                         if msg.starts_with('-') {
@@ -84,10 +87,11 @@ fn main() {
     xplr [FLAG]... [OPTION]... [PATH]"###;
 
         let flags = r###"
-    -                Read path from stdin
-    --               End of flags and options
-    -h, --help       Prints help information
-    -V, --version    Prints version information"###;
+    -                  Reads path from stdin
+    --                 Denotes the end of command-line flags and options
+        --read-only    Enables read-only mode (config.general.read_only)
+    -h, --help         Prints help information
+    -V, --version      Prints version information"###;
 
         let options = r###"
     -c, --config <PATH>           Specifies a custom config file (default is
@@ -115,7 +119,8 @@ fn main() {
     } else {
         match app::runner(cli.path.clone())
             .map(|a| a.with_on_load(cli.on_load.clone()))
-            .map(|a| a.with_config(cli.config))
+            .map(|a| a.with_config(cli.config.clone()))
+            .map(|a| a.with_read_only(cli.read_only))
             .and_then(|a| a.run())
         {
             Ok(Some(out)) => print!("{}", out),

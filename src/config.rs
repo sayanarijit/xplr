@@ -565,6 +565,11 @@ impl GeneralConfig {
     pub fn disable_recover_mode(&self) -> bool {
         self.disable_recover_mode
     }
+
+    /// Set the general config's read only.
+    pub fn set_read_only(&mut self, read_only: bool) {
+        self.read_only = read_only;
+    }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
