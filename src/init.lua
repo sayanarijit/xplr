@@ -11,6 +11,9 @@ xplr.config.general.show_hidden = false
 ------ Read only
 xplr.config.general.read_only = false
 
+------ Recover mode
+xplr.config.general.disable_recover_mode = false
+
 ------ Prompt
 xplr.config.general.prompt.format = "❯ "
 xplr.config.general.prompt.style.add_modifiers = nil
