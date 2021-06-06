@@ -108,17 +108,10 @@ fn main() {
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else {
-        let mut pwd = PathBuf::from(cli.path.unwrap_or_else(|| ".".into()))
-            .canonicalize()
-            .unwrap_or_default();
-        let mut focused_path = None;
-
-        if pwd.is_file() {
-            focused_path = pwd.file_name().map(|p| p.into());
-            pwd = pwd.parent().map(|p| p.into()).unwrap_or_else(|| ".".into());
-        }
-
-        match app::run(pwd, focused_path, Some(cli.on_load)) {
+        match app::runner(cli.path.as_ref().map(PathBuf::from))
+            .map(|a| a.with_on_load(cli.on_load))
+            .and_then(|a| a.run())
+        {
             Ok(Some(out)) => print!("{}", out),
             Ok(None) => {}
             Err(err) => {

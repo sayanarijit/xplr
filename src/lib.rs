@@ -15,4 +15,4 @@ pub mod pwd_watcher;
 pub mod runner;
 pub mod ui;
 
-pub use app::run;
+pub use app::runner;
