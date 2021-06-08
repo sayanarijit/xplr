@@ -1940,7 +1940,7 @@ impl App {
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
-                self.explore_pwd_async()
+                self.explore_pwd()
             }
             Err(e) => self.log_error(e.to_string()),
         }
