@@ -1306,7 +1306,16 @@ pub enum ExternalMsg {
     /// Quit with returncode zero (success).
     Quit,
 
-    /// Print selected paths if it's not empty, else, print the focused node's path.
+    /// Print $PWD and quit.
+    PrintPwdAndQuit,
+
+    /// Print the path under focus and quit. It can be empty string if there's nothing to focus.
+    PrintFocusPathAndQuit,
+
+    /// Print the selected paths and quit. It can be empty is no path is selected.
+    PrintSelectionAndQuit,
+
+    /// Print the selected paths if it's not empty, else, print the focused node's path.
     PrintResultAndQuit,
 
     /// Print the state of application in YAML format. Helpful for debugging or generating
@@ -1363,8 +1372,6 @@ pub enum MsgOut {
     Refresh,
     ClearScreen,
     Quit,
-    PrintResultAndQuit,
-    PrintAppStateAndQuit,
     Debug(String),
     Call(Command),
     CallSilently(Command),
@@ -1377,6 +1384,11 @@ pub enum MsgOut {
     StartFifo(String),
     StopFifo,
     ToggleFifo(String),
+    PrintPwdAndQuit,
+    PrintFocusPathAndQuit,
+    PrintSelectionAndQuit,
+    PrintResultAndQuit,
+    PrintAppStateAndQuit,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1744,6 +1756,9 @@ impl App {
                 ExternalMsg::LogWarning(l) => self.log_warning(l),
                 ExternalMsg::LogError(l) => self.log_error(l),
                 ExternalMsg::Quit => self.quit(),
+                ExternalMsg::PrintPwdAndQuit => self.print_pwd_and_quit(),
+                ExternalMsg::PrintFocusPathAndQuit => self.print_focus_path_and_quit(),
+                ExternalMsg::PrintSelectionAndQuit => self.print_selection_and_quit(),
                 ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
                 ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
                 ExternalMsg::Debug(path) => self.debug(path),
@@ -2514,6 +2529,21 @@ impl App {
 
     fn quit(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::Quit);
+        Ok(self)
+    }
+
+    fn print_pwd_and_quit(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::PrintPwdAndQuit);
+        Ok(self)
+    }
+
+    fn print_focus_path_and_quit(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::PrintFocusPathAndQuit);
+        Ok(self)
+    }
+
+    fn print_selection_and_quit(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::PrintSelectionAndQuit);
         Ok(self)
     }
 
