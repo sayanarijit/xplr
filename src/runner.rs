@@ -211,6 +211,23 @@ impl Runner {
                                 break 'outer;
                             }
 
+                            app::MsgOut::PrintPwdAndQuit => {
+                                result = Ok(Some(format!("{}\n", app.pwd())));
+                                break 'outer;
+                            }
+
+                            app::MsgOut::PrintFocusPathAndQuit => {
+                                result = Ok(app
+                                    .focused_node()
+                                    .map(|n| format!("{}\n", n.absolute_path())));
+                                break 'outer;
+                            }
+
+                            app::MsgOut::PrintSelectionAndQuit => {
+                                result = Ok(Some(app.selection_str()));
+                                break 'outer;
+                            }
+
                             app::MsgOut::PrintResultAndQuit => {
                                 result = Ok(Some(app.result_str()));
                                 break 'outer;
