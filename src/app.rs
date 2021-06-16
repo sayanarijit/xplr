@@ -1879,7 +1879,11 @@ impl App {
 
     fn focus_previous(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = dir.focus.max(1) - 1;
+            dir.focus = if dir.focus == 0 {
+                dir.total.max(1) - 1
+            } else {
+                dir.focus.max(1) - 1
+            };
         };
         Ok(self)
     }
@@ -1909,7 +1913,11 @@ impl App {
 
     fn focus_next(mut self) -> Result<Self> {
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = (dir.focus + 1).min(dir.total.max(1) - 1);
+            dir.focus = if (dir.focus + 1) == dir.total {
+                0
+            } else {
+                dir.focus + 1
+            }
         };
         Ok(self)
     }
