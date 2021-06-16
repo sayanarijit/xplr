@@ -828,6 +828,9 @@ pub struct BuiltinModesConfig {
 
     #[serde(default)]
     pub switch_layout: Mode,
+
+    #[serde(default)]
+    pub quit: Mode,
 }
 
 impl BuiltinModesConfig {
@@ -857,6 +860,7 @@ impl BuiltinModesConfig {
             "relative path does not contain" => Some(&self.relative_path_does_not_contain),
             "switch layout" => Some(&self.switch_layout),
             "switch_layout" => Some(&self.switch_layout),
+            "quit" => Some(&self.quit),
             _ => None,
         }
     }
@@ -944,6 +948,11 @@ impl BuiltinModesConfig {
     /// Get a reference to the builtin modes config's recover.
     pub fn recover(&self) -> &Mode {
         &self.recover
+    }
+
+    /// Get a reference to the builtin modes config's quit.
+    pub fn quit(&self) -> &Mode {
+        &self.quit
     }
 }
 
