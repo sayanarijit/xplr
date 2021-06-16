@@ -2118,7 +2118,10 @@ impl App {
     }
 
     pub fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
-        let pathbuf = PathBuf::from(path);
+        let mut pathbuf = PathBuf::from(path);
+        if pathbuf.is_relative() {
+            pathbuf = PathBuf::from(self.pwd()).join(pathbuf);
+        }
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
                 self.change_directory(&parent.to_string_lossy().to_string(), false)?
@@ -2279,7 +2282,10 @@ impl App {
     }
 
     fn select_path(mut self, path: String) -> Result<Self> {
-        let path = PathBuf::from(path);
+        let mut path = PathBuf::from(path);
+        if path.is_relative() {
+            path = PathBuf::from(self.pwd()).join(path);
+        }
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
