@@ -3,7 +3,6 @@
 #![allow(clippy::unnecessary_wraps)]
 
 pub mod app;
-pub mod auto_refresher;
 pub mod config;
 pub mod event_reader;
 pub mod explorer;

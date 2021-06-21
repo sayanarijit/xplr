@@ -1,7 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::app;
-use crate::auto_refresher;
 use crate::event_reader;
 use crate::explorer;
 use crate::lua;
@@ -184,10 +183,8 @@ impl Runner {
         terminal.hide_cursor()?;
 
         // Threads
-        auto_refresher::start_auto_refreshing(tx_msg_in.clone());
         event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
         pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
-        // pipe_reader::keep_reading(app.pipe().msg_in().clone(), tx_msg_in.clone());
 
         // Enqueue on_load messages
         for msg in self.on_load {
