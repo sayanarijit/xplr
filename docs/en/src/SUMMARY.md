@@ -1,0 +1,19 @@
+A hackable, minimal, fast TUI file explorer
+===========================================
+
+- [Introduction](introduction.md)
+- [Quickstart](quickstart.md)
+  - [Install](install.md)
+  - [Post Install](post-install.md)
+- [Configuration](configuration.md)
+  - [General Config](general-config.md)
+  - [Modes](modes.md)
+  - [Message](message.md)
+  - [Layouts](layouts.md)
+  - [Style](style.md)
+- [Default Key Bindings](default-key-bindings.md)
+- [TODO](todo.md)
+- [Alternatives](alternatives.md)
+- [Upgrade Guide](upgrade-guide.md)
+- [Community](community.md)
+- [Contribute](contribute.md)
