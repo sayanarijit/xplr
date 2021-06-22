@@ -164,7 +164,10 @@ impl Runner {
         let session_path = app.session_path().to_owned();
 
         term::enable_raw_mode()?;
+
+        // Use a tty to enable piping results
         let mut stdout = get_tty()?;
+        // let stdout = io::stdout();
         // let mut stdout = stdout.lock();
         execute!(stdout, term::EnterAlternateScreen)?;
 
