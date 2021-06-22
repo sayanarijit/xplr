@@ -1,0 +1,6 @@
+[book]
+authors = ["Arijit Basu <sayanarijit@gmail.com>"]
+title = "xplr book"
+description = "A hackable, minimal, fast TUI file explorer"
+src = "src"
+language = "en"
