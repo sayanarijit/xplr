@@ -7,7 +7,7 @@ on:
     #        │  │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
     - cron: "0 15 * * *"
   push:
-    branches: master
+    branches: main
   workflow_dispatch:
 
 name: Daily compile check
