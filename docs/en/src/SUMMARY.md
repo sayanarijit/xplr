@@ -10,6 +10,7 @@ A hackable, minimal, fast TUI file explorer
   - [Modes](modes.md)
   - [Message](message.md)
   - [Layouts](layouts.md)
+  - [Node Types](node_types.md)
   - [Style](style.md)
 - [Default Key Bindings](default-key-bindings.md)
 - [TODO](todo.md)
