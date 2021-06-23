@@ -920,9 +920,14 @@ xplr.config.node_types.symlink.style.add_modifiers = { &quot;Italic&quot; }
 <h3 id="mime_essence"><a class="header" href="#mime_essence">mime_essence</a></h3>
 <p>Type: mapping of mime-type and mapping of mime-subtype and <a href="node_types.html#nodetype-config">NodeType Config</a></p>
 <p>Properties related to files with specific mime types are defined here.</p>
+<p>It is possible to use the wildcard <code>*</code> to match all mime subtypes. It will be
+overwritten by the more specific sub types that are defined.</p>
 <p>Example:</p>
 <pre><code class="language-lua">xplr.config.node_types.mime_essence = {
   application = {
+    -- application/*
+    [&quot;*&quot;] = { meta = { icon = &quot;a&quot; } }
+    
     -- application/pdf
     pdf = { meta = { icon = &quot;&quot; } },
 
