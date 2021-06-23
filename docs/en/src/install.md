@@ -43,7 +43,7 @@ paru -S xplr-bin
 Git version:
 
 ```
-paru -S xplr-git  # git version
+paru -S xplr-git
 ```
 
 ### Void Linux

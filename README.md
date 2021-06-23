@@ -26,34 +26,40 @@ A hackable, minimal, fast TUI file explorer
 <img src="https://s3.gifyu.com/images/xplr-0.5.0.gif" />
 </p>
 
-Though [xplr](https://github.com/sayanarijit/xplr) strives to be fast and minimalist, its speciality is its hackability.
+`xplr` is a terminal UI based file explorer that aims to increase our terminal
+productivity by being a flexible, interactive orchestrator for the ever growing
+awesome command-line utilities that work with the file-system.
 
-Once you read the [documentation](https://github.com/sayanarijit/xplr/wiki), you should be able to configure the key bindings,
-different run modes, and also the way it looks by modifying one single configuration file.
+To achieve its goal, `xplr` strives to be a fast, minimal and more importantly,
+hackable file explorer.
 
+`xplr` is not meant to be a replacement for the standard shell commands or the
+GUI file managers. Rather, it aims to integrate them all and expose an
+intuitive, scriptable, keyboard controlled, real-time visual interface, also
+being an ideal candidate for further integration, enabling the users to achieve
+insane terminal productivity.
 
 Table of content
 ----------------
 
-- ### [Quickstart](https://github.com/sayanarijit/xplr/wiki/Quickstart)
-
-- ### [Features](https://github.com/sayanarijit/xplr/wiki/Features)
-
-- ### [Plugins](https://github.com/sayanarijit/xplr/wiki/Plugins)
-
-- ### [Hacks](https://github.com/sayanarijit/xplr/wiki/Hacks)
-
-- ### [Themes](https://github.com/sayanarijit/xplr/wiki/Themes)
-
-- ### [TODO](https://github.com/sayanarijit/xplr/wiki/TODO)
-
-- ### [Upgrade Guide](https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide)
-
-- ### [Alternatives](https://github.com/sayanarijit/xplr/wiki/Alternatives)
-
-- ### [Community](https://github.com/sayanarijit/xplr/wiki/Community)
-
-- ### [Contribute](https://github.com/sayanarijit/xplr/wiki/Contribute)
+- [Introduction](https://arijitbasu.in/xplr/en/introduction.html)
+- [Quickstart](https://arijitbasu.in/xplr/en/quickstart.html)
+  - [Install](https://arijitbasu.in/xplr/en/install.html)
+  - [Post Install](https://arijitbasu.in/xplr/en/post-install.html)
+- [Configuration](https://arijitbasu.in/xplr/en/configuration.html)
+  - [General Config](https://arijitbasu.in/xplr/en/general-config.html)
+  - [Modes](https://arijitbasu.in/xplr/en/modes.html)
+  - [Message](https://arijitbasu.in/xplr/en/message.html)
+  - [Layouts](https://arijitbasu.in/xplr/en/layouts.html)
+  - [Style](https://arijitbasu.in/xplr/en/style.html)
+- [Default Key Bindings](https://arijitbasu.in/xplr/en/default-key-bindings.html)
+- [TODO](https://arijitbasu.in/xplr/en/todo.html)
+- [Hacks](https://github.com/sayanarijit/xplr/wiki/Hacks)
+- [Themes](https://github.com/sayanarijit/xplr/wiki/Themes)
+- [Alternatives](https://github.com/sayanarijit/xplr/wiki/alternatives.html)
+- [Upgrade Guide](https://github.com/sayanarijit/xplr/wiki/upgrade-guide.html)
+- [Community](https://github.com/sayanarijit/xplr/wiki/community.html)
+- [Contribute](https://github.com/sayanarijit/xplr/wiki/contribute.html)
 
 
 ## Demo
