@@ -6,6 +6,6 @@ src = "src"
 language = "en"
 
 [output.html]
-site-url = "/xplr/"
+site-url = "/xplr/en/"
 git-repository-url = "https://github.com/sayanarijit/xplr"
 edit-url-template = "https://github.com/sayanarijit/xplr/edit/main/docs/en/{path}"
