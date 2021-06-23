@@ -76,11 +76,17 @@ Type: mapping of mime-type and mapping of mime-subtype and [NodeType Config](#no
 
 Properties related to files with specific mime types are defined here.
 
+It is possible to use the wildcard `*` to match all mime subtypes. It will be
+overwritten by the more specific sub types that are defined.
+
 Example:
 
 ```lua
 xplr.config.node_types.mime_essence = {
   application = {
+    -- application/*
+    ["*"] = { meta = { icon = "a" } }
+    
     -- application/pdf
     pdf = { meta = { icon = "" } },
 
