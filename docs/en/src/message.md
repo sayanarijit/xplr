@@ -104,7 +104,7 @@ Environment Variables and Pipes
 -------------------------------
 
 Alternative to `CallLua`, `CallLuaSilently` messages that call Lua functions,
-there are `Call`, `CallLuaSilently`, `BashExec`, `BashExecSilently` messages
+there are `Call`, `CallSilently`, `BashExec`, `BashExecSilently` messages
 that call shell commands.
 
 However, unlike the Lua functions, these shell commands have to read the useful
