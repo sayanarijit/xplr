@@ -117,7 +117,13 @@
                                                 <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                                                                        
+                                                                        <a href="https://github.com/sayanarijit/xplr" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/message.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+                        
                     </div>
                 </div>
 
@@ -153,11 +159,11 @@ that xplr can handle.</p>
 <ul>
 <li>Via <a href="modes.html#key-bindings">key bindings</a></li>
 <li>Via <a href="#lua-function-calls">Lua function calls</a></li>
-<li>Via shell using the <a href="#input-pipe">input pipe</a></li>
+<li>Via shell command using the <a href="#input-pipe">input pipe</a></li>
 </ul>
 <h2 id="format"><a class="header" href="#format">Format</a></h2>
-<p>To send messages using <a href="modes.html#key-bindings">key bindings</a> or
-<a href="#lua-functions-calls">Lua functions calls</a>, these are represented in
+<p>To send messages using the <a href="modes.html#key-bindings">key bindings</a> or
+<a href="#lua-functions-calls">Lua functions calls</a>, messages are represented in
 <a href="https://www.lua.org/">Lua</a> syntax. For example:</p>
 <ul>
 <li>&quot;Quit&quot;</li>
@@ -168,7 +174,7 @@ that xplr can handle.</p>
 represented using
 <a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. For example:</p>
 <ul>
-<li>Foo</li>
+<li>Quit</li>
 <li>FocusPath: &quot;/path/to/file&quot;</li>
 <li>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</li>
 </ul>
@@ -178,31 +184,6 @@ represented using
 <p>When called the function receives a <a href="#calllua-argument">special argument</a> that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.</p>
-<p>Example:</p>
-<pre><code class="language-lua">-- Define the function
-xplr.fn.custom.ask_name_and_greet = function(app)
-  print(&quot;What's your name?&quot;)
-
-  local name = io.read()
-  local greeting = &quot;Hello &quot; .. name .. &quot;!&quot;
-  local message = greeting .. &quot; You are inside &quot; .. app.pwd
-
-  return {
-    { LogSuccess = message },
-  }
-end
-
--- Map the function to a key (space)
-xplr.config.modes.builtin.default.key_bindings.on_key.space = {
-  help = &quot;and &amp; greet&quot;,
-  messages = {
-    { CallLua = &quot;custom.ask_name_and_greet&quot; }
-  }
-}
-
--- Now, when you press &quot;space&quot; in default mode, you will be prompted for your
--- name. Enter your name to receive a nice greeting and to know your location.
-</code></pre>
 <h3 id="calllua-argument"><a class="header" href="#calllua-argument">CallLua Argument</a></h3>
 <p>This is a special argument passed to the lua functions when called using the
 <code>CallLua</code>, <code>CallLuaSilently</code> messages.</p>
@@ -225,6 +206,31 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 </ul>
 <p>TODO: Document each. For now, refer to the
 <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields">rust doc</a>.</p>
+<h3 id="example"><a class="header" href="#example">Example:</a></h3>
+<pre><code class="language-lua">-- Define the function
+xplr.fn.custom.ask_name_and_greet = function(app)
+  print(&quot;What's your name?&quot;)
+
+  local name = io.read()
+  local greeting = &quot;Hello &quot; .. name .. &quot;!&quot;
+  local message = greeting .. &quot; You are inside &quot; .. app.pwd
+
+  return {
+    { LogSuccess = message },
+  }
+end
+
+-- Map the function to a key (space)
+xplr.config.modes.builtin.default.key_bindings.on_key.space = {
+  help = &quot;ask name and greet&quot;,
+  messages = {
+    { CallLua = &quot;custom.ask_name_and_greet&quot; }
+  }
+}
+
+-- Now, when you press &quot;space&quot; in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+</code></pre>
 <h2 id="environment-variables-and-pipes"><a class="header" href="#environment-variables-and-pipes">Environment Variables and Pipes</a></h2>
 <p>Alternative to <code>CallLua</code>, <code>CallLuaSilently</code> messages that call Lua functions,
 there are <code>Call</code>, <code>CallLuaSilently</code>, <code>BashExec</code>, <code>BashExecSilently</code> messages
@@ -258,12 +264,12 @@ XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_
 </code></pre>
 <p>The environment variables starting with <code>XPLR_PIPE_</code> are the temporary files
 called &quot;pipe&quot;s.</p>
-<h3 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h3>
+<h4 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h4>
 <p>Current there is only one input pipe.</p>
 <ul>
 <li><a href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></li>
 </ul>
-<h3 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h3>
+<h4 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h4>
 <p><code>XPLR_PIPE_*_OUT</code> are the output pipes that contain data which cannot be
 exposed directly via environment variables, like multi-line string.</p>
 <ul>
@@ -274,23 +280,44 @@ exposed directly via environment variables, like multi-line string.</p>
 <li><a href="#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></li>
 <li><a href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></li>
 </ul>
-<h3 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h3>
+<h4 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h4>
 <p>Append new-line delimited messages to this pipe in <a href="www.yaml.org">YAML</a> (or
 <a href="www.json.org">JSON</a>) syntax. These messages will be read and handled by xplr
 after the command execution.</p>
-<h3 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h3>
+<h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>
 <p>New-line delimited list of selected paths.</p>
-<h3 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h3>
+<h4 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h4>
 <p>The full help menu.</p>
-<h3 id="xplr_pipe_logs_out"><a class="header" href="#xplr_pipe_logs_out">XPLR_PIPE_LOGS_OUT</a></h3>
+<h4 id="xplr_pipe_logs_out"><a class="header" href="#xplr_pipe_logs_out">XPLR_PIPE_LOGS_OUT</a></h4>
 <p>New-line delimited list of logs.</p>
-<h3 id="xplr_pipe_result_out"><a class="header" href="#xplr_pipe_result_out">XPLR_PIPE_RESULT_OUT</a></h3>
+<h4 id="xplr_pipe_result_out"><a class="header" href="#xplr_pipe_result_out">XPLR_PIPE_RESULT_OUT</a></h4>
 <p>New-line delimited result (selected paths if any, else the focused path)</p>
-<h3 id="xplr_pipe_history_out"><a class="header" href="#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></h3>
+<h4 id="xplr_pipe_history_out"><a class="header" href="#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></h4>
 <p>New-line delimited list of last visited paths (similar to jump list in vim).</p>
-<h3 id="xplr_pipe_directory_nodes_out"><a class="header" href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></h3>
+<h4 id="xplr_pipe_directory_nodes_out"><a class="header" href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></h4>
 <p>New-line delimited list of paths, filtered and sorted as displayed in the
 <a href="layouts.html#table">files table</a>.</p>
+<h3 id="example-1"><a class="header" href="#example-1">Example:</a></h3>
+<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.space = {
+  help = &quot;ask name and greet&quot;,
+  messages = {
+    {
+      BashExec = [===[
+      echo &quot;What's your name?&quot;
+
+      read name
+      greeting=&quot;Hello $name!&quot;
+      message=&quot;$greeting You are inside $PWD&quot;
+    
+      echo LogSuccess: '&quot;'$message'&quot;' &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+      ]===]
+    }
+  }
+}
+
+-- Now, when you press &quot;space&quot; in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+</code></pre>
 
                     </main>
 

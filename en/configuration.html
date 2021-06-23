@@ -117,7 +117,13 @@
                                                 <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                                                                        
+                                                                        <a href="https://github.com/sayanarijit/xplr" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/configuration.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+                        
                     </div>
                 </div>
 
@@ -155,10 +161,10 @@ will be ignored.</p>
 the command-line argument <code>-c</code> / <code>--config</code> to specify its path explicitely. In
 that case, both <code>~/.config/xplr/init.lua</code> and <code>/etc/xplr/init.lua</code> will be
 ignored.</p>
-<h2 id="loading-order"><a class="header" href="#loading-order">Loading Order</a></h2>
+<h2 id="how-config-is-loaded"><a class="header" href="#how-config-is-loaded">How Config is Loaded</a></h2>
 <p>When xplr loads, it first executes the built-in
 <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">init.lua</a> to set
-the default values. It is then overwritten by another config file, if found
+the default values, which is then overwritten by another config file, if found
 using the following lookup order:</p>
 <p><strong>--config /path/to/init.lua</strong> &gt; <strong>~/.config/xplr/init.lua</strong> &gt; <strong>/etc/xplr/init.lua</strong></p>
 

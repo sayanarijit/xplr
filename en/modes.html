@@ -117,7 +117,13 @@
                                                 <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                                                                        
+                                                                        <a href="https://github.com/sayanarijit/xplr" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/modes.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+                        
                     </div>
                 </div>
 
@@ -144,14 +150,15 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="modes"><a class="header" href="#modes">Modes</a></h1>
-<p>xplr is a modal application. That means the users switch between different
-modes, each containing a different set to key binding to avoid classes. The
-modes can be configured using the <code>xplr.config.modes</code> Lua API.</p>
+<p>xplr is a modal file explorer. That means the users switch between different
+modes, each containing a different set to key bindings to avoid clashes. Users
+can switch between these modes at run-time.</p>
+<p>The modes can be configured using the <code>xplr.config.modes</code> Lua API.</p>
+<p>It contains the following fields:</p>
 <ul>
 <li><a href="#builtin">builtin</a></li>
 <li><a href="#custom">custom</a></li>
 </ul>
-<p>The users can switch between these modes at run-time.</p>
 <h2 id="builtin"><a class="header" href="#builtin">builtin</a></h2>
 <p>Type: mapping of string and <a href="#mode">Mode</a></p>
 <p>This is exposed by the <code>xplr.config.modes.builtin</code> API.</p>
@@ -181,7 +188,7 @@ does.</p>
 <h2 id="custom"><a class="header" href="#custom">custom</a></h2>
 <p>Type: mapping of string and <a href="#mode">Mode</a></p>
 <p>This is exposed by the <code>xplr.config.layouts.custom</code> API.</p>
-<p>It allows the users to define any custom layout.</p>
+<p>It allows the users to define custom modes.</p>
 <p>Example:</p>
 <pre><code class="language-lua">xplr.config.modes.custom.example = {
   name = &quot;example&quot;,
