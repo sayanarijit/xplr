@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Community - xplr book</title>
+        <title>Node Types - xplr book</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">5.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">6.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">7.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html" class="active"><strong aria-hidden="true">8.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">9.</strong> Contribute</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html" class="active"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">5.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">6.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">7.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">8.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">9.</strong> Contribute</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -120,7 +120,7 @@
                                                                         <a href="https://github.com/sayanarijit/xplr" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/community.md" title="Suggest an edit" aria-label="Suggest an edit">
+                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/node_types.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
                         
@@ -149,25 +149,105 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="community"><a class="header" href="#community">Community</a></h1>
-<p>Building an active community of awesome people and learning stuff together is
-one of my reasons to publish this tool and maintain it. Hence, please feel free
-to reach out via your preferred way.</p>
+                        <h1 id="node-types"><a class="header" href="#node-types">Node Types</a></h1>
+<p>This configuration defines how to deal with different kinds of nodes (files,
+directories, symlinks etc.) in a directory.</p>
+<p>This can be configured using the <code>xplr.config.node_types</code> Lua API.</p>
+<p>It contains the following fields:</p>
 <ul>
-<li>Real-time chat lovers can <a href="https://discord.gg/JmasSPCcz3"><strong>join our discord channel</strong></a>.</li>
-<li>Forum discussion veterans can <a href="https://github.com/sayanarijit/xplr/discussions"><strong>start a new GitHub discussion</strong></a>.</li>
+<li><a href="#directory">directory</a></li>
+<li><a href="#file">file</a></li>
+<li><a href="#symlink">symlink</a></li>
+<li><a href="#mime_essence">mime_essence</a></li>
+<li><a href="#extension">extension</a></li>
+<li><a href="#special">special</a></li>
 </ul>
-<p>BTW I like Miyazaki and Shinkai works.</p>
+<p>One node can fall into multiple categories. For example, a node can have the
+extension <code>md</code>, and be a <code>file</code>. In that case, the properties from the more
+specific category i.e. extension will be used.</p>
+<p>The priority is:</p>
+<p><strong>special</strong> &gt; <strong>extension</strong> &gt; <strong>mime_essence</strong> &gt; <strong>symlink</strong> &gt; <strong>file</strong> &gt; <strong>directory</strong></p>
+<h3 id="directory"><a class="header" href="#directory">directory</a></h3>
+<p>Type: <a href="#nodetype-config">NodeType Config</a></p>
+<p>Properties related to directories are defined here.</p>
+<p>Contains the following fields:</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.directory.meta.icon = &quot;&quot;
+xplr.config.node_types.directory.style.add_modifiers = { &quot;Bold&quot; }
+</code></pre>
+<h3 id="file"><a class="header" href="#file">file</a></h3>
+<p>Type: <a href="#nodetype-config">NodeType Config</a></p>
+<p>Properties related to regular files are defined here.</p>
+<p>Contains the following fields:</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.file.meta.icon = &quot;&quot;
+xplr.config.node_types.file.style.fg = &quot;White&quot;
+</code></pre>
+<h3 id="symlink"><a class="header" href="#symlink">symlink</a></h3>
+<p>Type: <a href="#nodetype-config">NodeType Config</a></p>
+<p>Properties related to symlink are defined here.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.symlink.meta.icon = &quot;&quot;
+xplr.config.node_types.symlink.style.add_modifiers = { &quot;Italic&quot; }
+</code></pre>
+<h3 id="mime_essence"><a class="header" href="#mime_essence">mime_essence</a></h3>
+<p>Type: mapping of mime-type and mapping of mime-subtype and <a href="#nodetype-config">NodeType Config</a></p>
+<p>Properties related to files with specific mime types are defined here.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.mime_essence = {
+  application = {
+    -- application/pdf
+    pdf = { meta = { icon = &quot;&quot; } },
+
+    -- application/zip
+    zip = { meta = { icon = &quot;&quot;} },
+  },
+}
+</code></pre>
+<h3 id="extension"><a class="header" href="#extension">extension</a></h3>
+<p>Type: mapping of extension and <a href="#nodetype-config">NodeType Config</a></p>
+<p>Properties related to files with specific extension are defined here.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.extension.md = { meta = { icon = &quot;&quot; } }
+xplr.config.node_types.extension.rs = { meta = { icon = &quot;🦀&quot; } }
+</code></pre>
+<h3 id="special"><a class="header" href="#special">special</a></h3>
+<p>Type: mapping of name and <a href="#nodetype-config">NodeType Config</a></p>
+<p>Properties related to files and directories with special names are defined
+here.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.special[&quot;Cargo.toml&quot;] = { meta = { icon = &quot;&quot; } }
+xplr.config.node_types.special[&quot;Downloads&quot;] = { meta = { icon = &quot;&quot; } }
+</code></pre>
+<h2 id="nodetype-config"><a class="header" href="#nodetype-config">NodeType Config</a></h2>
+<p>A node-type config contains the following fields:</p>
+<ul>
+<li><a href="#meta">meta</a></li>
+<li><a href="style.html">style</a></li>
+</ul>
+<h3 id="meta"><a class="header" href="#meta">meta</a></h3>
+<p>Type: mapping of string and string</p>
+<p>A meta field can contain custom metadata about a node. By default, the &quot;icon&quot;
+metadata is set for the <a href="#directory">directory</a>, <a href="#file">file</a>, and
+<a href="#symlink">symlink</a> nodes.</p>
+<p>Example:</p>
+<pre><code>xplr.config.node_types.file = {
+  meta = {
+    icon = &quot;f&quot;,
+    foo = &quot;bar&quot;,
+  }
+}
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                                                    <a rel="prev" href="upgrade-guide.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                                    <a rel="prev" href="layouts.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
-                                                    <a rel="next" href="contribute.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="style.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -177,11 +257,11 @@ to reach out via your preferred way.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                                    <a rel="prev" href="upgrade-guide.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                    <a rel="prev" href="layouts.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
-                                    <a rel="next" href="contribute.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="style.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>
