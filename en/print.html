@@ -1,0 +1,1435 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>xplr book</title>
+                <meta name="robots" content="noindex" />
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A hackable, minimal, fast TUI file explorer">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="favicon.svg">
+                        <link rel="shortcut icon" href="favicon.png">
+                <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+                <link rel="stylesheet" href="css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.5.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">5.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">6.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">7.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">8.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">9.</strong> Contribute</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title">xplr book</h1>
+
+                    <div class="right-buttons">
+                                                <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p><code>xplr</code> is a terminal UI based file explorer that aims to increase our terminal
+productivity by being a flexible, interactive orchestrator for the ever growing
+awesome command-line utilities that work with the file-system.</p>
+<p>To achieve its goal, <code>xplr</code> strives to be a fast, minimal and more importantly,
+hackable file explorer.</p>
+<p><code>xplr</code> is not meant to be a replacement for the standard shell commands or the
+GUI file managers. Rather, it aims to integrate them all and expose an
+intuitive, scriptable, keyboard controlled, real-time visual interface, also
+being an ideal candidate for further integration, enabling the users to achieve
+insane terminal productivity.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart"><a class="header" href="#quickstart">Quickstart</a></h1>
+<p>In this chapter, we'll learn how to install and configure xplr on our machine
+for the first time.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="install"><a class="header" href="#install">Install</a></h1>
+<p>You can install xplr using one of the following ways. Each has their own
+advantages and limitations.</p>
+<p>For example, the <a href="install.html#direct-download">Direct Download</a>,
+<a href="install.html#from-a-hrefhttpscratesiocratesxplrcratesioa">From crates.io</a>, and
+<a href="install.html#build-from-source">Build From Source</a> methods allow the users to install the
+latest possible version of xplr, but they have one common drawback - the user
+will need to keep an eye on the releases, and manually upgrade xplr when a new
+version is available.</p>
+<p>One way to keep an eye of the releases is to
+<a href="https://github.com/sayanarijit/xplr/watchers">watch the repository</a>.</p>
+<h2 id="community-maintained-repositories"><a class="header" href="#community-maintained-repositories">Community Maintained Repositories</a></h2>
+<p>xplr can be installed from one of the following community maintained
+repositories:</p>
+<p><a href="https://repology.org/project/xplr/versions"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" alt="packaging status" /></a></p>
+<h3 id="arch-linux"><a class="header" href="#arch-linux">Arch Linux</a></h3>
+<h4 id="a-hrefhttpsarchlinuxorgpackagescommunityx86_64xplrofficial-community-repoa"><a class="header" href="#a-hrefhttpsarchlinuxorgpackagescommunityx86_64xplrofficial-community-repoa"><a href="https://archlinux.org/packages/community/x86_64/xplr">Official Community Repo</a></a></h4>
+<pre><code>sudo pacman -Syu xplr
+</code></pre>
+<h4 id="a-hrefhttpsaurarchlinuxorgpackageso0sebnkxplroutdatedsbnsoapp50do_searchgoaura"><a class="header" href="#a-hrefhttpsaurarchlinuxorgpackageso0sebnkxplroutdatedsbnsoapp50do_searchgoaura"><a href="https://aur.archlinux.org/packages/?O=0&amp;SeB=n&amp;K=xplr&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=50&amp;do_Search=Go">AUR</a></a></h4>
+<p>Binary version:</p>
+<pre><code>paru -S xplr-bin
+</code></pre>
+<p>Git version:</p>
+<pre><code>paru -S xplr-git  # git version
+</code></pre>
+<h3 id="void-linux"><a class="header" href="#void-linux">Void Linux</a></h3>
+<h4 id="a-hrefhttpsgithubcomshubham-cppvoid-pkg-templatesvoid-templates-by-shubhama"><a class="header" href="#a-hrefhttpsgithubcomshubham-cppvoid-pkg-templatesvoid-templates-by-shubhama"><a href="https://github.com/shubham-cpp/void-pkg-templates">void-templates by shubham</a></a></h4>
+<h3 id="nixos"><a class="header" href="#nixos">Nix(OS)</a></h3>
+<h4 id="a-hrefhttpsgithubcomnixosnixpkgsblobmasterpkgsapplicationsmiscxplrnixpkgsa"><a class="header" href="#a-hrefhttpsgithubcomnixosnixpkgsblobmasterpkgsapplicationsmiscxplrnixpkgsa"><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr">Nixpkgs</a></a></h4>
+<pre><code>nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
+</code></pre>
+<h3 id="macos"><a class="header" href="#macos">macOS</a></h3>
+<h4 id="a-hrefhttpsportsmacportsorgportxplrmacportsa"><a class="header" href="#a-hrefhttpsportsmacportsorgportxplrmacportsa"><a href="https://ports.macports.org/port/xplr">MacPorts</a></a></h4>
+<pre><code>sudo port selfupdate
+sudo port install xplr
+</code></pre>
+<h4 id="a-hrefhttpsformulaebrewshformulaxplrhomebrewa"><a class="header" href="#a-hrefhttpsformulaebrewshformulaxplrhomebrewa"><a href="https://formulae.brew.sh/formula/xplr">Homebrew</a></a></h4>
+<p>Stable branch:</p>
+<pre><code>brew install xplr
+</code></pre>
+<p>HEAD branch:</p>
+<pre><code>brew install --head xplr
+</code></pre>
+<h3 id="freebsd"><a class="header" href="#freebsd">FreeBSD</a></h3>
+<h4 id="a-hrefhttpscgitfreebsdorgportsplainmiscxplrportsa"><a class="header" href="#a-hrefhttpscgitfreebsdorgportsplainmiscxplrportsa"><a href="https://cgit.freebsd.org/ports/plain/misc/xplr/">ports</a></a></h4>
+<pre><code>cd /usr/ports/misc/xplr
+make install
+</code></pre>
+<h3 id="netbsd"><a class="header" href="#netbsd">NetBSD</a></h3>
+<h4 id="a-hrefhttpspkgsrcsesysutilsxplrpkgsrca"><a class="header" href="#a-hrefhttpspkgsrcsesysutilsxplrpkgsrca"><a href="https://pkgsrc.se/sysutils/xplr">pkgsrc</a></a></h4>
+<pre><code>pkgin install xplr
+</code></pre>
+<p>Or build from source</p>
+<pre><code>cd /usr/pkgsrc/sysutils/xplr
+make install
+</code></pre>
+<h2 id="direct-download"><a class="header" href="#direct-download">Direct Download</a></h2>
+<p>One can directly download the standalone binary from the
+<a href="https://github.com/sayanarijit/xplr/releases">releases</a>.</p>
+<p>Currently, the following options are available for direct download:</p>
+<ul>
+<li><a href="https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz">Linux</a></li>
+<li><a href="https://github.com/sayanarijit/xplr/releases/latest/download/xplr-macos.tar.gz">macOS</a></li>
+</ul>
+<p>Command-line instructions:</p>
+<pre><code class="language-bash">platform=&quot;linux&quot;  # or &quot;macos&quot;
+
+# Download
+wget https://github.com/sayanarijit/xplr/releases/latest/download/xplr-$platform.tar.gz
+
+# Extract
+tar xzvf xplr-$platform.tar.gz
+
+# Place in $PATH
+sudo mv xplr /usr/local/bin/
+</code></pre>
+<h2 id="from-a-hrefhttpscratesiocratesxplrcratesioa"><a class="header" href="#from-a-hrefhttpscratesiocratesxplrcratesioa">From <a href="https://crates.io/crates/xplr">crates.io</a></a></h2>
+<p>Prerequisites:</p>
+<ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust toolchain</a>,</li>
+<li><a href="https://gcc.gnu.org/">gcc</a></li>
+<li><a href="https://www.gnu.org/software/make/">make</a></li>
+</ul>
+<p>Command-line instructions:</p>
+<pre><code class="language-bash">cargo install --force xplr
+</code></pre>
+<h2 id="build-from-source"><a class="header" href="#build-from-source">Build From Source</a></h2>
+<p>Prerequisites:</p>
+<ul>
+<li><a href="https://git-scm.com/">git</a></li>
+<li><a href="https://www.rust-lang.org/tools/install">Rust toolchain</a></li>
+<li><a href="https://gcc.gnu.org/">gcc</a></li>
+<li><a href="https://www.gnu.org/software/make/">make</a></li>
+</ul>
+<p>Command-line instructions:</p>
+<pre><code class="language-bash"># Clone the repository
+git clone https://github.com/sayanarijit/xplr.git
+cd xplr
+
+# Build
+cargo build --release --bin xplr
+
+# Place in $PATH
+sudo cp target/release/xplr /usr/local/bin/
+</code></pre>
+<h2 id="android"><a class="header" href="#android">Android</a></h2>
+<h3 id="a-hrefhttpstermuxcomtermuxa"><a class="header" href="#a-hrefhttpstermuxcomtermuxa"><a href="https://termux.com/">Termux</a></a></h3>
+<p><a href="https://gifyu.com/image/tF2D"><img src="https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg" alt="xplr-termuxfd3c398d3cf4bcbc.md.jpg" /></a></p>
+<blockquote>
+<p>Please note that xplr isn't heavily tested on Termux, hence things might
+need a little tweaking and fixing for a smooth usage experience.</p>
+</blockquote>
+<ul>
+<li>
+<p>Install build dependencies</p>
+<pre><code class="language-bash">pkg install rustc cargo make
+</code></pre>
+</li>
+<li>
+<p>Install <code>xplr</code></p>
+<pre><code class="language-bash">cargo install --force xplr
+</code></pre>
+</li>
+<li>
+<p>Setup storage</p>
+<pre><code class="language-bash">termux-setup-storage
+</code></pre>
+</li>
+<li>
+<p>Setup config and runtime dir</p>
+<pre><code class="language-bash">export XDG_CONFIG_HOME=&quot;$PWD/storage/.config&quot;
+export XDG_RUNTIME_DIR=&quot;$PWD/storage/run&quot;
+
+mkdir -p &quot;$XDG_CONFIG_HOME&quot; &quot;$XDG_RUNTIME_DIR&quot;
+</code></pre>
+</li>
+<li>
+<p>Run</p>
+<pre><code class="language-bash">~/.cargo/bin/xplr
+</code></pre>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="post-install"><a class="header" href="#post-install">Post Install</a></h1>
+<p>Once <a href="install.html">installed</a>, use the following steps to setup and run xplr.</p>
+<h2 id="create-the-customizable-config-file"><a class="header" href="#create-the-customizable-config-file">Create the customizable config file</a></h2>
+<pre><code class="language-bash">mkdir -p ~/.config/xplr
+
+version=&quot;$(xplr | grep ^version: | cut -d' ' -f 2)&quot;
+
+# When the app loads, press `#`
+
+echo version = '&quot;'${version:?}'&quot;' &gt; ~/.config/xplr/init.lua
+</code></pre>
+<p>Then
+<strong><a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">copy from here</a></strong>
+and remove / comment out what you don't want to customize.</p>
+<blockquote>
+<p><strong>Note:</strong> You don't generally need to create the config file. You can use the
+default configuration for basic operations. However, creating the config file
+is recommended because the project is in its early stage and the defaults
+might change. Creating the config file will save you from unexpected behavior
+when you <a href="upgrade-guide.html">upgrade</a>.
+Also, the default configuration is meant to be overwritten to suit your
+workflow.</p>
+</blockquote>
+<h2 id="run"><a class="header" href="#run">Run</a></h2>
+<pre><code>xplr
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration"><a class="header" href="#configuration">Configuration</a></h1>
+<p>xplr can be configured using <a href="https://www.lua.org/">Lua</a> via a special file
+named <code>init.lua</code>
+(<a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">example</a>), which
+can be placed in <code>~/.config/xplr/</code> (user specific) or <code>/etc/xplr/</code> (global)
+depending on the use case.</p>
+<p>When a user specific configuration is available, the global configuration file
+will be ignored.</p>
+<p>However, it's also possible to place the file anywhere, with any name and use
+the command-line argument <code>-c</code> / <code>--config</code> to specify its path explicitely. In
+that case, both <code>~/.config/xplr/init.lua</code> and <code>/etc/xplr/init.lua</code> will be
+ignored.</p>
+<h2 id="loading-order"><a class="header" href="#loading-order">Loading Order</a></h2>
+<p>When xplr loads, it first executes the built-in
+<a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">init.lua</a> to set
+the default values. It is then overwritten by another config file, if found
+using the following lookup order:</p>
+<p><strong>--config /path/to/init.lua</strong> &gt; <strong>~/.config/xplr/init.lua</strong> &gt; <strong>/etc/xplr/init.lua</strong></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="general-config"><a class="header" href="#general-config">General Config</a></h1>
+<p>This is configuration exposed via the <code>xplr.config.general</code> API. It contains
+the following fields:</p>
+<h2 id="enable_mouse"><a class="header" href="#enable_mouse">enable_mouse</a></h2>
+<p>Type: boolean</p>
+<p>Set it to <code>true</code> enable scrolling using mouse.</p>
+<h2 id="show_hidden"><a class="header" href="#show_hidden">show_hidden</a></h2>
+<p>Type: boolean</p>
+<p>Set it to <code>true</code> to show hidden files.</p>
+<h2 id="read_only"><a class="header" href="#read_only">read_only</a></h2>
+<p>Type: boolean</p>
+<p>Set it to <code>true</code> to use only a subset of selected operations that forbids
+executing commands or performing write operations on the file-system.</p>
+<h2 id="disable_recover_mode"><a class="header" href="#disable_recover_mode">disable_recover_mode</a></h2>
+<p>Type: boolean</p>
+<p>Set it to <code>true</code> when the special recover mode gets too annoying to appreciate
+the good intentions. When enabled, typing the wrong keys won't result in any
+action.</p>
+<h2 id="cursorformat"><a class="header" href="#cursorformat">cursor.format</a></h2>
+<p>Type: nullable string</p>
+<p>This is the shape of the cursor visible when the input buffer contains some string.</p>
+<h2 id="cursorstyle"><a class="header" href="#cursorstyle">cursor.style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Style of the cursor.</p>
+<h2 id="initial_layout"><a class="header" href="#initial_layout">initial_layout</a></h2>
+<p>Type: string</p>
+<p>The name of one of the defined <a href="layouts.html">layouts</a> to use when xplr loads.</p>
+<p>TODO: Continue documentation</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="modes"><a class="header" href="#modes">Modes</a></h1>
+<p>xplr is a modal application. That means the users switch between different
+modes, each containing a different set to key binding to avoid classes. The
+modes can be configured using the <code>xplr.config.modes</code> Lua API.</p>
+<ul>
+<li><a href="modes.html#builtin">builtin</a></li>
+<li><a href="modes.html#custom">custom</a></li>
+</ul>
+<p>The users can switch between these modes at run-time.</p>
+<h2 id="builtin"><a class="header" href="#builtin">builtin</a></h2>
+<p>Type: mapping of string and <a href="modes.html#mode">Mode</a></p>
+<p>This is exposed by the <code>xplr.config.modes.builtin</code> API.</p>
+<p>xplr by default provides the following builtin modes:</p>
+<ul>
+<li>default</li>
+<li>recover</li>
+<li>selection_ops</li>
+<li>create</li>
+<li>create_directory</li>
+<li>create_file</li>
+<li>number</li>
+<li>go_to</li>
+<li>rename</li>
+<li>delete</li>
+<li>action</li>
+<li>search</li>
+<li>filter</li>
+<li>relative_path_does_contain</li>
+<li>relative_path_does_not_contain</li>
+<li>sort</li>
+<li>switch_layout</li>
+<li>quit</li>
+</ul>
+<p>Visit the <a href="default-key-bindings.html">Default Key Bindings</a> to see what each mode
+does.</p>
+<h2 id="custom"><a class="header" href="#custom">custom</a></h2>
+<p>Type: mapping of string and <a href="modes.html#mode">Mode</a></p>
+<p>This is exposed by the <code>xplr.config.layouts.custom</code> API.</p>
+<p>It allows the users to define any custom layout.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.modes.custom.example = {
+  name = &quot;example&quot;,
+  key_bindings = {
+    on_key = {
+      enter = {
+        help = &quot;default mode&quot;,
+        messages = {
+          &quot;PopMode&quot;,
+          { SwitchModeBuiltin = &quot;default&quot; }
+        }
+      }
+    }
+  }
+}
+
+xplr.config.general.initial_mode = &quot;example&quot;
+
+-- when you load xplr, you should be in the &quot;example&quot; mode,
+-- pressing &quot;enter&quot; should take you to the &quot;default&quot; mode.
+</code></pre>
+<h2 id="mode"><a class="header" href="#mode">Mode</a></h2>
+<p>A mode contains the following information:</p>
+<ul>
+<li><a href="modes.html#name">name</a></li>
+<li><a href="modes.html#help">help</a></li>
+<li><a href="modes.html#extra_help">extra_help</a></li>
+<li><a href="modes.html#key_bindings">key_bindings</a></li>
+</ul>
+<h3 id="name"><a class="header" href="#name">name</a></h3>
+<p>Type: string</p>
+<p>This is the name of the mode visible in the help menu.</p>
+<h3 id="help"><a class="header" href="#help">help</a></h3>
+<p>Type: nullable string</p>
+<p>If specified, the help menu will display this instead of the auto generated
+mappings.</p>
+<h3 id="extra_help"><a class="header" href="#extra_help">extra_help</a></h3>
+<p>Type: nullable string</p>
+<p>If specified, the help menu will display this along-side the auto generated
+help menu.</p>
+<h3 id="key_bindings"><a class="header" href="#key_bindings">key_bindings</a></h3>
+<p>Type: <a href="modes.html#key-bindings">Key Bindings</a></p>
+<p>The key bindings available in that mode.</p>
+<h2 id="key-bindings"><a class="header" href="#key-bindings">Key Bindings</a></h2>
+<p>Key bindings define how each keyboard input will be handled in a specific mode.</p>
+<p>See the <a href="default-key-bindings.html">default key bindings</a> for example.</p>
+<p>Key bindings contains the following information:</p>
+<ul>
+<li><a href="modes.html#on_key">on_key</a></li>
+<li><a href="modes.html#on_alphabet">on_alphabet</a></li>
+<li><a href="modes.html#on_number">on_number</a></li>
+<li><a href="modes.html#on_special_character">on_special_character</a></li>
+<li><a href="modes.html#default">default</a></li>
+</ul>
+<h3 id="on_key"><a class="header" href="#on_key">on_key</a></h3>
+<p>Type: mapping of <a href="modes.html#key">Key</a> to nullable <a href="modes.html#action">Action</a></p>
+<p>Defines what to do when a specific key is pressed.</p>
+<h3 id="on_alphabet"><a class="header" href="#on_alphabet">on_alphabet</a></h3>
+<p>Type: nullable <a href="modes.html#action">Action</a></p>
+<p>An action to perform if the keyboard input is an alphabet and is not mapped via
+the <a href="modes.html#on_key">on_key</a> field.</p>
+<h3 id="on_number"><a class="header" href="#on_number">on_number</a></h3>
+<p>Type: nullable <a href="modes.html#action">Action</a></p>
+<p>An action to perform if the keyboard input is a number and is not mapped via
+the <a href="modes.html#on_key">on_key</a> field.</p>
+<h3 id="on_special_character"><a class="header" href="#on_special_character">on_special_character</a></h3>
+<p>Type: nullable <a href="modes.html#action">Action</a></p>
+<p>An action to perform if the keyboard input is a special character and is not
+mapped via the <a href="modes.html#on_key">on_key</a> field.</p>
+<h3 id="default"><a class="header" href="#default">default</a></h3>
+<p>Type: nullable <a href="modes.html#action">Action</a></p>
+<p>Default action to perform in case of a keyboard input not mapped via any of the
+<a href="modes.html#on_key">on_key</a>, <a href="modes.html#on_alphabet">on_alphabet</a>, <a href="modes.html#on_number">on_number</a> or
+<a href="modes.html#on_special_character">on_special_character</a> field.</p>
+<h2 id="action"><a class="header" href="#action">Action</a></h2>
+<p>An action contains the following information:</p>
+<ul>
+<li>help</li>
+<li><a href="modes.html#messages">messages</a></li>
+</ul>
+<h3 id="help-1"><a class="header" href="#help-1">help</a></h3>
+<p>Type: nullable string</p>
+<p>Description of what it does. If unspecified, it will be excluded from the help
+menu.</p>
+<h3 id="messages"><a class="header" href="#messages">messages</a></h3>
+<p>Type: A list of <a href="message.html">Message</a> to send.</p>
+<p>The list of messages to send when a key is pressed.</p>
+<h2 id="tutorial-adding-a-new-mode"><a class="header" href="#tutorial-adding-a-new-mode">Tutorial: Adding a New Mode</a></h2>
+<p>Assuming xplr is <a href="install.html">installed</a> and <a href="post-install.html">setup</a>, let's
+add our own mode to integrate xplr with <a href="https://github.com/junegunn/fzf">fzf</a>.</p>
+<p>We'll call it <code>fzxplr</code> mode.</p>
+<p>First, let's add a custom mode called <code>fzxplr</code>, and map the key <code>F</code> to an
+action that will call <code>fzf</code> to search and focus on a file or enter into a
+directory.</p>
+<pre><code class="language-lua">xplr.config.modes.custom.fzxplr = {
+  name = &quot;fzxplr&quot;,
+  key_bindings = {
+    on_key = {
+      F = {
+        help = &quot;search&quot;,
+        messages = {
+          {
+            BashExec = [===[
+            PTH=$(cat &quot;${XPLR_PIPE_DIRECTORY_NODES_OUT:?}&quot; | awk -F/ '{print $NF}' | fzf)
+            if [ -d &quot;$PTH&quot; ]; then
+              echo ChangeDirectory: &quot;'&quot;${PWD:?}/${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+            else
+              echo FocusPath: &quot;'&quot;${PWD:?}/${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+            fi
+            ]===]
+          },
+          &quot;PopMode&quot;,
+        },
+      },
+    },
+    default = {
+      messages = {
+        &quot;PopMode&quot;,
+      },
+    },
+  },
+}
+</code></pre>
+<p>As you can see, the key <code>F</code> in mode <code>fzxplr</code> (the name can be anything)
+executes a script in <code>bash</code>.</p>
+<p><code>BashExec</code>, <code>PopMode</code>, <code>SwitchModeBuiltin</code>, <code>ChangeDirectory</code> and <code>FocusPath</code>
+are <a href="message.html">messages</a>, <code>$XPLR_PIPE_MSG_IN</code>,
+<code>$XPLR_PIPE_DIRECTORY_NODES_OUT</code> are
+<a href="message.html#environment-variables">environment variables</a> exported by <code>xplr</code>
+before executing the command. They contain the path to the
+<a href="message.html#input-pipe">input</a> and <a href="message.html#output-pipes">output</a> pipes that
+allows external tools to interact with <code>xplr</code>.</p>
+<p>Now that we have our new mode ready, let's add an entry point to this mode via
+the <code>default</code> mode.</p>
+<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key[&quot;F&quot;] = {
+  help = &quot;fzf mode&quot;,
+  messages = {
+    { SwitchModeCustom = &quot;fzxplr&quot; },
+  },
+}
+</code></pre>
+<p>Now let's try out the new <code>xplr</code>-<code>fzf</code> integration.</p>
+<p><a href="https://gifyu.com/image/tW86"><img src="https://s3.gifyu.com/images/xplr-fzf.gif" alt="xplr-fzf.gif" /></a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="message"><a class="header" href="#message">Message</a></h1>
+<p>You can think of xplr as a server. Just like web servers listen to HTTP
+requests, xplr listens to messages.</p>
+<p>See the
+<a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variants"><strong>full list of messages</strong></a>
+that xplr can handle.</p>
+<p>You can send messages to an xplr session in the following ways:</p>
+<ul>
+<li>Via <a href="modes.html#key-bindings">key bindings</a></li>
+<li>Via <a href="message.html#lua-function-calls">Lua function calls</a></li>
+<li>Via shell using the <a href="message.html#input-pipe">input pipe</a></li>
+</ul>
+<h2 id="format"><a class="header" href="#format">Format</a></h2>
+<p>To send messages using <a href="modes.html#key-bindings">key bindings</a> or
+<a href="message.html#lua-functions-calls">Lua functions calls</a>, these are represented in
+<a href="https://www.lua.org/">Lua</a> syntax. For example:</p>
+<ul>
+<li>&quot;Quit&quot;</li>
+<li>{ FocusPath = &quot;/path/to/file&quot; }</li>
+<li>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</li>
+</ul>
+<p>However, to send messages using the <a href="message.html#input-pipe">input pipe</a>, they need to be
+represented using
+<a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. For example:</p>
+<ul>
+<li>Foo</li>
+<li>FocusPath: &quot;/path/to/file&quot;</li>
+<li>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</li>
+</ul>
+<h2 id="lua-function-calls"><a class="header" href="#lua-function-calls">Lua Function Calls</a></h2>
+<p>xplr allows users to define lua functions using the <code>xplr.fn.custom</code> Lua API.</p>
+<p>These functions can be called using messages like <code>CallLua</code>, <code>CallLuaSilently</code>.</p>
+<p>When called the function receives a <a href="message.html#calllua-argument">special argument</a> that
+contains some useful information. The function can optionally return a list of
+messages which will be handled by xplr.</p>
+<p>Example:</p>
+<pre><code class="language-lua">-- Define the function
+xplr.fn.custom.ask_name_and_greet = function(app)
+  print(&quot;What's your name?&quot;)
+
+  local name = io.read()
+  local greeting = &quot;Hello &quot; .. name .. &quot;!&quot;
+  local message = greeting .. &quot; You are inside &quot; .. app.pwd
+
+  return {
+    { LogSuccess = message },
+  }
+end
+
+-- Map the function to a key (space)
+xplr.config.modes.builtin.default.key_bindings.on_key.space = {
+  help = &quot;and &amp; greet&quot;,
+  messages = {
+    { CallLua = &quot;custom.ask_name_and_greet&quot; }
+  }
+}
+
+-- Now, when you press &quot;space&quot; in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+</code></pre>
+<h3 id="calllua-argument"><a class="header" href="#calllua-argument">CallLua Argument</a></h3>
+<p>This is a special argument passed to the lua functions when called using the
+<code>CallLua</code>, <code>CallLuaSilently</code> messages.</p>
+<p>It contains the following information:</p>
+<ul>
+<li>version</li>
+<li>config</li>
+<li>pwd</li>
+<li>focused_node</li>
+<li>directory_buffer</li>
+<li>selection</li>
+<li>mode</li>
+<li>layout</li>
+<li>input_buffer</li>
+<li>pid</li>
+<li>session_path</li>
+<li>explorer_config</li>
+<li>history</li>
+<li>last_modes</li>
+</ul>
+<p>TODO: Document each. For now, refer to the
+<a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields">rust doc</a>.</p>
+<h2 id="environment-variables-and-pipes"><a class="header" href="#environment-variables-and-pipes">Environment Variables and Pipes</a></h2>
+<p>Alternative to <code>CallLua</code>, <code>CallLuaSilently</code> messages that call Lua functions,
+there are <code>Call</code>, <code>CallLuaSilently</code>, <code>BashExec</code>, <code>BashExecSilently</code> messages
+that call shell commands.</p>
+<p>However, unlike the Lua functions, these shell commands have to read the useful
+information and send messages via environment variables and temporary files
+called &quot;pipe&quot;s. These environment variables and files are only available when
+a command is being executed.</p>
+<p>Visit the <a href="modes.html#tutorial-adding-a-new-mode"><strong>fzf integration tutorial</strong></a>
+for example.</p>
+<h3 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h3>
+<p>To see the environment variables, invoke the shell by typing <code>:!</code> in default
+mode and run the following command:</p>
+<pre><code>env | grep ^XPLR_
+</code></pre>
+<p>You will see something like:</p>
+<pre><code>XPLR_FOCUS_INDEX=0
+XPLR_MODE=action to
+XPLR_PIPE_SELECTION_OUT=/run/user/1000/xplr/session/122278/pipe/selection_out
+XPLR_INPUT_BUFFER=
+XPLR_PIPE_GLOBAL_HELP_MENU_OUT=/run/user/1000/xplr/session/122278/pipe/global_help_menu_out
+XPLR_PID=122278
+XPLR_PIPE_MSG_IN=/run/user/1000/xplr/session/122278/pipe/msg_in
+XPLR_PIPE_LOGS_OUT=/run/user/1000/xplr/session/122278/pipe/logs_out
+XPLR_PIPE_RESULT_OUT=/run/user/1000/xplr/session/122278/pipe/result_out
+XPLR_PIPE_HISTORY_OUT=/run/user/1000/xplr/session/122278/pipe/history_out
+XPLR_FOCUS_PATH=/home/sayanarijit/Documents/GitHub/xplr/docs/en/book
+XPLR_SESSION_PATH=/run/user/1000/xplr/session/122278
+XPLR_APP_VERSION=0.14.3
+XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_nodes_out
+</code></pre>
+<p>The environment variables starting with <code>XPLR_PIPE_</code> are the temporary files
+called &quot;pipe&quot;s.</p>
+<h3 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h3>
+<p>Current there is only one input pipe.</p>
+<ul>
+<li><a href="message.html#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></li>
+</ul>
+<h3 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h3>
+<p><code>XPLR_PIPE_*_OUT</code> are the output pipes that contain data which cannot be
+exposed directly via environment variables, like multi-line string.</p>
+<ul>
+<li><a href="message.html#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></li>
+<li><a href="message.html#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></li>
+<li><a href="message.html#xplr_pipe_logs_out">XPLR_PIPE_LOGS_OUT</a></li>
+<li><a href="message.html#xplr_pipe_result_out">XPLR_PIPE_RESULT_OUT</a></li>
+<li><a href="message.html#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></li>
+<li><a href="message.html#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></li>
+</ul>
+<h3 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h3>
+<p>Append new-line delimited messages to this pipe in <a href="www.yaml.org">YAML</a> (or
+<a href="www.json.org">JSON</a>) syntax. These messages will be read and handled by xplr
+after the command execution.</p>
+<h3 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h3>
+<p>New-line delimited list of selected paths.</p>
+<h3 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h3>
+<p>The full help menu.</p>
+<h3 id="xplr_pipe_logs_out"><a class="header" href="#xplr_pipe_logs_out">XPLR_PIPE_LOGS_OUT</a></h3>
+<p>New-line delimited list of logs.</p>
+<h3 id="xplr_pipe_result_out"><a class="header" href="#xplr_pipe_result_out">XPLR_PIPE_RESULT_OUT</a></h3>
+<p>New-line delimited result (selected paths if any, else the focused path)</p>
+<h3 id="xplr_pipe_history_out"><a class="header" href="#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></h3>
+<p>New-line delimited list of last visited paths (similar to jump list in vim).</p>
+<h3 id="xplr_pipe_directory_nodes_out"><a class="header" href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></h3>
+<p>New-line delimited list of paths, filtered and sorted as displayed in the
+<a href="layouts.html#table">files table</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="layouts"><a class="header" href="#layouts">Layouts</a></h1>
+<p>xplr layouts define the structure of the UI, i.e. how many panel we see,
+placement and size of the panels, how they look etc.</p>
+<p>This is configuration exposed via the <code>xplr.config.layouts</code> API. It contains
+the following fields:</p>
+<ul>
+<li><a href="layouts.html#builtin">builtin</a></li>
+<li><a href="layouts.html#custom">custom</a></li>
+</ul>
+<p>The users can switch between these layouts at run-time.</p>
+<h2 id="builtin-1"><a class="header" href="#builtin-1">builtin</a></h2>
+<p>Type: mapping of string and <a href="layouts.html#layout">Layout</a></p>
+<p>This is exposed by the <code>xplr.config.layouts.builtin</code> API.</p>
+<p>xplr by default provides the following builtin layouts:</p>
+<ul>
+<li><a href="layouts.html#default">default</a></li>
+<li><a href="layouts.html#no_help">no_help</a></li>
+<li><a href="layouts.html#no_selection">no_selection</a></li>
+<li><a href="layouts.html#no_help_no_selection">no_help_no_selection</a></li>
+</ul>
+<h3 id="default-1"><a class="header" href="#default-1">default</a></h3>
+<p>Type: <a href="layouts.html#layout">Layout</a></p>
+<p>This is the default layout we see when we run xplr.</p>
+<h3 id="no_help"><a class="header" href="#no_help">no_help</a></h3>
+<p>Type: <a href="layouts.html#layout">Layout</a></p>
+<p>This layout hides the help menu.</p>
+<h3 id="no_selection"><a class="header" href="#no_selection">no_selection</a></h3>
+<p>Type: <a href="layouts.html#layout">Layout</a></p>
+<p>This layout hides the selection panel.</p>
+<h3 id="no_help_no_selection"><a class="header" href="#no_help_no_selection">no_help_no_selection</a></h3>
+<p>Type: <a href="layouts.html#layout">Layout</a></p>
+<p>This layout hides both the help menu and the selection panel.</p>
+<h2 id="custom-1"><a class="header" href="#custom-1">custom</a></h2>
+<p>Type: mapping of string and <a href="layouts.html#layout">Layout</a></p>
+<p>This is exposed by the <code>xplr.config.layouts.custom</code> API.</p>
+<p>It allows the users to define any custom layout.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.layouts.custom.example = &quot;Nothing&quot;
+xplr.config.general.initial_layout = &quot;example&quot;
+
+-- when you load xplr, you should see a blank screen
+</code></pre>
+<h2 id="layout"><a class="header" href="#layout">Layout</a></h2>
+<p>A layout can be one of the following:</p>
+<ul>
+<li><a href="layouts.html#nothing">&quot;Nothing&quot;</a></li>
+<li><a href="layouts.html#table">&quot;Table&quot;</a></li>
+<li><a href="layouts.html#inputandlogs">&quot;InputAndLogs&quot;</a></li>
+<li><a href="layouts.html#selection">&quot;Selection&quot;</a></li>
+<li><a href="layouts.html#helpmenu">&quot;HelpMenu&quot;</a></li>
+<li><a href="layouts.html#sortandfilter">&quot;SortAndFilter&quot;</a></li>
+<li>{ <a href="layouts.html#horizontal">Horizontal</a> = { config = <a href="layouts.html#layout-config">Layout Config</a>, splits = { <a href="layouts.html#layout">Layout</a>, ... } }</li>
+<li>{ <a href="layouts.html#vertical">Vertical</a> = { config = <a href="layouts.html#layout-config">Layout Config</a>, splits = { <a href="layouts.html#layout">Layout</a>, ... } }</li>
+</ul>
+<h3 id="nothing"><a class="header" href="#nothing">Nothing</a></h3>
+<p>This layout contains a blank panel.</p>
+<h3 id="table"><a class="header" href="#table">Table</a></h3>
+<p>This layout contains the table displaying the files and directories in the
+current directory.</p>
+<h3 id="inputandlogs"><a class="header" href="#inputandlogs">InputAndLogs</a></h3>
+<p>This layout contains the panel displaying the input prompt and logs.</p>
+<h3 id="selection"><a class="header" href="#selection">Selection</a></h3>
+<p>This layout contains the panel displaying the selected paths.</p>
+<h3 id="helpmenu"><a class="header" href="#helpmenu">HelpMenu</a></h3>
+<p>This layout contains the panel displaying the help menu for the current mode in
+real-time.</p>
+<h3 id="sortandfilter"><a class="header" href="#sortandfilter">SortAndFilter</a></h3>
+<p>This layout contains the panel displaying the pipeline of sorters and filters
+applied of the list of paths being displayed.</p>
+<h3 id="horizontal"><a class="header" href="#horizontal">Horizontal</a></h3>
+<p>This is a special layout that splits the panel into two horizontal parts.</p>
+<p>It contains the following information:</p>
+<ul>
+<li><a href="layouts.html#layout-config">config</a></li>
+<li><a href="layouts.html#splits">splits</a></li>
+</ul>
+<h3 id="vertical"><a class="header" href="#vertical">Vertical</a></h3>
+<p>This is a special layout that splits the panel into two vertical parts.</p>
+<p>It contains the following information:</p>
+<ul>
+<li><a href="layouts.html#layout-config">config</a></li>
+<li><a href="layouts.html#splits">splits</a></li>
+</ul>
+<h2 id="layout-config"><a class="header" href="#layout-config">Layout Config</a></h2>
+<p>A layout config contains the following information:</p>
+<ul>
+<li><a href="layouts.html#margin">margin</a></li>
+<li><a href="layouts.html#horizontal_margin">horizontal_margin</a></li>
+<li><a href="layouts.html#vertical_margin">vertical_margin</a></li>
+<li><a href="layouts.html#constraints">constraints</a></li>
+</ul>
+<h3 id="margin"><a class="header" href="#margin">margin</a></h3>
+<p>Type: nullable integer</p>
+<p>The width of the margin in all direction.</p>
+<h3 id="horizontal_margin"><a class="header" href="#horizontal_margin">horizontal_Margin</a></h3>
+<p>Type: nullable integer</p>
+<p>The width of the horizontal margins. Overwrites the <a href="layouts.html#margin">margin</a> value.</p>
+<h3 id="vertical_margin"><a class="header" href="#vertical_margin">vertical_Margin</a></h3>
+<p>Type: nullable integer</p>
+<p>The width of the vertical margins. Overwrites the <a href="layouts.html#margin">margin</a> value.</p>
+<h3 id="constraints"><a class="header" href="#constraints">constraints</a></h3>
+<p>Type: nullable list of <a href="layouts.html#constraint">Constraint</a></p>
+<p>The constraints applied on the layout.</p>
+<h2 id="constraint"><a class="header" href="#constraint">Constraint</a></h2>
+<p>A constraint can be one of the following:</p>
+<ul>
+<li>{ Percentage = int }</li>
+<li>{ Ratio = { int, int } }</li>
+<li>{ Length = { int }</li>
+<li>{ LengthLessThanScreenHeight = int }</li>
+<li>{ LengthLessThanScreenWidth = int }</li>
+<li>{ LengthLessThanLayoutHeight = int }</li>
+<li>{ LengthLessThanLayoutWidth = int }</li>
+<li>{ Max = int }</li>
+<li>{ MaxLessThanScreenHeight = int }</li>
+<li>{ MaxLessThanScreenWidth = int }</li>
+<li>{ MaxLessThanLayoutHeight = int }</li>
+<li>{ MaxthLessThanLayoutWidth = int }</li>
+<li>{ Min = int }</li>
+<li>{ MinLessThanScreenHeight = int }</li>
+<li>{ MinLessThanScreenWidth = int }</li>
+<li>{ MinLessThanLayoutHeight = int }</li>
+<li>{ MinLessThanLayoutWidth = int }</li>
+</ul>
+<p>TODO: document each constraint.</p>
+<h2 id="splits"><a class="header" href="#splits">splits</a></h2>
+<p>Type: list of <a href="layouts.html#layout">Layout</a></p>
+<p>The list of child layouts to fit into the parent layout.</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<p><a href="https://gifyu.com/image/1X38"><img src="https://s6.gifyu.com/images/layout.png" alt="layout.png" /></a></p>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = {
+  Horizontal = {
+    config = {
+      margin = 1,
+      horizontal_margin = 2,
+      vertical_margin = 3,
+      constraints = {
+        { Percentage = 50 },
+        { Percentage = 50 },
+      }
+    },
+    splits = {
+      &quot;Table&quot;,
+      &quot;HelpMenu&quot;,
+    }
+  }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="style"><a class="header" href="#style">Style</a></h1>
+<p>A style object contains the following information:</p>
+<ul>
+<li><a href="style.html#fg">fg</a></li>
+<li><a href="style.html#bg">bg</a></li>
+<li><a href="style.html#add_modifiers">add_modifiers</a></li>
+<li><a href="style.html#sub_modifiers">sub_modifiers</a></li>
+</ul>
+<h3 id="fg"><a class="header" href="#fg">fg</a></h3>
+<p>Type: nullable <a href="style.html#color">Color</a></p>
+<p>The foreground color.</p>
+<h3 id="bg"><a class="header" href="#bg">bg</a></h3>
+<p>Type: nullable <a href="style.html#color">Color</a></p>
+<p>The background color.</p>
+<h3 id="add_modifiers"><a class="header" href="#add_modifiers">add_modifiers</a></h3>
+<p>Type: nullable list of <a href="style.html#modifier">Modifier</a></p>
+<p>Modifiers to add.</p>
+<h3 id="sub_modifiers"><a class="header" href="#sub_modifiers">sub_modifiers</a></h3>
+<p>Type: nullable list of <a href="style.html#modifier">Modifier</a></p>
+<p>Modifiers to remove.</p>
+<h2 id="color"><a class="header" href="#color">Color</a></h2>
+<p>Color can be one of the following:</p>
+<ul>
+<li>&quot;Reset&quot;</li>
+<li>&quot;Black&quot;</li>
+<li>&quot;Red&quot;</li>
+<li>&quot;Green&quot;</li>
+<li>&quot;Yellow&quot;</li>
+<li>&quot;Blue&quot;</li>
+<li>&quot;Magenta&quot;</li>
+<li>&quot;Cyan&quot;</li>
+<li>&quot;Gray&quot;</li>
+<li>&quot;DarkGray&quot;</li>
+<li>&quot;LightRed&quot;</li>
+<li>&quot;LightGreen&quot;</li>
+<li>&quot;LightYellow&quot;</li>
+<li>&quot;LightBlue&quot;</li>
+<li>&quot;LightMagenta&quot;</li>
+<li>&quot;LightCyan&quot;</li>
+<li>&quot;White&quot;</li>
+<li>{ Rgb = { int, int, int } }</li>
+<li>{ Indexed = int }</li>
+</ul>
+<h2 id="modifier"><a class="header" href="#modifier">Modifier</a></h2>
+<p>Modifier can be one of the following:</p>
+<ul>
+<li>&quot;Bold&quot;</li>
+<li>&quot;Dim&quot;</li>
+<li>&quot;Italic&quot;</li>
+<li>&quot;Underlined&quot;</li>
+<li>&quot;SlowBlink&quot;</li>
+<li>&quot;RapidBlink&quot;</li>
+<li>&quot;Reversed&quot;</li>
+<li>&quot;Hidden&quot;</li>
+<li>&quot;CrossedOut&quot;</li>
+</ul>
+<h2 id="example-1"><a class="header" href="#example-1">Example</a></h2>
+<pre><code class="language-lua">xplr.config.general.cursor.style.fg = &quot;Red&quot;
+xplr.config.general.cursor.style.bg = { Rgb = { 100, 150, 200 } }
+xplr.config.general.cursor.style.add_modifiers = { &quot;Bold&quot;, &quot;Italic&quot; }
+xplr.config.general.cursor.style.sub_modifiers = { &quot;Hidden&quot; }
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="default-key-bindings"><a class="header" href="#default-key-bindings">Default Key Bindings</a></h1>
+<p>The default key binding is inspired by <a href="https://www.vim.org/">vim</a> and slightly
+overlaps with <a href="https://github.com/jarun/nnn/">nnn</a>, but it's supposed to be
+customized as per user requirements.</p>
+<p>When you press <code>?</code> in <a href="default-key-bindings.html#default">default mode</a>, you can see the complete list
+of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
+<h3 id="default-2"><a class="header" href="#default-2">default</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>.</td><td></td><td>show hidden</td></tr>
+<tr><td>/</td><td>ctrl-f</td><td>search</td></tr>
+<tr><td>:</td><td></td><td>action</td></tr>
+<tr><td>?</td><td></td><td>global help menu</td></tr>
+<tr><td>G</td><td></td><td>go to bottom</td></tr>
+<tr><td>V</td><td>ctrl-a</td><td>select/unselect all</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-i</td><td>tab</td><td>next visited path</td></tr>
+<tr><td>ctrl-o</td><td></td><td>last visited path</td></tr>
+<tr><td>ctrl-r</td><td></td><td>refresh screen</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear selection</td></tr>
+<tr><td>ctrl-w</td><td></td><td>switch layout</td></tr>
+<tr><td>d</td><td></td><td>delete</td></tr>
+<tr><td>down</td><td>j</td><td>down</td></tr>
+<tr><td>enter</td><td></td><td>quit with result</td></tr>
+<tr><td>f</td><td></td><td>filter</td></tr>
+<tr><td>g</td><td></td><td>go to</td></tr>
+<tr><td>h</td><td>left</td><td>back</td></tr>
+<tr><td>k</td><td>up</td><td>up</td></tr>
+<tr><td>l</td><td>right</td><td>enter</td></tr>
+<tr><td>q</td><td></td><td>quit</td></tr>
+<tr><td>r</td><td></td><td>rename</td></tr>
+<tr><td>s</td><td></td><td>sort</td></tr>
+<tr><td>space</td><td>v</td><td>toggle selection</td></tr>
+<tr><td>~</td><td></td><td>go home</td></tr>
+<tr><td>[0-9]</td><td></td><td>input</td></tr>
+</tbody></table>
+<h3 id="recover"><a class="header" href="#recover">recover</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>esc</td><td></td><td>escape</td></tr>
+</tbody></table>
+<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>R</td><td></td><td>relative does not contain</td></tr>
+<tr><td>backspace</td><td></td><td>remove last filter</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
+<tr><td>enter</td><td>esc</td><td>done</td></tr>
+<tr><td>r</td><td></td><td>relative does contain</td></tr>
+</tbody></table>
+<h3 id="number"><a class="header" href="#number">number</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>down</td><td>j</td><td>to down</td></tr>
+<tr><td>enter</td><td></td><td>to index</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>k</td><td>up</td><td>to up</td></tr>
+<tr><td>[0-9]</td><td></td><td>input</td></tr>
+</tbody></table>
+<h3 id="go-to"><a class="header" href="#go-to">go to</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>follow symlink</td></tr>
+<tr><td>g</td><td></td><td>top</td></tr>
+<tr><td>x</td><td></td><td>open in gui</td></tr>
+</tbody></table>
+<h3 id="search"><a class="header" href="#search">search</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
+<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>enter</td><td>esc</td><td>focus</td></tr>
+<tr><td>left</td><td></td><td>back</td></tr>
+<tr><td>right</td><td></td><td>enter</td></tr>
+<tr><td>tab</td><td></td><td>toggle selection</td></tr>
+</tbody></table>
+<h3 id="selection-ops"><a class="header" href="#selection-ops">selection ops</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>c</td><td></td><td>copy here</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>m</td><td></td><td>move here</td></tr>
+<tr><td>x</td><td></td><td>open in gui</td></tr>
+</tbody></table>
+<h3 id="action-to"><a class="header" href="#action-to">action to</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>!</td><td></td><td>shell</td></tr>
+<tr><td>c</td><td></td><td>create</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>e</td><td></td><td>open in editor</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>l</td><td></td><td>logs</td></tr>
+<tr><td>m</td><td></td><td>toggle mouse</td></tr>
+<tr><td>q</td><td></td><td>quit options</td></tr>
+<tr><td>s</td><td></td><td>selection operations</td></tr>
+<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
+</tbody></table>
+<h3 id="create"><a class="header" href="#create">create</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>d</td><td></td><td>create directory</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>create file</td></tr>
+</tbody></table>
+<h3 id="create-file"><a class="header" href="#create-file">create file</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>enter</td><td></td><td>create file</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="create-directory"><a class="header" href="#create-directory">create directory</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>enter</td><td></td><td>create directory</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="rename"><a class="header" href="#rename">rename</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>enter</td><td></td><td>rename</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="delete"><a class="header" href="#delete">delete</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>D</td><td></td><td>force delete</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>d</td><td></td><td>delete</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="sort"><a class="header" href="#sort">sort</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>!</td><td></td><td>reverse sorters</td></tr>
+<tr><td>E</td><td></td><td>by canonical extension reverse</td></tr>
+<tr><td>M</td><td></td><td>by canonical mime essence reverse</td></tr>
+<tr><td>N</td><td></td><td>by node type reverse</td></tr>
+<tr><td>R</td><td></td><td>by relative path reverse</td></tr>
+<tr><td>S</td><td></td><td>by size reverse</td></tr>
+<tr><td>backspace</td><td></td><td>remove last sorter</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset sorters</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear sorters</td></tr>
+<tr><td>e</td><td></td><td>by canonical extension</td></tr>
+<tr><td>enter</td><td>esc</td><td>done</td></tr>
+<tr><td>m</td><td></td><td>by canonical mime essence</td></tr>
+<tr><td>n</td><td></td><td>by node type</td></tr>
+<tr><td>r</td><td></td><td>by relative path</td></tr>
+<tr><td>s</td><td></td><td>by size</td></tr>
+</tbody></table>
+<h3 id="filter-1"><a class="header" href="#filter-1">filter</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>R</td><td></td><td>relative does not contain</td></tr>
+<tr><td>backspace</td><td></td><td>remove last filter</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
+<tr><td>enter</td><td>esc</td><td>done</td></tr>
+<tr><td>r</td><td></td><td>relative does contain</td></tr>
+</tbody></table>
+<h3 id="relative-path-does-contain"><a class="header" href="#relative-path-does-contain">relative path does contain</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>enter</td><td></td><td>apply filter</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="relative-path-does-not-contain"><a class="header" href="#relative-path-does-not-contain">relative path does not contain</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>backspace</td><td></td><td>remove last character</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-u</td><td></td><td>remove line</td></tr>
+<tr><td>ctrl-w</td><td></td><td>remove last word</td></tr>
+<tr><td>enter</td><td></td><td>apply filter</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="switch-layout"><a class="header" href="#switch-layout">switch layout</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>1</td><td></td><td>default</td></tr>
+<tr><td>2</td><td></td><td>no help menu</td></tr>
+<tr><td>3</td><td></td><td>no selection panel</td></tr>
+<tr><td>4</td><td></td><td>no help or selection</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="todo"><a class="header" href="#todo">TODO</a></h1>
+<ul>
+<li><input disabled="" type="checkbox" checked=""/>
+Saner key bindings.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Pipes.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Native search &amp; filter.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Create, copy, move, delete files directly.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+logging support.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Version compatibility instructions.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Implement CLI arguments.</li>
+<li>~Add support for tabs and/or panes (non native)~ <a href="https://github.com/sayanarijit/xplr/wiki/Hacks#spawn-multiple-sessions-in-different-windows">hacked</a> | <a href="https://github.com/sayanarijit/xplr/discussions/15">discussion</a></li>
+<li>~Implement bookmarks.~ <a href="https://github.com/sayanarijit/xplr/wiki/Hacks#bookmark">hacked</a></li>
+<li><input disabled="" type="checkbox" checked=""/>
+Add sorting support.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Add filter support.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+File previews.</li>
+<li><input disabled="" type="checkbox"/>
+Implement plugins support (or some way to easily share configuration).</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Bigger (and better) help menu.</li>
+<li><input disabled="" type="checkbox"/>
+Offline docs.</li>
+<li><input disabled="" type="checkbox"/>
+Support for background services.</li>
+<li><input disabled="" type="checkbox" checked=""/>
+~Customize~ switch UI in run-time.</li>
+<li><input disabled="" type="checkbox"/>
+More tests and benchmarks.</li>
+<li><input disabled="" type="checkbox"/>
+Measure code coverage.</li>
+<li><input disabled="" type="checkbox"/>
+Improve the <a href="https://github.com/sayanarijit/xplr.vim">vim plugin</a>.</li>
+<li><input disabled="" type="checkbox"/>
+Cleanup, refactor, optimize.</li>
+</ul>
+<p><a href="https://github.com/sayanarijit/xplr/discussions/2">add more</a></p>
+<p>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a>.</strong></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h1>
+<p>These are the alternative TUI/CLI file managers/explorers you might want to check out (in no particular order).</p>
+<ul>
+<li><a href="https://github.com/jarun/nnn/">nnn</a></li>
+<li><a href="https://github.com/vifm/vifm">vifm</a></li>
+<li><a href="https://github.com/ranger/ranger">ranger</a></li>
+<li><a href="https://github.com/gokcehan/lf">lf</a></li>
+<li><a href="https://github.com/kamiyaa/joshuto">joshuto</a></li>
+<li><a href="https://github.com/dylanaraps/fff">fff</a></li>
+<li><a href="https://github.com/MidnightCommander/mc">mc</a></li>
+<li><a href="https://github.com/Canop/broot">broot</a></li>
+<li><a href="https://github.com/rabite0/hunter">hunter</a></li>
+<li><a href="https://github.com/RichardHyde/noice">noice</a></li>
+<li><a href="https://github.com/pasqu4le/clifm">clifm</a></li>
+<li><a href="https://github.com/leo-arch/clifm">clifm</a> (non curses)</li>
+</ul>
+<p><a href="community.html">add more</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="upgrade-guide"><a class="header" href="#upgrade-guide">Upgrade Guide</a></h1>
+<p>When you upgrade xplr, you might see an error like this</p>
+<pre><code>Incompatible script version in: /home/sayanarijit/.config/xplr/init.lua. The script version is: 0.9.0, the required version is: 0.10.1. Visit https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide
+</code></pre>
+<p>All you need to do is follow the <a href="upgrade-guide.html#instructions">instructions</a> starting from
+your config version, all the way to the required version.</p>
+<details>
+<summary>Expand for more information</summary>
+<p>With every update, we either implement a <code>major</code> breaking change (e.g.
+deprecating or replacing messages), or a <code>minor</code> feature addition (e.g. adding
+new messages) or <code>patch</code>, fixes, and optimization (e.g. performance
+optimization).</p>
+<p>Knowing that we use the <code>{major}.{minor}.{patch}</code> versioning format,</p>
+<ul>
+<li>Major version mismatch are generally incompatible. xplr will fail
+with error.</li>
+<li>Minor version upgrades (not downgrades) and patch fixes are backwards
+compatible. You might get notified by log a message which you can disable by
+updating the version in your config file.</li>
+<li>However, if the config file has a higher value for the minor version
+than the app, then also xplr will fail with error, suggesting you
+to visit this page.
+Though in that case, you will be downgrading your config file based on your
+app version.</li>
+</ul>
+<p>e.g.</p>
+<ul>
+<li><code>1.0.0</code> -&gt; <code>1.0.x</code>: Bug fix (fully compatible).</li>
+<li><code>1.0.0</code> -&gt; <code>1.x.x</code>: Only backwards compatible. You can't generally use for
+e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fine.</li>
+<li><code>1.0.0</code> -&gt; <code>x.x.x</code>: Not compatible at all.</li>
+</ul>
+<p>Note that until we're <code>v1</code>, we'll be using the <code>{minor}</code> version number as
+<code>{major}</code>, and the <code>{patch}</code> fix number as <code>{minor}</code> to determine
+compatibility.</p>
+</details>
+<h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0142v0142a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0142v0142a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.14.2">v0.14.2</a></a></h4>
+<ul>
+<li>macOS users need to place their config file (<code>init.lua</code>) in
+<code>$HOME/.config/xplr/</code> or <code>/etc/xplr/</code>.</li>
+<li>Library users please refer to the latest API docs.</li>
+<li>Check out the new messages: <code>{Start|Stop|Toggle}Fifo</code>. These enable support
+for <a href="https://github.com/sayanarijit/xplr/pull/229#issue-662426960">FIFO based file previews</a>.</li>
+<li>You can disable the recover mode using <code>config.general.disable_recover_mode = true</code>.</li>
+<li>Try running <code>xplr --help</code>. Yes, CLI has been implemented.</li>
+</ul>
+<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0121v0121a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0121v0121a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a></a></h4>
+<ul>
+<li>Lua functions called using <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua"><code>CallLua</code></a> and <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently"><code>CallLuaSilently</code></a> messages will receive <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
+<li>Each <code>node_types</code> config will inherit defaults from matching less specifig <code>node_types</code> config and overwrite them.</li>
+<li>Since version <code>v0.13.2</code>, you don't need to use/send <code>Refresh</code> anymore. It will be auto-handled by xplr.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0111v0111a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0121v0121a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0111v0111a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0121v0121a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.11.1">v0.11.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a></a></h4>
+<ul>
+<li><code>xplr.config.node_types.mime_essence</code> has split into type and subtype. Hence, instead of <code>xplr.config.node_types.mime_essence[&quot;text/plain&quot;] = ..</code> use <code>xplr.config.node_types.mime_essence[&quot;text&quot;] = { plain = .. }</code>.</li>
+<li>You can also define <code>xplr.config.node_types.mime_essence[&quot;text&quot;][&quot;*&quot;]</code> that will match all text types (<code>text/*</code>).</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0102v0102a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0111v0111a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0102v0102a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0111v0111a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.10.2">v0.10.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.11.1">v0.11.1</a></a></h4>
+<ul>
+<li><code>remaps:</code> has been removed to avoid confusion. Use lua assignments instead.
+For e.g.
+<pre><code>xplr.config.modes.builtin.default.key_bindings.on_key[&quot;v&quot;] = xplr.config.modes.builtin.default.key_bindings.on_key.space
+</code></pre>
+</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv091v091a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0102v0102a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv091v091a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0102v0102a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.9.1">v0.9.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.10.2">v0.10.2</a></a></h4>
+<ul>
+<li><a href="https://github.com/sayanarijit/xplr/blob/85696ded7a/src/config.yml"><code>config.yml</code></a> has been fully replaced with <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua"><code>init.lua</code></a>. If you have a lot of customization in your <code>config.yml</code>, <a href="https://github.com/sayanarijit/xplr-yml2lua">xplr-yml2lua</a> can help you with migrating it to <code>init.lua</code>.</li>
+<li><code>Handlebars</code> templates has been replaced with <a href="https://github.com/sayanarijit/xplr/blob/bfdb7736b99bc3c5ae53e7d621ba0e7ca2299b14/src/init.lua#L2005-L2064">Lua functions</a>. You can either remove the customizations or overwrite the functions accordingly.</li>
+<li>Added new messages <code>CallLua</code> and <code>CallLuaSilently</code> to call lua functions. The app state will be passed as input to the functions, and the returned messages will be handled by xplr. <code>CallLua</code> and <code>CallLuaSilently</code> are more flexible (and probably faster) alternatives to <code>Call</code>, <code>CallSilently</code>, <code>BashExec</code> and <code>BashExecSilently</code>. <a href="https://github.com/sayanarijit/xplr/pull/177#issue-650643573">e.g.</a></li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv090v090a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv091v091a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv090v090a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv091v091a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.9.0">v0.9.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.9.1">v0.9.1</a></a></h4>
+<ul>
+<li>You can now set <code>remaps: {key: null}</code> to un-map a key.</li>
+<li><code>gx</code> will open the item under focus.</li>
+<li>New key map <code>:sx</code> will open the selected items.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv080v080a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv090v090a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv080v080a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv090v090a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.8.0">v0.8.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.9.0">v0.9.0</a></a></h4>
+<p>Your previous config should mostly work fine. However, in case you are using <code>SwitchMode</code> heavily in your custom config, follow along.</p>
+<ul>
+<li>Introduced new message <code>PopMode</code>. You might want to use this message instead of <code>SwitchMode*</code> when returning back to the previous mode.</li>
+<li>After using (the group of) <code>PopMode</code> and <code>SwitchMode*</code> messages, you are now required to <code>Refresh</code> manually to avoid the UI lag.</li>
+<li>Pressing any invalid key will now lead you to the <code>recover</code> mode and will protect you from typing further invalid keys. Press <code>esc</code> to escape the <code>recover</code> mode.</li>
+<li>Introduced new message <code>LogWarning</code>, similar to other <code>Log*</code> messages.</li>
+<li>Creating files and directories has been optimized for batch creation.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv072v072a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv080v080a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv072v072a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv080v080a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.7.2">v0.7.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.8.0">v0.8.0</a></a></h4>
+<p>If you have made changes to the config file,</p>
+<ul>
+<li>Replace message <code>Explore</code> with <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> or probably <code>ExploreParentsAsync</code>.</li>
+<li>Pipe <code>$XPLR_PIPE_FOCUS_OUT</code> has been removed. Use <code>$XPLR_FOCUS_PATH</code> env var instead.</li>
+<li>You might want to review your path escaping logics. For e.g. use <code>echo FocusPath: &quot;'&quot;$PWD&quot;'&quot; &gt;&gt; $PIPE</code> instead of <code>echo &quot;FocusPath: $PWD&quot; &gt;&gt; $PIPE</code>.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv070v070a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv072v072a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv070v070a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv072v072a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.7.0">v0.7.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.7.2">v0.7.2</a></a></h4>
+<ul>
+<li>Just update the <code>version</code> in your config file.</li>
+<li>For version &gt;= <code>v0.7.1</code>, you might want to free up or remap the <code>tab</code> key in <code>search</code> mode to enable easy selection during search.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv060v060a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv070v070a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv060v060a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv070v070a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.6.0">v0.6.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.7.0">v0.7.0</a></a></h4>
+<p>If you haven't made any changes in the config file, you should be fine just updating the version number. Else,</p>
+<ul>
+<li>You can make the <code>Table: ...</code>, <code>InputAndLogs: ...</code> layout values null and define the common properties in the <code>general.panel_ui</code> instead.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0513v0513a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv060v060a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0513v0513a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv060v060a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.5.13">v0.5.13</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.6.0">v0.6.0</a></a></h4>
+<p>If you haven't made any changes in the config file, you should be fine just updating the version number. Else,</p>
+<ul>
+<li>Rename <code>add_modifier: {bits: 1}</code> to <code>add_modifiers: [Bold]</code>, <code>sub_modifier: {bits: 1}</code> to <code>sub_modifiers: [Bold]</code> and so on.</li>
+<li>Rename <code>percentage: 10</code> to <code>Percentage: 10</code>, <code>ratio: 1</code> to <code>Ratio: 1</code> and so on.</li>
+<li>You might want to free up or remap the <code>ctrl-w</code> key binding in <code>default</code> mode to enable layout switching.</li>
+</ul>
+<p>Optionally, checkout this new theme to learn more about what's new.</p>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv050v050a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0513v0513a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv050v050a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0513v0513a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.5.0">v0.5.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.5.13">v0.5.13</a></a></h4>
+<ul>
+<li>Just update the <code>version</code> in your config file.</li>
+<li>For versions &gt;= <code>v0.5.8</code>, you can set <code>$OPENER</code> env var to declare a global GUI file opener (to open files using keys <code>gx</code>).</li>
+<li>You might also want to update other mappings to handle files with names starting with <code>-</code> (hiphen). For example, instead of <code>rm ${filename}</code> use <code>rm -- ${filename}</code>. Same goes for <code>cp</code>, <code>mv</code>, <code>cat</code>, <code>touch</code> etc.</li>
+<li>For version &gt;= <code>v0.5.13</code>, you might want to use the more specific <code>SwitchModeBuiltin</code> and <code>SwitchModeCustom</code> messages instead of the general <code>SwitchMode</code> message.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv043v043a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv050v050a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv043v043a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv050v050a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.3">v0.4.3</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.5.0">v0.5.0</a></a></h4>
+<p>If you haven't have any changes in the config file, you should be fine just updating the version number.</p>
+<p>Else do the following</p>
+<ul>
+<li>Replace <code>{RelativePathIs, case_sensitive: true}</code> with <code>RelativePathIs</code>.</li>
+<li>Replace <code>{RelativePathIs, case_sensitive: false}</code> with <code>IRelativePathIs</code>.</li>
+<li>Do the same with other filters you are using.</li>
+<li>You might want to update your <code>backspace</code> handling to use the <code>RemoveInputBufferLastCharacter</code> message.</li>
+<li>You might want to free-up <code>f</code>, <code>s</code>, <code>ctrl-r</code> and <code>ctrl-u</code> key bindings in the default mode, or remap them.</li>
+<li>You might want to use the new UI variables.</li>
+<li>Update your config version to <code>v0.5.0</code>.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv042v042a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv043v043a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv042v042a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv043v043a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.2">v0.4.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.3">v0.4.3</a></a></h4>
+<p>If you have customized <code>general.table.row.cols</code>, you might want to <a href="https://github.com/sayanarijit/xplr/blob/af1cda5762/src/config.yml#L46-L48">update it</a> to use the new variables with better symlink support.</p>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv041v041a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv042v042a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv041v041a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv042v042a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.1">v0.4.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.2">v0.4.2</a></a></h4>
+<p>In case you have mapped the keys <code>q</code>, <code>ctrl-i</code> and <code>ctrl-o</code>, you may want to revisit the default mode key bindings and remap accordingly to use the new functionalities.</p>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0313v0313a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv041v041a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0313v0313a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv041v041a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.13">v0.3.13</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.1">v0.4.1</a></a></h4>
+<p>A lot has changed (apologies). But I promise from now on, upgrading will be much less painful (thanks to <a href="https://github.com/maximbaz">@maximbaz</a>'s valuable <a href="https://github.com/sayanarijit/xplr/issues/45#issue-854447104">inputs</a> and <a href="https://github.com/sayanarijit/xplr/pull/47">code reviews</a>).</p>
+<p>So, to start with the upgrade, let's remove everything from your config file except the <code>version</code> field and your custom modifications. If  <code>version</code> is the only thing remaining, update it to <code>v0.4.1</code> and you are done.</p>
+<p>Else, do the following</p>
+<ul>
+<li>Rename <code>general.focused_ui</code> to <code>general.focus_ui</code> (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L124">see here</a>).</li>
+<li>Rename <code>filetypes</code> to <code>node_types</code>. (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L145">see here</a>)</li>
+<li>Rename <code>custom</code> field to <code>meta</code>. (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L154-L155">see here</a>)</li>
+<li>Move <code>icon</code> to <code>meta.icon</code>. (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L45">see here</a>)</li>
+<li>Rename <code>normal_ui</code> to <code>default_ui</code>. (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L114">see here</a>)</li>
+<li>Split <code>modes</code> into <code>modes.builtin</code> and <code>modes.custom</code> (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L180-L181">see here</a>). Migrate your custom modes to <code>modes.custom</code>. And copy only the changes in the in-built modes in <code>modes.builtin</code>.</li>
+<li>Finally, update the <code>version</code> to <code>v0.4.1</code>.</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv038v038a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0313v0313a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv038v038a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0313v0313a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.8">v0.3.8</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.13">v0.3.13</a></a></h4>
+<p>Your current config should work fine. However, you might want to replace some <code>Call</code> and <code>BashExec</code> messages with <code>CallSilently</code> and <code>BashExecSilently</code> to remove the flickering of the screen.</p>
+<p>If you haven't made any changes to the configuration, you can delete and regenerate it.</p>
+<p>Else, do the following</p>
+<ul>
+<li>Check the new default config by temporarily removing your current config (with backup) and dumping the new config.</li>
+<li>Search for <code>Call</code> and <code>BashExec</code> in the new config.</li>
+<li>Compare and probably replace the associated actions in your current config</li>
+</ul>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv030v030a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv038v038a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv030v030a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv038v038a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.0">v0.3.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.8">v0.3.8</a></a></h4>
+<p>Your current config should work fine. However, you might want to replace some <code>ResetNodeFilters</code> messages with <code>RemoveNodeFilter</code> and <code>RemoveNodeFilterFromInput</code> to get a better search and filter experience.</p>
+<p>If you haven't made any changes to the configuration, you can delete and regenerate it.</p>
+<p>Else, do the following</p>
+<ul>
+<li>Check the new default config by temporarily removing your current config (with backup) and dumping the new config.</li>
+<li>Search for <code>RemoveNodeFilterFromInput</code> in the new config.</li>
+<li>Compare and probably replace the associated actions in your current config.</li>
+</ul>
+<h4 id="v0214---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv030v030a"><a class="header" href="#v0214---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv030v030a">v0.2.14 -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.0">v0.3.0</a></a></h4>
+<p>If you haven't made any changes to the configuration, you can delete and regenerate it.</p>
+<p>Else do the following:</p>
+<ul>
+<li><code>$XPLR_APP_YAML</code> has been removed. You can use <code>Debug</code> to export the app state.</li>
+<li><code>$XPLR_RESULT</code> has been ported to file <code>$XPLR_PIPE_RESULT_OUT</code>. Use <code>cat</code> instead of <code>echo</code>, <code>&lt;</code> instead of <code>&lt;&lt;&lt;</code> etc.</li>
+<li><code>$XPLR_GLOBAL_HELP_MENU</code> has been ported to
+file <code>$XPLR_PIPE_GLOBAL_HELP_MENU_OUT</code>. Use <code>cat</code> instead of <code>echo</code>, <code>&lt;</code> instead of <code>&lt;&lt;&lt;</code> etc.</li>
+<li><code>$XPLR_DIRECTORY_NODES</code> has been ported to
+file <code>$XPLR_PIPE_DIRECTORY_NODES_OUT</code>. Use <code>cat</code> instead of <code>echo</code>, <code>&lt;</code> instead of <code>&lt;&lt;&lt;</code> etc.</li>
+<li><code>$XPLR_LOGS</code> has been ported to file <code>$XPLR_PIPE_LOGS_OUT</code>. Use <code>cat</code> instead of <code>echo</code>, <code>&lt;</code> instead of <code>&lt;&lt;&lt;</code> etc.</li>
+<li><code>$XPLR_PIPE_RESULT</code> has been ported to file <code>$XPLR_PIPE_RESULT_OUT</code>. Use <code>cat</code> instead of <code>echo</code>, <code>&lt;</code> instead of <code>&lt;&lt;&lt;</code> etc.</li>
+<li>Finally, update the <code>version</code> in your config file.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="community"><a class="header" href="#community">Community</a></h1>
+<p>Building an active community of awesome people and learning stuff together is
+one of my reasons to publish this tool and maintain it. Hence, please feel free
+to reach out via your preferred way.</p>
+<ul>
+<li>Real-time chat lovers can <a href="https://discord.gg/JmasSPCcz3"><strong>join our discord channel</strong></a>.</li>
+<li>Forum discussion veterans can <a href="https://github.com/sayanarijit/xplr/discussions"><strong>start a new GitHub discussion</strong></a>.</li>
+</ul>
+<p>BTW I like Miyazaki and Shinkai works.</p>
+<div style="break-before: page; page-break-before: always;"></div><p>If you like xplr, and want to contribute, that would be really awesome.</p>
+<p>You can contribute to this project in the following ways</p>
+<ul>
+<li>
+<p>Contribute your time and expertise (read <a href="https://github.com/sayanarijit/xplr/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for instructions).</p>
+<ul>
+<li><strong>Developers:</strong> You can help me improve my code, fix things, implement features etc.</li>
+<li><strong>Repository maintainers:</strong> You can save the users from the pain of managing xplr in their system manually.</li>
+<li><strong>Code Reviewers:</strong> Teach me your ways of code.</li>
+<li><strong>Designers:</strong> You can make the logo even more awesome, donate stickers and blog post worthy pictures.</li>
+<li><strong>Bloggers, YouTubers &amp; broadcasters:</strong> You can help spread the word. </li>
+</ul>
+</li>
+<li>
+<p>Contribute by donating.</p>
+<ul>
+<li>You can <a href="https://opencollective.com/xplr">fuel me with coins of encouragement</a> or <a href="https://ko-fi.com/sayanarijit">buy me a coffee</a>.</li>
+</ul>
+</li>
+</ul>
+<p>For further queries or concern related to <code>xplr</code>, <a href="community.html">just ask us</a>.</p>
+<h3 id="backers"><a class="header" href="#backers">Backers</a></h3>
+<p><a href="https://opencollective.com/xplr#backer"><img src="https://opencollective.com/xplr/tiers/backer.svg?width=890" /></a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+                        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+                
+    </body>
+</html>
