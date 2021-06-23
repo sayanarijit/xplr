@@ -51,6 +51,7 @@ Table of content
   - [Modes](https://arijitbasu.in/xplr/en/modes.html)
   - [Message](https://arijitbasu.in/xplr/en/message.html)
   - [Layouts](https://arijitbasu.in/xplr/en/layouts.html)
+  - [Node Types](https://arijitbasu.in/xplr/en/node_types.html)
   - [Style](https://arijitbasu.in/xplr/en/style.html)
 - [Default Key Bindings](https://arijitbasu.in/xplr/en/default-key-bindings.html)
 - [TODO](https://arijitbasu.in/xplr/en/todo.html)
