@@ -1,14 +1,16 @@
 Modes
 =====
 
-xplr is a modal application. That means the users switch between different
-modes, each containing a different set to key binding to avoid classes. The
-modes can be configured using the `xplr.config.modes` Lua API.
+xplr is a modal file explorer. That means the users switch between different
+modes, each containing a different set to key bindings to avoid clashes. Users
+can switch between these modes at run-time.
+
+The modes can be configured using the `xplr.config.modes` Lua API.
+
+It contains the following fields:
 
 - [builtin](#builtin)
 - [custom](#custom)
-
-The users can switch between these modes at run-time.
 
 
 builtin
@@ -48,10 +50,9 @@ custom
 
 Type: mapping of string and [Mode](#mode)
 
-
 This is exposed by the `xplr.config.layouts.custom` API.
 
-It allows the users to define any custom layout.
+It allows the users to define custom modes.
 
 Example:
 

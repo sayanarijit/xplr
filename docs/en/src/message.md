@@ -12,14 +12,14 @@ You can send messages to an xplr session in the following ways:
 
 - Via [key bindings](modes.md#key-bindings)
 - Via [Lua function calls](#lua-function-calls)
-- Via shell using the [input pipe](#input-pipe)
+- Via shell command using the [input pipe](#input-pipe)
 
 
 Format
 ------
 
-To send messages using [key bindings](modes.md#key-bindings) or
-[Lua functions calls](#lua-functions-calls), these are represented in
+To send messages using the [key bindings](modes.md#key-bindings) or
+[Lua functions calls](#lua-functions-calls), messages are represented in
 [Lua](https://www.lua.org/) syntax. For example:
 
 - "Quit"
@@ -30,7 +30,7 @@ However, to send messages using the [input pipe](#input-pipe), they need to be
 represented using
 [YAML](http://yaml.org/) (or [JSON](https://www.json.org)) syntax. For example:
 
-- Foo
+- Quit
 - FocusPath: "/path/to/file"
 - Call: { command: bash, args: ["-c", "read -p test"] }
 
@@ -45,34 +45,6 @@ These functions can be called using messages like `CallLua`, `CallLuaSilently`.
 When called the function receives a [special argument](#calllua-argument) that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.
-
-Example:
-
-```lua
--- Define the function
-xplr.fn.custom.ask_name_and_greet = function(app)
-  print("What's your name?")
-
-  local name = io.read()
-  local greeting = "Hello " .. name .. "!"
-  local message = greeting .. " You are inside " .. app.pwd
-
-  return {
-    { LogSuccess = message },
-  }
-end
-
--- Map the function to a key (space)
-xplr.config.modes.builtin.default.key_bindings.on_key.space = {
-  help = "and & greet",
-  messages = {
-    { CallLua = "custom.ask_name_and_greet" }
-  }
-}
-
--- Now, when you press "space" in default mode, you will be prompted for your
--- name. Enter your name to receive a nice greeting and to know your location.
-```
 
 ### CallLua Argument
 
@@ -98,6 +70,34 @@ It contains the following information:
 
 TODO: Document each. For now, refer to the
 [rust doc](https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields).
+
+### Example:
+
+```lua
+-- Define the function
+xplr.fn.custom.ask_name_and_greet = function(app)
+  print("What's your name?")
+
+  local name = io.read()
+  local greeting = "Hello " .. name .. "!"
+  local message = greeting .. " You are inside " .. app.pwd
+
+  return {
+    { LogSuccess = message },
+  }
+end
+
+-- Map the function to a key (space)
+xplr.config.modes.builtin.default.key_bindings.on_key.space = {
+  help = "ask name and greet",
+  messages = {
+    { CallLua = "custom.ask_name_and_greet" }
+  }
+}
+
+-- Now, when you press "space" in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+```
 
 
 Environment Variables and Pipes
@@ -146,13 +146,13 @@ XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_
 The environment variables starting with `XPLR_PIPE_` are the temporary files
 called "pipe"s.
 
-### Input pipe
+#### Input pipe
 
 Current there is only one input pipe.
 
 - [XPLR_PIPE_MSG_IN](#xplr_pipe_msg_in)
 
-### Output pipes
+#### Output pipes
 
 `XPLR_PIPE_*_OUT` are the output pipes that contain data which cannot be
 exposed directly via environment variables, like multi-line string.
@@ -164,33 +164,59 @@ exposed directly via environment variables, like multi-line string.
 - [XPLR_PIPE_HISTORY_OUT](#xplr_pipe_history_out)
 - [XPLR_PIPE_DIRECTORY_NODES_OUT](#xplr_pipe_directory_nodes_out)
 
-### XPLR_PIPE_MSG_IN
+#### XPLR_PIPE_MSG_IN
 
 Append new-line delimited messages to this pipe in [YAML](www.yaml.org) (or
 [JSON](www.json.org)) syntax. These messages will be read and handled by xplr
 after the command execution.
 
-### XPLR_PIPE_SELECTION_OUT
+#### XPLR_PIPE_SELECTION_OUT
 
 New-line delimited list of selected paths.
 
-### XPLR_PIPE_GLOBAL_HELP_MENU_OUT
+#### XPLR_PIPE_GLOBAL_HELP_MENU_OUT
 
 The full help menu.
 
-### XPLR_PIPE_LOGS_OUT
+#### XPLR_PIPE_LOGS_OUT
 
 New-line delimited list of logs.
 
-### XPLR_PIPE_RESULT_OUT
+#### XPLR_PIPE_RESULT_OUT
 
 New-line delimited result (selected paths if any, else the focused path)
 
-### XPLR_PIPE_HISTORY_OUT
+#### XPLR_PIPE_HISTORY_OUT
 
 New-line delimited list of last visited paths (similar to jump list in vim).
 
-### XPLR_PIPE_DIRECTORY_NODES_OUT
+#### XPLR_PIPE_DIRECTORY_NODES_OUT
 
 New-line delimited list of paths, filtered and sorted as displayed in the
 [files table](layouts.md#table).
+
+
+### Example:
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key.space = {
+  help = "ask name and greet",
+  messages = {
+    {
+      BashExec = [===[
+      echo "What's your name?"
+
+      read name
+      greeting="Hello $name!"
+      message="$greeting You are inside $PWD"
+    
+      echo LogSuccess: '"'$message'"' >> "${XPLR_PIPE_MSG_IN:?}"
+      ]===]
+    }
+  }
+}
+
+-- Now, when you press "space" in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+```
+

@@ -16,12 +16,12 @@ that case, both `~/.config/xplr/init.lua` and `/etc/xplr/init.lua` will be
 ignored.
 
 
-Loading Order
--------------
+How Config is Loaded
+--------------------
 
 When xplr loads, it first executes the built-in
 [init.lua](https://github.com/sayanarijit/xplr/blob/main/src/init.lua) to set
-the default values. It is then overwritten by another config file, if found
+the default values, which is then overwritten by another config file, if found
 using the following lookup order:
 
 **--config /path/to/init.lua** > **~/.config/xplr/init.lua** > **/etc/xplr/init.lua**
