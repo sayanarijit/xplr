@@ -86,6 +86,16 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .status()
 }
 
+fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
+    match fs::OpenOptions::new().write(true).open(path) {
+        Ok(mut file) => {
+            writeln!(file, "{}", focus_path)?;
+            Ok(file)
+        }
+        Err(e) => Err(e.into()),
+    }
+}
+
 pub struct Runner {
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
@@ -171,7 +181,18 @@ impl Runner {
         // let mut stdout = stdout.lock();
         execute!(stdout, term::EnterAlternateScreen)?;
 
-        let mut fifo: Option<fs::File> = None;
+        let mut fifo: Option<fs::File> = if let Some(path) = app.config().general().start_fifo() {
+            match start_fifo(&path, &app.focused_node_str()) {
+                Ok(file) => Some(file),
+                Err(e) => {
+                    app = app.log_error(e.to_string())?;
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
         let mut last_focus: Option<app::Node> = None;
 
         let mut mouse_enabled = app.config().general().enable_mouse();
@@ -327,15 +348,11 @@ impl Runner {
                             }
 
                             app::MsgOut::StartFifo(path) => {
-                                if let Some(file) = fifo {
-                                    fifo = None;
-                                    std::mem::drop(file);
-                                }
-
-                                match fs::OpenOptions::new().write(true).open(path) {
-                                    Ok(file) => fifo = Some(file),
+                                fifo = match start_fifo(&path, &app.focused_node_str()) {
+                                    Ok(file) => Some(file),
                                     Err(e) => {
                                         app = app.log_error(e.to_string())?;
+                                        None
                                     }
                                 }
                             }
@@ -352,10 +369,11 @@ impl Runner {
                                     fifo = None;
                                     std::mem::drop(file);
                                 } else {
-                                    match fs::OpenOptions::new().write(true).open(path) {
-                                        Ok(file) => fifo = Some(file),
+                                    fifo = match start_fifo(&path, &app.focused_node_str()) {
+                                        Ok(file) => Some(file),
                                         Err(e) => {
                                             app = app.log_error(e.to_string())?;
+                                            None
                                         }
                                     }
                                 }

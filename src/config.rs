@@ -483,6 +483,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub initial_layout: Option<String>,
+
+    #[serde(default)]
+    pub start_fifo: Option<String>,
 }
 
 impl GeneralConfig {
@@ -569,6 +572,11 @@ impl GeneralConfig {
     /// Set the general config's read only.
     pub fn set_read_only(&mut self, read_only: bool) {
         self.read_only = read_only;
+    }
+
+    /// Get a reference to the general config's start fifo.
+    pub fn start_fifo(&self) -> Option<&String> {
+        self.start_fifo.as_ref()
     }
 }
 
