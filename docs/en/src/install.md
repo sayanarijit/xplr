@@ -29,7 +29,7 @@ repositories:
 #### [Official Community Repo](https://archlinux.org/packages/community/x86_64/xplr)
 
 ```
-sudo pacman -Syu xplr
+sudo pacman -S xplr
 ```
 
 #### [AUR](https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go)
