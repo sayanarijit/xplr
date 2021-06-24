@@ -2,7 +2,7 @@ Modes
 =====
 
 xplr is a modal file explorer. That means the users switch between different
-modes, each containing a different set to key bindings to avoid clashes. Users
+modes, each containing a different set of key bindings to avoid clashes. Users
 can switch between these modes at run-time.
 
 The modes can be configured using the `xplr.config.modes` Lua API.
@@ -258,3 +258,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key["F"] = {
 Now let's try out the new `xplr`-`fzf` integration.
 
 [![xplr-fzf.gif](https://s3.gifyu.com/images/xplr-fzf.gif)](https://gifyu.com/image/tW86)
+
+-----
+
+Visit [Awesome Plugins](awesome-plugins.md) for more [integration](awesome-plugins.md#integration) options.

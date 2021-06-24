@@ -54,54 +54,24 @@ Table of content
   - [Node Types](https://arijitbasu.in/xplr/en/node_types.html)
   - [Style](https://arijitbasu.in/xplr/en/style.html)
 - [Default Key Bindings](https://arijitbasu.in/xplr/en/default-key-bindings.html)
+- [Plugin](https://arijitbasu.in/xplr/en/default-key-bindings.html)
+  - [Installing Plugins](https://arijitbasu.in/xplr/en/installing-plugins.html)
+  - [Writing Plugins](https://arijitbasu.in/xplr/en/writing-plugins.html)
+  - [Awesome Plugins](https://arijitbasu.in/xplr/en/awesome-plugins.html)
 - [TODO](https://arijitbasu.in/xplr/en/todo.html)
-- [Hacks](https://github.com/sayanarijit/xplr/wiki/Hacks)
-- [Themes](https://github.com/sayanarijit/xplr/wiki/Themes)
-- [Alternatives](https://github.com/sayanarijit/xplr/wiki/alternatives.html)
-- [Upgrade Guide](https://github.com/sayanarijit/xplr/wiki/upgrade-guide.html)
-- [Community](https://github.com/sayanarijit/xplr/wiki/community.html)
-- [Contribute](https://github.com/sayanarijit/xplr/wiki/contribute.html)
+- [Alternatives](https://arijitbasu.in/xplr/en/alternatives.html)
+- [Upgrade Guide](https://arijitbasu.in/xplr/en/upgrade-guide.html)
+- [Community](https://arijitbasu.in/xplr/en/community.html)
+- [Contribute](https://arijitbasu.in/xplr/en/contribute.html)
 
 
-## Demo
-
-<details>
-<summary>Expand for demo</summary>
-  
-<p align="center">
-
-<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#fuzzy-search-with-preview" target="_blank">
-<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-fzf.gif" />
-</a>
-
-<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#batch-rename" target="_blank">
-<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-rename.gif" />
-</a>
-
-<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#serve-pwd" target="_blank">
-<img height=240 width=360 src="https://s3.gifyu.com/images/xplr-serve.gif" />
-</a>
-
-<a href="https://github.com/sayanarijit/xplr/wiki/Themes#material-landscape" target="_blank">
-<img height=240 width=360 src="https://s3.gifyu.com/images/theaming.gif" />
-</a>
-
-<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#sendreceive-files-via-qr-code-on-lan" target="_blank">
-<img height=240 width=360 src="https://s4.gifyu.com/images/xplr-qr.gif" />
-</a>
-
-<a href="https://github.com/sayanarijit/xplr/wiki/Hacks#spawn-multiple-sessions-in-different-windows" target="_blank">
-<img height=240 width=360 src="https://s3.gifyu.com/images/xplr-sessions.gif" />
-</a>
-
-</p>
-</details>
-
-
-## Packaging
+Packaging
+---------
 
 <a href="https://repology.org/project/xplr/versions" target="_blank"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" /></a>
 
-## Backers
+
+Backers
+-------
 
 <a href="https://opencollective.com/xplr#backer" target="_blank"><img src="https://opencollective.com/xplr/tiers/backer.svg?width=890" /></a>

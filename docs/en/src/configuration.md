@@ -16,7 +16,7 @@ that case, both `~/.config/xplr/init.lua` and `/etc/xplr/init.lua` will be
 ignored.
 
 
-How Config is Loaded
+How Config Is Loaded
 --------------------
 
 When xplr loads, it first executes the built-in
@@ -25,3 +25,14 @@ the default values, which is then overwritten by another config file, if found
 using the following lookup order:
 
 **--config /path/to/init.lua** > **~/.config/xplr/init.lua** > **/etc/xplr/init.lua**
+
+
+How to Configure
+----------------
+
+- [General Config](general-config.md)
+- [Modes](modes.md)
+- [Message](message.md)
+- [Layouts](layouts.md)
+- [Node Types](node_types.md)
+- [Style](style.md)
