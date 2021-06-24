@@ -1,7 +1,7 @@
 Quickstart
 ==========
 
-Nice yo have to have here! Let's start quickly start our xplr journey with the
+Nice to you have here! Let's quickly start our xplr journey with the
 following steps:
 
 - [Install](install.md)
