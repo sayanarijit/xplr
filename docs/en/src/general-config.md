@@ -1,7 +1,7 @@
 General Config
 ==============
 
-This is configuration exposed via the `xplr.config.general` API. It contains
+This configuration is exposed via the `xplr.config.general` API. It contains
 the following fields:
 
 
