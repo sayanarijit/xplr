@@ -12,6 +12,8 @@ A hackable, minimal, fast TUI file explorer
   - [Layouts](layouts.md)
   - [Node Types](node_types.md)
   - [Style](style.md)
+  - [Sorting](sorting.md)
+  - [Filtering](filtering.md)
 - [Default Key Bindings](default-key-bindings.md)
 - [Plugin](plugin.md)
   - [Installing Plugins](installing-plugins.md)

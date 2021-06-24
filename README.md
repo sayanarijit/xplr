@@ -53,6 +53,8 @@ Table of content
   - [Layouts](https://arijitbasu.in/xplr/en/layouts.html)
   - [Node Types](https://arijitbasu.in/xplr/en/node_types.html)
   - [Style](https://arijitbasu.in/xplr/en/style.html)
+  - [Sorting](https://arijitbasu.in/xplr/en/sorting.html)
+  - [Filtering](https://arijitbasu.in/xplr/en/filtering.html)
 - [Default Key Bindings](https://arijitbasu.in/xplr/en/default-key-bindings.html)
 - [Plugin](https://arijitbasu.in/xplr/en/plugin.html)
   - [Installing Plugins](https://arijitbasu.in/xplr/en/installing-plugins.html)
