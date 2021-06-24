@@ -18,4 +18,6 @@ Theme
 Integration
 -----------
 
-foo
+- [dua-cli.xplr](https://github.com/sayanarijit/dua-cli.xplr)
+  Get the disk usage using [dua-cli](https://github.com/Byron/dua-cli) with
+  selection support.
