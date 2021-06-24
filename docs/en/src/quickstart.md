@@ -1,5 +1,8 @@
 Quickstart
 ==========
 
-In this chapter, we'll learn how to install and configure xplr on our machine
-for the first time.
+Nice yo have to have here! Let's start quickly start our xplr journey with the
+following steps:
+
+- [Install](install.md)
+- [Post Install](post-install.md)
