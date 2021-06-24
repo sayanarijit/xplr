@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">5.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">6.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">7.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">8.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">9.</strong> Contribute</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="plugin.html"><strong aria-hidden="true">5.</strong> Plugin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installing-plugins.html"><strong aria-hidden="true">5.1.</strong> Installing Plugins</a></li><li class="chapter-item expanded "><a href="writing-plugins.html"><strong aria-hidden="true">5.2.</strong> Writing Plugins</a></li><li class="chapter-item expanded "><a href="awesome-plugins.html"><strong aria-hidden="true">5.3.</strong> Awesome Plugins</a></li></ol></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">7.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">8.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">9.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">10.</strong> Contribute</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -159,8 +159,12 @@ intuitive, scriptable, keyboard controlled, real-time visual interface, also
 being an ideal candidate for further integration, enabling the users to achieve
 insane terminal productivity.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart"><a class="header" href="#quickstart">Quickstart</a></h1>
-<p>In this chapter, we'll learn how to install and configure xplr on our machine
-for the first time.</p>
+<p>Nice yo have to have here! Let's start quickly start our xplr journey with the
+following steps:</p>
+<ul>
+<li><a href="install.html">Install</a></li>
+<li><a href="post-install.html">Post Install</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="install"><a class="header" href="#install">Install</a></h1>
 <p>You can install xplr using one of the following ways. Each has their own
 advantages and limitations.</p>
@@ -342,12 +346,21 @@ will be ignored.</p>
 the command-line argument <code>-c</code> / <code>--config</code> to specify its path explicitely. In
 that case, both <code>~/.config/xplr/init.lua</code> and <code>/etc/xplr/init.lua</code> will be
 ignored.</p>
-<h2 id="how-config-is-loaded"><a class="header" href="#how-config-is-loaded">How Config is Loaded</a></h2>
+<h2 id="how-config-is-loaded"><a class="header" href="#how-config-is-loaded">How Config Is Loaded</a></h2>
 <p>When xplr loads, it first executes the built-in
 <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">init.lua</a> to set
 the default values, which is then overwritten by another config file, if found
 using the following lookup order:</p>
 <p><strong>--config /path/to/init.lua</strong> &gt; <strong>~/.config/xplr/init.lua</strong> &gt; <strong>/etc/xplr/init.lua</strong></p>
+<h2 id="how-to-configure"><a class="header" href="#how-to-configure">How to Configure</a></h2>
+<ul>
+<li><a href="general-config.html">General Config</a></li>
+<li><a href="modes.html">Modes</a></li>
+<li><a href="message.html">Message</a></li>
+<li><a href="layouts.html">Layouts</a></li>
+<li><a href="node_types.html">Node Types</a></li>
+<li><a href="style.html">Style</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="general-config"><a class="header" href="#general-config">General Config</a></h1>
 <p>This is configuration exposed via the <code>xplr.config.general</code> API. It contains
 the following fields:</p>
@@ -378,7 +391,7 @@ action.</p>
 <p>TODO: Continue documentation</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="modes"><a class="header" href="#modes">Modes</a></h1>
 <p>xplr is a modal file explorer. That means the users switch between different
-modes, each containing a different set to key bindings to avoid clashes. Users
+modes, each containing a different set of key bindings to avoid clashes. Users
 can switch between these modes at run-time.</p>
 <p>The modes can be configured using the <code>xplr.config.modes</code> Lua API.</p>
 <p>It contains the following fields:</p>
@@ -559,6 +572,8 @@ the <code>default</code> mode.</p>
 </code></pre>
 <p>Now let's try out the new <code>xplr</code>-<code>fzf</code> integration.</p>
 <p><a href="https://gifyu.com/image/tW86"><img src="https://s3.gifyu.com/images/xplr-fzf.gif" alt="xplr-fzf.gif" /></a></p>
+<hr />
+<p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for more <a href="awesome-plugins.html#integration">integration</a> options.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="message"><a class="header" href="#message">Message</a></h1>
 <p>You can think of xplr as a server. Just like web servers listen to HTTP
 requests, xplr listens to messages.</p>
@@ -1233,6 +1248,86 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="plugin"><a class="header" href="#plugin">Plugin</a></h1>
+<p>xplr supports pluggable Lua modules that can be used to easily configure or
+extend xplr UI and functionalities.</p>
+<ul>
+<li><a href="installing-plugins.html">Installing Plugins</a></li>
+<li><a href="writing-plugins.html">Writing Plugins</a></li>
+<li><a href="awesome-plugins.html">Awesome Plugins</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installing-plugins"><a class="header" href="#installing-plugins">Installing Plugins</a></h1>
+<p>Until we get a cool plugin manager, let's install plugins manually using the
+following procedure:</p>
+<ul>
+<li>
+<p>Add the following line in <code>~/.config/xplr/init.lua</code></p>
+<pre><code class="language-lua">package.path = os.getenv(&quot;HOME&quot;) .. '/.config/xplr/plugins/?/src/init.lua'
+</code></pre>
+</li>
+<li>
+<p>Clone the plugin</p>
+<pre><code class="language-bash">mkdir -p ~/.config/xplr/plugins
+
+git clone https://github.com/sayanarijit/material-landscape2.xplr ~/.config/xplr/plugins/material-landscape2
+</code></pre>
+</li>
+<li>
+<p>Require the module in <code>~/.config/xplr/init.lua</code></p>
+<pre><code class="language-lua">require(&quot;material-landscape2&quot;).setup()
+
+-- The setup arguments might differ for different plugins.
+-- Visit the project README for setup instructions.
+</code></pre>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="writing-plugins"><a class="header" href="#writing-plugins">Writing Plugins</a></h1>
+<p>Anyone who can write <a href="https://www.lua.org">Lua</a> code, can write xplr plugins.</p>
+<p>Just follow the instructions and best practices:</p>
+<h2 id="naming"><a class="header" href="#naming">Naming</a></h2>
+<p>xplr plugins are named using hiphen (<code>-</code>) separated words that may also include
+integers. They will be plugged using the <code>require()</code> function in Lua.</p>
+<h2 id="structure"><a class="header" href="#structure">Structure</a></h2>
+<p>A minimal plugin should confirm to the following structure:</p>
+<pre><code>material-landscape
+├── README.md
+└── src
+    └── init.lua
+</code></pre>
+<p>You can also use
+<a href="https://github.com/sayanarijit/plugin-template1.xplr">this template</a>.</p>
+<h3 id="readmemd"><a class="header" href="#readmemd">README.md</a></h3>
+<p>This is where you document what the plugin does, how to use it, etc.</p>
+<h3 id="srcinitlua"><a class="header" href="#srcinitlua">src/init.lua</a></h3>
+<p>This file is executed to load the plugin. It should expose a <code>setup()</code>
+function, which will be used by the users to setup the plugin.</p>
+<p>Example:</p>
+<pre><code class="language-lua">local function setup(args)
+  local xplr = xplr
+  -- do stuff with xplr
+end
+
+return { setup = setup }
+</code></pre>
+<h2 id="publishing"><a class="header" href="#publishing">Publishing</a></h2>
+<p>When publishing plugins to GitHub or other repositories, it's a best practice
+to append <code>.xplr</code> to the name to make them distinguishable. Similar to the
+<code>*.nvim</code> naming convention for <a href="https://neovim.io">Neovim</a> plugins.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for xplr plugin examples.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="awesome-plugins"><a class="header" href="#awesome-plugins">Awesome Plugins</a></h1>
+<h2 id="categories"><a class="header" href="#categories">Categories</a></h2>
+<ul>
+<li><a href="awesome-plugins.html#theme">Theme</a></li>
+<li><a href="awesome-plugins.html#integration">Integration</a></li>
+</ul>
+<h2 id="theme"><a class="header" href="#theme">Theme</a></h2>
+<ul>
+<li><a href="https://github.com/sayanarijit/material-landscape.xplr">material-landscape.xplr</a></li>
+<li><a href="https://github.com/sayanarijit/material-landscape2.xplr">material-landscape2.xplr</a></li>
+</ul>
+<h2 id="integration"><a class="header" href="#integration">Integration</a></h2>
+<p>foo</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="todo"><a class="header" href="#todo">TODO</a></h1>
 <ul>
 <li><input disabled="" type="checkbox" checked=""/>

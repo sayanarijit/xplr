@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Quickstart - xplr book</title>
+        <title>Writing Plugins - xplr book</title>
                 
 
         <!-- Custom HTML head -->
@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html" class="active"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="plugin.html"><strong aria-hidden="true">5.</strong> Plugin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installing-plugins.html"><strong aria-hidden="true">5.1.</strong> Installing Plugins</a></li><li class="chapter-item expanded "><a href="writing-plugins.html"><strong aria-hidden="true">5.2.</strong> Writing Plugins</a></li><li class="chapter-item expanded "><a href="awesome-plugins.html"><strong aria-hidden="true">5.3.</strong> Awesome Plugins</a></li></ol></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">7.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">8.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">9.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">10.</strong> Contribute</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="plugin.html"><strong aria-hidden="true">5.</strong> Plugin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installing-plugins.html"><strong aria-hidden="true">5.1.</strong> Installing Plugins</a></li><li class="chapter-item expanded "><a href="writing-plugins.html" class="active"><strong aria-hidden="true">5.2.</strong> Writing Plugins</a></li><li class="chapter-item expanded "><a href="awesome-plugins.html"><strong aria-hidden="true">5.3.</strong> Awesome Plugins</a></li></ol></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">7.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">8.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">9.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">10.</strong> Contribute</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -120,7 +120,7 @@
                                                                         <a href="https://github.com/sayanarijit/xplr" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/quickstart.md" title="Suggest an edit" aria-label="Suggest an edit">
+                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/writing-plugins.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
                         
@@ -149,23 +149,50 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="quickstart"><a class="header" href="#quickstart">Quickstart</a></h1>
-<p>Nice yo have to have here! Let's start quickly start our xplr journey with the
-following steps:</p>
-<ul>
-<li><a href="install.html">Install</a></li>
-<li><a href="post-install.html">Post Install</a></li>
-</ul>
+                        <h1 id="writing-plugins"><a class="header" href="#writing-plugins">Writing Plugins</a></h1>
+<p>Anyone who can write <a href="https://www.lua.org">Lua</a> code, can write xplr plugins.</p>
+<p>Just follow the instructions and best practices:</p>
+<h2 id="naming"><a class="header" href="#naming">Naming</a></h2>
+<p>xplr plugins are named using hiphen (<code>-</code>) separated words that may also include
+integers. They will be plugged using the <code>require()</code> function in Lua.</p>
+<h2 id="structure"><a class="header" href="#structure">Structure</a></h2>
+<p>A minimal plugin should confirm to the following structure:</p>
+<pre><code>material-landscape
+├── README.md
+└── src
+    └── init.lua
+</code></pre>
+<p>You can also use
+<a href="https://github.com/sayanarijit/plugin-template1.xplr">this template</a>.</p>
+<h3 id="readmemd"><a class="header" href="#readmemd">README.md</a></h3>
+<p>This is where you document what the plugin does, how to use it, etc.</p>
+<h3 id="srcinitlua"><a class="header" href="#srcinitlua">src/init.lua</a></h3>
+<p>This file is executed to load the plugin. It should expose a <code>setup()</code>
+function, which will be used by the users to setup the plugin.</p>
+<p>Example:</p>
+<pre><code class="language-lua">local function setup(args)
+  local xplr = xplr
+  -- do stuff with xplr
+end
+
+return { setup = setup }
+</code></pre>
+<h2 id="publishing"><a class="header" href="#publishing">Publishing</a></h2>
+<p>When publishing plugins to GitHub or other repositories, it's a best practice
+to append <code>.xplr</code> to the name to make them distinguishable. Similar to the
+<code>*.nvim</code> naming convention for <a href="https://neovim.io">Neovim</a> plugins.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for xplr plugin examples.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                                                    <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                                    <a rel="prev" href="installing-plugins.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
-                                                    <a rel="next" href="install.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                                    <a rel="next" href="awesome-plugins.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -175,11 +202,11 @@ following steps:</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                    <a rel="prev" href="installing-plugins.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
-                                    <a rel="next" href="install.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                    <a rel="next" href="awesome-plugins.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                             </nav>
