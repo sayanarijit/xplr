@@ -14,6 +14,9 @@ xplr.config.general.read_only = false
 ------ Recover mode
 xplr.config.general.disable_recover_mode = false
 
+------ Start FIFO
+xplr.config.general.start_fifo = nil
+
 ------ Prompt
 xplr.config.general.prompt.format = "❯ "
 xplr.config.general.prompt.style.add_modifiers = nil
