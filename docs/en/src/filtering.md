@@ -13,7 +13,7 @@ rel!^. › [i]abs=~abc › [i]rel!~xyz
 This line means that the nodes visible on the table will first be filtered by
 the condition: *relative path does not start with `.`*, then by the condition:
 *absolute path contains `abc` (case insensitive)*, and finally by the
-condition: *relative path does not contain `xyz`*.
+condition: *relative path does not contain `xyz`* (case insensitive).
 
 Each part of this pipeline is called [Node Filter Applicable](#node-filter-applicable).
 
