@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html" class="active"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="plugin.html"><strong aria-hidden="true">5.</strong> Plugin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installing-plugins.html"><strong aria-hidden="true">5.1.</strong> Installing Plugins</a></li><li class="chapter-item expanded "><a href="writing-plugins.html"><strong aria-hidden="true">5.2.</strong> Writing Plugins</a></li><li class="chapter-item expanded "><a href="awesome-plugins.html"><strong aria-hidden="true">5.3.</strong> Awesome Plugins</a></li></ol></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">7.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">8.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">9.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">10.</strong> Contribute</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html" class="active"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li><li class="chapter-item expanded "><a href="sorting.html"><strong aria-hidden="true">3.7.</strong> Sorting</a></li><li class="chapter-item expanded "><a href="filtering.html"><strong aria-hidden="true">3.8.</strong> Filtering</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="plugin.html"><strong aria-hidden="true">5.</strong> Plugin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installing-plugins.html"><strong aria-hidden="true">5.1.</strong> Installing Plugins</a></li><li class="chapter-item expanded "><a href="writing-plugins.html"><strong aria-hidden="true">5.2.</strong> Writing Plugins</a></li><li class="chapter-item expanded "><a href="awesome-plugins.html"><strong aria-hidden="true">5.3.</strong> Awesome Plugins</a></li></ol></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">6.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">7.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">8.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">9.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">10.</strong> Contribute</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -175,7 +175,79 @@ action.</p>
 <p>Style of the cursor.</p>
 <h2 id="initial_layout"><a class="header" href="#initial_layout">initial_layout</a></h2>
 <p>Type: string</p>
-<p>The name of one of the defined <a href="layouts.html">layouts</a> to use when xplr loads.</p>
+<p>The name of one of the <a href="layouts.html">layout</a> to use when xplr loads.</p>
+<h2 id="initial_mode"><a class="header" href="#initial_mode">initial_mode</a></h2>
+<p>Type: string</p>
+<p>The name of one of the <a href="modes.html">mode</a> to use when xplr loads.</p>
+<h2 id="initial_sorting"><a class="header" href="#initial_sorting">initial_sorting</a></h2>
+<p>Type: list of <a href="sorting.html#node-sorter-applicable">Node Sorter Applicable</a></p>
+<p>Initial group if sorters applied to the nodes list in the table.</p>
+<h2 id="tablestyle"><a class="header" href="#tablestyle">table.style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Default style of the table.</p>
+<h2 id="tablecol_spacing"><a class="header" href="#tablecol_spacing">table.col_spacing</a></h2>
+<p>Type: nullable integer</p>
+<p>Default spacing of the columns in the table.</p>
+<h2 id="tablecol_widths"><a class="header" href="#tablecol_widths">table.col_widths</a></h2>
+<p>Type: nullable list of <a href="layouts.html#constraint">Constraint</a></p>
+<p>Width of each column in the table.</p>
+<h2 id="tableheaderheight"><a class="header" href="#tableheaderheight">table.header.height</a></h2>
+<p>Type: nullable integer</p>
+<p>Height of the table header.</p>
+<h2 id="tableheaderstyle"><a class="header" href="#tableheaderstyle">table.header.style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Style of table header.</p>
+<h2 id="tableheadercols"><a class="header" href="#tableheadercols">table.header.cols</a></h2>
+<p>Type: List of column configuration</p>
+<p>Each column config contains <code>format</code> field (string) and <code>style</code> field
+(<a href="style.html">Style</a>), that define the content and style of header.</p>
+<h2 id="tablerowheight"><a class="header" href="#tablerowheight">table.row.height</a></h2>
+<p>Type: nullable integer</p>
+<p>Height of each row in the table.</p>
+<h2 id="tablerowstyle"><a class="header" href="#tablerowstyle">table.row.style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Style of table rows.</p>
+<h2 id="tablerowcols"><a class="header" href="#tablerowcols">table.row.cols</a></h2>
+<p>Type: List of column configuration</p>
+<p>Each column config contains <code>format</code> field (string) and <code>style</code> field
+(<a href="style.html">Style</a>).</p>
+<p>However, unlike <a href="#tableheadercols">table.header.cols</a>, the <code>format</code> field here
+points to a Lua function that receives a
+<a href="https://docs.rs/xplr/latest/xplr/ui/struct.NodeUiMetadata.html">special argument</a>
+as input and returns a string that will be displayed in the column.</p>
+<p>TODO: Document the argument fields here.</p>
+<p>xplr by default provides the following functions:</p>
+<ul>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_0</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_1</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_2</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_3</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_4</code></li>
+</ul>
+<p>You can either overwrite these functions, or create new functions in
+<code>xplr.fn.custom</code> and point to them.</p>
+<p>Terminal colors are supported.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.fn.custom.fmt_simple_column = function(m)
+  return m.prefix .. m.relative_path .. m.suffix
+end
+
+xplr.config.general.table.header.cols = {
+  { format = &quot;  path&quot; }
+}
+
+xplr.config.general.table.row.cols = {
+  { format = &quot;custom.fmt_simple_column&quot; }
+}
+
+xplr.config.general.table.col_widths = {
+  { Percentage = 100 }
+}
+
+-- With this config, you should only see a single column displaying the
+-- relative paths.
+</code></pre>
+<hr />
 <p>TODO: Continue documentation</p>
 
                     </main>
