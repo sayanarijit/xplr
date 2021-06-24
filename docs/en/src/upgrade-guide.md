@@ -46,7 +46,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.13.7](https://github.com/sayanarijit/xplr/releases/tag/v0.13.7) -> [v0.14.2](https://github.com/sayanarijit/xplr/releases/tag/v0.14.2)
+#### [v0.13.7](https://github.com/sayanarijit/xplr/releases/tag/v0.13.7) -> [v0.14.3](https://github.com/sayanarijit/xplr/releases/tag/v0.14.3)
 
 - macOS users need to place their config file (`init.lua`) in
   `$HOME/.config/xplr/` or `/etc/xplr/`.
@@ -55,6 +55,10 @@ compatibility.
   for [FIFO based file previews](https://github.com/sayanarijit/xplr/pull/229#issue-662426960).
 - You can disable the recover mode using `config.general.disable_recover_mode = true`.
 - Try running `xplr --help`. Yes, CLI has been implemented.
+- Since version `v0.14.3`, `StartFifo` and `ToggleFifo` will write to the FIFO
+  path when called. So, there's no need to pipe the focus path explicitely.
+- Since version `v0.14.3`, general config `xplr.config.start_fifo` is available
+  which can be set to a file path to start a fifo when xplr starts.
 
 <sub>Like this project so far? **[Please consider contributing](contribute.md)**.</sub>
 

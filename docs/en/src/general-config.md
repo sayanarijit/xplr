@@ -61,7 +61,140 @@ initial_layout
 
 Type: string
 
-The name of one of the defined [layouts](layouts.md) to use when xplr loads.
+The name of one of the [layout](layouts.md) to use when xplr loads.
 
+
+initial_mode
+------------
+
+Type: string
+
+The name of one of the [mode](modes.md) to use when xplr loads.
+
+
+initial_sorting
+---------------
+
+Type: list of [Node Sorter Applicable](sorting.md#node-sorter-applicable)
+
+Initial group if sorters applied to the nodes list in the table.
+
+
+table.style
+-----------
+
+Type: [Style](style.md)
+
+Default style of the table.
+
+
+table.col_spacing
+-----------------
+
+Type: nullable integer
+
+Default spacing of the columns in the table.
+
+
+table.col_widths
+----------------
+
+Type: nullable list of [Constraint](layouts.md#constraint)
+
+Width of each column in the table.
+
+table.header.height
+----------------
+
+Type: nullable integer
+
+Height of the table header.
+
+
+table.header.style
+---------------
+
+Type: [Style](style.md)
+
+Style of table header.
+
+
+table.header.cols
+-----------------
+
+Type: List of column configuration
+
+Each column config contains `format` field (string) and `style` field
+([Style](style.md)), that define the content and style of header.
+
+
+table.row.height
+----------------
+
+Type: nullable integer
+
+Height of each row in the table.
+
+
+table.row.style
+---------------
+
+Type: [Style](style.md)
+
+Style of table rows.
+
+
+table.row.cols
+-----------------
+
+Type: List of column configuration
+
+Each column config contains `format` field (string) and `style` field
+([Style](style.md)).
+
+However, unlike [table.header.cols](#tableheadercols), the `format` field here
+points to a Lua function that receives a
+[special argument](https://docs.rs/xplr/latest/xplr/ui/struct.NodeUiMetadata.html)
+as input and returns a string that will be displayed in the column.
+
+TODO: Document the argument fields here.
+
+xplr by default provides the following functions:
+
+- `xplr.fn.builtin.fmt_general_table_row_cols_0`
+- `xplr.fn.builtin.fmt_general_table_row_cols_1`
+- `xplr.fn.builtin.fmt_general_table_row_cols_2`
+- `xplr.fn.builtin.fmt_general_table_row_cols_3`
+- `xplr.fn.builtin.fmt_general_table_row_cols_4`
+
+You can either overwrite these functions, or create new functions in
+`xplr.fn.custom` and point to them.
+
+Terminal colors are supported.
+
+Example:
+
+```lua
+xplr.fn.custom.fmt_simple_column = function(m)
+  return m.prefix .. m.relative_path .. m.suffix
+end
+
+xplr.config.general.table.header.cols = {
+  { format = "  path" }
+}
+
+xplr.config.general.table.row.cols = {
+  { format = "custom.fmt_simple_column" }
+}
+
+xplr.config.general.table.col_widths = {
+  { Percentage = 100 }
+}
+
+-- With this config, you should only see a single column displaying the
+-- relative paths.
+```
+
+------------
 
 TODO: Continue documentation
