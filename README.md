@@ -54,7 +54,7 @@ Table of content
   - [Node Types](https://arijitbasu.in/xplr/en/node_types.html)
   - [Style](https://arijitbasu.in/xplr/en/style.html)
 - [Default Key Bindings](https://arijitbasu.in/xplr/en/default-key-bindings.html)
-- [Plugin](https://arijitbasu.in/xplr/en/default-key-bindings.html)
+- [Plugin](https://arijitbasu.in/xplr/en/plugin.html)
   - [Installing Plugins](https://arijitbasu.in/xplr/en/installing-plugins.html)
   - [Writing Plugins](https://arijitbasu.in/xplr/en/writing-plugins.html)
   - [Awesome Plugins](https://arijitbasu.in/xplr/en/awesome-plugins.html)
