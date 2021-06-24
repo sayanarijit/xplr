@@ -50,7 +50,7 @@ custom
 
 Type: mapping of string and [Mode](#mode)
 
-This is exposed by the `xplr.config.layouts.custom` API.
+This is exposed by the `xplr.config.modes.custom` API.
 
 It allows the users to define custom modes.
 
