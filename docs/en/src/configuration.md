@@ -27,12 +27,13 @@ using the following lookup order:
 **--config /path/to/init.lua** > **~/.config/xplr/init.lua** > **/etc/xplr/init.lua**
 
 
-How to Configure
-----------------
+config
+------
 
-- [General Config](general-config.md)
-- [Modes](modes.md)
-- [Message](message.md)
-- [Layouts](layouts.md)
-- [Node Types](node_types.md)
-- [Style](style.md)
+The xplr configuration, exposed as `xplr.config` Lua API contains the
+following fields:
+
+- [general](general-config.md)
+- [modes](modes.md)
+- [layouts](layouts.md)
+- [node_types](node_types.md)
