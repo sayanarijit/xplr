@@ -22,4 +22,4 @@ Integration
   Get the disk usage using [dua-cli](https://github.com/Byron/dua-cli) with
   selection support.
 - [fzf.xplr](https://github.com/sayanarijit/fzf.xplr)
-  Fuzzy search to focus on select paths from the table.
+  Fuzzy search using fzf to focus and select paths from the table.
