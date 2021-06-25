@@ -10,8 +10,8 @@ Example:
 size↑ › [i]rel↓ › [c]dir↑ › [c]file↑ › sym↑
 ```
 
-This line means that the nodes visible on the table will be first sorted by
-relative file size, then by case insensitive relative path, then by the
+This line means that the nodes visible in the table will be first sorted by
+it's size, then by case insensitive relative path, then by the
 canonical (symlink resolved) type of the node, and finally by whether or not
 the node is a symlink.
 
