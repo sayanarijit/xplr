@@ -142,7 +142,7 @@ metadata is set for the [directory](#directory), [file](#file), and
 
 Example:
 
-```
+```lua
 xplr.config.node_types.file = {
   meta = {
     icon = "f",
