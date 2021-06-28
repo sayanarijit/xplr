@@ -19,7 +19,7 @@ Structure
 A minimal plugin should confirm to the following structure:
 
 ```
-material-landscape
+plugin-name
 ├── README.md
 └── src
     └── init.lua
