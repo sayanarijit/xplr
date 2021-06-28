@@ -13,13 +13,6 @@ Categories
 - [Theme](#theme)
 
 
-Theme
------
-
-- [material-landscape.xplr](https://github.com/sayanarijit/material-landscape.xplr)
-- [material-landscape2.xplr](https://github.com/sayanarijit/material-landscape2.xplr)
-
-
 Integration
 -----------
 
@@ -34,3 +27,13 @@ Integration
 - [trash-cli.xplr](https://github.com/sayanarijit/trash-cli.xplr)
   Trash files and directories using
   [trash-cli](https://github.com/andreafrancia/trash-cli).
+
+
+Theme
+-----
+
+- [material-landscape.xplr](https://github.com/sayanarijit/material-landscape.xplr)
+  Material Landscape
+
+- [material-landscape2.xplr](https://github.com/sayanarijit/material-landscape2.xplr)
+  xple theme - Material Landscape 2
