@@ -36,4 +36,4 @@ Theme
   Material Landscape
 
 - [material-landscape2.xplr](https://github.com/sayanarijit/material-landscape2.xplr)
-  xple theme - Material Landscape 2
+  Material Landscape 2
