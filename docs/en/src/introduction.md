@@ -1,14 +1,14 @@
 Introduction
 ============
 
-`xplr` is a terminal UI based file explorer that aims to increase our terminal
+xplr is a terminal UI based file explorer that aims to increase our terminal
 productivity by being a flexible, interactive orchestrator for the ever growing
 awesome command-line utilities that work with the file-system.
 
-To achieve its goal, `xplr` strives to be a fast, minimal and more importantly,
+To achieve its goal, xplr strives to be a fast, minimal and more importantly,
 hackable file explorer.
 
-`xplr` is not meant to be a replacement for the standard shell commands or the
+xplr is not meant to be a replacement for the standard shell commands or the
 GUI file managers. Rather, it aims to integrate them all and expose an
 intuitive, scriptable, keyboard controlled, real-time visual interface, also
 being an ideal candidate for further integration, enabling the users to achieve
@@ -23,7 +23,7 @@ Features
 xplr is built with configurability in mind. So it allows you to perform a vast
 set of operations and make it behave just the way you want.
 
-A few things you can do with the [`xplr`][xplr] configuration
+A few things you can do with the xplr configuration
 
 - [Hack the layout](layouts.md)
 - [Hack the key bindings](modes.md)
@@ -32,30 +32,29 @@ A few things you can do with the [`xplr`][xplr] configuration
 
 ## Fast
 
-Although speed is not the primary concern, [`xplr`][xplr] is already fast
-enough so that you can take it out for a walk into your `node_modules` or
-`/nix/store` any time you want. I currently
+Although speed is not the primary concern, xplr is already fast enough so that
+you can take it out for a walk into your `node_modules` or `/nix/store` any
+time you want. I currently
 [measure the most commonly used operations](https://github.com/sayanarijit/xplr/tree/main/benches)
 and I have seen it improve significantly over time, and it's only the start.
 
 **Tip:** A quick and easy way to optimize UI rendering is reducing the number
 of columns in the table.
 
-**Note:** If you feel [`xplr`][xplr] is not behaving at its optimal, this is
-probably because I am waiting for someone to complain. I want to avoid
-optimizing things I don't need to, because optimization often requires either
-complexity or feature sacrifice or both.
+**Note:** If you feel xplr is not behaving at its optimal, this is probably
+because I am waiting for someone to complain. I want to avoid optimizing things
+I don't need to, because optimization often requires either complexity or
+feature sacrifice or both.
 
 
 ## Minimalist
 
-[`xplr`][xplr] prefers to stay minimal, both in terms of features and binary
-size, but just like speed, minimalism isn't as aggressively pursued as
-configurability. If adding some feature, lines of code, or a dependency allows
-the users to be a little more productive or allows [`xplr`][xplr] to be a
-little more configurable, it will be considered. But of-course, the `bulk vs
-productivity gain per user` balance will also be considered in the
-decision-making.
+xplr prefers to stay minimal, both in terms of features and binary size, but
+just like speed, minimalism isn't as aggressively pursued as configurability.
+If adding some feature, lines of code, or a dependency allows the users to be a
+little more productive or allows xplr to be a little more configurable, it will
+be considered. But of-course, the `bulk vs productivity gain per user` balance
+will also be considered in the decision-making.
 
 
 ## Other features
