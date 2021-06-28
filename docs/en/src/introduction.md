@@ -64,22 +64,22 @@ will also be considered in the decision-making.
 - **Switchable recover mode:** Saves you from doing unwanted things when in a
   hurry.
 - **Sane (vim-like) defaults:**
-  - Use <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd> or arrow keys
+  - Use `h`, `j`, `k`, `l` or arrow keys
     for basic navigation.
-  - Go to top using <kbd>g</kbd><kbd>g</kbd>, and bottom using <kbd>G</kbd>.
-  - Travel history using <kbd>ctrl-o</kbd> and <kbd>ctrl-i</kbd>.
-  - Go to home directory using <kbd>~</kbd>.
-  - Enter search mode with <kbd>/</kbd> or <kbd>ctrl-f</kbd>.
-  - Go to absolute index (e.g. `4`) using <kbd>4</kbd><kbd>enter</kbd> or
-    <kbd>:</kbd><kbd>4</kbd><kbd>enter</kbd>.
-  - Go to relative index (e.g. `4 down`) using <kbd>4</kbd><kbd>down</kbd> or
-    <kbd>:</kbd><kbd>4</kbd><kbd>down</kbd>.
-  - Follow symlink using <kbd>g</kbd><kbd>f</kbd>.
-  - Open in GUI using <kbd>g</kbd><kbd>x</kbd>.
-  - Spawn terminal using <kbd>:</kbd><kbd>!</kbd>.
-  - Toggle selection using <kbd>v</kbd> or <kbd>space</kbd>.
-  - Toggle select all using <kbd>V</kbd> or <kbd>ctrl-a</kbd>.
-  - Clear selections using <kbd>ctrl-u</kbd>.
+  - Go to top using `g` `g`, and bottom using `G`.
+  - Travel history using `ctrl-o` and `ctrl-i`.
+  - Go to home directory using `~`.
+  - Enter search mode with `/` or `ctrl-f`.
+  - Go to absolute index (e.g. `4`) using `4` `enter` or
+    `:` `4` `enter`.
+  - Go to relative index (e.g. `4` `down`) using `4` `down` or
+    `:` `4` `down`.
+  - Follow symlink using `g` `f`.
+  - Open in GUI using `g` `x`.
+  - Spawn terminal using `:` `!`.
+  - Toggle selection using `v` or `space`.
+  - Toggle select all using `V` or `ctrl-a`.
+  - Clear selections using `ctrl-u`.
 - **Separate keys for navigation:** navigation keys are separated from the
   action keys (e.g. file opening action) to avoid mistakenly performing
   unwanted actions while navigating.
@@ -103,12 +103,12 @@ will also be considered in the decision-making.
 - **FIFO-based previews:** Easy to manage FIFO file that can be used to
   [integrate with previewers](https://github.com/sayanarijit/xplr/pull/229).
 - **Different quit options:**
-  - Quit with success without any output (<kbd>q</kbd>).
-  - Quit with success and the result printed on stdout (<kbd>enter</kbd>).
+  - Quit with success without any output (`q`).
+  - Quit with success and the result printed on stdout (`enter`).
   - Quit with success and the present working directory printed on stdout
-    (<kbd>:</kbd><kbd>q</kbd><kbd>p</kbd>).
+    (`:` `q` `p`).
   - Quit with success and the path under focus printed on stdout
-    (<kbd>:</kbd><kbd>q</kbd><kbd>f</kbd>).
+    (`:` `q` `f`).
   - Quit with success and the selection printed on stdout
-    (<kbd>:</kbd><kbd>q</kbd><kbd>s</kbd>).
-  - Quit with failure (<kbd>ctrl-c</kbd>).
+    (`:` `q` `s`).
+  - Quit with failure (`ctrl-c`).
