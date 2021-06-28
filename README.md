@@ -60,6 +60,8 @@ Table of content
   - [Installing Plugins](https://arijitbasu.in/xplr/en/installing-plugins.html)
   - [Writing Plugins](https://arijitbasu.in/xplr/en/writing-plugins.html)
   - [Awesome Plugins](https://arijitbasu.in/xplr/en/awesome-plugins.html)
+- [Integration](https://arijitbasu.in/xplr/en/integration.html)
+  - [Awesome Integrations](https://arijitbasu.in/xplr/en/awesome-integrations.html)
 - [TODO](https://arijitbasu.in/xplr/en/todo.html)
 - [Alternatives](https://arijitbasu.in/xplr/en/alternatives.html)
 - [Upgrade Guide](https://arijitbasu.in/xplr/en/upgrade-guide.html)

@@ -19,6 +19,8 @@ A hackable, minimal, fast TUI file explorer
   - [Installing Plugins](installing-plugins.md)
   - [Writing Plugins](writing-plugins.md)
   - [Awesome Plugins](awesome-plugins.md)
+- [Integration](integration.md)
+  - [Awesome Integrations](awesome-integrations.md)
 - [TODO](todo.md)
 - [Alternatives](alternatives.md)
 - [Upgrade Guide](upgrade-guide.md)

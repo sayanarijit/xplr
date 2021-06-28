@@ -56,6 +56,9 @@ When publishing plugins on GitHub or other repositories, it's a best practice
 to append `.xplr` to the name to make them distinguishable. Similar to the
 `*.nvim` naming convention for [Neovim](https://neovim.io) plugins.
 
+Finally, after publishing, don't hesitate to
+[let us know](https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell).
+
 
 Examples
 --------
