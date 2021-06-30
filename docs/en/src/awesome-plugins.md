@@ -28,6 +28,10 @@ Integration
   Trash files and directories using
   [trash-cli](https://github.com/andreafrancia/trash-cli).
 
+- [zoxide.xplr](https://github.com/sayanarijit/zoxide.xplr)
+  Change directory using the [zoxide](https://github.com/ajeetdsouza/zoxide)
+  database.
+
 
 Theme
 -----
