@@ -16,6 +16,9 @@ Categories
 Integration
 -----------
 
+- [dragon.xplr](https://github.com/sayanarijit/dragon.xplr)
+  Drag and drop files using [dragon](https://github.com/mwh/dragon).
+
 - [dua-cli.xplr](https://github.com/sayanarijit/dua-cli.xplr)
   Get the disk usage using [dua-cli](https://github.com/Byron/dua-cli) with
   selection support.
