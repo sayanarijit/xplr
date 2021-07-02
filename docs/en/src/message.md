@@ -478,19 +478,19 @@ Toggle selection by file path.
 
 Clear the selection.
 
-### { AddNodeFilter = { filter = "[NodeFilter](filtering.md#filter)", input = "string" }
+### { AddNodeFilter = { filter = [Filter](filtering.md#filter), input = "string" }
 
-**YAML:** `AddNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
+**YAML:** `AddNodeFilter: { filter = Filter, input = string }`
 
 Add a [filter](filtering.md) to exclude nodes while exploring directories.
 
 **YAML Example:** `AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
-**Lua Example:** `{ AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" }`
+**Lua Example:** `{ AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 
-### { RemoveNodeFilter = { filter = "[NodeFilter](filtering.md#filter)", input = "string" }
+### { RemoveNodeFilter = { filter = [Filter](filtering.md#filter), input = "string" }
 
-**YAML:** `RemoveNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
+**YAML:** `RemoveNodeFilter: { filter = Filter, input = string`
 
 Remove an existing [filter](filtering.md).
 
@@ -498,9 +498,9 @@ Remove an existing [filter](filtering.md).
 
 **Lua Example:** `{ RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }`
 
-### { ToggleNodeFilter = { filter = "[NodeFilter](filtering.md#filter)", input = "string" }
+### { ToggleNodeFilter = { filter = [Filter](filtering.md#filter), input = "string" }
 
-**YAML:** `ToggleNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
+**YAML:** `ToggleNodeFilter: { filter = Filter, input = string }`
 
 Remove a [filter](filter.md) if it exists, else, add a it.
 
@@ -508,9 +508,9 @@ Remove a [filter](filter.md) if it exists, else, add a it.
 
 **Lua Example:** `{ ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 
-### { AddNodeFilterFromInput = "[NodeFilter](filtering.md#filter)" }
+### { AddNodeFilterFromInput = [Filter](filtering.md#filter) }
 
-**YAML:** `AddNodeFilterFromInput: [NodeFilter](filtering.md#filter)`
+**YAML:** `AddNodeFilterFromInput: Filter`
 
 Add a node [filter](filtering.md) reading the input from the buffer.
 
@@ -518,9 +518,9 @@ Add a node [filter](filtering.md) reading the input from the buffer.
 
 **Lua Example:** `{ AddNodeFilterFromInput = "RelativePathDoesStartWith" }`
 
-### { RemoveNodeFilterFromInput = "[NodeFilter](filtering.md#filter)" }
+### { RemoveNodeFilterFromInput = [Filter](filtering.md#filter) }
 
-**YAML:** `RemoveNodeFilterFromInput: [NodeFilter](filtering.md#filter)`
+**YAML:** `RemoveNodeFilterFromInput: Filter`
 
 Remove a node [filter](filtering.md) reading the input from the buffer.
 
@@ -546,9 +546,9 @@ Reset the node [filters](filtering.md) back to the default configuration.
 
 Clear all the node [filters](filtering.md).
 
-### { AddNodeSorter = { sorter = "[NodeSorter](sorting.md#sorter)", reverse = bool } }
+### { AddNodeSorter = { sorter = [Sorter](sorting.md#sorter), reverse = bool } }
 
-**YAML:** `AddNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }`
+**YAML:** `AddNodeSorter: { sorter: Sorter, reverse = bool }`
 
 Add a [sorter](sorting.md#sorter) to sort nodes while exploring directories.
 
@@ -557,9 +557,9 @@ Add a [sorter](sorting.md#sorter) to sort nodes while exploring directories.
 **YAML Example:** `{ AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }`
 
 
-### { RemoveNodeSorter = "[NodeSorter](sorting.md#sorter)" }
+### { RemoveNodeSorter = [Sorter](sorting.md#sorter) }
 
-**YAML:** `RemoveNodeSorter: [NodeSorter](sorting.md#sorter)`
+**YAML:** `RemoveNodeSorter: Sorter`
 
 Remove an existing [sorter](sorting.md#sorter).
 
@@ -567,9 +567,9 @@ Remove an existing [sorter](sorting.md#sorter).
 
 **Lua Example:** `{ RemoveNodeSorter = "ByRelativePath" }`
 
-### { ReverseNodeSorter = "[NodeSorter](sorting.md#sorter)" }
+### { ReverseNodeSorter = [Sorter](sorting.md#sorter) }
 
-**YAML:** `ReverseNodeSorter: [NodeSorter](sorting.md#sorter)`
+**YAML:** `ReverseNodeSorter: Sorter`
 
 Reverse a node [sorter](sorting.md#sorter).
 
@@ -577,9 +577,9 @@ Reverse a node [sorter](sorting.md#sorter).
 
 **Lua Example:** `{ ReverseNodeSorter = "ByRelativePath" }`
 
-### { ToggleNodeSorter = { sorter = "[NodeSorter](sorting.md#sorter)", reverse = bool } }
+### { ToggleNodeSorter = { sorter = [Sorter](sorting.md#sorter), reverse = bool } }
 
-**YAML:** `ToggleNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }`
+**YAML:** `ToggleNodeSorter: { sorter: Sorter, reverse = bool }`
 
 Remove a [sorter](#sorting.md#sorter) if it exists, else, add a it.
 
