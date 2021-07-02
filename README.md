@@ -75,6 +75,12 @@ Packaging
 <a href="https://repology.org/project/xplr/versions" target="_blank"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" /></a>
 
 
+Introductions & Reviews
+-----------------------
+
+- [[VIDEO] XPLR: Insanely Hackable Lua File Manager ~ Brodie Robertson](https://youtu.be/MaVRtYh1IRU)
+
+
 Backers
 -------
 
