@@ -27,6 +27,10 @@ Integration
   Fuzzy search using [fzf](https://github.com/junegunn/fzf) to focus on a file
   or enter into a directory.
 
+- [preview-tabbed.xplr](https://github.com/sayanarijit/preview-tabbed.xplr)
+  Preview paths using suckless [tabbed](https://tools.suckless.org/tabbed/) and
+  [nnn preview-tabbed](https://github.com/jarun/nnn/blob/master/plugins/preview-tabbed).
+
 - [trash-cli.xplr](https://github.com/sayanarijit/trash-cli.xplr)
   Trash files and directories using
   [trash-cli](https://github.com/andreafrancia/trash-cli).
