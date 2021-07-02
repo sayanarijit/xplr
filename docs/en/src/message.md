@@ -81,7 +81,7 @@ Clears the screen.
 
 Focus next node.
 
-### : { FocusNextByRelativeIndex = int }
+### { FocusNextByRelativeIndex = int }
 
 **YAML:** `FocusNextByRelativeIndex: int`
 
