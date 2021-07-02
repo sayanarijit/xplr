@@ -35,6 +35,10 @@ Integration
   Trash files and directories using
   [trash-cli](https://github.com/andreafrancia/trash-cli).
 
+- [xclip.xplr](https://github.com/sayanarijit/xclip.xplr)
+  Copy and paste with system clipboard using
+  [xclip](https://github.com/astrand/xclip).
+
 - [zoxide.xplr](https://github.com/sayanarijit/zoxide.xplr)
   Change directory using the [zoxide](https://github.com/ajeetdsouza/zoxide)
   database.
