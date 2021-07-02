@@ -1008,28 +1008,28 @@ stderr will be piped to null. So it's non-interactive.</p>
 <h3 id="clearselection"><a class="header" href="#clearselection">&quot;ClearSelection&quot;</a></h3>
 <p><strong>YAML:</strong> <code>ClearSelection</code></p>
 <p>Clear the selection.</p>
-<h3 id="-addnodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-"><a class="header" href="#-addnodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-">{ AddNodeFilter = { filter = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot;, input = &quot;string&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>AddNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string</code></p>
+<h3 id="-addnodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-"><a class="header" href="#-addnodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-">{ AddNodeFilter = { filter = <a href="filtering.html#filter">Filter</a>, input = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>AddNodeFilter: { filter = Filter, input = string }</code></p>
 <p>Add a <a href="filtering.html">filter</a> to exclude nodes while exploring directories.</p>
 <p><strong>YAML Example:</strong> <code>AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></p>
-<p><strong>Lua Example:</strong> <code>{ AddNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; }</code></p>
-<h3 id="-removenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-"><a class="header" href="#-removenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-">{ RemoveNodeFilter = { filter = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot;, input = &quot;string&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>RemoveNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string</code></p>
+<p><strong>Lua Example:</strong> <code>{ AddNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></p>
+<h3 id="-removenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-"><a class="header" href="#-removenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-">{ RemoveNodeFilter = { filter = <a href="filtering.html#filter">Filter</a>, input = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>RemoveNodeFilter: { filter = Filter, input = string</code></p>
 <p>Remove an existing <a href="filtering.html">filter</a>.</p>
 <p><strong>YAML Example:</strong> <code>RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></p>
 <p><strong>Lua Example:</strong> <code>{ RemoveNodeFilter: { filter: &quot;RelativePathDoesStartWith&quot;, input: &quot;foo&quot; } }</code></p>
-<h3 id="-togglenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-"><a class="header" href="#-togglenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-">{ ToggleNodeFilter = { filter = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot;, input = &quot;string&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>ToggleNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string</code></p>
+<h3 id="-togglenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-"><a class="header" href="#-togglenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-">{ ToggleNodeFilter = { filter = <a href="filtering.html#filter">Filter</a>, input = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>ToggleNodeFilter: { filter = Filter, input = string }</code></p>
 <p>Remove a <a href="filter.html">filter</a> if it exists, else, add a it.</p>
 <p><strong>YAML Example:</strong> <code>ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></p>
 <p><strong>Lua Example:</strong> <code>{ ToggleNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></p>
-<h3 id="-addnodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-"><a class="header" href="#-addnodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-">{ AddNodeFilterFromInput = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>AddNodeFilterFromInput: [NodeFilter](filtering.md#filter)</code></p>
+<h3 id="-addnodefilterfrominput--a-hreffilteringhtmlfilterfiltera-"><a class="header" href="#-addnodefilterfrominput--a-hreffilteringhtmlfilterfiltera-">{ AddNodeFilterFromInput = <a href="filtering.html#filter">Filter</a> }</a></h3>
+<p><strong>YAML:</strong> <code>AddNodeFilterFromInput: Filter</code></p>
 <p>Add a node <a href="filtering.html">filter</a> reading the input from the buffer.</p>
 <p><strong>YAML Example:</strong> <code>AddNodeFilterFromInput: RelativePathDoesStartWith</code></p>
 <p><strong>Lua Example:</strong> <code>{ AddNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</code></p>
-<h3 id="-removenodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-"><a class="header" href="#-removenodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-">{ RemoveNodeFilterFromInput = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>RemoveNodeFilterFromInput: [NodeFilter](filtering.md#filter)</code></p>
+<h3 id="-removenodefilterfrominput--a-hreffilteringhtmlfilterfiltera-"><a class="header" href="#-removenodefilterfrominput--a-hreffilteringhtmlfilterfiltera-">{ RemoveNodeFilterFromInput = <a href="filtering.html#filter">Filter</a> }</a></h3>
+<p><strong>YAML:</strong> <code>RemoveNodeFilterFromInput: Filter</code></p>
 <p>Remove a node <a href="filtering.html">filter</a> reading the input from the buffer.</p>
 <p><strong>YAML Example:</strong> <code>RemoveNodeFilterFromInput: RelativePathDoesStartWith</code></p>
 <p><strong>Lua Example:</strong> <code>{ RemoveNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</code></p>
@@ -1042,23 +1042,23 @@ stderr will be piped to null. So it's non-interactive.</p>
 <h3 id="clearnodefilters"><a class="header" href="#clearnodefilters">&quot;ClearNodeFilters&quot;</a></h3>
 <p><strong>YAML:</strong> <code>ClearNodeFilters</code></p>
 <p>Clear all the node <a href="filtering.html">filters</a>.</p>
-<h3 id="-addnodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--"><a class="header" href="#-addnodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--">{ AddNodeSorter = { sorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot;, reverse = bool } }</a></h3>
-<p><strong>YAML:</strong> <code>AddNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }</code></p>
+<h3 id="-addnodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--"><a class="header" href="#-addnodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--">{ AddNodeSorter = { sorter = <a href="sorting.html#sorter">Sorter</a>, reverse = bool } }</a></h3>
+<p><strong>YAML:</strong> <code>AddNodeSorter: { sorter: Sorter, reverse = bool }</code></p>
 <p>Add a <a href="sorting.html#sorter">sorter</a> to sort nodes while exploring directories.</p>
 <p><strong>YAML Example:</strong> <code>AddNodeSorter: { sorter: ByRelativePath, reverse: false }</code></p>
 <p><strong>YAML Example:</strong> <code>{ AddNodeSorter = { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></p>
-<h3 id="-removenodesorter--a-hrefsortinghtmlsorternodesortera-"><a class="header" href="#-removenodesorter--a-hrefsortinghtmlsorternodesortera-">{ RemoveNodeSorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>RemoveNodeSorter: [NodeSorter](sorting.md#sorter)</code></p>
+<h3 id="-removenodesorter--a-hrefsortinghtmlsortersortera-"><a class="header" href="#-removenodesorter--a-hrefsortinghtmlsortersortera-">{ RemoveNodeSorter = <a href="sorting.html#sorter">Sorter</a> }</a></h3>
+<p><strong>YAML:</strong> <code>RemoveNodeSorter: Sorter</code></p>
 <p>Remove an existing <a href="sorting.html#sorter">sorter</a>.</p>
 <p><strong>YAML Example:</strong> <code>RemoveNodeSorter: ByRelativePath</code></p>
 <p><strong>Lua Example:</strong> <code>{ RemoveNodeSorter = &quot;ByRelativePath&quot; }</code></p>
-<h3 id="-reversenodesorter--a-hrefsortinghtmlsorternodesortera-"><a class="header" href="#-reversenodesorter--a-hrefsortinghtmlsorternodesortera-">{ ReverseNodeSorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>ReverseNodeSorter: [NodeSorter](sorting.md#sorter)</code></p>
+<h3 id="-reversenodesorter--a-hrefsortinghtmlsortersortera-"><a class="header" href="#-reversenodesorter--a-hrefsortinghtmlsortersortera-">{ ReverseNodeSorter = <a href="sorting.html#sorter">Sorter</a> }</a></h3>
+<p><strong>YAML:</strong> <code>ReverseNodeSorter: Sorter</code></p>
 <p>Reverse a node <a href="sorting.html#sorter">sorter</a>.</p>
 <p><strong>YAML Example:</strong> <code>ReverseNodeSorter: ByRelativePath</code></p>
 <p><strong>Lua Example:</strong> <code>{ ReverseNodeSorter = &quot;ByRelativePath&quot; }</code></p>
-<h3 id="-togglenodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--"><a class="header" href="#-togglenodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--">{ ToggleNodeSorter = { sorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot;, reverse = bool } }</a></h3>
-<p><strong>YAML:</strong> <code>ToggleNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }</code></p>
+<h3 id="-togglenodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--"><a class="header" href="#-togglenodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--">{ ToggleNodeSorter = { sorter = <a href="sorting.html#sorter">Sorter</a>, reverse = bool } }</a></h3>
+<p><strong>YAML:</strong> <code>ToggleNodeSorter: { sorter: Sorter, reverse = bool }</code></p>
 <p>Remove a <a href="message.html#sorting.md#sorter">sorter</a> if it exists, else, add a it.</p>
 <p><strong>YAML Example:</strong> <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code></p>
 <p><strong>Lua Example:</strong> <code>{ ToggleSorterSorter: { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></p>
