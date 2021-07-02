@@ -36,14 +36,14 @@ Full List of Messages
 
 ### "ExplorePwd"
 
-YAML: `ExplorePwd`
+**YAML:** `ExplorePwd`
 
 Explore the present working directory and register the filtered nodes.
 This operation is expensive. So, try to avoid using it too often.
 
 ### "ExplorePwdAsync"
 
-YAML: `ExplorePwdAsync`
+**YAML:** `ExplorePwdAsync`
 
 Explore the present working directory and register the filtered nodes asynchronously.
 This operation happens asynchronously. That means, the xplr directory buffers won't be updated
@@ -52,7 +52,7 @@ To explore `$PWD` synchronously, use `ExplorePwd` instead.
 
 ### "ExploreParentsAsync"
 
-YAML: `ExploreParentsAsync`
+**YAML:** `ExploreParentsAsync`
 
 Explore the present working directory along with its parents and register the filtered nodes.
 This operation happens asynchronously. That means, the xplr directory buffers won't be updated
@@ -61,7 +61,7 @@ To explore just the `$PWD` synchronously, use `ExplorePwd` instead.
 
 ### "Refresh"
 
-YAML: `Refresh`
+**YAML:** `Refresh`
 
 Refresh the UI.
 But it will not re-explore the directory if the working directory is the same.
@@ -71,192 +71,200 @@ Also, it will not clear the screen. Use `ClearScreen` for that.
 
 ### "ClearScreen"
 
-YAML: `ClearScreen`
+**YAML:** `ClearScreen`
 
 Clears the screen.
 
 ### "FocusNext"
 
-YAML: `FocusNext`
+**YAML:** `FocusNext`
 
 Focus next node.
 
 ### : { FocusNextByRelativeIndex = int }
 
-YAML: `FocusNextByRelativeIndex: int`
+**YAML:** `FocusNextByRelativeIndex: int`
 
 Focus on the `n`th node relative to the current focus where `n` is a given value.
 
 **YAML Example:** `FocusNextByRelativeIndex: 2`
+
 **Lua Example:** `{ FocusNextByRelativeIndex = 2 }`
 
 ### "FocusNextByRelativeIndexFromInput"
 
-YAML: `FocusNextByRelativeIndexFromInput`
+**YAML:** `FocusNextByRelativeIndexFromInput`
 
 Focus on the `n`th node relative to the current focus where `n` is read from
 the input buffer.
 
 ### "FocusPrevious"
 
-YAML: `FocusPrevious`
+**YAML:** `FocusPrevious`
 
 Focus on the previous item.
 
 ### { FocusPreviousByRelativeIndex = int }
 
-YAML: `FocusPreviousByRelativeIndex: int`
+**YAML:** `FocusPreviousByRelativeIndex: int`
 
 Focus on the `-n`th node relative to the current focus where `n` is a given value.
 
 **YAML Example:** `FocusPreviousByRelativeIndex: 2`
+
 **Lua Example:** `{ FocusPreviousByRelativeIndex = 2 }`
 
 ### "FocusPreviousByRelativeIndexFromInput"
 
-YAML: `FocusPreviousByRelativeIndexFromInput`
+**YAML:** `FocusPreviousByRelativeIndexFromInput`
 
 Focus on the `-n`th node relative to the current focus where `n` is read from
 the input buffer.
 
 ### "FocusFirst"
 
-YAML: `FocusFirst`
+**YAML:** `FocusFirst`
 
 Focus on the first node.
 
 ### "FocusLast"
 
-YAML: `FocusLast`
+**YAML:** `FocusLast`
 
 Focus on the last node.
 
 ### { FocusPath = "string" }
 
-YAML: `FocusPath: string`
+**YAML:** `FocusPath: string`
 
 Focus on the given path.
 
 **YAML Example:** `FocusPath: /path/to/file`
+
 **Lua Example:** `{ FocusPath = "/path/to/file" }`
 
 ### "FocusPathFromInput"
 
-YAML: `FocusPathFromInput`
+**YAML:** `FocusPathFromInput`
 
 Focus on the path read from input buffer.
 
 ### { FocusByIndex = int }
 
-YAML: `FocusByIndex: int`
+**YAML:** `FocusByIndex: int`
 
 Focus on the absolute `n`th node where `n` is a given value.
 
 **YAML Example:** `FocusByIndex: 2`
+
 **Lua Example:** `{ FocusByIndex = 2 }`
 
 ### "FocusByIndexFromInput"
 
-YAML: `FocusByIndexFromInput`
+**YAML:** `FocusByIndexFromInput`
 
 Focus on the absolute `n`th node where `n` is read from the input buffer.
 
 ### { FocusByFileName = "string" }
 
-YAML: `FocusByFileName: string`
+**YAML:** `FocusByFileName: string`
 
 Focus on the file by name from the present working directory.
 
 **YAML Example:** `FocusByFileName: filename.ext`
+
 **Lua Example:** `{ FocusByFileName = "filename.ext" }`
 
 ### { ChangeDirectory = "string" }
 
-YAML: `ChangeDirectory: string`
+**YAML:** `ChangeDirectory: string`
 
 Change the present working directory ($PWD)
 
 **YAML Example:** `ChangeDirectory: /path/to/directory`
+
 **Lua Example:** `{ ChangeDirectory = "/path/to/directory" }`
 
 ### "Enter"
 
-YAML: `Enter`
+**YAML:** `Enter`
 
 Enter into the currently focused path if it's a directory.
 
 ### "Back"
 
-YAML: `Back`
+**YAML:** `Back`
 
 Go back to the parent directory.
 
 ### "LastVisitedPath"
 
-YAML: `LastVisitedPath`
+**YAML:** `LastVisitedPath`
 
 Go to the last path visited.
 
 ### "NextVisitedPath"
 
-YAML: `NextVisitedPath`
+**YAML:** `NextVisitedPath`
 
 Go to the next path visited.
 
 ### "FollowSymlink"
 
-YAML: `FollowSymlink`
+**YAML:** `FollowSymlink`
 
 Follow the symlink under focus to its actual location.
 
 ### { BufferInput = "string" }
 
-YAML: `BufferInput(String)`
+**YAML:** `BufferInput(String)`
 
 Append/buffer the given string into the input buffer.
 
 **YAML Example:** `BufferInput: foo`
+
 **Lua Example:** `{ BufferInput = "foo" }`
 
 ### "BufferInputFromKey"
 
-YAML: `BufferInputFromKey`
+**YAML:** `BufferInputFromKey`
 
 Append/buffer the characted read from a keyboard input into the
 input buffer.
 
 ### { SetInputBuffer = "string" }
 
-YAML: `SetInputBuffer: string`
+**YAML:** `SetInputBuffer: string`
 
 Set/rewrite the input buffer with the given string.
 When the input buffer is not-null (even if empty string)
 it will show in the UI.
 
 **YAML Example:** `SetInputBuffer: foo`
+
 **Lua Example:** `{ SetInputBuffer = "foo" }`
 
 ### "RemoveInputBufferLastCharacter"
 
-YAML: `RemoveInputBufferLastCharacter`
+**YAML:** `RemoveInputBufferLastCharacter`
 
 Remove input buffer's last character.
 
 ### "RemoveInputBufferLastWord"
 
-YAML: `RemoveInputBufferLastWord`
+**YAML:** `RemoveInputBufferLastWord`
 
 Remove input buffer's last word.
 
 ### "ResetInputBuffer"
 
-YAML: `ResetInputBuffer`
+**YAML:** `ResetInputBuffer`
 
 Reset the input buffer back to null. It will not show in the UI.
 
 ### { SwitchMode = "string" }
 
-YAML: `SwitchMode: string`
+**YAML:** `SwitchMode: string`
 
 Switch input [mode](modes.md).
 
@@ -264,35 +272,38 @@ Switch input [mode](modes.md).
 `SwitchModeCustom` instead.
 
 **YAML Example:** `SwitchMode: default`
+
 **Lua Example:** `{ SwitchMode = "default" }`
 
 ### { SwitchModeBuiltin = "string" }
 
-YAML: `SwitchModeBuiltin: string`
+**YAML:** `SwitchModeBuiltin: string`
 
 Switch to a [builtin mode](modes.md#builtin).
 
 **YAML Example:** `SwitchModeBuiltin: default`
+
 **Lua Example:** `{ SwitchModeBuiltin = "default" }`
 
 ### { SwitchModeCustom = "string" }
 
-YAML: `SwitchModeCustom: string`
+**YAML:** `SwitchModeCustom: string`
 
 Switch to a [custom mode](modes.md#custom).
 
 **YAML Example:** `SwitchModeCustom: my_custom_mode`
+
 **Lua Example:** `{ SwitchModeCustom = "my_custom_mode" }`
 
 ### "PopMode"
 
-YAML: `PopMode`
+**YAML:** `PopMode`
 
 Pop the last mode from the history and switch to it.
 
 ### { SwitchLayout = "string" }
 
-YAML: `SwitchLayout: string`
+**YAML:** `SwitchLayout: string`
 
 Switch [layout](layouts.md).
 
@@ -300,29 +311,32 @@ Switch [layout](layouts.md).
 `SwitchLayoutCustom` instead.
 
 **YAML Example:** `SwitchLayout: default`
+
 **Lua Example:** `{ SwitchLayout = "default" }`
 
 ### { SwitchLayoutBuiltin = "string" }
 
-YAML: `SwitchLayoutBuiltin: string`
+**YAML:** `SwitchLayoutBuiltin: string`
 
 Switch to a [builtin layout](layouts.md#builtin).
 
 **YAML Example:** `SwitchLayoutBuiltin: default`
+
 **Lua Example:** `{ SwitchLayoutBuiltin = "default" }`
 
 ### { SwitchLayoutCustom = "string" }
 
-YAML: `SwitchLayoutCustom: string`
+**YAML:** `SwitchLayoutCustom: string`
 
 Switch to a [custom layout](layouts.md#custom).
 
 **YAML Example:** `SwitchLayoutCustom: my_custom_layout`
+
 **Lua Example:** `{ SwitchLayoutCustom = "my_custom_layout" }`
 
 ### { Call = "string" }
 
-YAML: `Call: string`
+**YAML:** `Call: string`
 
 Call a shell command with the given arguments.
 Note that the arguments will be shell-escaped.
@@ -331,21 +345,23 @@ can be used.
 You may need to pass `ExplorePwd` depening on the expectation.
 
 **YAML Example:** `Call: { command: bash, args: ["-c", "read -p test"] }`
+
 **Lua Example:** `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
 
 ### { CallSilently = "string" }
 
-YAML: `CallSilently: string`
+**YAML:** `CallSilently: string`
 
 Like `Call` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
 **YAML Example:** `CallSilently: { command: tput, args: ["bell"] }`
+
 **Lua Example:** `{ CallSilently = { command = "tput", args = { "bell" } } }`
 
 ### { CallLua = "string" }
 
-YAML: `CallLua: string`
+**YAML:** `CallLua: string`
 
 Call a Lua function.
 A [`CallLuaArg`](#calllua-argument) object will be passed to the
@@ -354,357 +370,381 @@ The function can optionally return a list of messages for xplr to handle
 after the executing the function.
 
 **YAML Example:** `CallLua: custom.some_custom_funtion`
+
 **Lua Example:** `{ CallLua = "custom.some_custom_funtion" }`
 
 ### { CallLuaSilently = "string" }
 
-YAML: `CallLuaSilently: string`
+**YAML:** `CallLuaSilently: string`
 
 Like `CallLua` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
 **YAML Example:** `CallLuaSilently: custom.some_custom_function`
+
 **Lua Example:** `{ CallLuaSilently = "custom.some_custom_function" }`
 
 ### { BashExec = "string" }
 
-YAML: `BashExec: string`
+**YAML:** `BashExec: string`
 
 An alias to `Call: {command: bash, args: ["-c", "{string}"], silent: false}`
 where `{string}` is the given value.
 
 **YAML Example:** `BashExec: "read -p test"`
+
 **Lua Example:** `{ BashExec = "read -p test" }`
 
 ### { BashExecSilently = "string" }
 
-YAML: `BashExecSilently(String)`
+**YAML:** `BashExecSilently(String)`
 
 Like `BashExec` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
 **YAML Example:** `BashExecSilently: "tput bell"`
+
 **Lua Example:** `{ BashExecSilently = "tput bell" }`
 
 ### "Select"
 
-YAML: `Select`
+**YAML:** `Select`
 
 Select the focused node.
 
 ### "SelectAll"
 
-YAML: `SelectAll`
+**YAML:** `SelectAll`
 
 Select all the visible nodes.
 
 ### { SelectPath = "string" }
 
-YAML: `SelectPath: string`
+**YAML:** `SelectPath: string`
 
 Select the given path.
 
 **YAML Example:** `SelectPath: /path/to/file`
+
 **Lua Example:** `{ SelectPath = "/path/to/file" }`
 
 ### "UnSelect"
 
-YAML: `UnSelect`
+**YAML:** `UnSelect`
 
 Unselect the focused node.
 
 ### "UnSelectAll"
 
-YAML: `UnSelectAll`
+**YAML:** `UnSelectAll`
 
 Unselect all the visible nodes.
 
 ### { UnSelectPath = "string)" }
 
-YAML: `UnSelectPath: string`
+**YAML:** `UnSelectPath: string`
 
 UnSelect the given path.
 
 **YAML Example:** `UnSelectPath: /path/to/file`
+
 **Lua Example:** `{ UnSelectPath = "/path/to/file" }`
 
 ### "ToggleSelection"
 
-YAML: `ToggleSelection`
+**YAML:** `ToggleSelection`
 
 Toggle selection on the focused node.
 
 ### "ToggleSelectAll"
 
-YAML: `ToggleSelectAll`
+**YAML:** `ToggleSelectAll`
 
 Toggle between select all and unselect all.
 
 ### { ToggleSelectionByPath = "string" }
 
-YAML: `ToggleSelectionByPath: string`
+**YAML:** `ToggleSelectionByPath: string`
 
 Toggle selection by file path.
 
 **YAML Example:** `ToggleSelectionByPath: /path/to/file`
+
 **Lua Example:** `{ ToggleSelectionByPath = "/path/to/file" }`
 
 ### "ClearSelection"
 
-YAML: `ClearSelection`
+**YAML:** `ClearSelection`
 
 Clear the selection.
 
 ### { AddNodeFilter = { filter = "[NodeFilter](filtering.md#filter)", input = "string" }
 
-YAML: `AddNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
+**YAML:** `AddNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
 
 Add a [filter](filtering.md) to exclude nodes while exploring directories.
 
 **YAML Example:** `AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
+
 **Lua Example:** `{ AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" }`
 
 ### { RemoveNodeFilter = { filter = "[NodeFilter](filtering.md#filter)", input = "string" }
 
-YAML: `RemoveNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
+**YAML:** `RemoveNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
 
 Remove an existing [filter](filtering.md).
 
 **YAML Example:** `RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
+
 **Lua Example:** `{ RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }`
 
 ### { ToggleNodeFilter = { filter = "[NodeFilter](filtering.md#filter)", input = "string" }
 
-YAML: `ToggleNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
+**YAML:** `ToggleNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string`
 
 Remove a [filter](filter.md) if it exists, else, add a it.
 
 **YAML Example:** `ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
+
 **Lua Example:** `{ ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 
 ### { AddNodeFilterFromInput = "[NodeFilter](filtering.md#filter)" }
 
-YAML: `AddNodeFilterFromInput: [NodeFilter](filtering.md#filter)`
+**YAML:** `AddNodeFilterFromInput: [NodeFilter](filtering.md#filter)`
 
 Add a node [filter](filtering.md) reading the input from the buffer.
 
 **YAML Example:** `AddNodeFilterFromInput: RelativePathDoesStartWith`
+
 **Lua Example:** `{ AddNodeFilterFromInput = "RelativePathDoesStartWith" }`
 
 ### { RemoveNodeFilterFromInput = "[NodeFilter](filtering.md#filter)" }
 
-YAML: `RemoveNodeFilterFromInput: [NodeFilter](filtering.md#filter)`
+**YAML:** `RemoveNodeFilterFromInput: [NodeFilter](filtering.md#filter)`
 
 Remove a node [filter](filtering.md) reading the input from the buffer.
 
 **YAML Example:** `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
+
 **Lua Example:** `{ RemoveNodeFilterFromInput = "RelativePathDoesStartWith" }`
 
 ### "RemoveLastNodeFilter"
 
-YAML: `RemoveLastNodeFilter`
+**YAML:** `RemoveLastNodeFilter`
 
 Remove the last node [filter](filtering.md).
 
 ### "ResetNodeFilters"
 
-YAML: `ResetNodeFilters`
+**YAML:** `ResetNodeFilters`
 
 Reset the node [filters](filtering.md) back to the default configuration.
 
 ### "ClearNodeFilters"
 
-YAML: `ClearNodeFilters`
+**YAML:** `ClearNodeFilters`
 
 Clear all the node [filters](filtering.md).
 
 ### { AddNodeSorter = { sorter = "[NodeSorter](sorting.md#sorter)", reverse = bool } }
 
-YAML: `AddNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }`
+**YAML:** `AddNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }`
 
 Add a [sorter](sorting.md#sorter) to sort nodes while exploring directories.
 
 **YAML Example:** `AddNodeSorter: { sorter: ByRelativePath, reverse: false }`
+
 **YAML Example:** `{ AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }`
+
 
 ### { RemoveNodeSorter = "[NodeSorter](sorting.md#sorter)" }
 
-YAML: `RemoveNodeSorter: [NodeSorter](sorting.md#sorter)`
+**YAML:** `RemoveNodeSorter: [NodeSorter](sorting.md#sorter)`
 
 Remove an existing [sorter](sorting.md#sorter).
 
 **YAML Example:** `RemoveNodeSorter: ByRelativePath`
+
 **Lua Example:** `{ RemoveNodeSorter = "ByRelativePath" }`
 
 ### { ReverseNodeSorter = "[NodeSorter](sorting.md#sorter)" }
 
-YAML: `ReverseNodeSorter: [NodeSorter](sorting.md#sorter)`
+**YAML:** `ReverseNodeSorter: [NodeSorter](sorting.md#sorter)`
 
 Reverse a node [sorter](sorting.md#sorter).
 
 **YAML Example:** `ReverseNodeSorter: ByRelativePath`
+
 **Lua Example:** `{ ReverseNodeSorter = "ByRelativePath" }`
 
 ### { ToggleNodeSorter = { sorter = "[NodeSorter](sorting.md#sorter)", reverse = bool } }
 
-YAML: `ToggleNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }`
+**YAML:** `ToggleNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }`
 
 Remove a [sorter](#sorting.md#sorter) if it exists, else, add a it.
 
 **YAML Example:** `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }`
+
 **Lua Example:** `{ ToggleSorterSorter: { sorter = "ByRelativePath", reverse = false } }`
 
 ### "ReverseNodeSorters"
 
-YAML: `ReverseNodeSorters`
+**YAML:** `ReverseNodeSorters`
 
 Reverse the node [sorters](sorting.md#sorter).
 
 ### "RemoveLastNodeSorter"
 
-YAML: `RemoveLastNodeSorter`
+**YAML:** `RemoveLastNodeSorter`
 
 Remove the last node [sorter](sorting.md#sorter).
 
 ### "ResetNodeSorters"
 
-YAML: `ResetNodeSorters`
+**YAML:** `ResetNodeSorters`
 
 Reset the node [sorters](sorting.md#sorter) back to the default configuration.
 
 ### "ClearNodeSorters"
 
-YAML: `ClearNodeSorters`
+**YAML:** `ClearNodeSorters`
 
 Clear all the node [sorters](sorting.md#sorter).
 
 ### "EnableMouse"
 
-YAML: `EnableMouse`
+**YAML:** `EnableMouse`
 
 Enable mouse
 
 ### "DisableMouse"
 
-YAML: `DisableMouse`
+**YAML:** `DisableMouse`
 
 Disable mouse
 
 ### "ToggleMouse"
 
-YAML: `ToggleMouse`
+**YAML:** `ToggleMouse`
 
 Toggle mouse
 
 ### { StartFifo = "string" }
 
-YAML: `StartFifo: string`
+**YAML:** `StartFifo: string`
 
 Start piping the focused path to the given fifo path
 
 **YAML Example:** `StartFifo: /tmp/xplr.fifo`
+
 **Lua Example:** `{ StartFifo = "/tmp/xplr.fifo }`
 
 ### "StopFifo"
 
-YAML: `StopFifo`
+**YAML:** `StopFifo`
 
 Close the active fifo and stop piping.
 
 ### { ToggleFifo = "string" }
 
-YAML: `ToggleFifo: string`
+**YAML:** `ToggleFifo: string`
 
 Toggle betwen {Start|Stop}Fifo
 
 **YAML Example:** `ToggleFifo: /path/to/fifo`
+
 **Lua Example:** `{ ToggleFifo = "/path/to/fifo" }`
 
 ### { LogInfo = "string" }
 
-YAML: `LogInfo: string`
+**YAML:** `LogInfo: string`
 
 Log information message.
 
 **YAML Example:** `LogInfo: launching satellite`
+
 **Lua Example:** `{ LogInfo = "launching satellite" }`
 
 ### { LogSuccess = "String" }
 
-YAML: `LogSuccess: string`
+**YAML:** `LogSuccess: string`
 
 Log a success message.
 
 **YAML Example:** `LogSuccess: satellite reached destination`.
+
 **Lua Example:** `{ LogSuccess = "satellite reached destination" }`.
 
 ### { LogWarning = "string" }
 
-YAML: `LogWarning: string`
+**YAML:** `LogWarning: string`
 
 Log an warning message.
 
 **YAML Example:** `LogWarning: satellite is heating`
+
 **Lua Example:** `{ LogWarning = "satellite is heating" }`
 
 ### { LogError = "string" }
 
-YAML: `LogError: string`
+**YAML:** `LogError: string`
 
 Log an error message.
 
 **YAML Example:** `LogError: satellite crashed`
+
 **Lua Example:** `{ LogError = "satellite crashed" }`
 
 ### "Quit"
 
-YAML: `Quit`
+**YAML:** `Quit`
 
 Quit with returncode zero (success).
 
 ### "PrintPwdAndQuit"
 
-YAML: `PrintPwdAndQuit`
+**YAML:** `PrintPwdAndQuit`
 
 Print $PWD and quit.
 
 ### "PrintFocusPathAndQuit"
 
-YAML: `PrintFocusPathAndQuit`
+**YAML:** `PrintFocusPathAndQuit`
 
 Print the path under focus and quit. It can be empty string if there's nothing to focus.
 
 ### "PrintSelectionAndQuit"
 
-YAML: `PrintSelectionAndQuit`
+**YAML:** `PrintSelectionAndQuit`
 
 Print the selected paths and quit. It can be empty is no path is selected.
 
 ### "PrintResultAndQuit"
 
-YAML: `PrintResultAndQuit`
+**YAML:** `PrintResultAndQuit`
 
 Print the selected paths if it's not empty, else, print the focused node's path.
 
 ### "PrintAppStateAndQuit"
 
-YAML: `PrintAppStateAndQuit`
+**YAML:** `PrintAppStateAndQuit`
 
 Print the state of application in YAML format. Helpful for debugging or generating
 the default configuration file.
 
 ### { Debug = "string" }
 
-YAML: `Debug: string`
+**YAML:** `Debug: string`
 
 Write the application state to a file, without quitting. Also helpful for debugging.
 
 **YAML Example:**  `Debug: /path/to/file`
+
 **Lua Example:**  `{ Debug = "/path/to/file" }`
 
 ### "Terminate"
 
-YAML: `Terminate`
+**YAML:** `Terminate`
 
 Terminate the application with a non-zero return code.
 
