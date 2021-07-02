@@ -742,11 +742,8 @@ the <code>default</code> mode.</p>
 <p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for more <a href="awesome-plugins.html#integration">integration</a> options.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="message"><a class="header" href="#message">Message</a></h1>
 <p>You can think of xplr as a server. Just like web servers listen to HTTP
-requests, xplr listens to messages.</p>
-<p>See the
-<a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variants"><strong>full list of messages</strong></a>
-that xplr can handle.</p>
-<p>You can send messages to an xplr session in the following ways:</p>
+requests, xplr listens to <a href="full-list-of-messages">messages</a>.</p>
+<p>You can send these messages to an xplr session in the following ways:</p>
 <ul>
 <li>Via <a href="modes.html#key-bindings">key bindings</a></li>
 <li>Via <a href="message.html#lua-function-calls">Lua function calls</a></li>
@@ -769,6 +766,383 @@ represented using
 <li>FocusPath: &quot;/path/to/file&quot;</li>
 <li>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</li>
 </ul>
+<h2 id="full-list-of-messages"><a class="header" href="#full-list-of-messages">Full List of Messages</a></h2>
+<h3 id="explorepwd"><a class="header" href="#explorepwd">&quot;ExplorePwd&quot;</a></h3>
+<p>YAML: <code>ExplorePwd</code></p>
+<p>Explore the present working directory and register the filtered nodes.
+This operation is expensive. So, try to avoid using it too often.</p>
+<h3 id="explorepwdasync"><a class="header" href="#explorepwdasync">&quot;ExplorePwdAsync&quot;</a></h3>
+<p>YAML: <code>ExplorePwdAsync</code></p>
+<p>Explore the present working directory and register the filtered nodes asynchronously.
+This operation happens asynchronously. That means, the xplr directory buffers won't be updated
+immediately. Hence, it needs to be used with care and probably with special checks in place.
+To explore <code>$PWD</code> synchronously, use <code>ExplorePwd</code> instead.</p>
+<h3 id="exploreparentsasync"><a class="header" href="#exploreparentsasync">&quot;ExploreParentsAsync&quot;</a></h3>
+<p>YAML: <code>ExploreParentsAsync</code></p>
+<p>Explore the present working directory along with its parents and register the filtered nodes.
+This operation happens asynchronously. That means, the xplr directory buffers won't be updated
+immediately. Hence, it needs to be used with care and probably with special checks in place.
+To explore just the <code>$PWD</code> synchronously, use <code>ExplorePwd</code> instead.</p>
+<h3 id="refresh"><a class="header" href="#refresh">&quot;Refresh&quot;</a></h3>
+<p>YAML: <code>Refresh</code></p>
+<p>Refresh the UI.
+But it will not re-explore the directory if the working directory is the same.
+If there is some change in the working directory and you want to re-explore it,
+use the <code>Explore</code> message instead.
+Also, it will not clear the screen. Use <code>ClearScreen</code> for that.</p>
+<h3 id="clearscreen"><a class="header" href="#clearscreen">&quot;ClearScreen&quot;</a></h3>
+<p>YAML: <code>ClearScreen</code></p>
+<p>Clears the screen.</p>
+<h3 id="focusnext"><a class="header" href="#focusnext">&quot;FocusNext&quot;</a></h3>
+<p>YAML: <code>FocusNext</code></p>
+<p>Focus next node.</p>
+<h3 id="--focusnextbyrelativeindex--int-"><a class="header" href="#--focusnextbyrelativeindex--int-">: { FocusNextByRelativeIndex = int }</a></h3>
+<p>YAML: <code>FocusNextByRelativeIndex: int</code></p>
+<p>Focus on the <code>n</code>th node relative to the current focus where <code>n</code> is a given value.</p>
+<p><strong>YAML Example:</strong> <code>FocusNextByRelativeIndex: 2</code>
+<strong>Lua Example:</strong> <code>{ FocusNextByRelativeIndex = 2 }</code></p>
+<h3 id="focusnextbyrelativeindexfrominput"><a class="header" href="#focusnextbyrelativeindexfrominput">&quot;FocusNextByRelativeIndexFromInput&quot;</a></h3>
+<p>YAML: <code>FocusNextByRelativeIndexFromInput</code></p>
+<p>Focus on the <code>n</code>th node relative to the current focus where <code>n</code> is read from
+the input buffer.</p>
+<h3 id="focusprevious"><a class="header" href="#focusprevious">&quot;FocusPrevious&quot;</a></h3>
+<p>YAML: <code>FocusPrevious</code></p>
+<p>Focus on the previous item.</p>
+<h3 id="-focuspreviousbyrelativeindex--int-"><a class="header" href="#-focuspreviousbyrelativeindex--int-">{ FocusPreviousByRelativeIndex = int }</a></h3>
+<p>YAML: <code>FocusPreviousByRelativeIndex: int</code></p>
+<p>Focus on the <code>-n</code>th node relative to the current focus where <code>n</code> is a given value.</p>
+<p><strong>YAML Example:</strong> <code>FocusPreviousByRelativeIndex: 2</code>
+<strong>Lua Example:</strong> <code>{ FocusPreviousByRelativeIndex = 2 }</code></p>
+<h3 id="focuspreviousbyrelativeindexfrominput"><a class="header" href="#focuspreviousbyrelativeindexfrominput">&quot;FocusPreviousByRelativeIndexFromInput&quot;</a></h3>
+<p>YAML: <code>FocusPreviousByRelativeIndexFromInput</code></p>
+<p>Focus on the <code>-n</code>th node relative to the current focus where <code>n</code> is read from
+the input buffer.</p>
+<h3 id="focusfirst"><a class="header" href="#focusfirst">&quot;FocusFirst&quot;</a></h3>
+<p>YAML: <code>FocusFirst</code></p>
+<p>Focus on the first node.</p>
+<h3 id="focuslast"><a class="header" href="#focuslast">&quot;FocusLast&quot;</a></h3>
+<p>YAML: <code>FocusLast</code></p>
+<p>Focus on the last node.</p>
+<h3 id="-focuspath--string-"><a class="header" href="#-focuspath--string-">{ FocusPath = &quot;string&quot; }</a></h3>
+<p>YAML: <code>FocusPath: string</code></p>
+<p>Focus on the given path.</p>
+<p><strong>YAML Example:</strong> <code>FocusPath: /path/to/file</code>
+<strong>Lua Example:</strong> <code>{ FocusPath = &quot;/path/to/file&quot; }</code></p>
+<h3 id="focuspathfrominput"><a class="header" href="#focuspathfrominput">&quot;FocusPathFromInput&quot;</a></h3>
+<p>YAML: <code>FocusPathFromInput</code></p>
+<p>Focus on the path read from input buffer.</p>
+<h3 id="-focusbyindex--int-"><a class="header" href="#-focusbyindex--int-">{ FocusByIndex = int }</a></h3>
+<p>YAML: <code>FocusByIndex: int</code></p>
+<p>Focus on the absolute <code>n</code>th node where <code>n</code> is a given value.</p>
+<p><strong>YAML Example:</strong> <code>FocusByIndex: 2</code>
+<strong>Lua Example:</strong> <code>{ FocusByIndex = 2 }</code></p>
+<h3 id="focusbyindexfrominput"><a class="header" href="#focusbyindexfrominput">&quot;FocusByIndexFromInput&quot;</a></h3>
+<p>YAML: <code>FocusByIndexFromInput</code></p>
+<p>Focus on the absolute <code>n</code>th node where <code>n</code> is read from the input buffer.</p>
+<h3 id="-focusbyfilename--string-"><a class="header" href="#-focusbyfilename--string-">{ FocusByFileName = &quot;string&quot; }</a></h3>
+<p>YAML: <code>FocusByFileName: string</code></p>
+<p>Focus on the file by name from the present working directory.</p>
+<p><strong>YAML Example:</strong> <code>FocusByFileName: filename.ext</code>
+<strong>Lua Example:</strong> <code>{ FocusByFileName = &quot;filename.ext&quot; }</code></p>
+<h3 id="-changedirectory--string-"><a class="header" href="#-changedirectory--string-">{ ChangeDirectory = &quot;string&quot; }</a></h3>
+<p>YAML: <code>ChangeDirectory: string</code></p>
+<p>Change the present working directory ($PWD)</p>
+<p><strong>YAML Example:</strong> <code>ChangeDirectory: /path/to/directory</code>
+<strong>Lua Example:</strong> <code>{ ChangeDirectory = &quot;/path/to/directory&quot; }</code></p>
+<h3 id="enter"><a class="header" href="#enter">&quot;Enter&quot;</a></h3>
+<p>YAML: <code>Enter</code></p>
+<p>Enter into the currently focused path if it's a directory.</p>
+<h3 id="back"><a class="header" href="#back">&quot;Back&quot;</a></h3>
+<p>YAML: <code>Back</code></p>
+<p>Go back to the parent directory.</p>
+<h3 id="lastvisitedpath"><a class="header" href="#lastvisitedpath">&quot;LastVisitedPath&quot;</a></h3>
+<p>YAML: <code>LastVisitedPath</code></p>
+<p>Go to the last path visited.</p>
+<h3 id="nextvisitedpath"><a class="header" href="#nextvisitedpath">&quot;NextVisitedPath&quot;</a></h3>
+<p>YAML: <code>NextVisitedPath</code></p>
+<p>Go to the next path visited.</p>
+<h3 id="followsymlink"><a class="header" href="#followsymlink">&quot;FollowSymlink&quot;</a></h3>
+<p>YAML: <code>FollowSymlink</code></p>
+<p>Follow the symlink under focus to its actual location.</p>
+<h3 id="-bufferinput--string-"><a class="header" href="#-bufferinput--string-">{ BufferInput = &quot;string&quot; }</a></h3>
+<p>YAML: <code>BufferInput(String)</code></p>
+<p>Append/buffer the given string into the input buffer.</p>
+<p><strong>YAML Example:</strong> <code>BufferInput: foo</code>
+<strong>Lua Example:</strong> <code>{ BufferInput = &quot;foo&quot; }</code></p>
+<h3 id="bufferinputfromkey"><a class="header" href="#bufferinputfromkey">&quot;BufferInputFromKey&quot;</a></h3>
+<p>YAML: <code>BufferInputFromKey</code></p>
+<p>Append/buffer the characted read from a keyboard input into the
+input buffer.</p>
+<h3 id="-setinputbuffer--string-"><a class="header" href="#-setinputbuffer--string-">{ SetInputBuffer = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SetInputBuffer: string</code></p>
+<p>Set/rewrite the input buffer with the given string.
+When the input buffer is not-null (even if empty string)
+it will show in the UI.</p>
+<p><strong>YAML Example:</strong> <code>SetInputBuffer: foo</code>
+<strong>Lua Example:</strong> <code>{ SetInputBuffer = &quot;foo&quot; }</code></p>
+<h3 id="removeinputbufferlastcharacter"><a class="header" href="#removeinputbufferlastcharacter">&quot;RemoveInputBufferLastCharacter&quot;</a></h3>
+<p>YAML: <code>RemoveInputBufferLastCharacter</code></p>
+<p>Remove input buffer's last character.</p>
+<h3 id="removeinputbufferlastword"><a class="header" href="#removeinputbufferlastword">&quot;RemoveInputBufferLastWord&quot;</a></h3>
+<p>YAML: <code>RemoveInputBufferLastWord</code></p>
+<p>Remove input buffer's last word.</p>
+<h3 id="resetinputbuffer"><a class="header" href="#resetinputbuffer">&quot;ResetInputBuffer&quot;</a></h3>
+<p>YAML: <code>ResetInputBuffer</code></p>
+<p>Reset the input buffer back to null. It will not show in the UI.</p>
+<h3 id="-switchmode--string-"><a class="header" href="#-switchmode--string-">{ SwitchMode = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SwitchMode: string</code></p>
+<p>Switch input <a href="modes.html">mode</a>.</p>
+<blockquote>
+<p><strong>NOTE:</strong> To be specific about which mode to switch to, use <code>SwitchModeBuiltin</code> or
+<code>SwitchModeCustom</code> instead.</p>
+</blockquote>
+<p><strong>YAML Example:</strong> <code>SwitchMode: default</code>
+<strong>Lua Example:</strong> <code>{ SwitchMode = &quot;default&quot; }</code></p>
+<h3 id="-switchmodebuiltin--string-"><a class="header" href="#-switchmodebuiltin--string-">{ SwitchModeBuiltin = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SwitchModeBuiltin: string</code></p>
+<p>Switch to a <a href="modes.html#builtin">builtin mode</a>.</p>
+<p><strong>YAML Example:</strong> <code>SwitchModeBuiltin: default</code>
+<strong>Lua Example:</strong> <code>{ SwitchModeBuiltin = &quot;default&quot; }</code></p>
+<h3 id="-switchmodecustom--string-"><a class="header" href="#-switchmodecustom--string-">{ SwitchModeCustom = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SwitchModeCustom: string</code></p>
+<p>Switch to a <a href="modes.html#custom">custom mode</a>.</p>
+<p><strong>YAML Example:</strong> <code>SwitchModeCustom: my_custom_mode</code>
+<strong>Lua Example:</strong> <code>{ SwitchModeCustom = &quot;my_custom_mode&quot; }</code></p>
+<h3 id="popmode"><a class="header" href="#popmode">&quot;PopMode&quot;</a></h3>
+<p>YAML: <code>PopMode</code></p>
+<p>Pop the last mode from the history and switch to it.</p>
+<h3 id="-switchlayout--string-"><a class="header" href="#-switchlayout--string-">{ SwitchLayout = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SwitchLayout: string</code></p>
+<p>Switch <a href="layouts.html">layout</a>.</p>
+<blockquote>
+<p><strong>NOTE:</strong> To be specific about which layout to switch to, use <code>SwitchLayoutBuiltin</code> or
+<code>SwitchLayoutCustom</code> instead.</p>
+</blockquote>
+<p><strong>YAML Example:</strong> <code>SwitchLayout: default</code>
+<strong>Lua Example:</strong> <code>{ SwitchLayout = &quot;default&quot; }</code></p>
+<h3 id="-switchlayoutbuiltin--string-"><a class="header" href="#-switchlayoutbuiltin--string-">{ SwitchLayoutBuiltin = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SwitchLayoutBuiltin: string</code></p>
+<p>Switch to a <a href="layouts.html#builtin">builtin layout</a>.</p>
+<p><strong>YAML Example:</strong> <code>SwitchLayoutBuiltin: default</code>
+<strong>Lua Example:</strong> <code>{ SwitchLayoutBuiltin = &quot;default&quot; }</code></p>
+<h3 id="-switchlayoutcustom--string-"><a class="header" href="#-switchlayoutcustom--string-">{ SwitchLayoutCustom = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SwitchLayoutCustom: string</code></p>
+<p>Switch to a <a href="layouts.html#custom">custom layout</a>.</p>
+<p><strong>YAML Example:</strong> <code>SwitchLayoutCustom: my_custom_layout</code>
+<strong>Lua Example:</strong> <code>{ SwitchLayoutCustom = &quot;my_custom_layout&quot; }</code></p>
+<h3 id="-call--string-"><a class="header" href="#-call--string-">{ Call = &quot;string&quot; }</a></h3>
+<p>YAML: <code>Call: string</code></p>
+<p>Call a shell command with the given arguments.
+Note that the arguments will be shell-escaped.
+So to read the variables, the <code>-c</code> option of the shell
+can be used.
+You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
+<p><strong>YAML Example:</strong> <code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code>
+<strong>Lua Example:</strong> <code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></p>
+<h3 id="-callsilently--string-"><a class="header" href="#-callsilently--string-">{ CallSilently = &quot;string&quot; }</a></h3>
+<p>YAML: <code>CallSilently: string</code></p>
+<p>Like <code>Call</code> but without the flicker. The stdin, stdout
+stderr will be piped to null. So it's non-interactive.</p>
+<p><strong>YAML Example:</strong> <code>CallSilently: { command: tput, args: [&quot;bell&quot;] }</code>
+<strong>Lua Example:</strong> <code>{ CallSilently = { command = &quot;tput&quot;, args = { &quot;bell&quot; } } }</code></p>
+<h3 id="-calllua--string-"><a class="header" href="#-calllua--string-">{ CallLua = &quot;string&quot; }</a></h3>
+<p>YAML: <code>CallLua: string</code></p>
+<p>Call a Lua function.
+A <a href="message.html#calllua-argument"><code>CallLuaArg</code></a> object will be passed to the
+<a href="message.html#lua-function-calls">function</a> as argument.
+The function can optionally return a list of messages for xplr to handle
+after the executing the function.</p>
+<p><strong>YAML Example:</strong> <code>CallLua: custom.some_custom_funtion</code>
+<strong>Lua Example:</strong> <code>{ CallLua = &quot;custom.some_custom_funtion&quot; }</code></p>
+<h3 id="-callluasilently--string-"><a class="header" href="#-callluasilently--string-">{ CallLuaSilently = &quot;string&quot; }</a></h3>
+<p>YAML: <code>CallLuaSilently: string</code></p>
+<p>Like <code>CallLua</code> but without the flicker. The stdin, stdout
+stderr will be piped to null. So it's non-interactive.</p>
+<p><strong>YAML Example:</strong> <code>CallLuaSilently: custom.some_custom_function</code>
+<strong>Lua Example:</strong> <code>{ CallLuaSilently = &quot;custom.some_custom_function&quot; }</code></p>
+<h3 id="-bashexec--string-"><a class="header" href="#-bashexec--string-">{ BashExec = &quot;string&quot; }</a></h3>
+<p>YAML: <code>BashExec: string</code></p>
+<p>An alias to <code>Call: {command: bash, args: [&quot;-c&quot;, &quot;{string}&quot;], silent: false}</code>
+where <code>{string}</code> is the given value.</p>
+<p><strong>YAML Example:</strong> <code>BashExec: &quot;read -p test&quot;</code>
+<strong>Lua Example:</strong> <code>{ BashExec = &quot;read -p test&quot; }</code></p>
+<h3 id="-bashexecsilently--string-"><a class="header" href="#-bashexecsilently--string-">{ BashExecSilently = &quot;string&quot; }</a></h3>
+<p>YAML: <code>BashExecSilently(String)</code></p>
+<p>Like <code>BashExec</code> but without the flicker. The stdin, stdout
+stderr will be piped to null. So it's non-interactive.</p>
+<p><strong>YAML Example:</strong> <code>BashExecSilently: &quot;tput bell&quot;</code>
+<strong>Lua Example:</strong> <code>{ BashExecSilently = &quot;tput bell&quot; }</code></p>
+<h3 id="select"><a class="header" href="#select">&quot;Select&quot;</a></h3>
+<p>YAML: <code>Select</code></p>
+<p>Select the focused node.</p>
+<h3 id="selectall"><a class="header" href="#selectall">&quot;SelectAll&quot;</a></h3>
+<p>YAML: <code>SelectAll</code></p>
+<p>Select all the visible nodes.</p>
+<h3 id="-selectpath--string-"><a class="header" href="#-selectpath--string-">{ SelectPath = &quot;string&quot; }</a></h3>
+<p>YAML: <code>SelectPath: string</code></p>
+<p>Select the given path.</p>
+<p><strong>YAML Example:</strong> <code>SelectPath: /path/to/file</code>
+<strong>Lua Example:</strong> <code>{ SelectPath = &quot;/path/to/file&quot; }</code></p>
+<h3 id="unselect"><a class="header" href="#unselect">&quot;UnSelect&quot;</a></h3>
+<p>YAML: <code>UnSelect</code></p>
+<p>Unselect the focused node.</p>
+<h3 id="unselectall"><a class="header" href="#unselectall">&quot;UnSelectAll&quot;</a></h3>
+<p>YAML: <code>UnSelectAll</code></p>
+<p>Unselect all the visible nodes.</p>
+<h3 id="-unselectpath--string-"><a class="header" href="#-unselectpath--string-">{ UnSelectPath = &quot;string)&quot; }</a></h3>
+<p>YAML: <code>UnSelectPath: string</code></p>
+<p>UnSelect the given path.</p>
+<p><strong>YAML Example:</strong> <code>UnSelectPath: /path/to/file</code>
+<strong>Lua Example:</strong> <code>{ UnSelectPath = &quot;/path/to/file&quot; }</code></p>
+<h3 id="toggleselection"><a class="header" href="#toggleselection">&quot;ToggleSelection&quot;</a></h3>
+<p>YAML: <code>ToggleSelection</code></p>
+<p>Toggle selection on the focused node.</p>
+<h3 id="toggleselectall"><a class="header" href="#toggleselectall">&quot;ToggleSelectAll&quot;</a></h3>
+<p>YAML: <code>ToggleSelectAll</code></p>
+<p>Toggle between select all and unselect all.</p>
+<h3 id="-toggleselectionbypath--string-"><a class="header" href="#-toggleselectionbypath--string-">{ ToggleSelectionByPath = &quot;string&quot; }</a></h3>
+<p>YAML: <code>ToggleSelectionByPath: string</code></p>
+<p>Toggle selection by file path.</p>
+<p><strong>YAML Example:</strong> <code>ToggleSelectionByPath: /path/to/file</code>
+<strong>Lua Example:</strong> <code>{ ToggleSelectionByPath = &quot;/path/to/file&quot; }</code></p>
+<h3 id="clearselection"><a class="header" href="#clearselection">&quot;ClearSelection&quot;</a></h3>
+<p>YAML: <code>ClearSelection</code></p>
+<p>Clear the selection.</p>
+<h3 id="-addnodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-"><a class="header" href="#-addnodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-">{ AddNodeFilter = { filter = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot;, input = &quot;string&quot; }</a></h3>
+<p>YAML: <code>AddNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string</code></p>
+<p>Add a <a href="filtering.html">filter</a> to exclude nodes while exploring directories.</p>
+<p><strong>YAML Example:</strong> <code>AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code>
+<strong>Lua Example:</strong> <code>{ AddNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; }</code></p>
+<h3 id="-removenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-"><a class="header" href="#-removenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-">{ RemoveNodeFilter = { filter = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot;, input = &quot;string&quot; }</a></h3>
+<p>YAML: <code>RemoveNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string</code></p>
+<p>Remove an existing <a href="filtering.html">filter</a>.</p>
+<p><strong>YAML Example:</strong> <code>RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code>
+<strong>Lua Example:</strong> <code>{ RemoveNodeFilter: { filter: &quot;RelativePathDoesStartWith&quot;, input: &quot;foo&quot; } }</code></p>
+<h3 id="-togglenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-"><a class="header" href="#-togglenodefilter---filter--a-hreffilteringhtmlfilternodefiltera-input--string-">{ ToggleNodeFilter = { filter = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot;, input = &quot;string&quot; }</a></h3>
+<p>YAML: <code>ToggleNodeFilter: { filter = [NodeFilter](filtering.md#filter), input = string</code></p>
+<p>Remove a <a href="filter.html">filter</a> if it exists, else, add a it.</p>
+<p><strong>YAML Example:</strong> <code>ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code>
+<strong>Lua Example:</strong> <code>{ ToggleNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></p>
+<h3 id="-addnodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-"><a class="header" href="#-addnodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-">{ AddNodeFilterFromInput = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot; }</a></h3>
+<p>YAML: <code>AddNodeFilterFromInput: [NodeFilter](filtering.md#filter)</code></p>
+<p>Add a node <a href="filtering.html">filter</a> reading the input from the buffer.</p>
+<p><strong>YAML Example:</strong> <code>AddNodeFilterFromInput: RelativePathDoesStartWith</code>
+<strong>Lua Example:</strong> <code>{ AddNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</code></p>
+<h3 id="-removenodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-"><a class="header" href="#-removenodefilterfrominput--a-hreffilteringhtmlfilternodefiltera-">{ RemoveNodeFilterFromInput = &quot;<a href="filtering.html#filter">NodeFilter</a>&quot; }</a></h3>
+<p>YAML: <code>RemoveNodeFilterFromInput: [NodeFilter](filtering.md#filter)</code></p>
+<p>Remove a node <a href="filtering.html">filter</a> reading the input from the buffer.</p>
+<p><strong>YAML Example:</strong> <code>RemoveNodeFilterFromInput: RelativePathDoesStartWith</code>
+<strong>Lua Example:</strong> <code>{ RemoveNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</code></p>
+<h3 id="removelastnodefilter"><a class="header" href="#removelastnodefilter">&quot;RemoveLastNodeFilter&quot;</a></h3>
+<p>YAML: <code>RemoveLastNodeFilter</code></p>
+<p>Remove the last node <a href="filtering.html">filter</a>.</p>
+<h3 id="resetnodefilters"><a class="header" href="#resetnodefilters">&quot;ResetNodeFilters&quot;</a></h3>
+<p>YAML: <code>ResetNodeFilters</code></p>
+<p>Reset the node <a href="filtering.html">filters</a> back to the default configuration.</p>
+<h3 id="clearnodefilters"><a class="header" href="#clearnodefilters">&quot;ClearNodeFilters&quot;</a></h3>
+<p>YAML: <code>ClearNodeFilters</code></p>
+<p>Clear all the node <a href="filtering.html">filters</a>.</p>
+<h3 id="-addnodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--"><a class="header" href="#-addnodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--">{ AddNodeSorter = { sorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot;, reverse = bool } }</a></h3>
+<p>YAML: <code>AddNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }</code></p>
+<p>Add a <a href="sorting.html#sorter">sorter</a> to sort nodes while exploring directories.</p>
+<p><strong>YAML Example:</strong> <code>AddNodeSorter: { sorter: ByRelativePath, reverse: false }</code>
+<strong>YAML Example:</strong> <code>{ AddNodeSorter = { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></p>
+<h3 id="-removenodesorter--a-hrefsortinghtmlsorternodesortera-"><a class="header" href="#-removenodesorter--a-hrefsortinghtmlsorternodesortera-">{ RemoveNodeSorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot; }</a></h3>
+<p>YAML: <code>RemoveNodeSorter: [NodeSorter](sorting.md#sorter)</code></p>
+<p>Remove an existing <a href="sorting.html#sorter">sorter</a>.</p>
+<p><strong>YAML Example:</strong> <code>RemoveNodeSorter: ByRelativePath</code>
+<strong>Lua Example:</strong> <code>{ RemoveNodeSorter = &quot;ByRelativePath&quot; }</code></p>
+<h3 id="-reversenodesorter--a-hrefsortinghtmlsorternodesortera-"><a class="header" href="#-reversenodesorter--a-hrefsortinghtmlsorternodesortera-">{ ReverseNodeSorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot; }</a></h3>
+<p>YAML: <code>ReverseNodeSorter: [NodeSorter](sorting.md#sorter)</code></p>
+<p>Reverse a node <a href="sorting.html#sorter">sorter</a>.</p>
+<p><strong>YAML Example:</strong> <code>ReverseNodeSorter: ByRelativePath</code>
+<strong>Lua Example:</strong> <code>{ ReverseNodeSorter = &quot;ByRelativePath&quot; }</code></p>
+<h3 id="-togglenodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--"><a class="header" href="#-togglenodesorter---sorter--a-hrefsortinghtmlsorternodesortera-reverse--bool--">{ ToggleNodeSorter = { sorter = &quot;<a href="sorting.html#sorter">NodeSorter</a>&quot;, reverse = bool } }</a></h3>
+<p>YAML: <code>ToggleNodeSorter: { sorter: [NodeSorter](sorting.md#sorter), reverse = bool }</code></p>
+<p>Remove a <a href="message.html#sorting.md#sorter">sorter</a> if it exists, else, add a it.</p>
+<p><strong>YAML Example:</strong> <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code>
+<strong>Lua Example:</strong> <code>{ ToggleSorterSorter: { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></p>
+<h3 id="reversenodesorters"><a class="header" href="#reversenodesorters">&quot;ReverseNodeSorters&quot;</a></h3>
+<p>YAML: <code>ReverseNodeSorters</code></p>
+<p>Reverse the node <a href="sorting.html#sorter">sorters</a>.</p>
+<h3 id="removelastnodesorter"><a class="header" href="#removelastnodesorter">&quot;RemoveLastNodeSorter&quot;</a></h3>
+<p>YAML: <code>RemoveLastNodeSorter</code></p>
+<p>Remove the last node <a href="sorting.html#sorter">sorter</a>.</p>
+<h3 id="resetnodesorters"><a class="header" href="#resetnodesorters">&quot;ResetNodeSorters&quot;</a></h3>
+<p>YAML: <code>ResetNodeSorters</code></p>
+<p>Reset the node <a href="sorting.html#sorter">sorters</a> back to the default configuration.</p>
+<h3 id="clearnodesorters"><a class="header" href="#clearnodesorters">&quot;ClearNodeSorters&quot;</a></h3>
+<p>YAML: <code>ClearNodeSorters</code></p>
+<p>Clear all the node <a href="sorting.html#sorter">sorters</a>.</p>
+<h3 id="enablemouse"><a class="header" href="#enablemouse">&quot;EnableMouse&quot;</a></h3>
+<p>YAML: <code>EnableMouse</code></p>
+<p>Enable mouse</p>
+<h3 id="disablemouse"><a class="header" href="#disablemouse">&quot;DisableMouse&quot;</a></h3>
+<p>YAML: <code>DisableMouse</code></p>
+<p>Disable mouse</p>
+<h3 id="togglemouse"><a class="header" href="#togglemouse">&quot;ToggleMouse&quot;</a></h3>
+<p>YAML: <code>ToggleMouse</code></p>
+<p>Toggle mouse</p>
+<h3 id="-startfifo--string-"><a class="header" href="#-startfifo--string-">{ StartFifo = &quot;string&quot; }</a></h3>
+<p>YAML: <code>StartFifo: string</code></p>
+<p>Start piping the focused path to the given fifo path</p>
+<p><strong>YAML Example:</strong> <code>StartFifo: /tmp/xplr.fifo</code>
+<strong>Lua Example:</strong> <code>{ StartFifo = &quot;/tmp/xplr.fifo }</code></p>
+<h3 id="stopfifo"><a class="header" href="#stopfifo">&quot;StopFifo&quot;</a></h3>
+<p>YAML: <code>StopFifo</code></p>
+<p>Close the active fifo and stop piping.</p>
+<h3 id="-togglefifo--string-"><a class="header" href="#-togglefifo--string-">{ ToggleFifo = &quot;string&quot; }</a></h3>
+<p>YAML: <code>ToggleFifo: string</code></p>
+<p>Toggle betwen {Start|Stop}Fifo</p>
+<p><strong>YAML Example:</strong> <code>ToggleFifo: /path/to/fifo</code>
+<strong>Lua Example:</strong> <code>{ ToggleFifo = &quot;/path/to/fifo&quot; }</code></p>
+<h3 id="-loginfo--string-"><a class="header" href="#-loginfo--string-">{ LogInfo = &quot;string&quot; }</a></h3>
+<p>YAML: <code>LogInfo: string</code></p>
+<p>Log information message.</p>
+<p><strong>YAML Example:</strong> <code>LogInfo: launching satellite</code>
+<strong>Lua Example:</strong> <code>{ LogInfo = &quot;launching satellite&quot; }</code></p>
+<h3 id="-logsuccess--string-"><a class="header" href="#-logsuccess--string-">{ LogSuccess = &quot;String&quot; }</a></h3>
+<p>YAML: <code>LogSuccess: string</code></p>
+<p>Log a success message.</p>
+<p><strong>YAML Example:</strong> <code>LogSuccess: satellite reached destination</code>.
+<strong>Lua Example:</strong> <code>{ LogSuccess = &quot;satellite reached destination&quot; }</code>.</p>
+<h3 id="-logwarning--string-"><a class="header" href="#-logwarning--string-">{ LogWarning = &quot;string&quot; }</a></h3>
+<p>YAML: <code>LogWarning: string</code></p>
+<p>Log an warning message.</p>
+<p><strong>YAML Example:</strong> <code>LogWarning: satellite is heating</code>
+<strong>Lua Example:</strong> <code>{ LogWarning = &quot;satellite is heating&quot; }</code></p>
+<h3 id="-logerror--string-"><a class="header" href="#-logerror--string-">{ LogError = &quot;string&quot; }</a></h3>
+<p>YAML: <code>LogError: string</code></p>
+<p>Log an error message.</p>
+<p><strong>YAML Example:</strong> <code>LogError: satellite crashed</code>
+<strong>Lua Example:</strong> <code>{ LogError = &quot;satellite crashed&quot; }</code></p>
+<h3 id="quit"><a class="header" href="#quit">&quot;Quit&quot;</a></h3>
+<p>YAML: <code>Quit</code></p>
+<p>Quit with returncode zero (success).</p>
+<h3 id="printpwdandquit"><a class="header" href="#printpwdandquit">&quot;PrintPwdAndQuit&quot;</a></h3>
+<p>YAML: <code>PrintPwdAndQuit</code></p>
+<p>Print $PWD and quit.</p>
+<h3 id="printfocuspathandquit"><a class="header" href="#printfocuspathandquit">&quot;PrintFocusPathAndQuit&quot;</a></h3>
+<p>YAML: <code>PrintFocusPathAndQuit</code></p>
+<p>Print the path under focus and quit. It can be empty string if there's nothing to focus.</p>
+<h3 id="printselectionandquit"><a class="header" href="#printselectionandquit">&quot;PrintSelectionAndQuit&quot;</a></h3>
+<p>YAML: <code>PrintSelectionAndQuit</code></p>
+<p>Print the selected paths and quit. It can be empty is no path is selected.</p>
+<h3 id="printresultandquit"><a class="header" href="#printresultandquit">&quot;PrintResultAndQuit&quot;</a></h3>
+<p>YAML: <code>PrintResultAndQuit</code></p>
+<p>Print the selected paths if it's not empty, else, print the focused node's path.</p>
+<h3 id="printappstateandquit"><a class="header" href="#printappstateandquit">&quot;PrintAppStateAndQuit&quot;</a></h3>
+<p>YAML: <code>PrintAppStateAndQuit</code></p>
+<p>Print the state of application in YAML format. Helpful for debugging or generating
+the default configuration file.</p>
+<h3 id="-debug--string-"><a class="header" href="#-debug--string-">{ Debug = &quot;string&quot; }</a></h3>
+<p>YAML: <code>Debug: string</code></p>
+<p>Write the application state to a file, without quitting. Also helpful for debugging.</p>
+<p><strong>YAML Example:</strong>  <code>Debug: /path/to/file</code>
+<strong>Lua Example:</strong>  <code>{ Debug = &quot;/path/to/file&quot; }</code></p>
+<h3 id="terminate"><a class="header" href="#terminate">&quot;Terminate&quot;</a></h3>
+<p>YAML: <code>Terminate</code></p>
+<p>Terminate the application with a non-zero return code.</p>
 <h2 id="lua-function-calls"><a class="header" href="#lua-function-calls">Lua Function Calls</a></h2>
 <p>xplr allows users to define lua functions using the <code>xplr.fn.custom</code> Lua API.</p>
 <p>These functions can be called using messages like <code>CallLua</code>, <code>CallLuaSilently</code>.</p>
