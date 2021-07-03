@@ -151,7 +151,7 @@
                     <main>
                         <h1 id="message"><a class="header" href="#message">Message</a></h1>
 <p>You can think of xplr as a server. Just like web servers listen to HTTP
-requests, xplr listens to <a href="full-list-of-messages">messages</a>.</p>
+requests, xplr listens to <a href="#full-list-of-messages">messages</a>.</p>
 <p>You can send these messages to an xplr session in the following ways:</p>
 <ul>
 <li>Via <a href="modes.html#key-bindings">key bindings</a></li>
@@ -429,7 +429,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ RemoveNodeFilter: { filter: &quot;RelativePathDoesStartWith&quot;, input: &quot;foo&quot; } }</code></p>
 <h3 id="-togglenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-"><a class="header" href="#-togglenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-">{ ToggleNodeFilter = { filter = <a href="filtering.html#filter">Filter</a>, input = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>ToggleNodeFilter: { filter = Filter, input = string }</code></p>
-<p>Remove a <a href="filter.html">filter</a> if it exists, else, add a it.</p>
+<p>Remove a <a href="filtering.html">filter</a> if it exists, else, add a it.</p>
 <p><strong>YAML Example:</strong> <code>ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></p>
 <p><strong>Lua Example:</strong> <code>{ ToggleNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></p>
 <h3 id="-addnodefilterfrominput--a-hreffilteringhtmlfilterfiltera-"><a class="header" href="#-addnodefilterfrominput--a-hreffilteringhtmlfilterfiltera-">{ AddNodeFilterFromInput = <a href="filtering.html#filter">Filter</a> }</a></h3>
@@ -468,7 +468,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ ReverseNodeSorter = &quot;ByRelativePath&quot; }</code></p>
 <h3 id="-togglenodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--"><a class="header" href="#-togglenodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--">{ ToggleNodeSorter = { sorter = <a href="sorting.html#sorter">Sorter</a>, reverse = bool } }</a></h3>
 <p><strong>YAML:</strong> <code>ToggleNodeSorter: { sorter: Sorter, reverse = bool }</code></p>
-<p>Remove a <a href="#sorting.md#sorter">sorter</a> if it exists, else, add a it.</p>
+<p>Remove a <a href="sorting.html#sorter">sorter</a> if it exists, else, add a it.</p>
 <p><strong>YAML Example:</strong> <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code></p>
 <p><strong>Lua Example:</strong> <code>{ ToggleSorterSorter: { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></p>
 <h3 id="reversenodesorters"><a class="header" href="#reversenodesorters">&quot;ReverseNodeSorters&quot;</a></h3>
@@ -655,9 +655,9 @@ exposed directly via environment variables, like multi-line string.</p>
 <li><a href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></li>
 </ul>
 <h4 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h4>
-<p>Append new-line delimited messages to this pipe in <a href="www.yaml.org">YAML</a> (or
-<a href="www.json.org">JSON</a>) syntax. These messages will be read and handled by xplr
-after the command execution.</p>
+<p>Append new-line delimited messages to this pipe in <a href="https://www.yaml.org">YAML</a>
+(or <a href="https://www.json.org">JSON</a>) syntax. These messages will be read and
+handled by xplr after the command execution.</p>
 <h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>
 <p>New-line delimited list of selected paths.</p>
 <h4 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h4>

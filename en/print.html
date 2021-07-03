@@ -669,6 +669,116 @@ mapped via the <a href="modes.html#on_key">on_key</a> field.</p>
 <p>Default action to perform in case of a keyboard input not mapped via any of the
 <a href="modes.html#on_key">on_key</a>, <a href="modes.html#on_alphabet">on_alphabet</a>, <a href="modes.html#on_number">on_number</a> or
 <a href="modes.html#on_special_character">on_special_character</a> field.</p>
+<h2 id="key"><a class="header" href="#key">Key</a></h2>
+<p>A key can be one of the following:</p>
+<ul>
+<li>
+<p>0</p>
+</li>
+<li>
+<p>1
+...</p>
+</li>
+<li>
+<p>9</p>
+</li>
+<li>
+<p>a</p>
+</li>
+<li>
+<p>b
+...</p>
+</li>
+<li>
+<p>z</p>
+</li>
+<li>
+<p>A</p>
+</li>
+<li>
+<p>B
+...</p>
+</li>
+<li>
+<p>Z</p>
+</li>
+<li>
+<p>f1</p>
+</li>
+<li>
+<p>f2
+...</p>
+</li>
+<li>
+<p>f12</p>
+</li>
+<li>
+<p>ctrl-a</p>
+</li>
+<li>
+<p>ctrl-b
+...</p>
+</li>
+<li>
+<p>ctrl-z</p>
+</li>
+<li>
+<p>alt-a</p>
+</li>
+<li>
+<p>alt-b
+...</p>
+</li>
+<li>
+<p>alt-z</p>
+</li>
+<li>
+<p>backspace</p>
+</li>
+<li>
+<p>left</p>
+</li>
+<li>
+<p>right</p>
+</li>
+<li>
+<p>up</p>
+</li>
+<li>
+<p>down</p>
+</li>
+<li>
+<p>home</p>
+</li>
+<li>
+<p>end</p>
+</li>
+<li>
+<p>pageUp</p>
+</li>
+<li>
+<p>pageDown</p>
+</li>
+<li>
+<p>backTab</p>
+</li>
+<li>
+<p>delete</p>
+</li>
+<li>
+<p>insert</p>
+</li>
+<li>
+<p>enter</p>
+</li>
+<li>
+<p>tab</p>
+</li>
+<li>
+<p>esc</p>
+</li>
+</ul>
+<p>And finally, special characters - including space (<code>&quot; &quot;</code>).</p>
 <h2 id="action"><a class="header" href="#action">Action</a></h2>
 <p>An action contains the following information:</p>
 <ul>
@@ -742,7 +852,7 @@ the <code>default</code> mode.</p>
 <p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for more <a href="awesome-plugins.html#integration">integration</a> options.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="message"><a class="header" href="#message">Message</a></h1>
 <p>You can think of xplr as a server. Just like web servers listen to HTTP
-requests, xplr listens to <a href="full-list-of-messages">messages</a>.</p>
+requests, xplr listens to <a href="message.html#full-list-of-messages">messages</a>.</p>
 <p>You can send these messages to an xplr session in the following ways:</p>
 <ul>
 <li>Via <a href="modes.html#key-bindings">key bindings</a></li>
@@ -1020,7 +1130,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ RemoveNodeFilter: { filter: &quot;RelativePathDoesStartWith&quot;, input: &quot;foo&quot; } }</code></p>
 <h3 id="-togglenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-"><a class="header" href="#-togglenodefilter---filter--a-hreffilteringhtmlfilterfiltera-input--string-">{ ToggleNodeFilter = { filter = <a href="filtering.html#filter">Filter</a>, input = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>ToggleNodeFilter: { filter = Filter, input = string }</code></p>
-<p>Remove a <a href="filter.html">filter</a> if it exists, else, add a it.</p>
+<p>Remove a <a href="filtering.html">filter</a> if it exists, else, add a it.</p>
 <p><strong>YAML Example:</strong> <code>ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></p>
 <p><strong>Lua Example:</strong> <code>{ ToggleNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></p>
 <h3 id="-addnodefilterfrominput--a-hreffilteringhtmlfilterfiltera-"><a class="header" href="#-addnodefilterfrominput--a-hreffilteringhtmlfilterfiltera-">{ AddNodeFilterFromInput = <a href="filtering.html#filter">Filter</a> }</a></h3>
@@ -1059,7 +1169,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ ReverseNodeSorter = &quot;ByRelativePath&quot; }</code></p>
 <h3 id="-togglenodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--"><a class="header" href="#-togglenodesorter---sorter--a-hrefsortinghtmlsortersortera-reverse--bool--">{ ToggleNodeSorter = { sorter = <a href="sorting.html#sorter">Sorter</a>, reverse = bool } }</a></h3>
 <p><strong>YAML:</strong> <code>ToggleNodeSorter: { sorter: Sorter, reverse = bool }</code></p>
-<p>Remove a <a href="message.html#sorting.md#sorter">sorter</a> if it exists, else, add a it.</p>
+<p>Remove a <a href="sorting.html#sorter">sorter</a> if it exists, else, add a it.</p>
 <p><strong>YAML Example:</strong> <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code></p>
 <p><strong>Lua Example:</strong> <code>{ ToggleSorterSorter: { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></p>
 <h3 id="reversenodesorters"><a class="header" href="#reversenodesorters">&quot;ReverseNodeSorters&quot;</a></h3>
@@ -1246,9 +1356,9 @@ exposed directly via environment variables, like multi-line string.</p>
 <li><a href="message.html#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></li>
 </ul>
 <h4 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h4>
-<p>Append new-line delimited messages to this pipe in <a href="www.yaml.org">YAML</a> (or
-<a href="www.json.org">JSON</a>) syntax. These messages will be read and handled by xplr
-after the command execution.</p>
+<p>Append new-line delimited messages to this pipe in <a href="https://www.yaml.org">YAML</a>
+(or <a href="https://www.json.org">JSON</a>) syntax. These messages will be read and
+handled by xplr after the command execution.</p>
 <h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>
 <p>New-line delimited list of selected paths.</p>
 <h4 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h4>
