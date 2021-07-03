@@ -172,35 +172,14 @@ Key
 
 A key can be one of the following:
 
-- 0
-- 1
-...
-- 9
+- 0, 1, ... 9
+- a, b, ... z
+- A, B, ... Z
+- f1, f2, ... f12
 
-- a
-- b
-...
-- z
+- ctrl-a, ctrl-b, ... ctrl-z
 
-- A
-- B
-...
-- Z
-
-- f1
-- f2
-...
-- f12
-
-- ctrl-a
-- ctrl-b
-...
-- ctrl-z
-
-- alt-a
-- alt-b
-...
-- alt-z
+- alt-a, alt-b, ... alt-z
 
 - backspace
 - left
@@ -218,7 +197,7 @@ A key can be one of the following:
 - tab
 - esc
 
-And finally, special characters - including space (`" "`).
+And finally, the special characters - including space (`" "`).
 
 
 Action
