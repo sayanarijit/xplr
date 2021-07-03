@@ -188,9 +188,9 @@ A key can be one of the following:
 - down
 - home
 - end
-- pageUp
-- pageDown
-- backTab
+- page-up
+- page-down
+- back-tab
 - delete
 - insert
 - enter
