@@ -51,7 +51,7 @@ This is the shape of the cursor visible when the input buffer contains some stri
 cursor.style
 ------------
 
-Type: [Style](style.md)
+Type: [Style][1]
 
 Style of the cursor.
 
@@ -61,7 +61,7 @@ initial_layout
 
 Type: string
 
-The name of one of the [layout](layouts.md) to use when xplr loads.
+The name of one of the [layout][2] to use when xplr loads.
 
 
 initial_mode
@@ -69,13 +69,13 @@ initial_mode
 
 Type: string
 
-The name of one of the [mode](modes.md) to use when xplr loads.
+The name of one of the [mode][3] to use when xplr loads.
 
 
 initial_sorting
 ---------------
 
-Type: list of [Node Sorter Applicable](sorting.md#node-sorter-applicable)
+Type: list of [Node Sorter Applicable][4]
 
 Initial group if sorters applied to the nodes list in the table.
 
@@ -83,7 +83,7 @@ Initial group if sorters applied to the nodes list in the table.
 table.style
 -----------
 
-Type: [Style](style.md)
+Type: [Style][1]
 
 Default style of the table.
 
@@ -99,7 +99,7 @@ Default spacing of the columns in the table.
 table.col_widths
 ----------------
 
-Type: nullable list of [Constraint](layouts.md#constraint)
+Type: nullable list of [Constraint][5]
 
 Width of each column in the table.
 
@@ -114,7 +114,7 @@ Height of the table header.
 table.header.style
 ---------------
 
-Type: [Style](style.md)
+Type: [Style][1]
 
 Style of table header.
 
@@ -125,7 +125,7 @@ table.header.cols
 Type: List of column configuration
 
 Each column config contains `format` field (string) and `style` field
-([Style](style.md)), that define the content and style of header.
+([Style][1]), that define the content and style of header.
 
 
 table.row.height
@@ -139,7 +139,7 @@ Height of each row in the table.
 table.row.style
 ---------------
 
-Type: [Style](style.md)
+Type: [Style][1]
 
 Style of table rows.
 
@@ -150,11 +150,11 @@ table.row.cols
 Type: List of column configuration
 
 Each column config contains `format` field (string) and `style` field
-([Style](style.md)).
+([Style][1]).
 
-However, unlike [table.header.cols](#tableheadercols), the `format` field here
+However, unlike [table.header.cols][6], the `format` field here
 points to a Lua function that receives a
-[special argument](https://docs.rs/xplr/latest/xplr/ui/struct.NodeUiMetadata.html)
+[special argument][7]
 as input and returns a string that will be displayed in the column.
 
 TODO: Document the argument fields here.
@@ -198,3 +198,12 @@ xplr.config.general.table.col_widths = {
 ------------
 
 TODO: Continue documentation
+
+
+[1]:style.md
+[2]:layouts.md
+[3]:modes.md
+[4]:sorting.md#node-sorter-applicable
+[5]:layouts.md#constraint
+[6]:#tableheadercols
+[7]:https://docs.rs/xplr/latest/xplr/ui/struct.NodeUiMetadata.html

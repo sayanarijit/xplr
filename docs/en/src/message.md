@@ -2,29 +2,29 @@ Message
 =======
 
 You can think of xplr as a server. Just like web servers listen to HTTP
-requests, xplr listens to [messages](#full-list-of-messages).
+requests, xplr listens to [messages][1].
 
 You can send these messages to an xplr session in the following ways:
 
-- Via [key bindings](modes.md#key-bindings)
-- Via [Lua function calls](#lua-function-calls)
-- Via shell command using the [input pipe](#input-pipe)
+- Via [key bindings][2]
+- Via [Lua function calls][3]
+- Via shell command using the [input pipe][4]
 
 
 Format
 ------
 
-To send messages using the [key bindings](modes.md#key-bindings) or
-[Lua functions calls](#lua-functions-calls), messages are represented in
-[Lua](https://www.lua.org/) syntax. For example:
+To send messages using the [key bindings][2] or
+[Lua function calls][3], messages are represented in
+[Lua][5] syntax. For example:
 
 - "Quit"
 - { FocusPath = "/path/to/file" }
 - { Call = { command = "bash", args = { "-c", "read -p test" } } }
 
-However, to send messages using the [input pipe](#input-pipe), they need to be
+However, to send messages using the [input pipe][4], they need to be
 represented using
-[YAML](http://yaml.org/) (or [JSON](https://www.json.org)) syntax. For example:
+[YAML][6] (or [JSON][7]) syntax. For example:
 
 - Quit
 - FocusPath: "/path/to/file"
@@ -266,7 +266,7 @@ Reset the input buffer back to null. It will not show in the UI.
 
 **YAML:** `SwitchMode: string`
 
-Switch input [mode](modes.md).
+Switch input [mode][8].
 
 > **NOTE:** To be specific about which mode to switch to, use `SwitchModeBuiltin` or
 `SwitchModeCustom` instead.
@@ -279,7 +279,7 @@ Switch input [mode](modes.md).
 
 **YAML:** `SwitchModeBuiltin: string`
 
-Switch to a [builtin mode](modes.md#builtin).
+Switch to a [builtin mode][9].
 
 **YAML Example:** `SwitchModeBuiltin: default`
 
@@ -289,7 +289,7 @@ Switch to a [builtin mode](modes.md#builtin).
 
 **YAML:** `SwitchModeCustom: string`
 
-Switch to a [custom mode](modes.md#custom).
+Switch to a [custom mode][10].
 
 **YAML Example:** `SwitchModeCustom: my_custom_mode`
 
@@ -305,7 +305,7 @@ Pop the last mode from the history and switch to it.
 
 **YAML:** `SwitchLayout: string`
 
-Switch [layout](layouts.md).
+Switch [layout][11].
 
 > **NOTE:** To be specific about which layout to switch to, use `SwitchLayoutBuiltin` or
 `SwitchLayoutCustom` instead.
@@ -318,7 +318,7 @@ Switch [layout](layouts.md).
 
 **YAML:** `SwitchLayoutBuiltin: string`
 
-Switch to a [builtin layout](layouts.md#builtin).
+Switch to a [builtin layout][12].
 
 **YAML Example:** `SwitchLayoutBuiltin: default`
 
@@ -328,7 +328,7 @@ Switch to a [builtin layout](layouts.md#builtin).
 
 **YAML:** `SwitchLayoutCustom: string`
 
-Switch to a [custom layout](layouts.md#custom).
+Switch to a [custom layout][13].
 
 **YAML Example:** `SwitchLayoutCustom: my_custom_layout`
 
@@ -364,8 +364,8 @@ stderr will be piped to null. So it's non-interactive.
 **YAML:** `CallLua: string`
 
 Call a Lua function.
-A [`CallLuaArg`](#calllua-argument) object will be passed to the
-[function](#lua-function-calls) as argument.
+A [`CallLuaArg`][14] object will be passed to the
+[function][3] as argument.
 The function can optionally return a list of messages for xplr to handle
 after the executing the function.
 
@@ -478,51 +478,51 @@ Toggle selection by file path.
 
 Clear the selection.
 
-### { AddNodeFilter = { filter = [Filter](filtering.md#filter), input = "string" }
+### { AddNodeFilter = { filter = [Filter][15], input = "string" }
 
 **YAML:** `AddNodeFilter: { filter = Filter, input = string }`
 
-Add a [filter](filtering.md) to exclude nodes while exploring directories.
+Add a [filter][16] to exclude nodes while exploring directories.
 
 **YAML Example:** `AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 **Lua Example:** `{ AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 
-### { RemoveNodeFilter = { filter = [Filter](filtering.md#filter), input = "string" }
+### { RemoveNodeFilter = { filter = [Filter][15], input = "string" }
 
 **YAML:** `RemoveNodeFilter: { filter = Filter, input = string`
 
-Remove an existing [filter](filtering.md).
+Remove an existing [filter][16].
 
 **YAML Example:** `RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 **Lua Example:** `{ RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }`
 
-### { ToggleNodeFilter = { filter = [Filter](filtering.md#filter), input = "string" }
+### { ToggleNodeFilter = { filter = [Filter][15], input = "string" }
 
 **YAML:** `ToggleNodeFilter: { filter = Filter, input = string }`
 
-Remove a [filter](filtering.md) if it exists, else, add a it.
+Remove a [filter][16] if it exists, else, add a it.
 
 **YAML Example:** `ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 **Lua Example:** `{ ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 
-### { AddNodeFilterFromInput = [Filter](filtering.md#filter) }
+### { AddNodeFilterFromInput = [Filter][15] }
 
 **YAML:** `AddNodeFilterFromInput: Filter`
 
-Add a node [filter](filtering.md) reading the input from the buffer.
+Add a node [filter][16] reading the input from the buffer.
 
 **YAML Example:** `AddNodeFilterFromInput: RelativePathDoesStartWith`
 
 **Lua Example:** `{ AddNodeFilterFromInput = "RelativePathDoesStartWith" }`
 
-### { RemoveNodeFilterFromInput = [Filter](filtering.md#filter) }
+### { RemoveNodeFilterFromInput = [Filter][15] }
 
 **YAML:** `RemoveNodeFilterFromInput: Filter`
 
-Remove a node [filter](filtering.md) reading the input from the buffer.
+Remove a node [filter][16] reading the input from the buffer.
 
 **YAML Example:** `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
 
@@ -532,56 +532,56 @@ Remove a node [filter](filtering.md) reading the input from the buffer.
 
 **YAML:** `RemoveLastNodeFilter`
 
-Remove the last node [filter](filtering.md).
+Remove the last node [filter][16].
 
 ### "ResetNodeFilters"
 
 **YAML:** `ResetNodeFilters`
 
-Reset the node [filters](filtering.md) back to the default configuration.
+Reset the node [filters][16] back to the default configuration.
 
 ### "ClearNodeFilters"
 
 **YAML:** `ClearNodeFilters`
 
-Clear all the node [filters](filtering.md).
+Clear all the node [filters][16].
 
-### { AddNodeSorter = { sorter = [Sorter](sorting.md#sorter), reverse = bool } }
+### { AddNodeSorter = { sorter = [Sorter][17], reverse = bool } }
 
 **YAML:** `AddNodeSorter: { sorter: Sorter, reverse = bool }`
 
-Add a [sorter](sorting.md#sorter) to sort nodes while exploring directories.
+Add a [sorter][17] to sort nodes while exploring directories.
 
 **YAML Example:** `AddNodeSorter: { sorter: ByRelativePath, reverse: false }`
 
 **YAML Example:** `{ AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }`
 
 
-### { RemoveNodeSorter = [Sorter](sorting.md#sorter) }
+### { RemoveNodeSorter = [Sorter][17] }
 
 **YAML:** `RemoveNodeSorter: Sorter`
 
-Remove an existing [sorter](sorting.md#sorter).
+Remove an existing [sorter][17].
 
 **YAML Example:** `RemoveNodeSorter: ByRelativePath`
 
 **Lua Example:** `{ RemoveNodeSorter = "ByRelativePath" }`
 
-### { ReverseNodeSorter = [Sorter](sorting.md#sorter) }
+### { ReverseNodeSorter = [Sorter][17] }
 
 **YAML:** `ReverseNodeSorter: Sorter`
 
-Reverse a node [sorter](sorting.md#sorter).
+Reverse a node [sorter][17].
 
 **YAML Example:** `ReverseNodeSorter: ByRelativePath`
 
 **Lua Example:** `{ ReverseNodeSorter = "ByRelativePath" }`
 
-### { ToggleNodeSorter = { sorter = [Sorter](sorting.md#sorter), reverse = bool } }
+### { ToggleNodeSorter = { sorter = [Sorter][17], reverse = bool } }
 
 **YAML:** `ToggleNodeSorter: { sorter: Sorter, reverse = bool }`
 
-Remove a [sorter](sorting.md#sorter) if it exists, else, add a it.
+Remove a [sorter][17] if it exists, else, add a it.
 
 **YAML Example:** `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }`
 
@@ -591,25 +591,25 @@ Remove a [sorter](sorting.md#sorter) if it exists, else, add a it.
 
 **YAML:** `ReverseNodeSorters`
 
-Reverse the node [sorters](sorting.md#sorter).
+Reverse the node [sorters][17].
 
 ### "RemoveLastNodeSorter"
 
 **YAML:** `RemoveLastNodeSorter`
 
-Remove the last node [sorter](sorting.md#sorter).
+Remove the last node [sorter][17].
 
 ### "ResetNodeSorters"
 
 **YAML:** `ResetNodeSorters`
 
-Reset the node [sorters](sorting.md#sorter) back to the default configuration.
+Reset the node [sorters][17] back to the default configuration.
 
 ### "ClearNodeSorters"
 
 **YAML:** `ClearNodeSorters`
 
-Clear all the node [sorters](sorting.md#sorter).
+Clear all the node [sorters][17].
 
 ### "EnableMouse"
 
@@ -756,7 +756,7 @@ xplr allows users to define lua functions using the `xplr.fn.custom` Lua API.
 
 These functions can be called using messages like `CallLua`, `CallLuaSilently`.
 
-When called the function receives a [special argument](#calllua-argument) that
+When called the function receives a [special argument][14] that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.
 
@@ -783,7 +783,7 @@ It contains the following information:
 - last_modes
 
 TODO: Document each. For now, refer to the
-[rust doc](https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields).
+[rust doc][18].
 
 ### Example:
 
@@ -826,7 +826,7 @@ information and send messages via environment variables and temporary files
 called "pipe"s. These environment variables and files are only available when
 a command is being executed.
 
-Visit the [**fzf integration tutorial**](modes.md#tutorial-adding-a-new-mode)
+Visit the [**fzf integration tutorial**][19]
 for example.
 
 ### Environment variables
@@ -864,24 +864,24 @@ called "pipe"s.
 
 Current there is only one input pipe.
 
-- [XPLR_PIPE_MSG_IN](#xplr_pipe_msg_in)
+- [XPLR_PIPE_MSG_IN][20]
 
 #### Output pipes
 
 `XPLR_PIPE_*_OUT` are the output pipes that contain data which cannot be
 exposed directly via environment variables, like multi-line string.
 
-- [XPLR_PIPE_SELECTION_OUT](#xplr_pipe_selection_out)
-- [XPLR_PIPE_GLOBAL_HELP_MENU_OUT](#xplr_pipe_global_help_menu_out)
-- [XPLR_PIPE_LOGS_OUT](#xplr_pipe_logs_out)
-- [XPLR_PIPE_RESULT_OUT](#xplr_pipe_result_out)
-- [XPLR_PIPE_HISTORY_OUT](#xplr_pipe_history_out)
-- [XPLR_PIPE_DIRECTORY_NODES_OUT](#xplr_pipe_directory_nodes_out)
+- [XPLR_PIPE_SELECTION_OUT][21]
+- [XPLR_PIPE_GLOBAL_HELP_MENU_OUT][22]
+- [XPLR_PIPE_LOGS_OUT][23]
+- [XPLR_PIPE_RESULT_OUT][24]
+- [XPLR_PIPE_HISTORY_OUT][25]
+- [XPLR_PIPE_DIRECTORY_NODES_OUT][26]
 
 #### XPLR_PIPE_MSG_IN
 
-Append new-line delimited messages to this pipe in [YAML](https://www.yaml.org)
-(or [JSON](https://www.json.org)) syntax. These messages will be read and
+Append new-line delimited messages to this pipe in [YAML][27]
+(or [JSON][7]) syntax. These messages will be read and
 handled by xplr after the command execution.
 
 #### XPLR_PIPE_SELECTION_OUT
@@ -907,7 +907,7 @@ New-line delimited list of last visited paths (similar to jump list in vim).
 #### XPLR_PIPE_DIRECTORY_NODES_OUT
 
 New-line delimited list of paths, filtered and sorted as displayed in the
-[files table](layouts.md#table).
+[files table][28].
 
 
 ### Example:
@@ -934,3 +934,33 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 -- name. Enter your name to receive a nice greeting and to know your location.
 ```
 
+
+
+[1]:#full-list-of-messages
+[2]:modes.md#key-bindings
+[3]:#lua-function-calls
+[4]:#input-pipe
+[5]:https://www.lua.org/
+[6]:http://yaml.org/
+[7]:https://www.json.org
+[8]:modes.md
+[9]:modes.md#builtin
+[10]:modes.md#custom
+[11]:layouts.md
+[12]:layouts.md#builtin
+[13]:layouts.md#custom
+[14]:#calllua-argument
+[15]:filtering.md#filter
+[16]:filtering.md
+[17]:sorting.md#sorter
+[18]:https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields
+[19]:modes.md#tutorial-adding-a-new-mode
+[20]:#xplr_pipe_msg_in
+[21]:#xplr_pipe_selection_out
+[22]:#xplr_pipe_global_help_menu_out
+[23]:#xplr_pipe_logs_out
+[24]:#xplr_pipe_result_out
+[25]:#xplr_pipe_history_out
+[26]:#xplr_pipe_directory_nodes_out
+[27]:https://www.yaml.org
+[28]:layouts.md#table

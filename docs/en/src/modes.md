@@ -9,14 +9,14 @@ The modes can be configured using the `xplr.config.modes` Lua API.
 
 It contains the following fields:
 
-- [builtin](#builtin)
-- [custom](#custom)
+- [builtin][1]
+- [custom][2]
 
 
 builtin
 -------
 
-Type: mapping of string and [Mode](#mode)
+Type: mapping of string and [Mode][3]
 
 This is exposed by the `xplr.config.modes.builtin` API.
 
@@ -41,14 +41,14 @@ xplr by default provides the following builtin modes:
 - switch_layout
 - quit
 
-Visit the [Default Key Bindings](default-key-bindings.md) to see what each mode
+Visit the [Default Key Bindings][4] to see what each mode
 does.
 
 
 custom
 ------
 
-Type: mapping of string and [Mode](#mode)
+Type: mapping of string and [Mode][3]
 
 This is exposed by the `xplr.config.modes.custom` API.
 
@@ -84,10 +84,10 @@ Mode
 
 A mode contains the following information:
 
-- [name](#name)
-- [help](#help)
-- [extra_help](#extra_help)
-- [key_bindings](#key_bindings)
+- [name][5]
+- [help][6]
+- [extra_help][7]
+- [key_bindings][8]
 
 ### name
 
@@ -111,7 +111,7 @@ help menu.
 
 ### key_bindings
 
-Type: [Key Bindings](#key-bindings)
+Type: [Key Bindings][9]
 
 The key bindings available in that mode.
 
@@ -121,50 +121,50 @@ Key Bindings
 
 Key bindings define how each keyboard input will be handled in a specific mode.
 
-See the [default key bindings](default-key-bindings.md) for example.
+See the [default key bindings][4] for example.
 
 Key bindings contains the following information:
 
-- [on_key](#on_key)
-- [on_alphabet](#on_alphabet)
-- [on_number](#on_number)
-- [on_special_character](#on_special_character)
-- [default](#default)
+- [on_key][10]
+- [on_alphabet][11]
+- [on_number][12]
+- [on_special_character][13]
+- [default][14]
 
 ### on_key
 
-Type: mapping of [Key](#key) to nullable [Action](#action)
+Type: mapping of [Key][15] to nullable [Action][16]
 
 Defines what to do when a specific key is pressed.
 
 ### on_alphabet
 
-Type: nullable [Action](#action)
+Type: nullable [Action][16]
 
 An action to perform if the keyboard input is an alphabet and is not mapped via
-the [on_key](#on_key) field.
+the [on_key][10] field.
 
 ### on_number
 
-Type: nullable [Action](#action)
+Type: nullable [Action][16]
 
 An action to perform if the keyboard input is a number and is not mapped via
-the [on_key](#on_key) field.
+the [on_key][10] field.
 
 ### on_special_character
 
-Type: nullable [Action](#action)
+Type: nullable [Action][16]
 
 An action to perform if the keyboard input is a special character and is not
-mapped via the [on_key](#on_key) field.
+mapped via the [on_key][10] field.
 
 ### default
 
-Type: nullable [Action](#action)
+Type: nullable [Action][16]
 
 Default action to perform in case of a keyboard input not mapped via any of the
-[on_key](#on_key), [on_alphabet](#on_alphabet), [on_number](#on_number) or
-[on_special_character](#on_special_character) field.
+[on_key][10], [on_alphabet][11], [on_number][12] or
+[on_special_character][13] field.
 
 
 Key
@@ -227,7 +227,7 @@ Action
 An action contains the following information:
 
 - help
-- [messages](#messages)
+- [messages][17]
 
 ### help
 
@@ -238,7 +238,7 @@ menu.
 
 ### messages
 
-Type: A list of [Message](message.md) to send.
+Type: A list of [Message][18] to send.
 
 The list of messages to send when a key is pressed.
 
@@ -246,8 +246,8 @@ The list of messages to send when a key is pressed.
 Tutorial: Adding a New Mode
 ---------------------------
 
-Assuming xplr is [installed](install.md) and [setup](post-install.md), let's
-add our own mode to integrate xplr with [fzf](https://github.com/junegunn/fzf).
+Assuming xplr is [installed][19] and [setup][20], let's
+add our own mode to integrate xplr with [fzf][21].
 
 We'll call it `fzxplr` mode.
 
@@ -290,11 +290,11 @@ As you can see, the key `F` in mode `fzxplr` (the name can be anything)
 executes a script in `bash`.
 
 `BashExec`, `PopMode`, `SwitchModeBuiltin`, `ChangeDirectory` and `FocusPath`
-are [messages](message.md), `$XPLR_PIPE_MSG_IN`,
+are [messages][18], `$XPLR_PIPE_MSG_IN`,
 `$XPLR_PIPE_DIRECTORY_NODES_OUT` are
-[environment variables](message.md#environment-variables) exported by `xplr`
+[environment variables][22] exported by `xplr`
 before executing the command. They contain the path to the
-[input](message.md#input-pipe) and [output](message.md#output-pipes) pipes that
+[input][23] and [output][24] pipes that
 allows external tools to interact with `xplr`.
 
 Now that we have our new mode ready, let's add an entry point to this mode via
@@ -311,8 +311,38 @@ xplr.config.modes.builtin.default.key_bindings.on_key["F"] = {
 
 Now let's try out the new `xplr`-`fzf` integration.
 
-[![xplr-fzf.gif](https://s3.gifyu.com/images/xplr-fzf.gif)](https://gifyu.com/image/tW86)
+[![xplr-fzf.gif][25]][26]
 
 -----
 
-Visit [Awesome Plugins](awesome-plugins.md) for more [integration](awesome-plugins.md#integration) options.
+Visit [Awesome Plugins][27] for more [integration][28] options.
+
+
+[1]:#builtin
+[2]:#custom
+[3]:#mode
+[4]:default-key-bindings.md
+[5]:#name
+[6]:#help
+[7]:#extra_help
+[8]:#key_bindings
+[9]:#key-bindings
+[10]:#on_key
+[11]:#on_alphabet
+[12]:#on_number
+[13]:#on_special_character
+[14]:#default
+[15]:#key
+[16]:#action
+[17]:#messages
+[18]:message.md
+[19]:install.md
+[20]:post-install.md
+[21]:https://github.com/junegunn/fzf
+[22]:message.md#environment-variables
+[23]:message.md#input-pipe
+[24]:message.md#output-pipes
+[25]:https://s3.gifyu.com/images/xplr-fzf.gif
+[26]:https://gifyu.com/image/tW86
+[27]:awesome-plugins.md
+[28]:awesome-plugins.md#integration
