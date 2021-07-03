@@ -167,6 +167,60 @@ Default action to perform in case of a keyboard input not mapped via any of the
 [on_special_character](#on_special_character) field.
 
 
+Key
+---
+
+A key can be one of the following:
+
+- 0
+- 1
+...
+- 9
+
+- a
+- b
+...
+- z
+
+- A
+- B
+...
+- Z
+
+- f1
+- f2
+...
+- f12
+
+- ctrl-a
+- ctrl-b
+...
+- ctrl-z
+
+- alt-a
+- alt-b
+...
+- alt-z
+
+- backspace
+- left
+- right
+- up
+- down
+- home
+- end
+- pageUp
+- pageDown
+- backTab
+- delete
+- insert
+- enter
+- tab
+- esc
+
+And finally, special characters - including space (`" "`).
+
+
 Action
 ------
 

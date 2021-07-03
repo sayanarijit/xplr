@@ -2,7 +2,7 @@ Message
 =======
 
 You can think of xplr as a server. Just like web servers listen to HTTP
-requests, xplr listens to [messages](full-list-of-messages).
+requests, xplr listens to [messages](#full-list-of-messages).
 
 You can send these messages to an xplr session in the following ways:
 
@@ -502,7 +502,7 @@ Remove an existing [filter](filtering.md).
 
 **YAML:** `ToggleNodeFilter: { filter = Filter, input = string }`
 
-Remove a [filter](filter.md) if it exists, else, add a it.
+Remove a [filter](filtering.md) if it exists, else, add a it.
 
 **YAML Example:** `ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
@@ -581,7 +581,7 @@ Reverse a node [sorter](sorting.md#sorter).
 
 **YAML:** `ToggleNodeSorter: { sorter: Sorter, reverse = bool }`
 
-Remove a [sorter](#sorting.md#sorter) if it exists, else, add a it.
+Remove a [sorter](sorting.md#sorter) if it exists, else, add a it.
 
 **YAML Example:** `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }`
 
@@ -826,7 +826,7 @@ information and send messages via environment variables and temporary files
 called "pipe"s. These environment variables and files are only available when
 a command is being executed.
 
-Visit the [**fzf integration tutorial**](modes.html#tutorial-adding-a-new-mode)
+Visit the [**fzf integration tutorial**](modes.md#tutorial-adding-a-new-mode)
 for example.
 
 ### Environment variables
@@ -880,9 +880,9 @@ exposed directly via environment variables, like multi-line string.
 
 #### XPLR_PIPE_MSG_IN
 
-Append new-line delimited messages to this pipe in [YAML](www.yaml.org) (or
-[JSON](www.json.org)) syntax. These messages will be read and handled by xplr
-after the command execution.
+Append new-line delimited messages to this pipe in [YAML](https://www.yaml.org)
+(or [JSON](https://www.json.org)) syntax. These messages will be read and
+handled by xplr after the command execution.
 
 #### XPLR_PIPE_SELECTION_OUT
 
