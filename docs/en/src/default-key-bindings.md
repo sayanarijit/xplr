@@ -1,12 +1,12 @@
 Default Key Bindings
 ====================
 
-The default key binding is inspired by [vim](https://www.vim.org/) and slightly
-overlaps with [nnn](https://github.com/jarun/nnn/), but it's supposed to be
+The default key binding is inspired by [vim][1] and slightly
+overlaps with [nnn][2], but it's supposed to be
 customized as per user requirements.
 
-When you press `?` in [default mode](#default), you can see the complete list
-of [modes](modes.md) and the key mappings for each mode.
+When you press `?` in [default mode][3], you can see the complete list
+of [modes][4] and the key mappings for each mode.
 
 
 ### default
@@ -256,3 +256,9 @@ of [modes](modes.md) and the key mappings for each mode.
  4               |                           | no help or selection
  ctrl-c          |                           | terminate
  esc             |                           | cancel
+
+
+[1]:https://www.vim.org/
+[2]:https://github.com/jarun/nnn/
+[3]:#default
+[4]:modes.md

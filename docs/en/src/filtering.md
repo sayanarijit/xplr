@@ -15,7 +15,7 @@ the condition: *relative path does not start with `.`*, then by the condition:
 *absolute path contains `abc` (case insensitive)*, and finally by the
 condition: *relative path does not contain `xyz`* (case insensitive).
 
-Each part of this pipeline is called [Node Filter Applicable](#node-filter-applicable).
+Each part of this pipeline is called [Node Filter Applicable][1].
 
 
 Node Filter Applicable
@@ -23,8 +23,8 @@ Node Filter Applicable
 
 It contains the following information:
 
-- [filter](#filter)
-- [input](#input)
+- [filter][2]
+- [input][3]
 
 ### filter
 
@@ -83,5 +83,11 @@ ToggleNodeFilter = {
 }
 ```
 
-Here, `ToggleNodeFilter` is a [message](message.md) that adds or removes
+Here, `ToggleNodeFilter` is a [message][4] that adds or removes
 (toggles) the filter applied.
+
+
+[1]:#node-filter-applicable
+[2]:#filter
+[3]:#input
+[4]:message.md

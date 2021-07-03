@@ -25,9 +25,9 @@ set of operations and make it behave just the way you want.
 
 A few things you can do with the xplr configuration
 
-- [Hack the layout](layouts.md)
-- [Hack the key bindings](modes.md)
-- [Extend with plugins](awesome-plugins.md)
+- [Hack the layout][1]
+- [Hack the key bindings][2]
+- [Extend with plugins][3]
 
 
 ## Fast
@@ -35,7 +35,7 @@ A few things you can do with the xplr configuration
 Although speed is not the primary concern, xplr is already fast enough so that
 you can take it out for a walk into your `node_modules` or `/nix/store` any
 time you want. I currently
-[measure the most commonly used operations](https://github.com/sayanarijit/xplr/tree/main/benches)
+[measure the most commonly used operations][4]
 and I have seen it improve significantly over time, and it's only the start.
 
 **Tip:** A quick and easy way to optimize UI rendering is reducing the number
@@ -59,7 +59,7 @@ will also be considered in the decision-making.
 
 ## Other features
 
-- [Embedded LuaJIT](https://github.com/sayanarijit/xplr/discussions/183) for
+- [Embedded LuaJIT][5] for
   portability and extensibility.
 - **Switchable recover mode:** Saves you from doing unwanted things when in a
   hurry.
@@ -101,7 +101,7 @@ will also be considered in the decision-making.
 - **Auto refresh state:** Auto refresh app state when the `$PWD` changes.
 - **Manually refresh UI** when other apps mess it up.
 - **FIFO-based previews:** Easy to manage FIFO file that can be used to
-  [integrate with previewers](https://github.com/sayanarijit/xplr/pull/229).
+  [integrate with previewers][6].
 - **Different quit options:**
   - Quit with success without any output (`q`).
   - Quit with success and the result printed on stdout (`enter`).
@@ -112,3 +112,11 @@ will also be considered in the decision-making.
   - Quit with success and the selection printed on stdout
     (`:` `q` `s`).
   - Quit with failure (`ctrl-c`).
+
+
+[1]:layouts.md
+[2]:modes.md
+[3]:awesome-plugins.md
+[4]:https://github.com/sayanarijit/xplr/tree/main/benches
+[5]:https://github.com/sayanarijit/xplr/discussions/183
+[6]:https://github.com/sayanarijit/xplr/pull/229

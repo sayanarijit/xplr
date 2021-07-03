@@ -4,15 +4,15 @@ Install
 You can install xplr using one of the following ways. Each has their own
 advantages and limitations.
 
-For example, the [Direct Download](#direct-download),
-[From crates.io](#from-a-hrefhttpscratesiocratesxplrcratesioa), and
-[Build From Source](#build-from-source) methods allow the users to install the
+For example, the [Direct Download][1],
+[From crates.io][2], and
+[Build From Source][3] methods allow the users to install the
 latest possible version of xplr, but they have one common drawback - the user
 will need to keep an eye on the releases, and manually upgrade xplr when a new
 version is available.
 
 One way to keep an eye of the releases is to
-[watch the repository](https://github.com/sayanarijit/xplr/watchers).
+[watch the repository][4].
 
 
 Community Maintained Repositories
@@ -21,18 +21,18 @@ Community Maintained Repositories
 xplr can be installed from one of the following community maintained
 repositories:
 
-[![packaging status](https://repology.org/badge/vertical-allrepos/xplr.svg)](https://repology.org/project/xplr/versions)
+[![packaging status][5]][6]
 
 
 ### Arch Linux
 
-#### [Official Community Repo](https://archlinux.org/packages/community/x86_64/xplr)
+#### [Official Community Repo][7]
 
 ```
 sudo pacman -S xplr
 ```
 
-#### [AUR](https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go)
+#### [AUR][8]
 
 Binary version:
 
@@ -48,11 +48,11 @@ paru -S xplr-git
 
 ### Void Linux
 
-#### [void-templates by shubham](https://github.com/shubham-cpp/void-pkg-templates)
+#### [void-templates by shubham][9]
 
 ### Nix(OS)
 
-#### [Nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr)
+#### [Nixpkgs][10]
 
 ```
 nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
@@ -60,14 +60,14 @@ nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
 
 ### macOS
 
-#### [MacPorts](https://ports.macports.org/port/xplr)
+#### [MacPorts][11]
 
 ```
 sudo port selfupdate
 sudo port install xplr
 ```
 
-#### [Homebrew](https://formulae.brew.sh/formula/xplr)
+#### [Homebrew][12]
 
 Stable branch:
 
@@ -83,7 +83,7 @@ brew install --head xplr
 
 ### FreeBSD
 
-#### [ports](https://cgit.freebsd.org/ports/plain/misc/xplr/)
+#### [ports][13]
 
 ```
 cd /usr/ports/misc/xplr
@@ -92,7 +92,7 @@ make install
 
 ### NetBSD
 
-#### [pkgsrc](https://pkgsrc.se/sysutils/xplr)
+#### [pkgsrc][14]
 
 ```
 pkgin install xplr
@@ -110,12 +110,12 @@ Direct Download
 ---------------
 
 One can directly download the standalone binary from the
-[releases](https://github.com/sayanarijit/xplr/releases).
+[releases][15].
 
 Currently, the following options are available for direct download:
 
-- [Linux](https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz)
-- [macOS](https://github.com/sayanarijit/xplr/releases/latest/download/xplr-macos.tar.gz)
+- [Linux][16]
+- [macOS][17]
 
 Command-line instructions:
 
@@ -133,14 +133,14 @@ sudo mv xplr /usr/local/bin/
 ```
 
 
-From [crates.io](https://crates.io/crates/xplr)
+From [crates.io][18]
 -----------------------------------------------
 
 Prerequisites:
 
-- [Rust toolchain](https://www.rust-lang.org/tools/install),
-- [gcc](https://gcc.gnu.org/)
-- [make](https://www.gnu.org/software/make/)
+- [Rust toolchain][19],
+- [gcc][20]
+- [make][21]
 
 Command-line instructions:
 
@@ -154,10 +154,10 @@ Build From Source
 
 Prerequisites:
 
-- [git](https://git-scm.com/)
-- [Rust toolchain](https://www.rust-lang.org/tools/install)
-- [gcc](https://gcc.gnu.org/)
-- [make](https://www.gnu.org/software/make/)
+- [git][22]
+- [Rust toolchain][19]
+- [gcc][20]
+- [make][21]
 
 Command-line instructions:
 
@@ -177,9 +177,9 @@ sudo cp target/release/xplr /usr/local/bin/
 Android
 -------
 
-### [Termux](https://termux.com/)
+### [Termux][23]
 
-[![xplr-termuxfd3c398d3cf4bcbc.md.jpg](https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg)](https://gifyu.com/image/tF2D)
+[![xplr-termuxfd3c398d3cf4bcbc.md.jpg][24]][25]
 
 > Please note that xplr isn't heavily tested on Termux, hence things might
 > need a little tweaking and fixing for a smooth usage experience.
@@ -215,3 +215,30 @@ Android
   ```bash
   ~/.cargo/bin/xplr
   ```
+
+
+[1]:#direct-download
+[2]:#from-a-hrefhttpscratesiocratesxplrcratesioa
+[3]:#build-from-source
+[4]:https://github.com/sayanarijit/xplr/watchers
+[5]:https://repology.org/badge/vertical-allrepos/xplr.svg
+[6]:https://repology.org/project/xplr/versions
+[7]:https://archlinux.org/packages/community/x86_64/xplr
+[8]:https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go
+[9]:https://github.com/shubham-cpp/void-pkg-templates
+[10]:https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr
+[11]:https://ports.macports.org/port/xplr
+[12]:https://formulae.brew.sh/formula/xplr
+[13]:https://cgit.freebsd.org/ports/plain/misc/xplr/
+[14]:https://pkgsrc.se/sysutils/xplr
+[15]:https://github.com/sayanarijit/xplr/releases
+[16]:https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz
+[17]:https://github.com/sayanarijit/xplr/releases/latest/download/xplr-macos.tar.gz
+[18]:https://crates.io/crates/xplr
+[19]:https://www.rust-lang.org/tools/install
+[20]:https://gcc.gnu.org/
+[21]:https://www.gnu.org/software/make/
+[22]:https://git-scm.com/
+[23]:https://termux.com/
+[24]:https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
+[25]:https://gifyu.com/image/tF2D

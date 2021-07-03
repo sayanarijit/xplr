@@ -7,8 +7,8 @@ placement and size of the panels, how they look etc.
 This is configuration exposed via the `xplr.config.layouts` API. It contains
 the following fields:
 
-- [builtin](#builtin)
-- [custom](#custom)
+- [builtin][1]
+- [custom][2]
 
 The users can switch between these layouts at run-time.
 
@@ -16,38 +16,38 @@ The users can switch between these layouts at run-time.
 builtin
 -------
 
-Type: mapping of string and [Layout](#layout)
+Type: mapping of string and [Layout][3]
 
 This is exposed by the `xplr.config.layouts.builtin` API.
 
 xplr by default provides the following builtin layouts:
 
-- [default](#default)
-- [no_help](#no_help)
-- [no_selection](#no_selection)
-- [no_help_no_selection](#no_help_no_selection)
+- [default][4]
+- [no_help][5]
+- [no_selection][6]
+- [no_help_no_selection][7]
 
 ### default
 
-Type: [Layout](#layout)
+Type: [Layout][3]
 
 This is the default layout we see when we run xplr.
 
 ### no_help
 
-Type: [Layout](#layout)
+Type: [Layout][3]
 
 This layout hides the help menu.
 
 ### no_selection
 
-Type: [Layout](#layout)
+Type: [Layout][3]
 
 This layout hides the selection panel.
 
 ### no_help_no_selection
 
-Type: [Layout](#layout)
+Type: [Layout][3]
 
 This layout hides both the help menu and the selection panel.
 
@@ -55,7 +55,7 @@ This layout hides both the help menu and the selection panel.
 custom
 ------
 
-Type: mapping of string and [Layout](#layout)
+Type: mapping of string and [Layout][3]
 
 This is exposed by the `xplr.config.layouts.custom` API.
 
@@ -75,14 +75,14 @@ Layout
 
 A layout can be one of the following:
 
-- ["Nothing"](#nothing)
-- ["Table"](#table)
-- ["InputAndLogs"](#inputandlogs)
-- ["Selection"](#selection)
-- ["HelpMenu"](#helpmenu)
-- ["SortAndFilter"](#sortandfilter)
-- { [Horizontal](#horizontal) = { config = [Layout Config](#layout-config), splits = { [Layout](#layout), ... } }
-- { [Vertical](#vertical) = { config = [Layout Config](#layout-config), splits = { [Layout](#layout), ... } }
+- ["Nothing"][8]
+- ["Table"][9]
+- ["InputAndLogs"][10]
+- ["Selection"][11]
+- ["HelpMenu"][12]
+- ["SortAndFilter"][13]
+- { [Horizontal][14] = { config = [Layout Config][15], splits = { [Layout][3], ... } }
+- { [Vertical][16] = { config = [Layout Config][15], splits = { [Layout][3], ... } }
 
 ### Nothing
 
@@ -117,8 +117,8 @@ This is a special layout that splits the panel into two horizontal parts.
 
 It contains the following information:
 
-- [config](#layout-config)
-- [splits](#splits)
+- [config][15]
+- [splits][17]
 
 ### Vertical
 
@@ -126,8 +126,8 @@ This is a special layout that splits the panel into two vertical parts.
 
 It contains the following information:
 
-- [config](#layout-config)
-- [splits](#splits)
+- [config][15]
+- [splits][17]
 
 
 Layout Config
@@ -135,10 +135,10 @@ Layout Config
 
 A layout config contains the following information:
 
-- [margin](#margin)
-- [horizontal_margin](#horizontal_margin)
-- [vertical_margin](#vertical_margin)
-- [constraints](#constraints)
+- [margin][18]
+- [horizontal_margin][19]
+- [vertical_margin][20]
+- [constraints][21]
 
 ### margin
 
@@ -150,17 +150,17 @@ The width of the margin in all direction.
 
 Type: nullable integer
 
-The width of the horizontal margins. Overwrites the [margin](#margin) value.
+The width of the horizontal margins. Overwrites the [margin][18] value.
 
 ### vertical_Margin
 
 Type: nullable integer
 
-The width of the vertical margins. Overwrites the [margin](#margin) value.
+The width of the vertical margins. Overwrites the [margin][18] value.
 
 ### constraints
 
-Type: nullable list of [Constraint](#constraint)
+Type: nullable list of [Constraint][22]
 
 The constraints applied on the layout.
 
@@ -194,7 +194,7 @@ TODO: document each constraint.
 splits
 ------
 
-Type: list of [Layout](#layout)
+Type: list of [Layout][3]
 
 The list of child layouts to fit into the parent layout.
 
@@ -202,7 +202,7 @@ The list of child layouts to fit into the parent layout.
 Example
 -------
 
-[![layout.png](https://s6.gifyu.com/images/layout.png)](https://gifyu.com/image/1X38)
+[![layout.png][23]][24]
 
 ```lua
 xplr.config.layouts.builtin.default = {
@@ -223,3 +223,29 @@ xplr.config.layouts.builtin.default = {
   }
 }
 ```
+
+
+[1]:#builtin
+[2]:#custom
+[3]:#layout
+[4]:#default
+[5]:#no_help
+[6]:#no_selection
+[7]:#no_help_no_selection
+[8]:#nothing
+[9]:#table
+[10]:#inputandlogs
+[11]:#selection
+[12]:#helpmenu
+[13]:#sortandfilter
+[14]:#horizontal
+[15]:#layout-config
+[16]:#vertical
+[17]:#splits
+[18]:#margin
+[19]:#horizontal_margin
+[20]:#vertical_margin
+[21]:#constraints
+[22]:#constraint
+[23]:https://s6.gifyu.com/images/layout.png
+[24]:https://gifyu.com/image/1X38

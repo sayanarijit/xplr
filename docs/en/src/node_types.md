@@ -8,12 +8,12 @@ This can be configured using the `xplr.config.node_types` Lua API.
 
 It contains the following fields:
 
-- [directory](#directory)
-- [file](#file)
-- [symlink](#symlink)
-- [mime_essence](#mime_essence)
-- [extension](#extension)
-- [special](#special)
+- [directory][1]
+- [file][2]
+- [symlink][3]
+- [mime_essence][4]
+- [extension][5]
+- [special][6]
 
 One node can fall into multiple categories. For example, a node can have the
 extension `md`, and be a `file`. In that case, the properties from the more
@@ -26,7 +26,7 @@ The priority is:
 
 ### directory
 
-Type: [NodeType Config](#nodetype-config)
+Type: [NodeType Config][7]
 
 Properties related to directories are defined here.
 
@@ -42,7 +42,7 @@ xplr.config.node_types.directory.style.add_modifiers = { "Bold" }
 
 ### file
 
-Type: [NodeType Config](#nodetype-config)
+Type: [NodeType Config][7]
 
 Properties related to regular files are defined here.
 
@@ -58,7 +58,7 @@ xplr.config.node_types.file.style.fg = "White"
 
 ### symlink
 
-Type: [NodeType Config](#nodetype-config)
+Type: [NodeType Config][7]
 
 Properties related to symlink are defined here.
 
@@ -72,7 +72,7 @@ xplr.config.node_types.symlink.style.add_modifiers = { "Italic" }
 
 ### mime_essence
 
-Type: mapping of mime-type and mapping of mime-subtype and [NodeType Config](#nodetype-config)
+Type: mapping of mime-type and mapping of mime-subtype and [NodeType Config][7]
 
 Properties related to files with specific mime types are defined here.
 
@@ -98,7 +98,7 @@ xplr.config.node_types.mime_essence = {
 
 ### extension
 
-Type: mapping of extension and [NodeType Config](#nodetype-config)
+Type: mapping of extension and [NodeType Config][7]
 
 Properties related to files with specific extension are defined here.
 
@@ -111,7 +111,7 @@ xplr.config.node_types.extension.rs = { meta = { icon = "🦀" } }
 
 ### special
 
-Type: mapping of name and [NodeType Config](#nodetype-config)
+Type: mapping of name and [NodeType Config][7]
 
 Properties related to files and directories with special names are defined
 here.
@@ -129,16 +129,16 @@ NodeType Config
 
 A node-type config contains the following fields:
 
-- [meta](#meta)
-- [style](style.md)
+- [meta][8]
+- [style][9]
 
 ### meta
 
 Type: mapping of string and string
 
 A meta field can contain custom metadata about a node. By default, the "icon"
-metadata is set for the [directory](#directory), [file](#file), and
-[symlink](#symlink) nodes.
+metadata is set for the [directory][1], [file][2], and
+[symlink][3] nodes.
 
 Example:
 
@@ -150,3 +150,14 @@ xplr.config.node_types.file = {
   }
 }
 ```
+
+
+[1]:#directory
+[2]:#file
+[3]:#symlink
+[4]:#mime_essence
+[5]:#extension
+[6]:#special
+[7]:#nodetype-config
+[8]:#meta
+[9]:style.md

@@ -17,7 +17,7 @@ the node is a symlink.
 
 The arrows denote the order.
 
-Each part of this pipeline is called [Node Sorter Applicable](#node-sorter-applicable).
+Each part of this pipeline is called [Node Sorter Applicable][1].
 
 
 Node Sorter Applicable
@@ -25,8 +25,8 @@ Node Sorter Applicable
 
 It contains the following information:
 
-- [sorter](#sorter)
-- [reverse](#reverse)
+- [sorter][2]
+- [reverse][3]
 
 
 ### sorter
@@ -81,3 +81,8 @@ xplr.config.general.initial_sorting = {
 ```
 
 This snippet defines the initial sorting logic to be applied when xplr loads.
+
+
+[1]:#node-sorter-applicable
+[2]:#sorter
+[3]:#reverse

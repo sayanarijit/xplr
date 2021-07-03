@@ -1,7 +1,7 @@
 Writing Plugins
 ===============
 
-Anyone who can write [Lua](https://www.lua.org) code, can write xplr plugins.
+Anyone who can write [Lua][1] code, can write xplr plugins.
 
 Just follow the instructions and best practices:
 
@@ -26,7 +26,7 @@ plugin-name
 ```
 
 You can also use
-[this template](https://github.com/sayanarijit/plugin-template1.xplr).
+[this template][2].
 
 
 ### README.md
@@ -54,13 +54,20 @@ Publishing
 
 When publishing plugins on GitHub or other repositories, it's a best practice
 to append `.xplr` to the name to make them distinguishable. Similar to the
-`*.nvim` naming convention for [Neovim](https://neovim.io) plugins.
+`*.nvim` naming convention for [Neovim][3] plugins.
 
 Finally, after publishing, don't hesitate to
-[let us know](https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell).
+[let us know][4].
 
 
 Examples
 --------
 
-Visit [Awesome Plugins](awesome-plugins.md) for xplr plugin examples.
+Visit [Awesome Plugins][5] for xplr plugin examples.
+
+
+[1]:https://www.lua.org
+[2]:https://github.com/sayanarijit/plugin-template1.xplr
+[3]:https://neovim.io
+[4]:https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
+[5]:awesome-plugins.md

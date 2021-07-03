@@ -3,35 +3,35 @@ Style
 
 A style object contains the following information:
 
-- [fg](#fg)
-- [bg](#bg)
-- [add_modifiers](#add_modifiers)
-- [sub_modifiers](#sub_modifiers)
+- [fg][1]
+- [bg][2]
+- [add_modifiers][3]
+- [sub_modifiers][4]
 
 ### fg
 
-Type: nullable [Color](#color)
+Type: nullable [Color][5]
 
 The foreground color.
 
 
 ### bg
 
-Type: nullable [Color](#color)
+Type: nullable [Color][5]
 
 The background color.
 
 
 ### add_modifiers
 
-Type: nullable list of [Modifier](#modifier)
+Type: nullable list of [Modifier][6]
 
 Modifiers to add.
 
 
 ### sub_modifiers
 
-Type: nullable list of [Modifier](#modifier)
+Type: nullable list of [Modifier][6]
 
 Modifiers to remove.
 
@@ -87,3 +87,11 @@ xplr.config.general.cursor.style.bg = { Rgb = { 100, 150, 200 } }
 xplr.config.general.cursor.style.add_modifiers = { "Bold", "Italic" }
 xplr.config.general.cursor.style.sub_modifiers = { "Hidden" }
 ```
+
+
+[1]:#fg
+[2]:#bg
+[3]:#add_modifiers
+[4]:#sub_modifiers
+[5]:#color
+[6]:#modifier
