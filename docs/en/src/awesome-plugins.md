@@ -15,6 +15,8 @@ Categories
 
 Integration
 -----------
+- [comex.xplr][21]
+  One xplr plugin to compress and extract them all.
 
 - [dragon.xplr][4]
   Drag and drop files using [dragon][5].
@@ -74,3 +76,4 @@ Theme
 [18]:https://github.com/ajeetdsouza/zoxide
 [19]:https://github.com/sayanarijit/material-landscape.xplr
 [20]:https://github.com/sayanarijit/material-landscape2.xplr
+[21]:https://github.com/sayanarijit/comex.xplr
