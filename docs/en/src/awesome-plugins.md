@@ -37,6 +37,9 @@ Integration
   Trash files and directories using
   [trash-cli][14].
 
+- [xargs.xplr][22]
+   Batch execute commands on the focused or selected files using `xargs`.
+
 - [xclip.xplr][15]
   Copy and paste with system clipboard using
   [xclip][16].
@@ -77,3 +80,4 @@ Theme
 [19]:https://github.com/sayanarijit/material-landscape.xplr
 [20]:https://github.com/sayanarijit/material-landscape2.xplr
 [21]:https://github.com/sayanarijit/comex.xplr
+[22]:https://github.com/sayanarijit/xargs.xplr
