@@ -366,6 +366,7 @@ impl Ord for Node {
         other.relative_path.cmp(&self.relative_path)
     }
 }
+
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -2322,7 +2323,12 @@ impl App {
     }
 
     fn un_select_path(mut self, path: String) -> Result<Self> {
-        self.selection.retain(|n| n.absolute_path != path);
+        let mut pathbuf = PathBuf::from(path);
+        if pathbuf.is_relative() {
+            pathbuf = PathBuf::from(self.pwd()).join(pathbuf);
+        }
+        self.selection
+            .retain(|n| PathBuf::from(&n.absolute_path) != pathbuf);
         Ok(self)
     }
 
@@ -2336,15 +2342,12 @@ impl App {
         Ok(self)
     }
 
-    fn toggle_selection(mut self) -> Result<Self> {
-        if let Some(n) = self.focused_node() {
-            if self.selection().contains(n) {
-                self = self.un_select()?;
-            } else {
-                self = self.select()?;
-            }
+    fn toggle_selection(self) -> Result<Self> {
+        if let Some(p) = self.focused_node().map(|n| n.absolute_path().clone()) {
+            self.toggle_selection_by_path(p)
+        } else {
+            Ok(self)
         }
-        Ok(self)
     }
 
     fn toggle_select_all(self) -> Result<Self> {
@@ -2360,10 +2363,18 @@ impl App {
     }
 
     fn toggle_selection_by_path(self, path: String) -> Result<Self> {
-        if self.selection.iter().any(|n| n.absolute_path == path) {
-            self.select_path(path)
-        } else {
+        let mut pathbuf = PathBuf::from(&path);
+        if pathbuf.is_relative() {
+            pathbuf = PathBuf::from(self.pwd()).join(pathbuf);
+        }
+        if self
+            .selection
+            .iter()
+            .any(|n| PathBuf::from(&n.absolute_path) == pathbuf)
+        {
             self.un_select_path(path)
+        } else {
+            self.select_path(path)
         }
     }
 
