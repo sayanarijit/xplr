@@ -106,12 +106,15 @@ pub struct Runner {
 
 impl Runner {
     pub(crate) fn new(path: Option<PathBuf>) -> Result<Self> {
-        let mut pwd = path.unwrap_or_else(|| ".".into()).canonicalize()?;
+        let basedir = std::env::current_dir()?;
+        let mut pwd = path
+            .map(|p| if p.is_relative() { basedir.join(p) } else { p })
+            .unwrap_or_else(|| basedir.clone());
         let mut focused_path = None;
 
         if pwd.is_file() {
             focused_path = pwd.file_name().map(|p| p.into());
-            pwd = pwd.parent().map(|p| p.into()).unwrap_or_else(|| ".".into());
+            pwd = pwd.parent().map(|p| p.into()).unwrap_or(basedir);
         }
 
         Ok(Self {

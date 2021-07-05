@@ -1958,9 +1958,14 @@ impl App {
     }
 
     fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
-        match env::set_current_dir(dir) {
+        let mut dir = PathBuf::from(dir);
+        if dir.is_relative() {
+            dir = PathBuf::from(self.pwd()).join(dir);
+        }
+
+        match env::set_current_dir(&dir) {
             Ok(()) => {
-                self.pwd = dir.to_owned();
+                self.pwd = dir.to_string_lossy().to_string();
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
