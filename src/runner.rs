@@ -565,7 +565,7 @@ impl Runner {
         term::disable_raw_mode()?;
         terminal.show_cursor()?;
 
-        fs::remove_dir(session_path)?;
+        fs::remove_dir_all(session_path)?;
 
         result
     }
