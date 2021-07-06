@@ -86,8 +86,14 @@ brew install --head xplr
 #### [ports][13]
 
 ```
+pkg install xplr
+```
+
+Or
+
+```
 cd /usr/ports/misc/xplr
-make install
+make install clean
 ```
 
 ### NetBSD
@@ -98,7 +104,7 @@ make install
 pkgin install xplr
 ```
 
-Or build from source
+Or
 
 ```
 cd /usr/pkgsrc/sysutils/xplr
