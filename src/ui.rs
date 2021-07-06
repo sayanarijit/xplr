@@ -857,7 +857,7 @@ fn draw_logs<B: Backend>(
         app.logs()
             .iter()
             .rev()
-            .take(1)
+            .take(layout_size.height as usize)
             .rev()
             .map(|l| {
                 let time = l.created_at().format("%r");
