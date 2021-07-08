@@ -8,7 +8,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/sayanarijit/xplr"
 homepage = "https://github.com/sayanarijit/xplr"
-documentation = "https://github.com/sayanarijit/xplr/Wiki"
+documentation = "https://arijitbasu.in/xplr/en"
 keywords = ["terminal", "file", "explorer", "manager", "tui"]
 categories = ["command-line-interface", "command-line-utilities"]
 

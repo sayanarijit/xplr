@@ -29,6 +29,10 @@ Integration
   Fuzzy search using [fzf][9] to focus on a file
   or enter into a directory.
 
+- [paste-rs.xplr][23]
+  Use this plugin to paste your files to [paste.rs][24], and open/delete them
+  later using [fzf][9].
+
 - [preview-tabbed.xplr][10]
   Preview paths using suckless [tabbed][11] and
   [nnn preview-tabbed][12].
@@ -81,3 +85,5 @@ Theme
 [20]:https://github.com/sayanarijit/material-landscape2.xplr
 [21]:https://github.com/sayanarijit/comex.xplr
 [22]:https://github.com/sayanarijit/xargs.xplr
+[23]:https://github.com/dtomvan/paste-rs.xplr
+[24]:https://paste.rs
