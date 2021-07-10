@@ -28,7 +28,7 @@ These are the alternative TUI/CLI file managers/explorers you might want to chec
 [7]:https://github.com/MidnightCommander/mc
 [8]:https://github.com/Canop/broot
 [9]:https://github.com/rabite0/hunter
-[10]:https://github.com/RichardHyde/noice
+[10]:https://git.2f30.org/noice/
 [11]:https://github.com/pasqu4le/clifm
 [12]:https://github.com/leo-arch/clifm
 [13]:community.md
