@@ -18,6 +18,9 @@ Integration
 - [comex.xplr][21]
   One xplr plugin to compress and extract them all.
 
+- [completion.xplr][25]
+  The missing tab completion for xplr input buffer.
+
 - [dragon.xplr][4]
   Drag and drop files using [dragon][5].
 
@@ -87,3 +90,4 @@ Theme
 [22]:https://github.com/sayanarijit/xargs.xplr
 [23]:https://github.com/dtomvan/paste-rs.xplr
 [24]:https://paste.rs
+[25]:https://github.com/sayanarijit/completion.xplr
