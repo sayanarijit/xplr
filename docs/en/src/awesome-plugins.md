@@ -30,10 +30,10 @@ Integration
 - [**trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
 - [**type-to-nav.xplr**] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
-- **[xargs.xplr][22]** Batch execute commands on the focused or selected files
+- [**xargs.xplr**][22] Batch execute commands on the focused or selected files
   using `xargs`.
-- **[xclip.xplr][15]** Copy and paste with system clipboard using [xclip][16].
-- **[zoxide.xplr][17]** Change directory using the [zoxide][18] database.
+- [**xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
+- [**zoxide.xplr**][17] Change directory using the [zoxide][18] database.
 
 
 Theme
