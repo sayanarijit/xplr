@@ -28,7 +28,7 @@ Integration
   [nnn preview-tabbed][12].
 - [**qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
 - [**trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
-- [**type-to-nav.xplr**] Inspired by [nnn's type-to-nav mode][29] for xplr,
+- [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 - [**xargs.xplr**][22] Batch execute commands on the focused or selected files
   using `xargs`.
