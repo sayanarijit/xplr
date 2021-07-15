@@ -15,37 +15,25 @@ Categories
 
 Integration
 -----------
-- [comex.xplr][21]
-  One xplr plugin to compress and extract them all.
-- [completion.xplr][25]
-  The missing tab completion for xplr input buffer.
-- [dragon.xplr][4]
-  Drag and drop files using [dragon][5].
-- [dua-cli.xplr][6]
-  Get the disk usage using [dua-cli][7] with
-  selection support.
-- [fzf.xplr][8]
-  Fuzzy search using [fzf][9] to focus on a file
-  or enter into a directory.
-- [paste-rs.xplr][23]
-  Use this plugin to paste your files to [paste.rs][24], and open/delete them
-  later using [fzf][9].
-- [preview-tabbed.xplr][10]
-  Preview paths using suckless [tabbed][11] and
+- [**comex.xplr**][21] One xplr plugin to compress and extract them all.
+- [**completion.xplr**][25] The missing tab completion for xplr input buffer.
+- [**dragon.xplr**][4] Drag and drop files using [dragon][5].
+- [**dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
+  support.
+- [**fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
+  into a directory.
+- [**paste-rs.xplr**][23] Use this plugin to paste your files to
+  [paste.rs][24], and open/delete them later using [fzf][9].
+- [**preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
   [nnn preview-tabbed][12].
-- [qrcp.xplr][26]
-  Send and receive files via QR code using [qrcp][27].
-- [trash-cli.xplr][13]
-  Trash files and directories using
-  [trash-cli][14].
-- [xargs.xplr][22]
-   Batch execute commands on the focused or selected files using `xargs`.
-- [xclip.xplr][15]
-  Copy and paste with system clipboard using
-  [xclip][16].
-- [zoxide.xplr][17]
-  Change directory using the [zoxide][18]
-  database.
+- [**qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
+- [**trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
+- [**type-to-nav.xplr**] Inspired by [nnn's type-to-nav mode][29] for xplr,
+  with some tweaks.
+- **[xargs.xplr][22]** Batch execute commands on the focused or selected files
+  using `xargs`.
+- **[xclip.xplr][15]** Copy and paste with system clipboard using [xclip][16].
+- **[zoxide.xplr][17]** Change directory using the [zoxide][18] database.
 
 
 Theme
@@ -84,3 +72,5 @@ Theme
 [25]:https://github.com/sayanarijit/completion.xplr
 [26]:https://github.com/sayanarijit/qrcp.xplr
 [27]:https://github.com/claudiodangelis/qrcp
+[28]:https://github.com/prncss-xyz/type-to-nav.xplr
+[29]:https://github.com/jarun/nnn/wiki/concepts#type-to-nav
