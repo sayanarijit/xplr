@@ -22,6 +22,7 @@ Integration
   support.
 - [**fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
   into a directory.
+- [**icons.xplr**][30] An icon theme for xplr.
 - [**paste-rs.xplr**][23] Use this plugin to paste your files to
   [paste.rs][24], and open/delete them later using [fzf][9].
 - [**preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
@@ -74,3 +75,4 @@ Theme
 [27]:https://github.com/claudiodangelis/qrcp
 [28]:https://github.com/prncss-xyz/type-to-nav.xplr
 [29]:https://github.com/jarun/nnn/wiki/concepts#type-to-nav
+[30]:https://github.com/prncss-xyz/icons.xplr
