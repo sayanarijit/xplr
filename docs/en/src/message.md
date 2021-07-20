@@ -806,16 +806,61 @@ Type: nullable [Node][44]
 
 The node under focus.
 
-- [directory_buffer][33]
-- [selection][34]
-- [mode][35]
-- [layout][36]
-- [input_buffer][37]
-- [pid][38]
-- [session_path][39]
-- [explorer_config][40]
-- [history][41]
-- [last_modes][42]
+### directory_buffer
+
+TODO
+
+### selection
+
+Type: list of selected [Node][44]s
+
+The selected nodes.
+
+### mode
+
+Type: [Mode][8]
+
+Current mode.
+
+### layout
+
+Type: [Layout][11]
+
+Current layout.
+
+### input_buffer
+
+Type: nullable string
+
+The input buffer.
+
+### pid
+
+Type: integer
+
+The xplr session PID.
+
+### session_path
+
+Type: string
+
+The session path.
+
+### explorer_config
+
+TODO
+
+
+### history
+
+TODO
+
+
+### last_modes
+
+Type: list of [Mode][8]
+
+Last modes, not popped yet.
 
 
 ### Node
@@ -1096,10 +1141,10 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [5]:https://www.lua.org/
 [6]:http://yaml.org/
 [7]:https://www.json.org
-[8]:modes.md
+[8]:modes.md#mode
 [9]:modes.md#builtin
 [10]:modes.md#custom
-[11]:layouts.md
+[11]:layouts.md#layout
 [12]:layouts.md#builtin
 [13]:layouts.md#custom
 [14]:#calllua-argument
