@@ -78,7 +78,7 @@ impl Cli {
 
 fn main() {
     let cli = Cli::parse(env::args()).unwrap_or_else(|e| {
-        println!("error: {}", e);
+        eprintln!("error: {}", e);
         std::process::exit(1);
     });
 

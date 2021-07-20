@@ -1582,7 +1582,7 @@ impl App {
 
         let pid = std::process::id();
         let session_path = dirs::runtime_dir()
-            .unwrap_or_else(|| "/tmp".into())
+            .unwrap_or_else(env::temp_dir)
             .join("xplr")
             .join("session")
             .join(&pid.to_string())
