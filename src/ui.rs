@@ -453,8 +453,10 @@ fn draw_table<B: Backend>(
                 .map(|(index, node)| {
                     let is_focused = dir.focus() == index;
 
-                    // TODO : Optimize
-                    let is_selected = app.selection().contains(node);
+                    let is_selected = app
+                        .selection()
+                        .iter()
+                        .any(|s| s.absolute_path == node.absolute_path);
 
                     let is_first = index == 0;
                     let is_last = index == dir.total().max(1) - 1;

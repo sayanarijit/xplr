@@ -55,6 +55,7 @@ Table of content
   - [Style](https://arijitbasu.in/xplr/en/style.html)
   - [Sorting](https://arijitbasu.in/xplr/en/sorting.html)
   - [Filtering](https://arijitbasu.in/xplr/en/filtering.html)
+  - [Column Renderer](https://arijitbasu.in/xplr/en/column-renderer.html)
 - [Default Key Bindings](https://arijitbasu.in/xplr/en/default-key-bindings.html)
 - [Plugin](https://arijitbasu.in/xplr/en/plugin.html)
   - [Installing Plugins](https://arijitbasu.in/xplr/en/installing-plugins.html)
