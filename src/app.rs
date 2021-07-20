@@ -2784,70 +2784,27 @@ impl App {
     }
 
     pub fn write_pipes(&self) -> Result<()> {
-        // TODO optimize and test
-
         fs::create_dir_all(self.pipe().path())?;
-
         fs::write(&self.pipe().msg_in, "")?;
 
         let selection_str = self.selection_str();
-        // if last_app
-        //     .map(|a| a.selection_str() != selection_str)
-        //     .unwrap_or(true)
-        // {
         fs::write(&self.pipe().selection_out, selection_str)?;
-        // };
 
         let history_str = self.history_str();
-        // if last_app
-        //     .map(|a| a.history_str() != history_str)
-        //     .unwrap_or(true)
-        // {
         fs::write(&self.pipe().history_out, history_str)?;
-        // };
 
         let directory_nodes_str = self.directory_nodes_str();
-        // if last_app
-        //     .map(|a| a.directory_nodes_str() != directory_nodes_str)
-        //     .unwrap_or(true)
-        // {
         fs::write(&self.pipe().directory_nodes_out, directory_nodes_str)?;
-        // };
 
-        // if last_app
-        //     .map(|a| a.logs().len() != self.logs().len())
-        //     .unwrap_or(true)
-        // {
-        // let new_logs = self
-        //     .logs()
-        //     .iter()
-        //     .skip(last_app.map(|a| a.logs().len()).unwrap_or(0))
-        //     .map(|l| format!("{}\n", l))
-        //     .collect::<Vec<String>>()
-        //     .join("");
-
-        // let mut file = fs::OpenOptions::new()
-        //     .append(true)
-        //     .open(&self.pipe().logs_out)?;
-        // file.write_all(new_logs.as_bytes())?;
-        // };
         let logs_str = self.logs_str();
         fs::write(&self.pipe().logs_out, logs_str)?;
 
         let result_str = self.result_str();
-        // if last_app
-        //     .map(|a| a.result_str() != result_str)
-        //     .unwrap_or(true)
-        // {
         fs::write(&self.pipe().result_out, result_str)?;
-        // };
+
         let global_help_menu_str = self.global_help_menu_str();
-        // if last_app
-        //     .map(|a| a.global_help_menu_str() != global_help_menu_str)
-        //     .unwrap_or(true)
-        // {
         fs::write(&self.pipe().global_help_menu_out, global_help_menu_str)?;
-        // };
+
         Ok(())
     }
 

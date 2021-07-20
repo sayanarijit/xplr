@@ -14,6 +14,7 @@ A hackable, minimal, fast TUI file explorer
   - [Style][11]
   - [Sorting][12]
   - [Filtering][13]
+  - [Column Renderer][26]
 - [Default Key Bindings][14]
 - [Plugin][15]
   - [Installing Plugins][16]
@@ -53,3 +54,4 @@ A hackable, minimal, fast TUI file explorer
 [23]:upgrade-guide.md
 [24]:community.md
 [25]:contribute.md
+[26]:column-renderer.md

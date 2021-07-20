@@ -767,23 +767,176 @@ This is a special argument passed to the lua functions when called using the
 
 It contains the following information:
 
-- version
-- config
-- pwd
-- focused_node
-- directory_buffer
-- selection
-- mode
-- layout
-- input_buffer
-- pid
-- session_path
-- explorer_config
-- history
-- last_modes
+- [version][29]
+- [config][30]
+- [pwd][31]
+- [focused_node][32]
+- [directory_buffer][33]
+- [selection][34]
+- [mode][35]
+- [layout][36]
+- [input_buffer][37]
+- [pid][38]
+- [session_path][39]
+- [explorer_config][40]
+- [history][41]
+- [last_modes][42]
 
-TODO: Document each. For now, refer to the
-[rust doc][18].
+
+### version
+
+Type: string
+
+xplr version. Can be used to test compatibility.
+
+### config
+
+Type: [Config][43]
+
+
+### pwd
+
+Type: string
+
+The present working directory/
+
+### focused_node
+
+Type: nullable [Node][44]
+
+The node under focus.
+
+- [directory_buffer][33]
+- [selection][34]
+- [mode][35]
+- [layout][36]
+- [input_buffer][37]
+- [pid][38]
+- [session_path][39]
+- [explorer_config][40]
+- [history][41]
+- [last_modes][42]
+
+
+### Node
+
+A node contains the following fields:
+
+- [parent][45]
+- [relative_path][46]
+- [absolute_path][47]
+- [extension][48]
+- [is_symlink][49]
+- [is_broken][50]
+- [is_dir][51]
+- [is_file][52]
+- [is_readonly][53]
+- [mime_essence][54]
+- [size][55]
+- [human_size][56]
+- [permissions][57]
+- [canonical][58]
+- [symlink][59]
+
+### parent
+
+Type: string
+
+The parent path of the node.
+
+### relative_path
+
+Type: string
+
+The path relative to the parent, i.e. the file/directory name with extension.
+
+### absolute_path
+
+Type: string
+
+The absolute path (without resolving symlinks) of the node.
+
+### extension
+
+Type: string
+
+The extension of the node.
+
+
+### is_symlink
+
+Type: boolean
+
+`true` if the node is a symlink.
+
+
+### is_broken
+
+Type: boolean
+
+`true` if the node is a broken symlink.
+
+
+### is_dir
+
+Type: boolean
+
+`true` if the node is a directory.
+
+### is_file
+
+Type: boolean
+
+`true` if the node is a file.
+
+### is_readonly
+
+Type: boolean
+
+`true` if the node is real-only.
+
+
+### mime_essence
+
+Type: string
+
+The mime type of the node. For e.g. `text/csv`, `image/jpeg` etc.
+
+### size
+
+Type: integer
+
+The size of the exact node. The size of a directory won't be calculated
+recursively.
+
+### human_size
+
+Type: string
+
+Like size but in human readable format.
+
+### permissions
+
+Type: [Permission][60]
+
+The [permissions][60] applied to the node.
+
+### canonical
+
+Type: nullable [Resolved Node Metadata][61]
+
+If the node is a symlink, it will hold information about the symlink resolved
+node. Else, it will hold information the actual node. It the symlink is broken,
+it will be null.
+
+### symlink
+
+Type: nullable [Resolved Node Metadata][61]
+
+If the node is a symlink and is not broken, it will hold information about the
+symlink resolved node. However, it will never hold information about the actual
+node. It will instead be null.
+
 
 ### Example:
 
@@ -964,3 +1117,36 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [26]:#xplr_pipe_directory_nodes_out
 [27]:https://www.yaml.org
 [28]:layouts.md#table
+[29]:#version
+[30]:#config
+[31]:#pwd
+[32]:#focused_node
+[33]:#directory_buffer
+[34]:#selection
+[35]:#mode
+[36]:#layout
+[37]:#input_buffer
+[38]:#pid
+[39]:#session_path
+[40]:#explorer_config
+[41]:#history
+[42]:#last_modes
+[43]:configuration.md#config
+[44]:#node
+[45]:#parent
+[46]:#relative_path
+[47]:#absolute_path
+[48]:#extension
+[49]:#is_symlink
+[50]:#is_broken
+[51]:#is_dir
+[52]:#is_file
+[53]:#is_readonly
+[54]:#mime_essence
+[55]:#size
+[56]:#human_size
+[57]:#permissions
+[58]:#canonical
+[59]:#symlink
+[60]:column-renderer.md#permission
+[61]:column-renderer.md#resolved-node-metadata

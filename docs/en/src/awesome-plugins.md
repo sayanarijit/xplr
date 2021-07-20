@@ -40,10 +40,8 @@ Integration
 Theme
 -----
 
-- [material-landscape.xplr][19]
-  Material Landscape
-- [material-landscape2.xplr][20]
-  Material Landscape 2
+- [**material-landscape.xplr**][19] Material Landscape
+- [**material-landscape2.xplr**][20] Material Landscape 2
 
 
 [1]:./writing-plugins.md

@@ -153,51 +153,31 @@ Each column config contains `format` field (string) and `style` field
 ([Style][1]).
 
 However, unlike [table.header.cols][6], the `format` field here
-points to a Lua function that receives a
-[special argument][7]
-as input and returns a string that will be displayed in the column.
+points to a [column renderer function][7].
 
-TODO: Document the argument fields here.
 
-xplr by default provides the following functions:
+table.tree
+-----------------
 
-- `xplr.fn.builtin.fmt_general_table_row_cols_0`
-- `xplr.fn.builtin.fmt_general_table_row_cols_1`
-- `xplr.fn.builtin.fmt_general_table_row_cols_2`
-- `xplr.fn.builtin.fmt_general_table_row_cols_3`
-- `xplr.fn.builtin.fmt_general_table_row_cols_4`
+Type: List of tree configuration
 
-You can either overwrite these functions, or create new functions in
-`xplr.fn.custom` and point to them.
+It expects a list of three items. The first component of the tree, then the
+middle components, and finally the last component of the tree.
 
-Terminal colors are supported.
+Each item requires the `format` field which is a string, and the `style` field,
+which is the [Style][1] object.
 
 Example:
 
 ```lua
-xplr.fn.custom.fmt_simple_column = function(m)
-  return m.prefix .. m.relative_path .. m.suffix
-end
-
-xplr.config.general.table.header.cols = {
-  { format = "  path" }
+xplr.config.general.table.tree = {
+    { format = "├─", style = { add_modifiers = { "Bold" }, bg = nil, fg = "Blue", sub_modifiers = nil } },
+    { format = "├─", style = { add_modifiers = { "Bold" }, bg = nil, fg = "Blue", sub_modifiers = nil } },
+    { format = "╰─", style = { add_modifiers = { "Bold" }, bg = nil, fg = "Blue", sub_modifiers = nil } },
 }
-
-xplr.config.general.table.row.cols = {
-  { format = "custom.fmt_simple_column" }
-}
-
-xplr.config.general.table.col_widths = {
-  { Percentage = 100 }
-}
-
--- With this config, you should only see a single column displaying the
--- relative paths.
 ```
 
-------------
-
-TODO: Continue documentation
+TODO: Continue documentation.
 
 
 [1]:style.md
@@ -206,4 +186,4 @@ TODO: Continue documentation
 [4]:sorting.md#node-sorter-applicable
 [5]:layouts.md#constraint
 [6]:#tableheadercols
-[7]:https://docs.rs/xplr/latest/xplr/ui/struct.NodeUiMetadata.html
+[7]:column-renderer.md
