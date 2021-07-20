@@ -1,0 +1,379 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Column Renderer - xplr book</title>
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A hackable, minimal, fast TUI file explorer">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="favicon.svg">
+                        <link rel="shortcut icon" href="favicon.png">
+                <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+                <link rel="stylesheet" href="css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="quickstart.html"><strong aria-hidden="true">2.</strong> Quickstart</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="install.html"><strong aria-hidden="true">2.1.</strong> Install</a></li><li class="chapter-item expanded "><a href="post-install.html"><strong aria-hidden="true">2.2.</strong> Post Install</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="general-config.html"><strong aria-hidden="true">3.1.</strong> General Config</a></li><li class="chapter-item expanded "><a href="modes.html"><strong aria-hidden="true">3.2.</strong> Modes</a></li><li class="chapter-item expanded "><a href="message.html"><strong aria-hidden="true">3.3.</strong> Message</a></li><li class="chapter-item expanded "><a href="layouts.html"><strong aria-hidden="true">3.4.</strong> Layouts</a></li><li class="chapter-item expanded "><a href="node_types.html"><strong aria-hidden="true">3.5.</strong> Node Types</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">3.6.</strong> Style</a></li><li class="chapter-item expanded "><a href="sorting.html"><strong aria-hidden="true">3.7.</strong> Sorting</a></li><li class="chapter-item expanded "><a href="filtering.html"><strong aria-hidden="true">3.8.</strong> Filtering</a></li><li class="chapter-item expanded "><a href="column-renderer.html" class="active"><strong aria-hidden="true">3.9.</strong> Column Renderer</a></li></ol></li><li class="chapter-item expanded "><a href="default-key-bindings.html"><strong aria-hidden="true">4.</strong> Default Key Bindings</a></li><li class="chapter-item expanded "><a href="plugin.html"><strong aria-hidden="true">5.</strong> Plugin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installing-plugins.html"><strong aria-hidden="true">5.1.</strong> Installing Plugins</a></li><li class="chapter-item expanded "><a href="writing-plugins.html"><strong aria-hidden="true">5.2.</strong> Writing Plugins</a></li><li class="chapter-item expanded "><a href="awesome-plugins.html"><strong aria-hidden="true">5.3.</strong> Awesome Plugins</a></li></ol></li><li class="chapter-item expanded "><a href="integration.html"><strong aria-hidden="true">6.</strong> Integration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="awesome-integrations.html"><strong aria-hidden="true">6.1.</strong> Awesome Integrations</a></li></ol></li><li class="chapter-item expanded "><a href="todo.html"><strong aria-hidden="true">7.</strong> TODO</a></li><li class="chapter-item expanded "><a href="alternatives.html"><strong aria-hidden="true">8.</strong> Alternatives</a></li><li class="chapter-item expanded "><a href="upgrade-guide.html"><strong aria-hidden="true">9.</strong> Upgrade Guide</a></li><li class="chapter-item expanded "><a href="community.html"><strong aria-hidden="true">10.</strong> Community</a></li><li class="chapter-item expanded "><a href="contribute.html"><strong aria-hidden="true">11.</strong> Contribute</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title">xplr book</h1>
+
+                    <div class="right-buttons">
+                                                <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        <a href="https://github.com/sayanarijit/xplr" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                                        <a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/column-renderer.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="column-renderer"><a class="header" href="#column-renderer">Column Renderer</a></h1>
+<p>A column renderer is a Lua function that receives a <a href="#table-renderer-argument">special argument</a> and
+returns a string that will be displayed in each specific field of the
+<a href="layouts.html#table">files table</a>.</p>
+<p>xplr by default provides the following column renderers:</p>
+<ul>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_0</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_1</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_2</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_3</code></li>
+<li><code>xplr.fn.builtin.fmt_general_table_row_cols_4</code></li>
+</ul>
+<p>You can either overwrite these functions, or create new functions in
+<code>xplr.fn.custom</code> and point to them.</p>
+<p>Terminal colors are supported.</p>
+<h2 id="table-renderer-argument"><a class="header" href="#table-renderer-argument">Table Renderer Argument</a></h2>
+<p>The special argument contains the following fields</p>
+<ul>
+<li><a href="#parent">parent</a></li>
+<li><a href="#relative_path">relative_path</a></li>
+<li><a href="#absolute_path">absolute_path</a></li>
+<li><a href="#extension">extension</a></li>
+<li><a href="#is_symlink">is_symlink</a></li>
+<li><a href="#is_broken">is_broken</a></li>
+<li><a href="#is_dir">is_dir</a></li>
+<li><a href="#is_file">is_file</a></li>
+<li><a href="#is_readonly">is_readonly</a></li>
+<li><a href="#mime_essence">mime_essence</a></li>
+<li><a href="#size">size</a></li>
+<li><a href="#human_size">human_size</a></li>
+<li><a href="#permissions">permissions</a></li>
+<li><a href="#canonical">canonical</a></li>
+<li><a href="#symlink">symlink</a></li>
+<li><a href="#index">index</a></li>
+<li><a href="#relative_index">relative_index</a></li>
+<li><a href="#is_before_focus">is_before_focus</a></li>
+<li><a href="#is_after_focus">is_after_focus</a></li>
+<li><a href="#tree">tree</a></li>
+<li><a href="#prefix">prefix</a></li>
+<li><a href="#suffix">suffix</a></li>
+<li><a href="#is_selected">is_selected</a></li>
+<li><a href="#is_focused">is_focused</a></li>
+<li><a href="#total">total</a></li>
+<li><a href="meta">meta</a></li>
+</ul>
+<h3 id="parent"><a class="header" href="#parent">parent</a></h3>
+<p>Type: string</p>
+<p>The parent path of the node.</p>
+<h3 id="relative_path"><a class="header" href="#relative_path">relative_path</a></h3>
+<p>Type: string</p>
+<p>The path relative to the parent, i.e. the file/directory name with extension.</p>
+<h3 id="absolute_path"><a class="header" href="#absolute_path">absolute_path</a></h3>
+<p>Type: string</p>
+<p>The absolute path (without resolving symlinks) of the node.</p>
+<h3 id="extension"><a class="header" href="#extension">extension</a></h3>
+<p>Type: string</p>
+<p>The extension of the node.</p>
+<h3 id="is_symlink"><a class="header" href="#is_symlink">is_symlink</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is a symlink.</p>
+<h3 id="is_broken"><a class="header" href="#is_broken">is_broken</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is a broken symlink.</p>
+<h3 id="is_dir"><a class="header" href="#is_dir">is_dir</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is a directory.</p>
+<h3 id="is_file"><a class="header" href="#is_file">is_file</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is a file.</p>
+<h3 id="is_readonly"><a class="header" href="#is_readonly">is_readonly</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is real-only.</p>
+<h3 id="mime_essence"><a class="header" href="#mime_essence">mime_essence</a></h3>
+<p>Type: string</p>
+<p>The mime type of the node. For e.g. <code>text/csv</code>, <code>image/jpeg</code> etc.</p>
+<h3 id="size"><a class="header" href="#size">size</a></h3>
+<p>Type: integer</p>
+<p>The size of the exact node. The size of a directory won't be calculated
+recursively.</p>
+<h3 id="human_size"><a class="header" href="#human_size">human_size</a></h3>
+<p>Type: string</p>
+<p>Like <a href="#size">size</a> but in human readable format.</p>
+<h3 id="permissions"><a class="header" href="#permissions">permissions</a></h3>
+<p>Type: <a href="#permission">Permission</a></p>
+<p>The <a href="#permission">permissions</a> applied to the node.</p>
+<h3 id="canonical"><a class="header" href="#canonical">canonical</a></h3>
+<p>Type: nullable <a href="#resolved-node-metadata">Resolved Node Metadata</a></p>
+<p>If the node is a symlink, it will hold information about the symlink resolved
+node. Else, it will hold information the actual node. It the symlink is broken,
+it will be null.</p>
+<h3 id="symlink"><a class="header" href="#symlink">symlink</a></h3>
+<p>Type: nullable <a href="#resolved-node-metadata">Resolved Node Metadata</a></p>
+<p>If the node is a symlink and is not broken, it will hold information about the
+symlink resolved node. However, it will never hold information about the actual
+node. It will instead be null.</p>
+<h3 id="index"><a class="header" href="#index">index</a></h3>
+<p>Type: integer</p>
+<p>Index (starting from 0) of the node.</p>
+<h3 id="relative_index"><a class="header" href="#relative_index">relative_index</a></h3>
+<p>Type: integer</p>
+<p>Relative index from the focused node (i.e. 0th node).</p>
+<h3 id="is_before_focus"><a class="header" href="#is_before_focus">is_before_focus</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is before the focused node.</p>
+<h3 id="is_after_focus"><a class="header" href="#is_after_focus">is_after_focus</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is after the focused node.</p>
+<h3 id="tree"><a class="header" href="#tree">tree</a></h3>
+<p>Type: string</p>
+<p>The <a href="general-config.html#tabletree">tree component</a> based on the node's index.</p>
+<h3 id="prefix"><a class="header" href="#prefix">prefix</a></h3>
+<p>Type: string</p>
+<p>The prefix applicable for the node.</p>
+<h3 id="suffix"><a class="header" href="#suffix">suffix</a></h3>
+<p>Type: string</p>
+<p>The suffix applicable for the node.</p>
+<h3 id="is_selected"><a class="header" href="#is_selected">is_selected</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is selected.</p>
+<h3 id="is_focused"><a class="header" href="#is_focused">is_focused</a></h3>
+<p>Type: boolean</p>
+<p><code>true</code> if the node is under focus.</p>
+<h3 id="total"><a class="header" href="#total">total</a></h3>
+<p>Type: integer</p>
+<p>The total number of the nodes.</p>
+<h3 id="meta"><a class="header" href="#meta">meta</a></h3>
+<p>Type: mapping of string and string</p>
+<p>The applicable <a href="node_types.html#meta">meta object</a> for the node.</p>
+<h2 id="permission"><a class="header" href="#permission">Permission</a></h2>
+<p>Permission contains the following fields:</p>
+<ul>
+<li>user_read</li>
+<li>user_write</li>
+<li>user_execute</li>
+<li>group_read</li>
+<li>group_write</li>
+<li>group_execute</li>
+<li>other_read</li>
+<li>other_write</li>
+<li>other_execute</li>
+<li>sticky</li>
+<li>setgid</li>
+<li>setuid</li>
+</ul>
+<p>Each field holds a boolean value.</p>
+<h2 id="resolved-node-metadata"><a class="header" href="#resolved-node-metadata">Resolved Node Metadata</a></h2>
+<p>It contains the following fields.</p>
+<ul>
+<li><a href="#absolute_path">absolute_path</a></li>
+<li><a href="#extension">extension</a></li>
+<li><a href="#is_dir">is_dir</a></li>
+<li><a href="#is_file">is_file</a></li>
+<li><a href="#is_readonly">is_readonly</a></li>
+<li><a href="#mime_essence">mime_essence</a></li>
+<li><a href="#size">size</a></li>
+<li><a href="#human_size">human_size</a></li>
+</ul>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<pre><code class="language-lua">xplr.fn.custom.fmt_simple_column = function(m)
+  return m.prefix .. m.relative_path .. m.suffix
+end
+
+xplr.config.general.table.header.cols = {
+  { format = &quot;  path&quot; }
+}
+
+xplr.config.general.table.row.cols = {
+  { format = &quot;custom.fmt_simple_column&quot; }
+}
+
+xplr.config.general.table.col_widths = {
+  { Percentage = 100 }
+}
+
+-- With this config, you should only see a single column displaying the
+-- relative paths.
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="filtering.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+                                                    <a rel="next" href="default-key-bindings.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="filtering.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+                                    <a rel="next" href="default-key-bindings.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+        
+    </body>
+</html>
