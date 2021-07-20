@@ -300,7 +300,7 @@ it will show in the UI.</p>
 <p>Reset the input buffer back to null. It will not show in the UI.</p>
 <h3 id="-switchmode--string-"><a class="header" href="#-switchmode--string-">{ SwitchMode = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>SwitchMode: string</code></p>
-<p>Switch input <a href="modes.html">mode</a>.</p>
+<p>Switch input <a href="modes.html#mode">mode</a>.</p>
 <blockquote>
 <p><strong>NOTE:</strong> To be specific about which mode to switch to, use <code>SwitchModeBuiltin</code> or
 <code>SwitchModeCustom</code> instead.</p>
@@ -322,7 +322,7 @@ it will show in the UI.</p>
 <p>Pop the last mode from the history and switch to it.</p>
 <h3 id="-switchlayout--string-"><a class="header" href="#-switchlayout--string-">{ SwitchLayout = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>SwitchLayout: string</code></p>
-<p>Switch <a href="layouts.html">layout</a>.</p>
+<p>Switch <a href="layouts.html#layout">layout</a>.</p>
 <blockquote>
 <p><strong>NOTE:</strong> To be specific about which layout to switch to, use <code>SwitchLayoutBuiltin</code> or
 <code>SwitchLayoutCustom</code> instead.</p>
@@ -589,18 +589,33 @@ messages which will be handled by xplr.</p>
 <h3 id="focused_node"><a class="header" href="#focused_node">focused_node</a></h3>
 <p>Type: nullable <a href="#node">Node</a></p>
 <p>The node under focus.</p>
-<ul>
-<li><a href="#directory_buffer">directory_buffer</a></li>
-<li><a href="#selection">selection</a></li>
-<li><a href="#mode">mode</a></li>
-<li><a href="#layout">layout</a></li>
-<li><a href="#input_buffer">input_buffer</a></li>
-<li><a href="#pid">pid</a></li>
-<li><a href="#session_path">session_path</a></li>
-<li><a href="#explorer_config">explorer_config</a></li>
-<li><a href="#history">history</a></li>
-<li><a href="#last_modes">last_modes</a></li>
-</ul>
+<h3 id="directory_buffer"><a class="header" href="#directory_buffer">directory_buffer</a></h3>
+<p>TODO</p>
+<h3 id="selection"><a class="header" href="#selection">selection</a></h3>
+<p>Type: list of selected <a href="#node">Node</a>s</p>
+<p>The selected nodes.</p>
+<h3 id="mode"><a class="header" href="#mode">mode</a></h3>
+<p>Type: <a href="modes.html#mode">Mode</a></p>
+<p>Current mode.</p>
+<h3 id="layout"><a class="header" href="#layout">layout</a></h3>
+<p>Type: <a href="layouts.html#layout">Layout</a></p>
+<p>Current layout.</p>
+<h3 id="input_buffer"><a class="header" href="#input_buffer">input_buffer</a></h3>
+<p>Type: nullable string</p>
+<p>The input buffer.</p>
+<h3 id="pid"><a class="header" href="#pid">pid</a></h3>
+<p>Type: integer</p>
+<p>The xplr session PID.</p>
+<h3 id="session_path"><a class="header" href="#session_path">session_path</a></h3>
+<p>Type: string</p>
+<p>The session path.</p>
+<h3 id="explorer_config"><a class="header" href="#explorer_config">explorer_config</a></h3>
+<p>TODO</p>
+<h3 id="history"><a class="header" href="#history">history</a></h3>
+<p>TODO</p>
+<h3 id="last_modes"><a class="header" href="#last_modes">last_modes</a></h3>
+<p>Type: list of <a href="modes.html#mode">Mode</a></p>
+<p>Last modes, not popped yet.</p>
 <h3 id="node"><a class="header" href="#node">Node</a></h3>
 <p>A node contains the following fields:</p>
 <ul>
