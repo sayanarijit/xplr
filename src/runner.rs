@@ -142,7 +142,8 @@ impl Runner {
     }
 
     pub fn run(self) -> Result<Option<String>> {
-        let lua = mlua::Lua::new();
+        // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
+        let lua = unsafe { mlua::Lua::unsafe_new() };
         let mut app = app::App::create(self.pwd, &lua, self.config)?;
         app.config.general.set_read_only(self.read_only);
 
