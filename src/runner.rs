@@ -186,7 +186,7 @@ impl Runner {
         execute!(stdout, term::EnterAlternateScreen)?;
 
         let mut fifo: Option<fs::File> = if let Some(path) = app.config().general().start_fifo() {
-            match start_fifo(&path, &app.focused_node_str()) {
+            match start_fifo(path, &app.focused_node_str()) {
                 Ok(file) => Some(file),
                 Err(e) => {
                     app = app.log_error(e.to_string())?;

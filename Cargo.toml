@@ -19,24 +19,24 @@ name = "xplr"
 
 [dependencies]
 tui = { version = "0.15.0", default-features = false, features = ['crossterm', 'serde'] }
-crossterm = "0.19.0"
+crossterm = "0.20.0"
 dirs = "3.0.2"
 serde = { version = "1.0.126", features = ["derive"] }
 serde_yaml = "0.8.17"
 mime_guess = "2.0.3"
-anyhow = "1.0.40"
+anyhow = "1.0.42"
 chrono = { version = "0.4.19", features = ["serde"] }
 lazy_static = "1.4.0"
-indexmap = { version = "1.6.2", features = ["serde"] }
+indexmap = { version = "1.7.0", features = ["serde"] }
 natord = "1.0.9"
 humansize = "1.1.1"
-mlua = { version = "0.5.4", features = ["luajit", "vendored", "serialize", "send"] }
+mlua = { version = "0.6.2", features = ["luajit", "vendored", "serialize", "send"] }
 ansi-to-tui = "0.3.0"
-libc = "0.2.95"
+libc = "0.2.98"
 
 [dev-dependencies]
-criterion = "0.3"
-assert_cmd = "1.0"
+criterion = "0.3.5"
+assert_cmd = "1.0.7"
 
 [[bench]]
 name = "criterion"
@@ -47,3 +47,4 @@ harness = false
 lto = true
 codegen-units = 1
 panic = 'abort'
+

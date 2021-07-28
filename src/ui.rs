@@ -538,7 +538,7 @@ fn draw_table<B: Backend>(
                     };
 
                     let meta = NodeUiMetadata::new(
-                        &node,
+                        node,
                         index,
                         relative_index,
                         is_before_focus,
@@ -790,7 +790,7 @@ fn draw_sort_n_filter<B: Backend>(
         .iter()
         .map(|f| {
             ui.filter_identifiers()
-                .get(&f.filter())
+                .get(f.filter())
                 .map(|u| {
                     let ui = defaultui.to_owned().extend(u);
                     (
@@ -807,7 +807,7 @@ fn draw_sort_n_filter<B: Backend>(
             let direction = if s.reverse() { &reverseui } else { &forwardui };
 
             ui.sorter_identifiers()
-                .get(&s.sorter())
+                .get(s.sorter())
                 .map(|u| {
                     let ui = defaultui.to_owned().extend(u);
                     (
