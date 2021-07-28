@@ -18,27 +18,27 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
 use std::sync::mpsc;
-use termion::get_tty;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
+
+fn get_tty() -> io::Result<fs::File> {
+    fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open("/dev/tty")
+}
 
 fn call_lua(
     app: &app::App,
     lua: &mlua::Lua,
     func: &str,
-    silent: bool,
+    _silent: bool,
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
     let _focus_index = app
         .directory_buffer()
         .map(|d| d.focus())
         .unwrap_or_default()
         .to_string();
-
-    let (_, _, _) = if silent {
-        (Stdio::null(), Stdio::null(), Stdio::null())
-    } else {
-        (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
-    };
 
     let arg = app.to_lua_arg();
     let arg = lua.to_value(&arg)?;
