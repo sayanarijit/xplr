@@ -63,7 +63,7 @@ fn resolve_fn_recursive<'lua, 'a>(
 /// This function resolves paths like `builtin.func_foo`, `custom.func_bar` into lua functions.
 pub fn resolve_fn<'lua>(globals: &mlua::Table<'lua>, path: &str) -> Result<mlua::Function<'lua>> {
     let path = format!("xplr.fn.{}", path);
-    resolve_fn_recursive(&globals, path.split('.'))
+    resolve_fn_recursive(globals, path.split('.'))
 }
 
 /// Used to initialize Lua globals
