@@ -21,7 +21,7 @@ use std::sync::mpsc;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
 
-fn get_tty() -> io::Result<fs::File> {
+pub fn get_tty() -> io::Result<fs::File> {
     fs::OpenOptions::new()
         .read(true)
         .write(true)
