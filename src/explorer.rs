@@ -36,7 +36,7 @@ pub(crate) fn explore_sync(
             .map(|(i, _)| i)
             .unwrap_or_else(|| fallback_focus.min(nodes.len().max(1) - 1))
     } else {
-        fallback_focus.min(nodes.len().max(1) - 1)
+        0
     };
 
     Ok(DirectoryBuffer::new(
@@ -58,10 +58,7 @@ pub(crate) fn explore_async(
             .map(|buf| {
                 tx_msg_in
                     .send(Task::new(
-                        MsgIn::Internal(InternalMsg::AddDirectory(
-                            parent.to_string_lossy().to_string(),
-                            buf,
-                        )),
+                        MsgIn::Internal(InternalMsg::SetDirectory(buf)),
                         None,
                     ))
                     .unwrap_or_default();
