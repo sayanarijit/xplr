@@ -419,7 +419,8 @@ impl DirectoryBuffer {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum InternalMsg {
-    AddDirectory(String, DirectoryBuffer),
+    AddLastFocus(String, Option<String>),
+    SetDirectory(DirectoryBuffer),
     HandleKey(Key),
 }
 
@@ -1517,7 +1518,8 @@ pub struct App {
     pub version: String,
     pub config: Config,
     pub pwd: String,
-    pub directory_buffers: HashMap<String, DirectoryBuffer>,
+    pub directory_buffer: Option<DirectoryBuffer>,
+    pub last_focus: HashMap<String, Option<String>>,
     pub selection: IndexSet<Node>,
     pub msg_out: VecDeque<MsgOut>,
     pub mode: Mode,
@@ -1608,7 +1610,8 @@ impl App {
             version: VERSION.to_string(),
             config,
             pwd,
-            directory_buffers: Default::default(),
+            directory_buffer: Default::default(),
+            last_focus: Default::default(),
             selection: Default::default(),
             msg_out: Default::default(),
             mode,
@@ -1658,7 +1661,10 @@ impl App {
 
     fn handle_internal(self, msg: InternalMsg) -> Result<Self> {
         match msg {
-            InternalMsg::AddDirectory(parent, dir) => self.add_directory(parent, dir),
+            InternalMsg::SetDirectory(dir) => self.set_directory(dir),
+            InternalMsg::AddLastFocus(parent, focus_path) => {
+                self.add_last_focus(parent, focus_path)
+            }
             InternalMsg::HandleKey(key) => self.handle_key(key),
         }
     }
@@ -1812,14 +1818,17 @@ impl App {
         Ok(self)
     }
 
-    pub fn explore_pwd(self) -> Result<Self> {
+    pub fn explore_pwd(mut self) -> Result<Self> {
+        let focus = self.last_focus.get(self.pwd()).cloned().unwrap_or(None);
+        let pwd = self.pwd().clone();
+        self = self.add_last_focus(pwd, focus.clone())?;
         let dir = explorer::explore_sync(
             self.explorer_config().clone(),
             self.pwd().into(),
-            self.focused_node().map(|n| n.absolute_path().into()),
+            focus.map(PathBuf::from),
             self.directory_buffer().map(|d| d.focus()).unwrap_or(0),
         )?;
-        self.add_directory(dir.parent().clone(), dir)
+        self.set_directory(dir)
     }
 
     fn explore_pwd_async(mut self) -> Result<Self> {
@@ -1965,6 +1974,9 @@ impl App {
 
         match env::set_current_dir(&dir) {
             Ok(()) => {
+                let pwd = self.pwd().clone();
+                let focus = self.focused_node().map(|n| n.relative_path().clone());
+                self = self.add_last_focus(pwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
@@ -2281,8 +2293,19 @@ impl App {
         })
     }
 
-    pub fn add_directory(mut self, parent: String, dir: DirectoryBuffer) -> Result<Self> {
-        self.directory_buffers.insert(parent, dir);
+    pub fn set_directory(mut self, dir: DirectoryBuffer) -> Result<Self> {
+        self = self.add_last_focus(
+            dir.parent.clone(),
+            dir.focused_node().map(|n| n.relative_path().clone()),
+        )?;
+        if dir.parent == self.pwd {
+            self.directory_buffer = Some(dir);
+        }
+        Ok(self)
+    }
+
+    pub fn add_last_focus(mut self, parent: String, focused_path: Option<String>) -> Result<Self> {
+        self.last_focus.insert(parent, focused_path);
         Ok(self)
     }
 
@@ -2593,7 +2616,7 @@ impl App {
     }
 
     fn directory_buffer_mut(&mut self) -> Option<&mut DirectoryBuffer> {
-        self.directory_buffers.get_mut(&self.pwd)
+        self.directory_buffer.as_mut()
     }
 
     /// Get a reference to the app's pwd.
@@ -2603,7 +2626,7 @@ impl App {
 
     /// Get a reference to the app's current directory buffer.
     pub fn directory_buffer(&self) -> Option<&DirectoryBuffer> {
-        self.directory_buffers.get(&self.pwd)
+        self.directory_buffer.as_ref()
     }
 
     /// Get a reference to the app's config.
@@ -2627,11 +2650,6 @@ impl App {
 
     pub fn mode_str(&self) -> String {
         format!("{}\n", &self.mode.name())
-    }
-
-    /// Get a reference to the app's directory buffers.
-    pub fn directory_buffers(&self) -> &HashMap<String, DirectoryBuffer> {
-        &self.directory_buffers
     }
 
     /// Get a reference to the app's input buffer.
