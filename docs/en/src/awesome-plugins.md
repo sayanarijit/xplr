@@ -22,7 +22,6 @@ Integration
   support.
 - [**fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
   into a directory.
-- [**icons.xplr**][30] An icon theme for xplr.
 - [**paste-rs.xplr**][23] Use this plugin to paste your files to
   [paste.rs][24], and open/delete them later using [fzf][9].
 - [**preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
@@ -42,7 +41,8 @@ Theme
 
 - [**material-landscape.xplr**][19] Material Landscape
 - [**material-landscape2.xplr**][20] Material Landscape 2
-- [**zentable.xplr**][31] A clean, distraction free xplr table UI 
+- [**zentable.xplr**][31] A clean, distraction free xplr table UI
+- [**icons.xplr**][30] An icon theme for xplr.
 
 
 [1]:./writing-plugins.md
