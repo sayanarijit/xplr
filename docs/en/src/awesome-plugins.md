@@ -42,6 +42,7 @@ Theme
 
 - [**material-landscape.xplr**][19] Material Landscape
 - [**material-landscape2.xplr**][20] Material Landscape 2
+- [**zentable.xplr**][31] A clean, distraction free xplr table UI 
 
 
 [1]:./writing-plugins.md
@@ -74,3 +75,4 @@ Theme
 [28]:https://github.com/prncss-xyz/type-to-nav.xplr
 [29]:https://github.com/jarun/nnn/wiki/concepts#type-to-nav
 [30]:https://github.com/prncss-xyz/icons.xplr
+[31]:https://github.com/sayanarijit/zentable.xplr
