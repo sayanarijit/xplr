@@ -9,14 +9,23 @@ of the following plugins work for you, it's very easy to
 Categories
 ----------
 
+- [Extension][32]
 - [Integration][2]
 - [Theme][3]
 
 
+Extension
+---------
+
+- [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
+  with some tweaks.
+- [**completion.xplr**][25] The missing tab completion for xplr input buffer.
+- [**comex.xplr**][21] One xplr plugin to compress and extract them all.
+
+
 Integration
 -----------
-- [**comex.xplr**][21] One xplr plugin to compress and extract them all.
-- [**completion.xplr**][25] The missing tab completion for xplr input buffer.
+
 - [**dragon.xplr**][4] Drag and drop files using [dragon][5].
 - [**dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
   support.
@@ -28,8 +37,6 @@ Integration
   [nnn preview-tabbed][12].
 - [**qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
 - [**trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
-- [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
-  with some tweaks.
 - [**xargs.xplr**][22] Batch execute commands on the focused or selected files
   using `xargs`.
 - [**xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
@@ -76,3 +83,4 @@ Theme
 [29]:https://github.com/jarun/nnn/wiki/concepts#type-to-nav
 [30]:https://github.com/prncss-xyz/icons.xplr
 [31]:https://github.com/sayanarijit/zentable.xplr
+[32]:#extension
