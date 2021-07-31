@@ -3,6 +3,8 @@
 --
 -- version = "1.0.0"
 
+local xplr = xplr
+
 -- Config
 ---- General
 ------ Show hidden
@@ -39,8 +41,8 @@ xplr.config.general.initial_mode = "default"
 
 ------ Initial sorting
 xplr.config.general.initial_sorting = {
-    { sorter = "ByCanonicalIsDir", reverse = true },
-    { sorter = "ByIRelativePath", reverse = false },
+  { sorter = "ByCanonicalIsDir", reverse = true },
+  { sorter = "ByIRelativePath", reverse = false },
 }
 
 ------ Logs
@@ -106,92 +108,285 @@ xplr.config.general.sort_and_filter_ui.separator.style.sub_modifiers = nil
 
 -------- Default identidier
 xplr.config.general.sort_and_filter_ui.default_identifier.format = nil
-xplr.config.general.sort_and_filter_ui.default_identifier.style.add_modifiers = { "Bold" }
+xplr.config.general.sort_and_filter_ui.default_identifier.style.add_modifiers =
+  {
+    "Bold",
+  }
 xplr.config.general.sort_and_filter_ui.default_identifier.style.bg = nil
 xplr.config.general.sort_and_filter_ui.default_identifier.style.fg = nil
-xplr.config.general.sort_and_filter_ui.default_identifier.style.sub_modifiers = nil
+xplr.config.general.sort_and_filter_ui.default_identifier.style.sub_modifiers =
+  nil
 
 -------- Filter identifiers
 xplr.config.general.sort_and_filter_ui.filter_identifiers = {
-    AbsolutePathDoesContain = { format = "abs=~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathDoesEndWith = { format = "abs=$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathDoesNotContain = { format = "abs!~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathDoesNotEndWith = { format = "abs!$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathDoesNotStartWith = { format = "abs!^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathDoesStartWith = { format = "abs=^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathIs = { format = "abs==", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    AbsolutePathIsNot = { format = "abs!=", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathDoesContain = { format = "[i]abs=~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathDoesEndWith = { format = "[i]abs=$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathDoesNotContain = { format = "[i]abs!~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathDoesNotEndWith = { format = "[i]abs!$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathDoesNotStartWith = { format = "[i]abs!^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathDoesStartWith = { format = "[i]abs=^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathIs = { format = "[i]abs==", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IAbsolutePathIsNot = { format = "[i]abs!=", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathDoesContain = { format = "[i]rel=~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathDoesEndWith = { format = "[i]rel=$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathDoesNotContain = { format = "[i]rel!~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathDoesNotEndWith = { format = "[i]rel!$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathDoesNotStartWith = { format = "[i]rel!^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathDoesStartWith = { format = "[i]rel=^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathIs = { format = "[i]rel==", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    IRelativePathIsNot = { format = "[i]rel!=", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathDoesContain = { format = "rel=~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathDoesEndWith = { format = "rel=$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathDoesNotContain = { format = "rel!~", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathDoesNotEndWith = { format = "rel!$", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathDoesNotStartWith = { format = "rel!^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathDoesStartWith = { format = "rel=^", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathIs = { format = "rel==", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    RelativePathIsNot = { format = "rel!=", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+  AbsolutePathDoesContain = {
+    format = "abs=~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathDoesEndWith = {
+    format = "abs=$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathDoesNotContain = {
+    format = "abs!~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathDoesNotEndWith = {
+    format = "abs!$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathDoesNotStartWith = {
+    format = "abs!^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathDoesStartWith = {
+    format = "abs=^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathIs = {
+    format = "abs==",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  AbsolutePathIsNot = {
+    format = "abs!=",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathDoesContain = {
+    format = "[i]abs=~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathDoesEndWith = {
+    format = "[i]abs=$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathDoesNotContain = {
+    format = "[i]abs!~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathDoesNotEndWith = {
+    format = "[i]abs!$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathDoesNotStartWith = {
+    format = "[i]abs!^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathDoesStartWith = {
+    format = "[i]abs=^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathIs = {
+    format = "[i]abs==",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IAbsolutePathIsNot = {
+    format = "[i]abs!=",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathDoesContain = {
+    format = "[i]rel=~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathDoesEndWith = {
+    format = "[i]rel=$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathDoesNotContain = {
+    format = "[i]rel!~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathDoesNotEndWith = {
+    format = "[i]rel!$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathDoesNotStartWith = {
+    format = "[i]rel!^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathDoesStartWith = {
+    format = "[i]rel=^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathIs = {
+    format = "[i]rel==",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  IRelativePathIsNot = {
+    format = "[i]rel!=",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathDoesContain = {
+    format = "rel=~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathDoesEndWith = {
+    format = "rel=$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathDoesNotContain = {
+    format = "rel!~",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathDoesNotEndWith = {
+    format = "rel!$",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathDoesNotStartWith = {
+    format = "rel!^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathDoesStartWith = {
+    format = "rel=^",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathIs = {
+    format = "rel==",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  RelativePathIsNot = {
+    format = "rel!=",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
 }
 
 -------- Sort direction identifiers
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.format = "↓"
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.add_modifiers = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.bg = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.fg = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.sub_modifiers = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.format = "↑"
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.add_modifiers = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.bg = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.fg = nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.sub_modifiers = nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.format =
+  "↓"
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.add_modifiers =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.bg =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.fg =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.sub_modifiers =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.format =
+  "↑"
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.add_modifiers =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.bg =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.fg =
+  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.sub_modifiers =
+  nil
 
 -------- Sorter identifiers
 xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
-    ByCanonicalAbsolutePath = { format = "[c]abs", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByCanonicalExtension = { format = "[c]ext", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByCanonicalIsDir = { format = "[c]dir", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByCanonicalIsFile = { format = "[c]file", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByCanonicalIsReadonly = { format = "[c]ro", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByCanonicalMimeEssence = { format = "[c]mime", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByCanonicalSize = { format = "[c]size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByExtension = { format = "ext", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByICanonicalAbsolutePath = { format = "[ci]abs", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByIRelativePath = { format = "[i]rel", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByISymlinkAbsolutePath = { format = "[si]abs", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByIsBroken = { format = "⨯", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByIsDir = { format = "dir", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByIsFile = { format = "file", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByIsReadonly = { format = "ro", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByIsSymlink = { format = "sym", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByMimeEssence = { format = "mime", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    ByRelativePath = { format = "rel", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySize = { format = "size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkAbsolutePath = { format = "[s]abs", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkExtension = { format = "[s]ext", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkIsDir = { format = "[s]dir", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkIsFile = { format = "[s]file", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkIsReadonly = { format = "[s]ro", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkMimeEssence = { format = "[s]mime", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    BySymlinkSize = { format = "[s]size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+  ByCanonicalAbsolutePath = {
+    format = "[c]abs",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalExtension = {
+    format = "[c]ext",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalIsDir = {
+    format = "[c]dir",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalIsFile = {
+    format = "[c]file",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalIsReadonly = {
+    format = "[c]ro",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalMimeEssence = {
+    format = "[c]mime",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalSize = {
+    format = "[c]size",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByExtension = {
+    format = "ext",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByICanonicalAbsolutePath = {
+    format = "[ci]abs",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByIRelativePath = {
+    format = "[i]rel",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByISymlinkAbsolutePath = {
+    format = "[si]abs",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByIsBroken = {
+    format = "⨯",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByIsDir = {
+    format = "dir",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByIsFile = {
+    format = "file",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByIsReadonly = {
+    format = "ro",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByIsSymlink = {
+    format = "sym",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByMimeEssence = {
+    format = "mime",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByRelativePath = {
+    format = "rel",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySize = {
+    format = "size",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkAbsolutePath = {
+    format = "[s]abs",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkExtension = {
+    format = "[s]ext",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkIsDir = {
+    format = "[s]dir",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkIsFile = {
+    format = "[s]file",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkIsReadonly = {
+    format = "[s]ro",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkMimeEssence = {
+    format = "[s]mime",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkSize = {
+    format = "[s]size",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
 }
 
 ------ Panel UI
 -------- Default
-xplr.config.general.panel_ui.default.borders = { "Top", "Right", "Bottom", "Left" }
+xplr.config.general.panel_ui.default.borders = {
+  "Top",
+  "Right",
+  "Bottom",
+  "Left",
+}
 xplr.config.general.panel_ui.default.style.add_modifiers = nil
 xplr.config.general.panel_ui.default.style.bg = nil
 xplr.config.general.panel_ui.default.style.fg = nil
@@ -262,7 +457,6 @@ xplr.config.general.panel_ui.table.title.style.bg = nil
 xplr.config.general.panel_ui.table.title.style.fg = nil
 xplr.config.general.panel_ui.table.title.style.sub_modifiers = nil
 
-
 ------ Table
 xplr.config.general.table.style.add_modifiers = nil
 xplr.config.general.table.style.bg = nil
@@ -274,20 +468,35 @@ xplr.config.general.table.col_spacing = 1
 
 -------- Col widths
 xplr.config.general.table.col_widths = {
-    { Percentage = 10 },
-    { Percentage = 50 },
-    { Percentage = 10 },
-    { Percentage = 10 },
-    { Percentage = 20 },
+  { Percentage = 10 },
+  { Percentage = 50 },
+  { Percentage = 10 },
+  { Percentage = 10 },
+  { Percentage = 20 },
 }
 
 -------- Header
 xplr.config.general.table.header.cols = {
-    { format = " index", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "╭──── path", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "permissions", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "size", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "type", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+  {
+    format = " index",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "╭──── path",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "permissions",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "size",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "type",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
 }
 xplr.config.general.table.header.height = 1
 xplr.config.general.table.header.style.add_modifiers = { "Bold" }
@@ -297,26 +506,26 @@ xplr.config.general.table.header.style.fg = nil
 
 -------- Row
 xplr.config.general.table.row.cols = {
-    {
-        format = "builtin.fmt_general_table_row_cols_0",
-        style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
-    },
-    {
-        format = "builtin.fmt_general_table_row_cols_1",
-        style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
-    },
-    {
-        format = "builtin.fmt_general_table_row_cols_2",
-        style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
-    },
-    {
-        format = "builtin.fmt_general_table_row_cols_3",
-        style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
-    },
-    {
-        format = "builtin.fmt_general_table_row_cols_4",
-        style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil }
-    },
+  {
+    format = "builtin.fmt_general_table_row_cols_0",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "builtin.fmt_general_table_row_cols_1",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "builtin.fmt_general_table_row_cols_2",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "builtin.fmt_general_table_row_cols_3",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "builtin.fmt_general_table_row_cols_4",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
 }
 xplr.config.general.table.row.height = 0
 xplr.config.general.table.row.style.add_modifiers = nil
@@ -326,9 +535,18 @@ xplr.config.general.table.row.style.sub_modifiers = nil
 
 -------- Tree
 xplr.config.general.table.tree = {
-    { format = "├─", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "├─", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
-    { format = "╰─", style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil } },
+  {
+    format = "├─",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "├─",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "╰─",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
 }
 
 ---- Node types
@@ -373,12 +591,12 @@ xplr.config.layouts.builtin.default = {
       vertical_margin = 0,
       constraints = {
         {
-          Percentage = 70
+          Percentage = 70,
         },
         {
-          Percentage = 30
-        }
-      }
+          Percentage = 30,
+        },
+      },
     },
     splits = {
       {
@@ -389,22 +607,22 @@ xplr.config.layouts.builtin.default = {
             vertical_margin = nil,
             constraints = {
               {
-                Length = 3
+                Length = 3,
               },
               {
-                Min = 1
+                Min = 1,
               },
               {
-                Length = 3
-              }
-            }
+                Length = 3,
+              },
+            },
           },
           splits = {
             "SortAndFilter",
             "Table",
             "InputAndLogs",
-          }
-        }
+          },
+        },
       },
       {
         Vertical = {
@@ -414,21 +632,21 @@ xplr.config.layouts.builtin.default = {
             vertical_margin = nil,
             constraints = {
               {
-                Percentage = 50
+                Percentage = 50,
               },
               {
-                Percentage = 50
+                Percentage = 50,
               },
-            }
+            },
           },
           splits = {
             "Selection",
             "HelpMenu",
-          }
-        }
-      }
-    }
-  }
+          },
+        },
+      },
+    },
+  },
 }
 
 ------ No help
@@ -440,12 +658,12 @@ xplr.config.layouts.builtin.no_help = {
       vertical_margin = nil,
       constraints = {
         {
-          Percentage = 70
+          Percentage = 70,
         },
         {
-          Percentage = 30
-        }
-      }
+          Percentage = 30,
+        },
+      },
     },
     splits = {
       {
@@ -456,26 +674,26 @@ xplr.config.layouts.builtin.no_help = {
             vertical_margin = nil,
             constraints = {
               {
-                Length = 3
+                Length = 3,
               },
               {
-                Min = 1
+                Min = 1,
               },
               {
-                Length = 3
-              }
-            }
+                Length = 3,
+              },
+            },
           },
           splits = {
             "SortAndFilter",
             "Table",
-            "InputAndLogs"
-          }
-        }
+            "InputAndLogs",
+          },
+        },
       },
-      "Selection"
-    }
-  }
+      "Selection",
+    },
+  },
 }
 
 ------ No selection
@@ -487,12 +705,12 @@ xplr.config.layouts.builtin.no_selection = {
       vertical_margin = nil,
       constraints = {
         {
-          Percentage = 70
+          Percentage = 70,
         },
         {
-          Percentage = 30
-        }
-      }
+          Percentage = 30,
+        },
+      },
     },
     splits = {
       {
@@ -503,26 +721,26 @@ xplr.config.layouts.builtin.no_selection = {
             vertical_margin = nil,
             constraints = {
               {
-                Length = 3
+                Length = 3,
               },
               {
-                Min = 1
+                Min = 1,
               },
               {
-                Length = 3
-              }
-            }
+                Length = 3,
+              },
+            },
           },
           splits = {
             "SortAndFilter",
             "Table",
             "InputAndLogs",
-          }
-        }
+          },
+        },
       },
-      "HelpMenu"
-    }
-  }
+      "HelpMenu",
+    },
+  },
 }
 
 ------ No help, no selection
@@ -534,22 +752,22 @@ xplr.config.layouts.builtin.no_help_no_selection = {
       vertical_margin = nil,
       constraints = {
         {
-          Length = 3
+          Length = 3,
         },
         {
-          Min = 1
+          Min = 1,
         },
         {
-          Length = 3
-        }
-      }
+          Length = 3,
+        },
+      },
     },
     splits = {
       "SortAndFilter",
       "Table",
       "InputAndLogs",
-    }
-  }
+    },
+  },
 }
 
 ---- Custom
@@ -566,7 +784,7 @@ xplr.config.modes.builtin.default = {
     on_key = {
       ["#"] = {
         help = nil,
-        messages = {"PrintAppStateAndQuit"}
+        messages = { "PrintAppStateAndQuit" },
       },
       ["."] = {
         help = "show hidden",
@@ -574,20 +792,20 @@ xplr.config.modes.builtin.default = {
           {
             ToggleNodeFilter = {
               filter = "RelativePathDoesNotStartWith",
-              input = "."
-            }
+              input = ".",
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       [":"] = {
         help = "action",
         messages = {
           "PopMode",
           {
-            SwitchModeBuiltin = "action"
+            SwitchModeBuiltin = "action",
           },
-        }
+        },
       },
       ["?"] = {
         help = "global help menu",
@@ -596,21 +814,21 @@ xplr.config.modes.builtin.default = {
             BashExec = [===[
             [ -z "$PAGER" ] && PAGER="less -+F"
             cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
-            ]===]
-          }
-        }
+            ]===],
+          },
+        },
       },
       ["G"] = {
         help = "go to bottom",
-        messages = {"PopMode", "FocusLast"}
+        messages = { "PopMode", "FocusLast" },
       },
       ["ctrl-a"] = {
         help = "select/unselect all",
-        messages = {"ToggleSelectAll"}
+        messages = { "ToggleSelectAll" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-f"] = {
         help = "search",
@@ -618,75 +836,75 @@ xplr.config.modes.builtin.default = {
           "PopMode",
           { SwitchModeBuiltin = "search" },
           { SetInputBuffer = "" },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-i"] = {
         help = "next visited path",
-        messages = {"NextVisitedPath"}
+        messages = { "NextVisitedPath" },
       },
       ["ctrl-o"] = {
         help = "last visited path",
-        messages = {"LastVisitedPath"}
+        messages = { "LastVisitedPath" },
       },
       ["ctrl-r"] = {
         help = "refresh screen",
-        messages = {"ClearScreen"}
+        messages = { "ClearScreen" },
       },
       ["ctrl-u"] = {
         help = "clear selection",
-        messages = {"ClearSelection"}
+        messages = { "ClearSelection" },
       },
       ["ctrl-w"] = {
         help = "switch layout",
         messages = {
           {
-            SwitchModeBuiltin = "switch_layout"
+            SwitchModeBuiltin = "switch_layout",
           },
-        }
+        },
       },
       ["d"] = {
         help = "delete",
         messages = {
           "PopMode",
           {
-            SwitchModeBuiltin = "delete"
+            SwitchModeBuiltin = "delete",
           },
-        }
+        },
       },
       down = {
         help = "down",
-        messages = {"FocusNext"}
+        messages = { "FocusNext" },
       },
       enter = {
         help = "quit with result",
-        messages = { "PrintResultAndQuit" }
+        messages = { "PrintResultAndQuit" },
       },
       esc = {
         help = nil,
-        messages = {}
+        messages = {},
       },
       ["f"] = {
         help = "filter",
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "filter" },
-        }
+        },
       },
       ["g"] = {
         help = "go to",
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "go_to" },
-        }
+        },
       },
       left = {
         help = "back",
-        messages = {"Back"}
+        messages = { "Back" },
       },
       ["q"] = {
         help = "quit",
-        messages = {"Quit"}
+        messages = { "Quit" },
       },
       ["r"] = {
         help = "rename",
@@ -696,28 +914,28 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
             echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
-            ]===]
+            ]===],
           },
-        }
+        },
       },
       right = {
         help = "enter",
-        messages = { "Enter" }
+        messages = { "Enter" },
       },
       ["s"] = {
         help = "sort",
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "sort" },
-        }
+        },
       },
       space = {
         help = "toggle selection",
-        messages = {"ToggleSelection", "FocusNext"}
+        messages = { "ToggleSelection", "FocusNext" },
       },
       up = {
         help = "up",
-        messages = {"FocusPrevious"}
+        messages = { "FocusPrevious" },
       },
       ["~"] = {
         help = "go home",
@@ -725,10 +943,10 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
             echo ChangeDirectory: "'"${HOME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
-            ]===]
-          }
-        }
-      }
+            ]===],
+          },
+        },
+      },
     },
     on_alphabet = nil,
     on_number = {
@@ -736,22 +954,37 @@ xplr.config.modes.builtin.default = {
       messages = {
         "PopMode",
         { SwitchModeBuiltin = "number" },
-        "BufferInputFromKey"
-      }
+        "BufferInputFromKey",
+      },
     },
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
-xplr.config.modes.builtin.default.key_bindings.on_key["tab"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
-xplr.config.modes.builtin.default.key_bindings.on_key["v"] = xplr.config.modes.builtin.default.key_bindings.on_key.space
-xplr.config.modes.builtin.default.key_bindings.on_key["V"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
-xplr.config.modes.builtin.default.key_bindings.on_key["/"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
-xplr.config.modes.builtin.default.key_bindings.on_key["h"] = xplr.config.modes.builtin.default.key_bindings.on_key.left
-xplr.config.modes.builtin.default.key_bindings.on_key["j"] = xplr.config.modes.builtin.default.key_bindings.on_key.down
-xplr.config.modes.builtin.default.key_bindings.on_key["k"] = xplr.config.modes.builtin.default.key_bindings.on_key.up
-xplr.config.modes.builtin.default.key_bindings.on_key["l"] = xplr.config.modes.builtin.default.key_bindings.on_key.right
+xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
+
+xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key.space
+
+xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+
+xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+
+xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key.left
+
+xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key.down
+
+xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key.up
+
+xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
+  xplr.config.modes.builtin.default.key_bindings.on_key.right
 
 ------ Recover
 xplr.config.modes.builtin.recover = {
@@ -762,21 +995,21 @@ xplr.config.modes.builtin.recover = {
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       esc = {
         help = "escape",
-        messages = {"PopMode"}
-      }
+        messages = { "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
     default = {
       help = nil,
-      messages = {}
-    }
-  }
+      messages = {},
+    },
+  },
 }
 
 ------ Selection ops
@@ -801,18 +1034,18 @@ xplr.config.modes.builtin.selection_ops = {
             echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
             echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
             read -p "[enter to continue]"
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       ["m"] = {
         help = "move here",
@@ -828,10 +1061,10 @@ xplr.config.modes.builtin.selection_ops = {
             done < "${XPLR_PIPE_SELECTION_OUT:?}")
             echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
             read -p "[enter to continue]"
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       ["x"] = {
         help = "open in gui",
@@ -851,18 +1084,18 @@ xplr.config.modes.builtin.selection_ops = {
             (while IFS= read -r line; do
             $OPENER "${line:?}" > /dev/null 2>&1
             done < "${XPLR_PIPE_RESULT_OUT:?}")
-            ]===]
+            ]===],
           },
           "ClearScreen",
           "PopMode",
-        }
-      }
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
 ------ Create
@@ -874,42 +1107,42 @@ xplr.config.modes.builtin.create = {
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["d"] = {
         help = "create directory",
         messages = {
           "PopMode",
           {
-            SwitchModeBuiltin = "create directory"
+            SwitchModeBuiltin = "create directory",
           },
           {
-            SetInputBuffer = ""
-          }
-        }
+            SetInputBuffer = "",
+          },
+        },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       ["f"] = {
         help = "create file",
         messages = {
           "PopMode",
           {
-            SwitchModeBuiltin = "create file"
+            SwitchModeBuiltin = "create file",
           },
           {
-            SetInputBuffer = ""
-          }
-        }
-      }
+            SetInputBuffer = "",
+          },
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
 ------ Create directory
@@ -921,23 +1154,23 @@ xplr.config.modes.builtin.create_directory = {
     on_key = {
       backspace = {
         help = "remove last character",
-        messages = {"RemoveInputBufferLastCharacter"}
+        messages = { "RemoveInputBufferLastCharacter" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            SetInputBuffer = ""
-          }
-        }
+            SetInputBuffer = "",
+          },
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
-        messages = {"RemoveInputBufferLastWord"}
+        messages = { "RemoveInputBufferLastWord" },
       },
       enter = {
         help = "create directory",
@@ -954,23 +1187,23 @@ xplr.config.modes.builtin.create_directory = {
             else
               echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
             fi
-            ]===]
-          }
-        }
+            ]===],
+          },
+        },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
-      }
+        messages = { "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
     default = {
       help = nil,
-      messages = {"BufferInputFromKey"}
-    }
-  }
+      messages = { "BufferInputFromKey" },
+    },
+  },
 }
 
 ------ Create file
@@ -982,23 +1215,23 @@ xplr.config.modes.builtin.create_file = {
     on_key = {
       backspace = {
         help = "remove last character",
-        messages = {"RemoveInputBufferLastCharacter"}
+        messages = { "RemoveInputBufferLastCharacter" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            SetInputBuffer = ""
-          }
-        }
+            SetInputBuffer = "",
+          },
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
-        messages = {"RemoveInputBufferLastWord"}
+        messages = { "RemoveInputBufferLastWord" },
       },
       enter = {
         help = "create file",
@@ -1015,23 +1248,23 @@ xplr.config.modes.builtin.create_file = {
             else
               echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
             fi
-            ]===]
-          }
-        }
+            ]===],
+          },
+        },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
-      }
+        messages = { "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
     default = {
       help = nil,
-      messages = {"BufferInputFromKey"}
-    }
-  }
+      messages = { "BufferInputFromKey" },
+    },
+  },
 }
 
 ------ Number
@@ -1043,53 +1276,55 @@ xplr.config.modes.builtin.number = {
     on_key = {
       backspace = {
         help = "remove last character",
-        messages = {"RemoveInputBufferLastCharacter"}
+        messages = { "RemoveInputBufferLastCharacter" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            SetInputBuffer = ""
-          }
-        }
+            SetInputBuffer = "",
+          },
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
-        messages = {"RemoveInputBufferLastWord"}
+        messages = { "RemoveInputBufferLastWord" },
       },
       down = {
         help = "to down",
-        messages = {"FocusNextByRelativeIndexFromInput", "PopMode"}
+        messages = { "FocusNextByRelativeIndexFromInput", "PopMode" },
       },
       enter = {
         help = "to index",
-        messages = {"FocusByIndexFromInput", "PopMode"}
+        messages = { "FocusByIndexFromInput", "PopMode" },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       up = {
         help = "to up",
-        messages = {"FocusPreviousByRelativeIndexFromInput", "PopMode"}
-      }
+        messages = { "FocusPreviousByRelativeIndexFromInput", "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = {
       help = "input",
-      messages = {"BufferInputFromKey"}
+      messages = { "BufferInputFromKey" },
     },
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
-xplr.config.modes.builtin.number.key_bindings.on_key["j"] = xplr.config.modes.builtin.number.key_bindings.on_key.down
-xplr.config.modes.builtin.number.key_bindings.on_key["k"] = xplr.config.modes.builtin.number.key_bindings.on_key.up
+xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
+  xplr.config.modes.builtin.number.key_bindings.on_key.down
+xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
+  xplr.config.modes.builtin.number.key_bindings.on_key.up
 
 ------ Go to
 xplr.config.modes.builtin.go_to = {
@@ -1100,19 +1335,19 @@ xplr.config.modes.builtin.go_to = {
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       ["f"] = {
         help = "follow symlink",
-        messages = {"FollowSymlink", "PopMode"}
+        messages = { "FollowSymlink", "PopMode" },
       },
       ["g"] = {
         help = "top",
-        messages = {"FocusFirst", "PopMode"}
+        messages = { "FocusFirst", "PopMode" },
       },
       ["x"] = {
         help = "open in gui",
@@ -1130,18 +1365,18 @@ xplr.config.modes.builtin.go_to = {
               fi
             fi
             $OPENER "${XPLR_FOCUS_PATH:?}" > /dev/null 2>&1
-            ]===]
+            ]===],
           },
           "ClearScreen",
           "PopMode",
-        }
-      }
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
 ------ Rename
@@ -1153,23 +1388,23 @@ xplr.config.modes.builtin.rename = {
     on_key = {
       backspace = {
         help = "remove last character",
-        messages = {"RemoveInputBufferLastCharacter"}
+        messages = { "RemoveInputBufferLastCharacter" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            SetInputBuffer = ""
-          }
-        }
+            SetInputBuffer = "",
+          },
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
-        messages = {"RemoveInputBufferLastWord"}
+        messages = { "RemoveInputBufferLastWord" },
       },
       enter = {
         help = "rename",
@@ -1182,24 +1417,24 @@ xplr.config.modes.builtin.rename = {
               && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
               && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
               && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
-      }
+        messages = { "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
     default = {
       help = nil,
-      messages = {"BufferInputFromKey"}
-    }
-  }
+      messages = { "BufferInputFromKey" },
+    },
+  },
 }
 
 ------ Delete
@@ -1223,14 +1458,14 @@ xplr.config.modes.builtin.delete = {
             done < "${XPLR_PIPE_RESULT_OUT:?}")
             echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
             read -p "[enter to continue]"
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["d"] = {
         help = "delete",
@@ -1254,21 +1489,21 @@ xplr.config.modes.builtin.delete = {
             done < "${XPLR_PIPE_RESULT_OUT:?}")
             echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
             read -p "[enter to continue]"
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
-      }
+        messages = { "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
 ------ Action
@@ -1284,25 +1519,25 @@ xplr.config.modes.builtin.action = {
           {
             Call = {
               command = "bash",
-              args = {"-i"}
-            }
+              args = { "-i" },
+            },
           },
           "ExplorePwdAsync",
           "PopMode",
-        }
+        },
       },
       ["c"] = {
         help = "create",
         messages = {
           "PopMode",
           {
-            SwitchModeBuiltin = "create"
+            SwitchModeBuiltin = "create",
           },
-        }
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["e"] = {
         help = "open in editor",
@@ -1310,14 +1545,14 @@ xplr.config.modes.builtin.action = {
           {
             BashExec = [===[
             ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       ["l"] = {
         help = "logs",
@@ -1326,34 +1561,34 @@ xplr.config.modes.builtin.action = {
             BashExec = [===[
             [ -z "$PAGER" ] && PAGER="less -+F"
             cat -- "${XPLR_PIPE_LOGS_OUT}" | ${PAGER:?}
-            ]===]
+            ]===],
           },
           "PopMode",
-        }
+        },
       },
       ["s"] = {
         help = "selection operations",
         messages = {
           "PopMode",
           {
-            SwitchModeBuiltin = "selection_ops"
+            SwitchModeBuiltin = "selection_ops",
           },
-        }
+        },
       },
       ["m"] = {
         help = "toggle mouse",
         messages = {
           "PopMode",
           "ToggleMouse",
-        }
+        },
       },
       ["q"] = {
         help = "quit options",
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "quit" },
-        }
-      }
+        },
+      },
     },
     on_alphabet = nil,
     on_number = {
@@ -1361,14 +1596,14 @@ xplr.config.modes.builtin.action = {
       messages = {
         "PopMode",
         {
-          SwitchModeBuiltin = "number"
+          SwitchModeBuiltin = "number",
         },
-        "BufferInputFromKey"
-      }
+        "BufferInputFromKey",
+      },
     },
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
 ------ Quit
@@ -1382,46 +1617,46 @@ xplr.config.modes.builtin.quit = {
         help = "just quit",
         messages = {
           "Quit",
-        }
+        },
       },
       p = {
         help = "quit printing pwd",
         messages = {
           "PrintPwdAndQuit",
-        }
+        },
       },
       f = {
         help = "quit printing focus",
         messages = {
           "PrintFocusPathAndQuit",
-        }
+        },
       },
       s = {
         help = "quit printing selection",
         messages = {
           "PrintSelectionAndQuit",
-        }
+        },
       },
       r = {
         help = "quit printing result",
         messages = {
           "PrintResultAndQuit",
-        }
+        },
       },
       esc = {
         help = "cancel",
         messages = {
           "PopMode",
-        }
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
         messages = {
           "Terminate",
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 }
 
 ------ Search
@@ -1435,95 +1670,95 @@ xplr.config.modes.builtin.search = {
         help = "remove last character",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "RemoveInputBufferLastCharacter",
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "RemoveInputBufferLastWord",
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       down = {
         help = "down",
-        messages = {"FocusNext"}
+        messages = { "FocusNext" },
       },
       enter = {
         help = "focus",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "PopMode",
           "ExplorePwdAsync",
-        }
+        },
       },
       left = {
         help = "back",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "Back",
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       right = {
         help = "enter",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "Enter",
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       tab = {
         help = "toggle selection",
-        messages = {"ToggleSelection", "FocusNext"}
+        messages = { "ToggleSelection", "FocusNext" },
       },
       up = {
         help = "up",
-        messages = {"FocusPrevious"}
-      }
+        messages = { "FocusPrevious" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
@@ -1532,21 +1767,24 @@ xplr.config.modes.builtin.search = {
       help = nil,
       messages = {
         {
-          RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          RemoveNodeFilterFromInput = "IRelativePathDoesContain",
         },
         "BufferInputFromKey",
         {
-          AddNodeFilterFromInput = "IRelativePathDoesContain"
+          AddNodeFilterFromInput = "IRelativePathDoesContain",
         },
-        "ExplorePwdAsync"
-      }
-    }
-  }
+        "ExplorePwdAsync",
+      },
+    },
+  },
 }
 
-xplr.config.modes.builtin.search.key_bindings.on_key["esc"] = xplr.config.modes.builtin.search.key_bindings.on_key.enter
-xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] = xplr.config.modes.builtin.search.key_bindings.on_key.down
-xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] = xplr.config.modes.builtin.search.key_bindings.on_key.up
+xplr.config.modes.builtin.search.key_bindings.on_key["esc"] =
+  xplr.config.modes.builtin.search.key_bindings.on_key.enter
+xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
+  xplr.config.modes.builtin.search.key_bindings.on_key.down
+xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
+  xplr.config.modes.builtin.search.key_bindings.on_key.up
 
 ------ Filter
 xplr.config.modes.builtin.filter = {
@@ -1559,61 +1797,62 @@ xplr.config.modes.builtin.filter = {
         help = "relative does not contain",
         messages = {
           {
-            SwitchModeBuiltin = "relative_path_does_not_contain"
+            SwitchModeBuiltin = "relative_path_does_not_contain",
           },
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
           {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       backspace = {
         help = "remove last filter",
-        messages = {"RemoveLastNodeFilter", "ExplorePwdAsync"}
+        messages = { "RemoveLastNodeFilter", "ExplorePwdAsync" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-r"] = {
         help = "reset filters",
-        messages = {"ResetNodeFilters", "ExplorePwdAsync"}
+        messages = { "ResetNodeFilters", "ExplorePwdAsync" },
       },
       ["ctrl-u"] = {
         help = "clear filters",
-        messages = {"ClearNodeFilters", "ExplorePwdAsync"}
+        messages = { "ClearNodeFilters", "ExplorePwdAsync" },
       },
       enter = {
         help = "done",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       ["r"] = {
         help = "relative does contain",
         messages = {
           {
-            SwitchModeBuiltin = "relative_path_does_contain"
+            SwitchModeBuiltin = "relative_path_does_contain",
           },
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
-      }
+          "ExplorePwdAsync",
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
-xplr.config.modes.builtin.filter.key_bindings.on_key["esc"] = xplr.config.modes.builtin.filter.key_bindings.on_key.enter
+xplr.config.modes.builtin.filter.key_bindings.on_key["esc"] =
+  xplr.config.modes.builtin.filter.key_bindings.on_key.enter
 
 ------ Relative path does contain
 xplr.config.modes.builtin.relative_path_does_contain = {
@@ -1626,61 +1865,61 @@ xplr.config.modes.builtin.relative_path_does_contain = {
         help = "remove last character",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "RemoveInputBufferLastCharacter",
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "RemoveInputBufferLastWord",
           {
-            AddNodeFilterFromInput = "IRelativePathDoesContain"
+            AddNodeFilterFromInput = "IRelativePathDoesContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       enter = {
         help = "apply filter",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       esc = {
         help = "cancel",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "PopMode",
           "ExplorePwdAsync",
-        }
-      }
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
@@ -1689,16 +1928,16 @@ xplr.config.modes.builtin.relative_path_does_contain = {
       help = nil,
       messages = {
         {
-          RemoveNodeFilterFromInput = "IRelativePathDoesContain"
+          RemoveNodeFilterFromInput = "IRelativePathDoesContain",
         },
         "BufferInputFromKey",
         {
-          AddNodeFilterFromInput = "IRelativePathDoesContain"
+          AddNodeFilterFromInput = "IRelativePathDoesContain",
         },
-        "ExplorePwdAsync"
-      }
-    }
-  }
+        "ExplorePwdAsync",
+      },
+    },
+  },
 }
 
 ------ Relative path does not contain
@@ -1712,61 +1951,61 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
         help = "remove last character",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
           "RemoveInputBufferLastCharacter",
           {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-u"] = {
         help = "remove line",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
           {
-            SetInputBuffer = ""
+            SetInputBuffer = "",
           },
           {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["ctrl-w"] = {
         help = "remove last word",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
           "RemoveInputBufferLastWord",
           {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       enter = {
         help = "apply filter",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       esc = {
         help = "cancel",
         messages = {
           {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
           },
           "PopMode",
-          "ExplorePwdAsync"
-        }
-      }
+          "ExplorePwdAsync",
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
@@ -1775,16 +2014,16 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
       help = nil,
       messages = {
         {
-          RemoveNodeFilterFromInput = "IRelativePathDoesNotContain"
+          RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
         },
         "BufferInputFromKey",
         {
-          AddNodeFilterFromInput = "IRelativePathDoesNotContain"
+          AddNodeFilterFromInput = "IRelativePathDoesNotContain",
         },
-        "ExplorePwdAsync"
-      }
-    }
-  }
+        "ExplorePwdAsync",
+      },
+    },
+  },
 }
 
 ------ Sort
@@ -1796,7 +2035,7 @@ xplr.config.modes.builtin.sort = {
     on_key = {
       ["!"] = {
         help = "reverse sorters",
-        messages = {"ReverseNodeSorters", "ExplorePwdAsync"}
+        messages = { "ReverseNodeSorters", "ExplorePwdAsync" },
       },
       ["E"] = {
         help = "by canonical extension reverse",
@@ -1804,11 +2043,11 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByCanonicalExtension",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["M"] = {
         help = "by canonical mime essence reverse",
@@ -1816,11 +2055,11 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByCanonicalMimeEssence",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["N"] = {
         help = "by node type reverse",
@@ -1828,23 +2067,23 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByCanonicalIsDir",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
           {
             AddNodeSorter = {
               sorter = "ByCanonicalIsFile",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
           {
             AddNodeSorter = {
               sorter = "ByIsSymlink",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["R"] = {
         help = "by relative path reverse",
@@ -1852,11 +2091,11 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByIRelativePath",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["S"] = {
         help = "by size reverse",
@@ -1864,27 +2103,27 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "BySize",
-              reverse = true
-            }
+              reverse = true,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       backspace = {
         help = "remove last sorter",
-        messages = {"RemoveLastNodeSorter", "ExplorePwdAsync"}
+        messages = { "RemoveLastNodeSorter", "ExplorePwdAsync" },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       ["ctrl-r"] = {
         help = "reset sorters",
-        messages = {"ResetNodeSorters", "ExplorePwdAsync"}
+        messages = { "ResetNodeSorters", "ExplorePwdAsync" },
       },
       ["ctrl-u"] = {
         help = "clear sorters",
-        messages = {"ClearNodeSorters", "ExplorePwdAsync"}
+        messages = { "ClearNodeSorters", "ExplorePwdAsync" },
       },
       ["e"] = {
         help = "by canonical extension",
@@ -1892,15 +2131,15 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByCanonicalExtension",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       enter = {
         help = "done",
-        messages = {"PopMode"}
+        messages = { "PopMode" },
       },
       ["m"] = {
         help = "by canonical mime essence",
@@ -1908,11 +2147,11 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByCanonicalMimeEssence",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["n"] = {
         help = "by node type",
@@ -1920,23 +2159,23 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByCanonicalIsDir",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
           {
             AddNodeSorter = {
               sorter = "ByCanonicalIsFile",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
           {
             AddNodeSorter = {
               sorter = "ByIsSymlink",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["r"] = {
         help = "by relative path",
@@ -1944,11 +2183,11 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "ByIRelativePath",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
-          "ExplorePwdAsync"
-        }
+          "ExplorePwdAsync",
+        },
       },
       ["s"] = {
         help = "by size",
@@ -1956,21 +2195,22 @@ xplr.config.modes.builtin.sort = {
           {
             AddNodeSorter = {
               sorter = "BySize",
-              reverse = false
-            }
+              reverse = false,
+            },
           },
-          "ExplorePwdAsync"
-        }
-      }
+          "ExplorePwdAsync",
+        },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
-xplr.config.modes.builtin.sort.key_bindings.on_key["esc"] = xplr.config.modes.builtin.sort.key_bindings.on_key.enter
+xplr.config.modes.builtin.sort.key_bindings.on_key["esc"] =
+  xplr.config.modes.builtin.sort.key_bindings.on_key.enter
 
 ------ Switch layout
 xplr.config.modes.builtin.switch_layout = {
@@ -1983,52 +2223,52 @@ xplr.config.modes.builtin.switch_layout = {
         help = "default",
         messages = {
           {
-            SwitchLayoutBuiltin = "default"
+            SwitchLayoutBuiltin = "default",
           },
           "PopMode",
-        }
+        },
       },
       ["2"] = {
         help = "no help menu",
         messages = {
           {
-            SwitchLayoutBuiltin = "no_help"
+            SwitchLayoutBuiltin = "no_help",
           },
           "PopMode",
-        }
+        },
       },
       ["3"] = {
         help = "no selection panel",
         messages = {
           {
-            SwitchLayoutBuiltin = "no_selection"
+            SwitchLayoutBuiltin = "no_selection",
           },
           "PopMode",
-        }
+        },
       },
       ["4"] = {
         help = "no help or selection",
         messages = {
           {
-            SwitchLayoutBuiltin = "no_help_no_selection"
+            SwitchLayoutBuiltin = "no_help_no_selection",
           },
           "PopMode",
-        }
+        },
       },
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = { "Terminate" },
       },
       esc = {
         help = "cancel",
-        messages = {"PopMode"}
-      }
+        messages = { "PopMode" },
+      },
     },
     on_alphabet = nil,
     on_number = nil,
     on_special_character = nil,
-    default = nil
-  }
+    default = nil,
+  },
 }
 
 ---- Custom
@@ -2088,7 +2328,6 @@ end
 
 -------- Format permissions column
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
-
   local no_color = os.getenv("NO_COLOR")
 
   local function green(x)
@@ -2106,7 +2345,6 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
       return x
     end
   end
-
 
   local function red(x)
     if no_color == nil then
