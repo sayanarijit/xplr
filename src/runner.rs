@@ -99,7 +99,8 @@ fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
 pub struct Runner {
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
-    config: Option<PathBuf>,
+    config_file: Option<PathBuf>,
+    extra_config_files: Vec<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
     read_only: bool,
 }
@@ -120,7 +121,8 @@ impl Runner {
         Ok(Self {
             pwd,
             focused_path,
-            config: None,
+            config_file: Default::default(),
+            extra_config_files: Default::default(),
             on_load: Default::default(),
             read_only: Default::default(),
         })
@@ -131,8 +133,13 @@ impl Runner {
         self
     }
 
-    pub fn with_config(mut self, config: Option<PathBuf>) -> Self {
-        self.config = config;
+    pub fn with_config(mut self, config_file: Option<PathBuf>) -> Self {
+        self.config_file = config_file;
+        self
+    }
+
+    pub fn with_extra_config(mut self, config_files: Vec<PathBuf>) -> Self {
+        self.extra_config_files = config_files;
         self
     }
 
@@ -144,7 +151,7 @@ impl Runner {
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
-        let mut app = app::App::create(self.pwd, &lua, self.config)?;
+        let mut app = app::App::create(self.pwd, &lua, self.config_file, self.extra_config_files)?;
         app.config.general.set_read_only(self.read_only);
 
         fs::create_dir_all(app.session_path())?;
