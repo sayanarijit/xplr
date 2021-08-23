@@ -1536,8 +1536,13 @@ pub struct App {
 }
 
 impl App {
-    pub fn create(pwd: PathBuf, lua: &mlua::Lua, config_file: Option<PathBuf>) -> Result<Self> {
-        let config = lua::init(lua)?;
+    pub fn create(
+        pwd: PathBuf,
+        lua: &mlua::Lua,
+        config_file: Option<PathBuf>,
+        extra_config_files: Vec<PathBuf>,
+    ) -> Result<Self> {
+        let mut config = lua::init(lua)?;
 
         let config_file = if let Some(path) = config_file {
             path
@@ -1547,14 +1552,19 @@ impl App {
             PathBuf::from("/").join("etc").join("xplr").join("init.lua")
         };
 
-        let (config, load_err) = if config_file.exists() {
+        let config_files = std::iter::once(config_file).chain(extra_config_files.into_iter());
+
+        let mut load_errs = vec![];
+        for config_file in config_files {
             match lua::extend(lua, &config_file.to_string_lossy().to_string()) {
-                Ok(c) => (c, None),
-                Err(e) => (config, Some(e.to_string())),
+                Ok(c) => {
+                    config = c;
+                }
+                Err(e) => {
+                    load_errs.push(e.to_string());
+                }
             }
-        } else {
-            (config, None)
-        };
+        }
 
         let mode = match config.modes().get(
             &config
@@ -1606,7 +1616,7 @@ impl App {
         env::set_current_dir(&pwd)?;
         let pwd = pwd.to_string_lossy().to_string();
 
-        let app = Self {
+        let mut app = Self {
             version: VERSION.to_string(),
             config,
             pwd,
@@ -1629,11 +1639,11 @@ impl App {
 
         fs::create_dir_all(app.session_path())?;
 
-        if let Some(err) = load_err {
-            app.log_error(err)
-        } else {
-            Ok(app)
+        for err in load_errs {
+            app = app.log_error(err)?
         }
+
+        Ok(app)
     }
 
     pub fn focused_node(&self) -> Option<&Node> {

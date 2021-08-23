@@ -14,6 +14,7 @@ struct Cli {
     read_only: bool,
     path: Option<PathBuf>,
     config: Option<PathBuf>,
+    extra_config: Vec<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
 }
 
@@ -50,6 +51,17 @@ impl Cli {
 
                 // Options
                 "-c" | "--config" => cli.config = args.pop_front().map(PathBuf::from),
+
+                "-C" | "--extra-config" => {
+                    while let Some(path) = args.pop_front() {
+                        if path.starts_with('-') {
+                            args.push_front(path);
+                            break;
+                        } else {
+                            cli.extra_config.push(PathBuf::from(path));
+                        }
+                    }
+                }
 
                 "--read-only" => cli.read_only = true,
 
@@ -94,9 +106,10 @@ fn main() {
     -V, --version      Prints version information"###;
 
         let options = r###"
-    -c, --config <PATH>           Specifies a custom config file (default is
-                                    "$HOME/.config/xplr/init.lua")
-        --on-load <MESSAGE>...    Sends messages when xplr loads"###;
+    -c, --config <PATH>            Specifies a custom config file (default is
+                                     "$HOME/.config/xplr/init.lua")
+    -C, --extra-config <PATH>...   Specifies extra config files to load
+        --on-load <MESSAGE>...     Sends messages when xplr loads"###;
 
         let args = r###"
     <PATH>    Path to focus on, or enter if directory"###;
@@ -120,6 +133,7 @@ fn main() {
         match app::runner(cli.path.clone())
             .map(|a| a.with_on_load(cli.on_load.clone()))
             .map(|a| a.with_config(cli.config.clone()))
+            .map(|a| a.with_extra_config(cli.extra_config.clone()))
             .map(|a| a.with_read_only(cli.read_only))
             .and_then(|a| a.run())
         {

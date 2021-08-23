@@ -2403,9 +2403,9 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   elseif p.other_execute == true and p.setuid == false then
     r = r .. bit("x", red, p.other_execute)
   elseif p.other_execute == false and p.setuid == true then
-    r = r .. bit("S", red, p.other_execute)
+    r = r .. bit("T", red, p.other_execute)
   else
-    r = r .. bit("s", red, p.other_execute)
+    r = r .. bit("t", red, p.other_execute)
   end
 
   return r

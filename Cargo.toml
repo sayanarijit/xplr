@@ -18,25 +18,25 @@ categories = ["command-line-interface", "command-line-utilities"]
 name = "xplr"
 
 [dependencies]
-tui = { version = "0.15.0", default-features = false, features = ['crossterm', 'serde'] }
+tui = { version = "0.16.0", default-features = false, features = ['crossterm', 'serde'] }
 crossterm = "0.20.0"
 dirs = "3.0.2"
-serde = { version = "1.0.126", features = ["derive"] }
-serde_yaml = "0.8.17"
+serde = { version = "1.0.128", features = ["derive"] }
+serde_yaml = "0.8.19"
 mime_guess = "2.0.3"
-anyhow = "1.0.42"
+anyhow = "1.0.43"
 chrono = { version = "0.4.19", features = ["serde"] }
 lazy_static = "1.4.0"
 indexmap = { version = "1.7.0", features = ["serde"] }
 natord = "1.0.9"
 humansize = "1.1.1"
 mlua = { version = "0.6.2", features = ["luajit", "vendored", "serialize", "send"] }
-ansi-to-tui = "0.3.0"
-libc = "0.2.98"
+ansi-to-tui = "0.4.0"
+libc = "0.2.100"
 
 [dev-dependencies]
 criterion = "0.3.5"
-assert_cmd = "1.0.7"
+assert_cmd = "2.0.0"
 
 [[bench]]
 name = "criterion"
