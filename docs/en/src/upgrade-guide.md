@@ -46,7 +46,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.13.7][2] -> [v0.14.5][3]
+#### [v0.13.7][2] -> [v0.14.6][3]
 
 - macOS users need to place their config file (`init.lua`) in
   `$HOME/.config/xplr/` or `/etc/xplr/`.
@@ -61,6 +61,8 @@ compatibility.
   which can be set to a file path to start a fifo when xplr starts.
 - Since version `v0.14.4`, `$XPLR_SESSION_PATH` can be used to dump session
   related data.
+- Since version `v0.14.6`, the `-C` or `--extra-config` CLI argument is
+  available.
 
 <sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
@@ -220,7 +222,7 @@ Else do the following:
 
 [1]:#instructions
 [2]:https://github.com/sayanarijit/xplr/releases/tag/v0.13.7
-[3]:https://github.com/sayanarijit/xplr/releases/tag/v0.14.5
+[3]:https://github.com/sayanarijit/xplr/releases/tag/v0.14.6
 [4]:https://github.com/sayanarijit/xplr/pull/229#issue-662426960
 [5]:contribute.md
 [6]:https://github.com/sayanarijit/xplr/releases/tag/v0.12.1
