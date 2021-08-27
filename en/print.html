@@ -1283,7 +1283,7 @@ it will be null.</p>
 <p>If the node is a symlink and is not broken, it will hold information about the
 symlink resolved node. However, it will never hold information about the actual
 node. It will instead be null.</p>
-<h3 id="example"><a class="header" href="#example">Example:</a></h3>
+<h3 id="example-using-lua-function-calls"><a class="header" href="#example-using-lua-function-calls">Example: Using Lua Function Calls</a></h3>
 <pre><code class="language-lua">-- Define the function
 xplr.fn.custom.ask_name_and_greet = function(app)
   print(&quot;What's your name?&quot;)
@@ -1374,7 +1374,7 @@ handled by xplr after the command execution.</p>
 <h4 id="xplr_pipe_directory_nodes_out"><a class="header" href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></h4>
 <p>New-line delimited list of paths, filtered and sorted as displayed in the
 <a href="layouts.html#table">files table</a>.</p>
-<h3 id="example-1"><a class="header" href="#example-1">Example:</a></h3>
+<h3 id="example-using-environment-variables-and-pipes"><a class="header" href="#example-using-environment-variables-and-pipes">Example: Using Environment Variables and Pipes</a></h3>
 <pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.space = {
   help = &quot;ask name and greet&quot;,
   messages = {
@@ -1523,7 +1523,7 @@ applied of the list of paths being displayed.</p>
 <h2 id="splits"><a class="header" href="#splits">splits</a></h2>
 <p>Type: list of <a href="layouts.html#layout">Layout</a></p>
 <p>The list of child layouts to fit into the parent layout.</p>
-<h2 id="example-2"><a class="header" href="#example-2">Example</a></h2>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
 <p><a href="https://gifyu.com/image/1X38"><img src="https://s6.gifyu.com/images/layout.png" alt="layout.png" /></a></p>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {
   Horizontal = {
@@ -1693,7 +1693,7 @@ metadata is set for the <a href="node_types.html#directory">directory</a>, <a hr
 <li>&quot;Hidden&quot;</li>
 <li>&quot;CrossedOut&quot;</li>
 </ul>
-<h2 id="example-3"><a class="header" href="#example-3">Example</a></h2>
+<h2 id="example-1"><a class="header" href="#example-1">Example</a></h2>
 <pre><code class="language-lua">xplr.config.general.cursor.style.fg = &quot;Red&quot;
 xplr.config.general.cursor.style.bg = { Rgb = { 100, 150, 200 } }
 xplr.config.general.cursor.style.add_modifiers = { &quot;Bold&quot;, &quot;Italic&quot; }
@@ -1751,7 +1751,7 @@ the node is a symlink.</p>
 <h3 id="reverse"><a class="header" href="#reverse">reverse</a></h3>
 <p>Type: boolean</p>
 <p>It defined the direction of the order.</p>
-<h2 id="example-4"><a class="header" href="#example-4">Example</a></h2>
+<h2 id="example-2"><a class="header" href="#example-2">Example</a></h2>
 <pre><code class="language-lua">xplr.config.general.initial_sorting = {
     { sorter = &quot;ByCanonicalIsDir&quot;, reverse = true },
     { sorter = &quot;ByIRelativePath&quot;, reverse = false },
@@ -1815,7 +1815,7 @@ condition: <em>relative path does not contain <code>xyz</code></em> (case insens
 <h3 id="input"><a class="header" href="#input">input</a></h3>
 <p>Type: string</p>
 <p>The input for the condition.</p>
-<h2 id="example-5"><a class="header" href="#example-5">Example:</a></h2>
+<h2 id="example-3"><a class="header" href="#example-3">Example:</a></h2>
 <pre><code class="language-lua">ToggleNodeFilter = {
   filter = &quot;RelativePathDoesNotStartWith&quot;,
   input = &quot;.&quot;
@@ -1980,7 +1980,7 @@ node. It will instead be null.</p>
 <li><a href="column-renderer.html#size">size</a></li>
 <li><a href="column-renderer.html#human_size">human_size</a></li>
 </ul>
-<h2 id="example-6"><a class="header" href="#example-6">Example</a></h2>
+<h2 id="example-customizing-table-renderer"><a class="header" href="#example-customizing-table-renderer">Example: Customizing Table Renderer</a></h2>
 <pre><code class="language-lua">xplr.fn.custom.fmt_simple_column = function(m)
   return m.prefix .. m.relative_path .. m.suffix
 end
@@ -2270,6 +2270,13 @@ to append <code>.xplr</code> to the name to make them distinguishable. Similar t
 <a href="https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell">let us know</a>.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for xplr plugin examples.</p>
+<h2 id="also-see"><a class="header" href="#also-see">Also See</a></h2>
+<ul>
+<li><a href="modes.html#tutorial-adding-a-new-mode">Tutorial: Adding a New Mode</a></li>
+<li><a href="message.html#example-using-environment-variables-and-pipes">Example: Using Environment Variables and Pipes</a></li>
+<li><a href="message.html#example-using-lua-function-calls">Example: Using Lua Function Calls</a></li>
+<li><a href="column-renderer.html#example-customizing-table-renderer">Example: Customizing Table Renderer</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="awesome-plugins"><a class="header" href="#awesome-plugins">Awesome Plugins</a></h1>
 <p>Here's a list of awesome xplr plugins that you might want to check out. If none
 of the following plugins work for you, it's very easy to
