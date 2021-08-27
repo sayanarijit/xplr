@@ -253,8 +253,8 @@ It contains the following fields.
 - [human_size][14]
 
 
-Example
--------
+Example: Customizing Table Renderer
+-----------------------------------
 
 ```lua
 xplr.fn.custom.fmt_simple_column = function(m)

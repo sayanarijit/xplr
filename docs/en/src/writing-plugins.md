@@ -66,6 +66,15 @@ Examples
 Visit [Awesome Plugins][5] for xplr plugin examples.
 
 
+Also See
+--------
+
+- [Tutorial: Adding a New Mode](modes.md#tutorial-adding-a-new-mode)
+- [Example: Using Environment Variables and Pipes](message.md#example-using-environment-variables-and-pipes)
+- [Example: Using Lua Function Calls](message.md#example-using-lua-function-calls)
+- [Example: Customizing Table Renderer](column-renderer.md#example-customizing-table-renderer)
+
+
 [1]:https://www.lua.org
 [2]:https://github.com/sayanarijit/plugin-template1.xplr
 [3]:https://neovim.io

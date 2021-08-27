@@ -983,7 +983,7 @@ symlink resolved node. However, it will never hold information about the actual
 node. It will instead be null.
 
 
-### Example:
+### Example: Using Lua Function Calls
 
 ```lua
 -- Define the function
@@ -1108,7 +1108,7 @@ New-line delimited list of paths, filtered and sorted as displayed in the
 [files table][28].
 
 
-### Example:
+### Example: Using Environment Variables and Pipes
 
 ```lua
 xplr.config.modes.builtin.default.key_bindings.on_key.space = {
