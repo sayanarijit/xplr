@@ -153,4 +153,10 @@ mod test {
         // Next bugfix release is ERR (Change when we get to v1)
         assert!(check_version("0.14.7", "foo path").is_err());
     }
+
+    #[test]
+    fn test_upgrade_guide_has_latest_version() {
+        let guide = std::fs::read_to_string("docs/en/src/upgrade-guide.md").unwrap();
+        assert!(guide.contains(VERSION));
+    }
 }
