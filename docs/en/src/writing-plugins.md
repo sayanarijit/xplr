@@ -69,10 +69,10 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 Also See
 --------
 
-- [Tutorial: Adding a New Mode](modes.md#tutorial-adding-a-new-mode)
-- [Example: Using Environment Variables and Pipes](message.md#example-using-environment-variables-and-pipes)
-- [Example: Using Lua Function Calls](message.md#example-using-lua-function-calls)
-- [Example: Customizing Table Renderer](column-renderer.md#example-customizing-table-renderer)
+- [Tutorial: Adding a New Mode][6]
+- [Example: Using Environment Variables and Pipes][7]
+- [Example: Using Lua Function Calls][8]
+- [Example: Customizing Table Renderer][9]
 
 
 [1]:https://www.lua.org
@@ -80,3 +80,7 @@ Also See
 [3]:https://neovim.io
 [4]:https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
 [5]:awesome-plugins.md
+[6]:modes.md#tutorial-adding-a-new-mode
+[7]:message.md#example-using-environment-variables-and-pipes
+[8]:message.md#example-using-lua-function-calls
+[9]:column-renderer.md#example-customizing-table-renderer
