@@ -1255,7 +1255,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [63]:#nodes
 [64]:#total
 [65]:#focus
-[66]:#https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html
+[66]:https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html
 [67]:#history
 [68]:#loc
 [69]:#paths
