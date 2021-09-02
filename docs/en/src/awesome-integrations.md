@@ -18,20 +18,21 @@ Categories
 Editor
 ------
 
-- [xplr.vim][5]
-- [vim-floaterm][6]
+- [**vim-floaterm**][6] xplr integrated in vim-floaterm (Neo)vim plugin.
+- [**xplr.nvim**][9] Opens xplr inside nvim, and hosts a msgpack client inside xplr.
+- [**xplr.vim**][5] Pick files in Vim using xplr.
 
 
 Shell
 -----
 
-- [powerlevel10k][7]
+- [**powerlevel10k**][7] Powerlevel10k prompt for xplr shell.
 
 
 Security Tools
 --------------
 
-- [gpg-tui][8]
+- [**gpg-tui**][8] Import GPG certificates using xplr.
 
 
 [1]:https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
@@ -42,3 +43,4 @@ Security Tools
 [6]:https://github.com/voldikss/vim-floaterm#xplr
 [7]:https://github.com/romkatv/powerlevel10k/blob/191d1b89e325ee3b6d2d75a394654aaf4f077a7c/internal/p10k.zsh#L4756-L4768
 [8]:https://github.com/orhun/gpg-tui#importreceive
+[9]:https://github.com/fhill2/xplr.nvim

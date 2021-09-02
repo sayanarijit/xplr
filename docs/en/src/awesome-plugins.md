@@ -32,6 +32,8 @@ Integration
   support.
 - [**fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
   into a directory.
+- [**nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
+  [nvim-ctrl][36].
 - [**paste-rs.xplr**][23] Use this plugin to paste your files to
   [paste.rs][24], and open/delete them later using [fzf][9].
 - [**preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
@@ -87,3 +89,5 @@ Theme
 [32]:#extension
 [33]:https://github.com/sayanarijit/alacritty.xplr
 [34]:https://github.com/alacritty/alacritty
+[35]:https://github.com/sayanarijit/nvim-ctrl.xplr
+[36]:https://github.com/chmln/nvim-ctrl
