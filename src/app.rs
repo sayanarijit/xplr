@@ -1562,9 +1562,9 @@ impl App {
             }
         };
 
-        let config_files = std::iter::once(config_file)
-            .chain(extra_config_files.into_iter().map(Some))
-            .filter_map(|x| x);
+        let config_files = config_file
+            .into_iter()
+            .chain(extra_config_files.into_iter());
 
         let mut load_errs = vec![];
         for config_file in config_files {
@@ -1605,13 +1605,23 @@ impl App {
         };
 
         let pid = std::process::id();
-        let session_path = dirs::runtime_dir()
+        let mut session_path = dirs::runtime_dir()
             .unwrap_or_else(env::temp_dir)
             .join("xplr")
             .join("session")
             .join(&pid.to_string())
             .to_string_lossy()
             .to_string();
+
+        if fs::create_dir_all(&session_path).is_err() {
+            session_path = env::temp_dir()
+                .join("xplr")
+                .join("session")
+                .join(&pid.to_string())
+                .to_string_lossy()
+                .to_string();
+            fs::create_dir_all(&session_path)?;
+        }
 
         let mut explorer_config = ExplorerConfig::default();
         if !config.general().show_hidden() {
@@ -1648,8 +1658,6 @@ impl App {
             history: Default::default(),
             last_modes: Default::default(),
         };
-
-        fs::create_dir_all(app.session_path())?;
 
         for err in load_errs {
             app = app.log_error(err)?
