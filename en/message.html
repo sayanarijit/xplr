@@ -583,6 +583,7 @@ messages which will be handled by xplr.</p>
 <p>xplr version. Can be used to test compatibility.</p>
 <h3 id="config"><a class="header" href="#config">config</a></h3>
 <p>Type: <a href="configuration.html#config">Config</a></p>
+<p>The loaded configuration.</p>
 <h3 id="pwd"><a class="header" href="#pwd">pwd</a></h3>
 <p>Type: string</p>
 <p>The present working directory/</p>
@@ -590,7 +591,8 @@ messages which will be handled by xplr.</p>
 <p>Type: nullable <a href="#node">Node</a></p>
 <p>The node under focus.</p>
 <h3 id="directory_buffer"><a class="header" href="#directory_buffer">directory_buffer</a></h3>
-<p>TODO</p>
+<p>Type: nullable <a href="#directorybuffer">DirectoryBuffer</a></p>
+<p>The directory buffer being rendered.</p>
 <h3 id="selection"><a class="header" href="#selection">selection</a></h3>
 <p>Type: list of selected <a href="#node">Node</a>s</p>
 <p>The selected nodes.</p>
@@ -610,31 +612,12 @@ messages which will be handled by xplr.</p>
 <p>Type: string</p>
 <p>The session path.</p>
 <h3 id="explorer_config"><a class="header" href="#explorer_config">explorer_config</a></h3>
-<p>TODO</p>
+<p><a href="#https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html">TODO</a></p>
 <h3 id="history"><a class="header" href="#history">history</a></h3>
-<p>TODO</p>
+<p>Type: <a href="#history-1">History</a></p>
 <h3 id="last_modes"><a class="header" href="#last_modes">last_modes</a></h3>
 <p>Type: list of <a href="modes.html#mode">Mode</a></p>
 <p>Last modes, not popped yet.</p>
-<h3 id="node"><a class="header" href="#node">Node</a></h3>
-<p>A node contains the following fields:</p>
-<ul>
-<li><a href="#parent">parent</a></li>
-<li><a href="#relative_path">relative_path</a></li>
-<li><a href="#absolute_path">absolute_path</a></li>
-<li><a href="#extension">extension</a></li>
-<li><a href="#is_symlink">is_symlink</a></li>
-<li><a href="#is_broken">is_broken</a></li>
-<li><a href="#is_dir">is_dir</a></li>
-<li><a href="#is_file">is_file</a></li>
-<li><a href="#is_readonly">is_readonly</a></li>
-<li><a href="#mime_essence">mime_essence</a></li>
-<li><a href="#size">size</a></li>
-<li><a href="#human_size">human_size</a></li>
-<li><a href="#permissions">permissions</a></li>
-<li><a href="#canonical">canonical</a></li>
-<li><a href="#symlink">symlink</a></li>
-</ul>
 <h3 id="parent"><a class="header" href="#parent">parent</a></h3>
 <p>Type: string</p>
 <p>The parent path of the node.</p>
@@ -685,6 +668,58 @@ it will be null.</p>
 <p>If the node is a symlink and is not broken, it will hold information about the
 symlink resolved node. However, it will never hold information about the actual
 node. It will instead be null.</p>
+<h3 id="node"><a class="header" href="#node">Node</a></h3>
+<p>A node contains the following fields:</p>
+<ul>
+<li><a href="#parent">parent</a></li>
+<li><a href="#relative_path">relative_path</a></li>
+<li><a href="#absolute_path">absolute_path</a></li>
+<li><a href="#extension">extension</a></li>
+<li><a href="#is_symlink">is_symlink</a></li>
+<li><a href="#is_broken">is_broken</a></li>
+<li><a href="#is_dir">is_dir</a></li>
+<li><a href="#is_file">is_file</a></li>
+<li><a href="#is_readonly">is_readonly</a></li>
+<li><a href="#mime_essence">mime_essence</a></li>
+<li><a href="#size">size</a></li>
+<li><a href="#human_size">human_size</a></li>
+<li><a href="#permissions">permissions</a></li>
+<li><a href="#canonical">canonical</a></li>
+<li><a href="#symlink">symlink</a></li>
+</ul>
+<h3 id="directorybuffer"><a class="header" href="#directorybuffer">DirectoryBuffer</a></h3>
+<p>Directory buffer contains the following fields:</p>
+<ul>
+<li><a href="#parent">parent</a></li>
+<li><a href="#nodes">nodes</a></li>
+<li><a href="#total">total</a></li>
+<li><a href="#focus">focus</a></li>
+</ul>
+<h4 id="parent-1"><a class="header" href="#parent-1">parent</a></h4>
+<p>Type: string</p>
+<p>The parent path of the node.</p>
+<h4 id="nodes"><a class="header" href="#nodes">nodes</a></h4>
+<p>Type: list of <a href="#node">Node</a>s</p>
+<p>A list of visible nodes.</p>
+<h4 id="total"><a class="header" href="#total">total</a></h4>
+<p>Type: int</p>
+<p>The count of nodes being rendered.</p>
+<h4 id="focus"><a class="header" href="#focus">focus</a></h4>
+<p>Type: int</p>
+<p>The index of the node under focus. It can be <code>0</code> even when there's no node to
+focus on.</p>
+<h3 id="history-1"><a class="header" href="#history-1">History</a></h3>
+<p>History contains the following fields:</p>
+<ul>
+<li><a href="#loc">loc</a></li>
+<li><a href="#paths">paths</a></li>
+</ul>
+<h4 id="loc"><a class="header" href="#loc">loc</a></h4>
+<p>Type: int</p>
+<p>Location of the current path in history.</p>
+<h4 id="paths"><a class="header" href="#paths">paths</a></h4>
+<p>Type: list of string</p>
+<p>Visited paths.</p>
 <h3 id="example-using-lua-function-calls"><a class="header" href="#example-using-lua-function-calls">Example: Using Lua Function Calls</a></h3>
 <pre><code class="language-lua">-- Define the function
 xplr.fn.custom.ask_name_and_greet = function(app)
