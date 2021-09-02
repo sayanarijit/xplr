@@ -17,10 +17,10 @@ Categories
 Extension
 ---------
 
+- [**comex.xplr**][21] One xplr plugin to compress and extract them all.
+- [**command-mode.xplr**][37] The missing command mode for xplr.
 - [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
-- [**completion.xplr**][25] The missing tab completion for xplr input buffer.
-- [**comex.xplr**][21] One xplr plugin to compress and extract them all.
 
 
 Integration
@@ -91,3 +91,4 @@ Theme
 [34]:https://github.com/alacritty/alacritty
 [35]:https://github.com/sayanarijit/nvim-ctrl.xplr
 [36]:https://github.com/chmln/nvim-ctrl
+[37]:https://github.com/sayanarijit/command-mode.xplr
