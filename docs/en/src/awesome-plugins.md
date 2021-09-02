@@ -26,7 +26,7 @@ Extension
 Integration
 -----------
 
-- [**alacritty.xplr**][32] [Alacritty][33] integration for xplr.
+- [**alacritty.xplr**][33] [Alacritty][34] integration for xplr.
 - [**dragon.xplr**][4] Drag and drop files using [dragon][5].
 - [**dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
   support.
@@ -86,4 +86,4 @@ Theme
 [31]:https://github.com/sayanarijit/zentable.xplr
 [32]:#extension
 [33]:https://github.com/sayanarijit/alacritty.xplr
-[34]: https://github.com/alacritty/alacritty
+[34]:https://github.com/alacritty/alacritty
