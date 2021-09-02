@@ -133,30 +133,30 @@ mod test {
         assert!(check_version(VERSION, "foo path").is_ok());
 
         // Current release if OK
-        assert!(check_version("0.14.6", "foo path").is_ok());
+        assert!(check_version("0.14.7", "foo path").is_ok());
 
         // Prev major release is ERR
         // - Not yet
 
         // Prev minor release is ERR (Change when we get to v1)
-        assert!(check_version("0.13.6", "foo path").is_err());
+        assert!(check_version("0.13.7", "foo path").is_err());
 
         // Prev bugfix release is OK
-        assert!(check_version("0.14.5", "foo path").is_ok());
+        assert!(check_version("0.14.6", "foo path").is_ok());
 
         // Next major release is ERR
-        assert!(check_version("1.14.6", "foo path").is_err());
+        assert!(check_version("1.14.7", "foo path").is_err());
 
         // Next minor release is ERR
-        assert!(check_version("0.15.6", "foo path").is_err());
+        assert!(check_version("0.15.7", "foo path").is_err());
 
         // Next bugfix release is ERR (Change when we get to v1)
-        assert!(check_version("0.14.7", "foo path").is_err());
+        assert!(check_version("0.14.8", "foo path").is_err());
     }
 
     #[test]
     fn test_upgrade_guide_has_latest_version() {
-        let guide = std::fs::read_to_string("docs/en/src/upgrade-guide.md").unwrap();
+        let guide = include_str!("../docs/en/src/upgrade-guide.md");
         assert!(guide.contains(VERSION));
     }
 }
