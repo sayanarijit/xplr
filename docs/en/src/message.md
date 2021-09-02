@@ -793,6 +793,7 @@ xplr version. Can be used to test compatibility.
 
 Type: [Config][43]
 
+The loaded configuration.
 
 ### pwd
 
@@ -808,7 +809,9 @@ The node under focus.
 
 ### directory_buffer
 
-TODO
+Type: nullable [DirectoryBuffer][62]
+
+The directory buffer being rendered.
 
 ### selection
 
@@ -848,40 +851,18 @@ The session path.
 
 ### explorer_config
 
-TODO
+[TODO][66]
 
 
 ### history
 
-TODO
-
+Type: [History][70]
 
 ### last_modes
 
 Type: list of [Mode][8]
 
 Last modes, not popped yet.
-
-
-### Node
-
-A node contains the following fields:
-
-- [parent][45]
-- [relative_path][46]
-- [absolute_path][47]
-- [extension][48]
-- [is_symlink][49]
-- [is_broken][50]
-- [is_dir][51]
-- [is_file][52]
-- [is_readonly][53]
-- [mime_essence][54]
-- [size][55]
-- [human_size][56]
-- [permissions][57]
-- [canonical][58]
-- [symlink][59]
 
 ### parent
 
@@ -981,6 +962,81 @@ Type: nullable [Resolved Node Metadata][61]
 If the node is a symlink and is not broken, it will hold information about the
 symlink resolved node. However, it will never hold information about the actual
 node. It will instead be null.
+
+### Node
+
+A node contains the following fields:
+
+- [parent][45]
+- [relative_path][46]
+- [absolute_path][47]
+- [extension][48]
+- [is_symlink][49]
+- [is_broken][50]
+- [is_dir][51]
+- [is_file][52]
+- [is_readonly][53]
+- [mime_essence][54]
+- [size][55]
+- [human_size][56]
+- [permissions][57]
+- [canonical][58]
+- [symlink][59]
+
+
+### DirectoryBuffer
+
+Directory buffer contains the following fields:
+
+- [parent][45]
+- [nodes][63]
+- [total][64]
+- [focus][65]
+
+#### parent
+
+Type: string
+
+The parent path of the node.
+
+#### nodes
+
+Type: list of [Node][44]s
+
+A list of visible nodes.
+
+#### total
+
+Type: int
+
+The count of nodes being rendered.
+
+#### focus
+
+Type: int
+
+The index of the node under focus. It can be `0` even when there's no node to
+focus on.
+
+
+### History
+
+History contains the following fields:
+
+- [loc][68]
+- [paths][69]
+
+#### loc
+
+Type: int
+
+Location of the current path in history.
+
+#### paths
+
+Type: list of string
+
+Visited paths.
 
 
 ### Example: Using Lua Function Calls
@@ -1195,3 +1251,12 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [59]:#symlink
 [60]:column-renderer.md#permission
 [61]:column-renderer.md#resolved-node-metadata
+[62]:#directorybuffer
+[63]:#nodes
+[64]:#total
+[65]:#focus
+[66]:#https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html
+[67]:#history
+[68]:#loc
+[69]:#paths
+[70]:#history-1
