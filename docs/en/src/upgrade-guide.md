@@ -46,7 +46,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.13.7][2] -> [v0.14.6][3]
+#### [v0.13.7][2] -> [v0.14.7][3]
 
 - macOS users need to place their config file (`init.lua`) in
   `$HOME/.config/xplr/` or `/etc/xplr/`.
@@ -222,7 +222,7 @@ Else do the following:
 
 [1]:#instructions
 [2]:https://github.com/sayanarijit/xplr/releases/tag/v0.13.7
-[3]:https://github.com/sayanarijit/xplr/releases/tag/v0.14.6
+[3]:https://github.com/sayanarijit/xplr/releases/tag/v0.14.7
 [4]:https://github.com/sayanarijit/xplr/pull/229#issue-662426960
 [5]:contribute.md
 [6]:https://github.com/sayanarijit/xplr/releases/tag/v0.12.1

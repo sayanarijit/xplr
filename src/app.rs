@@ -1545,14 +1545,26 @@ impl App {
         let mut config = lua::init(lua)?;
 
         let config_file = if let Some(path) = config_file {
-            path
+            Some(path)
         } else if let Some(dir) = dirs::home_dir() {
-            dir.join(".config").join("xplr").join("init.lua")
+            let path = dir.join(".config").join("xplr").join("init.lua");
+            if path.exists() {
+                Some(path)
+            } else {
+                None
+            }
         } else {
-            PathBuf::from("/").join("etc").join("xplr").join("init.lua")
+            let path = PathBuf::from("/").join("etc").join("xplr").join("init.lua");
+            if path.exists() {
+                Some(path)
+            } else {
+                None
+            }
         };
 
-        let config_files = std::iter::once(config_file).chain(extra_config_files.into_iter());
+        let config_files = std::iter::once(config_file)
+            .chain(extra_config_files.into_iter().map(Some))
+            .filter_map(|x| x);
 
         let mut load_errs = vec![];
         for config_file in config_files {
