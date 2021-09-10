@@ -13,11 +13,11 @@ TODO
 - [x] Add sorting support.
 - [x] Add filter support.
 - [x] File previews.
-- [ ] Implement plugins support (or some way to easily share configuration).
+- [x] Implement plugins support (or some way to easily share configuration).
 - [x] Bigger (and better) help menu.
-- [ ] Offline docs.
-- [ ] Support for background services.
-- [x] ~Customize~ switch UI in run-time.
+- [x] Offline docs.
+- [ ] Support for background services
+- [x] ~Customize~ switch UI at run-time.
 - [ ] More tests and benchmarks.
 - [ ] Measure code coverage.
 - [ ] Improve the [vim plugin][4].
