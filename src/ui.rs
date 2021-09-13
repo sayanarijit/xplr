@@ -523,14 +523,17 @@ fn draw_table<B: Backend>(
                         )
                     };
 
-                    if is_selected {
+                    if is_focused && is_selected {
+                        let ui = app_config.general().focus_selection_ui().to_owned();
+                        prefix = ui.prefix().to_owned().or(prefix);
+                        suffix = ui.suffix().to_owned().or(suffix);
+                        style = style.extend(ui.style());
+                    } else if is_selected {
                         let ui = app_config.general().selection_ui().to_owned();
                         prefix = ui.prefix().to_owned().or(prefix);
                         suffix = ui.suffix().to_owned().or(suffix);
                         style = style.extend(ui.style());
-                    };
-
-                    if is_focused {
+                    } else if is_focused {
                         let ui = app_config.general().focus_ui().to_owned();
                         prefix = ui.prefix().to_owned().or(prefix);
                         suffix = ui.suffix().to_owned().or(suffix);

@@ -98,6 +98,14 @@ xplr.config.general.selection_ui.style.sub_modifiers = nil
 xplr.config.general.selection_ui.style.bg = nil
 xplr.config.general.selection_ui.style.fg = "LightGreen"
 
+------ Focus UI
+xplr.config.general.focus_selection_ui.prefix = "▸["
+xplr.config.general.focus_selection_ui.suffix = "]"
+xplr.config.general.focus_selection_ui.style.add_modifiers = { "Bold" }
+xplr.config.general.focus_selection_ui.style.sub_modifiers = nil
+xplr.config.general.focus_selection_ui.style.bg = nil
+xplr.config.general.focus_selection_ui.style.fg = "LightGreen"
+
 ------ Sort & filter UI
 -------- Separator
 xplr.config.general.sort_and_filter_ui.separator.format = " › "

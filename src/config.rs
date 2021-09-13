@@ -470,6 +470,9 @@ pub struct GeneralConfig {
     pub selection_ui: UiConfig,
 
     #[serde(default)]
+    pub focus_selection_ui: UiConfig,
+
+    #[serde(default)]
     pub sort_and_filter_ui: SortAndFilterUi,
 
     #[serde(default)]
@@ -577,6 +580,11 @@ impl GeneralConfig {
     /// Get a reference to the general config's start fifo.
     pub fn start_fifo(&self) -> Option<&String> {
         self.start_fifo.as_ref()
+    }
+
+    /// Get a reference to the general config's focus selection ui.
+    pub fn focus_selection_ui(&self) -> &UiConfig {
+        &self.focus_selection_ui
     }
 }
 
