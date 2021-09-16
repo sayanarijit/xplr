@@ -3,6 +3,7 @@
 #![allow(clippy::unnecessary_wraps)]
 
 pub mod app;
+pub mod cli;
 pub mod config;
 pub mod event_reader;
 pub mod explorer;
@@ -13,5 +14,3 @@ pub mod pipe_reader;
 pub mod pwd_watcher;
 pub mod runner;
 pub mod ui;
-
-pub use app::runner;

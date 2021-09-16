@@ -106,9 +106,10 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub(crate) fn new(path: Option<PathBuf>) -> Result<Self> {
+    pub fn new(cli: crate::cli::Cli) -> Result<Self> {
         let basedir = std::env::current_dir()?;
-        let mut pwd = path
+        let mut pwd = cli
+            .path
             .map(|p| if p.is_relative() { basedir.join(p) } else { p })
             .unwrap_or_else(|| basedir.clone());
         let mut focused_path = None;
@@ -121,31 +122,11 @@ impl Runner {
         Ok(Self {
             pwd,
             focused_path,
-            config_file: Default::default(),
-            extra_config_files: Default::default(),
-            on_load: Default::default(),
-            read_only: Default::default(),
+            config_file: cli.config,
+            extra_config_files: cli.extra_config,
+            on_load: cli.on_load,
+            read_only: cli.read_only,
         })
-    }
-
-    pub fn with_on_load(mut self, on_load: Vec<app::ExternalMsg>) -> Self {
-        self.on_load = on_load;
-        self
-    }
-
-    pub fn with_config(mut self, config_file: Option<PathBuf>) -> Self {
-        self.config_file = config_file;
-        self
-    }
-
-    pub fn with_extra_config(mut self, config_files: Vec<PathBuf>) -> Self {
-        self.extra_config_files = config_files;
-        self
-    }
-
-    pub fn with_read_only(mut self, read_only: bool) -> Self {
-        self.read_only = read_only;
-        self
     }
 
     pub fn run(self) -> Result<Option<String>> {
@@ -231,55 +212,56 @@ impl Runner {
                 Ok(a) => {
                     app = a;
                     while let Some(msg) = app.pop_msg_out() {
+                        use app::MsgOut::*;
                         match msg {
                             // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
                             // Try handling them immediately.
-                            app::MsgOut::Enque(task) => {
+                            Enque(task) => {
                                 tx_msg_in.send(task)?;
                             }
 
-                            app::MsgOut::Quit => {
+                            Quit => {
                                 result = Ok(None);
                                 break 'outer;
                             }
 
-                            app::MsgOut::PrintPwdAndQuit => {
+                            PrintPwdAndQuit => {
                                 result = Ok(Some(format!("{}\n", app.pwd())));
                                 break 'outer;
                             }
 
-                            app::MsgOut::PrintFocusPathAndQuit => {
+                            PrintFocusPathAndQuit => {
                                 result = Ok(app
                                     .focused_node()
                                     .map(|n| format!("{}\n", n.absolute_path())));
                                 break 'outer;
                             }
 
-                            app::MsgOut::PrintSelectionAndQuit => {
+                            PrintSelectionAndQuit => {
                                 result = Ok(Some(app.selection_str()));
                                 break 'outer;
                             }
 
-                            app::MsgOut::PrintResultAndQuit => {
+                            PrintResultAndQuit => {
                                 result = Ok(Some(app.result_str()));
                                 break 'outer;
                             }
 
-                            app::MsgOut::PrintAppStateAndQuit => {
+                            PrintAppStateAndQuit => {
                                 let out = serde_yaml::to_string(&app)?;
                                 result = Ok(Some(out));
                                 break 'outer;
                             }
 
-                            app::MsgOut::Debug(path) => {
+                            Debug(path) => {
                                 fs::write(&path, serde_yaml::to_string(&app)?)?;
                             }
 
-                            app::MsgOut::ClearScreen => {
+                            ClearScreen => {
                                 terminal.clear()?;
                             }
 
-                            app::MsgOut::ExplorePwdAsync => {
+                            ExplorePwdAsync => {
                                 explorer::explore_async(
                                     app.explorer_config().clone(),
                                     app.pwd().into(),
@@ -290,7 +272,7 @@ impl Runner {
                                 tx_pwd_watcher.send(app.pwd().clone())?;
                             }
 
-                            app::MsgOut::ExploreParentsAsync => {
+                            ExploreParentsAsync => {
                                 explorer::explore_recursive_async(
                                     app.explorer_config().clone(),
                                     app.pwd().into(),
@@ -301,7 +283,7 @@ impl Runner {
                                 tx_pwd_watcher.send(app.pwd().clone())?;
                             }
 
-                            app::MsgOut::Refresh => {
+                            Refresh => {
                                 // $PWD watcher
                                 tx_pwd_watcher.send(app.pwd().clone())?;
                                 // UI
@@ -316,7 +298,7 @@ impl Runner {
                                 }
                             }
 
-                            app::MsgOut::EnableMouse => {
+                            EnableMouse => {
                                 if !mouse_enabled {
                                     match execute!(
                                         terminal.backend_mut(),
@@ -332,7 +314,7 @@ impl Runner {
                                 }
                             }
 
-                            app::MsgOut::ToggleMouse => {
+                            ToggleMouse => {
                                 let msg = if mouse_enabled {
                                     app::ExternalMsg::DisableMouse
                                 } else {
@@ -342,7 +324,7 @@ impl Runner {
                                     .handle_task(app::Task::new(app::MsgIn::External(msg), None))?;
                             }
 
-                            app::MsgOut::DisableMouse => {
+                            DisableMouse => {
                                 if mouse_enabled {
                                     match execute!(
                                         terminal.backend_mut(),
@@ -358,7 +340,7 @@ impl Runner {
                                 }
                             }
 
-                            app::MsgOut::StartFifo(path) => {
+                            StartFifo(path) => {
                                 fifo = match start_fifo(&path, &app.focused_node_str()) {
                                     Ok(file) => Some(file),
                                     Err(e) => {
@@ -368,14 +350,14 @@ impl Runner {
                                 }
                             }
 
-                            app::MsgOut::StopFifo => {
+                            StopFifo => {
                                 if let Some(file) = fifo {
                                     fifo = None;
                                     std::mem::drop(file);
                                 }
                             }
 
-                            app::MsgOut::ToggleFifo(path) => {
+                            ToggleFifo(path) => {
                                 if let Some(file) = fifo {
                                     fifo = None;
                                     std::mem::drop(file);
@@ -390,7 +372,7 @@ impl Runner {
                                 }
                             }
 
-                            app::MsgOut::CallLuaSilently(func) => {
+                            CallLuaSilently(func) => {
                                 tx_event_reader.send(true)?;
 
                                 match call_lua(&app, &lua, &func, false) {
@@ -411,7 +393,7 @@ impl Runner {
                                 tx_event_reader.send(false)?;
                             }
 
-                            app::MsgOut::CallSilently(cmd) => {
+                            CallSilently(cmd) => {
                                 tx_event_reader.send(true)?;
 
                                 app.write_pipes()?;
@@ -448,7 +430,7 @@ impl Runner {
                                 tx_event_reader.send(false)?;
                             }
 
-                            app::MsgOut::CallLua(func) => {
+                            CallLua(func) => {
                                 execute!(terminal.backend_mut(), event::DisableMouseCapture)
                                     .unwrap_or_default();
 
@@ -494,7 +476,7 @@ impl Runner {
                                 }
                             }
 
-                            app::MsgOut::Call(cmd) => {
+                            Call(cmd) => {
                                 execute!(terminal.backend_mut(), event::DisableMouseCapture)
                                     .unwrap_or_default();
 

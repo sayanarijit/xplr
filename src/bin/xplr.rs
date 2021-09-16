@@ -1,92 +1,8 @@
 #![allow(clippy::too_many_arguments)]
 
-use anyhow::Result;
-use std::collections::VecDeque;
 use std::env;
-use std::io;
-use std::path::PathBuf;
-use xplr::app;
 
-#[derive(Debug, Clone, Default)]
-struct Cli {
-    version: bool,
-    help: bool,
-    read_only: bool,
-    path: Option<PathBuf>,
-    config: Option<PathBuf>,
-    extra_config: Vec<PathBuf>,
-    on_load: Vec<app::ExternalMsg>,
-}
-
-impl Cli {
-    fn parse(args: env::Args) -> Result<Self> {
-        let mut args: VecDeque<String> = args.skip(1).collect();
-        let mut cli = Self::default();
-
-        while let Some(arg) = args.pop_front() {
-            match arg.as_str() {
-                // Flags
-                "-" => {
-                    let mut path = String::new();
-                    if io::stdin().read_line(&mut path).is_ok() {
-                        cli.path =
-                            Some(path.trim_end_matches("\r\n").trim_end_matches('\n').into());
-                    };
-                }
-
-                "-h" | "--help" => {
-                    cli.help = true;
-                }
-
-                "-V" | "--version" => {
-                    cli.version = true;
-                }
-
-                "--" => {
-                    if cli.path.is_none() {
-                        cli.path = args.pop_front().map(PathBuf::from);
-                    }
-                    return Ok(cli);
-                }
-
-                // Options
-                "-c" | "--config" => cli.config = args.pop_front().map(PathBuf::from),
-
-                "-C" | "--extra-config" => {
-                    while let Some(path) = args.pop_front() {
-                        if path.starts_with('-') {
-                            args.push_front(path);
-                            break;
-                        } else {
-                            cli.extra_config.push(PathBuf::from(path));
-                        }
-                    }
-                }
-
-                "--read-only" => cli.read_only = true,
-
-                "--on-load" => {
-                    while let Some(msg) = args.pop_front() {
-                        if msg.starts_with('-') {
-                            args.push_front(msg);
-                            break;
-                        } else {
-                            cli.on_load.push(serde_yaml::from_str(&msg)?);
-                        }
-                    }
-                }
-
-                // path
-                path => {
-                    if cli.path.is_none() {
-                        cli.path = Some(path.into());
-                    }
-                }
-            }
-        }
-        Ok(cli)
-    }
-}
+use xplr::{cli::Cli, runner::Runner};
 
 fn main() {
     let cli = Cli::parse(env::args()).unwrap_or_else(|e| {
@@ -130,13 +46,7 @@ fn main() {
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else {
-        match app::runner(cli.path.clone())
-            .map(|a| a.with_on_load(cli.on_load.clone()))
-            .map(|a| a.with_config(cli.config.clone()))
-            .map(|a| a.with_extra_config(cli.extra_config.clone()))
-            .map(|a| a.with_read_only(cli.read_only))
-            .and_then(|a| a.run())
-        {
+        match Runner::new(cli).and_then(|a| a.run()) {
             Ok(Some(out)) => print!("{}", out),
             Ok(None) => {}
             Err(err) => {
