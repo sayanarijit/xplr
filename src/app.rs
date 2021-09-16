@@ -1,3 +1,4 @@
+use crate::cli;
 use crate::config::Config;
 use crate::config::Mode;
 use crate::explorer;
@@ -2342,10 +2343,8 @@ impl App {
     fn select(mut self) -> Result<Self> {
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection.insert(n);
-            Ok(self)
-        } else {
-            Ok(self)
         }
+        Ok(self)
     }
 
     fn select_path(mut self, path: String) -> Result<Self> {
@@ -2357,10 +2356,8 @@ impl App {
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
             self.selection.insert(Node::new(p, n));
-            Ok(self)
-        } else {
-            Ok(self)
         }
+        Ok(self)
     }
 
     fn select_all(mut self) -> Result<Self> {
@@ -2903,6 +2900,6 @@ impl App {
     }
 }
 
-pub fn runner(path: Option<PathBuf>) -> Result<Runner> {
-    Runner::new(path)
+pub fn runner(cli: cli::Cli) -> Result<Runner> {
+    Runner::new(cli)
 }

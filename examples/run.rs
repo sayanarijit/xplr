@@ -1,5 +1,5 @@
 fn main() {
-    match xplr::runner(None).and_then(|a| a.run()) {
+    match xplr::runner::Runner::new(xplr::cli::Cli::default()).and_then(|a| a.run()) {
         Ok(Some(out)) => print!("{}", out),
         Ok(None) => {}
         Err(err) => {
