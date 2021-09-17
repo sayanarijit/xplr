@@ -1,4 +1,4 @@
-use crate::cli;
+use crate::cli::Cli;
 use crate::config::Config;
 use crate::config::Mode;
 use crate::explorer;
@@ -2900,6 +2900,12 @@ impl App {
     }
 }
 
-pub fn runner(cli: cli::Cli) -> Result<Runner> {
-    Runner::new(cli)
+/// Create a new runner object passing the default arguments
+pub fn runner() -> Result<Runner> {
+    Runner::new()
+}
+
+/// Create a new runner object passing the given arguments
+pub fn from_cli(cli: Cli) -> Result<Runner> {
+    Runner::from_cli(cli)
 }

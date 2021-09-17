@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::app;
+use crate::cli::Cli;
 use crate::event_reader;
 use crate::explorer;
 use crate::lua;
@@ -106,7 +107,13 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn new(cli: crate::cli::Cli) -> Result<Self> {
+    /// Create a new runner object passing the default arguments
+    pub fn new() -> Result<Self> {
+        Self::from_cli(Default::default())
+    }
+
+    /// Create a new runner object passing the given arguments
+    pub fn from_cli(cli: Cli) -> Result<Self> {
         let basedir = std::env::current_dir()?;
         let mut pwd = cli
             .path
@@ -129,6 +136,7 @@ impl Runner {
         })
     }
 
+    /// Run the instance
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
