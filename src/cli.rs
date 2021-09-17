@@ -5,6 +5,7 @@ use std::{env, io};
 
 use crate::app;
 
+/// The arguments to pass
 #[derive(Debug, Clone, Default)]
 pub struct Cli {
     pub version: bool,
@@ -17,6 +18,7 @@ pub struct Cli {
 }
 
 impl Cli {
+    /// Parse arguments from the command-line
     pub fn parse(args: env::Args) -> Result<Self> {
         let mut args: VecDeque<String> = args.skip(1).collect();
         let mut cli = Self::default();
