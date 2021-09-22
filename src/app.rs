@@ -1499,7 +1499,6 @@ impl History {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CallLuaArg {
     pub version: String,
-    pub config: Config,
     pub pwd: String,
     pub focused_node: Option<Node>,
     pub directory_buffer: Option<DirectoryBuffer>,
@@ -2883,7 +2882,6 @@ impl App {
     pub fn to_lua_arg(&self) -> CallLuaArg {
         CallLuaArg {
             version: self.version.clone(),
-            config: self.config.clone(),
             pwd: self.pwd.clone(),
             focused_node: self.focused_node().cloned(),
             directory_buffer: self.directory_buffer().cloned(),
