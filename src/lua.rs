@@ -8,7 +8,7 @@ use serde::Deserialize;
 use std::fs;
 
 const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
-const UPGRADE_GUIDE_LINK: &str = "https://arijitbasu.in/xplr/en/upgrade-guide.html";
+const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
 
 fn parse_version(version: &str) -> Result<(u16, u16, u16, Option<u16>)> {
     let mut configv = version.split('.');
