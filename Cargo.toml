@@ -7,8 +7,8 @@ description = "A hackable, minimal, fast TUI file explorer"
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/sayanarijit/xplr"
-homepage = "https://github.com/sayanarijit/xplr"
-documentation = "https://arijitbasu.in/xplr/en"
+homepage = "https://xplr.dev"
+documentation = "https://xplr.dev/en"
 keywords = ["terminal", "file", "explorer", "manager", "tui"]
 categories = ["command-line-interface", "command-line-utilities"]
 
