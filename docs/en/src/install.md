@@ -151,7 +151,7 @@ Prerequisites:
 Command-line instructions:
 
 ```bash
-cargo install --force xplr
+cargo install --locked --force xplr
 ```
 
 
@@ -173,7 +173,7 @@ git clone https://github.com/sayanarijit/xplr.git
 cd xplr
 
 # Build
-cargo build --release --bin xplr
+cargo build --locked --release --bin xplr
 
 # Place in $PATH
 sudo cp target/release/xplr /usr/local/bin/
@@ -199,7 +199,7 @@ Android
 - Install `xplr`
 
   ```bash
-  cargo install --force xplr
+  cargo install --locked --force xplr
   ```
 
 - Setup storage
