@@ -14,7 +14,7 @@ xplr.config.general.show_hidden = false
 xplr.config.general.read_only = false
 
 ------ Recover mode
-xplr.config.general.disable_recover_mode = false
+xplr.config.general.enable_recover_mode = false
 
 ------ Start FIFO
 xplr.config.general.start_fifo = nil

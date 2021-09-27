@@ -30,14 +30,13 @@ Set it to `true` to use only a subset of selected operations that forbids
 executing commands or performing write operations on the file-system.
 
 
-disable_recover_mode
+enable_recover_mode
 --------------------
 
 Type: boolean
 
-Set it to `true` when the special recover mode gets too annoying to appreciate
-the good intentions. When enabled, typing the wrong keys won't result in any
-action.
+Set it to `true` if you want to enable a safety feature that will save you from
+yourself when you type recklessly.
 
 
 cursor.format
