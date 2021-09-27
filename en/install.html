@@ -237,7 +237,7 @@ sudo mv xplr /usr/local/bin/
 <li><a href="https://www.gnu.org/software/make/">make</a></li>
 </ul>
 <p>Command-line instructions:</p>
-<pre><code class="language-bash">cargo install --force xplr
+<pre><code class="language-bash">cargo install --locked --force xplr
 </code></pre>
 <h2 id="build-from-source"><a class="header" href="#build-from-source">Build From Source</a></h2>
 <p>Prerequisites:</p>
@@ -253,7 +253,7 @@ git clone https://github.com/sayanarijit/xplr.git
 cd xplr
 
 # Build
-cargo build --release --bin xplr
+cargo build --locked --release --bin xplr
 
 # Place in $PATH
 sudo cp target/release/xplr /usr/local/bin/
@@ -273,7 +273,7 @@ need a little tweaking and fixing for a smooth usage experience.</p>
 </li>
 <li>
 <p>Install <code>xplr</code></p>
-<pre><code class="language-bash">cargo install --force xplr
+<pre><code class="language-bash">cargo install --locked --force xplr
 </code></pre>
 </li>
 <li>
