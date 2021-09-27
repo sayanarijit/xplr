@@ -23,6 +23,7 @@ jobs:
           mkdir gh-pages
           mv docs/en/gh-pages gh-pages/en
           mv docs/index.html gh-pages
+          mv docs/CNAME gh-pages
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v2.5.1
         with:
