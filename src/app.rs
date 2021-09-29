@@ -1830,12 +1830,7 @@ impl App {
             .or_else(|| default.map(|a| a.messages().clone()))
             .unwrap_or_else(|| {
                 if self.config().general().enable_recover_mode() {
-                    vec![
-                        ExternalMsg::SwitchModeBuiltin("recover".into()),
-                        ExternalMsg::LogWarning(
-                            "Key map not found. Let's calm down, escape, and try again.".into(),
-                        ),
-                    ]
+                    vec![ExternalMsg::SwitchModeBuiltin("recover".into())]
                 } else {
                     vec![ExternalMsg::LogWarning("Key map not found.".into())]
                 }

@@ -88,6 +88,7 @@ A mode contains the following information:
 - [help][6]
 - [extra_help][7]
 - [key_bindings][8]
+- [layout][29]
 
 ### name
 
@@ -114,6 +115,12 @@ help menu.
 Type: [Key Bindings][9]
 
 The key bindings available in that mode.
+
+### layout
+
+Type: nullable [Layout][30]
+
+If specified, this layout will be used to render the UI.
 
 
 Key Bindings
@@ -322,3 +329,5 @@ Visit [Awesome Plugins][27] for more [integration][28] options.
 [26]:https://gifyu.com/image/tW86
 [27]:awesome-plugins.md
 [28]:awesome-plugins.md#integration
+[29]:#layout
+[30]:layout.md#Layout

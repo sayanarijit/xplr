@@ -161,7 +161,7 @@ impl UiConfig {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct UiElement {
     #[serde(default)]
@@ -667,6 +667,9 @@ pub struct Mode {
 
     #[serde(default)]
     pub key_bindings: KeyBindings,
+
+    #[serde(default)]
+    pub layout: Option<Layout>,
 }
 
 impl Mode {
@@ -788,6 +791,11 @@ impl Mode {
     /// Get a reference to the mode's key bindings.
     pub fn key_bindings(&self) -> &KeyBindings {
         &self.key_bindings
+    }
+
+    /// Get a reference to the mode's layout.
+    pub fn layout(&self) -> &Option<Layout> {
+        &self.layout
     }
 }
 
@@ -1006,7 +1014,7 @@ impl ModesConfig {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct PanelUiConfig {
     #[serde(default)]

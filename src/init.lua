@@ -997,8 +997,20 @@ xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
 ------ Recover
 xplr.config.modes.builtin.recover = {
   name = "recover",
-  help = nil,
-  extra_help = nil,
+  layout = {
+    CustomContent = {
+      title = " recover ",
+      body = {
+        StaticParagraph = {
+          render = [[
+
+  You pressed an invalid key and went into "recover" mode.
+  Let's calm down, press `escape`, and try again.
+          ]],
+        },
+      },
+    },
+  },
   key_bindings = {
     on_key = {
       ["ctrl-c"] = {
@@ -1010,11 +1022,7 @@ xplr.config.modes.builtin.recover = {
         messages = { "PopMode" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
-      help = nil,
       messages = {},
     },
   },
