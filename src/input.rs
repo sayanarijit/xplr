@@ -538,17 +538,21 @@ impl From<char> for Key {
 
 impl From<String> for Key {
     fn from(string: String) -> Self {
-        string
-            .chars()
-            .next()
-            .map(|c| c.into())
-            .unwrap_or(Key::NotSupported)
+        string.into()
     }
 }
 
 impl From<&str> for Key {
     fn from(string: &str) -> Self {
-        string.to_string().into()
+        if string.len() == 1 {
+            string
+                .chars()
+                .next()
+                .map(|c| c.into())
+                .unwrap_or(Key::NotSupported)
+        } else {
+            Key::NotSupported
+        }
     }
 }
 
