@@ -23,7 +23,7 @@ pub fn keep_watching(
                 .map(|modified| {
                     if modified != last_modified {
                         let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
-                        tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+                        tx_msg_in.send(Task::new(msg, None)).unwrap();
                         last_modified = modified;
                     } else {
                         thread::sleep(Duration::from_secs(1));
@@ -31,7 +31,7 @@ pub fn keep_watching(
                 })
                 .unwrap_or_else(|e| {
                     let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
-                    tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+                    tx_msg_in.send(Task::new(msg, None)).unwrap();
                     thread::sleep(Duration::from_secs(1));
                 })
         }
