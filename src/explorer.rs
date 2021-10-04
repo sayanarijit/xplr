@@ -61,7 +61,7 @@ pub(crate) fn explore_async(
                         MsgIn::Internal(InternalMsg::SetDirectory(buf)),
                         None,
                     ))
-                    .unwrap_or_default();
+                    .unwrap();
             })
             .unwrap_or_else(|e| {
                 tx_msg_in
@@ -69,7 +69,7 @@ pub(crate) fn explore_async(
                         MsgIn::External(ExternalMsg::LogError(e.to_string())),
                         None,
                     ))
-                    .unwrap_or_default();
+                    .unwrap();
             })
     });
 }

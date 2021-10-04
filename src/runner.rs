@@ -147,6 +147,7 @@ impl Runner {
 
         let (tx_msg_in, rx_msg_in) = mpsc::channel();
         let (tx_event_reader, rx_event_reader) = mpsc::channel();
+        let (tx_loop_waiter, rx_loop_waiter) = mpsc::channel();
         let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
         app = app.explore_pwd()?;
@@ -207,7 +208,7 @@ impl Runner {
         terminal.hide_cursor()?;
 
         // Threads
-        event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader);
+        event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader, tx_loop_waiter);
         pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
 
         // Enqueue on_load messages
@@ -381,7 +382,7 @@ impl Runner {
                             }
 
                             CallLuaSilently(func) => {
-                                tx_event_reader.send(true)?;
+                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
 
                                 match call_lua(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
@@ -398,11 +399,11 @@ impl Runner {
                                     }
                                 };
 
-                                tx_event_reader.send(false)?;
+                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
                             }
 
                             CallSilently(cmd) => {
-                                tx_event_reader.send(true)?;
+                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
 
                                 app.write_pipes()?;
                                 let status = call(&app, cmd, true)
@@ -435,14 +436,14 @@ impl Runner {
                                     app = app.log_error(e.to_string())?;
                                 };
 
-                                tx_event_reader.send(false)?;
+                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
                             }
 
                             CallLua(func) => {
                                 execute!(terminal.backend_mut(), event::DisableMouseCapture)
                                     .unwrap_or_default();
 
-                                tx_event_reader.send(true)?;
+                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
 
                                 terminal.clear()?;
                                 terminal.set_cursor(0, 0)?;
@@ -467,7 +468,7 @@ impl Runner {
                                 terminal.clear()?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
-                                tx_event_reader.send(false)?;
+                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
 
                                 if mouse_enabled {
                                     match execute!(
@@ -488,7 +489,7 @@ impl Runner {
                                 execute!(terminal.backend_mut(), event::DisableMouseCapture)
                                     .unwrap_or_default();
 
-                                tx_event_reader.send(true)?;
+                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
 
                                 terminal.clear()?;
                                 terminal.set_cursor(0, 0)?;
@@ -529,7 +530,7 @@ impl Runner {
                                 terminal.clear()?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
-                                tx_event_reader.send(false)?;
+                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
 
                                 if mouse_enabled {
                                     match execute!(
