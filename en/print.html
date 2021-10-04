@@ -259,15 +259,25 @@ following steps:</p>
 <li><a href="install.html">Install</a></li>
 <li><a href="post-install.html">Post Install</a></li>
 </ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="install"><a class="header" href="#install">Install</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="try-in-docker"><a class="header" href="#try-in-docker">Try in Docker</a></h1>
+<p>If you prefer to try it before installing, here's the snipper for your
+convenience.</p>
+<pre><code class="language-bash">docker run -w / -it --rm ubuntu sh -uec '
+  apt-get update -y
+  apt-get install -y wget tar vim
+  wget https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz
+  tar -xzvf xplr-linux.tar.gz
+  ./xplr
+'
+</code></pre>
+<h1 id="install"><a class="header" href="#install">Install</a></h1>
 <p>You can install xplr using one of the following ways. Each has their own
 advantages and limitations.</p>
-<p>For example, the <a href="install.html#direct-download">Direct Download</a>,
-<a href="install.html#from-a-hrefhttpscratesiocratesxplrcratesioa">From crates.io</a>, and
-<a href="install.html#build-from-source">Build From Source</a> methods allow the users to install the
-latest possible version of xplr, but they have one common drawback - the user
-will need to keep an eye on the releases, and manually upgrade xplr when a new
-version is available.</p>
+<p>For example, the <a href="install.html#direct-download">Direct Download</a>, <a href="install.html#from-a-hrefhttpscratesiocratesxplrcratesioa">From crates.io</a>, and
+<a href="install.html#build-from-source">Build From Source</a> methods allow the users to install the latest possible
+version of xplr, but they have one common drawback - the user will need to keep
+an eye on the releases, and manually upgrade xplr when a new version is
+available.</p>
 <p>One way to keep an eye on the releases is to
 <a href="https://github.com/sayanarijit/xplr/watchers">watch the repository</a>.</p>
 <h2 id="community-maintained-repositories"><a class="header" href="#community-maintained-repositories">Community Maintained Repositories</a></h2>
