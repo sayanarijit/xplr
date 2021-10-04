@@ -1,15 +1,31 @@
+Try in Docker
+=============
+
+If you prefer to try it before installing, here's the snipper for your
+convenience.
+
+```bash
+docker run -w / -it --rm ubuntu sh -uec '
+  apt-get update -y
+  apt-get install -y wget tar vim
+  wget https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz
+  tar -xzvf xplr-linux.tar.gz
+  ./xplr
+'
+```
+
+
 Install
 =======
 
 You can install xplr using one of the following ways. Each has their own
 advantages and limitations.
 
-For example, the [Direct Download][1],
-[From crates.io][2], and
-[Build From Source][3] methods allow the users to install the
-latest possible version of xplr, but they have one common drawback - the user
-will need to keep an eye on the releases, and manually upgrade xplr when a new
-version is available.
+For example, the [Direct Download][1], [From crates.io][2], and
+[Build From Source][3] methods allow the users to install the latest possible
+version of xplr, but they have one common drawback - the user will need to keep
+an eye on the releases, and manually upgrade xplr when a new version is
+available.
 
 One way to keep an eye on the releases is to
 [watch the repository][4].
