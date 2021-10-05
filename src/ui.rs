@@ -1148,34 +1148,6 @@ pub struct ContentRendererArg {
     layout_size: Rect,
 }
 
-pub fn draw_dynamic_content<B: Backend>(
-    f: &mut Frame<B>,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    config: Option<PanelUiConfig>,
-    func: String,
-    lua: &Lua,
-) {
-    let panel_config = app.config().general().panel_ui();
-    let config = config.unwrap_or_else(|| panel_config.default().to_owned());
-
-    let lines: Vec<ListItem> = lua
-        .to_value(&app.to_lua_arg())
-        .map(|arg| lua::call(lua, &func, arg).unwrap_or_else(|e| format!("{:?}", e)))
-        .unwrap_or_else(|e| e.to_string())
-        .lines()
-        .into_iter()
-        .map(|l| {
-            let line = ansi_to_text(l.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
-            ListItem::new(line)
-        })
-        .collect();
-
-    let content = List::new(lines).block(block(config, "".into()));
-    f.render_widget(content, layout_size);
-}
-
 pub fn draw_layout<B: Backend>(
     layout: Layout,
     f: &mut Frame<B>,
