@@ -72,7 +72,9 @@ Also See
 - [Tutorial: Adding a New Mode][6]
 - [Example: Using Environment Variables and Pipes][7]
 - [Example: Using Lua Function Calls][8]
-- [Example: Customizing Table Renderer][9]
+- [Example: Defining Custom Layout][9]
+- [Example: Customizing Table Renderer][10]
+- [Example: Render a custom dynamic table][11]
 
 
 [1]:https://www.lua.org
@@ -83,4 +85,6 @@ Also See
 [6]:modes.md#tutorial-adding-a-new-mode
 [7]:message.md#example-using-environment-variables-and-pipes
 [8]:message.md#example-using-lua-function-calls
-[9]:column-renderer.md#example-customizing-table-renderer
+[9]:layouts.md#example-defining-custom-layout
+[10]:column-renderer.md#example-customizing-table-renderer
+[11]:layouts.md#example-render-a-custom-dynamic-table
