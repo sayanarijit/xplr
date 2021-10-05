@@ -487,7 +487,9 @@ impl NodeSorterApplicable {
     fn apply(&self, a: &Node, b: &Node) -> Ordering {
         let order = match self.sorter {
             NodeSorter::ByRelativePath => natord::compare(&a.relative_path, &b.relative_path),
-            NodeSorter::ByIRelativePath => natord::compare_ignore_case(&a.relative_path, &b.relative_path),
+            NodeSorter::ByIRelativePath => {
+                natord::compare_ignore_case(&a.relative_path, &b.relative_path)
+            }
             NodeSorter::ByExtension => a.extension.cmp(&b.extension),
             NodeSorter::ByIsDir => a.is_dir.cmp(&b.is_dir),
             NodeSorter::ByIsFile => a.is_file.cmp(&b.is_file),
@@ -613,7 +615,11 @@ impl NodeSorterApplicable {
                 .map(|s| &s.size)
                 .cmp(&b.symlink.as_ref().map(|s| &s.size)),
         };
-        if self.reverse { order.reverse() } else { order }
+        if self.reverse {
+            order.reverse()
+        } else {
+            order
+        }
     }
 
     /// Get a reference to the node sorter applicable's sorter.
