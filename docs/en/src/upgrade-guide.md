@@ -1,5 +1,4 @@
-Upgrade Guide
-=============
+# Upgrade Guide
 
 When you upgrade xplr, you might see an error like this
 
@@ -46,6 +45,27 @@ compatibility.
 
 ### Instructions
 
+#### [v0.14.7][3] -> [v0.15.0][43]
+
+- Added `CustomContent` as layout option that can be used to render custom
+  paragraphs, lists and tables. Both static and dynamic.
+- Added support for optionally defining custom layouts for different modes.
+- Added `xplr.config.general.focus_selection_ui` to highlight selected files
+  under focus differently than files under focus that are not selected.
+- Added `PopModeKeepingInputBuffer`, and SwitchMode alternatives to allow
+  switching to different modes without resetting the input buffer.
+- Removed `config` field from `CallLuaArg` as it's already available globally
+  as `xplr.config`.
+- Fixed a bug which caused xplr to misbehave when used with specific tools and
+  environment (e.g. neovim, fzf, zsh4humans etc.).
+- Recover mode will be disabled by default.
+  i.e. `xplr.config.general.disable_recover_mode` has been deprecated. Use
+  `xplr.config.general.enable_recover_mode` instead.
+- Library users please refer to the latest API docs and examples.
+- New homepage: https://xplr.dev
+
+<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
+
 #### [v0.13.7][2] -> [v0.14.7][3]
 
 - macOS users need to place their config file (`init.lua`) in
@@ -64,9 +84,8 @@ compatibility.
 - Since version `v0.14.6`, the `-C` or `--extra-config` CLI argument is
   available.
 
-<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
-
 #### [v0.12.1][6] -> [v0.13.7][2]
+
 - Lua functions called using [`CallLua`][7] and [`CallLuaSilently`][8] messages will receive [`CallLuaArg`][9] object as the function argument (instead of the [`App`][10] object).
 - Each `node_types` config will inherit defaults from matching less specifig `node_types` config and overwrite them.
 - Since version `v0.13.2`, you don't need to use/send `Refresh` anymore. It will be auto-handled by xplr.
@@ -158,7 +177,6 @@ Else do the following
 
 #### [v0.4.2][27] -> [v0.4.3][26]
 
-
 If you have customized `general.table.row.cols`, you might want to [update it][28] to use the new variables with better symlink support.
 
 #### [v0.4.1][29] -> [v0.4.2][27]
@@ -169,7 +187,7 @@ In case you have mapped the keys `q`, `ctrl-i` and `ctrl-o`, you may want to rev
 
 A lot has changed (apologies). But I promise from now on, upgrading will be much less painful (thanks to [@maximbaz][31]'s valuable [inputs][32] and [code reviews][33]).
 
-So, to start with the upgrade, let's remove everything from your config file except the `version` field and your custom modifications. If  `version` is the only thing remaining, update it to `v0.4.1` and you are done.
+So, to start with the upgrade, let's remove everything from your config file except the `version` field and your custom modifications. If `version` is the only thing remaining, update it to `v0.4.1` and you are done.
 
 Else, do the following
 
@@ -182,6 +200,7 @@ Else, do the following
 - Finally, update the `version` to `v0.4.1`.
 
 #### [v0.3.8][40] -> [v0.3.13][30]
+
 Your current config should work fine. However, you might want to replace some `Call` and `BashExec` messages with `CallSilently` and `BashExecSilently` to remove the flickering of the screen.
 
 If you haven't made any changes to the configuration, you can delete and regenerate it.
@@ -209,6 +228,7 @@ Else, do the following
 If you haven't made any changes to the configuration, you can delete and regenerate it.
 
 Else do the following:
+
 - `$XPLR_APP_YAML` has been removed. You can use `Debug` to export the app state.
 - `$XPLR_RESULT` has been ported to file `$XPLR_PIPE_RESULT_OUT`. Use `cat` instead of `echo`, `<` instead of `<<<` etc.
 - `$XPLR_GLOBAL_HELP_MENU` has been ported to
@@ -219,46 +239,46 @@ Else do the following:
 - `$XPLR_PIPE_RESULT` has been ported to file `$XPLR_PIPE_RESULT_OUT`. Use `cat` instead of `echo`, `<` instead of `<<<` etc.
 - Finally, update the `version` in your config file.
 
-
-[1]:#instructions
-[2]:https://github.com/sayanarijit/xplr/releases/tag/v0.13.7
-[3]:https://github.com/sayanarijit/xplr/releases/tag/v0.14.7
-[4]:https://github.com/sayanarijit/xplr/pull/229#issue-662426960
-[5]:contribute.md
-[6]:https://github.com/sayanarijit/xplr/releases/tag/v0.12.1
-[7]:https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua
-[8]:https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently
-[9]:https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html
-[10]:https://docs.rs/xplr/latest/xplr/app/struct.App.html
-[11]:https://github.com/sayanarijit/xplr/releases/tag/v0.11.1
-[12]:https://github.com/sayanarijit/xplr/releases/tag/v0.10.2
-[13]:https://github.com/sayanarijit/xplr/releases/tag/v0.9.1
-[14]:https://github.com/sayanarijit/xplr/blob/85696ded7a/src/config.yml
-[15]:https://github.com/sayanarijit/xplr/blob/main/src/init.lua
-[16]:https://github.com/sayanarijit/xplr-yml2lua
-[17]:https://github.com/sayanarijit/xplr/blob/bfdb7736b99bc3c5ae53e7d621ba0e7ca2299b14/src/init.lua#L2005-L2064
-[18]:https://github.com/sayanarijit/xplr/pull/177#issue-650643573
-[19]:https://github.com/sayanarijit/xplr/releases/tag/v0.9.0
-[20]:https://github.com/sayanarijit/xplr/releases/tag/v0.8.0
-[21]:https://github.com/sayanarijit/xplr/releases/tag/v0.7.2
-[22]:https://github.com/sayanarijit/xplr/releases/tag/v0.7.0
-[23]:https://github.com/sayanarijit/xplr/releases/tag/v0.6.0
-[24]:https://github.com/sayanarijit/xplr/releases/tag/v0.5.13
-[25]:https://github.com/sayanarijit/xplr/releases/tag/v0.5.0
-[26]:https://github.com/sayanarijit/xplr/releases/tag/v0.4.3
-[27]:https://github.com/sayanarijit/xplr/releases/tag/v0.4.2
-[28]:https://github.com/sayanarijit/xplr/blob/af1cda5762/src/config.yml#L46-L48
-[29]:https://github.com/sayanarijit/xplr/releases/tag/v0.4.1
-[30]:https://github.com/sayanarijit/xplr/releases/tag/v0.3.13
-[31]:https://github.com/maximbaz
-[32]:https://github.com/sayanarijit/xplr/issues/45#issue-854447104
-[33]:https://github.com/sayanarijit/xplr/pull/47
-[34]:https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L124
-[35]:https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L145
-[36]:https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L154-L155
-[37]:https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L45
-[38]:https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L114
-[39]:https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L180-L181
-[40]:https://github.com/sayanarijit/xplr/releases/tag/v0.3.8
-[41]:https://github.com/sayanarijit/xplr/releases/tag/v0.3.0
-[42]:https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
+[1]: #instructions
+[2]: https://github.com/sayanarijit/xplr/releases/tag/v0.13.7
+[3]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.7
+[4]: https://github.com/sayanarijit/xplr/pull/229#issue-662426960
+[5]: contribute.md
+[6]: https://github.com/sayanarijit/xplr/releases/tag/v0.12.1
+[7]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua
+[8]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently
+[9]: https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html
+[10]: https://docs.rs/xplr/latest/xplr/app/struct.App.html
+[11]: https://github.com/sayanarijit/xplr/releases/tag/v0.11.1
+[12]: https://github.com/sayanarijit/xplr/releases/tag/v0.10.2
+[13]: https://github.com/sayanarijit/xplr/releases/tag/v0.9.1
+[14]: https://github.com/sayanarijit/xplr/blob/85696ded7a/src/config.yml
+[15]: https://github.com/sayanarijit/xplr/blob/main/src/init.lua
+[16]: https://github.com/sayanarijit/xplr-yml2lua
+[17]: https://github.com/sayanarijit/xplr/blob/bfdb7736b99bc3c5ae53e7d621ba0e7ca2299b14/src/init.lua#L2005-L2064
+[18]: https://github.com/sayanarijit/xplr/pull/177#issue-650643573
+[19]: https://github.com/sayanarijit/xplr/releases/tag/v0.9.0
+[20]: https://github.com/sayanarijit/xplr/releases/tag/v0.8.0
+[21]: https://github.com/sayanarijit/xplr/releases/tag/v0.7.2
+[22]: https://github.com/sayanarijit/xplr/releases/tag/v0.7.0
+[23]: https://github.com/sayanarijit/xplr/releases/tag/v0.6.0
+[24]: https://github.com/sayanarijit/xplr/releases/tag/v0.5.13
+[25]: https://github.com/sayanarijit/xplr/releases/tag/v0.5.0
+[26]: https://github.com/sayanarijit/xplr/releases/tag/v0.4.3
+[27]: https://github.com/sayanarijit/xplr/releases/tag/v0.4.2
+[28]: https://github.com/sayanarijit/xplr/blob/af1cda5762/src/config.yml#L46-L48
+[29]: https://github.com/sayanarijit/xplr/releases/tag/v0.4.1
+[30]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.13
+[31]: https://github.com/maximbaz
+[32]: https://github.com/sayanarijit/xplr/issues/45#issue-854447104
+[33]: https://github.com/sayanarijit/xplr/pull/47
+[34]: https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L124
+[35]: https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L145
+[36]: https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L154-L155
+[37]: https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L45
+[38]: https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L114
+[39]: https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L180-L181
+[40]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.8
+[41]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.0
+[42]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
+[43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.0
