@@ -36,7 +36,8 @@ fn call_lua(
     _silent: bool,
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
     let _focus_index = app
-        .directory_buffer.as_ref()
+        .directory_buffer
+        .as_ref()
         .map(|d| d.focus)
         .unwrap_or_default()
         .to_string();
@@ -48,7 +49,8 @@ fn call_lua(
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
     let focus_index = app
-        .directory_buffer.as_ref()
+        .directory_buffer
+        .as_ref()
         .map(|d| d.focus)
         .unwrap_or_default()
         .to_string();
@@ -62,7 +64,10 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
     Command::new(cmd.command.clone())
         .env("XPLR_APP_VERSION", app.version.clone())
         .env("XPLR_PID", &app.pid.to_string())
-        .env("XPLR_INPUT_BUFFER", app.input_buffer.clone().unwrap_or_default())
+        .env(
+            "XPLR_INPUT_BUFFER",
+            app.input_buffer.clone().unwrap_or_default(),
+        )
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
         .env("XPLR_FOCUS_INDEX", focus_index)
         .env("XPLR_SESSION_PATH", &app.session_path)
@@ -71,8 +76,14 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .env("XPLR_PIPE_HISTORY_OUT", &app.pipe.history_out)
         .env("XPLR_MODE", app.mode_str())
         .env("XPLR_PIPE_RESULT_OUT", &app.pipe.result_out)
-        .env( "XPLR_PIPE_GLOBAL_HELP_MENU_OUT", &app.pipe.global_help_menu_out)
-        .env("XPLR_PIPE_DIRECTORY_NODES_OUT", &app.pipe.directory_nodes_out)
+        .env(
+            "XPLR_PIPE_GLOBAL_HELP_MENU_OUT",
+            &app.pipe.global_help_menu_out,
+        )
+        .env(
+            "XPLR_PIPE_DIRECTORY_NODES_OUT",
+            &app.pipe.directory_nodes_out,
+        )
         .env("XPLR_PIPE_LOGS_OUT", &app.pipe.logs_out)
         .stdin(stdin)
         .stdout(stdout)
@@ -174,7 +185,8 @@ impl Runner {
         // let mut stdout = stdout.lock();
         execute!(stdout, term::EnterAlternateScreen)?;
 
-        let mut fifo: Option<fs::File> = if let Some(path) = app.config.general.start_fifo.as_ref() {
+        let mut fifo: Option<fs::File> = if let Some(path) = app.config.general.start_fifo.as_ref()
+        {
             // TODO remove duplicate segment
             match start_fifo(&path, &app.focused_node_str()) {
                 Ok(file) => Some(file),
