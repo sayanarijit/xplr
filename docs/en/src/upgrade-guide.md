@@ -55,6 +55,9 @@ compatibility.
   under focus differently than files under focus that are not selected.
 - Use `PopModeKeepingInputBuffer`, and SwitchMode alternatives to switching to
   different modes without resetting the input buffer.
+- Use the new `CustomContent` layout option to render custom content.
+- Use the new `layout` field in a mode to define custom layout for a specific
+  mode.
 - Library users please refer to the latest API docs and examples.
 
 <sub>Like this project so far? **[Please consider contributing][5]**.</sub>
