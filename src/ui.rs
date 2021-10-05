@@ -984,6 +984,7 @@ pub fn draw_custom_content<B: Backend>(
 
     match body {
         ContentBody::StaticParagraph { render } => {
+            let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
             let content = Paragraph::new(render).block(block(config, title.unwrap_or_default()));
             f.render_widget(content, layout_size);
         }
@@ -1000,6 +1001,8 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|arg| lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{:?}", e)))
                 .unwrap_or_else(|e| e.to_string());
 
+            let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
+
             let content = Paragraph::new(render).block(block(config, title.unwrap_or_default()));
             f.render_widget(content, layout_size);
         }
@@ -1007,6 +1010,7 @@ pub fn draw_custom_content<B: Backend>(
         ContentBody::StaticList { render } => {
             let items = render
                 .into_iter()
+                .map(|item| ansi_to_text(item.bytes()).unwrap_or_else(|e| Text::raw(e.to_string())))
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
@@ -1028,6 +1032,7 @@ pub fn draw_custom_content<B: Backend>(
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
                 .into_iter()
+                .map(|item| ansi_to_text(item.bytes()).unwrap_or_else(|e| Text::raw(e.to_string())))
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
@@ -1042,7 +1047,17 @@ pub fn draw_custom_content<B: Backend>(
         } => {
             let rows = render
                 .into_iter()
-                .map(|cols| Row::new(cols.into_iter().map(Cell::from).collect::<Vec<Cell>>()))
+                .map(|cols| {
+                    Row::new(
+                        cols.into_iter()
+                            .map(|item| {
+                                ansi_to_text(item.bytes())
+                                    .unwrap_or_else(|e| Text::raw(e.to_string()))
+                            })
+                            .map(Cell::from)
+                            .collect::<Vec<Cell>>(),
+                    )
+                })
                 .collect::<Vec<Row>>();
 
             let widths = widths
@@ -1076,7 +1091,17 @@ pub fn draw_custom_content<B: Backend>(
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])
                 .into_iter()
-                .map(|cols| Row::new(cols.into_iter().map(Cell::from).collect::<Vec<Cell>>()))
+                .map(|cols| {
+                    Row::new(
+                        cols.into_iter()
+                            .map(|item| {
+                                ansi_to_text(item.bytes())
+                                    .unwrap_or_else(|e| Text::raw(e.to_string()))
+                            })
+                            .map(Cell::from)
+                            .collect::<Vec<Cell>>(),
+                    )
+                })
                 .collect::<Vec<Row>>();
 
             let widths = widths
