@@ -485,37 +485,19 @@ impl NodeSorterApplicable {
     }
 
     fn apply(&self, a: &Node, b: &Node) -> Ordering {
-        match (self.sorter, self.reverse) {
-            (NodeSorter::ByRelativePath, false) => {
-                natord::compare(&a.relative_path, &b.relative_path)
-            }
-            (NodeSorter::ByIRelativePath, false) => {
-                natord::compare_ignore_case(&a.relative_path, &b.relative_path)
-            }
-            (NodeSorter::ByRelativePath, true) => {
-                natord::compare(&b.relative_path, &a.relative_path)
-            }
-            (NodeSorter::ByIRelativePath, true) => {
-                natord::compare_ignore_case(&b.relative_path, &a.relative_path)
-            }
-            (NodeSorter::ByExtension, false) => a.extension.cmp(&b.extension),
-            (NodeSorter::ByExtension, true) => b.extension.cmp(&a.extension),
-            (NodeSorter::ByIsDir, false) => a.is_dir.cmp(&b.is_dir),
-            (NodeSorter::ByIsDir, true) => b.is_dir.cmp(&a.is_dir),
-            (NodeSorter::ByIsFile, false) => a.is_file.cmp(&b.is_file),
-            (NodeSorter::ByIsFile, true) => b.is_file.cmp(&a.is_file),
-            (NodeSorter::ByIsSymlink, false) => a.is_symlink.cmp(&b.is_symlink),
-            (NodeSorter::ByIsSymlink, true) => b.is_symlink.cmp(&a.is_symlink),
-            (NodeSorter::ByIsBroken, false) => a.is_broken.cmp(&b.is_broken),
-            (NodeSorter::ByIsBroken, true) => b.is_broken.cmp(&a.is_broken),
-            (NodeSorter::ByIsReadonly, false) => a.is_readonly.cmp(&b.is_readonly),
-            (NodeSorter::ByIsReadonly, true) => b.is_readonly.cmp(&a.is_readonly),
-            (NodeSorter::ByMimeEssence, false) => a.mime_essence.cmp(&b.mime_essence),
-            (NodeSorter::ByMimeEssence, true) => b.mime_essence.cmp(&a.mime_essence),
-            (NodeSorter::BySize, false) => a.size.cmp(&b.size),
-            (NodeSorter::BySize, true) => b.size.cmp(&a.size),
+        let order = match self.sorter {
+            NodeSorter::ByRelativePath => natord::compare(&a.relative_path, &b.relative_path),
+            NodeSorter::ByIRelativePath => natord::compare_ignore_case(&a.relative_path, &b.relative_path),
+            NodeSorter::ByExtension => a.extension.cmp(&b.extension),
+            NodeSorter::ByIsDir => a.is_dir.cmp(&b.is_dir),
+            NodeSorter::ByIsFile => a.is_file.cmp(&b.is_file),
+            NodeSorter::ByIsSymlink => a.is_symlink.cmp(&b.is_symlink),
+            NodeSorter::ByIsBroken => a.is_broken.cmp(&b.is_broken),
+            NodeSorter::ByIsReadonly => a.is_readonly.cmp(&b.is_readonly),
+            NodeSorter::ByMimeEssence => a.mime_essence.cmp(&b.mime_essence),
+            NodeSorter::BySize => a.size.cmp(&b.size),
 
-            (NodeSorter::ByCanonicalAbsolutePath, false) => natord::compare(
+            NodeSorter::ByCanonicalAbsolutePath => natord::compare(
                 &a.canonical
                     .as_ref()
                     .map(|s| s.absolute_path.clone())
@@ -526,18 +508,7 @@ impl NodeSorterApplicable {
                     .unwrap_or_default(),
             ),
 
-            (NodeSorter::ByCanonicalAbsolutePath, true) => natord::compare(
-                &b.canonical
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-                &a.canonical
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-            ),
-
-            (NodeSorter::ByICanonicalAbsolutePath, false) => natord::compare_ignore_case(
+            NodeSorter::ByICanonicalAbsolutePath => natord::compare_ignore_case(
                 &a.canonical
                     .as_ref()
                     .map(|s| s.absolute_path.clone())
@@ -548,90 +519,43 @@ impl NodeSorterApplicable {
                     .unwrap_or_default(),
             ),
 
-            (NodeSorter::ByICanonicalAbsolutePath, true) => natord::compare_ignore_case(
-                &b.canonical
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-                &a.canonical
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-            ),
-
-            (NodeSorter::ByCanonicalExtension, false) => a
+            NodeSorter::ByCanonicalExtension => a
                 .canonical
                 .as_ref()
                 .map(|s| &s.extension)
                 .cmp(&b.canonical.as_ref().map(|s| &s.extension)),
 
-            (NodeSorter::ByCanonicalExtension, true) => b
-                .canonical
-                .as_ref()
-                .map(|s| &s.extension)
-                .cmp(&a.canonical.as_ref().map(|s| &s.extension)),
-
-            (NodeSorter::ByCanonicalIsDir, false) => a
+            NodeSorter::ByCanonicalIsDir => a
                 .canonical
                 .as_ref()
                 .map(|s| &s.is_dir)
                 .cmp(&b.canonical.as_ref().map(|s| &s.is_dir)),
 
-            (NodeSorter::ByCanonicalIsDir, true) => b
-                .canonical
-                .as_ref()
-                .map(|s| &s.is_dir)
-                .cmp(&a.canonical.as_ref().map(|s| &s.is_dir)),
-
-            (NodeSorter::ByCanonicalIsFile, false) => a
+            NodeSorter::ByCanonicalIsFile => a
                 .canonical
                 .as_ref()
                 .map(|s| &s.is_file)
                 .cmp(&b.canonical.as_ref().map(|s| &s.is_file)),
 
-            (NodeSorter::ByCanonicalIsFile, true) => b
-                .canonical
-                .as_ref()
-                .map(|s| &s.is_file)
-                .cmp(&a.canonical.as_ref().map(|s| &s.is_file)),
-
-            (NodeSorter::ByCanonicalIsReadonly, false) => a
+            NodeSorter::ByCanonicalIsReadonly => a
                 .canonical
                 .as_ref()
                 .map(|s| &s.is_readonly)
                 .cmp(&b.canonical.as_ref().map(|s| &s.is_readonly)),
 
-            (NodeSorter::ByCanonicalIsReadonly, true) => b
-                .canonical
-                .as_ref()
-                .map(|s| &s.is_readonly)
-                .cmp(&a.canonical.as_ref().map(|s| &s.is_readonly)),
-
-            (NodeSorter::ByCanonicalMimeEssence, false) => a
+            NodeSorter::ByCanonicalMimeEssence => a
                 .canonical
                 .as_ref()
                 .map(|s| &s.mime_essence)
                 .cmp(&b.canonical.as_ref().map(|s| &s.mime_essence)),
 
-            (NodeSorter::ByCanonicalMimeEssence, true) => b
-                .canonical
-                .as_ref()
-                .map(|s| &s.mime_essence)
-                .cmp(&a.canonical.as_ref().map(|s| &s.mime_essence)),
-
-            (NodeSorter::ByCanonicalSize, false) => a
+            NodeSorter::ByCanonicalSize => a
                 .canonical
                 .as_ref()
                 .map(|s| &s.size)
                 .cmp(&b.canonical.as_ref().map(|s| &s.size)),
 
-            (NodeSorter::ByCanonicalSize, true) => b
-                .canonical
-                .as_ref()
-                .map(|s| &s.size)
-                .cmp(&a.canonical.as_ref().map(|s| &s.size)),
-
-            (NodeSorter::BySymlinkAbsolutePath, false) => natord::compare(
+            NodeSorter::BySymlinkAbsolutePath => natord::compare(
                 &a.symlink
                     .as_ref()
                     .map(|s| s.absolute_path.clone())
@@ -642,18 +566,7 @@ impl NodeSorterApplicable {
                     .unwrap_or_default(),
             ),
 
-            (NodeSorter::BySymlinkAbsolutePath, true) => natord::compare(
-                &b.symlink
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-                &a.symlink
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-            ),
-
-            (NodeSorter::ByISymlinkAbsolutePath, false) => natord::compare_ignore_case(
+            NodeSorter::ByISymlinkAbsolutePath => natord::compare_ignore_case(
                 &a.symlink
                     .as_ref()
                     .map(|s| s.absolute_path.clone())
@@ -664,89 +577,43 @@ impl NodeSorterApplicable {
                     .unwrap_or_default(),
             ),
 
-            (NodeSorter::ByISymlinkAbsolutePath, true) => natord::compare_ignore_case(
-                &b.symlink
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-                &a.symlink
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-            ),
-
-            (NodeSorter::BySymlinkExtension, false) => a
+            NodeSorter::BySymlinkExtension => a
                 .symlink
                 .as_ref()
                 .map(|s| &s.extension)
                 .cmp(&b.symlink.as_ref().map(|s| &s.extension)),
 
-            (NodeSorter::BySymlinkExtension, true) => b
-                .symlink
-                .as_ref()
-                .map(|s| &s.extension)
-                .cmp(&a.symlink.as_ref().map(|s| &s.extension)),
-
-            (NodeSorter::BySymlinkIsDir, false) => a
+            NodeSorter::BySymlinkIsDir => a
                 .symlink
                 .as_ref()
                 .map(|s| &s.is_dir)
                 .cmp(&b.symlink.as_ref().map(|s| &s.is_dir)),
 
-            (NodeSorter::BySymlinkIsDir, true) => b
-                .symlink
-                .as_ref()
-                .map(|s| &s.is_dir)
-                .cmp(&a.symlink.as_ref().map(|s| &s.is_dir)),
-
-            (NodeSorter::BySymlinkIsFile, false) => a
+            NodeSorter::BySymlinkIsFile => a
                 .symlink
                 .as_ref()
                 .map(|s| &s.is_file)
                 .cmp(&b.symlink.as_ref().map(|s| &s.is_file)),
 
-            (NodeSorter::BySymlinkIsFile, true) => b
-                .symlink
-                .as_ref()
-                .map(|s| &s.is_file)
-                .cmp(&a.symlink.as_ref().map(|s| &s.is_file)),
-
-            (NodeSorter::BySymlinkIsReadonly, false) => a
+            NodeSorter::BySymlinkIsReadonly => a
                 .symlink
                 .as_ref()
                 .map(|s| &s.is_readonly)
                 .cmp(&b.symlink.as_ref().map(|s| &s.is_readonly)),
 
-            (NodeSorter::BySymlinkIsReadonly, true) => b
-                .symlink
-                .as_ref()
-                .map(|s| &s.is_readonly)
-                .cmp(&a.symlink.as_ref().map(|s| &s.is_readonly)),
-
-            (NodeSorter::BySymlinkMimeEssence, false) => a
+            NodeSorter::BySymlinkMimeEssence => a
                 .symlink
                 .as_ref()
                 .map(|s| &s.mime_essence)
                 .cmp(&b.symlink.as_ref().map(|s| &s.mime_essence)),
 
-            (NodeSorter::BySymlinkMimeEssence, true) => b
-                .symlink
-                .as_ref()
-                .map(|s| &s.mime_essence)
-                .cmp(&a.symlink.as_ref().map(|s| &s.mime_essence)),
-
-            (NodeSorter::BySymlinkSize, false) => a
+            NodeSorter::BySymlinkSize => a
                 .symlink
                 .as_ref()
                 .map(|s| &s.size)
                 .cmp(&b.symlink.as_ref().map(|s| &s.size)),
-
-            (NodeSorter::BySymlinkSize, true) => b
-                .symlink
-                .as_ref()
-                .map(|s| &s.size)
-                .cmp(&a.symlink.as_ref().map(|s| &s.size)),
-        }
+        };
+        if self.reverse { order.reverse() } else { order }
     }
 
     /// Get a reference to the node sorter applicable's sorter.
