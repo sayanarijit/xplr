@@ -382,8 +382,6 @@ impl Runner {
                             }
 
                             CallLuaSilently(func) => {
-                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
-
                                 match call_lua(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
                                         for msg in msgs {
@@ -398,13 +396,9 @@ impl Runner {
                                         app = app.log_error(err.to_string())?;
                                     }
                                 };
-
-                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
                             }
 
                             CallSilently(cmd) => {
-                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
-
                                 app.write_pipes()?;
                                 let status = call(&app, cmd, true)
                                     .map(|s| {
@@ -435,8 +429,6 @@ impl Runner {
                                 if let Err(e) = status {
                                     app = app.log_error(e.to_string())?;
                                 };
-
-                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
                             }
 
                             CallLua(func) => {
