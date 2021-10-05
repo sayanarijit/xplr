@@ -4,3 +4,10 @@
 /perf.data.old
 
 book/
+
+# Vi[m] backups
+*.swp
+*~
+
+# Jetbrains config
+.idea/
