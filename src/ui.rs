@@ -984,8 +984,8 @@ pub fn draw_custom_content<B: Backend>(
 
     match body {
         ContentBody::StaticParagraph { render } => {
-            let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
-            let content = Paragraph::new(render).block(block(config, title.unwrap_or_default()));
+            let body = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
+            let content = Paragraph::new(body).block(block(config, title.unwrap_or_default()));
             f.render_widget(content, layout_size);
         }
 
@@ -996,14 +996,22 @@ pub fn draw_custom_content<B: Backend>(
                 screen_size: screen_size.into(),
             };
 
-            let render = lua
+            let (title, body) = lua
                 .to_value(&ctx)
-                .map(|arg| lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{:?}", e)))
-                .unwrap_or_else(|e| e.to_string());
+                .map(|arg| {
+                    let title = title
+                        .map(|t| {
+                            lua::call(lua, &t, arg.clone()).unwrap_or_else(|e| format!("{:?}", e))
+                        })
+                        .unwrap_or_default();
+                    let body = lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{:?}", e));
+                    (title, body)
+                })
+                .unwrap_or_else(|e| ("".to_string(), e.to_string()));
 
-            let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
+            let body = ansi_to_text(body.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
 
-            let content = Paragraph::new(render).block(block(config, title.unwrap_or_default()));
+            let content = Paragraph::new(body).block(block(config, title));
             f.render_widget(content, layout_size);
         }
 
@@ -1025,18 +1033,27 @@ pub fn draw_custom_content<B: Backend>(
                 screen_size: screen_size.into(),
             };
 
-            let items = lua
+            let (title, items) = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| vec![format!("{:?}", e)])
+                    let title = title
+                        .map(|t| {
+                            lua::call(lua, &t, arg.clone()).unwrap_or_else(|e| format!("{:?}", e))
+                        })
+                        .unwrap_or_default();
+                    let items =
+                        lua::call(lua, &render, arg).unwrap_or_else(|e| vec![format!("{:?}", e)]);
+                    (title, items)
                 })
-                .unwrap_or_else(|e| vec![e.to_string()])
+                .unwrap_or_else(|e| ("".to_string(), vec![e.to_string()]));
+
+            let items = items
                 .into_iter()
                 .map(|item| ansi_to_text(item.bytes()).unwrap_or_else(|e| Text::raw(e.to_string())))
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
-            let content = List::new(items).block(block(config, title.unwrap_or_default()));
+            let content = List::new(items).block(block(config, title));
             f.render_widget(content, layout_size);
         }
 
@@ -1084,12 +1101,21 @@ pub fn draw_custom_content<B: Backend>(
                 screen_size: screen_size.into(),
             };
 
-            let rows = lua
+            let (title, rows) = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
+                    let title = title
+                        .map(|t| {
+                            lua::call(lua, &t, arg.clone()).unwrap_or_else(|e| format!("{:?}", e))
+                        })
+                        .unwrap_or_default();
+                    let rows = lua::call(lua, &render, arg)
+                        .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]]);
+                    (title, rows)
                 })
-                .unwrap_or_else(|e| vec![vec![e.to_string()]])
+                .unwrap_or_else(|e| ("".to_string(), vec![vec![e.to_string()]]));
+
+            let rows = rows
                 .into_iter()
                 .map(|cols| {
                     Row::new(
@@ -1109,9 +1135,7 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|w| w.to_tui(screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
-            let mut content = Table::new(rows)
-                .widths(&widths)
-                .block(block(config, title.unwrap_or_default()));
+            let mut content = Table::new(rows).widths(&widths).block(block(config, title));
 
             if let Some(col_spacing) = col_spacing {
                 content = content.column_spacing(col_spacing);

@@ -274,12 +274,16 @@ It contains the following fields:
 ```lua
 xplr.config.layouts.builtin.default = {
   CustomContent = {
-    title = "custom title",
-    body = { DynamicParagraph = { render = "fn.custom.render_layout" } },
+    title = "custom.render_title",
+    body = { DynamicParagraph = { render = "custom.render_body" } },
   },
 }
 
-xplr.fn.custom.render_layout = function(ctx)
+xplr.fn.custom.render_title = function(ctx)
+  return ctx.app.mode.name
+end
+
+xplr.fn.custom.render_body = function(ctx)
   return ctx.app.pwd
 end
 ```
@@ -315,12 +319,16 @@ It contains the following fields:
 ```lua
 xplr.config.layouts.builtin.default = {
   CustomContent = {
-    title = "custom title",
-    body = { DynamicList = { render = "custom.render_layout" } },
+    title = "custom.render_title",
+    body = { DynamicList = { render = "custom.render_body" } },
   },
 }
 
-xplr.fn.custom.render_layout = function(ctx)
+xplr.fn.custom.render_title = function(ctx)
+  return ctx.app.mode.name
+end
+
+xplr.fn.custom.render_body = function(ctx)
   return ctx.app.history.paths
 end
 ```
@@ -370,7 +378,7 @@ It contains the following fields:
 ```lua
 xplr.config.layouts.builtin.default = {
   CustomContent = {
-    title = "custom title",
+    title = "custom.render_title",
     body = {
       DynamicTable = {
         widths = {
@@ -378,13 +386,17 @@ xplr.config.layouts.builtin.default = {
           { Percentage = 50 },
         },
         col_spacing = 1,
-        render = "custom.render_layout",
+        render = "custom.render_body",
       },
     },
   },
 }
 
-xplr.fn.custom.render_layout = function(ctx)
+xplr.fn.custom.render_title = function(ctx)
+  return ctx.app.mode.name
+end
+
+xplr.fn.custom.render_body = function(ctx)
   return {
     { "", "" },
     { "Layout height", tostring(ctx.layout_size.height) },
