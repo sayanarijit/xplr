@@ -2695,6 +2695,26 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0150v0150a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0150v0150a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.14.7">v0.14.7</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.15.0">v0.15.0</a></a></h4>
+<ul>
+<li>Added <code>CustomContent</code> as layout option that can be used to render custom
+paragraphs, lists and tables. Both static and dynamic.</li>
+<li>Added support for optionally defining custom layouts for different modes.</li>
+<li>Added <code>xplr.config.general.focus_selection_ui</code> to highlight selected files
+under focus differently than files under focus that are not selected.</li>
+<li>Added <code>PopModeKeepingInputBuffer</code>, and SwitchMode alternatives to allow
+switching to different modes without resetting the input buffer.</li>
+<li>Removed <code>config</code> field from <code>CallLuaArg</code> as it's already available globally
+as <code>xplr.config</code>.</li>
+<li>Fixed a bug which caused xplr to misbehave when used with specific tools and
+environment (e.g. neovim, fzf, zsh4humans etc.).</li>
+<li>Recover mode will be disabled by default.
+i.e. <code>xplr.config.general.disable_recover_mode</code> has been deprecated. Use
+<code>xplr.config.general.enable_recover_mode</code> instead.</li>
+<li>Library users please refer to the latest API docs and examples.</li>
+<li>New homepage: https://xplr.dev</li>
+</ul>
+<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.14.7">v0.14.7</a></a></h4>
 <ul>
 <li>macOS users need to place their config file (<code>init.lua</code>) in
@@ -2713,7 +2733,6 @@ related data.</li>
 <li>Since version <code>v0.14.6</code>, the <code>-C</code> or <code>--extra-config</code> CLI argument is
 available.</li>
 </ul>
-<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0121v0121a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0121v0121a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a></a></h4>
 <ul>
 <li>Lua functions called using <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua"><code>CallLua</code></a> and <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently"><code>CallLuaSilently</code></a> messages will receive <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
@@ -2804,7 +2823,7 @@ For e.g.
 <p>In case you have mapped the keys <code>q</code>, <code>ctrl-i</code> and <code>ctrl-o</code>, you may want to revisit the default mode key bindings and remap accordingly to use the new functionalities.</p>
 <h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0313v0313a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv041v041a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0313v0313a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv041v041a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.3.13">v0.3.13</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.4.1">v0.4.1</a></a></h4>
 <p>A lot has changed (apologies). But I promise from now on, upgrading will be much less painful (thanks to <a href="https://github.com/maximbaz">@maximbaz</a>'s valuable <a href="https://github.com/sayanarijit/xplr/issues/45#issue-854447104">inputs</a> and <a href="https://github.com/sayanarijit/xplr/pull/47">code reviews</a>).</p>
-<p>So, to start with the upgrade, let's remove everything from your config file except the <code>version</code> field and your custom modifications. If  <code>version</code> is the only thing remaining, update it to <code>v0.4.1</code> and you are done.</p>
+<p>So, to start with the upgrade, let's remove everything from your config file except the <code>version</code> field and your custom modifications. If <code>version</code> is the only thing remaining, update it to <code>v0.4.1</code> and you are done.</p>
 <p>Else, do the following</p>
 <ul>
 <li>Rename <code>general.focused_ui</code> to <code>general.focus_ui</code> (<a href="https://github.com/sayanarijit/xplr/blob/055c1083d6/src/config.yml#L124">see here</a>).</li>
