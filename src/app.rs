@@ -1085,6 +1085,7 @@ pub enum ExternalMsg {
     ResetInputBuffer,
 
     /// Switch input mode.
+    /// It clears the input buffer.
     ///
     /// > **NOTE:** To be specific about which mode to switch to, use `SwitchModeBuiltin` or
     /// `SwitchModeCustom` instead.
@@ -1092,18 +1093,47 @@ pub enum ExternalMsg {
     /// **Example:** `SwitchMode: default`
     SwitchMode(String),
 
+    /// Switch input mode.
+    /// It keeps the input buffer.
+    ///
+    /// > **NOTE:** To be specific about which mode to switch to, use
+    /// `SwitchModeBuiltinKeepingInputBuffer` or
+    /// `SwitchModeCustomKeepingInputBuffer` instead.
+    ///
+    /// **Example:** `SwitchModeKeepingInputBuffer: default`
+    SwitchModeKeepingInputBuffer(String),
+
     /// Switch to a builtin mode.
+    /// It clears the input buffer.
     ///
     /// **Example:** `SwitchModeBuiltin: default`
     SwitchModeBuiltin(String),
 
+    /// Switch to a builtin mode.
+    /// It keeps the input buffer.
+    ///
+    /// **Example:** `SwitchModeBuiltinKeepingInputBuffer: default`
+    SwitchModeBuiltinKeepingInputBuffer(String),
+
     /// Switch to a custom mode.
+    /// It clears the input buffer.
     ///
     /// **Example:** `SwitchModeCustom: my_custom_mode`
     SwitchModeCustom(String),
 
+    /// Switch to a custom mode.
+    /// It keeps the input buffer.
+    ///
+    /// **Example:** `SwitchModeCustomKeepingInputBuffer: my_custom_mode`
+    SwitchModeCustomKeepingInputBuffer(String),
+
     /// Pop the last mode from the history and switch to it.
+    /// It clears the input buffer.
     PopMode,
+
+    /// Pop the last mode from the history and switch to it.
+    /// It keeps the input buffer.
+    PopModeKeepingInputBuffer,
 
     /// Switch layout.
     ///
@@ -1744,9 +1774,19 @@ impl App {
                 ExternalMsg::RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
                 ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
                 ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
+                ExternalMsg::SwitchModeKeepingInputBuffer(mode) => {
+                    self.switch_mode_keeping_input_buffer(&mode)
+                }
                 ExternalMsg::SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
+                ExternalMsg::SwitchModeBuiltinKeepingInputBuffer(mode) => {
+                    self.switch_mode_builtin_keeping_input_buffer(&mode)
+                }
                 ExternalMsg::SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
+                ExternalMsg::SwitchModeCustomKeepingInputBuffer(mode) => {
+                    self.switch_mode_custom_keeping_input_buffer(&mode)
+                }
                 ExternalMsg::PopMode => self.pop_mode(),
+                ExternalMsg::PopModeKeepingInputBuffer => self.pop_mode_keeping_input_buffer(),
                 ExternalMsg::SwitchLayout(mode) => self.switch_layout(&mode),
                 ExternalMsg::SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
                 ExternalMsg::SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
@@ -2206,18 +2246,30 @@ impl App {
         self
     }
 
-    fn pop_mode(mut self) -> Result<Self> {
+    fn pop_mode(self) -> Result<Self> {
+        self.pop_mode_keeping_input_buffer().map(|mut a| {
+            a.input_buffer = None;
+            a
+        })
+    }
+
+    fn pop_mode_keeping_input_buffer(mut self) -> Result<Self> {
         if let Some(mode) = self.last_modes.pop() {
-            self.input_buffer = None;
             self.mode = mode;
         };
         Ok(self)
     }
 
-    fn switch_mode(mut self, mode: &str) -> Result<Self> {
+    fn switch_mode(self, mode: &str) -> Result<Self> {
+        self.switch_mode_keeping_input_buffer(mode).map(|mut a| {
+            a.input_buffer = None;
+            a
+        })
+    }
+
+    fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config().modes().clone().get(mode) {
             self = self.push_mode();
-            self.input_buffer = None;
             self.mode = mode
                 .to_owned()
                 .sanitized(self.config().general().read_only());
@@ -2227,10 +2279,17 @@ impl App {
         }
     }
 
-    fn switch_mode_builtin(mut self, mode: &str) -> Result<Self> {
+    fn switch_mode_builtin(self, mode: &str) -> Result<Self> {
+        self.switch_mode_builtin_keeping_input_buffer(mode)
+            .map(|mut a| {
+                a.input_buffer = None;
+                a
+            })
+    }
+
+    fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config().modes().clone().get_builtin(mode) {
             self = self.push_mode();
-            self.input_buffer = None;
             self.mode = mode
                 .to_owned()
                 .sanitized(self.config().general().read_only());
@@ -2240,10 +2299,17 @@ impl App {
         }
     }
 
-    fn switch_mode_custom(mut self, mode: &str) -> Result<Self> {
+    fn switch_mode_custom(self, mode: &str) -> Result<Self> {
+        self.switch_mode_custom_keeping_input_buffer(mode)
+            .map(|mut a| {
+                a.input_buffer = None;
+                a
+            })
+    }
+
+    fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config().modes().clone().get_custom(mode) {
             self = self.push_mode();
-            self.input_buffer = None;
             self.mode = mode
                 .to_owned()
                 .sanitized(self.config().general().read_only());
