@@ -434,10 +434,10 @@ fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
                 .fold(0, |a, b| (a ^ b)),
         ))
         .title(Span::styled(
-            config.title.format.to_owned().unwrap_or(default_title),
-            config.title.style.to_owned().into(),
+            config.title.format.unwrap_or(default_title),
+            config.title.style.into(),
         ))
-        .style(config.style.to_owned().into())
+        .style(config.style.into())
 }
 
 fn draw_table<B: Backend>(
@@ -480,11 +480,11 @@ fn draw_table<B: Backend>(
                         .to_owned()
                         .map(|t| {
                             if is_last {
-                                t.2.format.to_owned()
+                                t.2.format
                             } else if is_first {
-                                t.0.format.to_owned()
+                                t.0.format
                             } else {
-                                t.1.format.to_owned()
+                                t.1.format
                             }
                         })
                         .unwrap_or_default();
@@ -527,11 +527,7 @@ fn draw_table<B: Backend>(
 
                     let (mut prefix, mut suffix, mut style) = {
                         let ui = app_config.general.default_ui.to_owned();
-                        (
-                            ui.prefix.to_owned(),
-                            ui.suffix.to_owned(),
-                            ui.style.to_owned().extend(&node_type.style),
-                        )
+                        (ui.prefix, ui.suffix, ui.style.extend(&node_type.style))
                     };
 
                     if is_focused && is_selected {
@@ -563,7 +559,7 @@ fn draw_table<B: Backend>(
                         is_selected,
                         is_focused,
                         dir.total,
-                        node_type.meta.to_owned(),
+                        node_type.meta,
                     );
 
                     let cols = lua
@@ -791,10 +787,10 @@ fn draw_sort_n_filter<B: Backend>(
                             ui.format.to_owned().unwrap_or_default(),
                             ui.style.to_owned().into(),
                         ),
-                        Span::styled(f.input.to_owned(), ui.style.to_owned().into()),
+                        Span::styled(f.input.to_owned(), ui.style.into()),
                     )
                 })
-                .unwrap_or_else(|| (Span::raw("f"), Span::raw("")))
+                .unwrap_or((Span::raw("f"), Span::raw("")))
         })
         .chain(sort_by.iter().map(|s| {
             let direction = if s.reverse { &reverseui } else { &forwardui };
@@ -804,17 +800,14 @@ fn draw_sort_n_filter<B: Backend>(
                 .map(|u| {
                     let ui = defaultui.to_owned().extend(u);
                     (
-                        Span::styled(
-                            ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned().into(),
-                        ),
+                        Span::styled(ui.format.to_owned().unwrap_or_default(), ui.style.into()),
                         Span::styled(
                             direction.format.to_owned().unwrap_or_default(),
                             direction.style.to_owned().into(),
                         ),
                     )
                 })
-                .unwrap_or_else(|| (Span::raw("s"), Span::raw("")))
+                .unwrap_or((Span::raw("s"), Span::raw("")))
         }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
@@ -1135,15 +1128,10 @@ pub fn draw_layout<B: Backend>(
                 .horizontal_margin(
                     config
                         .horizontal_margin
-                        .or_else(|| config.margin)
+                        .or(config.margin)
                         .unwrap_or_default(),
                 )
-                .vertical_margin(
-                    config
-                        .vertical_margin
-                        .or_else(|| config.margin)
-                        .unwrap_or_default(),
-                )
+                .vertical_margin(config.vertical_margin.or(config.margin).unwrap_or_default())
                 .split(layout_size);
 
             splits
@@ -1167,15 +1155,10 @@ pub fn draw_layout<B: Backend>(
                 .horizontal_margin(
                     config
                         .horizontal_margin
-                        .or_else(|| config.margin)
+                        .or(config.margin)
                         .unwrap_or_default(),
                 )
-                .vertical_margin(
-                    config
-                        .vertical_margin
-                        .or_else(|| config.margin)
-                        .unwrap_or_default(),
-                )
+                .vertical_margin(config.vertical_margin.or(config.margin).unwrap_or_default())
                 .split(layout_size);
 
             splits
@@ -1188,12 +1171,7 @@ pub fn draw_layout<B: Backend>(
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, lua: &Lua) {
     let screen_size = f.size();
-    let layout = app
-        .mode
-        .layout
-        .as_ref()
-        .unwrap_or_else(|| &app.layout)
-        .to_owned();
+    let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).to_owned();
 
     draw_layout(layout, f, screen_size, screen_size, app, lua);
 }

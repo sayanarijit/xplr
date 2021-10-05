@@ -1549,16 +1549,16 @@ impl App {
             .map(|a| Some(a.messages.clone()))
             .unwrap_or_else(|| {
                 if key.is_alphabet() {
-                    kb.on_alphabet.clone().map(|a| a.messages.clone())
+                    kb.on_alphabet.clone().map(|a| a.messages)
                 } else if key.is_number() {
-                    kb.on_number.clone().map(|a| a.messages.clone())
+                    kb.on_number.clone().map(|a| a.messages)
                 } else if key.is_special_character() {
-                    kb.on_special_character.clone().map(|a| a.messages.clone())
+                    kb.on_special_character.clone().map(|a| a.messages)
                 } else {
                     None
                 }
             })
-            .or_else(|| default.map(|a| a.messages.clone()))
+            .or_else(|| default.map(|a| a.messages))
             .unwrap_or_else(|| {
                 if self.config.general.enable_recover_mode {
                     vec![ExternalMsg::SwitchModeBuiltin("recover".into())]
