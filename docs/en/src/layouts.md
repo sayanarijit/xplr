@@ -275,7 +275,7 @@ It contains the following fields:
 xplr.config.layouts.builtin.default = {
   CustomContent = {
     title = "custom title",
-    body = { DynamicParagraph = { render = "fn.custom.render_layout" } },
+    body = { DynamicParagraph = { render = "custom.render_layout" } },
   },
 }
 
