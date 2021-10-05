@@ -1,5 +1,4 @@
-Message
-=======
+# Message
 
 You can think of xplr as a server. Just like web servers listen to HTTP
 requests, xplr listens to [messages][1].
@@ -10,9 +9,7 @@ You can send these messages to an xplr session in the following ways:
 - Via [Lua function calls][3]
 - Via shell command using the [input pipe][4]
 
-
-Format
-------
+## Format
 
 To send messages using the [key bindings][2] or
 [Lua function calls][3], messages are represented in
@@ -30,9 +27,7 @@ represented using
 - FocusPath: "/path/to/file"
 - Call: { command: bash, args: ["-c", "read -p test"] }
 
-
-Full List of Messages
----------------------
+## Full List of Messages
 
 ### "ExplorePwd"
 
@@ -267,39 +262,87 @@ Reset the input buffer back to null. It will not show in the UI.
 **YAML:** `SwitchMode: string`
 
 Switch input [mode][8].
+It clears the input buffer.
 
 > **NOTE:** To be specific about which mode to switch to, use `SwitchModeBuiltin` or
-`SwitchModeCustom` instead.
+> `SwitchModeCustom` instead.
 
 **YAML Example:** `SwitchMode: default`
 
 **Lua Example:** `{ SwitchMode = "default" }`
+
+### { SwitchModeKeepingInputBuffer = "string" }
+
+**YAML:** `SwitchModeKeepingInputBuffer: string`
+
+Switch input [mode][8].
+It keeps the input buffer.
+
+> **NOTE:** To be specific about which mode to switch to, use
+> `SwitchModeBuiltinKeepingInputBuffer` or
+> `SwitchModeCustomKeepingInputBuffer` instead.
+
+**YAML Example:** `SwitchModeKeepingInputBuffer: default`
+
+**Lua Example:** `{ SwitchModeKeepingInputBuffer = "default" }`
 
 ### { SwitchModeBuiltin = "string" }
 
 **YAML:** `SwitchModeBuiltin: string`
 
 Switch to a [builtin mode][9].
+It clears the input buffer.
 
 **YAML Example:** `SwitchModeBuiltin: default`
 
 **Lua Example:** `{ SwitchModeBuiltin = "default" }`
+
+### { SwitchModeBuiltinKeepingInputBuffer = "string" }
+
+**YAML:** `SwitchModeBuiltinKeepingInputBuffer: string`
+
+Switch to a [builtin mode][9].
+It keeps the input buffer.
+
+**YAML Example:** `SwitchModeBuiltinKeepingInputBuffer: default`
+
+**Lua Example:** `{ SwitchModeBuiltinKeepingInputBuffer = "default" }`
 
 ### { SwitchModeCustom = "string" }
 
 **YAML:** `SwitchModeCustom: string`
 
 Switch to a [custom mode][10].
+It clears the input buffer.
 
 **YAML Example:** `SwitchModeCustom: my_custom_mode`
 
 **Lua Example:** `{ SwitchModeCustom = "my_custom_mode" }`
+
+### { SwitchModeCustomKeepingInputBuffer = "string" }
+
+**YAML:** `SwitchModeCustom: string`
+
+Switch to a [custom mode][10].
+It keeps the input buffer.
+
+**YAML Example:** `SwitchModeCustomKeepingInputBuffer: my_custom_mode`
+
+**Lua Example:** `{ SwitchModeCustomKeepingInputBuffer = "my_custom_mode" }`
 
 ### "PopMode"
 
 **YAML:** `PopMode`
 
 Pop the last mode from the history and switch to it.
+It clears the input buffer.
+
+### PopModeKeepingInputBuffer
+
+**YAML:** `PopModeKeepingInputBuffer`
+
+Pop the last mode from the history and switch to it.
+It keeps the input buffer.
 
 ### { SwitchLayout = "string" }
 
@@ -308,7 +351,7 @@ Pop the last mode from the history and switch to it.
 Switch [layout][11].
 
 > **NOTE:** To be specific about which layout to switch to, use `SwitchLayoutBuiltin` or
-`SwitchLayoutCustom` instead.
+> `SwitchLayoutCustom` instead.
 
 **YAML Example:** `SwitchLayout: default`
 
@@ -556,7 +599,6 @@ Add a [sorter][17] to sort nodes while exploring directories.
 
 **YAML Example:** `{ AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }`
 
-
 ### { RemoveNodeSorter = [Sorter][17] }
 
 **YAML:** `RemoveNodeSorter: Sorter`
@@ -738,9 +780,9 @@ the default configuration file.
 
 Write the application state to a file, without quitting. Also helpful for debugging.
 
-**YAML Example:**  `Debug: /path/to/file`
+**YAML Example:** `Debug: /path/to/file`
 
-**Lua Example:**  `{ Debug = "/path/to/file" }`
+**Lua Example:** `{ Debug = "/path/to/file" }`
 
 ### "Terminate"
 
@@ -748,9 +790,7 @@ Write the application state to a file, without quitting. Also helpful for debugg
 
 Terminate the application with a non-zero return code.
 
-
-Lua Function Calls
-------------------
+## Lua Function Calls
 
 xplr allows users to define lua functions using the `xplr.fn.custom` Lua API.
 
@@ -781,7 +821,6 @@ It contains the following information:
 - [explorer_config][40]
 - [history][41]
 - [last_modes][42]
-
 
 ### version
 
@@ -853,7 +892,6 @@ The session path.
 
 [TODO][66]
 
-
 ### history
 
 Type: [History][70]
@@ -888,20 +926,17 @@ Type: string
 
 The extension of the node.
 
-
 ### is_symlink
 
 Type: boolean
 
 `true` if the node is a symlink.
 
-
 ### is_broken
 
 Type: boolean
 
 `true` if the node is a broken symlink.
-
 
 ### is_dir
 
@@ -920,7 +955,6 @@ Type: boolean
 Type: boolean
 
 `true` if the node is real-only.
-
 
 ### mime_essence
 
@@ -983,7 +1017,6 @@ A node contains the following fields:
 - [canonical][58]
 - [symlink][59]
 
-
 ### DirectoryBuffer
 
 Directory buffer contains the following fields:
@@ -1018,7 +1051,6 @@ Type: int
 The index of the node under focus. It can be `0` even when there's no node to
 focus on.
 
-
 ### History
 
 History contains the following fields:
@@ -1037,7 +1069,6 @@ Location of the current path in history.
 Type: list of string
 
 Visited paths.
-
 
 ### Example: Using Lua Function Calls
 
@@ -1067,9 +1098,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 -- name. Enter your name to receive a nice greeting and to know your location.
 ```
 
-
-Environment Variables and Pipes
--------------------------------
+## Environment Variables and Pipes
 
 Alternative to `CallLua`, `CallLuaSilently` messages that call Lua functions,
 there are `Call`, `CallSilently`, `BashExec`, `BashExecSilently` messages
@@ -1163,7 +1192,6 @@ New-line delimited list of last visited paths (similar to jump list in vim).
 New-line delimited list of paths, filtered and sorted as displayed in the
 [files table][28].
 
-
 ### Example: Using Environment Variables and Pipes
 
 ```lua
@@ -1177,7 +1205,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
       read name
       greeting="Hello $name!"
       message="$greeting You are inside $PWD"
-    
+
       echo LogSuccess: '"'$message'"' >> "${XPLR_PIPE_MSG_IN:?}"
       ]===]
     }
@@ -1188,75 +1216,73 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 -- name. Enter your name to receive a nice greeting and to know your location.
 ```
 
-
-
-[1]:#full-list-of-messages
-[2]:modes.md#key-bindings
-[3]:#lua-function-calls
-[4]:#input-pipe
-[5]:https://www.lua.org/
-[6]:http://yaml.org/
-[7]:https://www.json.org
-[8]:modes.md#mode
-[9]:modes.md#builtin
-[10]:modes.md#custom
-[11]:layouts.md#layout
-[12]:layouts.md#builtin
-[13]:layouts.md#custom
-[14]:#calllua-argument
-[15]:filtering.md#filter
-[16]:filtering.md
-[17]:sorting.md#sorter
-[18]:https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields
-[19]:modes.md#tutorial-adding-a-new-mode
-[20]:#xplr_pipe_msg_in
-[21]:#xplr_pipe_selection_out
-[22]:#xplr_pipe_global_help_menu_out
-[23]:#xplr_pipe_logs_out
-[24]:#xplr_pipe_result_out
-[25]:#xplr_pipe_history_out
-[26]:#xplr_pipe_directory_nodes_out
-[27]:https://www.yaml.org
-[28]:layouts.md#table
-[29]:#version
-[30]:#config
-[31]:#pwd
-[32]:#focused_node
-[33]:#directory_buffer
-[34]:#selection
-[35]:#mode
-[36]:#layout
-[37]:#input_buffer
-[38]:#pid
-[39]:#session_path
-[40]:#explorer_config
-[41]:#history
-[42]:#last_modes
-[43]:configuration.md#config
-[44]:#node
-[45]:#parent
-[46]:#relative_path
-[47]:#absolute_path
-[48]:#extension
-[49]:#is_symlink
-[50]:#is_broken
-[51]:#is_dir
-[52]:#is_file
-[53]:#is_readonly
-[54]:#mime_essence
-[55]:#size
-[56]:#human_size
-[57]:#permissions
-[58]:#canonical
-[59]:#symlink
-[60]:column-renderer.md#permission
-[61]:column-renderer.md#resolved-node-metadata
-[62]:#directorybuffer
-[63]:#nodes
-[64]:#total
-[65]:#focus
-[66]:https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html
-[67]:#history
-[68]:#loc
-[69]:#paths
-[70]:#history-1
+[1]: #full-list-of-messages
+[2]: modes.md#key-bindings
+[3]: #lua-function-calls
+[4]: #input-pipe
+[5]: https://www.lua.org/
+[6]: http://yaml.org/
+[7]: https://www.json.org
+[8]: modes.md#mode
+[9]: modes.md#builtin
+[10]: modes.md#custom
+[11]: layouts.md#layout
+[12]: layouts.md#builtin
+[13]: layouts.md#custom
+[14]: #calllua-argument
+[15]: filtering.md#filter
+[16]: filtering.md
+[17]: sorting.md#sorter
+[18]: https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields
+[19]: modes.md#tutorial-adding-a-new-mode
+[20]: #xplr_pipe_msg_in
+[21]: #xplr_pipe_selection_out
+[22]: #xplr_pipe_global_help_menu_out
+[23]: #xplr_pipe_logs_out
+[24]: #xplr_pipe_result_out
+[25]: #xplr_pipe_history_out
+[26]: #xplr_pipe_directory_nodes_out
+[27]: https://www.yaml.org
+[28]: layouts.md#table
+[29]: #version
+[30]: #config
+[31]: #pwd
+[32]: #focused_node
+[33]: #directory_buffer
+[34]: #selection
+[35]: #mode
+[36]: #layout
+[37]: #input_buffer
+[38]: #pid
+[39]: #session_path
+[40]: #explorer_config
+[41]: #history
+[42]: #last_modes
+[43]: configuration.md#config
+[44]: #node
+[45]: #parent
+[46]: #relative_path
+[47]: #absolute_path
+[48]: #extension
+[49]: #is_symlink
+[50]: #is_broken
+[51]: #is_dir
+[52]: #is_file
+[53]: #is_readonly
+[54]: #mime_essence
+[55]: #size
+[56]: #human_size
+[57]: #permissions
+[58]: #canonical
+[59]: #symlink
+[60]: column-renderer.md#permission
+[61]: column-renderer.md#resolved-node-metadata
+[62]: #directorybuffer
+[63]: #nodes
+[64]: #total
+[65]: #focus
+[66]: https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html
+[67]: #history
+[68]: #loc
+[69]: #paths
+[70]: #history-1
