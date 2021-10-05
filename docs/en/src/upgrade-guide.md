@@ -47,22 +47,15 @@ compatibility.
 
 #### [v0.14.7][3] -> [v0.15.0][43]
 
-- Added `CustomContent` as layout option that can be used to render custom
-  paragraphs, lists and tables. Both static and dynamic.
-- Added support for optionally defining custom layouts for different modes.
-- Added `xplr.config.general.focus_selection_ui` to highlight selected files
-  under focus differently than files under focus that are not selected.
-- Added `PopModeKeepingInputBuffer`, and SwitchMode alternatives to allow
-  switching to different modes without resetting the input buffer.
-- Removed `config` field from `CallLuaArg` as it's already available globally
-  as `xplr.config`.
-- Fixed a bug which caused xplr to misbehave when used with specific tools and
-  environment (e.g. neovim, fzf, zsh4humans etc.).
-- Recover mode will be disabled by default.
-  i.e. `xplr.config.general.disable_recover_mode` has been deprecated. Use
+- Deprecated `config` field from `CallLua` argument. Use the globally available
+  `xplr.config` instead.
+- `xplr.config.general.disable_recover_mode` has been deprecated. Use
   `xplr.config.general.enable_recover_mode` instead.
+- Use `xplr.config.general.focus_selection_ui` to highlight selected files
+  under focus differently than files under focus that are not selected.
+- Use `PopModeKeepingInputBuffer`, and SwitchMode alternatives to switching to
+  different modes without resetting the input buffer.
 - Library users please refer to the latest API docs and examples.
-- New homepage: https://xplr.dev
 
 <sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
