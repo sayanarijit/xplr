@@ -2,7 +2,7 @@
 
 use crate::app;
 use crate::cli::Cli;
-use crate::event_reader;
+use crate::event_reader::EventReader;
 use crate::explorer;
 use crate::lua;
 use crate::pipe_reader;
@@ -146,8 +146,6 @@ impl Runner {
         fs::create_dir_all(app.session_path())?;
 
         let (tx_msg_in, rx_msg_in) = mpsc::channel();
-        let (tx_event_reader, rx_event_reader) = mpsc::channel();
-        let (tx_loop_waiter, rx_loop_waiter) = mpsc::channel();
         let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
         app = app.explore_pwd()?;
@@ -208,8 +206,10 @@ impl Runner {
         terminal.hide_cursor()?;
 
         // Threads
-        event_reader::keep_reading(tx_msg_in.clone(), rx_event_reader, tx_loop_waiter);
         pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
+
+        let mut event_reader = EventReader::new(tx_msg_in.clone());
+        event_reader.start();
 
         // Enqueue on_load messages
         for msg in self.on_load {
@@ -435,7 +435,7 @@ impl Runner {
                                 execute!(terminal.backend_mut(), event::DisableMouseCapture)
                                     .unwrap_or_default();
 
-                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
+                                event_reader.stop();
 
                                 terminal.clear()?;
                                 terminal.set_cursor(0, 0)?;
@@ -460,7 +460,7 @@ impl Runner {
                                 terminal.clear()?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
-                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
+                                event_reader.start();
 
                                 if mouse_enabled {
                                     match execute!(
@@ -481,7 +481,7 @@ impl Runner {
                                 execute!(terminal.backend_mut(), event::DisableMouseCapture)
                                     .unwrap_or_default();
 
-                                event_reader::pause_reading(&tx_event_reader, &rx_loop_waiter)?;
+                                event_reader.stop();
 
                                 terminal.clear()?;
                                 terminal.set_cursor(0, 0)?;
@@ -522,7 +522,7 @@ impl Runner {
                                 terminal.clear()?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
-                                event_reader::resume_reading(&tx_event_reader, &rx_loop_waiter)?;
+                                event_reader.start();
 
                                 if mouse_enabled {
                                     match execute!(

@@ -18,8 +18,8 @@ categories = ["command-line-interface", "command-line-utilities"]
 name = "xplr"
 
 [dependencies]
-tui = { version = "0.16.0", default-features = false, features = ['crossterm', 'serde'] }
-crossterm = "0.21.0"
+tui = { version = "0.16.0", default-features = false, features = ["crossterm", "serde"] }
+crossterm = { version = "0.21.0", features = ["event-stream"] }
 dirs = "4.0.0"
 serde = { version = "1.0.130", features = ["derive"] }
 serde_yaml = "0.8.21"
@@ -33,6 +33,9 @@ humansize = "1.1.1"
 mlua = { version = "0.6.4", features = ["luajit", "vendored", "serialize", "send"] }
 ansi-to-tui = "0.4.1"
 libc = "0.2.103"
+async-std = "1.10.0"
+futures = "0.3.17"
+futures-timer = "3.0.2"
 
 [dev-dependencies]
 criterion = "0.3.5"
