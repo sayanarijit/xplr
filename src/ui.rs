@@ -448,16 +448,14 @@ fn draw_table<B: Backend>(
     lua: &Lua,
 ) {
     let panel_config = &app.config.general.panel_ui;
-    let config = panel_config
-        .default
-        .to_owned()
-        .extend(&panel_config.table);
+    let config = panel_config.default.to_owned().extend(&panel_config.table);
     let app_config = app.config.to_owned();
     let header_height = app_config.general.table.header.height.unwrap_or(1);
     let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
 
     let rows = app
-        .directory_buffer.as_ref()
+        .directory_buffer
+        .as_ref()
         .map(|dir| {
             dir.nodes
                 .iter()
@@ -516,8 +514,7 @@ fn draw_table<B: Backend>(
                         node_type = node_type.extend(conf);
                     }
 
-                    if let Some(conf) = app_config.node_types.special.get(&node.relative_path)
-                    {
+                    if let Some(conf) = app_config.node_types.special.get(&node.relative_path) {
                         node_type = node_type.extend(conf);
                     }
 
@@ -617,19 +614,14 @@ fn draw_table<B: Backend>(
         .widths(&table_constraints)
         .style(app_config.general.table.style.to_owned().into())
         .highlight_style(app_config.general.focus_ui.style.to_owned().into())
-        .column_spacing(
-            app_config
-                .general
-                .table
-                .col_spacing
-                .unwrap_or_default(),
-        )
+        .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
         .block(block(
             config,
             format!(
                 " {} ({}) ",
                 app.pwd,
-                app.directory_buffer.as_ref()
+                app.directory_buffer
+                    .as_ref()
                     .map(|d| d.total)
                     .unwrap_or_default()
             ),
@@ -649,15 +641,7 @@ fn draw_table<B: Backend>(
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
-        .style(
-            app_config
-                .general
-                .table
-                .header
-                .style
-                .to_owned()
-                .into(),
-        ),
+        .style(app_config.general.table.header.style.to_owned().into()),
     );
 
     f.render_widget(table, layout_size);
@@ -722,11 +706,7 @@ fn draw_help_menu<B: Backend>(
     let help_menu = Table::new(help_menu_rows)
         .block(block(
             config,
-            format!(
-                " Help [{}{}] ",
-                &app.mode.name,
-                read_only_indicator(app)
-            ),
+            format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
         ))
         .widths(&[
             TuiConstraint::Percentage(20),
@@ -771,11 +751,7 @@ fn draw_input_buffer<B: Backend>(
     ]))
     .block(block(
         config,
-        format!(
-            " Input [{}{}] ",
-            app.mode.name,
-            read_only_indicator(app)
-        ),
+        format!(" Input [{}{}] ", app.mode.name, read_only_indicator(app)),
     ));
     f.render_widget(input_buf, layout_size);
 }
@@ -892,11 +868,7 @@ fn draw_logs<B: Backend>(
                     app::LogLevel::Warning => ListItem::new(format!(
                         "{} | {} | {}",
                         &time,
-                        &logs_config
-                            .warning
-                            .format
-                            .to_owned()
-                            .unwrap_or_default(),
+                        &logs_config.warning.format.to_owned().unwrap_or_default(),
                         l.message
                     ))
                     .style(logs_config.warning.style.to_owned().into()),
@@ -904,11 +876,7 @@ fn draw_logs<B: Backend>(
                     app::LogLevel::Success => ListItem::new(format!(
                         "{} | {} | {}",
                         &time,
-                        &logs_config
-                            .success
-                            .format
-                            .to_owned()
-                            .unwrap_or_default(),
+                        &logs_config.success.format.to_owned().unwrap_or_default(),
                         l.message
                     ))
                     .style(logs_config.success.style.to_owned().into()),

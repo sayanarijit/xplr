@@ -1388,7 +1388,9 @@ impl App {
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
-        self.directory_buffer.as_ref().and_then(|d| d.focused_node())
+        self.directory_buffer
+            .as_ref()
+            .and_then(|d| d.focused_node())
     }
 
     pub fn focused_node_str(&self) -> String {
@@ -1551,9 +1553,7 @@ impl App {
                 } else if key.is_number() {
                     kb.on_number.clone().map(|a| a.messages.clone())
                 } else if key.is_special_character() {
-                    kb.on_special_character
-                        .clone()
-                        .map(|a| a.messages.clone())
+                    kb.on_special_character.clone().map(|a| a.messages.clone())
                 } else {
                     None
                 }
@@ -1670,7 +1670,11 @@ impl App {
     }
 
     fn focus_previous_by_relative_index_from_input(self) -> Result<Self> {
-        if let Some(index) = self.input_buffer.as_ref().and_then(|i| i.parse::<usize>().ok()) {
+        if let Some(index) = self
+            .input_buffer
+            .as_ref()
+            .and_then(|i| i.parse::<usize>().ok())
+        {
             self.focus_previous_by_relative_index(index)
         } else {
             Ok(self)
@@ -1704,7 +1708,11 @@ impl App {
     }
 
     fn focus_next_by_relative_index_from_input(self) -> Result<Self> {
-        if let Some(index) = self.input_buffer.as_ref().and_then(|i| i.parse::<usize>().ok()) {
+        if let Some(index) = self
+            .input_buffer
+            .as_ref()
+            .and_then(|i| i.parse::<usize>().ok())
+        {
             self.focus_next_by_relative_index(index)
         } else {
             Ok(self)
@@ -1861,7 +1869,11 @@ impl App {
     }
 
     fn focus_by_index_from_input(self) -> Result<Self> {
-        if let Some(index) = self.input_buffer.as_ref().and_then(|i| i.parse::<usize>().ok()) {
+        if let Some(index) = self
+            .input_buffer
+            .as_ref()
+            .and_then(|i| i.parse::<usize>().ok())
+        {
             self.focus_by_index(index)
         } else {
             Ok(self)
@@ -1961,9 +1973,7 @@ impl App {
     fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.clone().get(mode) {
             self = self.push_mode();
-            self.mode = mode
-                .to_owned()
-                .sanitized(self.config.general.read_only);
+            self.mode = mode.to_owned().sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
@@ -1981,9 +1991,7 @@ impl App {
     fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.clone().builtin.get(mode) {
             self = self.push_mode();
-            self.mode = mode
-                .to_owned()
-                .sanitized(self.config.general.read_only);
+            self.mode = mode.to_owned().sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Builtin mode not found: {}", mode))
@@ -2001,9 +2009,7 @@ impl App {
     fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.clone().custom.get(mode) {
             self = self.push_mode();
-            self.mode = mode
-                .to_owned()
-                .sanitized(self.config.general.read_only);
+            self.mode = mode.to_owned().sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
@@ -2417,7 +2423,8 @@ impl App {
     }
 
     pub fn directory_nodes_str(&self) -> String {
-        self.directory_buffer.as_ref()
+        self.directory_buffer
+            .as_ref()
             .map(|d| {
                 d.nodes
                     .iter()
