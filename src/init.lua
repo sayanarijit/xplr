@@ -1005,6 +1005,8 @@ xplr.config.modes.builtin.recover = {
           render = [[
 
   You pressed an invalid key and went into "recover" mode.
+  This mode saves you from performing unwanted actions.
+
   Let's calm down, press `escape`, and try again.
           ]],
         },
