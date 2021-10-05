@@ -330,4 +330,4 @@ Visit [Awesome Plugins][27] for more [integration][28] options.
 [27]:awesome-plugins.md
 [28]:awesome-plugins.md#integration
 [29]:#layout
-[30]:layout.md#Layout
+[30]:layouts.md#Layout
