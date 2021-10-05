@@ -291,26 +291,57 @@ it will show in the UI.</p>
 <p>Reset the input buffer back to null. It will not show in the UI.</p>
 <h3 id="-switchmode--string-"><a class="header" href="#-switchmode--string-">{ SwitchMode = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>SwitchMode: string</code></p>
-<p>Switch input <a href="modes.html#mode">mode</a>.</p>
+<p>Switch input <a href="modes.html#mode">mode</a>.
+It clears the input buffer.</p>
 <blockquote>
 <p><strong>NOTE:</strong> To be specific about which mode to switch to, use <code>SwitchModeBuiltin</code> or
 <code>SwitchModeCustom</code> instead.</p>
 </blockquote>
 <p><strong>YAML Example:</strong> <code>SwitchMode: default</code></p>
 <p><strong>Lua Example:</strong> <code>{ SwitchMode = &quot;default&quot; }</code></p>
+<h3 id="-switchmodekeepinginputbuffer--string-"><a class="header" href="#-switchmodekeepinginputbuffer--string-">{ SwitchModeKeepingInputBuffer = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>SwitchModeKeepingInputBuffer: string</code></p>
+<p>Switch input <a href="modes.html#mode">mode</a>.
+It keeps the input buffer.</p>
+<blockquote>
+<p><strong>NOTE:</strong> To be specific about which mode to switch to, use
+<code>SwitchModeBuiltinKeepingInputBuffer</code> or
+<code>SwitchModeCustomKeepingInputBuffer</code> instead.</p>
+</blockquote>
+<p><strong>YAML Example:</strong> <code>SwitchModeKeepingInputBuffer: default</code></p>
+<p><strong>Lua Example:</strong> <code>{ SwitchModeKeepingInputBuffer = &quot;default&quot; }</code></p>
 <h3 id="-switchmodebuiltin--string-"><a class="header" href="#-switchmodebuiltin--string-">{ SwitchModeBuiltin = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>SwitchModeBuiltin: string</code></p>
-<p>Switch to a <a href="modes.html#builtin">builtin mode</a>.</p>
+<p>Switch to a <a href="modes.html#builtin">builtin mode</a>.
+It clears the input buffer.</p>
 <p><strong>YAML Example:</strong> <code>SwitchModeBuiltin: default</code></p>
 <p><strong>Lua Example:</strong> <code>{ SwitchModeBuiltin = &quot;default&quot; }</code></p>
+<h3 id="-switchmodebuiltinkeepinginputbuffer--string-"><a class="header" href="#-switchmodebuiltinkeepinginputbuffer--string-">{ SwitchModeBuiltinKeepingInputBuffer = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>SwitchModeBuiltinKeepingInputBuffer: string</code></p>
+<p>Switch to a <a href="modes.html#builtin">builtin mode</a>.
+It keeps the input buffer.</p>
+<p><strong>YAML Example:</strong> <code>SwitchModeBuiltinKeepingInputBuffer: default</code></p>
+<p><strong>Lua Example:</strong> <code>{ SwitchModeBuiltinKeepingInputBuffer = &quot;default&quot; }</code></p>
 <h3 id="-switchmodecustom--string-"><a class="header" href="#-switchmodecustom--string-">{ SwitchModeCustom = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>SwitchModeCustom: string</code></p>
-<p>Switch to a <a href="modes.html#custom">custom mode</a>.</p>
+<p>Switch to a <a href="modes.html#custom">custom mode</a>.
+It clears the input buffer.</p>
 <p><strong>YAML Example:</strong> <code>SwitchModeCustom: my_custom_mode</code></p>
 <p><strong>Lua Example:</strong> <code>{ SwitchModeCustom = &quot;my_custom_mode&quot; }</code></p>
+<h3 id="-switchmodecustomkeepinginputbuffer--string-"><a class="header" href="#-switchmodecustomkeepinginputbuffer--string-">{ SwitchModeCustomKeepingInputBuffer = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>SwitchModeCustom: string</code></p>
+<p>Switch to a <a href="modes.html#custom">custom mode</a>.
+It keeps the input buffer.</p>
+<p><strong>YAML Example:</strong> <code>SwitchModeCustomKeepingInputBuffer: my_custom_mode</code></p>
+<p><strong>Lua Example:</strong> <code>{ SwitchModeCustomKeepingInputBuffer = &quot;my_custom_mode&quot; }</code></p>
 <h3 id="popmode"><a class="header" href="#popmode">&quot;PopMode&quot;</a></h3>
 <p><strong>YAML:</strong> <code>PopMode</code></p>
-<p>Pop the last mode from the history and switch to it.</p>
+<p>Pop the last mode from the history and switch to it.
+It clears the input buffer.</p>
+<h3 id="popmodekeepinginputbuffer"><a class="header" href="#popmodekeepinginputbuffer">PopModeKeepingInputBuffer</a></h3>
+<p><strong>YAML:</strong> <code>PopModeKeepingInputBuffer</code></p>
+<p>Pop the last mode from the history and switch to it.
+It keeps the input buffer.</p>
 <h3 id="-switchlayout--string-"><a class="header" href="#-switchlayout--string-">{ SwitchLayout = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>SwitchLayout: string</code></p>
 <p>Switch <a href="layouts.html#layout">layout</a>.</p>
@@ -538,8 +569,8 @@ the default configuration file.</p>
 <h3 id="-debug--string-"><a class="header" href="#-debug--string-">{ Debug = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>Debug: string</code></p>
 <p>Write the application state to a file, without quitting. Also helpful for debugging.</p>
-<p><strong>YAML Example:</strong>  <code>Debug: /path/to/file</code></p>
-<p><strong>Lua Example:</strong>  <code>{ Debug = &quot;/path/to/file&quot; }</code></p>
+<p><strong>YAML Example:</strong> <code>Debug: /path/to/file</code></p>
+<p><strong>Lua Example:</strong> <code>{ Debug = &quot;/path/to/file&quot; }</code></p>
 <h3 id="terminate"><a class="header" href="#terminate">&quot;Terminate&quot;</a></h3>
 <p><strong>YAML:</strong> <code>Terminate</code></p>
 <p>Terminate the application with a non-zero return code.</p>
@@ -813,7 +844,7 @@ handled by xplr after the command execution.</p>
       read name
       greeting=&quot;Hello $name!&quot;
       message=&quot;$greeting You are inside $PWD&quot;
-    
+
       echo LogSuccess: '&quot;'$message'&quot;' &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
       ]===]
     }
