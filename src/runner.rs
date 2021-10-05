@@ -241,7 +241,7 @@ impl Runner {
                             }
 
                             PrintPwdAndQuit => {
-                                result = Ok(Some(format!("{}\n", app.pwd.clone())));
+                                result = Ok(Some(format!("{}\n", app.pwd)));
                                 break 'outer;
                             }
 
