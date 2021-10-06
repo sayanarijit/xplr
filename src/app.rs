@@ -75,46 +75,6 @@ impl Pipe {
             history_out,
         })
     }
-
-    /// Get a reference to the pipe's msg in.
-    pub fn msg_in(&self) -> &String {
-        &self.msg_in
-    }
-
-    /// Get a reference to the pipe's selection out.
-    pub fn selection_out(&self) -> &String {
-        &self.selection_out
-    }
-
-    /// Get a reference to the pipe's result out.
-    pub fn result_out(&self) -> &String {
-        &self.result_out
-    }
-
-    /// Get a reference to the pipe's directory nodes out.
-    pub fn directory_nodes_out(&self) -> &String {
-        &self.directory_nodes_out
-    }
-
-    /// Get a reference to the pipe's global help menu out.
-    pub fn global_help_menu_out(&self) -> &String {
-        &self.global_help_menu_out
-    }
-
-    /// Get a reference to the pipe's logs out.
-    pub fn logs_out(&self) -> &String {
-        &self.logs_out
-    }
-
-    /// Get a reference to the pipe's history out.
-    pub fn history_out(&self) -> &String {
-        &self.history_out
-    }
-
-    /// Get a reference to the pipe's path.
-    pub fn path(&self) -> &String {
-        &self.path
-    }
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
@@ -282,81 +242,6 @@ impl Node {
             },
         }
     }
-
-    /// Get a reference to the node's parent.
-    pub fn parent(&self) -> &String {
-        &self.parent
-    }
-
-    /// Get a reference to the node's relative path.
-    pub fn relative_path(&self) -> &String {
-        &self.relative_path
-    }
-
-    /// Get a reference to the node's extension.
-    pub fn extension(&self) -> &String {
-        &self.extension
-    }
-
-    /// Get a reference to the node's is dir.
-    pub fn is_dir(&self) -> bool {
-        self.is_dir
-    }
-
-    /// Get a reference to the node's is file.
-    pub fn is_file(&self) -> bool {
-        self.is_file
-    }
-
-    /// Get a reference to the node's is symlink.
-    pub fn is_symlink(&self) -> bool {
-        self.is_symlink
-    }
-
-    /// Get a reference to the node's is broken.
-    pub fn is_broken(&self) -> bool {
-        self.is_broken
-    }
-
-    /// Get a reference to the node's is readonly.
-    pub fn is_readonly(&self) -> bool {
-        self.is_readonly
-    }
-
-    /// Get a reference to the node's mime essence.
-    pub fn mime_essence(&self) -> &String {
-        &self.mime_essence
-    }
-
-    /// Get a reference to the node's size.
-    pub fn size(&self) -> u64 {
-        self.size
-    }
-
-    /// Get a reference to the node's canonical.
-    pub fn canonical(&self) -> &Option<ResolvedNode> {
-        &self.canonical
-    }
-
-    /// Get a reference to the node's symlink.
-    pub fn symlink(&self) -> &Option<ResolvedNode> {
-        &self.symlink
-    }
-
-    /// Get a reference to the node's absolute path.
-    pub fn absolute_path(&self) -> &String {
-        &self.absolute_path
-    }
-
-    /// Get a reference to the node's human size.
-    pub fn human_size(&self) -> &String {
-        &self.human_size
-    }
-
-    /// Get a reference to the node's permissions.
-    pub fn permissions(&self) -> &Permissions {
-        &self.permissions
-    }
 }
 
 impl Ord for Node {
@@ -395,26 +280,6 @@ impl DirectoryBuffer {
 
     pub fn focused_node(&self) -> Option<&Node> {
         self.nodes.get(self.focus)
-    }
-
-    /// Get a reference to the directory buffer's parent.
-    pub fn parent(&self) -> &String {
-        &self.parent
-    }
-
-    /// Get a reference to the directory buffer's nodes.
-    pub fn nodes(&self) -> &Vec<Node> {
-        &self.nodes
-    }
-
-    /// Get a reference to the directory buffer's total.
-    pub fn total(&self) -> usize {
-        self.total
-    }
-
-    /// Get a reference to the directory buffer's focus.
-    pub fn focus(&self) -> usize {
-        self.focus
     }
 }
 
@@ -621,16 +486,6 @@ impl NodeSorterApplicable {
             order
         }
     }
-
-    /// Get a reference to the node sorter applicable's sorter.
-    pub fn sorter(&self) -> &NodeSorter {
-        &self.sorter
-    }
-
-    /// Get a reference to the node sorter applicable's reverse.
-    pub fn reverse(&self) -> bool {
-        self.reverse
-    }
 }
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
@@ -790,16 +645,6 @@ impl NodeFilterApplicable {
 
     fn apply(&self, node: &Node) -> bool {
         self.filter.apply(node, &self.input)
-    }
-
-    /// Get a reference to the node filter applicable's filter.
-    pub fn filter(&self) -> &NodeFilter {
-        &self.filter
-    }
-
-    /// Get a reference to the node filter applicable's input.
-    pub fn input(&self) -> &String {
-        &self.input
     }
 }
 
@@ -1259,18 +1104,6 @@ pub struct Command {
     pub args: Vec<String>,
 }
 
-impl Command {
-    /// Get a reference to the command's command.
-    pub fn command(&self) -> &String {
-        &self.command
-    }
-
-    /// Get a reference to the command's args.
-    pub fn args(&self) -> &Vec<String> {
-        &self.args
-    }
-}
-
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
     ExplorePwdAsync,
@@ -1332,21 +1165,6 @@ impl Log {
             message,
             created_at: Local::now(),
         }
-    }
-
-    /// Get a reference to the log's created at.
-    pub fn created_at(&self) -> &DateTime<Local> {
-        &self.created_at
-    }
-
-    /// Get a reference to the log's message.
-    pub fn message(&self) -> &String {
-        &self.message
-    }
-
-    /// Get a reference to the log's level.
-    pub fn level(&self) -> &LogLevel {
-        &self.level
     }
 }
 
@@ -1481,23 +1299,23 @@ impl App {
             }
         }
 
-        let mode = match config.modes().get(
+        let mode = match config.modes.get(
             &config
-                .general()
-                .initial_mode()
+                .general
+                .initial_mode
                 .to_owned()
                 .unwrap_or_else(|| "default".into()),
         ) {
-            Some(m) => m.clone().sanitized(config.general().read_only()),
+            Some(m) => m.clone().sanitized(config.general.read_only),
             None => {
                 bail!("'default' mode is missing")
             }
         };
 
-        let layout = match config.layouts().get(
+        let layout = match config.layouts.get(
             &config
-                .general()
-                .initial_layout()
+                .general
+                .initial_layout
                 .to_owned()
                 .unwrap_or_else(|| "default".into()),
         ) {
@@ -1527,14 +1345,14 @@ impl App {
         }
 
         let mut explorer_config = ExplorerConfig::default();
-        if !config.general().show_hidden() {
+        if !config.general.show_hidden {
             explorer_config.filters.replace(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
             ));
         }
 
-        if let Some(sorters) = &config.general().initial_sorting() {
+        if let Some(sorters) = &config.general.initial_sorting {
             explorer_config.sorters = sorters.clone();
         };
 
@@ -1570,7 +1388,7 @@ impl App {
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
-        self.directory_buffer().and_then(|d| d.focused_node())
+        self.directory_buffer.as_ref().and_then(|d| d.focused_node())
     }
 
     pub fn focused_node_str(&self) -> String {
@@ -1603,7 +1421,7 @@ impl App {
     }
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
-        if self.config().general().read_only() && !msg.is_read_only() {
+        if self.config.general.read_only && !msg.is_read_only() {
             self.log_error("Cannot call shell command in read-only mode.".into())
         } else {
             match msg {
@@ -1719,30 +1537,30 @@ impl App {
     }
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
-        let kb = self.mode().key_bindings().clone();
+        let kb = self.mode.key_bindings.clone();
         let key_str = key.to_string();
-        let default = kb.default().clone();
+        let default = kb.default.clone();
         let msgs = kb
-            .on_key()
+            .on_key
             .get(&key_str)
             .to_owned()
-            .map(|a| Some(a.messages().clone()))
+            .map(|a| Some(a.messages.clone()))
             .unwrap_or_else(|| {
                 if key.is_alphabet() {
-                    kb.on_alphabet().clone().map(|a| a.messages().clone())
+                    kb.on_alphabet.clone().map(|a| a.messages.clone())
                 } else if key.is_number() {
-                    kb.on_number().clone().map(|a| a.messages().clone())
+                    kb.on_number.clone().map(|a| a.messages.clone())
                 } else if key.is_special_character() {
-                    kb.on_special_character()
+                    kb.on_special_character
                         .clone()
-                        .map(|a| a.messages().clone())
+                        .map(|a| a.messages.clone())
                 } else {
                     None
                 }
             })
-            .or_else(|| default.map(|a| a.messages().clone()))
+            .or_else(|| default.map(|a| a.messages.clone()))
             .unwrap_or_else(|| {
-                if self.config().general().enable_recover_mode() {
+                if self.config.general.enable_recover_mode {
                     vec![ExternalMsg::SwitchModeBuiltin("recover".into())]
                 } else {
                     vec![ExternalMsg::LogWarning("Key map not found.".into())]
@@ -1757,14 +1575,14 @@ impl App {
     }
 
     pub fn explore_pwd(mut self) -> Result<Self> {
-        let focus = self.last_focus.get(self.pwd()).cloned().unwrap_or(None);
-        let pwd = self.pwd().clone();
+        let focus = &self.last_focus.get(&self.pwd).cloned().unwrap_or(None);
+        let pwd = self.pwd.clone();
         self = self.add_last_focus(pwd, focus.clone())?;
         let dir = explorer::explore_sync(
-            self.explorer_config().clone(),
-            self.pwd().into(),
-            focus.map(PathBuf::from),
-            self.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+            self.explorer_config.clone(),
+            self.pwd.clone().into(),
+            focus.as_ref().map(PathBuf::from),
+            self.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
         )?;
         self.set_directory(dir)
     }
@@ -1794,7 +1612,7 @@ impl App {
         if let Some(dir) = self.directory_buffer_mut() {
             if save_history {
                 if let Some(n) = dir.focused_node() {
-                    history = history.push(n.absolute_path().clone());
+                    history = history.push(n.absolute_path.clone());
                 }
             }
 
@@ -1802,7 +1620,7 @@ impl App {
 
             if save_history {
                 if let Some(n) = self.clone().focused_node() {
-                    self.history = history.push(n.absolute_path().clone())
+                    self.history = history.push(n.absolute_path.clone())
                 }
             }
         };
@@ -1813,13 +1631,13 @@ impl App {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
-                history = history.push(n.absolute_path().clone());
+                history = history.push(n.absolute_path.clone());
             }
 
             dir.focus = dir.total.max(1) - 1;
 
             if let Some(n) = dir.focused_node() {
-                self.history = history.push(n.absolute_path().clone());
+                self.history = history.push(n.absolute_path.clone());
             }
         };
         Ok(self)
@@ -1840,19 +1658,19 @@ impl App {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
-                history = history.push(n.absolute_path().clone());
+                history = history.push(n.absolute_path.clone());
             }
 
             dir.focus = dir.focus.max(index) - index;
             if let Some(n) = self.focused_node() {
-                self.history = history.push(n.absolute_path().clone());
+                self.history = history.push(n.absolute_path.clone());
             }
         };
         Ok(self)
     }
 
     fn focus_previous_by_relative_index_from_input(self) -> Result<Self> {
-        if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
+        if let Some(index) = self.input_buffer.as_ref().and_then(|i| i.parse::<usize>().ok()) {
             self.focus_previous_by_relative_index(index)
         } else {
             Ok(self)
@@ -1874,19 +1692,19 @@ impl App {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
-                history = history.push(n.absolute_path().clone());
+                history = history.push(n.absolute_path.clone());
             }
 
             dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
             if let Some(n) = self.focused_node() {
-                self.history = history.push(n.absolute_path().clone());
+                self.history = history.push(n.absolute_path.clone());
             }
         };
         Ok(self)
     }
 
     fn focus_next_by_relative_index_from_input(self) -> Result<Self> {
-        if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
+        if let Some(index) = self.input_buffer.as_ref().and_then(|i| i.parse::<usize>().ok()) {
             self.focus_next_by_relative_index(index)
         } else {
             Ok(self)
@@ -1907,13 +1725,13 @@ impl App {
     fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
         let mut dir = PathBuf::from(dir);
         if dir.is_relative() {
-            dir = PathBuf::from(self.pwd()).join(dir);
+            dir = PathBuf::from(self.pwd.clone()).join(dir);
         }
 
         match env::set_current_dir(&dir) {
             Ok(()) => {
-                let pwd = self.pwd().clone();
-                let focus = self.focused_node().map(|n| n.relative_path().clone());
+                let pwd = self.pwd.clone();
+                let focus = self.focused_node().map(|n| n.relative_path.clone());
                 self = self.add_last_focus(pwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
                 if save_history {
@@ -1933,7 +1751,7 @@ impl App {
     }
 
     fn back(self) -> Result<Self> {
-        PathBuf::from(self.pwd())
+        PathBuf::from(self.pwd.clone())
             .parent()
             .map(|p| {
                 self.clone()
@@ -2036,14 +1854,14 @@ impl App {
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = index.min(dir.total.max(1) - 1);
             if let Some(n) = self.focused_node() {
-                self.history = history.push(n.absolute_path().clone());
+                self.history = history.push(n.absolute_path.clone());
             }
         };
         Ok(self)
     }
 
     fn focus_by_index_from_input(self) -> Result<Self> {
-        if let Some(index) = self.input_buffer().and_then(|i| i.parse::<usize>().ok()) {
+        if let Some(index) = self.input_buffer.as_ref().and_then(|i| i.parse::<usize>().ok()) {
             self.focus_by_index(index)
         } else {
             Ok(self)
@@ -2063,13 +1881,13 @@ impl App {
             {
                 if save_history {
                     if let Some(n) = dir_buf.focused_node() {
-                        history = history.push(n.absolute_path().clone());
+                        history = history.push(n.absolute_path.clone());
                     }
                 }
                 dir_buf.focus = focus;
                 if save_history {
                     if let Some(n) = dir_buf.focused_node() {
-                        self.history = history.push(n.absolute_path().clone());
+                        self.history = history.push(n.absolute_path.clone());
                     }
                 }
                 Ok(self)
@@ -2084,7 +1902,7 @@ impl App {
     pub fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
         let mut pathbuf = PathBuf::from(path);
         if pathbuf.is_relative() {
-            pathbuf = PathBuf::from(self.pwd()).join(pathbuf);
+            pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
         }
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
@@ -2099,7 +1917,7 @@ impl App {
     }
 
     fn focus_path_from_input(self) -> Result<Self> {
-        if let Some(p) = self.input_buffer() {
+        if let Some(p) = self.input_buffer.clone() {
             self.focus_path(&p, true)
         } else {
             Ok(self)
@@ -2107,11 +1925,11 @@ impl App {
     }
 
     fn push_mode(mut self) -> Self {
-        if self.mode() != self.config().modes().builtin().recover()
+        if self.mode != self.config.modes.builtin.recover
             && self
                 .last_modes
                 .last()
-                .map(|m| m != self.mode())
+                .map(|m| m != &self.mode)
                 .unwrap_or(true)
         {
             self.last_modes.push(self.mode.clone())
@@ -2141,11 +1959,11 @@ impl App {
     }
 
     fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config().modes().clone().get(mode) {
+        if let Some(mode) = self.config.modes.clone().get(mode) {
             self = self.push_mode();
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config().general().read_only());
+                .sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
@@ -2161,11 +1979,11 @@ impl App {
     }
 
     fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config().modes().clone().get_builtin(mode) {
+        if let Some(mode) = self.config.modes.clone().builtin.get(mode) {
             self = self.push_mode();
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config().general().read_only());
+                .sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Builtin mode not found: {}", mode))
@@ -2181,11 +1999,11 @@ impl App {
     }
 
     fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config().modes().clone().get_custom(mode) {
+        if let Some(mode) = self.config.modes.clone().custom.get(mode) {
             self = self.push_mode();
             self.mode = mode
                 .to_owned()
-                .sanitized(self.config().general().read_only());
+                .sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
@@ -2193,7 +2011,7 @@ impl App {
     }
 
     fn switch_layout(mut self, layout: &str) -> Result<Self> {
-        if let Some(l) = self.config().layouts().get(layout) {
+        if let Some(l) = self.config.layouts.get(layout) {
             self.layout = l.to_owned();
             Ok(self)
         } else {
@@ -2202,7 +2020,7 @@ impl App {
     }
 
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
-        if let Some(l) = self.config().layouts().get_builtin(layout) {
+        if let Some(l) = self.config.layouts.builtin.get(layout) {
             self.layout = l.to_owned();
             Ok(self)
         } else {
@@ -2211,7 +2029,7 @@ impl App {
     }
 
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
-        if let Some(l) = self.config().layouts().get_custom(layout) {
+        if let Some(l) = self.config.layouts.get_custom(layout) {
             self.layout = l.to_owned();
             Ok(self)
         } else {
@@ -2260,7 +2078,7 @@ impl App {
     pub fn set_directory(mut self, dir: DirectoryBuffer) -> Result<Self> {
         self = self.add_last_focus(
             dir.parent.clone(),
-            dir.focused_node().map(|n| n.relative_path().clone()),
+            dir.focused_node().map(|n| n.relative_path.clone()),
         )?;
         if dir.parent == self.pwd {
             self.directory_buffer = Some(dir);
@@ -2283,7 +2101,7 @@ impl App {
     fn select_path(mut self, path: String) -> Result<Self> {
         let mut path = PathBuf::from(path);
         if path.is_relative() {
-            path = PathBuf::from(self.pwd()).join(path);
+            path = PathBuf::from(self.pwd.clone()).join(path);
         }
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
@@ -2294,7 +2112,7 @@ impl App {
     }
 
     fn select_all(mut self) -> Result<Self> {
-        if let Some(d) = self.directory_buffer() {
+        if let Some(d) = self.directory_buffer.as_ref() {
             d.nodes.clone().into_iter().for_each(|n| {
                 self.selection.insert(n);
             });
@@ -2313,7 +2131,7 @@ impl App {
     fn un_select_path(mut self, path: String) -> Result<Self> {
         let mut pathbuf = PathBuf::from(path);
         if pathbuf.is_relative() {
-            pathbuf = PathBuf::from(self.pwd()).join(pathbuf);
+            pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
         }
         self.selection
             .retain(|n| PathBuf::from(&n.absolute_path) != pathbuf);
@@ -2321,7 +2139,7 @@ impl App {
     }
 
     fn un_select_all(mut self) -> Result<Self> {
-        if let Some(d) = self.directory_buffer() {
+        if let Some(d) = self.directory_buffer.as_ref() {
             d.nodes.clone().into_iter().for_each(|n| {
                 self.selection.retain(|s| s != &n);
             });
@@ -2331,7 +2149,7 @@ impl App {
     }
 
     fn toggle_selection(self) -> Result<Self> {
-        if let Some(p) = self.focused_node().map(|n| n.absolute_path().clone()) {
+        if let Some(p) = self.focused_node().map(|n| n.absolute_path.clone()) {
             self.toggle_selection_by_path(p)
         } else {
             Ok(self)
@@ -2339,7 +2157,7 @@ impl App {
     }
 
     fn toggle_select_all(self) -> Result<Self> {
-        if let Some(d) = self.directory_buffer() {
+        if let Some(d) = self.directory_buffer.as_ref() {
             if d.nodes.iter().all(|n| self.selection.contains(n)) {
                 self.un_select_all()
             } else {
@@ -2353,7 +2171,7 @@ impl App {
     fn toggle_selection_by_path(self, path: String) -> Result<Self> {
         let mut pathbuf = PathBuf::from(&path);
         if pathbuf.is_relative() {
-            pathbuf = PathBuf::from(self.pwd()).join(pathbuf);
+            pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
         }
         if self
             .selection
@@ -2377,7 +2195,7 @@ impl App {
     }
 
     fn add_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
-        if let Some(input) = self.input_buffer() {
+        if let Some(input) = self.input_buffer.clone() {
             self.explorer_config
                 .filters
                 .insert(NodeFilterApplicable::new(filter, input));
@@ -2391,7 +2209,7 @@ impl App {
     }
 
     fn remove_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
-        if let Some(input) = self.input_buffer() {
+        if let Some(input) = self.input_buffer.clone() {
             let nfa = NodeFilterApplicable::new(filter, input);
             self.explorer_config.filters.retain(|f| f != &nfa);
         };
@@ -2414,7 +2232,7 @@ impl App {
     fn reset_node_filters(mut self) -> Result<Self> {
         self.explorer_config.filters.clear();
 
-        if !self.config().general().show_hidden() {
+        if !self.config.general.show_hidden {
             self.add_node_filter(NodeFilterApplicable::new(
                 NodeFilter::RelativePathDoesNotStartWith,
                 ".".into(),
@@ -2473,9 +2291,9 @@ impl App {
 
     fn reset_node_sorters(mut self) -> Result<Self> {
         self.explorer_config.sorters = self
-            .config()
-            .general()
-            .initial_sorting()
+            .config
+            .general
+            .initial_sorting
             .to_owned()
             .unwrap_or_default();
         Ok(self)
@@ -2579,57 +2397,8 @@ impl App {
         self.directory_buffer.as_mut()
     }
 
-    /// Get a reference to the app's pwd.
-    pub fn pwd(&self) -> &String {
-        &self.pwd
-    }
-
-    /// Get a reference to the app's current directory buffer.
-    pub fn directory_buffer(&self) -> Option<&DirectoryBuffer> {
-        self.directory_buffer.as_ref()
-    }
-
-    /// Get a reference to the app's config.
-    pub fn config(&self) -> &Config {
-        &self.config
-    }
-
-    /// Get a reference to the app's selection.
-    pub fn selection(&self) -> &IndexSet<Node> {
-        &self.selection
-    }
-
-    pub fn pop_msg_out(&mut self) -> Option<MsgOut> {
-        self.msg_out.pop_front()
-    }
-
-    /// Get a reference to the app's mode.
-    pub fn mode(&self) -> &Mode {
-        &self.mode
-    }
-
     pub fn mode_str(&self) -> String {
-        format!("{}\n", &self.mode.name())
-    }
-
-    /// Get a reference to the app's input buffer.
-    pub fn input_buffer(&self) -> Option<String> {
-        self.input_buffer.clone()
-    }
-
-    /// Get a reference to the app's pipes.
-    pub fn pipe(&self) -> &Pipe {
-        &self.pipe
-    }
-
-    /// Get a reference to the app's pid.
-    pub fn pid(&self) -> &u32 {
-        &self.pid
-    }
-
-    /// Get a reference to the app's runtime path.
-    pub fn session_path(&self) -> &str {
-        &self.session_path
+        format!("{}\n", &self.mode.name)
     }
 
     fn refresh_selection(mut self) -> Result<Self> {
@@ -2648,7 +2417,7 @@ impl App {
     }
 
     pub fn directory_nodes_str(&self) -> String {
-        self.directory_buffer()
+        self.directory_buffer.as_ref()
             .map(|d| {
                 d.nodes
                     .iter()
@@ -2675,18 +2444,8 @@ impl App {
             .join("")
     }
 
-    /// Get a reference to the app's explorer config.
-    pub fn explorer_config(&self) -> &ExplorerConfig {
-        &self.explorer_config
-    }
-
-    /// Get a reference to the app's logs.
-    pub fn logs(&self) -> &Vec<Log> {
-        &self.logs
-    }
-
     pub fn logs_str(&self) -> String {
-        self.logs()
+        self.logs
             .iter()
             .map(|l| format!("{}\n", l))
             .collect::<Vec<String>>()
@@ -2694,30 +2453,30 @@ impl App {
     }
 
     pub fn global_help_menu_str(&self) -> String {
-        let builtin = self.config().modes().builtin();
-        let custom = self.config().modes().custom();
+        let builtin = &self.config.modes.builtin;
+        let custom = &self.config.modes.custom;
 
         [
-            builtin.default(),
-            builtin.recover(),
-            builtin.filter(),
-            builtin.number(),
-            builtin.go_to(),
-            builtin.search(),
-            builtin.selection_ops(),
-            builtin.action(),
-            builtin.create(),
-            builtin.create_file(),
-            builtin.create_directory(),
-            builtin.rename(),
-            builtin.delete(),
-            builtin.sort(),
-            builtin.filter(),
-            builtin.relative_path_does_contain(),
-            builtin.relative_path_does_not_contain(),
-            builtin.switch_layout(),
+            &builtin.default,
+            &builtin.recover,
+            &builtin.filter,
+            &builtin.number,
+            &builtin.go_to,
+            &builtin.search,
+            &builtin.selection_ops,
+            &builtin.action,
+            &builtin.create,
+            &builtin.create_file,
+            &builtin.create_directory,
+            &builtin.rename,
+            &builtin.delete,
+            &builtin.sort,
+            &builtin.filter,
+            &builtin.relative_path_does_contain,
+            &builtin.relative_path_does_not_contain,
+            &builtin.switch_layout,
         ]
-        .iter().map(|m| (m.name(), m.to_owned()))
+        .iter().map(|m| (&m.name, m.to_owned()))
         .chain(custom.iter())
         .map(|(name, mode)| {
             let help = mode
@@ -2742,16 +2501,6 @@ impl App {
         .join("\n")
     }
 
-    /// Get a reference to the app's version.
-    pub fn version(&self) -> &String {
-        &self.version
-    }
-
-    /// Get a reference to the app's history.
-    pub fn history(&self) -> &History {
-        &self.history
-    }
-
     pub fn history_str(&self) -> String {
         self.history
             .paths
@@ -2762,55 +2511,45 @@ impl App {
     }
 
     pub fn write_pipes(&self) -> Result<()> {
-        fs::create_dir_all(self.pipe().path())?;
-        fs::write(&self.pipe().msg_in, "")?;
+        fs::create_dir_all(self.pipe.path.clone())?;
+        fs::write(&self.pipe.msg_in, "")?;
 
         let selection_str = self.selection_str();
-        fs::write(&self.pipe().selection_out, selection_str)?;
+        fs::write(&self.pipe.selection_out, selection_str)?;
 
         let history_str = self.history_str();
-        fs::write(&self.pipe().history_out, history_str)?;
+        fs::write(&self.pipe.history_out, history_str)?;
 
         let directory_nodes_str = self.directory_nodes_str();
-        fs::write(&self.pipe().directory_nodes_out, directory_nodes_str)?;
+        fs::write(&self.pipe.directory_nodes_out, directory_nodes_str)?;
 
         let logs_str = self.logs_str();
-        fs::write(&self.pipe().logs_out, logs_str)?;
+        fs::write(&self.pipe.logs_out, logs_str)?;
 
         let result_str = self.result_str();
-        fs::write(&self.pipe().result_out, result_str)?;
+        fs::write(&self.pipe.result_out, result_str)?;
 
         let global_help_menu_str = self.global_help_menu_str();
-        fs::write(&self.pipe().global_help_menu_out, global_help_menu_str)?;
+        fs::write(&self.pipe.global_help_menu_out, global_help_menu_str)?;
 
         Ok(())
     }
 
     pub fn cleanup_pipes(&self) -> Result<()> {
-        while !fs::read_to_string(self.pipe().msg_in())?.is_empty() {
+        while !fs::read_to_string(&self.pipe.msg_in)?.is_empty() {
             std::thread::sleep(std::time::Duration::from_millis(1));
         }
 
-        fs::remove_file(self.pipe().msg_in())?;
-        fs::remove_file(self.pipe().selection_out())?;
-        fs::remove_file(self.pipe().result_out())?;
-        fs::remove_file(self.pipe().directory_nodes_out())?;
-        fs::remove_file(self.pipe().global_help_menu_out())?;
-        fs::remove_file(self.pipe().logs_out())?;
-        fs::remove_file(self.pipe().history_out())?;
+        fs::remove_file(&self.pipe.msg_in)?;
+        fs::remove_file(&self.pipe.selection_out)?;
+        fs::remove_file(&self.pipe.result_out)?;
+        fs::remove_file(&self.pipe.directory_nodes_out)?;
+        fs::remove_file(&self.pipe.global_help_menu_out)?;
+        fs::remove_file(&self.pipe.logs_out)?;
+        fs::remove_file(&self.pipe.history_out)?;
 
-        fs::remove_dir(self.pipe().path())?;
+        fs::remove_dir(&self.pipe.path)?;
         Ok(())
-    }
-
-    /// Get a reference to the app's layout.
-    pub fn layout(&self) -> &Layout {
-        &self.layout
-    }
-
-    /// Get a reference to the app's logs hidden.
-    pub fn logs_hidden(&self) -> bool {
-        self.logs_hidden
     }
 
     pub fn to_lua_arg(&self) -> CallLuaArg {
@@ -2818,7 +2557,7 @@ impl App {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
             focused_node: self.focused_node().cloned(),
-            directory_buffer: self.directory_buffer().cloned(),
+            directory_buffer: self.directory_buffer.clone(),
             selection: self.selection.clone(),
             mode: self.mode.clone(),
             layout: self.layout.clone(),

@@ -32,7 +32,7 @@ pub(crate) fn explore_sync(
         nodes
             .iter()
             .enumerate()
-            .find(|(_, n)| n.relative_path() == &focus_str)
+            .find(|(_, n)| n.relative_path == focus_str)
             .map(|(i, _)| i)
             .unwrap_or_else(|| fallback_focus.min(nodes.len().max(1) - 1))
     } else {
