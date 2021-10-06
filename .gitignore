@@ -3,6 +3,7 @@
 /perf.data
 /perf.data.old
 
+.vscode/
 book/
 
 # Vi[m] backups

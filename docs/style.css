@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+* {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	color: #2d3436;
+}
+
+h1 {
+	padding-left: 5px;
+	font-family: 'Share Tech Mono', monospace;
+	font-size: 3.5rem;
+	padding-top: 2.5vh;
+	text-align: center;
+}
+
+.main-page {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	background-color: #dfe6e9;
+	margin-top: 3vh;
+	min-height: 87vh;
+}
+
+.para {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 2rem;
+	color: rgba(0, 0, 0, 0.9);
+	text-align: center;
+}
+
+.para .more a {
+	font-size: 1.5rem;
+	color: #636e72;
+}
+
+.main-video {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.main-video img {
+	margin-right: 0rem;
+}
+
+.links {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 2rem;
+	margin: 5rem 0;
+}
+
+.links .linkCad {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 40vh;
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+	color: #2d3436;
+	font-family: sans-serif;
+	cursor: pointer;
+}
+
+.links .linkCad:hover {
+	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+.links a {
+	text-decoration: none;
+}
+
+.links .linkCad p {
+	padding-top: 2rem;
+	font-weight: 600;
+}
+
+.mrgL {
+	margin-left: 60%;
+}
+
+.mrgR {
+	margin-right: 60%;
+}
+
+@media (max-width:1300px) {
+	.mrgL {
+		margin-left: 50%;
+	}
+	.mrgR {
+		margin-right: 50%;
+	}
+}
+
+@media (max-width:1050px) {
+	.mrgL {
+		margin-left: 40%;
+	}
+	.mrgR {
+		margin-right: 40%;
+	}
+	.main-page {
+		display: block;
+	}
+	.para {
+		padding: 5rem 0;
+	}
+}
+
+@media (max-width:850px) {
+	.mrgL {
+		margin-left: 30%;
+	}
+	.mrgR {
+		margin-right: 30%;
+	}
+}
+
+@media (max-width:700px) {
+	.mrgL {
+		margin-left: 15%;
+	}
+	.mrgR {
+		margin-right: 15%;
+	}
+}
+
+@media (max-width:550px) {
+	.mrgL {
+		margin-left: 0%;
+	}
+	.mrgR {
+		margin-right: 0%;
+	}
+	.links {
+		display: block;
+	}
+	.links {
+		margin-top: 0rem;
+	}
+	.linkCad {
+		margin-bottom: 4rem;
+	}
+}
