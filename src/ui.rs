@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::env;
+use std::ops::BitXor;
 use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
@@ -227,27 +228,21 @@ impl Style {
 
 impl Into<TuiStyle> for Style {
     fn into(self) -> TuiStyle {
+        fn xor(modifiers: Option<IndexSet<Modifier>>) -> u16 {
+            modifiers
+                .unwrap_or_default()
+                .into_iter()
+                .map(Modifier::bits)
+                .fold(0, BitXor::bitxor)
+        }
         if *NO_COLOR {
             *DEFAULT_STYLE
         } else {
             TuiStyle {
                 fg: self.fg,
                 bg: self.bg,
-                add_modifier: TuiModifier::from_bits_truncate(
-                    self.add_modifiers
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(|m| m.bits())
-                        .fold(0, |a, b| (a ^ b)),
-                ),
-
-                sub_modifier: TuiModifier::from_bits_truncate(
-                    self.sub_modifiers
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(|m| m.bits())
-                        .fold(0, |a, b| (a ^ b)),
-                ),
+                add_modifier: TuiModifier::from_bits_truncate(xor(self.add_modifiers)),
+                sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
             }
         }
     }
