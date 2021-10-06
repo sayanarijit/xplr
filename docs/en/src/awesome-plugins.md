@@ -19,6 +19,7 @@ Extension
 
 - [**comex.xplr**][21] One xplr plugin to compress and extract them all.
 - [**command-mode.xplr**][37] The missing command mode for xplr.
+- [**map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
 - [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 
@@ -92,3 +93,4 @@ Theme
 [35]:https://github.com/sayanarijit/nvim-ctrl.xplr
 [36]:https://github.com/chmln/nvim-ctrl
 [37]:https://github.com/sayanarijit/command-mode.xplr
+[38]:https://github.com/sayanarijit/map.xplr
