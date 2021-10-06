@@ -119,46 +119,6 @@ impl ResolvedNode {
             human_size,
         }
     }
-
-    /// Get a reference to the resolved node's absolute path.
-    pub fn absolute_path(&self) -> &String {
-        &self.absolute_path
-    }
-
-    /// Get a reference to the resolved node's extension.
-    pub fn extension(&self) -> &String {
-        &self.extension
-    }
-
-    /// Get a reference to the resolved node's is dir.
-    pub fn is_dir(&self) -> bool {
-        self.is_dir
-    }
-
-    /// Get a reference to the resolved node's is file.
-    pub fn is_file(&self) -> bool {
-        self.is_file
-    }
-
-    /// Get a reference to the resolved node's is readonly.
-    pub fn is_readonly(&self) -> bool {
-        self.is_readonly
-    }
-
-    /// Get a reference to the resolved node's mime essence.
-    pub fn mime_essence(&self) -> &String {
-        &self.mime_essence
-    }
-
-    /// Get a reference to the resolved node's size.
-    pub fn size(&self) -> u64 {
-        self.size
-    }
-
-    /// Get a reference to the resolved node's human size.
-    pub fn human_size(&self) -> &String {
-        &self.human_size
-    }
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]

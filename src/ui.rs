@@ -317,14 +317,14 @@ pub struct ResolvedNodeUiMetadata {
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
     fn from(node: ResolvedNode) -> Self {
         Self {
-            absolute_path: node.absolute_path().to_owned(),
-            extension: node.extension().to_owned(),
-            is_dir: node.is_dir(),
-            is_file: node.is_file(),
-            is_readonly: node.is_readonly(),
-            mime_essence: node.mime_essence().to_owned(),
-            size: node.size(),
-            human_size: node.human_size().to_owned(),
+            absolute_path: node.absolute_path.to_owned(),
+            extension: node.extension.to_owned(),
+            is_dir: node.is_dir,
+            is_file: node.is_file,
+            is_readonly: node.is_readonly,
+            mime_essence: node.mime_essence.to_owned(),
+            size: node.size,
+            human_size: node.human_size,
         }
     }
 }
