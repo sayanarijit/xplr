@@ -196,7 +196,7 @@ A constraint can be one of the following:
 - { MaxLessThanScreenHeight = int }
 - { MaxLessThanScreenWidth = int }
 - { MaxLessThanLayoutHeight = int }
-- { MaxthLessThanLayoutWidth = int }
+- { MaxLessThanLayoutWidth = int }
 - { Min = int }
 - { MinLessThanScreenHeight = int }
 - { MinLessThanScreenWidth = int }
