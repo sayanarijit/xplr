@@ -23,7 +23,7 @@ use tui::widgets::{Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph
 use tui::Frame;
 
 lazy_static! {
-    pub static ref NO_COLOR: bool = env::var("NO_COLOR").ok().map(|_| true).unwrap_or(false);
+    pub static ref NO_COLOR: bool = env::var("NO_COLOR").is_ok();
     pub static ref DEFAULT_STYLE: TuiStyle = TuiStyle::default();
 }
 
