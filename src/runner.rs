@@ -36,8 +36,8 @@ fn call_lua(
     _silent: bool,
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
     let _focus_index = app
-        .directory_buffer()
-        .map(|d| d.focus())
+        .directory_buffer.as_ref()
+        .map(|d| d.focus)
         .unwrap_or_default()
         .to_string();
 
@@ -48,8 +48,8 @@ fn call_lua(
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
     let focus_index = app
-        .directory_buffer()
-        .map(|d| d.focus())
+        .directory_buffer.as_ref()
+        .map(|d| d.focus)
         .unwrap_or_default()
         .to_string();
 
@@ -59,31 +59,25 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
     };
 
-    Command::new(cmd.command().clone())
-        .env("XPLR_APP_VERSION", app.version())
-        .env("XPLR_PID", &app.pid().to_string())
-        .env("XPLR_INPUT_BUFFER", app.input_buffer().unwrap_or_default())
+    Command::new(cmd.command.clone())
+        .env("XPLR_APP_VERSION", app.version.clone())
+        .env("XPLR_PID", &app.pid.to_string())
+        .env("XPLR_INPUT_BUFFER", app.input_buffer.clone().unwrap_or_default())
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
         .env("XPLR_FOCUS_INDEX", focus_index)
-        .env("XPLR_SESSION_PATH", app.session_path())
-        .env("XPLR_PIPE_MSG_IN", app.pipe().msg_in())
-        .env("XPLR_PIPE_SELECTION_OUT", app.pipe().selection_out())
-        .env("XPLR_PIPE_HISTORY_OUT", app.pipe().history_out())
+        .env("XPLR_SESSION_PATH", &app.session_path)
+        .env("XPLR_PIPE_MSG_IN", &app.pipe.msg_in)
+        .env("XPLR_PIPE_SELECTION_OUT", &app.pipe.selection_out)
+        .env("XPLR_PIPE_HISTORY_OUT", &app.pipe.history_out)
         .env("XPLR_MODE", app.mode_str())
-        .env("XPLR_PIPE_RESULT_OUT", app.pipe().result_out())
-        .env(
-            "XPLR_PIPE_GLOBAL_HELP_MENU_OUT",
-            app.pipe().global_help_menu_out(),
-        )
-        .env(
-            "XPLR_PIPE_DIRECTORY_NODES_OUT",
-            app.pipe().directory_nodes_out(),
-        )
-        .env("XPLR_PIPE_LOGS_OUT", app.pipe().logs_out())
+        .env("XPLR_PIPE_RESULT_OUT", &app.pipe.result_out)
+        .env( "XPLR_PIPE_GLOBAL_HELP_MENU_OUT", &app.pipe.global_help_menu_out)
+        .env("XPLR_PIPE_DIRECTORY_NODES_OUT", &app.pipe.directory_nodes_out)
+        .env("XPLR_PIPE_LOGS_OUT", &app.pipe.logs_out)
         .stdin(stdin)
         .stdout(stdout)
         .stderr(stderr)
-        .args(cmd.args())
+        .args(cmd.args)
         .status()
 }
 
@@ -141,9 +135,9 @@ impl Runner {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
         let mut app = app::App::create(self.pwd, &lua, self.config_file, self.extra_config_files)?;
-        app.config.general.set_read_only(self.read_only);
+        app.config.general.read_only = self.read_only;
 
-        fs::create_dir_all(app.session_path())?;
+        fs::create_dir_all(app.session_path.clone())?;
 
         let (tx_msg_in, rx_msg_in) = mpsc::channel();
         let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
@@ -161,16 +155,16 @@ impl Runner {
         };
 
         explorer::explore_recursive_async(
-            app.explorer_config().clone(),
-            app.pwd().into(),
+            app.explorer_config.clone(),
+            app.pwd.clone().into(),
             self.focused_path,
-            app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+            app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
             tx_msg_in.clone(),
         );
-        tx_pwd_watcher.send(app.pwd().clone())?;
+        tx_pwd_watcher.send(app.pwd.clone())?;
 
         let mut result = Ok(None);
-        let session_path = app.session_path().to_owned();
+        let session_path = app.session_path.to_owned();
 
         term::enable_raw_mode()?;
 
@@ -180,8 +174,9 @@ impl Runner {
         // let mut stdout = stdout.lock();
         execute!(stdout, term::EnterAlternateScreen)?;
 
-        let mut fifo: Option<fs::File> = if let Some(path) = app.config().general().start_fifo() {
-            match start_fifo(path, &app.focused_node_str()) {
+        let mut fifo: Option<fs::File> = if let Some(path) = app.config.general.start_fifo.as_ref() {
+            // TODO remove duplicate segment
+            match start_fifo(&path, &app.focused_node_str()) {
                 Ok(file) => Some(file),
                 Err(e) => {
                     app = app.log_error(e.to_string())?;
@@ -194,7 +189,7 @@ impl Runner {
 
         let mut last_focus: Option<app::Node> = None;
 
-        let mut mouse_enabled = app.config().general().enable_mouse();
+        let mut mouse_enabled = app.config.general.enable_mouse;
         if mouse_enabled {
             if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
                 app = app.log_error(e.to_string())?;
@@ -206,7 +201,7 @@ impl Runner {
         terminal.hide_cursor()?;
 
         // Threads
-        pwd_watcher::keep_watching(app.pwd(), tx_msg_in.clone(), rx_pwd_watcher)?;
+        pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
         let mut event_reader = EventReader::new(tx_msg_in.clone());
         event_reader.start();
 
@@ -219,7 +214,7 @@ impl Runner {
             match app.handle_task(task) {
                 Ok(a) => {
                     app = a;
-                    while let Some(msg) = app.pop_msg_out() {
+                    while let Some(msg) = app.msg_out.pop_front() {
                         use app::MsgOut::*;
                         match msg {
                             // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
@@ -234,14 +229,14 @@ impl Runner {
                             }
 
                             PrintPwdAndQuit => {
-                                result = Ok(Some(format!("{}\n", app.pwd())));
+                                result = Ok(Some(format!("{}\n", app.pwd.clone())));
                                 break 'outer;
                             }
 
                             PrintFocusPathAndQuit => {
                                 result = Ok(app
                                     .focused_node()
-                                    .map(|n| format!("{}\n", n.absolute_path())));
+                                    .map(|n| format!("{}\n", n.absolute_path)));
                                 break 'outer;
                             }
 
@@ -271,29 +266,29 @@ impl Runner {
 
                             ExplorePwdAsync => {
                                 explorer::explore_async(
-                                    app.explorer_config().clone(),
-                                    app.pwd().into(),
-                                    app.focused_node().map(|n| n.relative_path().into()),
-                                    app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+                                    app.explorer_config.clone(),
+                                    app.pwd.clone().into(),
+                                    app.focused_node().map(|n| n.relative_path.clone().into()),
+                                    app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
                                     tx_msg_in.clone(),
                                 );
-                                tx_pwd_watcher.send(app.pwd().clone())?;
+                                tx_pwd_watcher.send(app.pwd.clone())?;
                             }
 
                             ExploreParentsAsync => {
                                 explorer::explore_recursive_async(
-                                    app.explorer_config().clone(),
-                                    app.pwd().into(),
-                                    app.focused_node().map(|n| n.relative_path().into()),
-                                    app.directory_buffer().map(|d| d.focus()).unwrap_or(0),
+                                    app.explorer_config.clone(),
+                                    app.pwd.clone().into(),
+                                    app.focused_node().map(|n| n.relative_path.clone().into()),
+                                    app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
                                     tx_msg_in.clone(),
                                 );
-                                tx_pwd_watcher.send(app.pwd().clone())?;
+                                tx_pwd_watcher.send(app.pwd.clone())?;
                             }
 
                             Refresh => {
                                 // $PWD watcher
-                                tx_pwd_watcher.send(app.pwd().clone())?;
+                                tx_pwd_watcher.send(app.pwd.clone())?;
                                 // UI
                                 terminal.draw(|f| ui::draw(f, &app, &lua))?;
                                 // Fifo
@@ -409,7 +404,7 @@ impl Runner {
                                     })
                                     .unwrap_or_else(|e| Err(e.to_string()));
 
-                                match pipe_reader::read_all(app.pipe().msg_in()) {
+                                match pipe_reader::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
                                         for msg in msgs {
                                             app = app.handle_task(app::Task::new(
@@ -498,7 +493,8 @@ impl Runner {
                                     })
                                     .unwrap_or_else(|e| Err(e.to_string()));
 
-                                match pipe_reader::read_all(app.pipe().msg_in()) {
+                                // TODO remove duplicate segment
+                                match pipe_reader::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
                                         for msg in msgs {
                                             app = app.handle_task(app::Task::new(

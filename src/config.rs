@@ -37,16 +37,6 @@ impl Action {
             Some(self)
         }
     }
-
-    /// Get a reference to the action's help.
-    pub fn help(&self) -> &Option<String> {
-        &self.help
-    }
-
-    /// Get a reference to the action's messages.
-    pub fn messages(&self) -> &Vec<ExternalMsg> {
-        &self.messages
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -60,16 +50,6 @@ pub struct NodeTypeConfig {
 }
 
 impl NodeTypeConfig {
-    /// Get a reference to the node type config's style.
-    pub fn style(&self) -> &Style {
-        &self.style
-    }
-
-    /// Get a reference to the node type config's meta.
-    pub fn meta(&self) -> &HashMap<String, String> {
-        &self.meta
-    }
-
     pub fn extend(mut self, other: &Self) -> Self {
         self.style = self.style.extend(&other.style);
         self.meta.extend(other.meta.to_owned());
@@ -99,38 +79,6 @@ pub struct NodeTypesConfig {
     pub special: HashMap<String, NodeTypeConfig>,
 }
 
-impl NodeTypesConfig {
-    /// Get a reference to the node types config's directory.
-    pub fn directory(&self) -> &NodeTypeConfig {
-        &self.directory
-    }
-
-    /// Get a reference to the node types config's file.
-    pub fn file(&self) -> &NodeTypeConfig {
-        &self.file
-    }
-
-    /// Get a reference to the node types config's symlink.
-    pub fn symlink(&self) -> &NodeTypeConfig {
-        &self.symlink
-    }
-
-    /// Get a reference to the node types config's mime essence.
-    pub fn mime_essence(&self) -> &HashMap<String, HashMap<String, NodeTypeConfig>> {
-        &self.mime_essence
-    }
-
-    /// Get a reference to the node types config's extension.
-    pub fn extension(&self) -> &HashMap<String, NodeTypeConfig> {
-        &self.extension
-    }
-
-    /// Get a reference to the node types config's special.
-    pub fn special(&self) -> &HashMap<String, NodeTypeConfig> {
-        &self.special
-    }
-}
-
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct UiConfig {
@@ -142,23 +90,6 @@ pub struct UiConfig {
 
     #[serde(default)]
     pub style: Style,
-}
-
-impl UiConfig {
-    /// Get a reference to the ui config's prefix.
-    pub fn prefix(&self) -> &Option<String> {
-        &self.prefix
-    }
-
-    /// Get a reference to the ui config's suffix.
-    pub fn suffix(&self) -> &Option<String> {
-        &self.suffix
-    }
-
-    /// Get a reference to the ui config's style.
-    pub fn style(&self) -> &Style {
-        &self.style
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -177,16 +108,6 @@ impl UiElement {
         self.style = self.style.extend(&other.style);
         self
     }
-
-    /// Get a reference to the ui element's format.
-    pub fn format(&self) -> &Option<String> {
-        &self.format
-    }
-
-    /// Get a reference to the ui element's style.
-    pub fn style(&self) -> &Style {
-        &self.style
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -200,23 +121,6 @@ pub struct TableRowConfig {
 
     #[serde(default)]
     pub height: Option<u16>,
-}
-
-impl TableRowConfig {
-    /// Get a reference to the table row config's cols.
-    pub fn cols(&self) -> &Option<Vec<UiElement>> {
-        &self.cols
-    }
-
-    /// Get a reference to the table row config's style.
-    pub fn style(&self) -> &Style {
-        &self.style
-    }
-
-    /// Get a reference to the table row config's height.
-    pub fn height(&self) -> Option<u16> {
-        self.height
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -241,38 +145,6 @@ pub struct TableConfig {
     pub col_widths: Option<Vec<Constraint>>,
 }
 
-impl TableConfig {
-    /// Get a reference to the table config's header.
-    pub fn header(&self) -> &TableRowConfig {
-        &self.header
-    }
-
-    /// Get a reference to the table config's row.
-    pub fn row(&self) -> &TableRowConfig {
-        &self.row
-    }
-
-    /// Get a reference to the table config's style.
-    pub fn style(&self) -> &Style {
-        &self.style
-    }
-
-    /// Get a reference to the table config's tree.
-    pub fn tree(&self) -> &Option<(UiElement, UiElement, UiElement)> {
-        &self.tree
-    }
-
-    /// Get a reference to the table config's col spacing.
-    pub fn col_spacing(&self) -> Option<u16> {
-        self.col_spacing
-    }
-
-    /// Get a reference to the table config's col widths.
-    pub fn col_widths(&self) -> &Option<Vec<Constraint>> {
-        &self.col_widths
-    }
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct LogsConfig {
@@ -289,28 +161,6 @@ pub struct LogsConfig {
     pub error: UiElement,
 }
 
-impl LogsConfig {
-    /// Get a reference to the logs config's info.
-    pub fn info(&self) -> &UiElement {
-        &self.info
-    }
-
-    /// Get a reference to the logs config's success.
-    pub fn success(&self) -> &UiElement {
-        &self.success
-    }
-
-    /// Get a reference to the logs config's error.
-    pub fn error(&self) -> &UiElement {
-        &self.error
-    }
-
-    /// Get a reference to the logs config's warning.
-    pub fn warning(&self) -> &UiElement {
-        &self.warning
-    }
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SortDirectionIdentifiersUi {
@@ -319,18 +169,6 @@ pub struct SortDirectionIdentifiersUi {
 
     #[serde(default)]
     pub reverse: UiElement,
-}
-
-impl SortDirectionIdentifiersUi {
-    /// Get a reference to the sort direction identifiers ui's forward.
-    pub fn forward(&self) -> &UiElement {
-        &self.forward
-    }
-
-    /// Get a reference to the sort direction identifiers ui's reverse.
-    pub fn reverse(&self) -> &UiElement {
-        &self.reverse
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -350,33 +188,6 @@ pub struct SortAndFilterUi {
 
     #[serde(default)]
     pub filter_identifiers: HashMap<NodeFilter, UiElement>,
-}
-
-impl SortAndFilterUi {
-    /// Get a reference to the sort and filter ui's separator.
-    pub fn separator(&self) -> &UiElement {
-        &self.separator
-    }
-
-    /// Get a reference to the sort and filter ui's sort direction identifiers.
-    pub fn sort_direction_identifiers(&self) -> &SortDirectionIdentifiersUi {
-        &self.sort_direction_identifiers
-    }
-
-    /// Get a reference to the sort and filter ui's sorter identifiers.
-    pub fn sorter_identifiers(&self) -> &HashMap<NodeSorter, UiElement> {
-        &self.sorter_identifiers
-    }
-
-    /// Get a reference to the sort and filter ui's filter identifiers.
-    pub fn filter_identifiers(&self) -> &HashMap<NodeFilter, UiElement> {
-        &self.filter_identifiers
-    }
-
-    /// Get a reference to the sort and filter ui's default identifier.
-    pub fn default_identifier(&self) -> &UiElement {
-        &self.default_identifier
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -399,38 +210,6 @@ pub struct PanelUi {
 
     #[serde(default)]
     pub help_menu: PanelUiConfig,
-}
-
-impl PanelUi {
-    /// Get a reference to the panel ui's default.
-    pub fn default(&self) -> &PanelUiConfig {
-        &self.default
-    }
-
-    /// Get a reference to the panel ui's table.
-    pub fn table(&self) -> &PanelUiConfig {
-        &self.table
-    }
-
-    /// Get a reference to the panel ui's sort and filter.
-    pub fn sort_and_filter(&self) -> &PanelUiConfig {
-        &self.sort_and_filter
-    }
-
-    /// Get a reference to the panel ui's selection.
-    pub fn selection(&self) -> &PanelUiConfig {
-        &self.selection
-    }
-
-    /// Get a reference to the panel ui's input and log.
-    pub fn input_and_logs(&self) -> &PanelUiConfig {
-        &self.input_and_logs
-    }
-
-    /// Get a reference to the panel ui's help menu.
-    pub fn help_menu(&self) -> &PanelUiConfig {
-        &self.help_menu
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -491,103 +270,6 @@ pub struct GeneralConfig {
     pub start_fifo: Option<String>,
 }
 
-impl GeneralConfig {
-    /// Get a reference to the general config's show hidden.
-    pub fn show_hidden(&self) -> bool {
-        self.show_hidden
-    }
-
-    /// Get a reference to the general config's read only.
-    pub fn read_only(&self) -> bool {
-        self.read_only
-    }
-
-    /// Get a reference to the general config's cursor.
-    pub fn cursor(&self) -> &UiElement {
-        &self.cursor
-    }
-
-    /// Get a reference to the general config's prompt.
-    pub fn prompt(&self) -> &UiElement {
-        &self.prompt
-    }
-
-    /// Get a reference to the general config's logs.
-    pub fn logs(&self) -> &LogsConfig {
-        &self.logs
-    }
-
-    /// Get a reference to the general config's table.
-    pub fn table(&self) -> &TableConfig {
-        &self.table
-    }
-
-    /// Get a reference to the general config's default ui.
-    pub fn default_ui(&self) -> &UiConfig {
-        &self.default_ui
-    }
-
-    /// Get a reference to the general config's focus ui.
-    pub fn focus_ui(&self) -> &UiConfig {
-        &self.focus_ui
-    }
-
-    /// Get a reference to the general config's selection ui.
-    pub fn selection_ui(&self) -> &UiConfig {
-        &self.selection_ui
-    }
-
-    /// Get a reference to the general config's sort and filter ui.
-    pub fn sort_and_filter_ui(&self) -> &SortAndFilterUi {
-        &self.sort_and_filter_ui
-    }
-
-    /// Get a reference to the general config's initial sorting.
-    pub fn initial_sorting(&self) -> &Option<IndexSet<NodeSorterApplicable>> {
-        &self.initial_sorting
-    }
-
-    /// Get a reference to the general config's initial mode.
-    pub fn initial_mode(&self) -> &Option<String> {
-        &self.initial_mode
-    }
-
-    /// Get a reference to the general config's initial layout.
-    pub fn initial_layout(&self) -> &Option<String> {
-        &self.initial_layout
-    }
-
-    /// Get a reference to the general config's panel ui.
-    pub fn panel_ui(&self) -> &PanelUi {
-        &self.panel_ui
-    }
-
-    /// Get a reference to the general config's enable mouse.
-    pub fn enable_mouse(&self) -> bool {
-        self.enable_mouse
-    }
-
-    /// Get a reference to the general config's enable recover mode.
-    pub fn enable_recover_mode(&self) -> bool {
-        self.enable_recover_mode
-    }
-
-    /// Set the general config's read only.
-    pub fn set_read_only(&mut self, read_only: bool) {
-        self.read_only = read_only;
-    }
-
-    /// Get a reference to the general config's start fifo.
-    pub fn start_fifo(&self) -> Option<&String> {
-        self.start_fifo.as_ref()
-    }
-
-    /// Get a reference to the general config's focus selection ui.
-    pub fn focus_selection_ui(&self) -> &UiConfig {
-        &self.focus_selection_ui
-    }
-}
-
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
@@ -625,31 +307,6 @@ impl KeyBindings {
         };
 
         self
-    }
-
-    /// Get a reference to the key bindings's on key.
-    pub fn on_key(&self) -> &BTreeMap<String, Action> {
-        &self.on_key
-    }
-
-    /// Get a reference to the key bindings's on alphabet.
-    pub fn on_alphabet(&self) -> &Option<Action> {
-        &self.on_alphabet
-    }
-
-    /// Get a reference to the key bindings's on number.
-    pub fn on_number(&self) -> &Option<Action> {
-        &self.on_number
-    }
-
-    /// Get a reference to the key bindings's on special character.
-    pub fn on_special_character(&self) -> &Option<Action> {
-        &self.on_special_character
-    }
-
-    /// Get a reference to the key bindings's default.
-    pub fn default(&self) -> &Option<Action> {
-        &self.default
     }
 }
 
@@ -772,31 +429,6 @@ impl Mode {
                 result
             })
     }
-
-    /// Get a reference to the mode's name.
-    pub fn name(&self) -> &String {
-        &self.name
-    }
-
-    /// Get a reference to the mode's help.
-    pub fn help(&self) -> &Option<String> {
-        &self.help
-    }
-
-    /// Get a reference to the mode's extra help.
-    pub fn extra_help(&self) -> &Option<String> {
-        &self.extra_help
-    }
-
-    /// Get a reference to the mode's key bindings.
-    pub fn key_bindings(&self) -> &KeyBindings {
-        &self.key_bindings
-    }
-
-    /// Get a reference to the mode's layout.
-    pub fn layout(&self) -> &Option<Layout> {
-        &self.layout
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -888,96 +520,6 @@ impl BuiltinModesConfig {
             _ => None,
         }
     }
-
-    /// Get a reference to the builtin modes config's default.
-    pub fn default(&self) -> &Mode {
-        &self.default
-    }
-
-    /// Get a reference to the builtin modes config's selection ops.
-    pub fn selection_ops(&self) -> &Mode {
-        &self.selection_ops
-    }
-
-    /// Get a reference to the builtin modes config's create.
-    pub fn create(&self) -> &Mode {
-        &self.create
-    }
-
-    /// Get a reference to the builtin modes config's create directory.
-    pub fn create_directory(&self) -> &Mode {
-        &self.create_directory
-    }
-
-    /// Get a reference to the builtin modes config's create file.
-    pub fn create_file(&self) -> &Mode {
-        &self.create_file
-    }
-
-    /// Get a reference to the builtin modes config's number.
-    pub fn number(&self) -> &Mode {
-        &self.number
-    }
-
-    /// Get a reference to the builtin modes config's go to.
-    pub fn go_to(&self) -> &Mode {
-        &self.go_to
-    }
-
-    /// Get a reference to the builtin modes config's rename.
-    pub fn rename(&self) -> &Mode {
-        &self.rename
-    }
-
-    /// Get a reference to the builtin modes config's delete.
-    pub fn delete(&self) -> &Mode {
-        &self.delete
-    }
-
-    /// Get a reference to the builtin modes config's action.
-    pub fn action(&self) -> &Mode {
-        &self.action
-    }
-
-    /// Get a reference to the builtin modes config's search.
-    pub fn search(&self) -> &Mode {
-        &self.search
-    }
-
-    /// Get a reference to the builtin modes config's filter.
-    pub fn filter(&self) -> &Mode {
-        &self.filter
-    }
-
-    /// Get a reference to the builtin modes config's relative path does contain.
-    pub fn relative_path_does_contain(&self) -> &Mode {
-        &self.relative_path_does_contain
-    }
-
-    /// Get a reference to the builtin modes config's relative path does not contain.
-    pub fn relative_path_does_not_contain(&self) -> &Mode {
-        &self.relative_path_does_not_contain
-    }
-
-    /// Get a reference to the builtin modes config's sort.
-    pub fn sort(&self) -> &Mode {
-        &self.sort
-    }
-
-    /// Get a reference to the builtin modes config's switch layout.
-    pub fn switch_layout(&self) -> &Mode {
-        &self.switch_layout
-    }
-
-    /// Get a reference to the builtin modes config's recover.
-    pub fn recover(&self) -> &Mode {
-        &self.recover
-    }
-
-    /// Get a reference to the builtin modes config's quit.
-    pub fn quit(&self) -> &Mode {
-        &self.quit
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -991,26 +533,8 @@ pub struct ModesConfig {
 }
 
 impl ModesConfig {
-    pub fn get_builtin(&self, name: &str) -> Option<&Mode> {
-        self.builtin.get(name)
-    }
-
-    pub fn get_custom(&self, name: &str) -> Option<&Mode> {
-        self.custom.get(name)
-    }
-
     pub fn get(&self, name: &str) -> Option<&Mode> {
-        self.get_builtin(name).or_else(|| self.get_custom(name))
-    }
-
-    /// Get a reference to the modes config's builtin.
-    pub fn builtin(&self) -> &BuiltinModesConfig {
-        &self.builtin
-    }
-
-    /// Get a reference to the modes config's custom.
-    pub fn custom(&self) -> &HashMap<String, Mode> {
-        &self.custom
+        self.builtin.get(name).or_else(|| self.custom.get(name))
     }
 }
 
@@ -1033,20 +557,6 @@ impl PanelUiConfig {
         self.borders = other.borders.to_owned().or(self.borders);
         self.style = self.style.extend(&other.style);
         self
-    }
-    /// Get a reference to the block config's borders.
-    pub fn borders(&self) -> &Option<IndexSet<Border>> {
-        &self.borders
-    }
-
-    /// Get a reference to the block config's title.
-    pub fn title(&self) -> &UiElement {
-        &self.title
-    }
-
-    /// Get a reference to the block config's style.
-    pub fn style(&self) -> &Style {
-        &self.style
     }
 }
 
@@ -1079,11 +589,6 @@ impl BuiltinLayoutsConfig {
             _ => None,
         }
     }
-
-    /// Get a reference to the builtin layouts config's default.
-    pub fn default(&self) -> &Layout {
-        &self.default
-    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -1108,16 +613,6 @@ impl LayoutsConfig {
     pub fn get(&self, name: &str) -> Option<&Layout> {
         self.get_builtin(name).or_else(|| self.get_custom(name))
     }
-
-    /// Get a reference to the layouts config's builtin.
-    pub fn builtin(&self) -> &BuiltinLayoutsConfig {
-        &self.builtin
-    }
-
-    /// Get a reference to the layouts config's custom.
-    pub fn custom(&self) -> &HashMap<String, Layout> {
-        &self.custom
-    }
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -1134,26 +629,4 @@ pub struct Config {
 
     #[serde(default)]
     pub modes: ModesConfig,
-}
-
-impl Config {
-    /// Get a reference to the config's layouts.
-    pub fn layouts(&self) -> &LayoutsConfig {
-        &self.layouts
-    }
-
-    /// Get a reference to the config's general.
-    pub fn general(&self) -> &GeneralConfig {
-        &self.general
-    }
-
-    /// Get a reference to the config's node types.
-    pub fn node_types(&self) -> &NodeTypesConfig {
-        &self.node_types
-    }
-
-    /// Get a reference to the config's modes.
-    pub fn modes(&self) -> &ModesConfig {
-        &self.modes
-    }
 }
