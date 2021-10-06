@@ -206,22 +206,13 @@ impl Modifier {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
     pub fg: Option<Color>,
     pub bg: Option<Color>,
     pub add_modifiers: Option<IndexSet<Modifier>>,
     pub sub_modifiers: Option<IndexSet<Modifier>>,
-}
-
-impl PartialEq for Style {
-    fn eq(&self, other: &Self) -> bool {
-        self.fg == other.fg
-            && self.bg == other.bg
-            && self.add_modifiers == other.add_modifiers
-            && self.sub_modifiers == other.sub_modifiers
-    }
 }
 
 impl Style {
