@@ -28,7 +28,7 @@ impl Action {
         if self.messages.is_empty() {
             None
         } else if read_only {
-            if self.messages.iter().all(|m| m.is_read_only()) {
+            if self.messages.iter().all(ExternalMsg::is_read_only) {
                 Some(self)
             } else {
                 None
