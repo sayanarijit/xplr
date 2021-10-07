@@ -912,7 +912,10 @@ pub fn draw_custom_content<B: Backend>(
     match body {
         ContentBody::StaticParagraph { render } => {
             let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
-            let content = Paragraph::new(render).block(block(config, title.unwrap_or_default()));
+            let content = Paragraph::new(render).block(block(
+                config,
+                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+            ));
             f.render_widget(content, layout_size);
         }
 
@@ -930,7 +933,10 @@ pub fn draw_custom_content<B: Backend>(
 
             let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
 
-            let content = Paragraph::new(render).block(block(config, title.unwrap_or_default()));
+            let content = Paragraph::new(render).block(block(
+                config,
+                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+            ));
             f.render_widget(content, layout_size);
         }
 
@@ -941,7 +947,10 @@ pub fn draw_custom_content<B: Backend>(
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
-            let content = List::new(items).block(block(config, title.unwrap_or_default()));
+            let content = List::new(items).block(block(
+                config,
+                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+            ));
             f.render_widget(content, layout_size);
         }
 
@@ -963,7 +972,10 @@ pub fn draw_custom_content<B: Backend>(
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
-            let content = List::new(items).block(block(config, title.unwrap_or_default()));
+            let content = List::new(items).block(block(
+                config,
+                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+            ));
             f.render_widget(content, layout_size);
         }
 
@@ -995,7 +1007,10 @@ pub fn draw_custom_content<B: Backend>(
             let content = Table::new(rows)
                 .widths(&widths)
                 .column_spacing(col_spacing.unwrap_or(1))
-                .block(block(config, title.unwrap_or_default()));
+                .block(block(
+                    config,
+                    title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                ));
 
             f.render_widget(content, layout_size);
         }
@@ -1036,9 +1051,10 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|w| w.to_tui(screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
-            let mut content = Table::new(rows)
-                .widths(&widths)
-                .block(block(config, title.unwrap_or_default()));
+            let mut content = Table::new(rows).widths(&widths).block(block(
+                config,
+                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+            ));
 
             if let Some(col_spacing) = col_spacing {
                 content = content.column_spacing(col_spacing);
