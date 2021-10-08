@@ -11,6 +11,7 @@ homepage = "https://xplr.dev"
 documentation = "https://xplr.dev/en"
 keywords = ["terminal", "file", "explorer", "manager", "tui"]
 categories = ["command-line-interface", "command-line-utilities"]
+include = ["src/**/*", "LICENSE", "README.md"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
