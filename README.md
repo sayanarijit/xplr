@@ -16,8 +16,12 @@ A hackable, minimal, fast TUI file explorer
 <img src="https://img.shields.io/github/commit-activity/m/sayanarijit/xplr" />
 </a>
 
+<a href="https://matrix.to/#/#xplr-pub:matrix.org" target="_blank">
+<img alt="Matrix" src="https://img.shields.io/matrix/xplr-pub:matrix.org?color=0DB787&label=matrix&logo=Matrix">
+</a>
+  
 <a href="https://discord.gg/JmasSPCcz3" target="_blank">
-<img src="https://img.shields.io/discord/834369918312382485?logo=discord&style=social" />
+<img src="https://img.shields.io/discord/834369918312382485?color=5865F2&label=discord&logo=Discord" />
 </a>
 
 </p>
