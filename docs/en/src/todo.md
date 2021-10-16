@@ -1,5 +1,4 @@
-TODO
-====
+# TODO
 
 - [x] Saner key bindings.
 - [x] Pipes.
@@ -27,10 +26,9 @@ TODO
 
 Like this project so far? **[Please consider contributing][6].**
 
-
-[1]:https://github.com/sayanarijit/xplr/wiki/Hacks#spawn-multiple-sessions-in-different-windows
-[2]:https://github.com/sayanarijit/xplr/discussions/15
-[3]:https://github.com/sayanarijit/xplr/wiki/Hacks#bookmark
-[4]:https://github.com/sayanarijit/xplr.vim
-[5]:https://github.com/sayanarijit/xplr/discussions/2
-[6]:contribute.md
+[1]: https://github.com/sayanarijit/xplr/wiki/Hacks#spawn-multiple-sessions-in-different-windows
+[2]: https://github.com/sayanarijit/xplr/discussions/15
+[3]: https://github.com/sayanarijit/xplr/wiki/Hacks#bookmark
+[4]: https://github.com/sayanarijit/xplr.vim
+[5]: https://github.com/sayanarijit/xplr/discussions/2
+[6]: contribute.md

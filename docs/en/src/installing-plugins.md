@@ -1,5 +1,4 @@
-Installing Plugins
-==================
+# Installing Plugins
 
 Until we get a cool plugin manager, let's install plugins manually using the
 following procedure:

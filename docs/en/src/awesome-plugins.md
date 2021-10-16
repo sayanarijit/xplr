@@ -1,21 +1,16 @@
-Awesome Plugins
-===============
+# Awesome Plugins
 
 Here's a list of awesome xplr plugins that you might want to check out. If none
 of the following plugins work for you, it's very easy to
 [write your own][1].
 
-
-Categories
-----------
+## Categories
 
 - [Extension][32]
 - [Integration][2]
 - [Theme][3]
 
-
-Extension
----------
+## Extension
 
 - [**comex.xplr**][21] One xplr plugin to compress and extract them all.
 - [**command-mode.xplr**][37] The missing command mode for xplr.
@@ -23,9 +18,7 @@ Extension
 - [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 
-
-Integration
------------
+## Integration
 
 - [**alacritty.xplr**][33] [Alacritty][34] integration for xplr.
 - [**dragon.xplr**][4] Drag and drop files using [dragon][5].
@@ -46,51 +39,48 @@ Integration
 - [**xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
 - [**zoxide.xplr**][17] Change directory using the [zoxide][18] database.
 
-
-Theme
------
+## Theme
 
 - [**material-landscape.xplr**][19] Material Landscape
 - [**material-landscape2.xplr**][20] Material Landscape 2
 - [**zentable.xplr**][31] A clean, distraction free xplr table UI
 - [**icons.xplr**][30] An icon theme for xplr.
 
-
-[1]:./writing-plugins.md
-[2]:#integration
-[3]:#theme
-[4]:https://github.com/sayanarijit/dragon.xplr
-[5]:https://github.com/mwh/dragon
-[6]:https://github.com/sayanarijit/dua-cli.xplr
-[7]:https://github.com/Byron/dua-cli
-[8]:https://github.com/sayanarijit/fzf.xplr
-[9]:https://github.com/junegunn/fzf
-[10]:https://github.com/sayanarijit/preview-tabbed.xplr
-[11]:https://tools.suckless.org/tabbed/
-[12]:https://github.com/jarun/nnn/blob/master/plugins/preview-tabbed
-[13]:https://github.com/sayanarijit/trash-cli.xplr
-[14]:https://github.com/andreafrancia/trash-cli
-[15]:https://github.com/sayanarijit/xclip.xplr
-[16]:https://github.com/astrand/xclip
-[17]:https://github.com/sayanarijit/zoxide.xplr
-[18]:https://github.com/ajeetdsouza/zoxide
-[19]:https://github.com/sayanarijit/material-landscape.xplr
-[20]:https://github.com/sayanarijit/material-landscape2.xplr
-[21]:https://github.com/sayanarijit/comex.xplr
-[22]:https://github.com/sayanarijit/xargs.xplr
-[23]:https://github.com/dtomvan/paste-rs.xplr
-[24]:https://paste.rs
-[25]:https://github.com/sayanarijit/completion.xplr
-[26]:https://github.com/sayanarijit/qrcp.xplr
-[27]:https://github.com/claudiodangelis/qrcp
-[28]:https://github.com/prncss-xyz/type-to-nav.xplr
-[29]:https://github.com/jarun/nnn/wiki/concepts#type-to-nav
-[30]:https://github.com/prncss-xyz/icons.xplr
-[31]:https://github.com/sayanarijit/zentable.xplr
-[32]:#extension
-[33]:https://github.com/sayanarijit/alacritty.xplr
-[34]:https://github.com/alacritty/alacritty
-[35]:https://github.com/sayanarijit/nvim-ctrl.xplr
-[36]:https://github.com/chmln/nvim-ctrl
-[37]:https://github.com/sayanarijit/command-mode.xplr
-[38]:https://github.com/sayanarijit/map.xplr
+[1]: ./writing-plugins.md
+[2]: #integration
+[3]: #theme
+[4]: https://github.com/sayanarijit/dragon.xplr
+[5]: https://github.com/mwh/dragon
+[6]: https://github.com/sayanarijit/dua-cli.xplr
+[7]: https://github.com/Byron/dua-cli
+[8]: https://github.com/sayanarijit/fzf.xplr
+[9]: https://github.com/junegunn/fzf
+[10]: https://github.com/sayanarijit/preview-tabbed.xplr
+[11]: https://tools.suckless.org/tabbed/
+[12]: https://github.com/jarun/nnn/blob/master/plugins/preview-tabbed
+[13]: https://github.com/sayanarijit/trash-cli.xplr
+[14]: https://github.com/andreafrancia/trash-cli
+[15]: https://github.com/sayanarijit/xclip.xplr
+[16]: https://github.com/astrand/xclip
+[17]: https://github.com/sayanarijit/zoxide.xplr
+[18]: https://github.com/ajeetdsouza/zoxide
+[19]: https://github.com/sayanarijit/material-landscape.xplr
+[20]: https://github.com/sayanarijit/material-landscape2.xplr
+[21]: https://github.com/sayanarijit/comex.xplr
+[22]: https://github.com/sayanarijit/xargs.xplr
+[23]: https://github.com/dtomvan/paste-rs.xplr
+[24]: https://paste.rs
+[25]: https://github.com/sayanarijit/completion.xplr
+[26]: https://github.com/sayanarijit/qrcp.xplr
+[27]: https://github.com/claudiodangelis/qrcp
+[28]: https://github.com/prncss-xyz/type-to-nav.xplr
+[29]: https://github.com/jarun/nnn/wiki/concepts#type-to-nav
+[30]: https://github.com/prncss-xyz/icons.xplr
+[31]: https://github.com/sayanarijit/zentable.xplr
+[32]: #extension
+[33]: https://github.com/sayanarijit/alacritty.xplr
+[34]: https://github.com/alacritty/alacritty
+[35]: https://github.com/sayanarijit/nvim-ctrl.xplr
+[36]: https://github.com/chmln/nvim-ctrl
+[37]: https://github.com/sayanarijit/command-mode.xplr
+[38]: https://github.com/sayanarijit/map.xplr

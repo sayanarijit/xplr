@@ -1,5 +1,4 @@
-Column Renderer
-==============
+# Column Renderer
 
 A column renderer is a Lua function that receives a [special argument][1] and
 returns a string that will be displayed in each specific field of the
@@ -18,9 +17,7 @@ You can either overwrite these functions, or create new functions in
 
 Terminal colors are supported.
 
-
-Table Renderer Argument
------------------------
+## Table Renderer Argument
 
 The special argument contains the following fields
 
@@ -75,20 +72,17 @@ Type: string
 
 The extension of the node.
 
-
 ### is_symlink
 
 Type: boolean
 
 `true` if the node is a symlink.
 
-
 ### is_broken
 
 Type: boolean
 
 `true` if the node is a broken symlink.
-
 
 ### is_dir
 
@@ -107,7 +101,6 @@ Type: boolean
 Type: boolean
 
 `true` if the node is real-only.
-
 
 ### mime_essence
 
@@ -216,9 +209,7 @@ Type: mapping of string and string
 
 The applicable [meta object][33] for the node.
 
-
-Permission
-----------
+## Permission
 
 Permission contains the following fields:
 
@@ -237,9 +228,7 @@ Permission contains the following fields:
 
 Each field holds a boolean value.
 
-
-Resolved Node Metadata
-----------------------
+## Resolved Node Metadata
 
 It contains the following fields.
 
@@ -252,9 +241,7 @@ It contains the following fields.
 - [size][13]
 - [human_size][14]
 
-
-Example: Customizing Table Renderer
------------------------------------
+## Example: Customizing Table Renderer
 
 ```lua
 xplr.fn.custom.fmt_simple_column = function(m)
@@ -277,37 +264,36 @@ xplr.config.general.table.col_widths = {
 -- relative paths.
 ```
 
-
-[1]:#table-renderer-argument
-[2]:layouts.md#table
-[3]:#parent
-[4]:#relative_path
-[5]:#absolute_path
-[6]:#extension
-[7]:#is_symlink
-[8]:#is_broken
-[9]:#is_dir
-[10]:#is_file
-[11]:#is_readonly
-[12]:#mime_essence
-[13]:#size
-[14]:#human_size
-[15]:#permissions
-[16]:#canonical
-[17]:#symlink
-[18]:#index
-[19]:#relative_index
-[20]:#is_before_focus
-[21]:#is_after_focus
-[22]:#tree
-[23]:#prefix
-[24]:#suffix
-[25]:#is_selected
-[26]:#is_focused
-[27]:#total
-[28]:meta
-[29]:#size
-[30]:#permission
-[31]:#resolved-node-metadata
-[32]:general-config.md#tabletree
-[33]:node_types.md#meta
+[1]: #table-renderer-argument
+[2]: layouts.md#table
+[3]: #parent
+[4]: #relative_path
+[5]: #absolute_path
+[6]: #extension
+[7]: #is_symlink
+[8]: #is_broken
+[9]: #is_dir
+[10]: #is_file
+[11]: #is_readonly
+[12]: #mime_essence
+[13]: #size
+[14]: #human_size
+[15]: #permissions
+[16]: #canonical
+[17]: #symlink
+[18]: #index
+[19]: #relative_index
+[20]: #is_before_focus
+[21]: #is_after_focus
+[22]: #tree
+[23]: #prefix
+[24]: #suffix
+[25]: #is_selected
+[26]: #is_focused
+[27]: #total
+[28]: meta
+[29]: #size
+[30]: #permission
+[31]: #resolved-node-metadata
+[32]: general-config.md#tabletree
+[33]: node_types.md#meta

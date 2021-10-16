@@ -1,20 +1,15 @@
-Writing Plugins
-===============
+# Writing Plugins
 
 Anyone who can write [Lua][1] code, can write xplr plugins.
 
 Just follow the instructions and best practices:
 
-
-Naming
-------
+## Naming
 
 xplr plugins are named using hiphen (`-`) separated words that may also include
 integers. They will be plugged using the `require()` function in Lua.
 
-
-Structure
----------
+## Structure
 
 A minimal plugin should confirm to the following structure:
 
@@ -27,7 +22,6 @@ plugin-name
 
 You can also use
 [this template][2].
-
 
 ### README.md
 
@@ -49,8 +43,7 @@ end
 return { setup = setup }
 ```
 
-Publishing
-----------
+## Publishing
 
 When publishing plugins on GitHub or other repositories, it's a best practice
 to append `.xplr` to the name to make them distinguishable. Similar to the
@@ -59,15 +52,11 @@ to append `.xplr` to the name to make them distinguishable. Similar to the
 Finally, after publishing, don't hesitate to
 [let us know][4].
 
-
-Examples
---------
+## Examples
 
 Visit [Awesome Plugins][5] for xplr plugin examples.
 
-
-Also See
---------
+## Also See
 
 - [Tutorial: Adding a New Mode][6]
 - [Example: Using Environment Variables and Pipes][7]
@@ -76,15 +65,14 @@ Also See
 - [Example: Customizing Table Renderer][10]
 - [Example: Render a custom dynamic table][11]
 
-
-[1]:https://www.lua.org
-[2]:https://github.com/sayanarijit/plugin-template1.xplr
-[3]:https://neovim.io
-[4]:https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
-[5]:awesome-plugins.md
-[6]:modes.md#tutorial-adding-a-new-mode
-[7]:message.md#example-using-environment-variables-and-pipes
-[8]:message.md#example-using-lua-function-calls
-[9]:layouts.md#example-defining-custom-layout
-[10]:column-renderer.md#example-customizing-table-renderer
-[11]:layouts.md#example-render-a-custom-dynamic-table
+[1]: https://www.lua.org
+[2]: https://github.com/sayanarijit/plugin-template1.xplr
+[3]: https://neovim.io
+[4]: https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
+[5]: awesome-plugins.md
+[6]: modes.md#tutorial-adding-a-new-mode
+[7]: message.md#example-using-environment-variables-and-pipes
+[8]: message.md#example-using-lua-function-calls
+[9]: layouts.md#example-defining-custom-layout
+[10]: column-renderer.md#example-customizing-table-renderer
+[11]: layouts.md#example-render-a-custom-dynamic-table

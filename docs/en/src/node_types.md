@@ -1,5 +1,4 @@
-Node Types
-==========
+# Node Types
 
 This configuration defines how to deal with different kinds of nodes (files,
 directories, symlinks etc.) in a directory.
@@ -23,7 +22,6 @@ The priority is:
 
 **special** > **extension** > **mime_essence** > **symlink** > **file** > **directory**
 
-
 ### directory
 
 Type: [NodeType Config][7]
@@ -38,7 +36,6 @@ Example:
 xplr.config.node_types.directory.meta.icon = ""
 xplr.config.node_types.directory.style.add_modifiers = { "Bold" }
 ```
-
 
 ### file
 
@@ -55,7 +52,6 @@ xplr.config.node_types.file.meta.icon = ""
 xplr.config.node_types.file.style.fg = "White"
 ```
 
-
 ### symlink
 
 Type: [NodeType Config][7]
@@ -68,7 +64,6 @@ Example:
 xplr.config.node_types.symlink.meta.icon = ""
 xplr.config.node_types.symlink.style.add_modifiers = { "Italic" }
 ```
-
 
 ### mime_essence
 
@@ -86,7 +81,7 @@ xplr.config.node_types.mime_essence = {
   application = {
     -- application/*
     ["*"] = { meta = { icon = "a" } }
-    
+
     -- application/pdf
     pdf = { meta = { icon = "" } },
 
@@ -123,9 +118,7 @@ xplr.config.node_types.special["Cargo.toml"] = { meta = { icon = "" } }
 xplr.config.node_types.special["Downloads"] = { meta = { icon = "" } }
 ```
 
-
-NodeType Config
----------------
+## NodeType Config
 
 A node-type config contains the following fields:
 
@@ -151,13 +144,12 @@ xplr.config.node_types.file = {
 }
 ```
 
-
-[1]:#directory
-[2]:#file
-[3]:#symlink
-[4]:#mime_essence
-[5]:#extension
-[6]:#special
-[7]:#nodetype-config
-[8]:#meta
-[9]:style.md
+[1]: #directory
+[2]: #file
+[3]: #symlink
+[4]: #mime_essence
+[5]: #extension
+[6]: #special
+[7]: #nodetype-config
+[8]: #meta
+[9]: style.md

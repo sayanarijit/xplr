@@ -1,5 +1,4 @@
-Introduction
-============
+# Introduction
 
 xplr is a terminal UI based file explorer that aims to increase our terminal
 productivity by being a flexible, interactive orchestrator for the ever growing
@@ -14,9 +13,7 @@ intuitive, scriptable, keyboard controlled, real-time visual interface, also
 being an ideal candidate for further integration, enabling the users to achieve
 insane terminal productivity.
 
-
-Features
---------
+## Features
 
 ### Hackable
 
@@ -28,7 +25,6 @@ A few things you can do with the xplr configuration
 - [Hack the layout][1]
 - [Hack the key bindings][2]
 - [Extend with plugins][3]
-
 
 ## Fast
 
@@ -46,7 +42,6 @@ because I am waiting for someone to complain. I want to avoid optimizing things
 I don't need to, because optimization often requires either complexity or
 feature sacrifice or both.
 
-
 ## Minimalist
 
 xplr prefers to stay minimal, both in terms of features and binary size, but
@@ -55,7 +50,6 @@ If adding some feature, lines of code, or a dependency allows the users to be a
 little more productive or allows xplr to be a little more configurable, it will
 be considered. But of-course, the `bulk vs productivity gain per user` balance
 will also be considered in the decision-making.
-
 
 ## Other features
 
@@ -113,10 +107,9 @@ will also be considered in the decision-making.
     (`:` `q` `s`).
   - Quit with failure (`ctrl-c`).
 
-
-[1]:layouts.md
-[2]:modes.md
-[3]:awesome-plugins.md
-[4]:https://github.com/sayanarijit/xplr/tree/main/benches
-[5]:https://github.com/sayanarijit/xplr/discussions/183
-[6]:https://github.com/sayanarijit/xplr/pull/229
+[1]: layouts.md
+[2]: modes.md
+[3]: awesome-plugins.md
+[4]: https://github.com/sayanarijit/xplr/tree/main/benches
+[5]: https://github.com/sayanarijit/xplr/discussions/183
+[6]: https://github.com/sayanarijit/xplr/pull/229

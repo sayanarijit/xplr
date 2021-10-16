@@ -1,5 +1,4 @@
-Style
-=====
+# Style
 
 A style object contains the following information:
 
@@ -14,13 +13,11 @@ Type: nullable [Color][5]
 
 The foreground color.
 
-
 ### bg
 
 Type: nullable [Color][5]
 
 The background color.
-
 
 ### add_modifiers
 
@@ -28,16 +25,13 @@ Type: nullable list of [Modifier][6]
 
 Modifiers to add.
 
-
 ### sub_modifiers
 
 Type: nullable list of [Modifier][6]
 
 Modifiers to remove.
 
-
-Color
------
+## Color
 
 Color can be one of the following:
 
@@ -61,9 +55,7 @@ Color can be one of the following:
 - { Rgb = { int, int, int } }
 - { Indexed = int }
 
-
-Modifier
---------
+## Modifier
 
 Modifier can be one of the following:
 
@@ -77,9 +69,7 @@ Modifier can be one of the following:
 - "Hidden"
 - "CrossedOut"
 
-
-Example
--------
+## Example
 
 ```lua
 xplr.config.general.cursor.style.fg = "Red"
@@ -88,10 +78,9 @@ xplr.config.general.cursor.style.add_modifiers = { "Bold", "Italic" }
 xplr.config.general.cursor.style.sub_modifiers = { "Hidden" }
 ```
 
-
-[1]:#fg
-[2]:#bg
-[3]:#add_modifiers
-[4]:#sub_modifiers
-[5]:#color
-[6]:#modifier
+[1]: #fg
+[2]: #bg
+[3]: #add_modifiers
+[4]: #sub_modifiers
+[5]: #color
+[6]: #modifier

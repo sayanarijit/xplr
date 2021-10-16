@@ -1,5 +1,4 @@
-Sorting
-=======
+# Sorting
 
 xplr supports sorting paths by different properties. The sorting mechanism
 works like a pipeline, which in visible in the `Sort & filter` panel.
@@ -19,15 +18,12 @@ The arrows denote the order.
 
 Each part of this pipeline is called [Node Sorter Applicable][1].
 
-
-Node Sorter Applicable
-----------------------
+## Node Sorter Applicable
 
 It contains the following information:
 
 - [sorter][2]
 - [reverse][3]
-
 
 ### sorter
 
@@ -62,16 +58,13 @@ A sorter can be one of the following:
 
 TODO: document each
 
-
 ### reverse
 
 Type: boolean
 
 It defined the direction of the order.
 
-
-Example
--------
+## Example
 
 ```lua
 xplr.config.general.initial_sorting = {
@@ -82,7 +75,6 @@ xplr.config.general.initial_sorting = {
 
 This snippet defines the initial sorting logic to be applied when xplr loads.
 
-
-[1]:#node-sorter-applicable
-[2]:#sorter
-[3]:#reverse
+[1]: #node-sorter-applicable
+[2]: #sorter
+[3]: #reverse

@@ -1,5 +1,4 @@
-Filtering
-=========
+# Filtering
 
 xplr supports filtering paths by different properties. The filtering mechanism
 works like a pipeline, which in visible in the `Sort & filter` panel.
@@ -11,15 +10,13 @@ rel!^. › [i]abs=~abc › [i]rel!~xyz
 ```
 
 This line means that the nodes visible on the table will first be filtered by
-the condition: *relative path does not start with `.`*, then by the condition:
-*absolute path contains `abc` (case insensitive)*, and finally by the
-condition: *relative path does not contain `xyz`* (case insensitive).
+the condition: _relative path does not start with `.`_, then by the condition:
+_absolute path contains `abc` (case insensitive)_, and finally by the
+condition: _relative path does not contain `xyz`_ (case insensitive).
 
 Each part of this pipeline is called [Node Filter Applicable][1].
 
-
-Node Filter Applicable
-----------------------
+## Node Filter Applicable
 
 It contains the following information:
 
@@ -63,7 +60,6 @@ A filter can be one of the following:
 - "IAbsolutePathDoesEndWith"
 - "IAbsolutePathDoesNotEndWith"
 
-
 TODO: document each
 
 ### input
@@ -72,9 +68,7 @@ Type: string
 
 The input for the condition.
 
-
-Example:
---------
+## Example:
 
 ```lua
 ToggleNodeFilter = {
@@ -86,8 +80,7 @@ ToggleNodeFilter = {
 Here, `ToggleNodeFilter` is a [message][4] that adds or removes
 (toggles) the filter applied.
 
-
-[1]:#node-filter-applicable
-[2]:#filter
-[3]:#input
-[4]:message.md
+[1]: #node-filter-applicable
+[2]: #filter
+[3]: #input
+[4]: message.md

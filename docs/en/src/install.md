@@ -1,5 +1,4 @@
-Try in Docker
-=============
+# Try in Docker
 
 If you prefer to try it before installing, here's the snipper for your
 convenience.
@@ -14,9 +13,7 @@ docker run -w / -it --rm ubuntu sh -uec '
 '
 ```
 
-
-Install
-=======
+# Install
 
 You can install xplr using one of the following ways. Each has their own
 advantages and limitations.
@@ -30,15 +27,12 @@ available.
 One way to keep an eye on the releases is to
 [watch the repository][4].
 
-
-Community Maintained Repositories
----------------------------------
+## Community Maintained Repositories
 
 xplr can be installed from one of the following community maintained
 repositories:
 
 [![packaging status][5]][6]
-
 
 ### Arch Linux
 
@@ -127,9 +121,7 @@ cd /usr/pkgsrc/sysutils/xplr
 make install
 ```
 
-
-Direct Download
----------------
+## Direct Download
 
 One can directly download the standalone binary from the
 [releases][15].
@@ -154,9 +146,7 @@ tar xzvf xplr-$platform.tar.gz
 sudo mv xplr /usr/local/bin/
 ```
 
-
-From [crates.io][18]
------------------------------------------------
+## From [crates.io][18]
 
 Prerequisites:
 
@@ -170,9 +160,7 @@ Command-line instructions:
 cargo install --locked --force xplr
 ```
 
-
-Build From Source
------------------
+## Build From Source
 
 Prerequisites:
 
@@ -195,9 +183,7 @@ cargo build --locked --release --bin xplr
 sudo cp target/release/xplr /usr/local/bin/
 ```
 
-
-Android
--------
+## Android
 
 ### [Termux][23]
 
@@ -238,29 +224,28 @@ Android
   ~/.cargo/bin/xplr
   ```
 
-
-[1]:#direct-download
-[2]:#from-a-hrefhttpscratesiocratesxplrcratesioa
-[3]:#build-from-source
-[4]:https://github.com/sayanarijit/xplr/watchers
-[5]:https://repology.org/badge/vertical-allrepos/xplr.svg
-[6]:https://repology.org/project/xplr/versions
-[7]:https://archlinux.org/packages/community/x86_64/xplr
-[8]:https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go
-[9]:https://github.com/shubham-cpp/void-pkg-templates
-[10]:https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr
-[11]:https://ports.macports.org/port/xplr
-[12]:https://formulae.brew.sh/formula/xplr
-[13]:https://cgit.freebsd.org/ports/plain/misc/xplr/
-[14]:https://pkgsrc.se/sysutils/xplr
-[15]:https://github.com/sayanarijit/xplr/releases
-[16]:https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz
-[17]:https://github.com/sayanarijit/xplr/releases/latest/download/xplr-macos.tar.gz
-[18]:https://crates.io/crates/xplr
-[19]:https://www.rust-lang.org/tools/install
-[20]:https://gcc.gnu.org/
-[21]:https://www.gnu.org/software/make/
-[22]:https://git-scm.com/
-[23]:https://termux.com/
-[24]:https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
-[25]:https://gifyu.com/image/tF2D
+[1]: #direct-download
+[2]: #from-a-hrefhttpscratesiocratesxplrcratesioa
+[3]: #build-from-source
+[4]: https://github.com/sayanarijit/xplr/watchers
+[5]: https://repology.org/badge/vertical-allrepos/xplr.svg
+[6]: https://repology.org/project/xplr/versions
+[7]: https://archlinux.org/packages/community/x86_64/xplr
+[8]: https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go
+[9]: https://github.com/shubham-cpp/void-pkg-templates
+[10]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr
+[11]: https://ports.macports.org/port/xplr
+[12]: https://formulae.brew.sh/formula/xplr
+[13]: https://cgit.freebsd.org/ports/plain/misc/xplr/
+[14]: https://pkgsrc.se/sysutils/xplr
+[15]: https://github.com/sayanarijit/xplr/releases
+[16]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux.tar.gz
+[17]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-macos.tar.gz
+[18]: https://crates.io/crates/xplr
+[19]: https://www.rust-lang.org/tools/install
+[20]: https://gcc.gnu.org/
+[21]: https://www.gnu.org/software/make/
+[22]: https://git-scm.com/
+[23]: https://termux.com/
+[24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
+[25]: https://gifyu.com/image/tF2D

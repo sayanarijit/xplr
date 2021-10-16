@@ -1,5 +1,4 @@
-Configuration
-=============
+# Configuration
 
 xplr can be configured using [Lua][1] via a special file
 named `init.lua`
@@ -15,9 +14,7 @@ the command-line argument `-c` / `--config` to specify its path explicitely. In
 that case, both `~/.config/xplr/init.lua` and `/etc/xplr/init.lua` will be
 ignored.
 
-
-How Config Is Loaded
---------------------
+## How Config Is Loaded
 
 When xplr loads, it first executes the built-in
 [init.lua][2] to set
@@ -26,9 +23,7 @@ using the following lookup order:
 
 **--config /path/to/init.lua** > **~/.config/xplr/init.lua** > **/etc/xplr/init.lua**
 
-
-config
-------
+## config
 
 The xplr configuration, exposed as `xplr.config` Lua API contains the
 following fields:
@@ -38,10 +33,9 @@ following fields:
 - [layouts][5]
 - [node_types][6]
 
-
-[1]:https://www.lua.org/
-[2]:https://github.com/sayanarijit/xplr/blob/main/src/init.lua
-[3]:general-config.md
-[4]:modes.md
-[5]:layouts.md
-[6]:node_types.md
+[1]: https://www.lua.org/
+[2]: https://github.com/sayanarijit/xplr/blob/main/src/init.lua
+[3]: general-config.md
+[4]: modes.md
+[5]: layouts.md
+[6]: node_types.md

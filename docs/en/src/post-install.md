@@ -1,10 +1,8 @@
-Post Install
-============
+# Post Install
 
 Once [installed][1], use the following steps to setup and run xplr.
 
-Create the customizable config file
------------------------------------
+## Create the customizable config file
 
 ```bash
 mkdir -p ~/.config/xplr
@@ -28,15 +26,12 @@ and remove / comment out what you don't want to customize.
 > Also, the default configuration is meant to be overwritten to suit your
 > workflow.
 
-
-Run
----
+## Run
 
 ```
 xplr
 ```
 
-
-[1]:install.md
-[2]:https://github.com/sayanarijit/xplr/blob/main/src/init.lua
-[3]:upgrade-guide.md
+[1]: install.md
+[2]: https://github.com/sayanarijit/xplr/blob/main/src/init.lua
+[3]: upgrade-guide.md

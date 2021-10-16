@@ -1,5 +1,4 @@
-A hackable, minimal, fast TUI file explorer
-===========================================
+# A hackable, minimal, fast TUI file explorer
 
 - [Introduction][1]
 - [Quickstart][2]
@@ -28,30 +27,29 @@ A hackable, minimal, fast TUI file explorer
 - [Community][24]
 - [Contribute][25]
 
-
-[1]:introduction.md
-[2]:quickstart.md
-[3]:install.md
-[4]:post-install.md
-[5]:configuration.md
-[6]:general-config.md
-[7]:modes.md
-[8]:message.md
-[9]:layouts.md
-[10]:node_types.md
-[11]:style.md
-[12]:sorting.md
-[13]:filtering.md
-[14]:default-key-bindings.md
-[15]:plugin.md
-[16]:installing-plugins.md
-[17]:writing-plugins.md
-[18]:awesome-plugins.md
-[19]:integration.md
-[20]:awesome-integrations.md
-[21]:todo.md
-[22]:alternatives.md
-[23]:upgrade-guide.md
-[24]:community.md
-[25]:contribute.md
-[26]:column-renderer.md
+[1]: introduction.md
+[2]: quickstart.md
+[3]: install.md
+[4]: post-install.md
+[5]: configuration.md
+[6]: general-config.md
+[7]: modes.md
+[8]: message.md
+[9]: layouts.md
+[10]: node_types.md
+[11]: style.md
+[12]: sorting.md
+[13]: filtering.md
+[14]: default-key-bindings.md
+[15]: plugin.md
+[16]: installing-plugins.md
+[17]: writing-plugins.md
+[18]: awesome-plugins.md
+[19]: integration.md
+[20]: awesome-integrations.md
+[21]: todo.md
+[22]: alternatives.md
+[23]: upgrade-guide.md
+[24]: community.md
+[25]: contribute.md
+[26]: column-renderer.md

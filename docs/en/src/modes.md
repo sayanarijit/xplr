@@ -1,5 +1,4 @@
-Modes
-=====
+# Modes
 
 xplr is a modal file explorer. That means the users switch between different
 modes, each containing a different set of key bindings to avoid clashes. Users
@@ -12,9 +11,7 @@ It contains the following fields:
 - [builtin][1]
 - [custom][2]
 
-
-builtin
--------
+## builtin
 
 Type: mapping of string and [Mode][3]
 
@@ -44,9 +41,7 @@ xplr by default provides the following builtin modes:
 Visit the [Default Key Bindings][4] to see what each mode
 does.
 
-
-custom
-------
+## custom
 
 Type: mapping of string and [Mode][3]
 
@@ -78,9 +73,7 @@ xplr.config.general.initial_mode = "example"
 -- pressing "enter" should take you to the "default" mode.
 ```
 
-
-Mode
-----
+## Mode
 
 A mode contains the following information:
 
@@ -122,9 +115,7 @@ Type: nullable [Layout][30]
 
 If specified, this layout will be used to render the UI.
 
-
-Key Bindings
-------------
+## Key Bindings
 
 Key bindings define how each keyboard input will be handled in a specific mode.
 
@@ -173,9 +164,7 @@ Default action to perform in case of a keyboard input not mapped via any of the
 [on_key][10], [on_alphabet][11], [on_number][12] or
 [on_special_character][13] field.
 
-
-Key
----
+## Key
 
 A key can be one of the following:
 
@@ -203,9 +192,7 @@ A key can be one of the following:
 
 And finally, the special characters - including space (`" "`).
 
-
-Action
-------
+## Action
 
 An action contains the following information:
 
@@ -225,9 +212,7 @@ Type: A list of [Message][18] to send.
 
 The list of messages to send when a key is pressed.
 
-
-Tutorial: Adding a New Mode
----------------------------
+## Tutorial: Adding a New Mode
 
 Assuming xplr is [installed][19] and [setup][20], let's
 add our own mode to integrate xplr with [fzf][21].
@@ -296,38 +281,37 @@ Now let's try out the new `xplr`-`fzf` integration.
 
 [![xplr-fzf.gif][25]][26]
 
------
+---
 
 Visit [Awesome Plugins][27] for more [integration][28] options.
 
-
-[1]:#builtin
-[2]:#custom
-[3]:#mode
-[4]:default-key-bindings.md
-[5]:#name
-[6]:#help
-[7]:#extra_help
-[8]:#key_bindings
-[9]:#key-bindings
-[10]:#on_key
-[11]:#on_alphabet
-[12]:#on_number
-[13]:#on_special_character
-[14]:#default
-[15]:#key
-[16]:#action
-[17]:#messages
-[18]:message.md
-[19]:install.md
-[20]:post-install.md
-[21]:https://github.com/junegunn/fzf
-[22]:message.md#environment-variables
-[23]:message.md#input-pipe
-[24]:message.md#output-pipes
-[25]:https://s3.gifyu.com/images/xplr-fzf.gif
-[26]:https://gifyu.com/image/tW86
-[27]:awesome-plugins.md
-[28]:awesome-plugins.md#integration
-[29]:#layout
-[30]:layouts.md#Layout
+[1]: #builtin
+[2]: #custom
+[3]: #mode
+[4]: default-key-bindings.md
+[5]: #name
+[6]: #help
+[7]: #extra_help
+[8]: #key_bindings
+[9]: #key-bindings
+[10]: #on_key
+[11]: #on_alphabet
+[12]: #on_number
+[13]: #on_special_character
+[14]: #default
+[15]: #key
+[16]: #action
+[17]: #messages
+[18]: message.md
+[19]: install.md
+[20]: post-install.md
+[21]: https://github.com/junegunn/fzf
+[22]: message.md#environment-variables
+[23]: message.md#input-pipe
+[24]: message.md#output-pipes
+[25]: https://s3.gifyu.com/images/xplr-fzf.gif
+[26]: https://gifyu.com/image/tW86
+[27]: awesome-plugins.md
+[28]: awesome-plugins.md#integration
+[29]: #layout
+[30]: layouts.md#Layout
