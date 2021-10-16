@@ -159,7 +159,8 @@ executing commands or performing write operations on the file-system.</p>
 yourself when you type recklessly.</p>
 <h2 id="cursorformat"><a class="header" href="#cursorformat">cursor.format</a></h2>
 <p>Type: nullable string</p>
-<p>This is the shape of the cursor visible when the input buffer contains some string.</p>
+<p>This is the shape of the cursor visible when the input buffer contains some
+string.</p>
 <h2 id="cursorstyle"><a class="header" href="#cursorstyle">cursor.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style of the cursor.</p>
@@ -188,7 +189,7 @@ yourself when you type recklessly.</p>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style of table header.</p>
 <h2 id="tableheadercols"><a class="header" href="#tableheadercols">table.header.cols</a></h2>
-<p>Type: List of column configuration</p>
+<p>Type: list of column configuration</p>
 <p>Each column config contains <code>format</code> field (string) and <code>style</code> field
 (<a href="style.html">Style</a>), that define the content and style of header.</p>
 <h2 id="tablerowheight"><a class="header" href="#tablerowheight">table.row.height</a></h2>
@@ -198,13 +199,13 @@ yourself when you type recklessly.</p>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style of table rows.</p>
 <h2 id="tablerowcols"><a class="header" href="#tablerowcols">table.row.cols</a></h2>
-<p>Type: List of column configuration</p>
+<p>Type: list of column configuration</p>
 <p>Each column config contains <code>format</code> field (string) and <code>style</code> field
 (<a href="style.html">Style</a>).</p>
 <p>However, unlike <a href="#tableheadercols">table.header.cols</a>, the <code>format</code> field here
 points to a <a href="column-renderer.html">column renderer function</a>.</p>
 <h2 id="tabletree"><a class="header" href="#tabletree">table.tree</a></h2>
-<p>Type: List of tree configuration</p>
+<p>Type: list of tree configuration</p>
 <p>It expects a list of three items. The first component of the tree, then the
 middle components, and finally the last component of the tree.</p>
 <p>Each item requires the <code>format</code> field which is a string, and the <code>style</code> field,
@@ -218,7 +219,8 @@ which is the <a href="style.html">Style</a> object.</p>
 </code></pre>
 <h2 id="start_fifo"><a class="header" href="#start_fifo">start_fifo</a></h2>
 <p>Type: nullable string</p>
-<p><a href="https://docs.rs/xplr/0.15.0/xplr/config/struct.GeneralConfig.html#structfield.start_fifo">Description</a></p>
+<p>Start a FIFO file when xplr loads. It will track the absolute path of the file
+under focus.</p>
 <h2 id="promptformat"><a class="header" href="#promptformat">prompt.format</a></h2>
 <p>Type: string</p>
 <p>This is the shape of the prompt for the input buffer.</p>
@@ -290,7 +292,7 @@ which is the <a href="style.html">Style</a> object.</p>
 <p>The shape of the separator for the <code>Sort &amp; filter</code> panel.</p>
 <h2 id="sort_and_filter_uiseparatorstyle"><a class="header" href="#sort_and_filter_uiseparatorstyle">sort_and_filter_ui.separator.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
-<p>Style for <code>Sort &amp; filter</code>  panel separator.</p>
+<p>Style for <code>Sort &amp; filter</code> panel separator.</p>
 <h2 id="sort_and_filter_uidefault_identifierformat"><a class="header" href="#sort_and_filter_uidefault_identifierformat">sort_and_filter_ui.default_identifier.format</a></h2>
 <p>Type: nullable string</p>
 <p>The content of the default identifier in <code>Sort &amp; filter</code> panel.</p>
@@ -299,42 +301,43 @@ which is the <a href="style.html">Style</a> object.</p>
 <p>Style for the default identifier in <code>Sort &amp; filter</code> panel.</p>
 <h2 id="sort_and_filter_uifilter_identifiers"><a class="header" href="#sort_and_filter_uifilter_identifiers">sort_and_filter_ui.filter_identifiers</a></h2>
 <p>Type: Table with <a href="filtering.html#filter">filter name</a> as key</p>
-<p>The value contains format field (string) and style field (Style), that define the content and style for the given filter.</p>
+<p>The value contains format field (string) and style field (Style), that define
+the content and style for the given filter.</p>
 <p>Example:</p>
-<pre><code class="language-lua">xplr.config.general.sort_and_filter_ui.filter_identifiers = {
-    AbsolutePathDoesContain = {
-        format = &quot;abs=~&quot;,
-        style = { add_modifiers = { &quot;Bold&quot; }, bg = nil, fg = nil, sub_modifiers = nil },
-    }
+<pre><code class="language-lua">xplr.config.general.sort_and_filter_ui.filter_identifiers.AbsolutePathDoesContain = {
+  format = &quot;abs=~&quot;,
+  style = { add_modifiers = { &quot;Bold&quot; }, bg = nil, fg = nil, sub_modifiers = nil },
 }
 </code></pre>
 <h2 id="sort_and_filter_uisort_direction_identifiersforwardformat"><a class="header" href="#sort_and_filter_uisort_direction_identifiersforwardformat">sort_and_filter_ui.sort_direction_identifiers.forward.format</a></h2>
 <p>Type: nullable string</p>
-<p>The shape of the forward direction indicator for sort identifiers in <code>Sort &amp; filter</code> panel.</p>
+<p>The shape of the forward direction indicator for sort identifiers in
+<code>Sort &amp; filter</code> panel.</p>
 <h2 id="sort_and_filter_uisort_direction_identifiersforwardstyle"><a class="header" href="#sort_and_filter_uisort_direction_identifiersforwardstyle">sort_and_filter_ui.sort_direction_identifiers.forward.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style of forward direction indicator.</p>
 <h2 id="sort_and_filter_uisort_direction_identifiersreverseformat"><a class="header" href="#sort_and_filter_uisort_direction_identifiersreverseformat">sort_and_filter_ui.sort_direction_identifiers.reverse.format</a></h2>
 <p>Type: nullable string</p>
-<p>The shape of the reverse direction indicator for sort identifiers in <code>Sort &amp; filter</code> panel.</p>
+<p>The shape of the reverse direction indicator for sort identifiers in
+<code>Sort &amp; filter</code> panel.</p>
 <h2 id="sort_and_filter_uisort_direction_identifiersreversestyle"><a class="header" href="#sort_and_filter_uisort_direction_identifiersreversestyle">sort_and_filter_ui.sort_direction_identifiers.reverse.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style of reverse direction indicator.</p>
 <h2 id="sort_and_filter_uisorter_identifiers"><a class="header" href="#sort_and_filter_uisorter_identifiers">sort_and_filter_ui.sorter_identifiers</a></h2>
 <p>Type: Table with <a href="sorting.html#sorter">sorter name</a> as key</p>
-<p>The value contains format field (string) and style field (Style), that define the content and style for the given sorter.</p>
+<p>The value contains format field (string) and style field (Style), that define
+the content and style for the given sorter.</p>
 <p>Example:</p>
-<pre><code class="language-lua">sort_and_filter_ui.sorter_identifiers = {
-    ByCanonicalAbsolutePath = {
-        format = &quot;[c]abs&quot;,
-        style = { add_modifiers = nil, bg = nil, fg = &quot;Yellow&quot;, sub_modifiers = nil },
-    }
-} 
+<pre><code class="language-lua">sort_and_filter_ui.sorter_identifiers.ByCanonicalAbsolutePath = {
+  format = &quot;[c]abs&quot;,
+  style = { add_modifiers = nil, bg = nil, fg = &quot;Yellow&quot;, sub_modifiers = nil },
+}
 </code></pre>
 <h2 id="panel_uidefaultborders"><a class="header" href="#panel_uidefaultborders">panel_ui.default.borders</a></h2>
-<p>Type: nullable List of strings</p>
+<p>Type: nullable list of strings</p>
 <p>Defines where to show borders for the panels.</p>
-<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and &quot;Right&quot;.</p>
+<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
+&quot;Right&quot;.</p>
 <p>Example:</p>
 <pre><code class="language-lua">-- Show Left and Right borders only
 xplr.config.general.panel_ui.default.borders = {
@@ -352,9 +355,10 @@ xplr.config.general.panel_ui.default.borders = {
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for panel title.</p>
 <h2 id="panel_uihelp_menuborders"><a class="header" href="#panel_uihelp_menuborders">panel_ui.help_menu.borders</a></h2>
-<p>Type: nullable List of strings</p>
+<p>Type: nullable list of strings</p>
 <p>Defines where to show borders for the <code>Help</code> panel.</p>
-<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and &quot;Right&quot;.</p>
+<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
+&quot;Right&quot;.</p>
 <h2 id="panel_uihelp_menustyle"><a class="header" href="#panel_uihelp_menustyle">panel_ui.help_menu.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Help</code> panel.</p>
@@ -365,9 +369,10 @@ xplr.config.general.panel_ui.default.borders = {
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Help</code> panel title.</p>
 <h2 id="panel_uiinput_and_logsborders"><a class="header" href="#panel_uiinput_and_logsborders">panel_ui.input_and_logs.borders</a></h2>
-<p>Type: nullable List of strings</p>
+<p>Type: nullable list of strings</p>
 <p>Defines where to show borders for the <code>Input</code> &amp; <code>Logs</code> panel.</p>
-<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and &quot;Right&quot;.</p>
+<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
+&quot;Right&quot;.</p>
 <h2 id="panel_uiinput_and_logsstyle"><a class="header" href="#panel_uiinput_and_logsstyle">panel_ui.input_and_logs.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Input</code> &amp; <code>Logs</code> panel.</p>
@@ -378,9 +383,10 @@ xplr.config.general.panel_ui.default.borders = {
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Input</code> &amp; <code>Logs</code> panel title.</p>
 <h2 id="panel_uiselectionborders"><a class="header" href="#panel_uiselectionborders">panel_ui.selection.borders</a></h2>
-<p>Type: nullable List of strings</p>
+<p>Type: nullable list of strings</p>
 <p>Defines where to show borders for the <code>Selection</code> panel.</p>
-<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and &quot;Right&quot;.</p>
+<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
+&quot;Right&quot;.</p>
 <h2 id="panel_uiselectionstyle"><a class="header" href="#panel_uiselectionstyle">panel_ui.selection.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Selection</code> panel.</p>
@@ -393,7 +399,8 @@ xplr.config.general.panel_ui.default.borders = {
 <h2 id="panel_uisort_and_filterborders"><a class="header" href="#panel_uisort_and_filterborders">panel_ui.sort_and_filter.borders</a></h2>
 <p>Type: nullable list of strings</p>
 <p>Defines where to show borders for the <code>Sort &amp; filter</code> panel.</p>
-<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and &quot;Right&quot;.</p>
+<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
+&quot;Right&quot;.</p>
 <h2 id="panel_uisort_and_filterstyle"><a class="header" href="#panel_uisort_and_filterstyle">panel_ui.sort_and_filter.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Sort &amp; filter</code> panel.</p>
