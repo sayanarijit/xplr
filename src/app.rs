@@ -1,11 +1,9 @@
-use crate::cli::Cli;
 use crate::config::Config;
 use crate::config::Mode;
 use crate::explorer;
 use crate::input::Key;
 use crate::lua;
 use crate::permissions::Permissions;
-use crate::runner::Runner;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
@@ -2536,14 +2534,4 @@ impl App {
             last_modes: self.last_modes.clone(),
         }
     }
-}
-
-/// Create a new runner object passing the default arguments
-pub fn runner() -> Result<Runner> {
-    Runner::new()
-}
-
-/// Create a new runner object passing the given arguments
-pub fn from_cli(cli: Cli) -> Result<Runner> {
-    Runner::from_cli(cli)
 }

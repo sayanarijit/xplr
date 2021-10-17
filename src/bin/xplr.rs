@@ -2,8 +2,8 @@
 
 use std::env;
 
-use xplr::app;
 use xplr::cli::Cli;
+use xplr::runner;
 
 fn main() {
     let cli = Cli::parse(env::args()).unwrap_or_else(|e| {
@@ -47,7 +47,7 @@ fn main() {
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else {
-        match app::from_cli(cli).and_then(|a| a.run()) {
+        match runner::from_cli(cli).and_then(|a| a.run()) {
             Ok(Some(out)) => print!("{}", out),
             Ok(None) => {}
             Err(err) => {

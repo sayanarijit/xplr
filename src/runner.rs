@@ -568,3 +568,13 @@ impl Runner {
         result
     }
 }
+
+/// Create a new runner object passing the default arguments
+pub fn runner() -> Result<Runner> {
+    Runner::new()
+}
+
+/// Create a new runner object passing the given arguments
+pub fn from_cli(cli: Cli) -> Result<Runner> {
+    Runner::from_cli(cli)
+}
