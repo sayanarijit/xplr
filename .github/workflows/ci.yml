@@ -39,6 +39,8 @@ jobs:
     name: Test Suite
     runs-on: ubuntu-latest
     needs: prepare
+    env:
+      RUST_BACKTRACE: full
     steps:
       - uses: actions/checkout@master
       - uses: actions-rs/toolchain@v1
