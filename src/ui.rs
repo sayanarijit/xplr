@@ -642,6 +642,8 @@ fn draw_selection<B: Backend>(
         .to_owned()
         .extend(&panel_config.selection);
 
+    let selection_count = app.selection.len();
+
     let selection: Vec<ListItem> = app
         .selection
         .iter()
@@ -651,8 +653,6 @@ fn draw_selection<B: Backend>(
         .map(|n| n.absolute_path.to_owned())
         .map(ListItem::new)
         .collect();
-
-    let selection_count = selection.len();
 
     // Selected items
     let selection_list =
