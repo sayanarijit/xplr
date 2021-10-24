@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.14.7][3] -> [v0.15.0][43]
+#### [v0.14.7][3] -> [v0.15.1][43]
 
 - Deprecated `config` field from `CallLua` argument. Use the globally available
   `xplr.config` instead.
@@ -277,4 +277,4 @@ Else do the following:
 [40]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.8
 [41]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.0
 [42]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
-[43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.0
+[43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.1
