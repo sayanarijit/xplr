@@ -15,7 +15,7 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
@@ -24,6 +24,17 @@ pub const UNSUPPORTED_STR: &str = "???";
 fn to_humansize(size: u64) -> String {
     size.file_size(options::CONVENTIONAL)
         .unwrap_or_else(|_| format!("{} B", size))
+}
+
+fn mime_essence(path: &Path, is_dir: bool) -> String {
+    if is_dir {
+        String::from("inode/directory")
+    } else {
+        mime_guess::from_path(&path)
+            .first()
+            .map(|m| m.essence_str().to_string())
+            .unwrap_or_default()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -99,15 +110,7 @@ impl ResolvedNode {
             .map(|m| (m.is_dir(), m.is_file(), m.permissions().readonly(), m.len()))
             .unwrap_or((false, false, false, 0));
 
-        let mime_essence = if is_file {
-            mime_guess::from_path(&path)
-                .first()
-                .map(|m| m.essence_str().to_string())
-                .unwrap_or_default()
-        } else {
-            String::from("")
-        };
-
+        let mime_essence = mime_essence(&path, is_dir);
         let human_size = to_humansize(size);
 
         Self {
@@ -175,15 +178,7 @@ impl Node {
             })
             .unwrap_or_else(|_| (false, false, false, false, 0, Permissions::default()));
 
-        let mime_essence = if is_dir {
-            String::from("")
-        } else {
-            mime_guess::from_path(&path)
-                .first()
-                .map(|m| m.essence_str().to_string())
-                .unwrap_or_default()
-        };
-
+        let mime_essence = mime_essence(&path, is_dir);
         let human_size = to_humansize(size);
 
         Self {
@@ -1937,9 +1932,9 @@ impl App {
     }
 
     fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config.modes.clone().get(mode) {
+        if let Some(mode) = self.config.modes.get(mode).cloned() {
             self = self.push_mode();
-            self.mode = mode.to_owned().sanitized(self.config.general.read_only);
+            self.mode = mode.sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
@@ -1955,9 +1950,9 @@ impl App {
     }
 
     fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config.modes.clone().builtin.get(mode) {
+        if let Some(mode) = self.config.modes.builtin.get(mode).cloned() {
             self = self.push_mode();
-            self.mode = mode.to_owned().sanitized(self.config.general.read_only);
+            self.mode = mode.sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Builtin mode not found: {}", mode))
@@ -1973,9 +1968,9 @@ impl App {
     }
 
     fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config.modes.clone().custom.get(mode) {
+        if let Some(mode) = self.config.modes.custom.get(mode).cloned() {
             self = self.push_mode();
-            self.mode = mode.to_owned().sanitized(self.config.general.read_only);
+            self.mode = mode.sanitized(self.config.general.read_only);
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
