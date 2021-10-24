@@ -124,7 +124,7 @@ pub fn call<'lua, R: Deserialize<'lua>>(
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

@@ -1179,7 +1179,7 @@ pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, lua: &Lua) {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use tui::style::Color;
 
