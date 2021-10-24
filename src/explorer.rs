@@ -98,3 +98,92 @@ pub(crate) fn explore_recursive_async(
         );
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_explore_sync() {
+        let config = ExplorerConfig::default();
+        let path = PathBuf::from("/bin");
+
+        let r = explore_sync(config, path, None, 0);
+
+        assert!(r.is_ok());
+    }
+
+    #[test]
+    fn test_failed_explore_sync() {
+        let config = ExplorerConfig::default();
+        let path = PathBuf::from("/there/is/no/path");
+
+        let r = explore_sync(config, path, None, 0);
+
+        assert!(r.is_err());
+    }
+
+    fn extract_dirbuf_from_msg(msg: MsgIn) -> DirectoryBuffer {
+        assert!(matches!(msg, MsgIn::Internal(_)));
+
+        let msgin = match msg {
+            MsgIn::Internal(m) => m,
+            _ => panic!(),
+        };
+
+        assert!(matches!(msgin, InternalMsg::SetDirectory(_)));
+
+        match msgin {
+            InternalMsg::SetDirectory(dbuf) => dbuf,
+            _ => panic!(),
+        }
+    }
+
+    use std::sync::mpsc;
+
+    #[test]
+    fn test_explore_async() {
+        let config = ExplorerConfig::default();
+        let path = PathBuf::from("/usr/bin");
+        let (tx_msg_in, rx_msg_in) = mpsc::channel();
+
+        explore_async(config, path, None, 0, tx_msg_in.clone());
+
+        let task = rx_msg_in.recv().unwrap();
+        let dbuf = extract_dirbuf_from_msg(task.msg);
+
+        assert_eq!(dbuf.parent, "/usr/bin");
+
+        drop(tx_msg_in);
+        assert!(rx_msg_in.recv().is_err());
+    }
+
+    //XXX: explore_recursive_async() generates messages with random order.
+    // Discussing on GitHub (https://github.com/sayanarijit/xplr/issues/372)
+    //#[test]
+    //fn test_explore_recursive_async() {
+    //    let config = ExplorerConfig::default();
+    //    let path = PathBuf::from("/usr/bin");
+    //    let (tx_msg_in, rx_msg_in) = mpsc::channel();
+
+    //    explore_recursive_async(config, path, None, 0, tx_msg_in.clone());
+
+    //    let mut task = rx_msg_in.recv().unwrap();
+    //    let mut dbuf = extract_dirbuf_from_msg(task.msg);
+
+    //    assert_eq!(dbuf.parent, "/");
+
+    //    task = rx_msg_in.recv().unwrap();
+    //    dbuf = extract_dirbuf_from_msg(task.msg);
+
+    //    assert_eq!(dbuf.parent, "/usr");
+
+    //    task = rx_msg_in.recv().unwrap();
+    //    dbuf = extract_dirbuf_from_msg(task.msg);
+
+    //    assert_eq!(dbuf.parent, "/usr/bin");
+
+    //    drop(tx_msg_in);
+    //    assert!(rx_msg_in.recv().is_err());
+    //}
+}
