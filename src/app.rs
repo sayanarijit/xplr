@@ -99,10 +99,14 @@ impl ResolvedNode {
             .map(|m| (m.is_dir(), m.is_file(), m.permissions().readonly(), m.len()))
             .unwrap_or((false, false, false, 0));
 
-        let mime_essence = mime_guess::from_path(&path)
-            .first()
-            .map(|m| m.essence_str().to_string())
-            .unwrap_or_default();
+        let mime_essence = if is_file {
+            mime_guess::from_path(&path)
+                .first()
+                .map(|m| m.essence_str().to_string())
+                .unwrap_or_default()
+        } else {
+            String::from("")
+        };
 
         let human_size = to_humansize(size);
 
@@ -171,10 +175,14 @@ impl Node {
             })
             .unwrap_or_else(|_| (false, false, false, false, 0, Permissions::default()));
 
-        let mime_essence = mime_guess::from_path(&path)
-            .first()
-            .map(|m| m.essence_str().to_string())
-            .unwrap_or_default();
+        let mime_essence = if is_dir {
+            String::from("")
+        } else {
+            mime_guess::from_path(&path)
+                .first()
+                .map(|m| m.essence_str().to_string())
+                .unwrap_or_default()
+        };
 
         let human_size = to_humansize(size);
 
