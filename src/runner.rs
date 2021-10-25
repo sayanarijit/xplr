@@ -191,7 +191,7 @@ impl Runner {
             match start_fifo(path, &app.focused_node_str()) {
                 Ok(file) => Some(file),
                 Err(e) => {
-                    app = app.log_error(e.to_string())?;
+                    app.log_error(e.to_string());
                     None
                 }
             }
@@ -204,7 +204,7 @@ impl Runner {
         let mut mouse_enabled = app.config.general.enable_mouse;
         if mouse_enabled {
             if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
-                app = app.log_error(e.to_string())?;
+                app.log_error(e.to_string());
             }
         }
 
@@ -323,7 +323,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app.log_error(e.to_string());
                                         }
                                     }
                                 }
@@ -349,7 +349,7 @@ impl Runner {
                                             mouse_enabled = false;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app.log_error(e.to_string());
                                         }
                                     }
                                 }
@@ -359,7 +359,7 @@ impl Runner {
                                 fifo = match start_fifo(&path, &app.focused_node_str()) {
                                     Ok(file) => Some(file),
                                     Err(e) => {
-                                        app = app.log_error(e.to_string())?;
+                                        app.log_error(e.to_string());
                                         None
                                     }
                                 }
@@ -380,7 +380,7 @@ impl Runner {
                                     fifo = match start_fifo(&path, &app.focused_node_str()) {
                                         Ok(file) => Some(file),
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app.log_error(e.to_string());
                                             None
                                         }
                                     }
@@ -399,7 +399,7 @@ impl Runner {
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        app.log_error(err.to_string());
                                     }
                                 };
                             }
@@ -426,14 +426,14 @@ impl Runner {
                                         }
                                     }
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        app.log_error(err.to_string());
                                     }
                                 };
 
                                 app.cleanup_pipes()?;
 
                                 if let Err(e) = status {
-                                    app = app.log_error(e.to_string())?;
+                                    app.log_error(e.to_string());
                                 };
                             }
 
@@ -459,7 +459,7 @@ impl Runner {
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        app.log_error(err.to_string());
                                     }
                                 };
 
@@ -477,7 +477,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app.log_error(e.to_string());
                                         }
                                     }
                                 }
@@ -516,14 +516,14 @@ impl Runner {
                                         }
                                     }
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        app.log_error(err.to_string());
                                     }
                                 };
 
                                 app.cleanup_pipes()?;
 
                                 if let Err(e) = status {
-                                    app = app.log_error(e.to_string())?;
+                                    app.log_error(e.to_string());
                                 };
 
                                 terminal.clear()?;
@@ -540,7 +540,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app.log_error(e.to_string());
                                         }
                                     }
                                 }

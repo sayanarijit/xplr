@@ -1342,7 +1342,7 @@ impl App {
         };
 
         for err in load_errs {
-            app = app.log_error(err)?
+            app.log_error(err);
         }
 
         Ok(app)
@@ -1383,9 +1383,10 @@ impl App {
         }
     }
 
-    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
+    fn handle_external(mut self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
         if self.config.general.read_only && !msg.is_read_only() {
-            self.log_error("Cannot call shell command in read-only mode.".into())
+            self.log_error("Cannot call shell command in read-only mode.".into());
+            Ok(self)
         } else {
             match msg {
                 ExternalMsg::ExplorePwd => self.explore_pwd(),
@@ -1482,10 +1483,22 @@ impl App {
                 ExternalMsg::StartFifo(f) => self.start_fifo(f),
                 ExternalMsg::StopFifo => self.stop_fifo(),
                 ExternalMsg::ToggleFifo(f) => self.toggle_fifo(f),
-                ExternalMsg::LogInfo(l) => self.log_info(l),
-                ExternalMsg::LogSuccess(l) => self.log_success(l),
-                ExternalMsg::LogWarning(l) => self.log_warning(l),
-                ExternalMsg::LogError(l) => self.log_error(l),
+                ExternalMsg::LogInfo(l) => {
+                    self.log_info(l);
+                    Ok(self)
+                }
+                ExternalMsg::LogSuccess(l) => {
+                    self.log_success(l);
+                    Ok(self)
+                }
+                ExternalMsg::LogWarning(l) => {
+                    self.log_warning(l);
+                    Ok(self)
+                }
+                ExternalMsg::LogError(l) => {
+                    self.log_error(l);
+                    Ok(self)
+                }
                 ExternalMsg::Quit => self.quit(),
                 ExternalMsg::PrintPwdAndQuit => self.print_pwd_and_quit(),
                 ExternalMsg::PrintFocusPathAndQuit => self.print_focus_path_and_quit(),
@@ -1708,7 +1721,10 @@ impl App {
                 }
                 self.explore_pwd()
             }
-            Err(e) => self.log_error(e.to_string()),
+            Err(e) => {
+                self.log_error(e.to_string());
+                Ok(self)
+            }
         }
     }
 
@@ -1863,16 +1879,14 @@ impl App {
                         self.history = history.push(n.absolute_path.clone());
                     }
                 }
-                Ok(self)
             } else {
-                self.log_error(format!("{} not found in $PWD", name))
+                self.log_error(format!("{} not found in $PWD", name));
             }
-        } else {
-            Ok(self)
         }
+        Ok(self)
     }
 
-    pub fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
+    pub fn focus_path(mut self, path: &str, save_history: bool) -> Result<Self> {
         let mut pathbuf = PathBuf::from(path);
         if pathbuf.is_relative() {
             pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
@@ -1882,10 +1896,12 @@ impl App {
                 self.change_directory(&parent.to_string_lossy().to_string(), false)?
                     .focus_by_file_name(&filename.to_string_lossy().to_string(), save_history)
             } else {
-                self.log_error(format!("{} not found", path))
+                self.log_error(format!("{} not found", path));
+                Ok(self)
             }
         } else {
-            self.log_error(format!("Cannot focus on {}", path))
+            self.log_error(format!("Cannot focus on {}", path));
+            Ok(self)
         }
     }
 
@@ -1935,10 +1951,10 @@ impl App {
         if let Some(mode) = self.config.modes.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
-            Ok(self)
         } else {
-            self.log_error(format!("Mode not found: {}", mode))
+            self.log_error(format!("Mode not found: {}", mode));
         }
+        Ok(self)
     }
 
     fn switch_mode_builtin(self, mode: &str) -> Result<Self> {
@@ -1953,10 +1969,10 @@ impl App {
         if let Some(mode) = self.config.modes.builtin.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
-            Ok(self)
         } else {
-            self.log_error(format!("Builtin mode not found: {}", mode))
+            self.log_error(format!("Builtin mode not found: {}", mode));
         }
+        Ok(self)
     }
 
     fn switch_mode_custom(self, mode: &str) -> Result<Self> {
@@ -1971,37 +1987,37 @@ impl App {
         if let Some(mode) = self.config.modes.custom.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
-            Ok(self)
         } else {
-            self.log_error(format!("Custom mode not found: {}", mode))
+            self.log_error(format!("Custom mode not found: {}", mode));
         }
+        Ok(self)
     }
 
     fn switch_layout(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.get(layout) {
             self.layout = l.to_owned();
-            Ok(self)
         } else {
-            self.log_error(format!("Layout not found: {}", layout))
+            self.log_error(format!("Layout not found: {}", layout));
         }
+        Ok(self)
     }
 
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.builtin.get(layout) {
             self.layout = l.to_owned();
-            Ok(self)
         } else {
-            self.log_error(format!("Builtin layout not found: {}", layout))
+            self.log_error(format!("Builtin layout not found: {}", layout));
         }
+        Ok(self)
     }
 
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.get_custom(layout) {
             self.layout = l.to_owned();
-            Ok(self)
         } else {
-            self.log_error(format!("Custom layout not found: {}", layout))
+            self.log_error(format!("Custom layout not found: {}", layout));
         }
+        Ok(self)
     }
 
     fn call(mut self, command: Command) -> Result<Self> {
@@ -2301,28 +2317,24 @@ impl App {
         Ok(self)
     }
 
-    pub fn log_info(mut self, message: String) -> Result<Self> {
+    pub fn log_info(&mut self, message: String) {
         self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Info, message));
-        Ok(self)
     }
 
-    pub fn log_success(mut self, message: String) -> Result<Self> {
+    pub fn log_success(&mut self, message: String) {
         self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Success, message));
-        Ok(self)
     }
 
-    pub fn log_warning(mut self, message: String) -> Result<Self> {
+    pub fn log_warning(&mut self, message: String) {
         self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Warning, message));
-        Ok(self)
     }
 
-    pub fn log_error(mut self, message: String) -> Result<Self> {
+    pub fn log_error(&mut self, message: String) {
         self.logs_hidden = false;
         self.logs.push(Log::new(LogLevel::Error, message));
-        Ok(self)
     }
 
     fn quit(mut self) -> Result<Self> {
