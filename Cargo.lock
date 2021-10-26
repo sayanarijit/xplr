@@ -1107,6 +1107,7 @@ dependencies = [
  "ansi-to-tui",
  "anyhow",
  "assert_cmd",
+ "atty",
  "chrono",
  "criterion",
  "crossterm 0.22.1",

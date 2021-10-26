@@ -34,6 +34,7 @@ humansize = "1.1.1"
 mlua = { version = "0.6.6", features = ["luajit", "vendored", "serialize", "send"] }
 ansi-to-tui = "0.4.1"
 libc = "0.2.105"
+atty = "0.2.14"
 
 [dev-dependencies]
 criterion = "0.3.5"
