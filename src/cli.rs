@@ -15,6 +15,7 @@ pub struct Cli {
     pub config: Option<PathBuf>,
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
+    pub select_file: Option<PathBuf>,
 }
 
 impl Cli {
@@ -73,6 +74,11 @@ impl Cli {
                         } else {
                             cli.on_load.push(serde_yaml::from_str(&msg)?);
                         }
+                    }
+                }
+                "--select" => {
+                    if cli.select_file.is_none() {
+                        cli.select_file = args.pop_front().map(PathBuf::from);
                     }
                 }
 

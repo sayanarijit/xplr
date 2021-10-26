@@ -26,7 +26,8 @@ fn main() {
     -c, --config <PATH>            Specifies a custom config file (default is
                                      "$HOME/.config/xplr/init.lua")
     -C, --extra-config <PATH>...   Specifies extra config files to load
-        --on-load <MESSAGE>...     Sends messages when xplr loads"###;
+        --on-load <MESSAGE>...     Sends messages when xplr loads
+        --select <FILE>            Selects all entries in a given file."###;
 
         let args = r###"
     <PATH>    Path to focus on, or enter if directory"###;

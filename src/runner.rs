@@ -14,7 +14,10 @@ use crossterm::execute;
 use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
 use std::fs;
+use std::fs::File;
 use std::io;
+use std::io::BufRead;
+use std::io::BufReader;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
@@ -102,6 +105,20 @@ fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
     }
 }
 
+fn process_lines<R: std::io::Read>(
+    lines: BufReader<R>,
+    tx_msg_in: &mpsc::Sender<app::Task>,
+) -> Result<()> {
+    for line in lines.lines() {
+        let line = line?;
+        tx_msg_in.send(app::Task::new(
+            app::MsgIn::External(app::ExternalMsg::SelectPath(line)),
+            None,
+        ))?;
+    }
+    Ok(())
+}
+
 pub struct Runner {
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
@@ -109,6 +126,7 @@ pub struct Runner {
     extra_config_files: Vec<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
     read_only: bool,
+    select_file: Option<PathBuf>,
 }
 
 impl Runner {
@@ -138,6 +156,7 @@ impl Runner {
             extra_config_files: cli.extra_config,
             on_load: cli.on_load,
             read_only: cli.read_only,
+            select_file: cli.select_file,
         })
     }
 
@@ -220,6 +239,26 @@ impl Runner {
         // Enqueue on_load messages
         for msg in self.on_load {
             tx_msg_in.send(app::Task::new(app::MsgIn::External(msg), None))?;
+        }
+
+        // Select all files in the select file
+        if let Some(f) = self.select_file {
+            let is_stdin = f.as_os_str() == "-";
+            if !f.is_file() && !is_stdin {
+                app = app.log_error(format!(
+                    "Could not find your select file: {}",
+                    f.to_string_lossy()
+                ))?;
+            }
+            if is_stdin {
+                if atty::isnt(atty::Stream::Stdin) {
+                    let lines = BufReader::new(std::io::stdin());
+                    process_lines(lines, &tx_msg_in)?;
+                }
+            } else {
+                let lines = BufReader::new(File::open(f)?);
+                process_lines(lines, &tx_msg_in)?;
+            };
         }
 
         'outer: for task in rx_msg_in {
