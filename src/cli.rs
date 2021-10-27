@@ -15,7 +15,7 @@ pub struct Cli {
     pub config: Option<PathBuf>,
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
-    pub select_file: Option<PathBuf>,
+    pub select: Vec<PathBuf>,
 }
 
 impl Cli {
@@ -77,8 +77,13 @@ impl Cli {
                     }
                 }
                 "--select" => {
-                    if cli.select_file.is_none() {
-                        cli.select_file = args.pop_front().map(PathBuf::from);
+                    while let Some(path) = args.pop_front() {
+                        if path.starts_with('-') && path != "-" {
+                            args.push_front(path);
+                            break;
+                        } else {
+                            cli.select.push(PathBuf::from(path));
+                        }
                     }
                 }
 
