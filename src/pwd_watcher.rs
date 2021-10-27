@@ -38,3 +38,26 @@ pub fn keep_watching(
     });
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::sync::mpsc;
+    #[test]
+    fn test_pwd_watcher() {
+        let (tx_msg_in, rx_msg_in) = mpsc::channel();
+        let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
+
+        let result = keep_watching("/", tx_msg_in, rx_pwd_watcher);
+
+        assert!(result.is_ok());
+
+        tx_pwd_watcher.send("/bin".to_string()).unwrap();
+        let task = rx_msg_in.recv().unwrap();
+
+        let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
+
+        assert_eq!(task, Task::new(msg, None));
+    }
+}
