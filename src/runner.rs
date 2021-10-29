@@ -15,8 +15,6 @@ use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
 use std::fs;
 use std::io;
-use std::io::BufRead;
-use std::io::BufReader;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
@@ -228,13 +226,7 @@ impl Runner {
 
         // Select all files in our selection vector.
         for file in self.select.iter() {
-            if file.as_os_str() == "-" {
-                for x in BufReader::new(std::io::stdin()).lines() {
-                    app = app.select_path(x?)?;
-                }
-            } else {
-                app = app.select_path(file.to_string_lossy().to_string())?;
-            }
+            app = app.select_path(file.to_string_lossy().to_string())?;
         }
 
         'outer: for task in rx_msg_in {

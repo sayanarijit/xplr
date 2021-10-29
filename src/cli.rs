@@ -1,5 +1,6 @@
 use anyhow::Result;
 use std::collections::VecDeque;
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::{env, io};
 
@@ -79,7 +80,9 @@ impl Cli {
                 "--select" => {
                     while let Some(path) = args.pop_front() {
                         if path.starts_with('-') && path != "-" {
-                            args.push_front(path);
+                            for path in BufReader::new(std::io::stdin()).lines() {
+                                cli.select.push(PathBuf::from(path?));
+                            }
                             break;
                         } else {
                             cli.select.push(PathBuf::from(path));
@@ -91,9 +94,9 @@ impl Cli {
                     let path = cli
                         .path
                         .as_ref()
-                        .map(|x| x.clone())
-                        .or(args.pop_front().map(PathBuf::from))
-                        .unwrap_or(PathBuf::new());
+                        .cloned()
+                        .or_else(|| args.pop_front().map(PathBuf::from))
+                        .unwrap_or_default();
                     cli.on_load.push(app::ExternalMsg::FocusPath(
                         path.to_string_lossy().to_string(),
                     ));
