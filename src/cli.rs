@@ -87,6 +87,18 @@ impl Cli {
                     }
                 }
 
+                "--force-focus" => {
+                    let path = cli
+                        .path
+                        .as_ref()
+                        .map(|x| x.clone())
+                        .or(args.pop_front().map(PathBuf::from))
+                        .unwrap_or(PathBuf::new());
+                    cli.on_load.push(app::ExternalMsg::FocusPath(
+                        path.to_string_lossy().to_string(),
+                    ));
+                }
+
                 // path
                 path => {
                     if cli.path.is_none() {
