@@ -2505,7 +2505,11 @@ impl App {
     fn refresh_selection(mut self) -> Result<Self> {
         // Should be able to select broken symlink
         self.selection.retain(|n| {
-            PathBuf::from(&n.absolute_path).symlink_metadata().is_ok()
+            let s = PathBuf::from(&n.absolute_path).symlink_metadata().is_ok();
+            if !s {
+                println!("{:?}", &n);
+            }
+            s
         });
         Ok(self)
     }
