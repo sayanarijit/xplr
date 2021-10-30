@@ -17,6 +17,7 @@ of the following plugins work for you, it's very easy to
 - [**map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
 - [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
+- [**term.xplr**][39] Terminal integration for xplr 
 
 ## Integration
 
@@ -84,3 +85,4 @@ of the following plugins work for you, it's very easy to
 [36]: https://github.com/chmln/nvim-ctrl
 [37]: https://github.com/sayanarijit/command-mode.xplr
 [38]: https://github.com/sayanarijit/map.xplr
+[39]: https://github.com/igorepst/term.xplr
