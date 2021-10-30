@@ -1,5 +1,8 @@
-use crate::app::{DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task};
-use anyhow::{Result, Error};
+use crate::app::{
+    DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node,
+    Task,
+};
+use anyhow::{Error, Result};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;

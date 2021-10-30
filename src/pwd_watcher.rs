@@ -17,27 +17,25 @@ pub fn keep_watching(
     thread::spawn(move || loop {
         if let Ok(new_pwd) = rx_pwd_watcher.try_recv() {
             pwd = PathBuf::from(new_pwd);
-        } else {
-            if let Err(e) = pwd
-                .metadata()
-                .map_err(Error::new)
-                .and_then(|m| m.modified().map_err(Error::new))
-                .and_then(|modified| {
-                    if modified != last_modified {
-                        let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
-                        last_modified = modified;
-                        tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
-                    } else {
-                        thread::sleep(Duration::from_secs(1));
-                        Result::Ok(())
-                    }
-                })
-            {
-                let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
-                tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
-                thread::sleep(Duration::from_secs(1));
-            };
-        };
+        } else if let Err(e) = pwd
+            .metadata()
+            .map_err(Error::new)
+            .and_then(|m| m.modified().map_err(Error::new))
+            .and_then(|modified| {
+                if modified != last_modified {
+                    let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
+                    last_modified = modified;
+                    tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
+                } else {
+                    thread::sleep(Duration::from_secs(1));
+                    Result::Ok(())
+                }
+            })
+        {
+            let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
+            tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+            thread::sleep(Duration::from_secs(1));
+        }
     });
     Ok(())
 }
