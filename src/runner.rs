@@ -124,13 +124,14 @@ impl Runner {
     /// Create a new runner object passing the given arguments
     pub fn from_cli(cli: Cli) -> Result<Self> {
         let basedir = std::env::current_dir()?;
-        let mut pwd = cli
-            .path
+        let mut paths = cli.paths.into_iter();
+        let mut pwd = paths
+            .next()
             .map(|p| if p.is_relative() { basedir.join(p) } else { p })
             .unwrap_or_else(|| basedir.clone());
         let mut focused_path = None;
 
-        if pwd.is_file() {
+        if cli.force_focus || pwd.is_file() {
             focused_path = pwd.file_name().map(|p| p.into());
             pwd = pwd.parent().map(|p| p.into()).unwrap_or(basedir);
         }
@@ -142,7 +143,7 @@ impl Runner {
             extra_config_files: cli.extra_config,
             on_load: cli.on_load,
             read_only: cli.read_only,
-            select: cli.select,
+            select: paths.collect(),
         })
     }
 
