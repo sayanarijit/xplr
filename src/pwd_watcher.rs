@@ -1,6 +1,6 @@
 use crate::app::Task;
 use crate::app::{ExternalMsg, MsgIn};
-use anyhow::Result;
+use anyhow::{Error, Result};
 use std::path::PathBuf;
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
@@ -18,23 +18,26 @@ pub fn keep_watching(
         if let Ok(new_pwd) = rx_pwd_watcher.try_recv() {
             pwd = PathBuf::from(new_pwd);
         } else {
-            pwd.metadata()
-                .and_then(|m| m.modified())
-                .map(|modified| {
+            if let Err(e) = pwd
+                .metadata()
+                .map_err(Error::new)
+                .and_then(|m| m.modified().map_err(Error::new))
+                .and_then(|modified| {
                     if modified != last_modified {
                         let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
-                        tx_msg_in.send(Task::new(msg, None)).unwrap();
                         last_modified = modified;
+                        tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
                     } else {
                         thread::sleep(Duration::from_secs(1));
-                    };
+                        Result::Ok(())
+                    }
                 })
-                .unwrap_or_else(|e| {
-                    let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
-                    tx_msg_in.send(Task::new(msg, None)).unwrap();
-                    thread::sleep(Duration::from_secs(1));
-                })
-        }
+            {
+                let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
+                tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+                thread::sleep(Duration::from_secs(1));
+            };
+        };
     });
     Ok(())
 }
@@ -42,8 +45,8 @@ pub fn keep_watching(
 #[cfg(test)]
 mod tests {
     use super::*;
-
     use std::sync::mpsc;
+
     #[test]
     fn test_pwd_watcher() {
         let (tx_msg_in, rx_msg_in) = mpsc::channel();

@@ -1,5 +1,5 @@
 use crate::app::{DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task};
-use anyhow::Result;
+use anyhow::{Result, Error};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
@@ -55,13 +55,13 @@ pub(crate) fn explore_async(
 ) {
     thread::spawn(move || {
         explore_sync(config, parent.clone(), focused_path, fallback_focus)
-            .map(|buf| {
+            .and_then(|buf| {
                 tx_msg_in
                     .send(Task::new(
                         MsgIn::Internal(InternalMsg::SetDirectory(buf)),
                         None,
                     ))
-                    .unwrap();
+                    .map_err(Error::new)
             })
             .unwrap_or_else(|e| {
                 tx_msg_in
@@ -69,7 +69,7 @@ pub(crate) fn explore_async(
                         MsgIn::External(ExternalMsg::LogError(e.to_string())),
                         None,
                     ))
-                    .unwrap();
+                    .unwrap_or_default(); // Let's not panic if xplr closes.
             })
     });
 }
