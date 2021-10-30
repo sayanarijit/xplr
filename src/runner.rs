@@ -112,7 +112,7 @@ pub struct Runner {
     extra_config_files: Vec<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
     read_only: bool,
-    select: Vec<PathBuf>,
+    selection: Vec<PathBuf>,
 }
 
 impl Runner {
@@ -124,11 +124,15 @@ impl Runner {
     /// Create a new runner object passing the given arguments
     pub fn from_cli(cli: Cli) -> Result<Self> {
         let basedir = std::env::current_dir()?;
-        let mut paths = cli.paths.into_iter();
-        let mut pwd = paths
-            .next()
-            .map(|p| if p.is_relative() { basedir.join(p) } else { p })
-            .unwrap_or_else(|| basedir.clone());
+        let basedir_clone = basedir.clone();
+        let mut paths = cli.paths.into_iter().map(|p| {
+            if p.is_relative() {
+                basedir_clone.join(p)
+            } else {
+                p
+            }
+        });
+        let mut pwd = paths.next().unwrap_or_else(|| basedir.clone());
         let mut focused_path = None;
 
         if cli.force_focus || pwd.is_file() {
@@ -143,7 +147,7 @@ impl Runner {
             extra_config_files: cli.extra_config,
             on_load: cli.on_load,
             read_only: cli.read_only,
-            select: paths.collect(),
+            selection: paths.collect(),
         })
     }
 
@@ -165,6 +169,10 @@ impl Runner {
         let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
 
         app = app.explore_pwd()?;
+
+        for file in self.selection {
+            app = app.select_path(file.to_string_lossy().to_string())?;
+        }
 
         app = if let Some(f) = self
             .focused_path
@@ -235,11 +243,6 @@ impl Runner {
         // Enqueue on_load messages
         for msg in self.on_load {
             tx_msg_in.send(app::Task::new(app::MsgIn::External(msg), None))?;
-        }
-
-        // Select all files in our selection vector.
-        for file in self.select.iter() {
-            app = app.select_path(file.to_string_lossy().to_string())?;
         }
 
         'outer: for task in rx_msg_in {
