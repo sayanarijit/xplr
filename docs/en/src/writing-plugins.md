@@ -58,6 +58,10 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 
 ## Also See
 
+- [Tip: A list of hacks yet to make it as Lua plugins][15]
+- [Tip: Some UI and themeing tips][12]
+- [Tip: A list of handy utility functions][13]
+- [Tip: Share tips and tricks working with Lua][14]
 - [Tutorial: Adding a New Mode][6]
 - [Example: Using Environment Variables and Pipes][7]
 - [Example: Using Lua Function Calls][8]
@@ -76,3 +80,7 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 [9]: layouts.md#example-defining-custom-layout
 [10]: column-renderer.md#example-customizing-table-renderer
 [11]: layouts.md#example-render-a-custom-dynamic-table
+[12]: https://github.com/sayanarijit/xplr/discussions/274
+[13]: https://github.com/sayanarijit/xplr/discussions/273
+[14]: https://github.com/sayanarijit/xplr/discussions/250
+[15]: https://github.com/sayanarijit/xplr/wiki/Hacks
