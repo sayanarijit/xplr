@@ -8,13 +8,12 @@ use crate::lua;
 use crate::pipe_reader;
 use crate::pwd_watcher;
 use crate::ui;
-use anyhow::Result;
+use anyhow::{bail, Error, Result};
 use crossterm::event;
 use crossterm::execute;
 use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
 use std::fs;
-use std::io;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus, Stdio};
@@ -22,11 +21,14 @@ use std::sync::mpsc;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
 
-pub fn get_tty() -> io::Result<fs::File> {
-    fs::OpenOptions::new()
-        .read(true)
-        .write(true)
-        .open("/dev/tty")
+pub fn get_tty() -> Result<fs::File> {
+    let tty = "/dev/tty";
+    match fs::OpenOptions::new().read(true).write(true).open(&tty) {
+        Ok(f) => Ok(f),
+        Err(e) => {
+            bail!(format!("Failed to open {}. {}", tty, e))
+        }
+    }
 }
 
 fn call_lua(
@@ -47,7 +49,7 @@ fn call_lua(
     lua::call(lua, func, arg)
 }
 
-fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatus> {
+fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
     let focus_index = app
         .directory_buffer
         .as_ref()
@@ -90,6 +92,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> io::Result<ExitStatu
         .stderr(stderr)
         .args(cmd.args)
         .status()
+        .map_err(Error::new)
 }
 
 fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
