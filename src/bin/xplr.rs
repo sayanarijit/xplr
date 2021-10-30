@@ -13,25 +13,25 @@ fn main() {
 
     if cli.help {
         let usage = r###"
-    xplr [FLAG]... [OPTION]... [PATH]"###;
+    xplr [FLAG]... [OPTION]... [FOCUS] [SELECTION]..."###;
 
         let flags = r###"
-    -                  Reads path from stdin
+    -                  Reads paths from stdin
     --                 Denotes the end of command-line flags and options
         --read-only    Enables read-only mode (config.general.read_only)
     -h, --help         Prints help information
     -V, --version      Prints version information"###;
 
         let options = r###"
-    -c, --config <PATH>            Specifies a custom config file (default is
-                                     "$HOME/.config/xplr/init.lua")
-    -C, --extra-config <PATH>...   Specifies extra config files to load
-        --on-load <MESSAGE>...     Sends messages when xplr loads
-        --select <PATH>...         Selects the given paths.
-        --force-focus              Focuses the given path, instead of entering it."###;
+    -c, --config <PATH>             Specifies a custom config file (default is
+                                      "$HOME/.config/xplr/init.lua")
+    -C, --extra-config <PATH>...    Specifies extra config files to load
+        --on-load <MESSAGE>...      Sends messages when xplr loads
+        --force-focus               Focuses the given path, instead of entering it."###;
 
         let args = r###"
-    <PATH>    Path to focus on, or enter if directory"###;
+    <FOCUS>           Path to focus on, or enter if directory, (default is `.`)
+    <SELECTION>...    Paths to select, requires <FOCUS> to be set explicitely"###;
 
         let help = format!(
             "xplr {}\n{}\n{}\n\nUSAGE:{}\n\nFLAGS:{}\n\nOPTIONS:{}\n\nARGS:{}",
