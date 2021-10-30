@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use std::collections::VecDeque;
 use std::env;
 use std::io::{BufRead, BufReader};
@@ -20,15 +20,18 @@ pub struct Cli {
 }
 
 impl Cli {
-    fn read_path(&mut self, arg: &str) {
+    fn read_path(&mut self, arg: &str) -> Result<()> {
         if arg.is_empty() {
-            return;
+            bail!("empty string passed")
         };
 
         let path = PathBuf::from(arg);
         if path.exists() {
             self.paths.push(path);
-        };
+            Ok(())
+        } else {
+            bail!("path doesn't exist: {}", path.to_string_lossy().to_string())
+        }
     }
 
     /// Parse arguments from the command-line
@@ -40,16 +43,13 @@ impl Cli {
 
         while let Some(arg) = args.pop_front() {
             if flag_ends {
-                cli.read_path(&arg);
+                cli.read_path(&arg)?;
             } else {
                 match arg.as_str() {
                     // Flags
                     "-" => {
-                        for path in BufReader::new(std::io::stdin())
-                            .lines()
-                            .filter_map(|l| l.ok())
-                        {
-                            cli.read_path(&path);
+                        for path in BufReader::new(std::io::stdin()).lines() {
+                            cli.read_path(&path?)?;
                         }
                     }
 
@@ -100,7 +100,7 @@ impl Cli {
 
                     // path
                     path => {
-                        cli.read_path(path);
+                        cli.read_path(path)?;
                     }
                 }
             }
