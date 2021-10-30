@@ -32,7 +32,11 @@ pub fn check_version(version: &str, path: &str) -> Result<()> {
     let (rmajor, rminor, rbugfix, rbeta) = parse_version(VERSION)?;
     let (smajor, sminor, sbugfix, sbeta) = parse_version(version)?;
 
-    if rmajor == smajor && rminor == sminor && rbugfix >= sbugfix && rbeta == sbeta {
+    if rmajor == smajor
+        && rminor == sminor
+        && rbugfix >= sbugfix
+        && rbeta == sbeta
+    {
         Ok(())
     } else {
         bail!(
@@ -61,7 +65,10 @@ fn resolve_fn_recursive<'lua, 'a>(
 }
 
 /// This function resolves paths like `builtin.func_foo`, `custom.func_bar` into lua functions.
-pub fn resolve_fn<'lua>(globals: &mlua::Table<'lua>, path: &str) -> Result<mlua::Function<'lua>> {
+pub fn resolve_fn<'lua>(
+    globals: &mlua::Table<'lua>,
+    path: &str,
+) -> Result<mlua::Function<'lua>> {
     let path = format!("xplr.fn.{}", path);
     resolve_fn_recursive(globals, path.split('.'))
 }
@@ -98,10 +105,11 @@ pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
 
     lua.load(&script).set_name("init")?.exec()?;
 
-    let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
-        Ok(v) => v,
-        Err(_) => bail!("'version' must be defined globally in {}", path),
-    };
+    let version: String =
+        match globals.get("version").and_then(|v| lua.from_value(v)) {
+            Ok(v) => v,
+            Err(_) => bail!("'version' must be defined globally in {}", path),
+        };
 
     check_version(&version, path)?;
 

@@ -66,7 +66,9 @@ impl Cli {
                     }
 
                     // Options
-                    "-c" | "--config" => cli.config = args.pop_front().map(PathBuf::from),
+                    "-c" | "--config" => {
+                        cli.config = args.pop_front().map(PathBuf::from)
+                    }
 
                     "-C" | "--extra-config" => {
                         while let Some(path) = args.pop_front() {

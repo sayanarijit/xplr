@@ -17,10 +17,14 @@ use std::env;
 use std::ops::BitXor;
 use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
-use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
+use tui::layout::{
+    Constraint as TuiConstraint, Direction, Layout as TuiLayout,
+};
 use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
 use tui::text::{Span, Spans, Text};
-use tui::widgets::{Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph, Row, Table};
+use tui::widgets::{
+    Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph, Row, Table,
+};
 use tui::Frame;
 
 lazy_static! {
@@ -55,7 +59,8 @@ pub struct LayoutOptions {
 impl LayoutOptions {
     pub fn extend(mut self, other: &Self) -> Self {
         self.margin = other.margin.or(self.margin);
-        self.horizontal_margin = other.horizontal_margin.or(self.horizontal_margin);
+        self.horizontal_margin =
+            other.horizontal_margin.or(self.horizontal_margin);
         self.vertical_margin = other.vertical_margin.or(self.vertical_margin);
         self.constraints = other.constraints.to_owned().or(self.constraints);
         self
@@ -157,7 +162,9 @@ impl Layout {
     }
 }
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize,
+)]
 #[serde(deny_unknown_fields)]
 pub enum Border {
     Top,
@@ -177,7 +184,9 @@ impl Border {
     }
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize)]
+#[derive(
+    Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize,
+)]
 #[serde(deny_unknown_fields)]
 pub enum Modifier {
     Bold,
@@ -220,8 +229,10 @@ impl Style {
     pub fn extend(mut self, other: &Self) -> Self {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.add_modifiers = other.add_modifiers.to_owned().or(self.add_modifiers);
-        self.sub_modifiers = other.sub_modifiers.to_owned().or(self.sub_modifiers);
+        self.add_modifiers =
+            other.add_modifiers.to_owned().or(self.add_modifiers);
+        self.sub_modifiers =
+            other.sub_modifiers.to_owned().or(self.sub_modifiers);
         self
     }
 }
@@ -241,8 +252,12 @@ impl Into<TuiStyle> for Style {
             TuiStyle {
                 fg: self.fg,
                 bg: self.bg,
-                add_modifier: TuiModifier::from_bits_truncate(xor(self.add_modifiers)),
-                sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
+                add_modifier: TuiModifier::from_bits_truncate(xor(
+                    self.add_modifiers
+                )),
+                sub_modifier: TuiModifier::from_bits_truncate(xor(
+                    self.sub_modifiers
+                )),
             }
         }
     }
@@ -271,7 +286,11 @@ pub enum Constraint {
 }
 
 impl Constraint {
-    pub fn to_tui(self, screen_size: TuiRect, layout_size: TuiRect) -> TuiConstraint {
+    pub fn to_tui(
+        self,
+        screen_size: TuiRect,
+        layout_size: TuiRect,
+    ) -> TuiConstraint {
         match self {
             Self::Percentage(n) => TuiConstraint::Percentage(n),
             Self::Ratio(x, y) => TuiConstraint::Ratio(x, y),
@@ -289,15 +308,31 @@ impl Constraint {
                 TuiConstraint::Length(layout_size.width.max(n) - n)
             }
             Self::Max(n) => TuiConstraint::Max(n),
-            Self::MaxLessThanScreenHeight(n) => TuiConstraint::Max(screen_size.height.max(n) - n),
-            Self::MaxLessThanScreenWidth(n) => TuiConstraint::Max(screen_size.width.max(n) - n),
-            Self::MaxLessThanLayoutHeight(n) => TuiConstraint::Max(layout_size.height.max(n) - n),
-            Self::MaxLessThanLayoutWidth(n) => TuiConstraint::Max(layout_size.width.max(n) - n),
+            Self::MaxLessThanScreenHeight(n) => {
+                TuiConstraint::Max(screen_size.height.max(n) - n)
+            }
+            Self::MaxLessThanScreenWidth(n) => {
+                TuiConstraint::Max(screen_size.width.max(n) - n)
+            }
+            Self::MaxLessThanLayoutHeight(n) => {
+                TuiConstraint::Max(layout_size.height.max(n) - n)
+            }
+            Self::MaxLessThanLayoutWidth(n) => {
+                TuiConstraint::Max(layout_size.width.max(n) - n)
+            }
             Self::Min(n) => TuiConstraint::Min(n),
-            Self::MinLessThanScreenHeight(n) => TuiConstraint::Min(screen_size.height.max(n) - n),
-            Self::MinLessThanScreenWidth(n) => TuiConstraint::Min(screen_size.width.max(n) - n),
-            Self::MinLessThanLayoutHeight(n) => TuiConstraint::Min(layout_size.height.max(n) - n),
-            Self::MinLessThanLayoutWidth(n) => TuiConstraint::Min(layout_size.width.max(n) - n),
+            Self::MinLessThanScreenHeight(n) => {
+                TuiConstraint::Min(screen_size.height.max(n) - n)
+            }
+            Self::MinLessThanScreenWidth(n) => {
+                TuiConstraint::Min(screen_size.width.max(n) - n)
+            }
+            Self::MinLessThanLayoutHeight(n) => {
+                TuiConstraint::Min(layout_size.height.max(n) - n)
+            }
+            Self::MinLessThanLayoutWidth(n) => {
+                TuiConstraint::Min(layout_size.width.max(n) - n)
+            }
         }
     }
 }
@@ -437,7 +472,9 @@ fn draw_table<B: Backend>(
     let config = panel_config.default.to_owned().extend(&panel_config.table);
     let app_config = app.config.to_owned();
     let header_height = app_config.general.table.header.height.unwrap_or(1);
-    let height: usize = (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
+    let height: usize = (layout_size.height.max(header_height + 2)
+        - (header_height + 2))
+        .into();
 
     let rows = app
         .directory_buffer
@@ -476,8 +513,10 @@ fn draw_table<B: Backend>(
                         .unwrap_or_default();
 
                     let mut me = node.mime_essence.splitn(2, '/');
-                    let mimetype: String = me.next().map(|s| s.into()).unwrap_or_default();
-                    let mimesub: String = me.next().map(|s| s.into()).unwrap_or_default();
+                    let mimetype: String =
+                        me.next().map(|s| s.into()).unwrap_or_default();
+                    let mimesub: String =
+                        me.next().map(|s| s.into()).unwrap_or_default();
 
                     let mut node_type = if node.is_symlink {
                         app_config.node_types.symlink.to_owned()
@@ -496,28 +535,39 @@ fn draw_table<B: Backend>(
                         node_type = node_type.extend(conf);
                     }
 
-                    if let Some(conf) = app_config.node_types.extension.get(&node.extension) {
+                    if let Some(conf) =
+                        app_config.node_types.extension.get(&node.extension)
+                    {
                         node_type = node_type.extend(conf);
                     }
 
-                    if let Some(conf) = app_config.node_types.special.get(&node.relative_path) {
+                    if let Some(conf) =
+                        app_config.node_types.special.get(&node.relative_path)
+                    {
                         node_type = node_type.extend(conf);
                     }
 
                     let (relative_index, is_before_focus, is_after_focus) =
                         match dir.focus.cmp(&index) {
-                            Ordering::Greater => (dir.focus - index, true, false),
+                            Ordering::Greater => {
+                                (dir.focus - index, true, false)
+                            }
                             Ordering::Less => (index - dir.focus, false, true),
                             Ordering::Equal => (0, false, false),
                         };
 
                     let (mut prefix, mut suffix, mut style) = {
                         let ui = app_config.general.default_ui.to_owned();
-                        (ui.prefix, ui.suffix, ui.style.extend(&node_type.style))
+                        (
+                            ui.prefix,
+                            ui.suffix,
+                            ui.style.extend(&node_type.style),
+                        )
                     };
 
                     if is_focused && is_selected {
-                        let ui = app_config.general.focus_selection_ui.to_owned();
+                        let ui =
+                            app_config.general.focus_selection_ui.to_owned();
                         prefix = ui.prefix.to_owned().or(prefix);
                         suffix = ui.suffix.to_owned().or(suffix);
                         style = style.extend(&ui.style);
@@ -561,10 +611,16 @@ fn draw_table<B: Backend>(
                                 .iter()
                                 .filter_map(|c| {
                                     c.format.as_ref().map(|f| {
-                                        let out: Result<String> = lua::call(lua, f, v.clone());
+                                        let out: Result<String> =
+                                            lua::call(lua, f, v.clone());
                                         match out {
                                             Ok(o) => ansi_to_text(o.bytes())
-                                                .unwrap_or_else(|e| Text::raw(format!("{:?}", e))),
+                                                .unwrap_or_else(|e| {
+                                                    Text::raw(format!(
+                                                        "{:?}",
+                                                        e
+                                                    ))
+                                                }),
                                             Err(e) => Text::raw(e.to_string()),
                                         }
                                     })
@@ -596,7 +652,9 @@ fn draw_table<B: Backend>(
         .widths(&table_constraints)
         .style(app_config.general.table.style.to_owned().into())
         .highlight_style(app_config.general.focus_ui.style.to_owned().into())
-        .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
+        .column_spacing(
+            app_config.general.table.col_spacing.unwrap_or_default(),
+        )
         .block(block(
             config,
             format!(
@@ -655,8 +713,8 @@ fn draw_selection<B: Backend>(
         .collect();
 
     // Selected items
-    let selection_list =
-        List::new(selection).block(block(config, format!(" Selection ({}) ", selection_count)));
+    let selection_list = List::new(selection)
+        .block(block(config, format!(" Selection ({}) ", selection_count)));
 
     f.render_widget(selection_list, layout_size);
 }
@@ -679,9 +737,10 @@ fn draw_help_menu<B: Backend>(
         .into_iter()
         .map(|l| match l {
             HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
-            HelpMenuLine::KeyMap(k, remaps, h) => {
-                Row::new([Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)].to_vec())
-            }
+            HelpMenuLine::KeyMap(k, remaps, h) => Row::new(
+                [Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)]
+                    .to_vec(),
+            ),
         })
         .collect::<Vec<Row>>();
 
@@ -751,7 +810,8 @@ fn draw_sort_n_filter<B: Backend>(
         .to_owned()
         .extend(&panel_config.sort_and_filter);
     let ui = app.config.general.sort_and_filter_ui.to_owned();
-    let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
+    let filter_by: &IndexSet<NodeFilterApplicable> =
+        &app.explorer_config.filters;
     let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
     let defaultui = &ui.default_identifier;
     let forwardui = defaultui
@@ -786,7 +846,10 @@ fn draw_sort_n_filter<B: Backend>(
                 .map(|u| {
                     let ui = defaultui.to_owned().extend(u);
                     (
-                        Span::styled(ui.format.to_owned().unwrap_or_default(), ui.style.into()),
+                        Span::styled(
+                            ui.format.to_owned().unwrap_or_default(),
+                            ui.style.into(),
+                        ),
                         Span::styled(
                             direction.format.to_owned().unwrap_or_default(),
                             direction.style.to_owned().into(),
@@ -847,7 +910,11 @@ fn draw_logs<B: Backend>(
                     app::LogLevel::Warning => ListItem::new(format!(
                         "{} | {} | {}",
                         &time,
-                        &logs_config.warning.format.to_owned().unwrap_or_default(),
+                        &logs_config
+                            .warning
+                            .format
+                            .to_owned()
+                            .unwrap_or_default(),
                         l.message
                     ))
                     .style(logs_config.warning.style.to_owned().into()),
@@ -855,7 +922,11 @@ fn draw_logs<B: Backend>(
                     app::LogLevel::Success => ListItem::new(format!(
                         "{} | {} | {}",
                         &time,
-                        &logs_config.success.format.to_owned().unwrap_or_default(),
+                        &logs_config
+                            .success
+                            .format
+                            .to_owned()
+                            .unwrap_or_default(),
                         l.message
                     ))
                     .style(logs_config.success.style.to_owned().into()),
@@ -863,7 +934,11 @@ fn draw_logs<B: Backend>(
                     app::LogLevel::Error => ListItem::new(format!(
                         "{} | {} | {}",
                         &time,
-                        &logs_config.error.format.to_owned().unwrap_or_default(),
+                        &logs_config
+                            .error
+                            .format
+                            .to_owned()
+                            .unwrap_or_default(),
                         l.message
                     ))
                     .style(logs_config.error.style.to_owned().into()),
@@ -911,7 +986,8 @@ pub fn draw_custom_content<B: Backend>(
 
     match body {
         ContentBody::StaticParagraph { render } => {
-            let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
+            let render = ansi_to_text(render.bytes())
+                .unwrap_or_else(|e| Text::raw(e.to_string()));
             let content = Paragraph::new(render).block(block(
                 config,
                 title.map(|t| format!(" {} ", t)).unwrap_or_default(),
@@ -928,10 +1004,14 @@ pub fn draw_custom_content<B: Backend>(
 
             let render = lua
                 .to_value(&ctx)
-                .map(|arg| lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{:?}", e)))
+                .map(|arg| {
+                    lua::call(lua, &render, arg)
+                        .unwrap_or_else(|e| format!("{:?}", e))
+                })
                 .unwrap_or_else(|e| e.to_string());
 
-            let render = ansi_to_text(render.bytes()).unwrap_or_else(|e| Text::raw(e.to_string()));
+            let render = ansi_to_text(render.bytes())
+                .unwrap_or_else(|e| Text::raw(e.to_string()));
 
             let content = Paragraph::new(render).block(block(
                 config,
@@ -943,7 +1023,10 @@ pub fn draw_custom_content<B: Backend>(
         ContentBody::StaticList { render } => {
             let items = render
                 .into_iter()
-                .map(|item| ansi_to_text(item.bytes()).unwrap_or_else(|e| Text::raw(e.to_string())))
+                .map(|item| {
+                    ansi_to_text(item.bytes())
+                        .unwrap_or_else(|e| Text::raw(e.to_string()))
+                })
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
@@ -964,11 +1047,15 @@ pub fn draw_custom_content<B: Backend>(
             let items = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| vec![format!("{:?}", e)])
+                    lua::call(lua, &render, arg)
+                        .unwrap_or_else(|e| vec![format!("{:?}", e)])
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
                 .into_iter()
-                .map(|item| ansi_to_text(item.bytes()).unwrap_or_else(|e| Text::raw(e.to_string())))
+                .map(|item| {
+                    ansi_to_text(item.bytes())
+                        .unwrap_or_else(|e| Text::raw(e.to_string()))
+                })
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
@@ -990,8 +1077,9 @@ pub fn draw_custom_content<B: Backend>(
                     Row::new(
                         cols.into_iter()
                             .map(|item| {
-                                ansi_to_text(item.bytes())
-                                    .unwrap_or_else(|e| Text::raw(e.to_string()))
+                                ansi_to_text(item.bytes()).unwrap_or_else(|e| {
+                                    Text::raw(e.to_string())
+                                })
                             })
                             .map(Cell::from)
                             .collect::<Vec<Cell>>(),
@@ -1029,7 +1117,8 @@ pub fn draw_custom_content<B: Backend>(
             let rows = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
+                    lua::call(lua, &render, arg)
+                        .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])
                 .into_iter()
@@ -1037,8 +1126,9 @@ pub fn draw_custom_content<B: Backend>(
                     Row::new(
                         cols.into_iter()
                             .map(|item| {
-                                ansi_to_text(item.bytes())
-                                    .unwrap_or_else(|e| Text::raw(e.to_string()))
+                                ansi_to_text(item.bytes()).unwrap_or_else(|e| {
+                                    Text::raw(e.to_string())
+                                })
                             })
                             .map(Cell::from)
                             .collect::<Vec<Cell>>(),
@@ -1102,9 +1192,15 @@ pub fn draw_layout<B: Backend>(
     match layout {
         Layout::Nothing => draw_nothing(f, screen_size, layout_size, app, lua),
         Layout::Table => draw_table(f, screen_size, layout_size, app, lua),
-        Layout::SortAndFilter => draw_sort_n_filter(f, screen_size, layout_size, app, lua),
-        Layout::HelpMenu => draw_help_menu(f, screen_size, layout_size, app, lua),
-        Layout::Selection => draw_selection(f, screen_size, layout_size, app, lua),
+        Layout::SortAndFilter => {
+            draw_sort_n_filter(f, screen_size, layout_size, app, lua)
+        }
+        Layout::HelpMenu => {
+            draw_help_menu(f, screen_size, layout_size, app, lua)
+        }
+        Layout::Selection => {
+            draw_selection(f, screen_size, layout_size, app, lua)
+        }
         Layout::InputAndLogs => {
             if app.input_buffer.is_some() {
                 draw_input_buffer(f, screen_size, layout_size, app, lua);
@@ -1112,9 +1208,15 @@ pub fn draw_layout<B: Backend>(
                 draw_logs(f, screen_size, layout_size, app, lua);
             };
         }
-        Layout::CustomContent { title, body } => {
-            draw_custom_content(f, screen_size, layout_size, app, title, body, lua)
-        }
+        Layout::CustomContent { title, body } => draw_custom_content(
+            f,
+            screen_size,
+            layout_size,
+            app,
+            title,
+            body,
+            lua,
+        ),
         Layout::Horizontal { config, splits } => {
             let chunks = TuiLayout::default()
                 .direction(Direction::Horizontal)
@@ -1133,13 +1235,19 @@ pub fn draw_layout<B: Backend>(
                         .or(config.margin)
                         .unwrap_or_default(),
                 )
-                .vertical_margin(config.vertical_margin.or(config.margin).unwrap_or_default())
+                .vertical_margin(
+                    config
+                        .vertical_margin
+                        .or(config.margin)
+                        .unwrap_or_default(),
+                )
                 .split(layout_size);
 
-            splits
-                .into_iter()
-                .zip(chunks.into_iter())
-                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, lua));
+            splits.into_iter().zip(chunks.into_iter()).for_each(
+                |(split, chunk)| {
+                    draw_layout(split, f, screen_size, chunk, app, lua)
+                },
+            );
         }
 
         Layout::Vertical { config, splits } => {
@@ -1160,13 +1268,19 @@ pub fn draw_layout<B: Backend>(
                         .or(config.margin)
                         .unwrap_or_default(),
                 )
-                .vertical_margin(config.vertical_margin.or(config.margin).unwrap_or_default())
+                .vertical_margin(
+                    config
+                        .vertical_margin
+                        .or(config.margin)
+                        .unwrap_or_default(),
+                )
                 .split(layout_size);
 
-            splits
-                .into_iter()
-                .zip(chunks.into_iter())
-                .for_each(|(split, chunk)| draw_layout(split, f, screen_size, chunk, app, lua));
+            splits.into_iter().zip(chunks.into_iter()).for_each(
+                |(split, chunk)| {
+                    draw_layout(split, f, screen_size, chunk, app, lua)
+                },
+            );
         }
     }
 }

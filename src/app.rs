@@ -55,7 +55,8 @@ impl Pipe {
 
         let msg_in = path.join("msg_in").to_string_lossy().to_string();
 
-        let selection_out = path.join("selection_out").to_string_lossy().to_string();
+        let selection_out =
+            path.join("selection_out").to_string_lossy().to_string();
 
         let result_out = path.join("result_out").to_string_lossy().to_string();
 
@@ -71,7 +72,8 @@ impl Pipe {
 
         let logs_out = path.join("logs_out").to_string_lossy().to_string();
 
-        let history_out = path.join("history_out").to_string_lossy().to_string();
+        let history_out =
+            path.join("history_out").to_string_lossy().to_string();
 
         Ok(Self {
             path: path.to_string_lossy().to_string(),
@@ -107,7 +109,9 @@ impl ResolvedNode {
 
         let (is_dir, is_file, is_readonly, size) = path
             .metadata()
-            .map(|m| (m.is_dir(), m.is_file(), m.permissions().readonly(), m.len()))
+            .map(|m| {
+                (m.is_dir(), m.is_file(), m.permissions().readonly(), m.len())
+            })
             .unwrap_or((false, false, false, 0));
 
         let mime_essence = mime_essence(&path, is_dir);
@@ -164,19 +168,21 @@ impl Node {
             .map(|p| (false, Some(ResolvedNode::from(p))))
             .unwrap_or_else(|_| (true, None));
 
-        let (is_symlink, is_dir, is_file, is_readonly, size, permissions) = path
-            .symlink_metadata()
-            .map(|m| {
-                (
-                    m.file_type().is_symlink(),
-                    m.is_dir(),
-                    m.is_file(),
-                    m.permissions().readonly(),
-                    m.len(),
-                    Permissions::from(&m),
-                )
-            })
-            .unwrap_or_else(|_| (false, false, false, false, 0, Permissions::default()));
+        let (is_symlink, is_dir, is_file, is_readonly, size, permissions) =
+            path.symlink_metadata()
+                .map(|m| {
+                    (
+                        m.file_type().is_symlink(),
+                        m.is_dir(),
+                        m.is_file(),
+                        m.permissions().readonly(),
+                        m.len(),
+                        Permissions::from(&m),
+                    )
+                })
+                .unwrap_or_else(|_| {
+                    (false, false, false, false, 0, Permissions::default())
+                });
 
         let mime_essence = mime_essence(&path, is_dir);
         let human_size = to_humansize(size);
@@ -312,7 +318,9 @@ impl NodeSorterApplicable {
 
     fn apply(&self, a: &Node, b: &Node) -> Ordering {
         let order = match self.sorter {
-            NodeSorter::ByRelativePath => natord::compare(&a.relative_path, &b.relative_path),
+            NodeSorter::ByRelativePath => {
+                natord::compare(&a.relative_path, &b.relative_path)
+            }
             NodeSorter::ByIRelativePath => {
                 natord::compare_ignore_case(&a.relative_path, &b.relative_path)
             }
@@ -336,16 +344,18 @@ impl NodeSorterApplicable {
                     .unwrap_or_default(),
             ),
 
-            NodeSorter::ByICanonicalAbsolutePath => natord::compare_ignore_case(
-                &a.canonical
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-                &b.canonical
-                    .as_ref()
-                    .map(|s| s.absolute_path.clone())
-                    .unwrap_or_default(),
-            ),
+            NodeSorter::ByICanonicalAbsolutePath => {
+                natord::compare_ignore_case(
+                    &a.canonical
+                        .as_ref()
+                        .map(|s| s.absolute_path.clone())
+                        .unwrap_or_default(),
+                    &b.canonical
+                        .as_ref()
+                        .map(|s| s.absolute_path.clone())
+                        .unwrap_or_default(),
+                )
+            }
 
             NodeSorter::ByCanonicalExtension => a
                 .canonical
@@ -505,18 +515,26 @@ impl NodeFilter {
     fn apply(&self, node: &Node, input: &str) -> bool {
         match self {
             Self::RelativePathIs => node.relative_path.eq(input),
-            Self::IRelativePathIs => node.relative_path.eq_ignore_ascii_case(input),
+            Self::IRelativePathIs => {
+                node.relative_path.eq_ignore_ascii_case(input)
+            }
 
             Self::RelativePathIsNot => !node.relative_path.eq(input),
-            Self::IRelativePathIsNot => !node.relative_path.eq_ignore_ascii_case(input),
+            Self::IRelativePathIsNot => {
+                !node.relative_path.eq_ignore_ascii_case(input)
+            }
 
-            Self::RelativePathDoesStartWith => node.relative_path.starts_with(input),
+            Self::RelativePathDoesStartWith => {
+                node.relative_path.starts_with(input)
+            }
             Self::IRelativePathDoesStartWith => node
                 .relative_path
                 .to_lowercase()
                 .starts_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotStartWith => !node.relative_path.starts_with(input),
+            Self::RelativePathDoesNotStartWith => {
+                !node.relative_path.starts_with(input)
+            }
 
             Self::IRelativePathDoesNotStartWith => !node
                 .relative_path
@@ -529,37 +547,51 @@ impl NodeFilter {
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotContain => !node.relative_path.contains(input),
+            Self::RelativePathDoesNotContain => {
+                !node.relative_path.contains(input)
+            }
             Self::IRelativePathDoesNotContain => !node
                 .relative_path
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::RelativePathDoesEndWith => node.relative_path.ends_with(input),
+            Self::RelativePathDoesEndWith => {
+                node.relative_path.ends_with(input)
+            }
             Self::IRelativePathDoesEndWith => node
                 .relative_path
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotEndWith => !node.relative_path.ends_with(input),
+            Self::RelativePathDoesNotEndWith => {
+                !node.relative_path.ends_with(input)
+            }
             Self::IRelativePathDoesNotEndWith => !node
                 .relative_path
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
             Self::AbsolutePathIs => node.absolute_path.eq(input),
-            Self::IAbsolutePathIs => node.absolute_path.eq_ignore_ascii_case(input),
+            Self::IAbsolutePathIs => {
+                node.absolute_path.eq_ignore_ascii_case(input)
+            }
 
             Self::AbsolutePathIsNot => !node.absolute_path.eq(input),
-            Self::IAbsolutePathIsNot => !node.absolute_path.eq_ignore_ascii_case(input),
+            Self::IAbsolutePathIsNot => {
+                !node.absolute_path.eq_ignore_ascii_case(input)
+            }
 
-            Self::AbsolutePathDoesStartWith => node.absolute_path.starts_with(input),
+            Self::AbsolutePathDoesStartWith => {
+                node.absolute_path.starts_with(input)
+            }
             Self::IAbsolutePathDoesStartWith => node
                 .absolute_path
                 .to_lowercase()
                 .starts_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotStartWith => !node.absolute_path.starts_with(input),
+            Self::AbsolutePathDoesNotStartWith => {
+                !node.absolute_path.starts_with(input)
+            }
             Self::IAbsolutePathDoesNotStartWith => !node
                 .absolute_path
                 .to_lowercase()
@@ -571,19 +603,25 @@ impl NodeFilter {
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotContain => !node.absolute_path.contains(input),
+            Self::AbsolutePathDoesNotContain => {
+                !node.absolute_path.contains(input)
+            }
             Self::IAbsolutePathDoesNotContain => !node
                 .absolute_path
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesEndWith => node.absolute_path.ends_with(input),
+            Self::AbsolutePathDoesEndWith => {
+                node.absolute_path.ends_with(input)
+            }
             Self::IAbsolutePathDoesEndWith => node
                 .absolute_path
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotEndWith => !node.absolute_path.ends_with(input),
+            Self::AbsolutePathDoesNotEndWith => {
+                !node.absolute_path.ends_with(input)
+            }
             Self::IAbsolutePathDoesNotEndWith => !node
                 .absolute_path
                 .to_lowercase()
@@ -1045,7 +1083,10 @@ impl ExternalMsg {
     pub fn is_read_only(&self) -> bool {
         !matches!(
             self,
-            Self::Call(_) | Self::CallSilently(_) | Self::BashExec(_) | Self::BashExecSilently(_)
+            Self::Call(_)
+                | Self::CallSilently(_)
+                | Self::BashExec(_)
+                | Self::BashExecSilently(_)
         )
     }
 }
@@ -1236,7 +1277,8 @@ impl App {
                 None
             }
         } else {
-            let path = PathBuf::from("/").join("etc").join("xplr").join("init.lua");
+            let path =
+                PathBuf::from("/").join("etc").join("xplr").join("init.lua");
             if path.exists() {
                 Some(path)
             } else {
@@ -1383,13 +1425,21 @@ impl App {
         }
     }
 
-    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
+    fn handle_external(
+        self,
+        msg: ExternalMsg,
+        key: Option<Key>,
+    ) -> Result<Self> {
         if self.config.general.read_only && !msg.is_read_only() {
-            self.log_error("Cannot call shell command in read-only mode.".into())
+            self.log_error(
+                "Cannot call shell command in read-only mode.".into(),
+            )
         } else {
             match msg {
                 ExternalMsg::ExplorePwd => self.explore_pwd(),
-                ExternalMsg::ExploreParentsAsync => self.explore_parents_async(),
+                ExternalMsg::ExploreParentsAsync => {
+                    self.explore_parents_async()
+                }
                 ExternalMsg::ExplorePwdAsync => self.explore_pwd_async(),
                 ExternalMsg::Refresh => self.refresh(),
                 ExternalMsg::ClearScreen => self.clear_screen(),
@@ -1404,52 +1454,80 @@ impl App {
                     self.focus_previous_by_relative_index_from_input()
                 }
                 ExternalMsg::FocusNext => self.focus_next(),
-                ExternalMsg::FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
+                ExternalMsg::FocusNextByRelativeIndex(i) => {
+                    self.focus_next_by_relative_index(i)
+                }
                 ExternalMsg::FocusNextByRelativeIndexFromInput => {
                     self.focus_next_by_relative_index_from_input()
                 }
                 ExternalMsg::FocusPath(p) => self.focus_path(&p, true),
                 ExternalMsg::FocusPathFromInput => self.focus_path_from_input(),
                 ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
-                ExternalMsg::FocusByIndexFromInput => self.focus_by_index_from_input(),
-                ExternalMsg::FocusByFileName(n) => self.focus_by_file_name(&n, true),
-                ExternalMsg::ChangeDirectory(dir) => self.change_directory(&dir, true),
+                ExternalMsg::FocusByIndexFromInput => {
+                    self.focus_by_index_from_input()
+                }
+                ExternalMsg::FocusByFileName(n) => {
+                    self.focus_by_file_name(&n, true)
+                }
+                ExternalMsg::ChangeDirectory(dir) => {
+                    self.change_directory(&dir, true)
+                }
                 ExternalMsg::Enter => self.enter(),
                 ExternalMsg::Back => self.back(),
                 ExternalMsg::LastVisitedPath => self.last_visited_path(),
                 ExternalMsg::NextVisitedPath => self.next_visited_path(),
                 ExternalMsg::FollowSymlink => self.follow_symlink(),
                 ExternalMsg::BufferInput(input) => self.buffer_input(&input),
-                ExternalMsg::BufferInputFromKey => self.buffer_input_from_key(key),
-                ExternalMsg::SetInputBuffer(input) => self.set_input_buffer(input),
+                ExternalMsg::BufferInputFromKey => {
+                    self.buffer_input_from_key(key)
+                }
+                ExternalMsg::SetInputBuffer(input) => {
+                    self.set_input_buffer(input)
+                }
                 ExternalMsg::RemoveInputBufferLastCharacter => {
                     self.remove_input_buffer_last_character()
                 }
-                ExternalMsg::RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
+                ExternalMsg::RemoveInputBufferLastWord => {
+                    self.remove_input_buffer_last_word()
+                }
                 ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
                 ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
                 ExternalMsg::SwitchModeKeepingInputBuffer(mode) => {
                     self.switch_mode_keeping_input_buffer(&mode)
                 }
-                ExternalMsg::SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
+                ExternalMsg::SwitchModeBuiltin(mode) => {
+                    self.switch_mode_builtin(&mode)
+                }
                 ExternalMsg::SwitchModeBuiltinKeepingInputBuffer(mode) => {
                     self.switch_mode_builtin_keeping_input_buffer(&mode)
                 }
-                ExternalMsg::SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
+                ExternalMsg::SwitchModeCustom(mode) => {
+                    self.switch_mode_custom(&mode)
+                }
                 ExternalMsg::SwitchModeCustomKeepingInputBuffer(mode) => {
                     self.switch_mode_custom_keeping_input_buffer(&mode)
                 }
                 ExternalMsg::PopMode => self.pop_mode(),
-                ExternalMsg::PopModeKeepingInputBuffer => self.pop_mode_keeping_input_buffer(),
+                ExternalMsg::PopModeKeepingInputBuffer => {
+                    self.pop_mode_keeping_input_buffer()
+                }
                 ExternalMsg::SwitchLayout(mode) => self.switch_layout(&mode),
-                ExternalMsg::SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
-                ExternalMsg::SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
+                ExternalMsg::SwitchLayoutBuiltin(mode) => {
+                    self.switch_layout_builtin(&mode)
+                }
+                ExternalMsg::SwitchLayoutCustom(mode) => {
+                    self.switch_layout_custom(&mode)
+                }
                 ExternalMsg::Call(cmd) => self.call(cmd),
                 ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
                 ExternalMsg::CallLua(func) => self.call_lua(func),
-                ExternalMsg::CallLuaSilently(func) => self.call_lua_silently(func),
+                ExternalMsg::CallLuaSilently(func) => {
+                    self.call_lua_silently(func)
+                }
                 ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
-                ExternalMsg::BashExecSilently(cmd) => self.bash_exec_silently(cmd),
+                ExternalMsg::BashExecSilently(cmd) => {
+                    self.bash_exec_silently(cmd)
+                }
                 ExternalMsg::Select => self.select(),
                 ExternalMsg::SelectAll => self.select_all(),
                 ExternalMsg::SelectPath(p) => self.select_path(p),
@@ -1458,21 +1536,33 @@ impl App {
                 ExternalMsg::UnSelectPath(p) => self.un_select_path(p),
                 ExternalMsg::ToggleSelection => self.toggle_selection(),
                 ExternalMsg::ToggleSelectAll => self.toggle_select_all(),
-                ExternalMsg::ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
+                ExternalMsg::ToggleSelectionByPath(p) => {
+                    self.toggle_selection_by_path(p)
+                }
                 ExternalMsg::ClearSelection => self.clear_selection(),
                 ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
-                ExternalMsg::AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
+                ExternalMsg::AddNodeFilterFromInput(f) => {
+                    self.add_node_filter_from_input(f)
+                }
                 ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
-                ExternalMsg::RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
+                ExternalMsg::RemoveNodeFilterFromInput(f) => {
+                    self.remove_node_filter_from_input(f)
+                }
                 ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
-                ExternalMsg::RemoveLastNodeFilter => self.remove_last_node_filter(),
+                ExternalMsg::RemoveLastNodeFilter => {
+                    self.remove_last_node_filter()
+                }
                 ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
                 ExternalMsg::ClearNodeFilters => self.clear_node_filters(),
                 ExternalMsg::AddNodeSorter(f) => self.add_node_sorter(f),
                 ExternalMsg::RemoveNodeSorter(f) => self.remove_node_sorter(f),
-                ExternalMsg::ReverseNodeSorter(f) => self.reverse_node_sorter(f),
+                ExternalMsg::ReverseNodeSorter(f) => {
+                    self.reverse_node_sorter(f)
+                }
                 ExternalMsg::ToggleNodeSorter(f) => self.toggle_node_sorter(f),
-                ExternalMsg::RemoveLastNodeSorter => self.remove_last_node_sorter(),
+                ExternalMsg::RemoveLastNodeSorter => {
+                    self.remove_last_node_sorter()
+                }
                 ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
                 ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
                 ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
@@ -1488,10 +1578,16 @@ impl App {
                 ExternalMsg::LogError(l) => self.log_error(l),
                 ExternalMsg::Quit => self.quit(),
                 ExternalMsg::PrintPwdAndQuit => self.print_pwd_and_quit(),
-                ExternalMsg::PrintFocusPathAndQuit => self.print_focus_path_and_quit(),
-                ExternalMsg::PrintSelectionAndQuit => self.print_selection_and_quit(),
+                ExternalMsg::PrintFocusPathAndQuit => {
+                    self.print_focus_path_and_quit()
+                }
+                ExternalMsg::PrintSelectionAndQuit => {
+                    self.print_selection_and_quit()
+                }
                 ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
-                ExternalMsg::PrintAppStateAndQuit => self.print_app_state_and_quit(),
+                ExternalMsg::PrintAppStateAndQuit => {
+                    self.print_app_state_and_quit()
+                }
                 ExternalMsg::Debug(path) => self.debug(path),
                 ExternalMsg::Terminate => bail!(""),
             }
@@ -1615,7 +1711,10 @@ impl App {
         Ok(self)
     }
 
-    fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
+    fn focus_previous_by_relative_index(
+        mut self,
+        index: usize,
+    ) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
@@ -1691,7 +1790,11 @@ impl App {
         }
     }
 
-    fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
+    fn change_directory(
+        mut self,
+        dir: &str,
+        save_history: bool,
+    ) -> Result<Self> {
         let mut dir = PathBuf::from(dir);
         if dir.is_relative() {
             dir = PathBuf::from(self.pwd.clone()).join(dir);
@@ -1700,7 +1803,8 @@ impl App {
         match env::set_current_dir(&dir) {
             Ok(()) => {
                 let pwd = self.pwd.clone();
-                let focus = self.focused_node().map(|n| n.relative_path.clone());
+                let focus =
+                    self.focused_node().map(|n| n.relative_path.clone());
                 self = self.add_last_focus(pwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
                 if save_history {
@@ -1841,7 +1945,11 @@ impl App {
         }
     }
 
-    pub fn focus_by_file_name(mut self, name: &str, save_history: bool) -> Result<Self> {
+    pub fn focus_by_file_name(
+        mut self,
+        name: &str,
+        save_history: bool,
+    ) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
@@ -1879,8 +1987,14 @@ impl App {
         }
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
-                self.change_directory(&parent.to_string_lossy().to_string(), false)?
-                    .focus_by_file_name(&filename.to_string_lossy().to_string(), save_history)
+                self.change_directory(
+                    &parent.to_string_lossy().to_string(),
+                    false,
+                )?
+                .focus_by_file_name(
+                    &filename.to_string_lossy().to_string(),
+                    save_history,
+                )
             } else {
                 self.log_error(format!("{} not found", path))
             }
@@ -1949,7 +2063,10 @@ impl App {
             })
     }
 
-    fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
+    fn switch_mode_builtin_keeping_input_buffer(
+        mut self,
+        mode: &str,
+    ) -> Result<Self> {
         if let Some(mode) = self.config.modes.builtin.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
@@ -1967,7 +2084,10 @@ impl App {
             })
     }
 
-    fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
+    fn switch_mode_custom_keeping_input_buffer(
+        mut self,
+        mode: &str,
+    ) -> Result<Self> {
         if let Some(mode) = self.config.modes.custom.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
@@ -2053,7 +2173,11 @@ impl App {
         Ok(self)
     }
 
-    pub fn add_last_focus(mut self, parent: String, focused_path: Option<String>) -> Result<Self> {
+    pub fn add_last_focus(
+        mut self,
+        parent: String,
+        focused_path: Option<String>,
+    ) -> Result<Self> {
         self.last_focus.insert(parent, focused_path);
         Ok(self)
     }
@@ -2071,7 +2195,8 @@ impl App {
             path = PathBuf::from(self.pwd.clone()).join(path);
         }
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
-        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
+        let filename =
+            path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
             self.selection.insert(Node::new(p, n));
         }
@@ -2161,7 +2286,10 @@ impl App {
         Ok(self)
     }
 
-    fn add_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
+    fn add_node_filter_from_input(
+        mut self,
+        filter: NodeFilter,
+    ) -> Result<Self> {
         if let Some(input) = self.input_buffer.clone() {
             self.explorer_config
                 .filters
@@ -2170,12 +2298,18 @@ impl App {
         Ok(self)
     }
 
-    fn remove_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
+    fn remove_node_filter(
+        mut self,
+        filter: NodeFilterApplicable,
+    ) -> Result<Self> {
         self.explorer_config.filters.retain(|f| f != &filter);
         Ok(self)
     }
 
-    fn remove_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
+    fn remove_node_filter_from_input(
+        mut self,
+        filter: NodeFilter,
+    ) -> Result<Self> {
         if let Some(input) = self.input_buffer.clone() {
             let nfa = NodeFilterApplicable::new(filter, input);
             self.explorer_config.filters.retain(|f| f != &nfa);
@@ -2370,8 +2504,9 @@ impl App {
 
     fn refresh_selection(mut self) -> Result<Self> {
         // Should be able to select broken symlink
-        self.selection
-            .retain(|n| PathBuf::from(&n.absolute_path).symlink_metadata().is_ok());
+        self.selection.retain(|n| {
+            PathBuf::from(&n.absolute_path).symlink_metadata().is_ok()
+        });
         Ok(self)
     }
 

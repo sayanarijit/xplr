@@ -298,8 +298,10 @@ impl KeyBindings {
                 .filter_map(|(k, a)| a.sanitized(read_only).map(|a| (k, a)))
                 .collect();
 
-            self.on_alphabet = self.on_alphabet.and_then(|a| a.sanitized(read_only));
-            self.on_number = self.on_number.and_then(|a| a.sanitized(read_only));
+            self.on_alphabet =
+                self.on_alphabet.and_then(|a| a.sanitized(read_only));
+            self.on_number =
+                self.on_number.and_then(|a| a.sanitized(read_only));
             self.on_special_character = self
                 .on_special_character
                 .and_then(|a| a.sanitized(read_only));
@@ -353,32 +355,36 @@ impl Mode {
                 let lines = extra_help_lines
                     .unwrap_or_default()
                     .into_iter()
-                    .chain(self.key_bindings.on_key.iter().filter_map(|(k, a)| {
-                        let remaps = self
-                            .key_bindings
-                            .on_key
-                            .iter()
-                            .filter_map(|(rk, ra)| {
-                                if rk == k {
-                                    None
-                                } else if a == ra {
-                                    Some(rk.clone())
-                                } else {
-                                    None
-                                }
+                    .chain(self.key_bindings.on_key.iter().filter_map(
+                        |(k, a)| {
+                            let remaps = self
+                                .key_bindings
+                                .on_key
+                                .iter()
+                                .filter_map(|(rk, ra)| {
+                                    if rk == k {
+                                        None
+                                    } else if a == ra {
+                                        Some(rk.clone())
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .collect::<Vec<String>>();
+                            a.help.clone().map(|h| {
+                                HelpMenuLine::KeyMap(k.into(), remaps, h)
                             })
-                            .collect::<Vec<String>>();
-                        a.help
-                            .clone()
-                            .map(|h| HelpMenuLine::KeyMap(k.into(), remaps, h))
-                    }))
+                        },
+                    ))
                     .chain(
                         self.key_bindings
                             .on_alphabet
                             .iter()
                             .map(|a| ("[a-Z]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
                             }),
                     )
                     .chain(
@@ -387,7 +393,9 @@ impl Mode {
                             .iter()
                             .map(|a| ("[0-9]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
                             }),
                     )
                     .chain(
@@ -396,7 +404,9 @@ impl Mode {
                             .iter()
                             .map(|a| ("[spcl chars]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
                             }),
                     )
                     .chain(
@@ -405,7 +415,9 @@ impl Mode {
                             .iter()
                             .map(|a| ("[default]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
                             }),
                     );
 
@@ -414,7 +426,9 @@ impl Mode {
 
                 for line in lines {
                     match line {
-                        HelpMenuLine::Paragraph(p) => result.push(HelpMenuLine::Paragraph(p)),
+                        HelpMenuLine::Paragraph(p) => {
+                            result.push(HelpMenuLine::Paragraph(p))
+                        }
                         HelpMenuLine::KeyMap(k, r, d) => {
                             if !remapped.contains(&k) {
                                 for k in r.iter() {
@@ -510,10 +524,18 @@ impl BuiltinModesConfig {
             "search" => Some(&self.search),
             "sort" => Some(&self.sort),
             "filter" => Some(&self.filter),
-            "relative_path_does_contain" => Some(&self.relative_path_does_contain),
-            "relative path does contain" => Some(&self.relative_path_does_contain),
-            "relative_path_does_not_contain" => Some(&self.relative_path_does_not_contain),
-            "relative path does not contain" => Some(&self.relative_path_does_not_contain),
+            "relative_path_does_contain" => {
+                Some(&self.relative_path_does_contain)
+            }
+            "relative path does contain" => {
+                Some(&self.relative_path_does_contain)
+            }
+            "relative_path_does_not_contain" => {
+                Some(&self.relative_path_does_not_contain)
+            }
+            "relative path does not contain" => {
+                Some(&self.relative_path_does_not_contain)
+            }
             "switch layout" => Some(&self.switch_layout),
             "switch_layout" => Some(&self.switch_layout),
             "quit" => Some(&self.quit),

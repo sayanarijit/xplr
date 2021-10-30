@@ -151,7 +151,12 @@ impl Runner {
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
-        let mut app = app::App::create(self.pwd, &lua, self.config_file, self.extra_config_files)?;
+        let mut app = app::App::create(
+            self.pwd,
+            &lua,
+            self.config_file,
+            self.extra_config_files,
+        )?;
         app.config.general.read_only = self.read_only;
 
         fs::create_dir_all(app.session_path.clone())?;
@@ -191,19 +196,19 @@ impl Runner {
         // let mut stdout = stdout.lock();
         execute!(stdout, term::EnterAlternateScreen)?;
 
-        let mut fifo: Option<fs::File> = if let Some(path) = app.config.general.start_fifo.as_ref()
-        {
-            // TODO remove duplicate segment
-            match start_fifo(path, &app.focused_node_str()) {
-                Ok(file) => Some(file),
-                Err(e) => {
-                    app = app.log_error(e.to_string())?;
-                    None
+        let mut fifo: Option<fs::File> =
+            if let Some(path) = app.config.general.start_fifo.as_ref() {
+                // TODO remove duplicate segment
+                match start_fifo(path, &app.focused_node_str()) {
+                    Ok(file) => Some(file),
+                    Err(e) => {
+                        app = app.log_error(e.to_string())?;
+                        None
+                    }
                 }
-            }
-        } else {
-            None
-        };
+            } else {
+                None
+            };
 
         let mut last_focus: Option<app::Node> = None;
 
@@ -219,7 +224,11 @@ impl Runner {
         terminal.hide_cursor()?;
 
         // Threads
-        pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
+        pwd_watcher::keep_watching(
+            app.pwd.as_ref(),
+            tx_msg_in.clone(),
+            rx_pwd_watcher,
+        )?;
         let mut event_reader = EventReader::new(tx_msg_in.clone());
         event_reader.start();
 
@@ -291,8 +300,13 @@ impl Runner {
                                 explorer::explore_async(
                                     app.explorer_config.clone(),
                                     app.pwd.clone().into(),
-                                    app.focused_node().map(|n| n.relative_path.clone().into()),
-                                    app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
+                                    app.focused_node().map(|n| {
+                                        n.relative_path.clone().into()
+                                    }),
+                                    app.directory_buffer
+                                        .as_ref()
+                                        .map(|d| d.focus)
+                                        .unwrap_or(0),
                                     tx_msg_in.clone(),
                                 );
                                 tx_pwd_watcher.send(app.pwd.clone())?;
@@ -302,8 +316,13 @@ impl Runner {
                                 explorer::explore_recursive_async(
                                     app.explorer_config.clone(),
                                     app.pwd.clone().into(),
-                                    app.focused_node().map(|n| n.relative_path.clone().into()),
-                                    app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
+                                    app.focused_node().map(|n| {
+                                        n.relative_path.clone().into()
+                                    }),
+                                    app.directory_buffer
+                                        .as_ref()
+                                        .map(|d| d.focus)
+                                        .unwrap_or(0),
                                     tx_msg_in.clone(),
                                 );
                                 tx_pwd_watcher.send(app.pwd.clone())?;
@@ -318,7 +337,11 @@ impl Runner {
                                 let focus = app.focused_node();
                                 if focus != last_focus.as_ref() {
                                     if let Some(ref mut file) = fifo {
-                                        writeln!(file, "{}", app.focused_node_str())?;
+                                        writeln!(
+                                            file,
+                                            "{}",
+                                            app.focused_node_str()
+                                        )?;
                                     };
                                     last_focus = focus.cloned();
                                 }
@@ -334,7 +357,8 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app =
+                                                app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -346,8 +370,10 @@ impl Runner {
                                 } else {
                                     app::ExternalMsg::EnableMouse
                                 };
-                                app = app
-                                    .handle_task(app::Task::new(app::MsgIn::External(msg), None))?;
+                                app = app.handle_task(app::Task::new(
+                                    app::MsgIn::External(msg),
+                                    None,
+                                ))?;
                             }
 
                             DisableMouse => {
@@ -360,14 +386,18 @@ impl Runner {
                                             mouse_enabled = false;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app =
+                                                app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
                             }
 
                             StartFifo(path) => {
-                                fifo = match start_fifo(&path, &app.focused_node_str()) {
+                                fifo = match start_fifo(
+                                    &path,
+                                    &app.focused_node_str(),
+                                ) {
                                     Ok(file) => Some(file),
                                     Err(e) => {
                                         app = app.log_error(e.to_string())?;
@@ -388,10 +418,14 @@ impl Runner {
                                     fifo = None;
                                     std::mem::drop(file);
                                 } else {
-                                    fifo = match start_fifo(&path, &app.focused_node_str()) {
+                                    fifo = match start_fifo(
+                                        &path,
+                                        &app.focused_node_str(),
+                                    ) {
                                         Ok(file) => Some(file),
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app =
+                                                app.log_error(e.to_string())?;
                                             None
                                         }
                                     }
@@ -402,10 +436,12 @@ impl Runner {
                                 match call_lua(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
                                         for msg in msgs {
-                                            app = app.handle_task(app::Task::new(
-                                                app::MsgIn::External(msg),
-                                                None,
-                                            ))?;
+                                            app = app.handle_task(
+                                                app::Task::new(
+                                                    app::MsgIn::External(msg),
+                                                    None,
+                                                ),
+                                            )?;
                                         }
                                     }
                                     Ok(None) => {}
@@ -422,7 +458,10 @@ impl Runner {
                                         if s.success() {
                                             Ok(())
                                         } else {
-                                            Err(format!("process exited with code {}", &s))
+                                            Err(format!(
+                                                "process exited with code {}",
+                                                &s
+                                            ))
                                         }
                                     })
                                     .unwrap_or_else(|e| Err(e.to_string()));
@@ -430,10 +469,12 @@ impl Runner {
                                 match pipe_reader::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
                                         for msg in msgs {
-                                            app = app.handle_task(app::Task::new(
-                                                app::MsgIn::External(msg),
-                                                None,
-                                            ))?;
+                                            app = app.handle_task(
+                                                app::Task::new(
+                                                    app::MsgIn::External(msg),
+                                                    None,
+                                                ),
+                                            )?;
                                         }
                                     }
                                     Err(err) => {
@@ -449,8 +490,11 @@ impl Runner {
                             }
 
                             CallLua(func) => {
-                                execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                                    .unwrap_or_default();
+                                execute!(
+                                    terminal.backend_mut(),
+                                    event::DisableMouseCapture
+                                )
+                                .unwrap_or_default();
 
                                 event_reader.stop();
 
@@ -462,10 +506,12 @@ impl Runner {
                                 match call_lua(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
                                         for msg in msgs {
-                                            app = app.handle_task(app::Task::new(
-                                                app::MsgIn::External(msg),
-                                                None,
-                                            ))?;
+                                            app = app.handle_task(
+                                                app::Task::new(
+                                                    app::MsgIn::External(msg),
+                                                    None,
+                                                ),
+                                            )?;
                                         }
                                     }
                                     Ok(None) => {}
@@ -488,15 +534,19 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app =
+                                                app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
                             }
 
                             Call(cmd) => {
-                                execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                                    .unwrap_or_default();
+                                execute!(
+                                    terminal.backend_mut(),
+                                    event::DisableMouseCapture
+                                )
+                                .unwrap_or_default();
 
                                 event_reader.stop();
 
@@ -511,7 +561,10 @@ impl Runner {
                                         if s.success() {
                                             Ok(())
                                         } else {
-                                            Err(format!("process exited with code {}", &s))
+                                            Err(format!(
+                                                "process exited with code {}",
+                                                &s
+                                            ))
                                         }
                                     })
                                     .unwrap_or_else(|e| Err(e.to_string()));
@@ -520,10 +573,12 @@ impl Runner {
                                 match pipe_reader::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
                                         for msg in msgs {
-                                            app = app.handle_task(app::Task::new(
-                                                app::MsgIn::External(msg),
-                                                None,
-                                            ))?;
+                                            app = app.handle_task(
+                                                app::Task::new(
+                                                    app::MsgIn::External(msg),
+                                                    None,
+                                                ),
+                                            )?;
                                         }
                                     }
                                     Err(err) => {
@@ -551,7 +606,8 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app =
+                                                app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -570,7 +626,8 @@ impl Runner {
         terminal.clear()?;
         terminal.set_cursor(0, 0)?;
         execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
-        execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
+        execute!(terminal.backend_mut(), event::DisableMouseCapture)
+            .unwrap_or_default();
         term::disable_raw_mode()?;
         terminal.show_cursor()?;
 
