@@ -473,10 +473,11 @@ xplr.config.general.table.col_spacing = 1
 -------- Col widths
 xplr.config.general.table.col_widths = {
   { Percentage = 10 },
-  { Percentage = 50 },
+  { Percentage = 30 },
   { Percentage = 10 },
   { Percentage = 10 },
-  { Percentage = 20 },
+  { Percentage = 15 },
+  { Percentage = 15 },
 }
 
 -------- Header
@@ -499,6 +500,10 @@ xplr.config.general.table.header.cols = {
   },
   {
     format = "type",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "time",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
 }
@@ -528,6 +533,10 @@ xplr.config.general.table.row.cols = {
   },
   {
     format = "builtin.fmt_general_table_row_cols_4",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "builtin.fmt_general_table_row_cols_5",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
 }
@@ -2185,6 +2194,15 @@ xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
     return m.symlink.mime_essence
   else
     return m.mime_essence
+  end
+end
+
+-------- Format last modified column
+xplr.fn.builtin.fmt_general_table_row_cols_5 = function(m)
+  if m.is_symlink and not m.is_broken then
+    return m.symlink.human_modified
+  else
+    return m.human_modified
   end
 end
 
