@@ -240,10 +240,11 @@ xplr.config.general.table.col_spacing = 1
 -- Type: nullable list of [Constraint](https://xplr.dev/en/layouts#constraint)
 xplr.config.general.table.col_widths = {
   { Percentage = 10 },
-  { Percentage = 50 },
+  { Percentage = 30 },
   { Percentage = 10 },
   { Percentage = 10 },
-  { Percentage = 20 },
+  { Percentage = 15 },
+  { Percentage = 15 },
 }
 
 -- The content that is placed before the item name for each row by default.
