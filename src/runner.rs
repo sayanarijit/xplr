@@ -115,6 +115,22 @@ pub struct Runner {
     selection: Vec<PathBuf>,
 }
 
+// In unix system, the std::env::current_dir() calls libc getcwd() that
+// returns physical path. As a workaround, this function tries to use `PWD`
+// environment variable that is configured by shell.
+fn get_current_dir() -> Result<PathBuf, std::io::Error> {
+    let cur = std::env::current_dir();
+    if let Ok(pwd) = std::env::var("PWD") {
+        if pwd.is_empty() {
+            cur
+        } else {
+            Ok(PathBuf::from(pwd))
+        }
+    } else {
+        cur
+    }
+}
+
 impl Runner {
     /// Create a new runner object passing the default arguments
     pub fn new() -> Result<Self> {
@@ -123,7 +139,7 @@ impl Runner {
 
     /// Create a new runner object passing the given arguments
     pub fn from_cli(cli: Cli) -> Result<Self> {
-        let basedir = std::env::current_dir()?;
+        let basedir = get_current_dir()?;
         let basedir_clone = basedir.clone();
         let mut paths = cli.paths.into_iter().map(|p| {
             if p.is_relative() {
