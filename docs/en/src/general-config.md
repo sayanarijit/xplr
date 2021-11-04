@@ -29,19 +29,6 @@ Type: boolean
 Set it to `true` if you want to enable a safety feature that will save you from
 yourself when you type recklessly.
 
-## cursor.format
-
-Type: nullable string
-
-This is the shape of the cursor visible when the input buffer contains some
-string.
-
-## cursor.style
-
-Type: [Style][1]
-
-Style of the cursor.
-
 ## initial_layout
 
 Type: string

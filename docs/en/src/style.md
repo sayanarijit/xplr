@@ -72,10 +72,10 @@ Modifier can be one of the following:
 ## Example
 
 ```lua
-xplr.config.general.cursor.style.fg = "Red"
-xplr.config.general.cursor.style.bg = { Rgb = { 100, 150, 200 } }
-xplr.config.general.cursor.style.add_modifiers = { "Bold", "Italic" }
-xplr.config.general.cursor.style.sub_modifiers = { "Hidden" }
+xplr.config.general.prompt.style.fg = "Red"
+xplr.config.general.prompt.style.bg = { Rgb = { 100, 150, 200 } }
+xplr.config.general.prompt.style.add_modifiers = { "Bold", "Italic" }
+xplr.config.general.prompt.style.sub_modifiers = { "Hidden" }
 ```
 
 [1]: #fg

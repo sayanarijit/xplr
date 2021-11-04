@@ -16,6 +16,7 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
+use tui_input::{Input, InputRequest};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
@@ -776,6 +777,9 @@ pub enum ExternalMsg {
     /// Follow the symlink under focus to its actual location.
     FollowSymlink,
 
+    /// Update the input buffer from given key
+    UpdateInputBufferFromKey,
+
     /// Append/buffer the given string into the input buffer.
     ///
     /// **Example:** `BufferInput: foo`
@@ -1247,7 +1251,7 @@ pub struct App {
     pub msg_out: VecDeque<MsgOut>,
     pub mode: Mode,
     pub layout: Layout,
-    pub input_buffer: Option<String>,
+    pub input: Option<Input>,
     pub pid: u32,
     pub session_path: String,
     pub pipe: Pipe,
@@ -1372,7 +1376,7 @@ impl App {
             msg_out: Default::default(),
             mode,
             layout,
-            input_buffer: Default::default(),
+            input: Default::default(),
             pid,
             session_path: session_path.clone(),
             pipe: Pipe::from_session_path(&session_path)?,
@@ -1477,6 +1481,9 @@ impl App {
                 ExternalMsg::LastVisitedPath => self.last_visited_path(),
                 ExternalMsg::NextVisitedPath => self.next_visited_path(),
                 ExternalMsg::FollowSymlink => self.follow_symlink(),
+                ExternalMsg::UpdateInputBufferFromKey => {
+                    self.update_input_buffer_from_key(key)
+                }
                 ExternalMsg::BufferInput(input) => self.buffer_input(&input),
                 ExternalMsg::BufferInputFromKey => {
                     self.buffer_input_from_key(key)
@@ -1731,9 +1738,9 @@ impl App {
 
     fn focus_previous_by_relative_index_from_input(self) -> Result<Self> {
         if let Some(index) = self
-            .input_buffer
+            .input
             .as_ref()
-            .and_then(|i| i.parse::<usize>().ok())
+            .and_then(|i| i.value().parse::<usize>().ok())
         {
             self.focus_previous_by_relative_index(index)
         } else {
@@ -1769,9 +1776,9 @@ impl App {
 
     fn focus_next_by_relative_index_from_input(self) -> Result<Self> {
         if let Some(index) = self
-            .input_buffer
+            .input
             .as_ref()
-            .and_then(|i| i.parse::<usize>().ok())
+            .and_then(|i| i.value().parse::<usize>().ok())
         {
             self.focus_next_by_relative_index(index)
         } else {
@@ -1865,11 +1872,26 @@ impl App {
         }
     }
 
+    fn update_input_buffer_from_key(
+        mut self,
+        key: Option<Key>,
+    ) -> Result<Self> {
+        if let Some(req) = key.and_then(|k| k.to_input_request()) {
+            if let Some(buf) = self.input.as_mut() {
+                buf.handle(req);
+            }
+        }
+        Ok(self)
+    }
+
     fn buffer_input(mut self, input: &str) -> Result<Self> {
-        if let Some(buf) = self.input_buffer.as_mut() {
-            buf.push_str(input)
+        if let Some(buf) = self.input.as_mut() {
+            buf.handle(InputRequest::GoToEnd);
+            for c in input.chars() {
+                buf.handle(InputRequest::InsertChar(c));
+            }
         } else {
-            self.input_buffer = Some(input.to_owned());
+            self.input = Some(Input::default().with_value(input.into()));
         };
         self.logs_hidden = true;
         Ok(self)
@@ -1884,41 +1906,31 @@ impl App {
     }
 
     fn set_input_buffer(mut self, string: String) -> Result<Self> {
-        self.input_buffer = Some(string);
+        self.input = Some(Input::default().with_value(string));
         self.logs_hidden = true;
         Ok(self)
     }
 
     fn remove_input_buffer_last_character(mut self) -> Result<Self> {
-        if let Some(mut buf) = self.input_buffer {
-            buf.pop();
-            self.input_buffer = Some(buf);
+        if let Some(buf) = self.input.as_mut() {
+            buf.handle(InputRequest::GoToEnd);
+            buf.handle(InputRequest::DeletePrevChar);
             self.logs_hidden = true;
         };
         Ok(self)
     }
 
     fn remove_input_buffer_last_word(mut self) -> Result<Self> {
-        if let Some(buf) = self.input_buffer {
-            let buf = buf
-                .chars()
-                .into_iter()
-                .rev()
-                .skip_while(|c| !c.is_ascii_alphanumeric())
-                .skip_while(|c| c.is_ascii_alphanumeric())
-                .collect::<Vec<char>>()
-                .into_iter()
-                .rev()
-                .collect::<String>();
-
-            self.input_buffer = Some(buf);
+        if let Some(buf) = self.input.as_mut() {
+            buf.handle(InputRequest::GoToEnd);
+            buf.handle(InputRequest::DeletePrevWord);
             self.logs_hidden = true;
         };
         Ok(self)
     }
 
     fn reset_input_buffer(mut self) -> Result<Self> {
-        self.input_buffer = None;
+        self.input = None;
         Ok(self)
     }
 
@@ -1935,9 +1947,9 @@ impl App {
 
     fn focus_by_index_from_input(self) -> Result<Self> {
         if let Some(index) = self
-            .input_buffer
+            .input
             .as_ref()
-            .and_then(|i| i.parse::<usize>().ok())
+            .and_then(|i| i.value().parse::<usize>().ok())
         {
             self.focus_by_index(index)
         } else {
@@ -2004,8 +2016,8 @@ impl App {
     }
 
     fn focus_path_from_input(self) -> Result<Self> {
-        if let Some(p) = self.input_buffer.clone() {
-            self.focus_path(&p, true)
+        if let Some(p) = self.input.clone() {
+            self.focus_path(p.value(), true)
         } else {
             Ok(self)
         }
@@ -2026,7 +2038,7 @@ impl App {
 
     fn pop_mode(self) -> Result<Self> {
         self.pop_mode_keeping_input_buffer().map(|mut a| {
-            a.input_buffer = None;
+            a.input = None;
             a
         })
     }
@@ -2040,7 +2052,7 @@ impl App {
 
     fn switch_mode(self, mode: &str) -> Result<Self> {
         self.switch_mode_keeping_input_buffer(mode).map(|mut a| {
-            a.input_buffer = None;
+            a.input = None;
             a
         })
     }
@@ -2058,7 +2070,7 @@ impl App {
     fn switch_mode_builtin(self, mode: &str) -> Result<Self> {
         self.switch_mode_builtin_keeping_input_buffer(mode)
             .map(|mut a| {
-                a.input_buffer = None;
+                a.input = None;
                 a
             })
     }
@@ -2079,7 +2091,7 @@ impl App {
     fn switch_mode_custom(self, mode: &str) -> Result<Self> {
         self.switch_mode_custom_keeping_input_buffer(mode)
             .map(|mut a| {
-                a.input_buffer = None;
+                a.input = None;
                 a
             })
     }
@@ -2290,10 +2302,13 @@ impl App {
         mut self,
         filter: NodeFilter,
     ) -> Result<Self> {
-        if let Some(input) = self.input_buffer.clone() {
+        if let Some(input) = self.input.as_ref() {
             self.explorer_config
                 .filters
-                .insert(NodeFilterApplicable::new(filter, input));
+                .insert(NodeFilterApplicable::new(
+                    filter,
+                    input.value().into(),
+                ));
         };
         Ok(self)
     }
@@ -2310,8 +2325,8 @@ impl App {
         mut self,
         filter: NodeFilter,
     ) -> Result<Self> {
-        if let Some(input) = self.input_buffer.clone() {
-            let nfa = NodeFilterApplicable::new(filter, input);
+        if let Some(input) = self.input.as_ref() {
+            let nfa = NodeFilterApplicable::new(filter, input.value().into());
             self.explorer_config.filters.retain(|f| f != &nfa);
         };
         Ok(self)
@@ -2668,7 +2683,7 @@ impl App {
             selection: self.selection.clone(),
             mode: self.mode.clone(),
             layout: self.layout.clone(),
-            input_buffer: self.input_buffer.clone(),
+            input_buffer: self.input.as_ref().map(|i| i.value().into()),
             pid: self.pid,
             session_path: self.session_path.clone(),
             explorer_config: self.explorer_config.clone(),

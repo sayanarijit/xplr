@@ -1,6 +1,7 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use tui_input::InputRequest;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -111,6 +112,23 @@ pub enum Key {
     CtrlY,
     CtrlZ,
 
+    CtrlBackspace,
+    CtrlLeft,
+    CtrlRight,
+    CtrlUp,
+    CtrlDown,
+    CtrlHome,
+    CtrlEnd,
+    CtrlPageUp,
+    CtrlPageDown,
+    CtrlBackTab,
+    CtrlDelete,
+    CtrlInsert,
+    CtrlEnter,
+    CtrlSpace,
+    CtrlTab,
+    CtrlEsc,
+
     AltA,
     AltB,
     AltC,
@@ -190,6 +208,35 @@ impl std::fmt::Display for Key {
 }
 
 impl Key {
+    pub fn to_input_request(self) -> Option<InputRequest> {
+        use InputRequest::*;
+        use Key::*;
+
+        if self.is_alphabet() || self.is_number() || self.is_special_character()
+        {
+            self.to_char().map(InsertChar)
+        } else {
+            match self {
+                Backspace => Some(DeletePrevChar),
+                Delete => Some(DeleteNextChar),
+                Tab => Some(InsertChar('\t')),
+                Space => Some(InsertChar(' ')),
+                Left => Some(GoToPrevChar),
+                CtrlLeft => Some(GoToPrevWord),
+                Right => Some(GoToNextChar),
+                CtrlRight => Some(GoToNextWord),
+                CtrlU => Some(DeleteLine),
+                CtrlW => Some(DeletePrevWord),
+                CtrlDelete => Some(DeleteNextWord),
+                CtrlA => Some(GoToStart),
+                CtrlE => Some(GoToEnd),
+                Enter => Some(Submit),
+                Esc => Some(Escape),
+                _ => None,
+            }
+        }
+    }
+
     pub fn from_event(key: KeyEvent) -> Self {
         match key.modifiers {
             KeyModifiers::CONTROL => match key.code {
@@ -219,6 +266,23 @@ impl Key {
                 KeyCode::Char('x') => Key::CtrlX,
                 KeyCode::Char('y') => Key::CtrlY,
                 KeyCode::Char('z') => Key::CtrlZ,
+                KeyCode::Char(' ') => Key::CtrlSpace,
+
+                KeyCode::Backspace => Key::CtrlBackspace,
+                KeyCode::Left => Key::CtrlLeft,
+                KeyCode::Right => Key::CtrlRight,
+                KeyCode::Up => Key::CtrlUp,
+                KeyCode::Down => Key::CtrlDown,
+                KeyCode::Home => Key::CtrlHome,
+                KeyCode::End => Key::CtrlEnd,
+                KeyCode::PageUp => Key::CtrlPageUp,
+                KeyCode::PageDown => Key::CtrlPageDown,
+                KeyCode::BackTab => Key::CtrlBackTab,
+                KeyCode::Delete => Key::CtrlDelete,
+                KeyCode::Insert => Key::CtrlInsert,
+                KeyCode::Enter => Key::CtrlEnter,
+                KeyCode::Tab => Key::CtrlTab,
+                KeyCode::Esc => Key::CtrlEsc,
 
                 KeyCode::Char(c) => c.into(),
 

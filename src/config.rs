@@ -228,9 +228,6 @@ pub struct GeneralConfig {
     pub enable_recover_mode: bool,
 
     #[serde(default)]
-    pub cursor: UiElement,
-
-    #[serde(default)]
     pub prompt: UiElement,
 
     #[serde(default)]
