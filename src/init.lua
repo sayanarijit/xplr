@@ -26,13 +26,6 @@ xplr.config.general.prompt.style.sub_modifiers = nil
 xplr.config.general.prompt.style.bg = nil
 xplr.config.general.prompt.style.fg = nil
 
------- Cursor
-xplr.config.general.cursor.format = "█"
-xplr.config.general.cursor.style.add_modifiers = nil
-xplr.config.general.cursor.style.bg = nil
-xplr.config.general.cursor.style.fg = nil
-xplr.config.general.cursor.style.sub_modifiers = nil
-
 ------ Initial layout
 xplr.config.general.initial_layout = "default"
 
@@ -1170,25 +1163,9 @@ xplr.config.modes.builtin.create_directory = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = { "RemoveInputBufferLastCharacter" },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            SetInputBuffer = "",
-          },
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = { "RemoveInputBufferLastWord" },
       },
       enter = {
         help = "create directory",
@@ -1219,7 +1196,7 @@ xplr.config.modes.builtin.create_directory = {
     on_special_character = nil,
     default = {
       help = nil,
-      messages = { "BufferInputFromKey" },
+      messages = { "UpdateInputBufferFromKey" },
     },
   },
 }
@@ -1231,25 +1208,9 @@ xplr.config.modes.builtin.create_file = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = { "RemoveInputBufferLastCharacter" },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            SetInputBuffer = "",
-          },
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = { "RemoveInputBufferLastWord" },
       },
       enter = {
         help = "create file",
@@ -1280,7 +1241,7 @@ xplr.config.modes.builtin.create_file = {
     on_special_character = nil,
     default = {
       help = nil,
-      messages = { "BufferInputFromKey" },
+      messages = { "UpdateInputBufferFromKey" },
     },
   },
 }
@@ -1292,25 +1253,9 @@ xplr.config.modes.builtin.number = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = { "RemoveInputBufferLastCharacter" },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            SetInputBuffer = "",
-          },
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = { "RemoveInputBufferLastWord" },
       },
       down = {
         help = "to down",
@@ -1332,7 +1277,7 @@ xplr.config.modes.builtin.number = {
     on_alphabet = nil,
     on_number = {
       help = "input",
-      messages = { "BufferInputFromKey" },
+      messages = { "UpdateInputBufferFromKey" },
     },
     on_special_character = nil,
     default = nil,
@@ -1404,25 +1349,9 @@ xplr.config.modes.builtin.rename = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = { "RemoveInputBufferLastCharacter" },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            SetInputBuffer = "",
-          },
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = { "RemoveInputBufferLastWord" },
       },
       enter = {
         help = "rename",
@@ -1450,7 +1379,7 @@ xplr.config.modes.builtin.rename = {
     on_special_character = nil,
     default = {
       help = nil,
-      messages = { "BufferInputFromKey" },
+      messages = { "UpdateInputBufferFromKey" },
     },
   },
 }
@@ -1684,50 +1613,9 @@ xplr.config.modes.builtin.search = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "RemoveInputBufferLastCharacter",
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "ExplorePwdAsync",
-        },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          {
-            SetInputBuffer = "",
-          },
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "ExplorePwdAsync",
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "RemoveInputBufferLastWord",
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "ExplorePwdAsync",
-        },
       },
       down = {
         help = "down",
@@ -1743,19 +1631,6 @@ xplr.config.modes.builtin.search = {
           "ExplorePwdAsync",
         },
       },
-      left = {
-        help = "back",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "Back",
-          {
-            SetInputBuffer = "",
-          },
-          "ExplorePwdAsync",
-        },
-      },
       right = {
         help = "enter",
         messages = {
@@ -1763,6 +1638,19 @@ xplr.config.modes.builtin.search = {
             RemoveNodeFilterFromInput = "IRelativePathDoesContain",
           },
           "Enter",
+          {
+            SetInputBuffer = "",
+          },
+          "ExplorePwdAsync",
+        },
+      },
+      left = {
+        help = "back",
+        messages = {
+          {
+            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
+          },
+          "Back",
           {
             SetInputBuffer = "",
           },
@@ -1787,7 +1675,7 @@ xplr.config.modes.builtin.search = {
         {
           RemoveNodeFilterFromInput = "IRelativePathDoesContain",
         },
-        "BufferInputFromKey",
+        "UpdateInputBufferFromKey",
         {
           AddNodeFilterFromInput = "IRelativePathDoesContain",
         },
@@ -1825,10 +1713,6 @@ xplr.config.modes.builtin.filter = {
           },
           "ExplorePwdAsync",
         },
-      },
-      backspace = {
-        help = "remove last filter",
-        messages = { "RemoveLastNodeFilter", "ExplorePwdAsync" },
       },
       ["ctrl-c"] = {
         help = "terminate",
@@ -1879,50 +1763,9 @@ xplr.config.modes.builtin.relative_path_does_contain = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "RemoveInputBufferLastCharacter",
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "ExplorePwdAsync",
-        },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          {
-            SetInputBuffer = "",
-          },
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "ExplorePwdAsync",
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "RemoveInputBufferLastWord",
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesContain",
-          },
-          "ExplorePwdAsync",
-        },
       },
       enter = {
         help = "apply filter",
@@ -1948,7 +1791,7 @@ xplr.config.modes.builtin.relative_path_does_contain = {
         {
           RemoveNodeFilterFromInput = "IRelativePathDoesContain",
         },
-        "BufferInputFromKey",
+        "UpdateInputBufferFromKey",
         {
           AddNodeFilterFromInput = "IRelativePathDoesContain",
         },
@@ -1965,50 +1808,9 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
   extra_help = nil,
   key_bindings = {
     on_key = {
-      backspace = {
-        help = "remove last character",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
-          },
-          "RemoveInputBufferLastCharacter",
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
-          },
-          "ExplorePwdAsync",
-        },
-      },
       ["ctrl-c"] = {
         help = "terminate",
         messages = { "Terminate" },
-      },
-      ["ctrl-u"] = {
-        help = "remove line",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
-          },
-          {
-            SetInputBuffer = "",
-          },
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
-          },
-          "ExplorePwdAsync",
-        },
-      },
-      ["ctrl-w"] = {
-        help = "remove last word",
-        messages = {
-          {
-            RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
-          },
-          "RemoveInputBufferLastWord",
-          {
-            AddNodeFilterFromInput = "IRelativePathDoesNotContain",
-          },
-          "ExplorePwdAsync",
-        },
       },
       enter = {
         help = "apply filter",
@@ -2034,7 +1836,7 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
         {
           RemoveNodeFilterFromInput = "IRelativePathDoesNotContain",
         },
-        "BufferInputFromKey",
+        "UpdateInputBufferFromKey",
         {
           AddNodeFilterFromInput = "IRelativePathDoesNotContain",
         },
