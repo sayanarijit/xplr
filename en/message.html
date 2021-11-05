@@ -384,6 +384,18 @@ You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
 stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>YAML Example:</strong> <code>CallSilently: { command: tput, args: [&quot;bell&quot;] }</code></p>
 <p><strong>Lua Example:</strong> <code>{ CallSilently = { command = &quot;tput&quot;, args = { &quot;bell&quot; } } }</code></p>
+<h3 id="-bashexec--string-"><a class="header" href="#-bashexec--string-">{ BashExec = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>BashExec: string</code></p>
+<p>An alias to <code>Call: {command: bash, args: [&quot;-c&quot;, &quot;{string}&quot;], silent: false}</code>
+where <code>{string}</code> is the given value.</p>
+<p><strong>YAML Example:</strong> <code>BashExec: &quot;read -p test&quot;</code></p>
+<p><strong>Lua Example:</strong> <code>{ BashExec = &quot;read -p test&quot; }</code></p>
+<h3 id="-bashexecsilently--string-"><a class="header" href="#-bashexecsilently--string-">{ BashExecSilently = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>BashExecSilently(String)</code></p>
+<p>Like <code>BashExec</code> but without the flicker. The stdin, stdout
+stderr will be piped to null. So it's non-interactive.</p>
+<p><strong>YAML Example:</strong> <code>BashExecSilently: &quot;tput bell&quot;</code></p>
+<p><strong>Lua Example:</strong> <code>{ BashExecSilently = &quot;tput bell&quot; }</code></p>
 <h3 id="-calllua--string-"><a class="header" href="#-calllua--string-">{ CallLua = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>CallLua: string</code></p>
 <p>Call a Lua function.
@@ -399,18 +411,18 @@ after the executing the function.</p>
 stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>YAML Example:</strong> <code>CallLuaSilently: custom.some_custom_function</code></p>
 <p><strong>Lua Example:</strong> <code>{ CallLuaSilently = &quot;custom.some_custom_function&quot; }</code></p>
-<h3 id="-bashexec--string-"><a class="header" href="#-bashexec--string-">{ BashExec = &quot;string&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>BashExec: string</code></p>
-<p>An alias to <code>Call: {command: bash, args: [&quot;-c&quot;, &quot;{string}&quot;], silent: false}</code>
-where <code>{string}</code> is the given value.</p>
-<p><strong>YAML Example:</strong> <code>BashExec: &quot;read -p test&quot;</code></p>
-<p><strong>Lua Example:</strong> <code>{ BashExec = &quot;read -p test&quot; }</code></p>
-<h3 id="-bashexecsilently--string-"><a class="header" href="#-bashexecsilently--string-">{ BashExecSilently = &quot;string&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>BashExecSilently(String)</code></p>
-<p>Like <code>BashExec</code> but without the flicker. The stdin, stdout
+<h3 id="-luaeval--string-"><a class="header" href="#-luaeval--string-">{ LuaEval = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>LuaEval: string</code></p>
+<p>Execute Lua code without needing to define a function.
+However, <code>CallLuaArg</code> won't be available.</p>
+<p><strong>YAML Example:</strong> <code>LuaEval: &quot;return { { LogInfo = io.read() } }&quot;</code></p>
+<p><strong>Lua Example:</strong> <code>{ LuaEval = [[return { { LogInfo = io.read() } }]] }</code></p>
+<h3 id="-luaevalsilently--string-"><a class="header" href="#-luaevalsilently--string-">{ LuaEvalSilently = &quot;string&quot; }</a></h3>
+<p><strong>YAML:</strong> <code>LuaEvalSilently: string</code></p>
+<p>Like <code>LuaEval</code> but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.</p>
-<p><strong>YAML Example:</strong> <code>BashExecSilently: &quot;tput bell&quot;</code></p>
-<p><strong>Lua Example:</strong> <code>{ BashExecSilently = &quot;tput bell&quot; }</code></p>
+<p><strong>YAML Example:</strong> <code>LuaEvalSilently: &quot;return { { LogInfo = 'foo' } }&quot;</code></p>
+<p><strong>Lua Example:</strong> <code>{ LuaEvalSilently = [[return { { LogInfo = &quot;foo&quot; } }]] }</code></p>
 <h3 id="select"><a class="header" href="#select">&quot;Select&quot;</a></h3>
 <p><strong>YAML:</strong> <code>Select</code></p>
 <p>Select the focused node.</p>
