@@ -208,27 +208,25 @@ impl std::fmt::Display for Key {
 }
 
 impl Key {
-    pub fn to_input_request(&self) -> Option<InputRequest> {
-        use InputRequest::*;
+    pub fn to_input_operation(&self) -> Option<InputOperation> {
+        use InputOperation::*;
         use Key::*;
 
         match self {
-            Backspace => Some(DeletePrevChar),
-            Delete => Some(DeleteNextChar),
-            Tab => Some(InsertChar('\t')),
-            Space => Some(InsertChar(' ')),
-            Left => Some(GoToPrevChar),
-            CtrlLeft => Some(GoToPrevWord),
-            Right => Some(GoToNextChar),
+            Backspace => Some(DeletePreviousCharacter),
+            Delete => Some(DeleteNextCharacter),
+            Tab => Some(InsertCharacter('\t')),
+            Space => Some(InsertCharacter(' ')),
+            Left => Some(GoToPreviousCharacter),
+            CtrlLeft => Some(GoToPreviousWord),
+            Right => Some(GoToNextCharacter),
             CtrlRight => Some(GoToNextWord),
             CtrlU => Some(DeleteLine),
-            CtrlW => Some(DeletePrevWord),
+            CtrlW => Some(DeletePreviousWord),
             CtrlDelete => Some(DeleteNextWord),
             CtrlA => Some(GoToStart),
             CtrlE => Some(GoToEnd),
-            Enter => Some(Submit),
-            Esc => Some(Escape),
-            key => key.to_char().map(InsertChar),
+            key => key.to_char().map(InsertCharacter),
         }
     }
 
@@ -724,5 +722,42 @@ impl Ord for Key {
 impl PartialOrd for Key {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum InputOperation {
+    SetCursor(usize),
+    InsertCharacter(char),
+    GoToPreviousCharacter,
+    GoToNextCharacter,
+    GoToPreviousWord,
+    GoToNextWord,
+    GoToStart,
+    GoToEnd,
+    DeletePreviousCharacter,
+    DeleteNextCharacter,
+    DeletePreviousWord,
+    DeleteNextWord,
+    DeleteLine,
+}
+
+impl Into<InputRequest> for InputOperation {
+    fn into(self) -> InputRequest {
+        match self {
+            Self::SetCursor(i) => InputRequest::SetCursor(i),
+            Self::InsertCharacter(c) => InputRequest::InsertChar(c),
+            Self::GoToPreviousCharacter => InputRequest::GoToPrevChar,
+            Self::GoToNextCharacter => InputRequest::GoToNextChar,
+            Self::GoToPreviousWord => InputRequest::GoToPrevWord,
+            Self::GoToNextWord => InputRequest::GoToNextWord,
+            Self::GoToStart => InputRequest::GoToStart,
+            Self::GoToEnd => InputRequest::GoToEnd,
+            Self::DeletePreviousCharacter => InputRequest::DeletePrevChar,
+            Self::DeleteNextCharacter => InputRequest::DeleteNextChar,
+            Self::DeletePreviousWord => InputRequest::DeletePrevWord,
+            Self::DeleteNextWord => InputRequest::DeleteNextWord,
+            Self::DeleteLine => InputRequest::DeleteLine,
+        }
     }
 }
