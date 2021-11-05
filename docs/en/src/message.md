@@ -418,6 +418,28 @@ stderr will be piped to null. So it's non-interactive.
 
 **Lua Example:** `{ CallSilently = { command = "tput", args = { "bell" } } }`
 
+### { BashExec = "string" }
+
+**YAML:** `BashExec: string`
+
+An alias to `Call: {command: bash, args: ["-c", "{string}"], silent: false}`
+where `{string}` is the given value.
+
+**YAML Example:** `BashExec: "read -p test"`
+
+**Lua Example:** `{ BashExec = "read -p test" }`
+
+### { BashExecSilently = "string" }
+
+**YAML:** `BashExecSilently(String)`
+
+Like `BashExec` but without the flicker. The stdin, stdout
+stderr will be piped to null. So it's non-interactive.
+
+**YAML Example:** `BashExecSilently: "tput bell"`
+
+**Lua Example:** `{ BashExecSilently = "tput bell" }`
+
 ### { CallLua = "string" }
 
 **YAML:** `CallLua: string`
@@ -443,27 +465,27 @@ stderr will be piped to null. So it's non-interactive.
 
 **Lua Example:** `{ CallLuaSilently = "custom.some_custom_function" }`
 
-### { BashExec = "string" }
+### { LuaEval = "string" }
 
-**YAML:** `BashExec: string`
+**YAML:** `LuaEval: string`
 
-An alias to `Call: {command: bash, args: ["-c", "{string}"], silent: false}`
-where `{string}` is the given value.
+Execute Lua code without needing to define a function.
+However, `CallLuaArg` won't be available.
 
-**YAML Example:** `BashExec: "read -p test"`
+**YAML Example:** `LuaEval: "return { { LogInfo = io.read() } }"`
 
-**Lua Example:** `{ BashExec = "read -p test" }`
+**Lua Example:** `{ LuaEval = [[return { { LogInfo = io.read() } }]] }`
 
-### { BashExecSilently = "string" }
+### { LuaEvalSilently = "string" }
 
-**YAML:** `BashExecSilently(String)`
+**YAML:** `LuaEvalSilently: string`
 
-Like `BashExec` but without the flicker. The stdin, stdout
+Like `LuaEval` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
-**YAML Example:** `BashExecSilently: "tput bell"`
+**YAML Example:** `LuaEvalSilently: "return { { LogInfo = 'foo' } }"`
 
-**Lua Example:** `{ BashExecSilently = "tput bell" }`
+**Lua Example:** `{ LuaEvalSilently = [[return { { LogInfo = "foo" } }]] }`
 
 ### "Select"
 

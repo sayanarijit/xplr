@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 
 use crate::app;
+use crate::app::ExternalMsg;
 use crate::cli::Cli;
 use crate::event_reader::EventReader;
 use crate::explorer;
@@ -273,6 +274,8 @@ impl Runner {
                         match msg {
                             // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
                             // Try handling them immediately.
+                            //
+                            // TODO: Remove boilerplate code.
                             Enque(task) => {
                                 tx_msg_in.send(task)?;
                             }
@@ -561,6 +564,89 @@ impl Runner {
                                         }
                                     }
                                 }
+                            }
+
+                            LuaEval(code) => {
+                                execute!(
+                                    terminal.backend_mut(),
+                                    event::DisableMouseCapture
+                                )
+                                .unwrap_or_default();
+
+                                event_reader.stop();
+
+                                terminal.clear()?;
+                                terminal.set_cursor(0, 0)?;
+                                term::disable_raw_mode()?;
+                                terminal.show_cursor()?;
+
+                                let res: Result<Option<Vec<ExternalMsg>>> = lua
+                                    .load(&code)
+                                    .eval()
+                                    .and_then(|v| lua.from_value(v))
+                                    .map_err(Error::from);
+
+                                match res {
+                                    Ok(Some(msgs)) => {
+                                        for msg in msgs {
+                                            app = app.handle_task(
+                                                app::Task::new(
+                                                    app::MsgIn::External(msg),
+                                                    None,
+                                                ),
+                                            )?;
+                                        }
+                                    }
+                                    Ok(None) => {}
+                                    Err(err) => {
+                                        app = app.log_error(err.to_string())?;
+                                    }
+                                };
+
+                                terminal.clear()?;
+                                term::enable_raw_mode()?;
+                                terminal.hide_cursor()?;
+                                event_reader.start();
+
+                                if mouse_enabled {
+                                    match execute!(
+                                        terminal.backend_mut(),
+                                        event::EnableMouseCapture
+                                    ) {
+                                        Ok(_) => {
+                                            mouse_enabled = true;
+                                        }
+                                        Err(e) => {
+                                            app =
+                                                app.log_error(e.to_string())?;
+                                        }
+                                    }
+                                }
+                            }
+
+                            LuaEvalSilently(code) => {
+                                let res: Result<Option<Vec<ExternalMsg>>> = lua
+                                    .load(&code)
+                                    .eval()
+                                    .and_then(|v| lua.from_value(v))
+                                    .map_err(Error::from);
+
+                                match res {
+                                    Ok(Some(msgs)) => {
+                                        for msg in msgs {
+                                            app = app.handle_task(
+                                                app::Task::new(
+                                                    app::MsgIn::External(msg),
+                                                    None,
+                                                ),
+                                            )?;
+                                        }
+                                    }
+                                    Ok(None) => {}
+                                    Err(err) => {
+                                        app = app.log_error(err.to_string())?;
+                                    }
+                                };
                             }
 
                             Call(cmd) => {

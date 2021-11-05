@@ -894,6 +894,18 @@ pub enum ExternalMsg {
     /// **Example:** `CallSilently: {command: tput, args: ["bell"]}`
     CallSilently(Command),
 
+    /// An alias to `Call: {command: bash, args: ["-c", "${command}"], silent: false}`
+    /// where ${command} is the given value.
+    ///
+    /// **Example:** `BashExec: "read -p test"`
+    BashExec(String),
+
+    /// Like `BashExec` but without the flicker. The stdin, stdout
+    /// stderr will be piped to null. So it's non-interactive.
+    ///
+    /// **Example:** `BashExecSilently: "tput bell"`
+    BashExecSilently(String),
+
     /// Call a Lua function.
     /// A `CallLuaArg` object will be passed to the function as argument.
     /// The function can optionally return a list of messages for xplr to handle
@@ -908,17 +920,17 @@ pub enum ExternalMsg {
     /// **Example:** `CallLuaSilently: custom.some_custom_function`
     CallLuaSilently(String),
 
-    /// An alias to `Call: {command: bash, args: ["-c", "${command}"], silent: false}`
-    /// where ${command} is the given value.
+    /// Execute Lua code without needing to define a function.
+    /// However, `CallLuaArg` won't be available.
     ///
-    /// **Example:** `BashExec: "read -p test"`
-    BashExec(String),
+    /// **Example:** `LuaEval: "return io.read()"`
+    LuaEval(String),
 
-    /// Like `BashExec` but without the flicker. The stdin, stdout
+    /// Like `LuaEval` but without the flicker. The stdin, stdout
     /// stderr will be piped to null. So it's non-interactive.
     ///
-    /// **Example:** `BashExecSilently: "tput bell"`
-    BashExecSilently(String),
+    /// **Example:** `LuaEvalSilently: "return { LogInfo = 'foo' }"`
+    LuaEvalSilently(String),
 
     /// Select the focused node.
     Select,
@@ -1096,6 +1108,10 @@ impl ExternalMsg {
                 | Self::CallSilently(_)
                 | Self::BashExec(_)
                 | Self::BashExecSilently(_)
+                | Self::CallLua(_)
+                | Self::CallLuaSilently(_)
+                | Self::LuaEval(_)
+                | Self::LuaEvalSilently(_)
         )
     }
 }
@@ -1127,6 +1143,8 @@ pub enum MsgOut {
     CallSilently(Command),
     CallLua(String),
     CallLuaSilently(String),
+    LuaEval(String),
+    LuaEvalSilently(String),
     Enque(Task),
     EnableMouse,
     DisableMouse,
@@ -1440,9 +1458,7 @@ impl App {
         key: Option<Key>,
     ) -> Result<Self> {
         if self.config.general.read_only && !msg.is_read_only() {
-            self.log_error(
-                "Cannot call shell command in read-only mode.".into(),
-            )
+            self.log_error("Cannot execute code in read-only mode.".into())
         } else {
             match msg {
                 ExternalMsg::ExplorePwd => self.explore_pwd(),
@@ -1535,13 +1551,17 @@ impl App {
                 }
                 ExternalMsg::Call(cmd) => self.call(cmd),
                 ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
+                ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
+                ExternalMsg::BashExecSilently(cmd) => {
+                    self.bash_exec_silently(cmd)
+                }
                 ExternalMsg::CallLua(func) => self.call_lua(func),
                 ExternalMsg::CallLuaSilently(func) => {
                     self.call_lua_silently(func)
                 }
-                ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
-                ExternalMsg::BashExecSilently(cmd) => {
-                    self.bash_exec_silently(cmd)
+                ExternalMsg::LuaEval(code) => self.lua_eval(code),
+                ExternalMsg::LuaEvalSilently(code) => {
+                    self.lua_eval_silently(code)
                 }
                 ExternalMsg::Select => self.select(),
                 ExternalMsg::SelectAll => self.select_all(),
@@ -2173,18 +2193,6 @@ impl App {
         Ok(self)
     }
 
-    fn call_lua(mut self, func: String) -> Result<Self> {
-        self.logs_hidden = true;
-        self.msg_out.push_back(MsgOut::CallLua(func));
-        Ok(self)
-    }
-
-    fn call_lua_silently(mut self, func: String) -> Result<Self> {
-        self.logs_hidden = true;
-        self.msg_out.push_back(MsgOut::CallLuaSilently(func));
-        Ok(self)
-    }
-
     fn bash_exec(self, script: String) -> Result<Self> {
         self.call(Command {
             command: "bash".into(),
@@ -2197,6 +2205,30 @@ impl App {
             command: "bash".into(),
             args: vec!["-c".into(), script],
         })
+    }
+
+    fn call_lua(mut self, func: String) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::CallLua(func));
+        Ok(self)
+    }
+
+    fn call_lua_silently(mut self, func: String) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::CallLuaSilently(func));
+        Ok(self)
+    }
+
+    fn lua_eval(mut self, code: String) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::LuaEval(code));
+        Ok(self)
+    }
+
+    fn lua_eval_silently(mut self, code: String) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::LuaEvalSilently(code));
+        Ok(self)
     }
 
     pub fn set_directory(mut self, dir: DirectoryBuffer) -> Result<Self> {
