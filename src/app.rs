@@ -1919,12 +1919,14 @@ impl App {
     fn update_input_buffer(mut self, op: InputOperation) -> Result<Self> {
         if let Some(buf) = self.input.as_mut() {
             buf.handle(op.into());
+            self.logs_hidden = true;
         } else {
             let mut buf = Input::default();
-            buf.handle(op.into());
-            self.input = Some(buf);
+            if buf.handle(op.into()).is_some() {
+                self.input = Some(buf);
+                self.logs_hidden = true;
+            }
         }
-        self.logs_hidden = true;
         Ok(self)
     }
 
