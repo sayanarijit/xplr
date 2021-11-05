@@ -292,7 +292,16 @@ pub struct KeyBindings {
     pub on_navigation: Option<Action>,
 
     #[serde(default)]
+    pub on_function: Option<Action>,
+
+    #[serde(default)]
     pub default: Option<Action>,
+    // Checklist for adding field:
+    // - [ ] Update App::handle_key
+    // - [ ] Update KeyBindings::sanitized
+    // - [ ] Update Mode::help_menu
+    // - [ ] Update configure-key-bindings.md
+    // - [ ] Update debug-key-bindings.md
 }
 
 impl KeyBindings {
@@ -308,12 +317,19 @@ impl KeyBindings {
                 self.on_alphabet.and_then(|a| a.sanitized(read_only));
             self.on_number =
                 self.on_number.and_then(|a| a.sanitized(read_only));
+            self.on_alphanumeric =
+                self.on_alphanumeric.and_then(|a| a.sanitized(read_only));
             self.on_special_character = self
                 .on_special_character
                 .and_then(|a| a.sanitized(read_only));
+            self.on_character =
+                self.on_character.and_then(|a| a.sanitized(read_only));
+            self.on_navigation =
+                self.on_navigation.and_then(|a| a.sanitized(read_only));
+            self.on_function =
+                self.on_function.and_then(|a| a.sanitized(read_only));
             self.default = self.default.and_then(|a| a.sanitized(read_only));
         };
-
         self
     }
 }
@@ -406,9 +422,53 @@ impl Mode {
                     )
                     .chain(
                         self.key_bindings
+                            .on_alphanumeric
+                            .iter()
+                            .map(|a| ("[0-Z]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
                             .on_special_character
                             .iter()
-                            .map(|a| ("[spcl chars]", a.help.clone()))
+                            .map(|a| ("[^0-Z]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
+                            .on_character
+                            .iter()
+                            .map(|a| ("[*]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
+                            .on_navigation
+                            .iter()
+                            .map(|a| ("[nav]", a.help.clone()))
+                            .filter_map(|(k, mh)| {
+                                mh.map(|h| {
+                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
+                                })
+                            }),
+                    )
+                    .chain(
+                        self.key_bindings
+                            .on_function
+                            .iter()
+                            .map(|a| ("[f1-f12]", a.help.clone()))
                             .filter_map(|(k, mh)| {
                                 mh.map(|h| {
                                     HelpMenuLine::KeyMap(k.into(), vec![], h)

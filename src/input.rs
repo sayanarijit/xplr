@@ -449,9 +449,27 @@ impl Key {
         self.is_alphanumeric() || self.is_special_character()
     }
 
+    pub fn is_function(&self) -> bool {
+        matches!(
+            self,
+            Self::F1
+                | Self::F2
+                | Self::F3
+                | Self::F4
+                | Self::F5
+                | Self::F6
+                | Self::F7
+                | Self::F8
+                | Self::F9
+                | Self::F10
+                | Self::F11
+                | Self::F12
+        )
+    }
+
     pub fn is_navigation(&self) -> bool {
         matches!(
-            &self,
+            self,
             Self::Backspace
                 | Self::Left
                 | Self::Right
@@ -464,9 +482,6 @@ impl Key {
                 | Self::BackTab
                 | Self::Delete
                 | Self::Insert
-                | Self::Enter
-                | Self::Space
-                | Self::Tab
                 | Self::Esc
                 | Self::CtrlA
                 | Self::CtrlB
