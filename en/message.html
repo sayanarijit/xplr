@@ -264,8 +264,16 @@ the input buffer.</p>
 <h3 id="followsymlink"><a class="header" href="#followsymlink">&quot;FollowSymlink&quot;</a></h3>
 <p><strong>YAML:</strong> <code>FollowSymlink</code></p>
 <p>Follow the symlink under focus to its actual location.</p>
+<h3 id="-updateinputbuffer--a-hrefinputoperationinput-opertaiona-"><a class="header" href="#-updateinputbuffer--a-hrefinputoperationinput-opertaiona-">{ UpdateInputBuffer = <a href="#inputoperation">Input Opertaion</a> }</a></h3>
+<p><strong>YAML:</strong> <code>BufferInput: Input Operation</code></p>
+<p>Update the input buffer using cursor based operations.</p>
+<p><strong>YAML Example:</strong> <code>UpdateInputBuffer: GoToPreviousWord</code></p>
+<p><strong>Lua Example:</strong> <code>{ UpdateInputBuffer = &quot;GoToPreviousWord&quot; }</code></p>
+<h3 id="updateinputbufferfromkey"><a class="header" href="#updateinputbufferfromkey">&quot;UpdateInputBufferFromKey&quot;</a></h3>
+<p><strong>YAML:</strong> <code>UpdateInputBufferFromKey</code></p>
+<p>Update the input buffer from the key read from keyboard input.</p>
 <h3 id="-bufferinput--string-"><a class="header" href="#-bufferinput--string-">{ BufferInput = &quot;string&quot; }</a></h3>
-<p><strong>YAML:</strong> <code>BufferInput(String)</code></p>
+<p><strong>YAML:</strong> <code>BufferInput: string</code></p>
 <p>Append/buffer the given string into the input buffer.</p>
 <p><strong>YAML Example:</strong> <code>BufferInput: foo</code></p>
 <p><strong>Lua Example:</strong> <code>{ BufferInput = &quot;foo&quot; }</code></p>
@@ -574,6 +582,23 @@ the default configuration file.</p>
 <h3 id="terminate"><a class="header" href="#terminate">&quot;Terminate&quot;</a></h3>
 <p><strong>YAML:</strong> <code>Terminate</code></p>
 <p>Terminate the application with a non-zero return code.</p>
+<h2 id="inputoperation"><a class="header" href="#inputoperation">InputOperation</a></h2>
+<p>Cursor based input operation can be one of the following:</p>
+<ul>
+<li>{ SetCursor = int }</li>
+<li>{ InsertCharacter = str }</li>
+<li>&quot;GoToPreviousCharacter&quot;</li>
+<li>&quot;GoToNextCharacter&quot;</li>
+<li>&quot;GoToPreviousWord&quot;</li>
+<li>&quot;GoToNextWord&quot;</li>
+<li>&quot;GoToStart&quot;</li>
+<li>&quot;GoToEnd&quot;</li>
+<li>&quot;DeletePreviousCharacter&quot;</li>
+<li>&quot;DeleteNextCharacter&quot;</li>
+<li>&quot;DeletePreviousWord&quot;</li>
+<li>&quot;DeleteNextWord&quot;</li>
+<li>&quot;DeleteLine&quot;</li>
+</ul>
 <h2 id="lua-function-calls"><a class="header" href="#lua-function-calls">Lua Function Calls</a></h2>
 <p>xplr allows users to define lua functions using the <code>xplr.fn.custom</code> Lua API.</p>
 <p>These functions can be called using messages like <code>CallLua</code>, <code>CallLuaSilently</code>.</p>
