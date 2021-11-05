@@ -2,7 +2,7 @@
 
 If you need help debugging or understanding key bindings DYI way, you can
 create a `test.lua` file with the following script, launch xplr with
-`xplr --extra-config text.lua`, press `#` and play around.
+`xplr --extra-config test.lua`, press `#` and play around.
 
 ```lua
 xplr.config.modes.builtin.default.key_bindings.on_key["#"] = {
