@@ -1605,24 +1605,38 @@ impl App {
     fn handle_key(mut self, key: Key) -> Result<Self> {
         let kb = self.mode.key_bindings.clone();
         let key_str = key.to_string();
-        let default = kb.default.clone();
         let msgs = kb
             .on_key
             .get(&key_str)
-            .to_owned()
-            .map(|a| Some(a.messages.clone()))
-            .unwrap_or_else(|| {
+            .map(|a| a.messages.clone())
+            .or_else(|| {
                 if key.is_alphabet() {
-                    kb.on_alphabet.clone().map(|a| a.messages)
+                    kb.on_alphabet.as_ref().map(|a| a.messages.clone())
                 } else if key.is_number() {
-                    kb.on_number.clone().map(|a| a.messages)
-                } else if key.is_special_character() {
-                    kb.on_special_character.clone().map(|a| a.messages)
+                    kb.on_number.as_ref().map(|a| a.messages.clone())
                 } else {
                     None
                 }
             })
-            .or_else(|| default.map(|a| a.messages))
+            .or_else(|| {
+                if key.is_alphanumeric() {
+                    kb.on_alphanumeric.as_ref().map(|a| a.messages.clone())
+                } else if key.is_special_character() {
+                    kb.on_special_character.as_ref().map(|a| a.messages.clone())
+                } else {
+                    None
+                }
+            })
+            .or_else(|| {
+                if key.is_character() {
+                    kb.on_character.as_ref().map(|a| a.messages.clone())
+                } else if key.is_navigation() {
+                    kb.on_navigation.as_ref().map(|a| a.messages.clone())
+                } else {
+                    None
+                }
+            })
+            .or_else(|| kb.default.as_ref().map(|a| a.messages.clone()))
             .unwrap_or_else(|| {
                 if self.config.general.enable_recover_mode {
                     vec![ExternalMsg::SwitchModeBuiltin("recover".into())]

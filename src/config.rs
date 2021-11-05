@@ -280,7 +280,16 @@ pub struct KeyBindings {
     pub on_number: Option<Action>,
 
     #[serde(default)]
+    pub on_alphanumeric: Option<Action>,
+
+    #[serde(default)]
     pub on_special_character: Option<Action>,
+
+    #[serde(default)]
+    pub on_character: Option<Action>,
+
+    #[serde(default)]
+    pub on_navigation: Option<Action>,
 
     #[serde(default)]
     pub default: Option<Action>,

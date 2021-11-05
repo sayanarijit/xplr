@@ -949,7 +949,6 @@ xplr.config.modes.builtin.default = {
         },
       },
     },
-    on_alphabet = nil,
     on_number = {
       help = "input",
       messages = {
@@ -958,8 +957,6 @@ xplr.config.modes.builtin.default = {
         "BufferInputFromKey",
       },
     },
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1102,10 +1099,6 @@ xplr.config.modes.builtin.selection_ops = {
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1149,10 +1142,6 @@ xplr.config.modes.builtin.create = {
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1191,11 +1180,7 @@ xplr.config.modes.builtin.create_directory = {
         messages = { "PopMode" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
-      help = nil,
       messages = { "UpdateInputBufferFromKey" },
     },
   },
@@ -1236,11 +1221,8 @@ xplr.config.modes.builtin.create_file = {
         messages = { "PopMode" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
     on_special_character = nil,
     default = {
-      help = nil,
       messages = { "UpdateInputBufferFromKey" },
     },
   },
@@ -1274,13 +1256,13 @@ xplr.config.modes.builtin.number = {
         messages = { "FocusPreviousByRelativeIndexFromInput", "PopMode" },
       },
     },
-    on_alphabet = nil,
+    on_navigation = {
+      messages = { "UpdateInputBufferFromKey" },
+    },
     on_number = {
       help = "input",
       messages = { "UpdateInputBufferFromKey" },
     },
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1335,10 +1317,6 @@ xplr.config.modes.builtin.go_to = {
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1374,9 +1352,6 @@ xplr.config.modes.builtin.rename = {
         messages = { "PopMode" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
       help = nil,
       messages = { "UpdateInputBufferFromKey" },
@@ -1446,10 +1421,6 @@ xplr.config.modes.builtin.delete = {
         messages = { "PopMode" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1537,7 +1508,6 @@ xplr.config.modes.builtin.action = {
         },
       },
     },
-    on_alphabet = nil,
     on_number = {
       help = "go to index",
       messages = {
@@ -1548,8 +1518,6 @@ xplr.config.modes.builtin.action = {
         "BufferInputFromKey",
       },
     },
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1666,11 +1634,7 @@ xplr.config.modes.builtin.search = {
         messages = { "FocusPrevious" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
-      help = nil,
       messages = {
         {
           RemoveNodeFilterFromInput = "IRelativePathDoesContain",
@@ -1746,10 +1710,6 @@ xplr.config.modes.builtin.filter = {
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -1782,9 +1742,6 @@ xplr.config.modes.builtin.relative_path_does_contain = {
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
       help = nil,
       messages = {
@@ -1827,9 +1784,6 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
       help = nil,
       messages = {
@@ -2000,32 +1954,18 @@ xplr.config.modes.builtin.sort = {
       ["r"] = {
         help = "by relative path",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByIRelativePath",
-              reverse = false,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByIRelativePath", reverse = false } },
           "ExplorePwdAsync",
         },
       },
       ["s"] = {
         help = "by size",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "BySize",
-              reverse = false,
-            },
-          },
+          { AddNodeSorter = { sorter = "BySize", reverse = false } },
           "ExplorePwdAsync",
         },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 
@@ -2084,10 +2024,6 @@ xplr.config.modes.builtin.switch_layout = {
         messages = { "PopMode" },
       },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
-    default = nil,
   },
 }
 

@@ -197,7 +197,7 @@ impl std::fmt::Display for Key {
                 _ => c.to_string(),
             })
             .unwrap_or_else(|| {
-                serde_yaml::to_value(self)
+                serde_yaml::to_value(&self)
                     .ok()
                     .and_then(|v| v.as_str().map(|v| v.to_string()))
                     .unwrap_or_default()
@@ -208,32 +208,27 @@ impl std::fmt::Display for Key {
 }
 
 impl Key {
-    pub fn to_input_request(self) -> Option<InputRequest> {
+    pub fn to_input_request(&self) -> Option<InputRequest> {
         use InputRequest::*;
         use Key::*;
 
-        if self.is_alphabet() || self.is_number() || self.is_special_character()
-        {
-            self.to_char().map(InsertChar)
-        } else {
-            match self {
-                Backspace => Some(DeletePrevChar),
-                Delete => Some(DeleteNextChar),
-                Tab => Some(InsertChar('\t')),
-                Space => Some(InsertChar(' ')),
-                Left => Some(GoToPrevChar),
-                CtrlLeft => Some(GoToPrevWord),
-                Right => Some(GoToNextChar),
-                CtrlRight => Some(GoToNextWord),
-                CtrlU => Some(DeleteLine),
-                CtrlW => Some(DeletePrevWord),
-                CtrlDelete => Some(DeleteNextWord),
-                CtrlA => Some(GoToStart),
-                CtrlE => Some(GoToEnd),
-                Enter => Some(Submit),
-                Esc => Some(Escape),
-                _ => None,
-            }
+        match self {
+            Backspace => Some(DeletePrevChar),
+            Delete => Some(DeleteNextChar),
+            Tab => Some(InsertChar('\t')),
+            Space => Some(InsertChar(' ')),
+            Left => Some(GoToPrevChar),
+            CtrlLeft => Some(GoToPrevWord),
+            Right => Some(GoToNextChar),
+            CtrlRight => Some(GoToNextWord),
+            CtrlU => Some(DeleteLine),
+            CtrlW => Some(DeletePrevWord),
+            CtrlDelete => Some(DeleteNextWord),
+            CtrlA => Some(GoToStart),
+            CtrlE => Some(GoToEnd),
+            Enter => Some(Submit),
+            Esc => Some(Escape),
+            key => key.to_char().map(InsertChar),
         }
     }
 
@@ -444,11 +439,109 @@ impl Key {
         )
     }
 
-    pub fn is_special_character(&self) -> bool {
-        matches!(self, Self::Special(_))
+    pub fn is_alphanumeric(&self) -> bool {
+        self.is_alphabet() || self.is_number()
     }
 
-    pub fn to_char(self) -> Option<char> {
+    pub fn is_special_character(&self) -> bool {
+        matches!(&self, Self::Special(_))
+    }
+
+    pub fn is_character(&self) -> bool {
+        self.is_alphanumeric() || self.is_special_character()
+    }
+
+    pub fn is_navigation(&self) -> bool {
+        matches!(
+            &self,
+            Self::Backspace
+                | Self::Left
+                | Self::Right
+                | Self::Up
+                | Self::Down
+                | Self::Home
+                | Self::End
+                | Self::PageUp
+                | Self::PageDown
+                | Self::BackTab
+                | Self::Delete
+                | Self::Insert
+                | Self::Enter
+                | Self::Space
+                | Self::Tab
+                | Self::Esc
+                | Self::CtrlA
+                | Self::CtrlB
+                | Self::CtrlC
+                | Self::CtrlD
+                | Self::CtrlE
+                | Self::CtrlF
+                | Self::CtrlG
+                | Self::CtrlH
+                | Self::CtrlI
+                | Self::CtrlJ
+                | Self::CtrlK
+                | Self::CtrlL
+                | Self::CtrlM
+                | Self::CtrlN
+                | Self::CtrlO
+                | Self::CtrlP
+                | Self::CtrlQ
+                | Self::CtrlR
+                | Self::CtrlS
+                | Self::CtrlT
+                | Self::CtrlU
+                | Self::CtrlV
+                | Self::CtrlW
+                | Self::CtrlX
+                | Self::CtrlY
+                | Self::CtrlZ
+                | Self::CtrlBackspace
+                | Self::CtrlLeft
+                | Self::CtrlRight
+                | Self::CtrlUp
+                | Self::CtrlDown
+                | Self::CtrlHome
+                | Self::CtrlEnd
+                | Self::CtrlPageUp
+                | Self::CtrlPageDown
+                | Self::CtrlBackTab
+                | Self::CtrlDelete
+                | Self::CtrlInsert
+                | Self::CtrlEnter
+                | Self::CtrlSpace
+                | Self::CtrlTab
+                | Self::CtrlEsc
+                | Self::AltA
+                | Self::AltB
+                | Self::AltC
+                | Self::AltD
+                | Self::AltE
+                | Self::AltF
+                | Self::AltG
+                | Self::AltH
+                | Self::AltI
+                | Self::AltJ
+                | Self::AltK
+                | Self::AltL
+                | Self::AltM
+                | Self::AltN
+                | Self::AltO
+                | Self::AltP
+                | Self::AltQ
+                | Self::AltR
+                | Self::AltS
+                | Self::AltT
+                | Self::AltU
+                | Self::AltV
+                | Self::AltW
+                | Self::AltX
+                | Self::AltY
+                | Self::AltZ
+        )
+    }
+
+    pub fn to_char(&self) -> Option<char> {
         match self {
             Self::Num0 => Some('0'),
             Self::Num1 => Some('1'),

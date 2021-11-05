@@ -1217,7 +1217,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 ```
 
 [1]: #full-list-of-messages
-[2]: modes.md#key-bindings
+[2]: key-bindings.md
 [3]: #lua-function-calls
 [4]: #input-pipe
 [5]: https://www.lua.org/
@@ -1234,7 +1234,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [16]: filtering.md
 [17]: sorting.md#sorter
 [18]: https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields
-[19]: modes.md#tutorial-adding-a-new-mode
+[19]: configure-key-bindings.md#tutorial-adding-a-new-mode
 [20]: #xplr_pipe_msg_in
 [21]: #xplr_pipe_selection_out
 [22]: #xplr_pipe_global_help_menu_out

@@ -74,7 +74,7 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 [3]: https://neovim.io
 [4]: https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
 [5]: awesome-plugins.md
-[6]: modes.md#tutorial-adding-a-new-mode
+[6]: configure-key-bindings.md#tutorial-adding-a-new-mode
 [7]: message.md#example-using-environment-variables-and-pipes
 [8]: message.md#example-using-lua-function-calls
 [9]: layouts.md#example-defining-custom-layout
