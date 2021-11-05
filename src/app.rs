@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::config::Mode;
 use crate::explorer;
-use crate::input::Key;
+use crate::input::{InputOperation, Key};
 use crate::lua;
 use crate::permissions::Permissions;
 use crate::ui::Layout;
@@ -777,6 +777,11 @@ pub enum ExternalMsg {
     /// Follow the symlink under focus to its actual location.
     FollowSymlink,
 
+    /// Update the input buffer using cursor based operations.
+    ///
+    /// **Example:** `UpdateInputBuffer: GoToPreviousWord`
+    UpdateInputBuffer(InputOperation),
+
     /// Update the input buffer from given key
     UpdateInputBufferFromKey,
 
@@ -1481,6 +1486,9 @@ impl App {
                 ExternalMsg::LastVisitedPath => self.last_visited_path(),
                 ExternalMsg::NextVisitedPath => self.next_visited_path(),
                 ExternalMsg::FollowSymlink => self.follow_symlink(),
+                ExternalMsg::UpdateInputBuffer(op) => {
+                    self.update_input_buffer(op)
+                }
                 ExternalMsg::UpdateInputBufferFromKey => {
                     self.update_input_buffer_from_key(key)
                 }
@@ -1886,16 +1894,19 @@ impl App {
         }
     }
 
-    fn update_input_buffer_from_key(
-        mut self,
-        key: Option<Key>,
-    ) -> Result<Self> {
-        if let Some(req) = key.and_then(|k| k.to_input_request()) {
-            if let Some(buf) = self.input.as_mut() {
-                buf.handle(req);
-            }
+    fn update_input_buffer(mut self, op: InputOperation) -> Result<Self> {
+        if let Some(buf) = self.input.as_mut() {
+            buf.handle(op.into());
         }
         Ok(self)
+    }
+
+    fn update_input_buffer_from_key(self, key: Option<Key>) -> Result<Self> {
+        if let Some(op) = key.and_then(|k| k.to_input_operation()) {
+            self.update_input_buffer(op)
+        } else {
+            Ok(self)
+        }
     }
 
     fn buffer_input(mut self, input: &str) -> Result<Self> {

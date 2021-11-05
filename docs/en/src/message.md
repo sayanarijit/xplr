@@ -210,9 +210,25 @@ Go to the next path visited.
 
 Follow the symlink under focus to its actual location.
 
+### { UpdateInputBuffer = [Input Opertaion][71] }
+
+**YAML:** `BufferInput: Input Operation`
+
+Update the input buffer using cursor based operations.
+
+**YAML Example:** `UpdateInputBuffer: GoToPreviousWord`
+
+**Lua Example:** `{ UpdateInputBuffer = "GoToPreviousWord" }`
+
+### "UpdateInputBufferFromKey"
+
+**YAML:** `UpdateInputBufferFromKey`
+
+Update the input buffer from the key read from keyboard input.
+
 ### { BufferInput = "string" }
 
-**YAML:** `BufferInput(String)`
+**YAML:** `BufferInput: string`
 
 Append/buffer the given string into the input buffer.
 
@@ -790,6 +806,24 @@ Write the application state to a file, without quitting. Also helpful for debugg
 
 Terminate the application with a non-zero return code.
 
+## InputOperation
+
+Cursor based input operation can be one of the following:
+
+- { SetCursor = int }
+- { InsertCharacter = str }
+- "GoToPreviousCharacter"
+- "GoToNextCharacter"
+- "GoToPreviousWord"
+- "GoToNextWord"
+- "GoToStart"
+- "GoToEnd"
+- "DeletePreviousCharacter"
+- "DeleteNextCharacter"
+- "DeletePreviousWord"
+- "DeleteNextWord"
+- "DeleteLine"
+
 ## Lua Function Calls
 
 xplr allows users to define lua functions using the `xplr.fn.custom` Lua API.
@@ -1286,3 +1320,4 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [68]: #loc
 [69]: #paths
 [70]: #history-1
+[71]: #inputoperation
