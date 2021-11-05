@@ -229,4 +229,4 @@ Visit [Awesome Plugins][27] for more [integration][28] options.
 [32]: #on_alphanumeric
 [33]: #on_character
 [34]: #on_navigation
-[34]: #on_function
+[35]: #on_function
