@@ -1,6 +1,6 @@
 # Quickstart
 
-Nice to you have here! Let's quickly start our xplr journey with the
+Nice to you have here! Let's quickly start with the
 following steps:
 
 - [Install][1]
