@@ -913,7 +913,6 @@ fn draw_logs<B: Backend>(
             .iter()
             .rev()
             .take(layout_size.height as usize)
-            .rev()
             .map(|l| {
                 let time = l.created_at.format("%r");
                 match l.level {
