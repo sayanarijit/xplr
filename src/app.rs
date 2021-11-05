@@ -1642,6 +1642,12 @@ impl App {
                     kb.on_alphabet.as_ref().map(|a| a.messages.clone())
                 } else if key.is_number() {
                     kb.on_number.as_ref().map(|a| a.messages.clone())
+                } else if key.is_special_character() {
+                    kb.on_special_character.as_ref().map(|a| a.messages.clone())
+                } else if key.is_navigation() {
+                    kb.on_navigation.as_ref().map(|a| a.messages.clone())
+                } else if key.is_function() {
+                    kb.on_function.as_ref().map(|a| a.messages.clone())
                 } else {
                     None
                 }
@@ -1649,8 +1655,6 @@ impl App {
             .or_else(|| {
                 if key.is_alphanumeric() {
                     kb.on_alphanumeric.as_ref().map(|a| a.messages.clone())
-                } else if key.is_special_character() {
-                    kb.on_special_character.as_ref().map(|a| a.messages.clone())
                 } else {
                     None
                 }
@@ -1658,8 +1662,6 @@ impl App {
             .or_else(|| {
                 if key.is_character() {
                     kb.on_character.as_ref().map(|a| a.messages.clone())
-                } else if key.is_navigation() {
-                    kb.on_navigation.as_ref().map(|a| a.messages.clone())
                 } else {
                     None
                 }

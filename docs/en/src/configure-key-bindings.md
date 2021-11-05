@@ -16,6 +16,7 @@ Key bindings contains the following information:
 - [on_special_character][13]
 - [on_character][33]
 - [on_navigation][34]
+- [on_function][35]
 - [default][14]
 
 ### on_key
@@ -66,6 +67,13 @@ Type: nullable [Action][16]
 
 An action to perform if the keyboard input is a navigation key and is not
 mapped via the [on_key][10] field.
+
+### on_function
+
+Type: nullable [Action][16]
+
+An action to perform if the keyboard input is a function key and is not mapped
+via the [on_key][10] field.
 
 ### default
 
@@ -221,3 +229,4 @@ Visit [Awesome Plugins][27] for more [integration][28] options.
 [32]: #on_alphanumeric
 [33]: #on_character
 [34]: #on_navigation
+[34]: #on_function
