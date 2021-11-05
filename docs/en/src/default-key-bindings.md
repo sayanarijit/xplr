@@ -1,8 +1,8 @@
 # Default Key Bindings
 
 The default key binding is inspired by [vim][1] and slightly
-overlaps with [nnn][2], but it's supposed to be
-customized as per user requirements.
+overlaps with [nnn][2], but it's supposed to be customized as per user
+requirements.
 
 When you press `?` in [default mode][3], you can see the complete list
 of [modes][4] and the key mappings for each mode.
@@ -47,29 +47,25 @@ of [modes][4] and the key mappings for each mode.
 
 ### filter
 
-| key       | remaps | action                    |
-| --------- | ------ | ------------------------- |
-| R         |        | relative does not contain |
-| backspace |        | remove last filter        |
-| ctrl-c    |        | terminate                 |
-| ctrl-r    |        | reset filters             |
-| ctrl-u    |        | clear filters             |
-| enter     | esc    | done                      |
-| r         |        | relative does contain     |
+| key    | remaps | action                    |
+| ------ | ------ | ------------------------- |
+| R      |        | relative does not contain |
+| ctrl-c |        | terminate                 |
+| ctrl-r |        | reset filters             |
+| ctrl-u |        | clear filters             |
+| enter  | esc    | done                      |
+| r      |        | relative does contain     |
 
 ### number
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| down      | j      | to down               |
-| enter     |        | to index              |
-| esc       |        | cancel                |
-| k         | up     | to up                 |
-| [0-9]     |        | input                 |
+| key    | remaps | action    |
+| ------ | ------ | --------- |
+| ctrl-c |        | terminate |
+| down   | j      | to down   |
+| enter  |        | to index  |
+| esc    |        | cancel    |
+| k      | up     | to up     |
+| [0-9]  |        | input     |
 
 ### go to
 
@@ -83,18 +79,15 @@ of [modes][4] and the key mappings for each mode.
 
 ### search
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-n    | down   | down                  |
-| ctrl-p    | up     | up                    |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| enter     | esc    | focus                 |
-| left      |        | back                  |
-| right     |        | enter                 |
-| tab       |        | toggle selection      |
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-c |        | terminate        |
+| ctrl-n | down   | down             |
+| ctrl-p | up     | up               |
+| enter  | esc    | focus            |
+| left   |        | back             |
+| right  |        | enter            |
+| tab    |        | toggle selection |
 
 ### selection ops
 
@@ -132,36 +125,27 @@ of [modes][4] and the key mappings for each mode.
 
 ### create file
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| enter     |        | create file           |
-| esc       |        | cancel                |
+| key    | remaps | action      |
+| ------ | ------ | ----------- |
+| ctrl-c |        | terminate   |
+| enter  |        | create file |
+| esc    |        | cancel      |
 
 ### create directory
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| enter     |        | create directory      |
-| esc       |        | cancel                |
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-c |        | terminate        |
+| enter  |        | create directory |
+| esc    |        | cancel           |
 
 ### rename
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| enter     |        | rename                |
-| esc       |        | cancel                |
+| key    | remaps | action    |
+| ------ | ------ | --------- |
+| ctrl-c |        | terminate |
+| enter  |        | rename    |
+| esc    |        | cancel    |
 
 ### delete
 
@@ -195,37 +179,30 @@ of [modes][4] and the key mappings for each mode.
 
 ### filter
 
-| key       | remaps | action                    |
-| --------- | ------ | ------------------------- |
-| R         |        | relative does not contain |
-| backspace |        | remove last filter        |
-| ctrl-c    |        | terminate                 |
-| ctrl-r    |        | reset filters             |
-| ctrl-u    |        | clear filters             |
-| enter     | esc    | done                      |
-| r         |        | relative does contain     |
+| key    | remaps | action                    |
+| ------ | ------ | ------------------------- |
+| R      |        | relative does not contain |
+| ctrl-c |        | terminate                 |
+| ctrl-r |        | reset filters             |
+| ctrl-u |        | clear filters             |
+| enter  | esc    | done                      |
+| r      |        | relative does contain     |
 
 ### relative path does contain
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| enter     |        | apply filter          |
-| esc       |        | cancel                |
+| key    | remaps | action       |
+| ------ | ------ | ------------ |
+| ctrl-c |        | terminate    |
+| enter  |        | apply filter |
+| esc    |        | cancel       |
 
 ### relative path does not contain
 
-| key       | remaps | action                |
-| --------- | ------ | --------------------- |
-| backspace |        | remove last character |
-| ctrl-c    |        | terminate             |
-| ctrl-u    |        | remove line           |
-| ctrl-w    |        | remove last word      |
-| enter     |        | apply filter          |
-| esc       |        | cancel                |
+| key    | remaps | action       |
+| ------ | ------ | ------------ |
+| ctrl-c |        | terminate    |
+| enter  |        | apply filter |
+| esc    |        | cancel       |
 
 ### switch layout
 

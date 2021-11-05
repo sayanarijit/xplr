@@ -5,6 +5,10 @@
   - [Install][3]
   - [Post Install][4]
 - [Configuration][5]
+  - [Key Bindings][27]
+    - [Configure Key Bindings][28]
+    - [Default Key Bindings][14]
+    - [Debug Key Bindings][29]
   - [General Config][6]
   - [Modes][7]
   - [Message][8]
@@ -14,7 +18,6 @@
   - [Sorting][12]
   - [Filtering][13]
   - [Column Renderer][26]
-- [Default Key Bindings][14]
 - [Plugin][15]
   - [Installing Plugins][16]
   - [Writing Plugins][17]
@@ -53,3 +56,6 @@
 [24]: community.md
 [25]: contribute.md
 [26]: column-renderer.md
+[27]: key-bindings.md
+[28]: configure-key-bindings.md
+[29]: debug-key-bindings.md
