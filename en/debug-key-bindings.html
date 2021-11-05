@@ -171,11 +171,6 @@ xplr.config.modes.custom.test = {
           { LogInfo = &quot;on_key called&quot; },
         },
       },
-      f1 = {
-        messages = {
-          { LogInfo = &quot;on_key called&quot; },
-        },
-      },
       tab = {
         messages = {
           { LogInfo = &quot;on_key called&quot; },
@@ -189,6 +184,11 @@ xplr.config.modes.custom.test = {
       [&quot;ctrl-c&quot;] = {
         messages = {
           &quot;Terminate&quot;,
+        },
+      },
+      f1 = {
+        messages = {
+          { LogInfo = &quot;on_key called&quot; },
         },
       },
     },
@@ -220,6 +220,11 @@ xplr.config.modes.custom.test = {
     on_navigation = {
       messages = {
         { LogInfo = &quot;on_navigation called&quot; },
+      },
+    },
+    on_function = {
+      messages = {
+        { LogInfo = &quot;on_function called&quot; },
       },
     },
     default = {

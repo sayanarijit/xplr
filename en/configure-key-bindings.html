@@ -155,6 +155,7 @@ configured to with an <a href="#action">action</a>, it will intercept the key an
 <li><a href="#on_special_character">on_special_character</a></li>
 <li><a href="#on_character">on_character</a></li>
 <li><a href="#on_navigation">on_navigation</a></li>
+<li>[on_function][35]</li>
 <li><a href="#default">default</a></li>
 </ul>
 <h3 id="on_key"><a class="header" href="#on_key">on_key</a></h3>
@@ -185,6 +186,10 @@ or <a href="#on_special_character">on_special_character</a> field.</p>
 <p>Type: nullable <a href="#action">Action</a></p>
 <p>An action to perform if the keyboard input is a navigation key and is not
 mapped via the <a href="#on_key">on_key</a> field.</p>
+<h3 id="on_function"><a class="header" href="#on_function">on_function</a></h3>
+<p>Type: nullable <a href="#action">Action</a></p>
+<p>An action to perform if the keyboard input is a function key and is not mapped
+via the <a href="#on_key">on_key</a> field.</p>
 <h3 id="default"><a class="header" href="#default">default</a></h3>
 <p>Type: nullable <a href="#action">Action</a></p>
 <p>Default action to perform in case if a keyboard input not mapped via any of the

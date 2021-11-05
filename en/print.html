@@ -481,6 +481,7 @@ configured to with an <a href="configure-key-bindings.html#action">action</a>, i
 <li><a href="configure-key-bindings.html#on_special_character">on_special_character</a></li>
 <li><a href="configure-key-bindings.html#on_character">on_character</a></li>
 <li><a href="configure-key-bindings.html#on_navigation">on_navigation</a></li>
+<li>[on_function][35]</li>
 <li><a href="configure-key-bindings.html#default">default</a></li>
 </ul>
 <h3 id="on_key"><a class="header" href="#on_key">on_key</a></h3>
@@ -511,6 +512,10 @@ or <a href="configure-key-bindings.html#on_special_character">on_special_charact
 <p>Type: nullable <a href="configure-key-bindings.html#action">Action</a></p>
 <p>An action to perform if the keyboard input is a navigation key and is not
 mapped via the <a href="configure-key-bindings.html#on_key">on_key</a> field.</p>
+<h3 id="on_function"><a class="header" href="#on_function">on_function</a></h3>
+<p>Type: nullable <a href="configure-key-bindings.html#action">Action</a></p>
+<p>An action to perform if the keyboard input is a function key and is not mapped
+via the <a href="configure-key-bindings.html#on_key">on_key</a> field.</p>
 <h3 id="default"><a class="header" href="#default">default</a></h3>
 <p>Type: nullable <a href="configure-key-bindings.html#action">Action</a></p>
 <p>Default action to perform in case if a keyboard input not mapped via any of the
@@ -823,11 +828,6 @@ xplr.config.modes.custom.test = {
           { LogInfo = &quot;on_key called&quot; },
         },
       },
-      f1 = {
-        messages = {
-          { LogInfo = &quot;on_key called&quot; },
-        },
-      },
       tab = {
         messages = {
           { LogInfo = &quot;on_key called&quot; },
@@ -841,6 +841,11 @@ xplr.config.modes.custom.test = {
       [&quot;ctrl-c&quot;] = {
         messages = {
           &quot;Terminate&quot;,
+        },
+      },
+      f1 = {
+        messages = {
+          { LogInfo = &quot;on_key called&quot; },
         },
       },
     },
@@ -872,6 +877,11 @@ xplr.config.modes.custom.test = {
     on_navigation = {
       messages = {
         { LogInfo = &quot;on_navigation called&quot; },
+      },
+    },
+    on_function = {
+      messages = {
+        { LogInfo = &quot;on_function called&quot; },
       },
     },
     default = {
