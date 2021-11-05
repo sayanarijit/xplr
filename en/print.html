@@ -476,13 +476,6 @@ executing commands or performing write operations on the file-system.</p>
 <p>Type: boolean</p>
 <p>Set it to <code>true</code> if you want to enable a safety feature that will save you from
 yourself when you type recklessly.</p>
-<h2 id="cursorformat"><a class="header" href="#cursorformat">cursor.format</a></h2>
-<p>Type: nullable string</p>
-<p>This is the shape of the cursor visible when the input buffer contains some
-string.</p>
-<h2 id="cursorstyle"><a class="header" href="#cursorstyle">cursor.style</a></h2>
-<p>Type: <a href="style.html">Style</a></p>
-<p>Style of the cursor.</p>
 <h2 id="initial_layout"><a class="header" href="#initial_layout">initial_layout</a></h2>
 <p>Type: string</p>
 <p>The name of one of the <a href="layouts.html">layout</a> to use when xplr loads.</p>
@@ -2131,10 +2124,10 @@ metadata is set for the <a href="node_types.html#directory">directory</a>, <a hr
 <li>&quot;CrossedOut&quot;</li>
 </ul>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
-<pre><code class="language-lua">xplr.config.general.cursor.style.fg = &quot;Red&quot;
-xplr.config.general.cursor.style.bg = { Rgb = { 100, 150, 200 } }
-xplr.config.general.cursor.style.add_modifiers = { &quot;Bold&quot;, &quot;Italic&quot; }
-xplr.config.general.cursor.style.sub_modifiers = { &quot;Hidden&quot; }
+<pre><code class="language-lua">xplr.config.general.prompt.style.fg = &quot;Red&quot;
+xplr.config.general.prompt.style.bg = { Rgb = { 100, 150, 200 } }
+xplr.config.general.prompt.style.add_modifiers = { &quot;Bold&quot;, &quot;Italic&quot; }
+xplr.config.general.prompt.style.sub_modifiers = { &quot;Hidden&quot; }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sorting"><a class="header" href="#sorting">Sorting</a></h1>
 <p>xplr supports sorting paths by different properties. The sorting mechanism
