@@ -29,6 +29,7 @@ of the following plugins work for you, it's very easy to
   into a directory.
 - [**nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
   [nvim-ctrl][36].
+- [**ouch.xplr**][40] This plugin uses ouch to compress and decompress files.
 - [**paste-rs.xplr**][23] Use this plugin to paste your files to
   [paste.rs][24], and open/delete them later using [fzf][9].
 - [**preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
@@ -86,3 +87,4 @@ of the following plugins work for you, it's very easy to
 [37]: https://github.com/sayanarijit/command-mode.xplr
 [38]: https://github.com/sayanarijit/map.xplr
 [39]: https://github.com/igorepst/term.xplr
+[40]: https://github.com/dtomvan/ouch.xplr
