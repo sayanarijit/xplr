@@ -764,55 +764,67 @@ fn draw_input_buffer<B: Backend>(
     app: &app::App,
     _: &Lua,
 ) {
-    let panel_config = &app.config.general.panel_ui;
-    let config = panel_config
-        .default
-        .to_owned()
-        .extend(&panel_config.input_and_logs);
+    if let Some(input) = app.input.as_ref() {
+        let panel_config = &app.config.general.panel_ui;
+        let config = panel_config
+            .default
+            .to_owned()
+            .extend(&panel_config.input_and_logs);
 
-    let cursor_offset = if config
-        .borders
-        .as_ref()
-        .map(|b| b.contains(&Border::Right))
-        .unwrap_or(false)
-    {
-        3
-    } else {
-        2
+        let cursor_offset_left = if config
+            .borders
+            .as_ref()
+            .map(|b| b.contains(&Border::Left))
+            .unwrap_or(false)
+        {
+            3
+        } else {
+            2
+        };
+
+        let cursor_offset_right = if config
+            .borders
+            .as_ref()
+            .map(|b| b.contains(&Border::Right))
+            .unwrap_or(false)
+        {
+            2
+        } else {
+            1
+        };
+
+        let offset_width = cursor_offset_left + cursor_offset_right;
+        let width = layout_size.width.max(offset_width) - offset_width;
+        let scroll = (input.cursor() as u16).max(width) - width;
+
+        let input_buf = Paragraph::new(Spans::from(vec![
+            Span::styled(
+                app.config
+                    .general
+                    .prompt
+                    .format
+                    .to_owned()
+                    .unwrap_or_default(),
+                app.config.general.prompt.style.to_owned().into(),
+            ),
+            Span::raw(input.value()),
+        ]))
+        .scroll((0, scroll))
+        .block(block(
+            config,
+            format!(" Input [{}{}] ", app.mode.name, read_only_indicator(app)),
+        ));
+
+        f.render_widget(input_buf, layout_size);
+        f.set_cursor(
+            // Put cursor past the end of the input text
+            layout_size.x
+                + (input.cursor() as u16).min(width)
+                + cursor_offset_left,
+            // Move one line down, from the border to the input line
+            layout_size.y + 1,
+        );
     };
-
-    let input_val = app
-        .input
-        .as_ref()
-        .map(|i| i.value().to_string())
-        .unwrap_or_default();
-    let input_cursor =
-        app.input.as_ref().map(|i| i.cursor()).unwrap_or_default();
-
-    let input_buf = Paragraph::new(Spans::from(vec![
-        Span::styled(
-            app.config
-                .general
-                .prompt
-                .format
-                .to_owned()
-                .unwrap_or_default(),
-            app.config.general.prompt.style.to_owned().into(),
-        ),
-        Span::raw(&input_val),
-    ]))
-    .block(block(
-        config,
-        format!(" Input [{}{}] ", app.mode.name, read_only_indicator(app)),
-    ));
-
-    f.render_widget(input_buf, layout_size);
-    f.set_cursor(
-        // Put cursor past the end of the input text
-        layout_size.x + input_cursor as u16 + cursor_offset,
-        // Move one line down, from the border to the input line
-        layout_size.y + 1,
-    );
 }
 
 fn draw_sort_n_filter<B: Backend>(
