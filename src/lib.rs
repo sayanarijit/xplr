@@ -14,3 +14,15 @@ pub mod pipe_reader;
 pub mod pwd_watcher;
 pub mod runner;
 pub mod ui;
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_upgrade_guide_has_latest_version() {
+        let guide = include_str!("../docs/en/src/upgrade-guide.md");
+        assert!(guide.contains(app::VERSION));
+    }
+}

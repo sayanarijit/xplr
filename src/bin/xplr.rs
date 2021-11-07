@@ -68,6 +68,16 @@ mod tests {
     use assert_cmd::Command;
 
     #[test]
+    fn test_no_debug_in_lib() {
+        for pat in ["print!", "println!"].iter() {
+            Command::new("grep")
+                .args(&["-R", pat, "src", "--exclude-dir", "bin/"])
+                .assert()
+                .failure();
+        }
+    }
+
+    #[test]
     fn test_cli_version() {
         Command::cargo_bin("xplr")
             .unwrap()

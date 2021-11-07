@@ -161,10 +161,4 @@ mod tests {
         // Next bugfix release is ERR (Change when we get to v1)
         assert!(check_version("0.15.3", "foo path").is_err());
     }
-
-    #[test]
-    fn test_upgrade_guide_has_latest_version() {
-        let guide = include_str!("../docs/en/src/upgrade-guide.md");
-        assert!(guide.contains(VERSION));
-    }
 }
