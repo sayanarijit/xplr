@@ -14,6 +14,7 @@ of the following plugins work for you, it's very easy to
 
 - [**comex.xplr**][21] One xplr plugin to compress and extract them all.
 - [**command-mode.xplr**][37] The missing command mode for xplr.
+- [**context-switch.xplr**][42] Context switch plugin for xplr.
 - [**map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
 - [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
@@ -89,3 +90,4 @@ of the following plugins work for you, it's very easy to
 [39]: https://github.com/igorepst/term.xplr
 [40]: https://github.com/dtomvan/ouch.xplr
 [41]: https://github.com/ouch-org/ouch
+[42]: https://github.com/igorepst/context-switch.xplr
