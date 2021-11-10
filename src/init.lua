@@ -19,6 +19,9 @@ xplr.config.general.enable_recover_mode = false
 ------ Start FIFO
 xplr.config.general.start_fifo = nil
 
+------ Hide remaps in help menu
+xplr.config.general.help_hide_remaps = false
+
 ------ Prompt
 xplr.config.general.prompt.format = "❯ "
 xplr.config.general.prompt.style.add_modifiers = nil

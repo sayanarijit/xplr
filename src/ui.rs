@@ -737,10 +737,14 @@ fn draw_help_menu<B: Backend>(
         .into_iter()
         .map(|l| match l {
             HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
-            HelpMenuLine::KeyMap(k, remaps, h) => Row::new(
-                [Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)]
-                    .to_vec(),
-            ),
+            HelpMenuLine::KeyMap(k, remaps, h) => Row::new({
+                if app.config.general.help_hide_remaps {
+                    [Cell::from(k), Cell::from(h)].to_vec()
+                } else {
+                    [Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)]
+                        .to_vec()
+                }
+            }),
         })
         .collect::<Vec<Row>>();
 
@@ -749,11 +753,15 @@ fn draw_help_menu<B: Backend>(
             config,
             format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
         ))
-        .widths(&[
-            TuiConstraint::Percentage(20),
-            TuiConstraint::Percentage(20),
-            TuiConstraint::Percentage(60),
-        ]);
+        .widths(if app.config.general.help_hide_remaps {
+            &[TuiConstraint::Percentage(20), TuiConstraint::Percentage(80)]
+        } else {
+            &[
+                TuiConstraint::Percentage(20),
+                TuiConstraint::Percentage(20),
+                TuiConstraint::Percentage(60),
+            ]
+        });
     f.render_widget(help_menu, layout_size);
 }
 

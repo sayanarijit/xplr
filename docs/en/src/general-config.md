@@ -29,6 +29,12 @@ Type: boolean
 Set it to `true` if you want to enable a safety feature that will save you from
 yourself when you type recklessly.
 
+## help_hide_remaps
+
+Type: boolean
+
+Set it to `true` if you want to hide all remaps in the help buffer, except one.
+
 ## initial_layout
 
 Type: string
