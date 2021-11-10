@@ -55,7 +55,7 @@ compatibility.
   `RemoveInputBufferLastWord`, `SetInputBuffer = ""` etc. messages with a
   single `UpdateInputBufferFromKey` message.
 - You can now pass multiple paths as command-line arguments or via stdin to
-  select paths, e.g. `xplr - $PWD /path/to/select/1 /path/to/select/2`.
+  select paths, e.g. `xplr -- $PWD /path/to/select/1 /path/to/select/2`.
 - Pass `--force-focus` to focus on the first path even if it's a directory,
   e.g. `xplr . --force-focus`.
 - Use new messages `LuaEval` and `LuaEvalSilently` to run Lua code without
