@@ -15,7 +15,7 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
-          - ubuntu-latest
+          - ubuntu-20.04
         rust: [stable]
         include:
           - os: macos-latest
@@ -26,7 +26,7 @@ jobs:
             artifact_prefix: linux
             target: x86_64-unknown-linux-gnu
             binary_postfix: ''
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             artifact_prefix: linux-musl
             target: x86_64-unknown-linux-musl
             binary_postfix: ''
@@ -43,7 +43,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: brew install openssl@1.1
       - name: Installing needed Ubuntu dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
