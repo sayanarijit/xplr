@@ -15,6 +15,7 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
+          - ubuntu-latest
         rust: [stable]
         include:
           - os: macos-latest
@@ -37,6 +38,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
           override: true
+
       - name: Installing needed macOS dependencies
         if: matrix.os == 'macos-latest'
         run: brew install openssl@1.1

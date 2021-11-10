@@ -29,6 +29,7 @@ jobs:
         os:
           - macos-latest
           - ubuntu-latest
+          - ubuntu-latest
         rust: [stable]
         include:
           - os: macos-latest
