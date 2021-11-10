@@ -45,6 +45,29 @@ compatibility.
 
 ### Instructions
 
+#### [v0.15.2][43] -> [v0.16.0][44]
+
+- Deprecated `config.general.cursor`. The default terminal cursor will be used
+  for the time being.
+- Opening xplr inside a symlink will not resolve the path.
+- You can now replace most boilerplate configuration handling keys to send
+  `BufferInputFromKey`, `RemoveInputBufferLastCharacter`,
+  `RemoveInputBufferLastWord`, `SetInputBuffer = ""` etc. messages with a
+  single `UpdateInputBufferFromKey` message.
+- You can now pass multiple paths as command-line arguments or via stdin to
+  select paths, e.g. `xplr - $PWD /path/to/select/1 /path/to/select/2`.
+- Pass `--force-focus` to focus on the first path even if it's a directory,
+  e.g. `xplr . --force-focus`.
+- Use new messages `LuaEval` and `LuaEvalSilently` to run Lua code without
+  needing to define a function. However, the `app` context won't be available.
+- You can now use new key handlers in the config:
+  - on_alphanumeric
+  - on_character
+  - on_navigation
+  - on_function
+
+<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
+
 #### [v0.14.7][3] -> [v0.15.2][43]
 
 - Deprecated `config` field from `CallLua` argument. Use the globally available
@@ -59,8 +82,6 @@ compatibility.
 - Use the new `layout` field in a mode to define custom layout for a specific
   mode.
 - Library users please refer to the latest API docs and examples.
-
-<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
 #### [v0.13.7][2] -> [v0.14.7][3]
 
@@ -278,3 +299,4 @@ Else do the following:
 [41]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.0
 [42]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
 [43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.2
+[44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.0
