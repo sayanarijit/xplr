@@ -177,7 +177,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0162v0162a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0162v0162a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.15.2">v0.15.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.16.2">v0.16.2</a></a></h4>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0163v0163a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0163v0163a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.15.2">v0.15.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.16.3">v0.16.3</a></a></h4>
 <ul>
 <li>Deprecated <code>config.general.cursor</code>. The default terminal cursor will be used
 for the time being.</li>
@@ -187,7 +187,7 @@ for the time being.</li>
 <code>RemoveInputBufferLastWord</code>, <code>SetInputBuffer = &quot;&quot;</code> etc. messages with a
 single <code>UpdateInputBufferFromKey</code> message.</li>
 <li>You can now pass multiple paths as command-line arguments or via stdin to
-select paths, e.g. <code>xplr - $PWD /path/to/select/1 /path/to/select/2</code>.</li>
+select paths, e.g. <code>xplr -- $PWD /path/to/select/1 /path/to/select/2</code>.</li>
 <li>Pass <code>--force-focus</code> to focus on the first path even if it's a directory,
 e.g. <code>xplr . --force-focus</code>.</li>
 <li>Use new messages <code>LuaEval</code> and <code>LuaEvalSilently</code> to run Lua code without
