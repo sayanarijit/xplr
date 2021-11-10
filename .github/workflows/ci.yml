@@ -1,31 +1,17 @@
+name: Continuous Integration
+
 on:
   pull_request:
   push:
     branches: main
   workflow_dispatch:
 
-name: Continuous Integration
-
 jobs:
-  # Workaround for making Github Actions skip based on commit message `[skip ci]`
-  # Source https://gist.github.com/ybiquitous/c80f15c18319c63cae8447a3be341267
-  prepare:
-    runs-on: ubuntu-latest
-    if: |
-      !contains(format('{0} {1} {2}', github.event.head_commit.message, github.event.pull_request.title, github.event.pull_request.body), '[skip ci]')
-    steps:
-      - run: |
-          cat <<'MESSAGE'
-          github.event_name: ${{ toJson(github.event_name) }}
-          github.event:
-          ${{ toJson(github.event) }}
-          MESSAGE
   check:
     name: Check
     runs-on: ubuntu-latest
-    needs: prepare
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -37,32 +23,68 @@ jobs:
 
   test:
     name: Test Suite
-    runs-on: ubuntu-latest
-    needs: prepare
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - ubuntu-latest
+        rust: [stable]
+        include:
+          - os: macos-latest
+            artifact_prefix: macos
+            target: x86_64-apple-darwin
+            binary_postfix: ''
+          - os: ubuntu-latest
+            artifact_prefix: linux
+            target: x86_64-unknown-linux-gnu
+            binary_postfix: ''
+          - os: ubuntu-latest
+            artifact_prefix: linux-musl
+            target: x86_64-unknown-linux-musl
+            binary_postfix: ''
+
     env:
       RUST_BACKTRACE: full
     steps:
-      - uses: actions/checkout@master
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v2
+
+      - name: Installing Rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
-          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
           override: true
-      # These dependencies are required for `clipboard`
-      - run: sudo apt-get install -y -qq libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-      - uses: actions-rs/cargo@v1
+
+      - name: Installing needed macOS dependencies
+        if: matrix.os == 'macos-latest'
+        run: brew install openssl@1.1
+
+      - name: Installing needed Ubuntu dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
+      - name: Build
+        uses: actions-rs/cargo@v1
         with:
           command: build
-      - uses: actions-rs/cargo@v1
+          toolchain: ${{ matrix.rust }}
+          args: --target ${{ matrix.target }}
+
+      - name: Test
+        uses: actions-rs/cargo@v1
         with:
           command: test
+          toolchain: ${{ matrix.rust }}
+          args: --target ${{ matrix.target }}
 
   # bench:
   #   name: Benchmarks
   #   runs-on: ubuntu-latest
-  #   needs: prepare
   #   steps:
-  #     - uses: actions/checkout@master
+  #     - uses: actions/checkout@v2
   #     - uses: actions-rs/toolchain@v1
   #       with:
   #         toolchain: stable
@@ -77,9 +99,8 @@ jobs:
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
-    needs: prepare
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -94,9 +115,8 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
-    needs: prepare
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
