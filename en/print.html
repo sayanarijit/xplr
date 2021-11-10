@@ -3033,6 +3033,31 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0160v0160a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0160v0160a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.15.2">v0.15.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.16.0">v0.16.0</a></a></h4>
+<ul>
+<li>Deprecated <code>config.general.cursor</code>. The default terminal cursor will be used
+for the time being.</li>
+<li>Opening xplr inside a symlink will not resolve the path.</li>
+<li>You can now replace most boilerplate configuration handling keys to send
+<code>BufferInputFromKey</code>, <code>RemoveInputBufferLastCharacter</code>,
+<code>RemoveInputBufferLastWord</code>, <code>SetInputBuffer = &quot;&quot;</code> etc. messages with a
+single <code>UpdateInputBufferFromKey</code> message.</li>
+<li>You can now pass multiple paths as command-line arguments or via stdin to
+select paths, e.g. <code>xplr - $PWD /path/to/select/1 /path/to/select/2</code>.</li>
+<li>Pass <code>--force-focus</code> to focus on the first path even if it's a directory,
+e.g. <code>xplr . --force-focus</code>.</li>
+<li>Use new messages <code>LuaEval</code> and <code>LuaEvalSilently</code> to run Lua code without
+needing to define a function. However, the <code>app</code> context won't be available.</li>
+<li>You can now use new key handlers in the config:
+<ul>
+<li>on_alphanumeric</li>
+<li>on_character</li>
+<li>on_navigation</li>
+<li>on_function</li>
+</ul>
+</li>
+</ul>
+<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0152v0152a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.14.7">v0.14.7</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.15.2">v0.15.2</a></a></h4>
 <ul>
 <li>Deprecated <code>config</code> field from <code>CallLua</code> argument. Use the globally available
@@ -3048,7 +3073,6 @@ different modes without resetting the input buffer.</li>
 mode.</li>
 <li>Library users please refer to the latest API docs and examples.</li>
 </ul>
-<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a"><a class="header" href="#a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0137v0137a---a-hrefhttpsgithubcomsayanarijitxplrreleasestagv0147v0147a"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.14.7">v0.14.7</a></a></h4>
 <ul>
 <li>macOS users need to place their config file (<code>init.lua</code>) in
