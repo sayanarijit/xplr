@@ -228,7 +228,7 @@ pub struct GeneralConfig {
     pub enable_recover_mode: bool,
 
     #[serde(default)]
-    pub help_hide_remaps: bool,
+    pub hide_remaps_in_help_menu: bool,
 
     #[serde(default)]
     pub prompt: UiElement,
