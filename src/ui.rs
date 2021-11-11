@@ -738,7 +738,7 @@ fn draw_help_menu<B: Backend>(
         .map(|l| match l {
             HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
             HelpMenuLine::KeyMap(k, remaps, h) => Row::new({
-                if app.config.general.help_hide_remaps {
+                if app.config.general.hide_remaps_in_help_menu {
                     [Cell::from(k), Cell::from(h)].to_vec()
                 } else {
                     [Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)]
@@ -753,7 +753,7 @@ fn draw_help_menu<B: Backend>(
             config,
             format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
         ))
-        .widths(if app.config.general.help_hide_remaps {
+        .widths(if app.config.general.hide_remaps_in_help_menu {
             &[TuiConstraint::Percentage(20), TuiConstraint::Percentage(80)]
         } else {
             &[
