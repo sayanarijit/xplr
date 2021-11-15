@@ -1133,6 +1133,7 @@ pub struct Command {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
+    CacheDirectoryNodes(Vec<Node>),
     ExplorePwdAsync,
     ExploreParentsAsync,
     Refresh,
@@ -1246,12 +1247,29 @@ impl History {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct CachedDirectoryBuffer {
+    pub parent: String,
+    pub total: usize,
+    pub focus: usize,
+}
+
+impl CachedDirectoryBuffer {
+    pub fn new(buf: &DirectoryBuffer) -> Self {
+        Self {
+            parent: buf.parent.clone(),
+            total: buf.total,
+            focus: buf.focus,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct CallLuaArg {
     pub version: String,
     pub pwd: String,
     pub focused_node: Option<Node>,
-    pub directory_buffer: Option<DirectoryBuffer>,
+    pub directory_buffer: Option<CachedDirectoryBuffer>,
     pub selection: IndexSet<Node>,
     pub mode: Mode,
     pub layout: Layout,
@@ -2246,6 +2264,8 @@ impl App {
             dir.focused_node().map(|n| n.relative_path.clone()),
         )?;
         if dir.parent == self.pwd {
+            self.msg_out
+                .push_back(MsgOut::CacheDirectoryNodes(dir.nodes.clone()));
             self.directory_buffer = Some(dir);
         }
         Ok(self)
@@ -2741,7 +2761,10 @@ impl App {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
             focused_node: self.focused_node().cloned(),
-            directory_buffer: self.directory_buffer.clone(),
+            directory_buffer: self
+                .directory_buffer
+                .as_ref()
+                .map(|buf| CachedDirectoryBuffer::new(buf)),
             selection: self.selection.clone(),
             mode: self.mode.clone(),
             layout: self.layout.clone(),

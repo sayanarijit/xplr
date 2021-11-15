@@ -38,13 +38,6 @@ fn call_lua(
     func: &str,
     _silent: bool,
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
-    let _focus_index = app
-        .directory_buffer
-        .as_ref()
-        .map(|d| d.focus)
-        .unwrap_or_default()
-        .to_string();
-
     let arg = app.to_lua_arg();
     let arg = lua.to_value(&arg)?;
     lua::call(lua, func, arg)
@@ -278,6 +271,10 @@ impl Runner {
                             // TODO: Remove boilerplate code.
                             Enque(task) => {
                                 tx_msg_in.send(task)?;
+                            }
+
+                            CacheDirectoryNodes(nodes) => {
+                                lua::cache_directory_nodes(&lua, &nodes)?;
                             }
 
                             Quit => {
