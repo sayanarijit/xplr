@@ -1034,7 +1034,7 @@ pub fn draw_custom_content<B: Backend>(
             let render = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg)
+                    lua::call_with_cache(lua, &render, arg)
                         .unwrap_or_else(|e| format!("{:?}", e))
                 })
                 .unwrap_or_else(|e| e.to_string());
@@ -1076,7 +1076,7 @@ pub fn draw_custom_content<B: Backend>(
             let items = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg)
+                    lua::call_with_cache(lua, &render, arg)
                         .unwrap_or_else(|e| vec![format!("{:?}", e)])
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
@@ -1146,7 +1146,7 @@ pub fn draw_custom_content<B: Backend>(
             let rows = lua
                 .to_value(&ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg)
+                    lua::call_with_cache(lua, &render, arg)
                         .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])

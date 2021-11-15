@@ -98,15 +98,52 @@ pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
     Ok(config)
 }
 
-/// Used to call lua functions.
+fn resolve_fn_recursive<'lua, 'a>(
+    table: &mlua::Table<'lua>,
+    mut path: impl Iterator<Item = &'a str>,
+) -> Result<mlua::Function<'lua>> {
+    if let Some(nxt) = path.next() {
+        match table.get(nxt)? {
+            mlua::Value::Table(t) => resolve_fn_recursive(&t, path),
+            mlua::Value::Function(f) => Ok(f),
+            t => bail!("{:?} is not a function", t),
+        }
+    } else {
+        bail!("Invalid path")
+    }
+}
+
+/// This function resolves paths like `builtin.func_foo`, `custom.func_bar` into lua functions.
+pub fn resolve_fn<'lua>(
+    globals: &mlua::Table<'lua>,
+    path: &str,
+) -> Result<mlua::Function<'lua>> {
+    resolve_fn_recursive(globals, path.split('.'))
+}
+
 pub fn call<'lua, R: Deserialize<'lua>>(
     lua: &'lua Lua,
     func: &str,
     arg: mlua::Value<'lua>,
 ) -> Result<R> {
-    let func = format!("xplr.__CACHE__.caller(xplr.fn.{})", func);
-    let caller: mlua::Function = lua.load(&func).eval()?;
-    let res: mlua::Value = caller.call(arg)?;
+    let func = format!("xplr.fn.{}", func);
+    let func = resolve_fn(&lua.globals(), &func)?;
+    let res: mlua::Value = func.call(arg)?;
+    let res: R = lua.from_value(res)?;
+    Ok(res)
+}
+
+/// Used to call lua functions with cache support.
+pub fn call_with_cache<'lua, R: Deserialize<'lua>>(
+    lua: &'lua Lua,
+    func: &str,
+    arg: mlua::Value<'lua>,
+) -> Result<R> {
+    let caller: mlua::Function =
+        resolve_fn(&lua.globals(), "xplr.__CACHE__.call")?;
+    let func = format!("xplr.fn.{}", func);
+    let func: mlua::Function = resolve_fn(&lua.globals(), &func)?;
+    let res: mlua::Value = caller.call((func, arg))?;
     let res: R = lua.from_value(res)?;
     Ok(res)
 }
@@ -114,7 +151,7 @@ pub fn call<'lua, R: Deserialize<'lua>>(
 /// Used to cache the directory nodes.
 pub fn cache_directory_nodes(lua: &Lua, nodes: &[Node]) -> Result<()> {
     let func = "xplr.__CACHE__.set_directory_nodes";
-    let func: mlua::Function = lua.load(func).eval()?;
+    let func: mlua::Function = resolve_fn(&lua.globals(), func)?;
     func.call(lua.to_value(nodes)?)?;
     Ok(())
 }
