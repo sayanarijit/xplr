@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.15.2][43] -> [v0.16.3][44]
+#### [v0.15.2][43] -> [v0.16.4][44]
 
 - Deprecated `config.general.cursor`. The default terminal cursor will be used
   for the time being.
@@ -299,4 +299,4 @@ Else do the following:
 [41]: https://github.com/sayanarijit/xplr/releases/tag/v0.3.0
 [42]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
 [43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.2
-[44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.3
+[44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4

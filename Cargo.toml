@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.16.3"  # Update lua.rs
+version = "0.16.4"  # Update lua.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "A hackable, minimal, fast TUI file explorer"
@@ -33,7 +33,7 @@ natord = "1.0.9"
 humansize = "1.1.1"
 mlua = { version = "0.6.6", features = ["luajit", "vendored", "serialize", "send"] }
 ansi-to-tui = "0.4.1"
-libc = "0.2.106"
+libc = "0.2.107"
 tui-input = { version = "0.1.2", features = [ "serde" ] }
 
 [dev-dependencies]
