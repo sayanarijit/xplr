@@ -1452,7 +1452,10 @@ impl App {
         self
     }
 
-    pub fn handle_batch_external_msgs(mut self, msgs: Vec<ExternalMsg>) -> Result<Self> {
+    pub fn handle_batch_external_msgs(
+        mut self,
+        msgs: Vec<ExternalMsg>,
+    ) -> Result<Self> {
         for task in msgs
             .into_iter()
             .map(|msg| Task::new(MsgIn::External(msg), None))

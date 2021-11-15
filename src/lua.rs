@@ -9,7 +9,7 @@ use serde::Deserialize;
 use std::fs;
 
 const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
-const INTERNAL_LUA_SCRIPT: &str = include_str!("__cache__.lua");
+const CACHE_LUA_SCRIPT: &str = include_str!("__cache__.lua");
 const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
 
 fn parse_version(version: &str) -> Result<(u16, u16, u16, Option<u16>)> {
@@ -69,7 +69,7 @@ pub fn init(lua: &Lua) -> Result<Config> {
     globals.set("xplr", lua_xplr)?;
 
     lua.load(DEFAULT_LUA_SCRIPT).set_name("init")?.exec()?;
-    lua.load(INTERNAL_LUA_SCRIPT).set_name("internal")?.exec()?;
+    lua.load(CACHE_LUA_SCRIPT).set_name("internal")?.exec()?;
 
     let lua_xplr: mlua::Table = globals.get("xplr")?;
     let config: Config = lua.from_value(lua_xplr.get("config")?)?;
@@ -112,10 +112,7 @@ pub fn call<'lua, R: Deserialize<'lua>>(
 }
 
 /// Used to cache the directory nodes.
-pub fn cache_directory_nodes<'lua>(
-    lua: &'lua Lua,
-    nodes: &[Node],
-) -> Result<()> {
+pub fn cache_directory_nodes(lua: &Lua, nodes: &[Node]) -> Result<()> {
     let func = "xplr.__CACHE__.set_directory_nodes";
     let func: mlua::Function = lua.load(func).eval()?;
     func.call(lua.to_value(nodes)?)?;
