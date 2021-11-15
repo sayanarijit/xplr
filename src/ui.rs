@@ -1203,7 +1203,7 @@ impl From<TuiRect> for Rect {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ContentRendererArg {
     app: app::CallLuaArg,
     screen_size: Rect,
