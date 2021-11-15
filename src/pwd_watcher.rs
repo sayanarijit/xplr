@@ -17,14 +17,18 @@ pub fn keep_watching(
     thread::spawn(move || loop {
         if let Ok(new_pwd) = rx_pwd_watcher.try_recv() {
             pwd = PathBuf::from(new_pwd);
+            last_modified = pwd
+                .metadata()
+                .and_then(|m| m.modified())
+                .unwrap_or(last_modified)
         } else if let Err(e) = pwd
             .metadata()
             .map_err(Error::new)
             .and_then(|m| m.modified().map_err(Error::new))
             .and_then(|modified| {
                 if modified != last_modified {
-                    let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
                     last_modified = modified;
+                    let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
                     tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
                 } else {
                     thread::sleep(Duration::from_secs(1));
@@ -48,17 +52,18 @@ mod tests {
     #[test]
     fn test_pwd_watcher() {
         let (tx_msg_in, rx_msg_in) = mpsc::channel();
-        let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
+        let (_, rx_pwd_watcher) = mpsc::channel();
 
-        let result = keep_watching("/", tx_msg_in, rx_pwd_watcher);
+        let result = keep_watching("/tmp", tx_msg_in, rx_pwd_watcher);
 
         assert!(result.is_ok());
 
-        tx_pwd_watcher.send("/bin".to_string()).unwrap();
+        let file = "/tmp/__xplr_pwd_watcher_test__";
+        std::fs::write(file, "test").unwrap();
+        std::fs::remove_file(file).unwrap();
+
         let task = rx_msg_in.recv().unwrap();
-
         let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
-
         assert_eq!(task, Task::new(msg, None));
     }
 }
