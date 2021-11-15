@@ -40,7 +40,7 @@ fn call_lua(
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
     let arg = app.to_lua_arg();
     let arg = lua.to_value(&arg)?;
-    lua::call(lua, func, arg)
+    lua::call_with_cache(lua, func, arg)
 }
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
