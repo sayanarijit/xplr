@@ -1452,6 +1452,19 @@ impl App {
         self
     }
 
+    pub fn handle_batch_external_msgs(mut self, msgs: Vec<ExternalMsg>) -> Result<Self> {
+        for task in msgs
+            .into_iter()
+            .map(|msg| Task::new(MsgIn::External(msg), None))
+        {
+            self = match task.msg {
+                MsgIn::Internal(msg) => self.handle_internal(msg)?,
+                MsgIn::External(msg) => self.handle_external(msg, task.key)?,
+            };
+        }
+        self.refresh()
+    }
+
     pub fn handle_task(self, task: Task) -> Result<Self> {
         let app = match task.msg {
             MsgIn::Internal(msg) => self.handle_internal(msg)?,
