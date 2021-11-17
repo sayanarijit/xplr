@@ -33,7 +33,7 @@ yourself when you type recklessly.
 
 Type: boolean
 
-Set it to `true` if you want to hide all remaps in the help buffer.
+Set it to `true` if you want to hide all remaps in the help menu.
 
 ## initial_layout
 
