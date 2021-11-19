@@ -2,15 +2,29 @@ use crate::app::Node;
 use crate::app::VERSION;
 use crate::config::Config;
 use anyhow::bail;
+use anyhow::Error;
 use anyhow::Result;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
+use mlua::SerializeOptions;
 use serde::Deserialize;
+use serde::Serialize;
 use std::fs;
 
 const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
 const CACHE_LUA_SCRIPT: &str = include_str!("__cache__.lua");
 const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
+
+pub fn serialize<'lua, T: Serialize + Sized>(
+    lua: &'lua mlua::Lua,
+    value: &T,
+) -> Result<mlua::Value<'lua>> {
+    lua.to_value_with(
+        value,
+        SerializeOptions::new().serialize_none_to_null(false),
+    )
+    .map_err(Error::from)
+}
 
 fn parse_version(version: &str) -> Result<(u16, u16, u16, Option<u16>)> {
     let mut configv = version.split('.');
@@ -57,7 +71,7 @@ pub fn init(lua: &Lua) -> Result<Config> {
     let globals = lua.globals();
 
     let lua_xplr = lua.create_table()?;
-    lua_xplr.set("config", lua.to_value(&config)?)?;
+    lua_xplr.set("config", serialize(lua, &config)?)?;
 
     let lua_xplr_fn = lua.create_table()?;
     let lua_xplr_fn_builtin = lua.create_table()?;
@@ -152,7 +166,7 @@ pub fn call_with_cache<'lua, R: Deserialize<'lua>>(
 pub fn cache_directory_nodes(lua: &Lua, nodes: &[Node]) -> Result<()> {
     let func = "xplr.__CACHE__.set_directory_nodes";
     let func: mlua::Function = resolve_fn(&lua.globals(), func)?;
-    func.call(lua.to_value(nodes)?)?;
+    func.call(serialize(lua, &nodes)?)?;
     Ok(())
 }
 
