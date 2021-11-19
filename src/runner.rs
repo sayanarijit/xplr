@@ -39,7 +39,7 @@ fn call_lua(
     _silent: bool,
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
     let arg = app.to_lua_arg();
-    let arg = lua.to_value(&arg)?;
+    let arg = lua::serialize(lua, &arg)?;
     lua::call_with_cache(lua, func, arg)
 }
 

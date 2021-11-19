@@ -9,7 +9,6 @@ use anyhow::Result;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use mlua::Lua;
-use mlua::LuaSerdeExt;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -598,8 +597,7 @@ fn draw_table<B: Backend>(
                         node_type.meta,
                     );
 
-                    let cols = lua
-                        .to_value::<NodeUiMetadata>(&meta)
+                    let cols = lua::serialize::<NodeUiMetadata>(lua, &meta)
                         .map(|v| {
                             app_config
                                 .general
@@ -1039,8 +1037,7 @@ pub fn draw_custom_content<B: Backend>(
                 screen_size: screen_size.into(),
             };
 
-            let render = lua
-                .to_value(&ctx)
+            let render = lua::serialize(lua, &ctx)
                 .map(|arg| {
                     lua::call_with_cache(lua, &render, arg)
                         .unwrap_or_else(|e| format!("{:?}", e))
@@ -1081,8 +1078,7 @@ pub fn draw_custom_content<B: Backend>(
                 screen_size: screen_size.into(),
             };
 
-            let items = lua
-                .to_value(&ctx)
+            let items = lua::serialize(lua, &ctx)
                 .map(|arg| {
                     lua::call_with_cache(lua, &render, arg)
                         .unwrap_or_else(|e| vec![format!("{:?}", e)])
@@ -1151,8 +1147,7 @@ pub fn draw_custom_content<B: Backend>(
                 screen_size: screen_size.into(),
             };
 
-            let rows = lua
-                .to_value(&ctx)
+            let rows = lua::serialize(lua, &ctx)
                 .map(|arg| {
                     lua::call_with_cache(lua, &render, arg)
                         .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
