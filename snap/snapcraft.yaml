@@ -14,9 +14,6 @@ apps:
     command: bin/xplr
     environment:
       PATH: $SNAP/usr/bin:$SNAP/usr/local/bin/:$PATH:$SNAP/bin/:$PATH
-    plugs:
-      - home
-      - removable-media
 
 parts:
   xplr:
