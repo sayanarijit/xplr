@@ -7,13 +7,16 @@ description: |
   productivity by being a flexible, interactive orchestrator for the ever
   growing awesome command-line utilities that work with the file-system.
 grade: stable
-confinement: strict
+confinement: devmode
 
 apps:
   xplr:
     command: bin/xplr
     environment:
       PATH: $SNAP/usr/bin:$SNAP/usr/local/bin/:$PATH:$SNAP/bin/:$PATH
+    plugs:
+      - home
+      - removable-media
 
 parts:
   xplr:
