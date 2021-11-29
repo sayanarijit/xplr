@@ -165,11 +165,18 @@ available.</p>
 <p>xplr can be installed from one of the following community maintained
 repositories:</p>
 <p><a href="https://repology.org/project/xplr/versions"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" alt="packaging status" /></a></p>
+<h3 id="cross-platform"><a class="header" href="#cross-platform">Cross-platform</a></h3>
+<h4 id="snap"><a class="header" href="#snap"><a href="https://snapcraft.io/xplr">Snap</a></a></h4>
+<pre><code>snap install xplr
+</code></pre>
+<h4 id="nixpkgs"><a class="header" href="#nixpkgs"><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr">Nixpkgs</a></a></h4>
+<pre><code>nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
+</code></pre>
 <h3 id="arch-linux"><a class="header" href="#arch-linux">Arch Linux</a></h3>
-<h4 id="a-hrefhttpsarchlinuxorgpackagescommunityx86_64xplrofficial-community-repoa"><a class="header" href="#a-hrefhttpsarchlinuxorgpackagescommunityx86_64xplrofficial-community-repoa"><a href="https://archlinux.org/packages/community/x86_64/xplr">Official Community Repo</a></a></h4>
+<h4 id="official-community-repo"><a class="header" href="#official-community-repo"><a href="https://archlinux.org/packages/community/x86_64/xplr">Official Community Repo</a></a></h4>
 <pre><code>sudo pacman -S xplr
 </code></pre>
-<h4 id="a-hrefhttpsaurarchlinuxorgpackageso0sebnkxplroutdatedsbnsoapp50do_searchgoaura"><a class="header" href="#a-hrefhttpsaurarchlinuxorgpackageso0sebnkxplroutdatedsbnsoapp50do_searchgoaura"><a href="https://aur.archlinux.org/packages/?O=0&amp;SeB=n&amp;K=xplr&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=50&amp;do_Search=Go">AUR</a></a></h4>
+<h4 id="aur"><a class="header" href="#aur"><a href="https://aur.archlinux.org/packages/?O=0&amp;SeB=n&amp;K=xplr&amp;outdated=&amp;SB=n&amp;SO=a&amp;PP=50&amp;do_Search=Go">AUR</a></a></h4>
 <p>Binary version:</p>
 <pre><code>paru -S xplr-bin
 </code></pre>
@@ -177,17 +184,13 @@ repositories:</p>
 <pre><code>paru -S xplr-git
 </code></pre>
 <h3 id="void-linux"><a class="header" href="#void-linux">Void Linux</a></h3>
-<h4 id="a-hrefhttpsgithubcomshubham-cppvoid-pkg-templatesvoid-templates-by-shubhama"><a class="header" href="#a-hrefhttpsgithubcomshubham-cppvoid-pkg-templatesvoid-templates-by-shubhama"><a href="https://github.com/shubham-cpp/void-pkg-templates">void-templates by shubham</a></a></h4>
-<h3 id="nixos"><a class="header" href="#nixos">Nix(OS)</a></h3>
-<h4 id="a-hrefhttpsgithubcomnixosnixpkgsblobmasterpkgsapplicationsmiscxplrnixpkgsa"><a class="header" href="#a-hrefhttpsgithubcomnixosnixpkgsblobmasterpkgsapplicationsmiscxplrnixpkgsa"><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr">Nixpkgs</a></a></h4>
-<pre><code>nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
-</code></pre>
+<h4 id="void-templates-by-shubham"><a class="header" href="#void-templates-by-shubham"><a href="https://github.com/shubham-cpp/void-pkg-templates">void-templates by shubham</a></a></h4>
 <h3 id="macos"><a class="header" href="#macos">macOS</a></h3>
-<h4 id="a-hrefhttpsportsmacportsorgportxplrmacportsa"><a class="header" href="#a-hrefhttpsportsmacportsorgportxplrmacportsa"><a href="https://ports.macports.org/port/xplr">MacPorts</a></a></h4>
+<h4 id="macports"><a class="header" href="#macports"><a href="https://ports.macports.org/port/xplr">MacPorts</a></a></h4>
 <pre><code>sudo port selfupdate
 sudo port install xplr
 </code></pre>
-<h4 id="a-hrefhttpsformulaebrewshformulaxplrhomebrewa"><a class="header" href="#a-hrefhttpsformulaebrewshformulaxplrhomebrewa"><a href="https://formulae.brew.sh/formula/xplr">Homebrew</a></a></h4>
+<h4 id="homebrew"><a class="header" href="#homebrew"><a href="https://formulae.brew.sh/formula/xplr">Homebrew</a></a></h4>
 <p>Stable branch:</p>
 <pre><code>brew install xplr
 </code></pre>
@@ -195,7 +198,7 @@ sudo port install xplr
 <pre><code>brew install --head xplr
 </code></pre>
 <h3 id="freebsd"><a class="header" href="#freebsd">FreeBSD</a></h3>
-<h4 id="a-hrefhttpscgitfreebsdorgportsplainmiscxplrportsa"><a class="header" href="#a-hrefhttpscgitfreebsdorgportsplainmiscxplrportsa"><a href="https://cgit.freebsd.org/ports/plain/misc/xplr/">ports</a></a></h4>
+<h4 id="ports"><a class="header" href="#ports"><a href="https://cgit.freebsd.org/ports/plain/misc/xplr/">ports</a></a></h4>
 <pre><code>pkg install xplr
 </code></pre>
 <p>Or</p>
@@ -203,7 +206,7 @@ sudo port install xplr
 make install clean
 </code></pre>
 <h3 id="netbsd"><a class="header" href="#netbsd">NetBSD</a></h3>
-<h4 id="a-hrefhttpspkgsrcsesysutilsxplrpkgsrca"><a class="header" href="#a-hrefhttpspkgsrcsesysutilsxplrpkgsrca"><a href="https://pkgsrc.se/sysutils/xplr">pkgsrc</a></a></h4>
+<h4 id="pkgsrc"><a class="header" href="#pkgsrc"><a href="https://pkgsrc.se/sysutils/xplr">pkgsrc</a></a></h4>
 <pre><code>pkgin install xplr
 </code></pre>
 <p>Or</p>
@@ -230,7 +233,7 @@ tar xzvf xplr-$platform.tar.gz
 # Place in $PATH
 sudo mv xplr /usr/local/bin/
 </code></pre>
-<h2 id="from-a-hrefhttpscratesiocratesxplrcratesioa"><a class="header" href="#from-a-hrefhttpscratesiocratesxplrcratesioa">From <a href="https://crates.io/crates/xplr">crates.io</a></a></h2>
+<h2 id="from-cratesio"><a class="header" href="#from-cratesio">From <a href="https://crates.io/crates/xplr">crates.io</a></a></h2>
 <p>Prerequisites:</p>
 <ul>
 <li><a href="https://www.rust-lang.org/tools/install">Rust toolchain</a>,</li>
@@ -260,7 +263,7 @@ cargo build --locked --release --bin xplr
 sudo cp target/release/xplr /usr/local/bin/
 </code></pre>
 <h2 id="android"><a class="header" href="#android">Android</a></h2>
-<h3 id="a-hrefhttpstermuxcomtermuxa"><a class="header" href="#a-hrefhttpstermuxcomtermuxa"><a href="https://termux.com/">Termux</a></a></h3>
+<h3 id="termux"><a class="header" href="#termux"><a href="https://termux.com/">Termux</a></a></h3>
 <p><a href="https://gifyu.com/image/tF2D"><img src="https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg" alt="xplr-termuxfd3c398d3cf4bcbc.md.jpg" /></a></p>
 <blockquote>
 <p>Please note that xplr isn't heavily tested on Termux, hence things might
