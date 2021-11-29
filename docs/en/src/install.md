@@ -34,6 +34,20 @@ repositories:
 
 [![packaging status][5]][6]
 
+### Cross-platform
+
+#### [Snap][26]
+
+```
+snap install xplr
+```
+
+#### [Nixpkgs][10]
+
+```
+nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
+```
+
 ### Arch Linux
 
 #### [Official Community Repo][7]
@@ -59,14 +73,6 @@ paru -S xplr-git
 ### Void Linux
 
 #### [void-templates by shubham][9]
-
-### Nix(OS)
-
-#### [Nixpkgs][10]
-
-```
-nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
-```
 
 ### macOS
 
@@ -249,3 +255,4 @@ sudo cp target/release/xplr /usr/local/bin/
 [23]: https://termux.com/
 [24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
 [25]: https://gifyu.com/image/tF2D
+[26]: https://snapcraft.io/xplr
