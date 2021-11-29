@@ -39,7 +39,7 @@ repositories:
 #### [Snap][26]
 
 ```
-snap install xplr
+snap install xplr --classic
 ```
 
 #### [Nixpkgs][10]

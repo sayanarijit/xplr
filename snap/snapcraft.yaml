@@ -7,7 +7,7 @@ description: |
   productivity by being a flexible, interactive orchestrator for the ever
   growing awesome command-line utilities that work with the file-system.
 grade: stable
-confinement: devmode
+confinement: classic
 
 apps:
   xplr:
