@@ -469,12 +469,16 @@ stderr will be piped to null. So it's non-interactive.
 
 **YAML:** `LuaEval: string`
 
-Execute Lua code without needing to define a function. However,
-[Lua Context][14] won't be available.
+Execute Lua code without needing to define a function.
+
+If the `string` is a callable, xplr will try to call it with with the
+[Lua Context][14] argument.
 
 **YAML Example:** `LuaEval: "return { { LogInfo = io.read() } }"`
+**YAML Example:** `LuaEval: "function(app) return { { LogInfo = app.pwd } } end"`
 
 **Lua Example:** `{ LuaEval = [[return { { LogInfo = io.read() } }]] }`
+**Lua Example:** `{ LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }`
 
 ### { LuaEvalSilently = "string" }
 

@@ -14,6 +14,7 @@ use crossterm::event;
 use crossterm::execute;
 use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
+use mlua::Value;
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
@@ -555,18 +556,55 @@ impl Runner {
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
 
-                                let res: Result<Option<Vec<ExternalMsg>>> = lua
-                                    .load(&code)
-                                    .eval()
-                                    .and_then(|v| lua.from_value(v))
-                                    .map_err(Error::from);
+                                let res: Result<Value> =
+                                    lua.load(&code).eval().map_err(Error::from);
 
                                 match res {
-                                    Ok(Some(msgs)) => {
-                                        app = app
-                                            .handle_batch_external_msgs(msgs)?;
+                                    Ok(Value::Function(f)) => {
+                                        let arg = app.to_lua_ctx_heavy();
+                                        let res: Result<
+                                            Option<Vec<ExternalMsg>>,
+                                        > = lua
+                                            .to_value(&arg)
+                                            .and_then(|a| f.call(a))
+                                            .and_then(|v| lua.from_value(v))
+                                            .map_err(Error::from);
+                                        match res {
+                                            Ok(Some(msgs)) => {
+                                                app = app
+                                                    .handle_batch_external_msgs(
+                                                        msgs,
+                                                    )?;
+                                            }
+                                            Ok(None) => {}
+                                            Err(err) => {
+                                                app = app.log_error(
+                                                    err.to_string(),
+                                                )?;
+                                            }
+                                        }
                                     }
-                                    Ok(None) => {}
+                                    Ok(v) => {
+                                        let res: Result<
+                                            Option<Vec<ExternalMsg>>,
+                                        > = lua
+                                            .from_value(v)
+                                            .map_err(Error::from);
+                                        match res {
+                                            Ok(Some(msgs)) => {
+                                                app = app
+                                                    .handle_batch_external_msgs(
+                                                        msgs,
+                                                    )?;
+                                            }
+                                            Ok(None) => {}
+                                            Err(err) => {
+                                                app = app.log_error(
+                                                    err.to_string(),
+                                                )?;
+                                            }
+                                        }
+                                    }
                                     Err(err) => {
                                         app = app.log_error(err.to_string())?;
                                     }
@@ -594,18 +632,55 @@ impl Runner {
                             }
 
                             LuaEvalSilently(code) => {
-                                let res: Result<Option<Vec<ExternalMsg>>> = lua
-                                    .load(&code)
-                                    .eval()
-                                    .and_then(|v| lua.from_value(v))
-                                    .map_err(Error::from);
+                                let res: Result<Value> =
+                                    lua.load(&code).eval().map_err(Error::from);
 
                                 match res {
-                                    Ok(Some(msgs)) => {
-                                        app = app
-                                            .handle_batch_external_msgs(msgs)?;
+                                    Ok(Value::Function(f)) => {
+                                        let arg = app.to_lua_ctx_heavy();
+                                        let res: Result<
+                                            Option<Vec<ExternalMsg>>,
+                                        > = lua
+                                            .to_value(&arg)
+                                            .and_then(|a| f.call(a))
+                                            .and_then(|v| lua.from_value(v))
+                                            .map_err(Error::from);
+                                        match res {
+                                            Ok(Some(msgs)) => {
+                                                app = app
+                                                    .handle_batch_external_msgs(
+                                                        msgs,
+                                                    )?;
+                                            }
+                                            Ok(None) => {}
+                                            Err(err) => {
+                                                app = app.log_error(
+                                                    err.to_string(),
+                                                )?;
+                                            }
+                                        }
                                     }
-                                    Ok(None) => {}
+                                    Ok(v) => {
+                                        let res: Result<
+                                            Option<Vec<ExternalMsg>>,
+                                        > = lua
+                                            .from_value(v)
+                                            .map_err(Error::from);
+                                        match res {
+                                            Ok(Some(msgs)) => {
+                                                app = app
+                                                    .handle_batch_external_msgs(
+                                                        msgs,
+                                                    )?;
+                                            }
+                                            Ok(None) => {}
+                                            Err(err) => {
+                                                app = app.log_error(
+                                                    err.to_string(),
+                                                )?;
+                                            }
+                                        }
+                                    }
                                     Err(err) => {
                                         app = app.log_error(err.to_string())?;
                                     }
