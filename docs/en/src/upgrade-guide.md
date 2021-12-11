@@ -45,6 +45,20 @@ compatibility.
 
 ### Instructions
 
+#### [v0.16.4][44] -> [v0.17.0][45]
+
+- Deprecated `app.directory_buffer`, `app.history`, and `app.last_modes` in
+  the custom dynamic layout renderer context.
+  As of now, there's no way to access these fields in dynamic layouts. While
+  `app.history` and `app.last_modes` can be re-added upon request
+  (with justification), `app.directory_buffer` has been deprecated for good.
+  However, there's no change in the `CallLua*` context.
+- Set `xplr.config.general.help_hide_remaps` to `true` to hide the remaps in
+  help menu.
+- `None` will be serialized to `nil` in Lua.
+- `LuaEval` can now return a function that will be called with the Lua Context
+  argument. Refer to the `Full List of Messages` doc for example.
+
 #### [v0.15.2][43] -> [v0.16.4][44]
 
 - Deprecated `config.general.cursor`. The default terminal cursor will be used
@@ -300,3 +314,4 @@ Else do the following:
 [42]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
 [43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.2
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
+[45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.0
