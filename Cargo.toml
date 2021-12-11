@@ -1,6 +1,6 @@
 [package]
 name = "xplr"
-version = "0.16.4"  # Update lua.rs
+version = "0.17.0"  # Update lua.rs
 authors = ["Arijit Basu <sayanarijit@gmail.com>"]
 edition = "2018"
 description = "A hackable, minimal, fast TUI file explorer"
@@ -22,18 +22,18 @@ name = "xplr"
 tui = { version = "0.16.0", default-features = false, features = ['crossterm', 'serde'] }
 crossterm = "0.22.1"
 dirs = "4.0.0"
-serde = { version = "1.0.130", features = ["derive"] }
+serde = { version = "1.0.131", features = ["derive"] }
 serde_yaml = "0.8.21"
 mime_guess = "2.0.3"
-anyhow = "1.0.45"
+anyhow = "1.0.51"
 chrono = { version = "0.4.19", features = ["serde"] }
 lazy_static = "1.4.0"
 indexmap = { version = "1.7.0", features = ["serde"] }
 natord = "1.0.9"
 humansize = "1.1.1"
-mlua = { version = "0.6.6", features = ["luajit", "vendored", "serialize", "send"] }
+mlua = { version = "0.7.0", features = ["luajit", "vendored", "serialize", "send"] }
 ansi-to-tui = "0.4.1"
-libc = "0.2.107"
+libc = "0.2.109"
 tui-input = { version = "0.1.2", features = [ "serde" ] }
 
 [dev-dependencies]
