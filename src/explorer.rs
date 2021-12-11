@@ -109,7 +109,7 @@ mod tests {
     #[test]
     fn test_explore_sync() {
         let config = ExplorerConfig::default();
-        let path = PathBuf::from("/bin");
+        let path = PathBuf::from(".");
 
         let r = explore_sync(config, path, None, 0);
 
@@ -147,7 +147,7 @@ mod tests {
     #[test]
     fn test_explore_async() {
         let config = ExplorerConfig::default();
-        let path = PathBuf::from("/usr/bin");
+        let path = PathBuf::from(".");
         let (tx_msg_in, rx_msg_in) = mpsc::channel();
 
         explore_async(config, path, None, 0, tx_msg_in.clone());
@@ -155,7 +155,7 @@ mod tests {
         let task = rx_msg_in.recv().unwrap();
         let dbuf = extract_dirbuf_from_msg(task.msg);
 
-        assert_eq!(dbuf.parent, "/usr/bin");
+        assert_eq!(dbuf.parent, ".");
 
         drop(tx_msg_in);
         assert!(rx_msg_in.recv().is_err());
