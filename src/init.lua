@@ -208,6 +208,7 @@ xplr.config.general.table.row.cols = {
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.row.style = {}
 
+<<<<<<< HEAD
 -- Height of the table rows.
 --
 -- Type: nullable integer
@@ -240,11 +241,10 @@ xplr.config.general.table.col_spacing = 1
 -- Type: nullable list of [Constraint](https://xplr.dev/en/layouts#constraint)
 xplr.config.general.table.col_widths = {
   { Percentage = 10 },
-  { Percentage = 30 },
+  { Percentage = 40 },
+  { Percentage = 20 },
   { Percentage = 10 },
-  { Percentage = 10 },
-  { Percentage = 15 },
-  { Percentage = 15 },
+  { Percentage = 20 },
 }
 
 -- The content that is placed before the item name for each row by default.
@@ -2363,6 +2363,38 @@ xplr.config.modes.builtin.sort = {
         help = "by size",
         messages = {
           { AddNodeSorter = { sorter = "BySize", reverse = false } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["c"] = {
+        help = "by created",
+        messages = {
+          { AddNodeSorter = { sorter = "ByCreated", reverse = false } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["C"] = {
+        help = "by created reverse",
+        messages = {
+          { AddNodeSorter = { sorter = "ByCreated", reverse = true } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["l"] = {
+        help = "by last modified",
+        messages = {
+          { AddNodeSorter = { sorter = "ByLastModified", reverse = false } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["L"] = {
+        help = "by last modified reverse",
+        messages = {
+          { AddNodeSorter = { sorter = "ByLastModified", reverse = true } },
           "ExplorePwdAsync",
         },
       },
