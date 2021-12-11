@@ -321,7 +321,11 @@ xplr.config.layouts.builtin.default = {
 }
 
 xplr.fn.custom.render_layout = function(ctx)
-  return ctx.app.history.paths
+  return {
+    ctx.app.pwd,
+    ctx.app.version,
+    tostring(ctx.app.pid),
+  }
 end
 ```
 
