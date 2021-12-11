@@ -1032,14 +1032,14 @@ pub fn draw_custom_content<B: Backend>(
 
         ContentBody::DynamicParagraph { render } => {
             let ctx = ContentRendererArg {
-                app: app.to_lua_arg(),
+                app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
                 screen_size: screen_size.into(),
             };
 
             let render = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call_with_cache(lua, &render, arg)
+                    lua::call(lua, &render, arg)
                         .unwrap_or_else(|e| format!("{:?}", e))
                 })
                 .unwrap_or_else(|e| e.to_string());
@@ -1073,14 +1073,14 @@ pub fn draw_custom_content<B: Backend>(
 
         ContentBody::DynamicList { render } => {
             let ctx = ContentRendererArg {
-                app: app.to_lua_arg(),
+                app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
                 screen_size: screen_size.into(),
             };
 
             let items = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call_with_cache(lua, &render, arg)
+                    lua::call(lua, &render, arg)
                         .unwrap_or_else(|e| vec![format!("{:?}", e)])
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
@@ -1142,14 +1142,14 @@ pub fn draw_custom_content<B: Backend>(
             render,
         } => {
             let ctx = ContentRendererArg {
-                app: app.to_lua_arg(),
+                app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
                 screen_size: screen_size.into(),
             };
 
             let rows = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call_with_cache(lua, &render, arg)
+                    lua::call(lua, &render, arg)
                         .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])
@@ -1208,7 +1208,7 @@ impl From<TuiRect> for Rect {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ContentRendererArg {
-    app: app::CallLuaArg,
+    app: app::LuaContextLight,
     screen_size: Rect,
     layout_size: Rect,
 }

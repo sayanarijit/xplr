@@ -410,7 +410,7 @@ It contains the following information:
 - [screen_size][37]
 - [app][38]
 
-## Size
+### Size
 
 It contains the following information:
 
@@ -420,6 +420,25 @@ It contains the following information:
 - width
 
 Every field is of integer type.
+
+### app
+
+This is a lightweight version of the [Lua Context][39]. In this context, the 
+heavyweight fields like [directory_buffer][50] are omitted for performance
+reasons.
+
+Hence, only the following fields are avilable.
+
+- [version][40]
+- [pwd][41]
+- [focused_node][42]
+- [selection][43]
+- [mode][44]
+- [layout][45]
+- [input_buffer][46]
+- [pid][47]
+- [session_path][48]
+- [explorer_config][49]
 
 [1]: #builtin
 [2]: #custom
@@ -458,4 +477,16 @@ Every field is of integer type.
 [35]: #content-renderer
 [36]: #content-renderer-argument
 [37]: #size
-[38]: message.md#calllua-argument
+[38]: #app
+[39]: message.md#lua-context
+[40]: message.md#version
+[41]: message.md#pwd
+[42]: message.md#focused_node
+[43]: message.md#selection
+[44]: message.md#mode
+[45]: message.md#layout
+[46]: message.md#input_buffer
+[47]: message.md#pid
+[48]: message.md#session_path
+[49]: message.md#explorer_config
+[50]: message.md#directory_buffer
