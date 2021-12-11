@@ -6,7 +6,6 @@ use crate::lua;
 use crate::permissions::Permissions;
 use ansi_to_tui::ansi_to_text;
 use anyhow::Result;
-use chrono::{DateTime, Local};
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use mlua::Lua;
@@ -347,8 +346,10 @@ pub struct ResolvedNodeUiMetadata {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
-    pub last_modified: Option<DateTime<Local>>,
-    pub human_modified: String,
+    pub created: Option<i64>,
+    pub human_created: String,
+    pub last_modified: Option<i64>,
+    pub human_last_modified: String,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
@@ -362,8 +363,10 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
             mime_essence: node.mime_essence.to_owned(),
             size: node.size,
             human_size: node.human_size,
+            created: node.created,
+            human_created: node.human_created,
             last_modified: node.last_modified.to_owned(),
-            human_modified: node.human_modified,
+            human_last_modified: node.human_last_modified,
         }
     }
 }
@@ -386,8 +389,10 @@ pub struct NodeUiMetadata {
     pub permissions: Permissions,
     pub canonical: Option<ResolvedNodeUiMetadata>,
     pub symlink: Option<ResolvedNodeUiMetadata>,
-    pub last_modified: Option<DateTime<Local>>,
-    pub human_modified: String,
+    pub created: Option<i64>,
+    pub human_created: String,
+    pub last_modified: Option<i64>,
+    pub human_last_modified: String,
 
     // Extra
     pub index: usize,
@@ -434,8 +439,10 @@ impl NodeUiMetadata {
             permissions: node.permissions.to_owned(),
             canonical: node.canonical.to_owned().map(ResolvedNode::into),
             symlink: node.symlink.to_owned().map(ResolvedNode::into),
-            last_modified: node.last_modified.to_owned(),
-            human_modified: node.human_modified.to_owned(),
+            created: node.created,
+            human_created: node.human_created.to_owned(),
+            last_modified: node.last_modified,
+            human_last_modified: node.human_last_modified.to_owned(),
             index,
             relative_index,
             is_before_focus,

@@ -305,6 +305,14 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
     format = "[c]size",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
+  ByCanonicalCreated = {
+    format = "[c]created",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByCanonicalLastModified = {
+    format = "[c]modified",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
   ByExtension = {
     format = "ext",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
@@ -353,6 +361,14 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
     format = "size",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
+  ByCreated = {
+    format = "created",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  ByLastModified = {
+    format = "modified",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
   BySymlinkAbsolutePath = {
     format = "[s]abs",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
@@ -379,6 +395,14 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
   },
   BySymlinkSize = {
     format = "[s]size",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkCreated = {
+    format = "[s]created",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  BySymlinkLastModified = {
+    format = "[s]modified",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
 }
@@ -473,11 +497,10 @@ xplr.config.general.table.col_spacing = 1
 -------- Col widths
 xplr.config.general.table.col_widths = {
   { Percentage = 10 },
-  { Percentage = 30 },
+  { Percentage = 40 },
+  { Percentage = 20 },
   { Percentage = 10 },
-  { Percentage = 10 },
-  { Percentage = 15 },
-  { Percentage = 15 },
+  { Percentage = 20 },
 }
 
 -------- Header
@@ -500,10 +523,6 @@ xplr.config.general.table.header.cols = {
   },
   {
     format = "type",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "time",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
 }
@@ -535,8 +554,14 @@ xplr.config.general.table.row.cols = {
     format = "builtin.fmt_general_table_row_cols_4",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
+
+  -- Hidden fields, modify `general.table.col_widths` to show
   {
     format = "builtin.fmt_general_table_row_cols_5",
+    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+  },
+  {
+    format = "builtin.fmt_general_table_row_cols_6",
     style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
   },
 }
@@ -1977,6 +2002,38 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
+
+      ["c"] = {
+        help = "by created",
+        messages = {
+          { AddNodeSorter = { sorter = "ByCreated", reverse = false } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["C"] = {
+        help = "by created reverse",
+        messages = {
+          { AddNodeSorter = { sorter = "ByCreated", reverse = true } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["l"] = {
+        help = "by last modified",
+        messages = {
+          { AddNodeSorter = { sorter = "ByLastModified", reverse = false } },
+          "ExplorePwdAsync",
+        },
+      },
+
+      ["L"] = {
+        help = "by last modified reverse",
+        messages = {
+          { AddNodeSorter = { sorter = "ByLastModified", reverse = true } },
+          "ExplorePwdAsync",
+        },
+      },
     },
   },
 }
@@ -2197,13 +2254,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   end
 end
 
--------- Format last modified column
+-------- Format created column
 xplr.fn.builtin.fmt_general_table_row_cols_5 = function(m)
-  if m.is_symlink and not m.is_broken then
-    return m.symlink.human_modified
-  else
-    return m.human_modified
-  end
+  return m.human_created
+end
+
+-------- Format last modified column
+xplr.fn.builtin.fmt_general_table_row_cols_6 = function(m)
+  return m.human_last_modified
 end
 
 ---- Custom

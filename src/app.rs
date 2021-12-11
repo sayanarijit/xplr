@@ -22,9 +22,14 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 
-fn to_humansize(size: u64) -> String {
+fn to_human_size(size: u64) -> String {
     size.file_size(options::CONVENTIONAL)
         .unwrap_or_else(|_| format!("{} B", size))
+}
+
+fn to_human_timestamp(t: Option<DateTime<Local>>) -> String {
+    t.map(|l: DateTime<Local>| l.format("%y-%m-%d %H:%M:%S").to_string())
+        .unwrap_or_default()
 }
 
 fn mime_essence(path: &Path, is_dir: bool) -> String {
@@ -36,12 +41,6 @@ fn mime_essence(path: &Path, is_dir: bool) -> String {
             .map(|m| m.essence_str().to_string())
             .unwrap_or_default()
     }
-}
-
-fn to_human_modified(modified: Option<DateTime<Local>>) -> String {
-    modified.map_or("".to_string(), |l: DateTime<Local>| {
-        l.format("%b %d %R").to_string()
-    })
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -105,8 +104,10 @@ pub struct ResolvedNode {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
-    pub last_modified: Option<DateTime<Local>>,
-    pub human_modified: String,
+    pub created: Option<i64>,
+    pub human_created: String,
+    pub last_modified: Option<i64>,
+    pub human_last_modified: String,
 }
 
 impl ResolvedNode {
@@ -116,7 +117,7 @@ impl ResolvedNode {
             .map(|e| e.to_string_lossy().to_string())
             .unwrap_or_default();
 
-        let (is_dir, is_file, is_readonly, size, last_modified) = path
+        let (is_dir, is_file, is_readonly, size, created, last_modified) = path
             .metadata()
             .map(|m| {
                 (
@@ -124,16 +125,16 @@ impl ResolvedNode {
                     m.is_file(),
                     m.permissions().readonly(),
                     m.len(),
-                    m.modified()
-                        .map(|md| Some(md.into()))
-                        .unwrap_or_else(|_| None),
+                    m.created().ok().map(From::from),
+                    m.modified().ok().map(From::from),
                 )
             })
-            .unwrap_or((false, false, false, 0, None));
+            .unwrap_or((false, false, false, 0, None, None));
 
-        let human_modified = to_human_modified(last_modified);
+        let human_last_modified = to_human_timestamp(last_modified);
+        let human_created = to_human_timestamp(created);
         let mime_essence = mime_essence(&path, is_dir);
-        let human_size = to_humansize(size);
+        let human_size = to_human_size(size);
 
         Self {
             absolute_path: path.to_string_lossy().to_string(),
@@ -144,8 +145,10 @@ impl ResolvedNode {
             mime_essence,
             size,
             human_size,
-            last_modified,
-            human_modified,
+            created: created.map(|t| t.timestamp()),
+            human_created,
+            last_modified: last_modified.map(|t| t.timestamp()),
+            human_last_modified,
         }
     }
 }
@@ -167,8 +170,10 @@ pub struct Node {
     pub permissions: Permissions,
     pub canonical: Option<ResolvedNode>,
     pub symlink: Option<ResolvedNode>,
-    pub last_modified: Option<DateTime<Local>>,
-    pub human_modified: String,
+    pub created: Option<i64>,
+    pub human_created: String,
+    pub last_modified: Option<i64>,
+    pub human_last_modified: String,
 }
 
 impl Node {
@@ -197,6 +202,7 @@ impl Node {
             is_readonly,
             size,
             permissions,
+            created,
             last_modified,
         ) = path
             .symlink_metadata()
@@ -208,18 +214,27 @@ impl Node {
                     m.permissions().readonly(),
                     m.len(),
                     Permissions::from(&m),
-                    m.modified()
-                        .map(|md| Some(md.into()))
-                        .unwrap_or_else(|_| None),
+                    m.created().ok().map(From::from),
+                    m.modified().ok().map(From::from),
                 )
             })
             .unwrap_or_else(|_| {
-                (false, false, false, false, 0, Permissions::default(), None)
+                (
+                    false,
+                    false,
+                    false,
+                    false,
+                    0,
+                    Permissions::default(),
+                    None,
+                    None,
+                )
             });
 
-        let human_modified = to_human_modified(last_modified);
+        let human_created = to_human_timestamp(created);
+        let human_last_modified = to_human_timestamp(last_modified);
         let mime_essence = mime_essence(&path, is_dir);
-        let human_size = to_humansize(size);
+        let human_size = to_human_size(size);
 
         Self {
             parent,
@@ -241,8 +256,10 @@ impl Node {
             } else {
                 None
             },
-            last_modified,
-            human_modified,
+            created: created.map(|t| t.timestamp()),
+            human_created,
+            last_modified: last_modified.map(|t| t.timestamp()),
+            human_last_modified,
         }
     }
 }
@@ -305,6 +322,8 @@ pub enum NodeSorter {
     ByIsBroken,
     ByIsReadonly,
     ByMimeEssence,
+    ByCreated,
+    ByLastModified,
     BySize,
 
     ByCanonicalAbsolutePath,
@@ -314,6 +333,8 @@ pub enum NodeSorter {
     ByCanonicalIsFile,
     ByCanonicalIsReadonly,
     ByCanonicalMimeEssence,
+    ByCanonicalCreated,
+    ByCanonicalLastModified,
     ByCanonicalSize,
 
     BySymlinkAbsolutePath,
@@ -323,6 +344,8 @@ pub enum NodeSorter {
     BySymlinkIsFile,
     BySymlinkIsReadonly,
     BySymlinkMimeEssence,
+    BySymlinkCreated,
+    BySymlinkLastModified,
     BySymlinkSize,
 }
 
@@ -367,6 +390,8 @@ impl NodeSorterApplicable {
             NodeSorter::ByIsBroken => a.is_broken.cmp(&b.is_broken),
             NodeSorter::ByIsReadonly => a.is_readonly.cmp(&b.is_readonly),
             NodeSorter::ByMimeEssence => a.mime_essence.cmp(&b.mime_essence),
+            NodeSorter::ByCreated => a.created.cmp(&b.created),
+            NodeSorter::ByLastModified => a.last_modified.cmp(&b.last_modified),
             NodeSorter::BySize => a.size.cmp(&b.size),
 
             NodeSorter::ByCanonicalAbsolutePath => natord::compare(
@@ -422,6 +447,18 @@ impl NodeSorterApplicable {
                 .as_ref()
                 .map(|s| &s.mime_essence)
                 .cmp(&b.canonical.as_ref().map(|s| &s.mime_essence)),
+
+            NodeSorter::ByCanonicalCreated => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.created)
+                .cmp(&b.canonical.as_ref().map(|s| &s.created)),
+
+            NodeSorter::ByCanonicalLastModified => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.last_modified)
+                .cmp(&b.canonical.as_ref().map(|s| &s.last_modified)),
 
             NodeSorter::ByCanonicalSize => a
                 .canonical
@@ -480,6 +517,18 @@ impl NodeSorterApplicable {
                 .as_ref()
                 .map(|s| &s.mime_essence)
                 .cmp(&b.symlink.as_ref().map(|s| &s.mime_essence)),
+
+            NodeSorter::BySymlinkCreated => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.created)
+                .cmp(&b.symlink.as_ref().map(|s| &s.created)),
+
+            NodeSorter::BySymlinkLastModified => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.last_modified)
+                .cmp(&b.symlink.as_ref().map(|s| &s.last_modified)),
 
             NodeSorter::BySymlinkSize => a
                 .symlink
