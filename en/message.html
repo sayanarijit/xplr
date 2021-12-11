@@ -398,9 +398,8 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ BashExecSilently = &quot;tput bell&quot; }</code></p>
 <h3 id="-calllua--string-"><a class="header" href="#-calllua--string-">{ CallLua = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>CallLua: string</code></p>
-<p>Call a Lua function.
-A <a href="#calllua-argument"><code>CallLuaArg</code></a> object will be passed to the
-<a href="#lua-function-calls">function</a> as argument.
+<p>Call a Lua function.</p>
+<p>A <a href="#lua-context">Lua Context</a> object will be passed to the <a href="#lua-function-calls">function</a> as argument.
 The function can optionally return a list of messages for xplr to handle
 after the executing the function.</p>
 <p><strong>YAML Example:</strong> <code>CallLua: custom.some_custom_funtion</code></p>
@@ -413,8 +412,8 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ CallLuaSilently = &quot;custom.some_custom_function&quot; }</code></p>
 <h3 id="-luaeval--string-"><a class="header" href="#-luaeval--string-">{ LuaEval = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>LuaEval: string</code></p>
-<p>Execute Lua code without needing to define a function.
-However, <code>CallLuaArg</code> won't be available.</p>
+<p>Execute Lua code without needing to define a function. However,
+<a href="#lua-context">Lua Context</a> won't be available.</p>
 <p><strong>YAML Example:</strong> <code>LuaEval: &quot;return { { LogInfo = io.read() } }&quot;</code></p>
 <p><strong>Lua Example:</strong> <code>{ LuaEval = [[return { { LogInfo = io.read() } }]] }</code></p>
 <h3 id="-luaevalsilently--string-"><a class="header" href="#-luaevalsilently--string-">{ LuaEvalSilently = &quot;string&quot; }</a></h3>
@@ -614,16 +613,15 @@ the default configuration file.</p>
 <h2 id="lua-function-calls"><a class="header" href="#lua-function-calls">Lua Function Calls</a></h2>
 <p>xplr allows users to define lua functions using the <code>xplr.fn.custom</code> Lua API.</p>
 <p>These functions can be called using messages like <code>CallLua</code>, <code>CallLuaSilently</code>.</p>
-<p>When called the function receives a <a href="#calllua-argument">special argument</a> that
+<p>When called the function receives a <a href="#lua-context">special argument</a> that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.</p>
-<h3 id="calllua-argument"><a class="header" href="#calllua-argument">CallLua Argument</a></h3>
+<h3 id="lua-context"><a class="header" href="#lua-context">Lua Context</a></h3>
 <p>This is a special argument passed to the lua functions when called using the
 <code>CallLua</code>, <code>CallLuaSilently</code> messages.</p>
 <p>It contains the following information:</p>
 <ul>
 <li><a href="#version">version</a></li>
-<li><a href="#config">config</a></li>
 <li><a href="#pwd">pwd</a></li>
 <li><a href="#focused_node">focused_node</a></li>
 <li><a href="#directory_buffer">directory_buffer</a></li>
@@ -640,9 +638,6 @@ messages which will be handled by xplr.</p>
 <h3 id="version"><a class="header" href="#version">version</a></h3>
 <p>Type: string</p>
 <p>xplr version. Can be used to test compatibility.</p>
-<h3 id="config"><a class="header" href="#config">config</a></h3>
-<p>Type: <a href="configuration.html#config">Config</a></p>
-<p>The loaded configuration.</p>
 <h3 id="pwd"><a class="header" href="#pwd">pwd</a></h3>
 <p>Type: string</p>
 <p>The present working directory/</p>
@@ -650,7 +645,7 @@ messages which will be handled by xplr.</p>
 <p>Type: nullable <a href="#node">Node</a></p>
 <p>The node under focus.</p>
 <h3 id="directory_buffer"><a class="header" href="#directory_buffer">directory_buffer</a></h3>
-<p>Type: nullable <a href="#directorybuffer">DirectoryBuffer</a></p>
+<p>Type: nullable <a href="#directory-buffer">Directory Buffer</a></p>
 <p>The directory buffer being rendered.</p>
 <h3 id="selection"><a class="header" href="#selection">selection</a></h3>
 <p>Type: list of selected <a href="#node">Node</a>s</p>
@@ -746,7 +741,7 @@ node. It will instead be null.</p>
 <li><a href="#canonical">canonical</a></li>
 <li><a href="#symlink">symlink</a></li>
 </ul>
-<h3 id="directorybuffer"><a class="header" href="#directorybuffer">DirectoryBuffer</a></h3>
+<h3 id="directory-buffer"><a class="header" href="#directory-buffer">Directory Buffer</a></h3>
 <p>Directory buffer contains the following fields:</p>
 <ul>
 <li><a href="#parent">parent</a></li>

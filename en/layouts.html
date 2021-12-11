@@ -451,9 +451,9 @@ content body for the custom dynamic layouts.</p>
 <ul>
 <li><a href="#size">layout_size</a></li>
 <li><a href="#size">screen_size</a></li>
-<li><a href="message.html#calllua-argument">app</a></li>
+<li><a href="#app">app</a></li>
 </ul>
-<h2 id="size"><a class="header" href="#size">Size</a></h2>
+<h3 id="size"><a class="header" href="#size">Size</a></h3>
 <p>It contains the following information:</p>
 <ul>
 <li>x</li>
@@ -462,6 +462,23 @@ content body for the custom dynamic layouts.</p>
 <li>width</li>
 </ul>
 <p>Every field is of integer type.</p>
+<h3 id="app"><a class="header" href="#app">app</a></h3>
+<p>This is a lightweight version of the <a href="message.html#lua-context">Lua Context</a>. In this context, the 
+heavyweight fields like <a href="message.html#directory_buffer">directory_buffer</a> are omitted for performance
+reasons.</p>
+<p>Hence, only the following fields are avilable.</p>
+<ul>
+<li><a href="message.html#version">version</a></li>
+<li><a href="message.html#pwd">pwd</a></li>
+<li><a href="message.html#focused_node">focused_node</a></li>
+<li><a href="message.html#selection">selection</a></li>
+<li><a href="message.html#mode">mode</a></li>
+<li><a href="message.html#layout">layout</a></li>
+<li><a href="message.html#input_buffer">input_buffer</a></li>
+<li><a href="message.html#pid">pid</a></li>
+<li><a href="message.html#session_path">session_path</a></li>
+<li><a href="message.html#explorer_config">explorer_config</a></li>
+</ul>
 
                     </main>
 
