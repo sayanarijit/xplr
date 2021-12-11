@@ -1133,7 +1133,6 @@ pub struct Command {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
-    CacheDirectoryNodes(Vec<Node>),
     ExplorePwdAsync,
     ExploreParentsAsync,
     Refresh,
@@ -1247,29 +1246,12 @@ impl History {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
-pub struct CachedDirectoryBuffer {
-    pub parent: String,
-    pub total: usize,
-    pub focus: usize,
-}
-
-impl CachedDirectoryBuffer {
-    pub fn new(buf: &DirectoryBuffer) -> Self {
-        Self {
-            parent: buf.parent.clone(),
-            total: buf.total,
-            focus: buf.focus,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize)]
-pub struct CallLuaArg {
+pub struct LuaContextHeavy {
     pub version: String,
     pub pwd: String,
     pub focused_node: Option<Node>,
-    pub directory_buffer: Option<CachedDirectoryBuffer>,
+    pub directory_buffer: Option<DirectoryBuffer>,
     pub selection: IndexSet<Node>,
     pub mode: Mode,
     pub layout: Layout,
@@ -1279,6 +1261,20 @@ pub struct CallLuaArg {
     pub explorer_config: ExplorerConfig,
     pub history: History,
     pub last_modes: Vec<Mode>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LuaContextLight {
+    pub version: String,
+    pub pwd: String,
+    pub focused_node: Option<Node>,
+    pub selection: IndexSet<Node>,
+    pub mode: Mode,
+    pub layout: Layout,
+    pub input_buffer: Option<String>,
+    pub pid: u32,
+    pub session_path: String,
+    pub explorer_config: ExplorerConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -2280,8 +2276,6 @@ impl App {
             dir.focused_node().map(|n| n.relative_path.clone()),
         )?;
         if dir.parent == self.pwd {
-            self.msg_out
-                .push_back(MsgOut::CacheDirectoryNodes(dir.nodes.clone()));
             self.directory_buffer = Some(dir);
         }
         Ok(self)
@@ -2772,15 +2766,12 @@ impl App {
         Ok(())
     }
 
-    pub fn to_lua_arg(&self) -> CallLuaArg {
-        CallLuaArg {
+    pub fn to_lua_ctx_heavy(&self) -> LuaContextHeavy {
+        LuaContextHeavy {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
             focused_node: self.focused_node().cloned(),
-            directory_buffer: self
-                .directory_buffer
-                .as_ref()
-                .map(|buf| CachedDirectoryBuffer::new(buf)),
+            directory_buffer: self.directory_buffer.clone(),
             selection: self.selection.clone(),
             mode: self.mode.clone(),
             layout: self.layout.clone(),
@@ -2790,6 +2781,21 @@ impl App {
             explorer_config: self.explorer_config.clone(),
             history: self.history.clone(),
             last_modes: self.last_modes.clone(),
+        }
+    }
+
+    pub fn to_lua_ctx_light(&self) -> LuaContextLight {
+        LuaContextLight {
+            version: self.version.clone(),
+            pwd: self.pwd.clone(),
+            focused_node: self.focused_node().cloned(),
+            selection: self.selection.clone(),
+            mode: self.mode.clone(),
+            layout: self.layout.clone(),
+            input_buffer: self.input.as_ref().map(|i| i.value().into()),
+            pid: self.pid,
+            session_path: self.session_path.clone(),
+            explorer_config: self.explorer_config.clone(),
         }
     }
 }

@@ -1,4 +1,3 @@
-use crate::app::Node;
 use crate::app::VERSION;
 use crate::config::Config;
 use anyhow::bail;
@@ -12,7 +11,6 @@ use serde::Serialize;
 use std::fs;
 
 const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
-const CACHE_LUA_SCRIPT: &str = include_str!("__cache__.lua");
 const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
 
 pub fn serialize<'lua, T: Serialize + Sized>(
@@ -83,7 +81,6 @@ pub fn init(lua: &Lua) -> Result<Config> {
     globals.set("xplr", lua_xplr)?;
 
     lua.load(DEFAULT_LUA_SCRIPT).set_name("init")?.exec()?;
-    lua.load(CACHE_LUA_SCRIPT).set_name("internal")?.exec()?;
 
     let lua_xplr: mlua::Table = globals.get("xplr")?;
     let config: Config = lua.from_value(lua_xplr.get("config")?)?;
@@ -145,29 +142,6 @@ pub fn call<'lua, R: Deserialize<'lua>>(
     let res: mlua::Value = func.call(arg)?;
     let res: R = lua.from_value(res)?;
     Ok(res)
-}
-
-/// Used to call lua functions with cache support.
-pub fn call_with_cache<'lua, R: Deserialize<'lua>>(
-    lua: &'lua Lua,
-    func: &str,
-    arg: mlua::Value<'lua>,
-) -> Result<R> {
-    let caller: mlua::Function =
-        resolve_fn(&lua.globals(), "xplr.__CACHE__.call")?;
-    let func = format!("xplr.fn.{}", func);
-    let func: mlua::Function = resolve_fn(&lua.globals(), &func)?;
-    let res: mlua::Value = caller.call((func, arg))?;
-    let res: R = lua.from_value(res)?;
-    Ok(res)
-}
-
-/// Used to cache the directory nodes.
-pub fn cache_directory_nodes(lua: &Lua, nodes: &[Node]) -> Result<()> {
-    let func = "xplr.__CACHE__.set_directory_nodes";
-    let func: mlua::Function = resolve_fn(&lua.globals(), func)?;
-    func.call(serialize(lua, &nodes)?)?;
-    Ok(())
 }
 
 #[cfg(test)]

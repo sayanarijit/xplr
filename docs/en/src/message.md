@@ -445,8 +445,8 @@ stderr will be piped to null. So it's non-interactive.
 **YAML:** `CallLua: string`
 
 Call a Lua function.
-A [`CallLuaArg`][14] object will be passed to the
-[function][3] as argument.
+
+A [Lua Context][14] object will be passed to the [function][3] as argument.
 The function can optionally return a list of messages for xplr to handle
 after the executing the function.
 
@@ -469,8 +469,8 @@ stderr will be piped to null. So it's non-interactive.
 
 **YAML:** `LuaEval: string`
 
-Execute Lua code without needing to define a function.
-However, `CallLuaArg` won't be available.
+Execute Lua code without needing to define a function. However,
+[Lua Context][14] won't be available.
 
 **YAML Example:** `LuaEval: "return { { LogInfo = io.read() } }"`
 
@@ -856,7 +856,7 @@ When called the function receives a [special argument][14] that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.
 
-### CallLua Argument
+### Lua Context
 
 This is a special argument passed to the lua functions when called using the
 `CallLua`, `CallLuaSilently` messages.
@@ -864,7 +864,6 @@ This is a special argument passed to the lua functions when called using the
 It contains the following information:
 
 - [version][29]
-- [config][30]
 - [pwd][31]
 - [focused_node][32]
 - [directory_buffer][33]
@@ -884,12 +883,6 @@ Type: string
 
 xplr version. Can be used to test compatibility.
 
-### config
-
-Type: [Config][43]
-
-The loaded configuration.
-
 ### pwd
 
 Type: string
@@ -904,7 +897,7 @@ The node under focus.
 
 ### directory_buffer
 
-Type: nullable [DirectoryBuffer][62]
+Type: nullable [Directory Buffer][62]
 
 The directory buffer being rendered.
 
@@ -1073,7 +1066,7 @@ A node contains the following fields:
 - [canonical][58]
 - [symlink][59]
 
-### DirectoryBuffer
+### Directory Buffer
 
 Directory buffer contains the following fields:
 
@@ -1285,11 +1278,10 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [11]: layouts.md#layout
 [12]: layouts.md#builtin
 [13]: layouts.md#custom
-[14]: #calllua-argument
+[14]: #lua-context
 [15]: filtering.md#filter
 [16]: filtering.md
 [17]: sorting.md#sorter
-[18]: https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html#fields
 [19]: configure-key-bindings.md#tutorial-adding-a-new-mode
 [20]: #xplr_pipe_msg_in
 [21]: #xplr_pipe_selection_out
@@ -1333,7 +1325,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [59]: #symlink
 [60]: column-renderer.md#permission
 [61]: column-renderer.md#resolved-node-metadata
-[62]: #directorybuffer
+[62]: #directory-buffer
 [63]: #nodes
 [64]: #total
 [65]: #focus

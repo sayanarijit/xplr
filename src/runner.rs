@@ -32,15 +32,15 @@ pub fn get_tty() -> Result<fs::File> {
     }
 }
 
-fn call_lua(
+fn call_lua_heavy(
     app: &app::App,
     lua: &mlua::Lua,
     func: &str,
     _silent: bool,
 ) -> Result<Option<Vec<app::ExternalMsg>>> {
-    let arg = app.to_lua_arg();
+    let arg = app.to_lua_ctx_heavy();
     let arg = lua::serialize(lua, &arg)?;
-    lua::call_with_cache(lua, func, arg)
+    lua::call(lua, func, arg)
 }
 
 fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
@@ -273,10 +273,6 @@ impl Runner {
                                 tx_msg_in.send(task)?;
                             }
 
-                            CacheDirectoryNodes(nodes) => {
-                                lua::cache_directory_nodes(&lua, &nodes)?;
-                            }
-
                             Quit => {
                                 result = Ok(None);
                                 break 'outer;
@@ -455,7 +451,7 @@ impl Runner {
                             }
 
                             CallLuaSilently(func) => {
-                                match call_lua(&app, &lua, &func, false) {
+                                match call_lua_heavy(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
                                         app = app
                                             .handle_batch_external_msgs(msgs)?;
@@ -513,7 +509,7 @@ impl Runner {
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
 
-                                match call_lua(&app, &lua, &func, false) {
+                                match call_lua_heavy(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
                                         app = app
                                             .handle_batch_external_msgs(msgs)?;
