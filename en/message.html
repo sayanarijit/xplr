@@ -412,10 +412,13 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p><strong>Lua Example:</strong> <code>{ CallLuaSilently = &quot;custom.some_custom_function&quot; }</code></p>
 <h3 id="-luaeval--string-"><a class="header" href="#-luaeval--string-">{ LuaEval = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>LuaEval: string</code></p>
-<p>Execute Lua code without needing to define a function. However,
-<a href="#lua-context">Lua Context</a> won't be available.</p>
-<p><strong>YAML Example:</strong> <code>LuaEval: &quot;return { { LogInfo = io.read() } }&quot;</code></p>
-<p><strong>Lua Example:</strong> <code>{ LuaEval = [[return { { LogInfo = io.read() } }]] }</code></p>
+<p>Execute Lua code without needing to define a function.</p>
+<p>If the <code>string</code> is a callable, xplr will try to call it with with the
+<a href="#lua-context">Lua Context</a> argument.</p>
+<p><strong>YAML Example:</strong> <code>LuaEval: &quot;return { { LogInfo = io.read() } }&quot;</code>
+<strong>YAML Example:</strong> <code>LuaEval: &quot;function(app) return { { LogInfo = app.pwd } } end&quot;</code></p>
+<p><strong>Lua Example:</strong> <code>{ LuaEval = [[return { { LogInfo = io.read() } }]] }</code>
+<strong>Lua Example:</strong> <code>{ LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }</code></p>
 <h3 id="-luaevalsilently--string-"><a class="header" href="#-luaevalsilently--string-">{ LuaEvalSilently = &quot;string&quot; }</a></h3>
 <p><strong>YAML:</strong> <code>LuaEvalSilently: string</code></p>
 <p>Like <code>LuaEval</code> but without the flicker. The stdin, stdout
