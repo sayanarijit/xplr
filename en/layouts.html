@@ -376,7 +376,11 @@ It contains the following fields:</p>
 }
 
 xplr.fn.custom.render_layout = function(ctx)
-  return ctx.app.history.paths
+  return {
+    ctx.app.pwd,
+    ctx.app.version,
+    tostring(ctx.app.pid),
+  }
 end
 </code></pre>
 <h3 id="static-table"><a class="header" href="#static-table">Static Table</a></h3>
