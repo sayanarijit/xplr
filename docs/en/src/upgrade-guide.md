@@ -53,7 +53,7 @@ compatibility.
   `app.history` and `app.last_modes` can be re-added upon request
   (with justification), `app.directory_buffer` has been deprecated for good.
   However, there's no change in the `CallLua*` context.
-- Set `xplr.config.general.help_hide_remaps` to `true` to hide the remaps in
+- Set `xplr.config.general.hide_remaps_in_help_menu` to `true` to hide the remaps in
   help menu.
 - `None` will be serialized to `nil` in Lua.
 - `LuaEval` can now return a function that will be called with the Lua Context
