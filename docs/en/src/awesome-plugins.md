@@ -12,42 +12,42 @@ of the following plugins work for you, it's very easy to
 
 ## Extension
 
-- [**comex.xplr**][21] One xplr plugin to compress and extract them all.
-- [**command-mode.xplr**][37] The missing command mode for xplr.
-- [**context-switch.xplr**][42] Context switch plugin for xplr.
-- [**map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
-- [**type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
+- [**sayanarijit/command-mode.xplr**][37] The missing command mode for xplr.
+- [**igorepst/context-switch.xplr**][42] Context switch plugin for xplr.
+- [**sayanarijit/map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
+- [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
-- [**term.xplr**][39] Terminal integration for xplr 
+- [**igorepst/term.xplr**][39] Terminal integration for xplr
 
 ## Integration
 
-- [**alacritty.xplr**][33] [Alacritty][34] integration for xplr.
-- [**dragon.xplr**][4] Drag and drop files using [dragon][5].
-- [**dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
+- [**sayanarijit/alacritty.xplr**][33] [Alacritty][34] integration for xplr.
+- [**sayanarijit/dragon.xplr**][4] Drag and drop files using [dragon][5].
+- [**sayanarijit/dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
   support.
-- [**fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
+- [**sayanarijit/fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
   into a directory.
-- [**nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
+- [**sayanarijit/nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
   [nvim-ctrl][36].
-- [**ouch.xplr**][40] This plugin uses [ouch][41] to compress and decompress files.
-- [**paste-rs.xplr**][23] Use this plugin to paste your files to
+- [**dtomvan/ouch.xplr**][40] This plugin uses [ouch][41] to compress and decompress files.
+- [**dtomvan/paste-rs.xplr**][23] Use this plugin to paste your files to
   [paste.rs][24], and open/delete them later using [fzf][9].
-- [**preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
+- [**sayanarijit/preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
   [nnn preview-tabbed][12].
-- [**qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
-- [**trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
-- [**xargs.xplr**][22] Batch execute commands on the focused or selected files
+- [**sayanarijit/qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
+- [**sayanarijit/trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
+- [**sayanarijit/xargs.xplr**][22] Batch execute commands on the focused or selected files
   using `xargs`.
-- [**xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
-- [**zoxide.xplr**][17] Change directory using the [zoxide][18] database.
+- [**sayanarijit/xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
+- [**sayanarijit/zoxide.xplr**][17] Change directory using the [zoxide][18] database.
 
 ## Theme
 
-- [**material-landscape.xplr**][19] Material Landscape
-- [**material-landscape2.xplr**][20] Material Landscape 2
-- [**zentable.xplr**][31] A clean, distraction free xplr table UI
-- [**icons.xplr**][30] An icon theme for xplr.
+- [**sayanarijit/material-landscape.xplr**][19] Material Landscape
+- [**sayanarijit/material-landscape2.xplr**][20] Material Landscape 2
+- [**sayanarijit/zentable.xplr**][31] A clean, distraction free xplr table UI
+- [**prncss-xyz/icons.xplr**][30] An icon theme for xplr.
+- [**dtomvan/icons.xplr**][43] Adds (dev)icons to xplr.
 
 [1]: ./writing-plugins.md
 [2]: #integration
@@ -69,7 +69,6 @@ of the following plugins work for you, it's very easy to
 [18]: https://github.com/ajeetdsouza/zoxide
 [19]: https://github.com/sayanarijit/material-landscape.xplr
 [20]: https://github.com/sayanarijit/material-landscape2.xplr
-[21]: https://github.com/sayanarijit/comex.xplr
 [22]: https://github.com/sayanarijit/xargs.xplr
 [23]: https://github.com/dtomvan/paste-rs.xplr
 [24]: https://paste.rs
@@ -91,3 +90,4 @@ of the following plugins work for you, it's very easy to
 [40]: https://github.com/dtomvan/ouch.xplr
 [41]: https://github.com/ouch-org/ouch
 [42]: https://github.com/igorepst/context-switch.xplr
+[43]: https://github.com/dtomvan/icons.xplr
