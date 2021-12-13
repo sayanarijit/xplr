@@ -47,7 +47,6 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/material-landscape2.xplr**][20] Material Landscape 2
 - [**sayanarijit/zentable.xplr**][31] A clean, distraction free xplr table UI
 - [**prncss-xyz/icons.xplr**][30] An icon theme for xplr.
-- [**dtomvan/icons.xplr**][43] Adds (dev)icons to xplr.
 
 [1]: ./writing-plugins.md
 [2]: #integration
@@ -90,4 +89,3 @@ of the following plugins work for you, it's very easy to
 [40]: https://github.com/dtomvan/ouch.xplr
 [41]: https://github.com/ouch-org/ouch
 [42]: https://github.com/igorepst/context-switch.xplr
-[43]: https://github.com/dtomvan/icons.xplr
