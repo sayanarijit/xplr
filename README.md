@@ -47,8 +47,8 @@ hackable file explorer.
 `xplr` is not meant to be a replacement for the standard shell commands or the
 GUI file managers. Rather, it aims to integrate them all and expose an
 intuitive, scriptable, keyboard controlled, real-time visual interface, also
-being an ideal candidate for further integration, enabling the users to achieve
-insane terminal productivity.
+being an ideal candidate for further integration, enabling us to achieve insane
+terminal productivity.
 
 ## Introductions & Reviews
 
