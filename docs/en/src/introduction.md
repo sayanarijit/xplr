@@ -108,7 +108,7 @@ will also be considered in the decision-making.
   - Quit with failure (`ctrl-c`).
 
 [1]: layouts.md
-[2]: modes.md
+[2]: configure-key-bindings.md
 [3]: awesome-plugins.md
 [4]: https://github.com/sayanarijit/xplr/tree/main/benches
 [5]: https://github.com/sayanarijit/xplr/discussions/183
