@@ -216,6 +216,9 @@ pub struct PanelUi {
 #[serde(deny_unknown_fields)]
 pub struct GeneralConfig {
     #[serde(default)]
+    pub debug_on_error: bool,
+
+    #[serde(default)]
     pub enable_mouse: bool,
 
     #[serde(default)]
@@ -521,6 +524,9 @@ pub struct BuiltinModesConfig {
     pub default: Mode,
 
     #[serde(default)]
+    pub debug: Mode,
+
+    #[serde(default)]
     pub recover: Mode,
 
     #[serde(default)]
@@ -576,6 +582,7 @@ impl BuiltinModesConfig {
     pub fn get(&self, name: &str) -> Option<&Mode> {
         match name {
             "default" => Some(&self.default),
+            "debug" => Some(&self.debug),
             "recover" => Some(&self.recover),
             "selection ops" => Some(&self.selection_ops),
             "selection_ops" => Some(&self.selection_ops),

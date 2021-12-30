@@ -1424,8 +1424,13 @@ impl App {
             last_modes: Default::default(),
         };
 
+        let has_errs = !load_errs.is_empty();
         for err in load_errs {
             app = app.log_error(err)?
+        }
+
+        if has_errs && app.config.general.debug_on_error {
+            app = app.switch_mode_builtin("debug")?;
         }
 
         Ok(app)
@@ -2672,6 +2677,7 @@ impl App {
 
         [
             &builtin.default,
+            &builtin.debug,
             &builtin.recover,
             &builtin.filter,
             &builtin.number,

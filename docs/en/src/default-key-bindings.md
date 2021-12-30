@@ -38,6 +38,14 @@ of [modes][4] and the key mappings for each mode.
 | ~      |        | go home             |
 | [0-9]  |        | input               |
 
+### debug
+
+| key    | remaps | action              |
+| -------| ------ | --------------------|
+| ctrl-c |        | terminate           |
+| enter  |        | open logs in editor |
+| esc    |        | escape              |
+
 ### recover
 
 | key    | remaps | action    |

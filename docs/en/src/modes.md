@@ -20,6 +20,7 @@ This is exposed by the `xplr.config.modes.builtin` API.
 xplr by default provides the following builtin modes:
 
 - default
+- debug
 - recover
 - selection_ops
 - create

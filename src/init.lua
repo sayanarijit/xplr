@@ -7,6 +7,9 @@ local xplr = xplr
 
 -- Config
 ---- General
+------ Debug on error
+xplr.config.general.debug_on_error = true
+
 ------ Show hidden
 xplr.config.general.show_hidden = false
 
@@ -972,6 +975,70 @@ xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
 
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
   xplr.config.modes.builtin.default.key_bindings.on_key.right
+
+xplr.config.modes.builtin.debug = {
+  name = "debug",
+  help = nil,
+  extra_help = nil,
+  layout = {
+    Vertical = {
+      config = {
+        constraints = {
+          { Min = 9 },
+          { MinLessThanScreenHeight = 9 },
+        }
+      },
+      splits = {
+        {
+          CustomContent = {
+            title = "debug mode",
+            body = {
+              StaticParagraph = {
+                render = [[Startup errors have occured. Check your init.lua for errors.
+If you think this is a bug, report your error at:
+
+https://github.com/sayanarijit/xplr/issues/new
+
+To open the logs in your editor, press `enter`.
+To ignore the errors continue in the default config, press `escape`.]]
+              }
+            },
+          },
+        },
+        "InputAndLogs",
+      }
+    }
+  },
+  key_bindings = {
+    on_key = {
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {"Terminate"}
+      },
+      enter = {
+        help = "open logs in editor",
+        messages = {
+          {
+            BashExec = [===[
+              ${EDITOR:-vi} "${XPLR_PIPE_LOGS_OUT:?}"
+            ]===],
+          },
+        },
+      },
+      esc = {
+        help = "escape",
+        messages = {"PopMode"}
+      }
+    },
+    on_alphabet = nil,
+    on_number = nil,
+    on_special_character = nil,
+    default = {
+      help = nil,
+      messages = {}
+    }
+  }
+}
 
 ------ Recover
 xplr.config.modes.builtin.recover = {

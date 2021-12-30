@@ -3,6 +3,12 @@
 This configuration is exposed via the `xplr.config.general` API. It contains
 the following fields:
 
+## debug_on_error
+
+Type: boolean
+
+Set it to `true` to debug errors if they occur during startup.
+
 ## enable_mouse
 
 Type: boolean
