@@ -657,6 +657,12 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>~</td><td></td><td>go home</td></tr>
 <tr><td>[0-9]</td><td></td><td>input</td></tr>
 </tbody></table>
+<h3 id="debug"><a class="header" href="#debug">debug</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>open logs in editor</td></tr>
+<tr><td>esc</td><td></td><td>escape</td></tr>
+</tbody></table>
 <h3 id="recover"><a class="header" href="#recover">recover</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
@@ -898,6 +904,9 @@ xplr.config.modes.custom.test = {
 <div style="break-before: page; page-break-before: always;"></div><h1 id="general-config"><a class="header" href="#general-config">General Config</a></h1>
 <p>This configuration is exposed via the <code>xplr.config.general</code> API. It contains
 the following fields:</p>
+<h2 id="debug_on_error"><a class="header" href="#debug_on_error">debug_on_error</a></h2>
+<p>Type: boolean</p>
+<p>Set it to <code>true</code> to debug errors if they occur during startup.</p>
 <h2 id="enable_mouse"><a class="header" href="#enable_mouse">enable_mouse</a></h2>
 <p>Type: boolean</p>
 <p>Set it to <code>true</code> enable scrolling using mouse.</p>
@@ -1177,6 +1186,7 @@ can switch between these modes at run-time.</p>
 <p>xplr by default provides the following builtin modes:</p>
 <ul>
 <li>default</li>
+<li>debug</li>
 <li>recover</li>
 <li>selection_ops</li>
 <li>create</li>
@@ -2893,6 +2903,7 @@ of the following plugins work for you, it's very easy to
 <ul>
 <li><a href="https://github.com/sayanarijit/command-mode.xplr"><strong>sayanarijit/command-mode.xplr</strong></a> The missing command mode for xplr.</li>
 <li><a href="https://github.com/igorepst/context-switch.xplr"><strong>igorepst/context-switch.xplr</strong></a> Context switch plugin for xplr.</li>
+<li><a href="https://github.com/sayanarijit/dual-pane.xplr"><strong>sayanarijit/dual-pane.xplr</strong></a>  Implements support for dual-pane navigation into xplr.</li>
 <li><a href="https://github.com/sayanarijit/map.xplr"><strong>sayanarijit/map.xplr</strong></a> Visually inspect and interactively execute batch commands using xplr.</li>
 <li><a href="https://github.com/prncss-xyz/type-to-nav.xplr"><strong>prncss-xyz/type-to-nav.xplr</strong></a> Inspired by <a href="https://github.com/jarun/nnn/wiki/concepts#type-to-nav">nnn's type-to-nav mode</a> for xplr,
 with some tweaks.</li>
