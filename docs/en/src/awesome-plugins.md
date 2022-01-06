@@ -14,6 +14,7 @@ of the following plugins work for you, it's very easy to
 
 - [**sayanarijit/command-mode.xplr**][37] The missing command mode for xplr.
 - [**igorepst/context-switch.xplr**][42] Context switch plugin for xplr.
+- [**sayanarijit/dual-pane.xplr**][43]  Implements support for dual-pane navigation into xplr.
 - [**sayanarijit/map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
 - [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
@@ -89,3 +90,4 @@ of the following plugins work for you, it's very easy to
 [40]: https://github.com/dtomvan/ouch.xplr
 [41]: https://github.com/ouch-org/ouch
 [42]: https://github.com/igorepst/context-switch.xplr
+[43]: https://github.com/sayanarijit/dual-pane.xplr
