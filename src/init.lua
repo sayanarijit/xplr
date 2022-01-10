@@ -1269,8 +1269,9 @@ xplr.config.modes.builtin.create_file = {
           {
             BashExecSilently = [===[
               PTH="$XPLR_INPUT_BUFFER"
-              if [ "${PTH}" ]; then
-                touch -- "${PTH:?}" \
+              if [ "$PTH" ]; then
+                mkdir -p -- "$(dirname $PTH)" \
+                && touch -- "$PTH" \
                 && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
