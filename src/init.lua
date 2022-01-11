@@ -7,8 +7,8 @@ local xplr = xplr
 
 -- Config
 ---- General
------- Debug on error
-xplr.config.general.debug_on_error = true
+------ Debug error
+xplr.config.general.disable_debug_error_mode = false
 
 ------ Show hidden
 xplr.config.general.show_hidden = false
@@ -976,44 +976,52 @@ xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
   xplr.config.modes.builtin.default.key_bindings.on_key.right
 
-xplr.config.modes.builtin.debug = {
-  name = "debug",
+xplr.config.modes.builtin.debug_error = {
+  name = "debug error",
   help = nil,
   extra_help = nil,
   layout = {
     Vertical = {
       config = {
         constraints = {
-          { Min = 9 },
-          { MinLessThanScreenHeight = 9 },
-        }
+          { Min = 14 },
+          { MinLessThanScreenHeight = 14 },
+        },
       },
       splits = {
         {
           CustomContent = {
-            title = "debug mode",
+            title = "debug error",
             body = {
               StaticParagraph = {
-                render = [[Startup errors have occured. Check your init.lua for errors.
-If you think this is a bug, report your error at:
+                render = [[
 
-https://github.com/sayanarijit/xplr/issues/new
+  Some errors occurred during startup.
+  If you think this is a bug, please report it at:
 
-To open the logs in your editor, press `enter`.
-To ignore the errors continue in the default config, press `escape`.]]
-              }
+  https://github.com/sayanarijit/xplr/issues/new
+
+  Press `enter` to open the logs in your $EDITOR.
+  Press `escape` to ignore the errors and continue with the default config.
+
+  To disable this mode, set `xplr.config.general.disable_debug_error_mode`
+  to `true` in your config file.
+                ]],
+              },
             },
           },
         },
         "InputAndLogs",
-      }
-    }
+      },
+    },
   },
   key_bindings = {
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
-        messages = {"Terminate"}
+        messages = {
+          "Terminate",
+        },
       },
       enter = {
         help = "open logs in editor",
@@ -1027,17 +1035,22 @@ To ignore the errors continue in the default config, press `escape`.]]
       },
       esc = {
         help = "escape",
-        messages = {"PopMode"}
-      }
+        messages = {
+          "PopMode",
+        },
+      },
+      q = {
+        help = "quit",
+        messages = {
+          "Quit",
+        },
+      },
     },
-    on_alphabet = nil,
-    on_number = nil,
-    on_special_character = nil,
     default = {
       help = nil,
-      messages = {}
-    }
-  }
+      messages = {},
+    },
+  },
 }
 
 ------ Recover
@@ -1054,6 +1067,9 @@ xplr.config.modes.builtin.recover = {
   This mode saves you from performing unwanted actions.
 
   Let's calm down, press `escape`, and try again.
+
+  To disable this mode, set `xplr.config.general.enable_recover_mode`
+  to `false` in your config file.
           ]],
         },
       },
@@ -1308,7 +1324,9 @@ xplr.config.modes.builtin.number = {
     on_key = {
       ["ctrl-c"] = {
         help = "terminate",
-        messages = { "Terminate" },
+        messages = {
+          "Terminate",
+        },
       },
       down = {
         help = "to down",

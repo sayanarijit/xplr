@@ -3,11 +3,12 @@
 This configuration is exposed via the `xplr.config.general` API. It contains
 the following fields:
 
-## debug_on_error
+## disable_debug_error_mode
 
 Type: boolean
 
-Set it to `true` to debug errors if they occur during startup.
+Set it to `true` if you want to ignore the startup errors. You can still see
+the errors in the logs.
 
 ## enable_mouse
 

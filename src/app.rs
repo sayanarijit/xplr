@@ -1429,8 +1429,8 @@ impl App {
             app = app.log_error(err)?
         }
 
-        if has_errs && app.config.general.debug_on_error {
-            app = app.switch_mode_builtin("debug")?;
+        if has_errs && !app.config.general.disable_debug_error_mode {
+            app = app.switch_mode_builtin("debug_error")?;
         }
 
         Ok(app)
@@ -2677,7 +2677,7 @@ impl App {
 
         [
             &builtin.default,
-            &builtin.debug,
+            &builtin.debug_error,
             &builtin.recover,
             &builtin.filter,
             &builtin.number,
