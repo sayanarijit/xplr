@@ -1245,7 +1245,7 @@ xplr.config.modes.builtin.create_directory = {
                 && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                && echo FocusPath: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
               fi
@@ -1291,7 +1291,7 @@ xplr.config.modes.builtin.create_file = {
                 && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusByFileName: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                && echo FocusPath: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
               fi
