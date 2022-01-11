@@ -45,6 +45,7 @@ of [modes][4] and the key mappings for each mode.
 | ctrl-c |        | terminate           |
 | enter  |        | open logs in editor |
 | esc    |        | escape              |
+| q      |        | quit                |
 
 ### recover
 
