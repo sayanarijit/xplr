@@ -146,7 +146,12 @@ following procedure:</p>
 <ul>
 <li>
 <p>Add the following line in <code>~/.config/xplr/init.lua</code></p>
-<pre><code class="language-lua">package.path = os.getenv(&quot;HOME&quot;) .. '/.config/xplr/plugins/?/src/init.lua'
+<pre><code class="language-lua">local home = os.getenv(&quot;HOME&quot;)
+package.path = home
+.. &quot;/.config/xplr/plugins/?/src/init.lua;&quot;
+.. home
+.. &quot;/.config/xplr/plugins/?.lua;&quot;
+.. package.path
 </code></pre>
 </li>
 <li>
