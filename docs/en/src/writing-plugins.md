@@ -16,8 +16,7 @@ A minimal plugin should confirm to the following structure:
 ```
 plugin-name
 ├── README.md
-└── src
-    └── init.lua
+└── init.lua
 ```
 
 You can also use
@@ -27,7 +26,7 @@ You can also use
 
 This is where you document what the plugin does, how to use it, etc.
 
-### src/init.lua
+### init.lua
 
 This file is executed to load the plugin. It should expose a `setup()`
 function, which will be used by the users to setup the plugin.
