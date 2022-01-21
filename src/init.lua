@@ -904,6 +904,18 @@ xplr.config.modes.builtin.default = {
           },
         },
       },
+      ["ctrl-d"] = {
+        help = "duplicate as",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "duplicate_as" },
+          {
+            BashExecSilently = [===[
+              echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
+            ]===],
+          },
+        },
+      },
       right = {
         help = "enter",
         messages = {
@@ -1454,10 +1466,63 @@ xplr.config.modes.builtin.rename = {
             BashExecSilently = [===[
               SRC="${XPLR_FOCUS_PATH:?}"
               TARGET="${XPLR_INPUT_BUFFER:?}"
-              mv -- "${SRC:?}" "${TARGET:?}" \
-                && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusByFileName: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
+              if [ -e "${TARGET:?}" ]; then
+                echo LogError: $TARGET already exists >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                mv -- "${SRC:?}" "${TARGET:?}" \
+                  && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && echo FocusPath: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      esc = {
+        help = "cancel",
+        messages = {
+          "PopMode",
+        },
+      },
+    },
+    default = {
+      help = nil,
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
+------ Duplicate as
+xplr.config.modes.builtin.duplicate_as = {
+  name = "duplicate as",
+  help = nil,
+  extra_help = nil,
+  key_bindings = {
+    on_key = {
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {
+          "Terminate",
+        },
+      },
+      enter = {
+        help = "duplicate",
+        messages = {
+          {
+            BashExecSilently = [===[
+              SRC="${XPLR_FOCUS_PATH:?}"
+              TARGET="${XPLR_INPUT_BUFFER:?}"
+              if [ -e "${TARGET:?}" ]; then
+                echo LogError: $TARGET already exists >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                cp -r -- "${SRC:?}" "${TARGET:?}" \
+                  && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && echo FocusPath: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && echo LogSuccess: $SRC duplicated as $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
             ]===],
           },
           "PopMode",

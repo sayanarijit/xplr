@@ -2689,6 +2689,7 @@ impl App {
             &builtin.create_file,
             &builtin.create_directory,
             &builtin.rename,
+            &builtin.duplicate_as,
             &builtin.delete,
             &builtin.sort,
             &builtin.filter,
