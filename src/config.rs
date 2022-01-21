@@ -551,6 +551,9 @@ pub struct BuiltinModesConfig {
     pub rename: Mode,
 
     #[serde(default)]
+    pub duplicate_as: Mode,
+
+    #[serde(default)]
     pub delete: Mode,
 
     #[serde(default)]
@@ -595,6 +598,8 @@ impl BuiltinModesConfig {
             "go to" => Some(&self.go_to),
             "go_to" => Some(&self.go_to),
             "rename" => Some(&self.rename),
+            "duplicate as" => Some(&self.duplicate_as),
+            "duplicate_as" => Some(&self.duplicate_as),
             "delete" => Some(&self.delete),
             "action" => Some(&self.action),
             "search" => Some(&self.search),

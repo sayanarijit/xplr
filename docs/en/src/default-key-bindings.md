@@ -18,6 +18,7 @@ of [modes][4] and the key mappings for each mode.
 | G      |        | go to bottom        |
 | V      | ctrl-a | select/unselect all |
 | ctrl-c |        | terminate           |
+| ctrl-d |        | duplicate as        |
 | ctrl-i | tab    | next visited path   |
 | ctrl-o |        | last visited path   |
 | ctrl-r |        | refresh screen      |
@@ -38,10 +39,10 @@ of [modes][4] and the key mappings for each mode.
 | ~      |        | go home             |
 | [0-9]  |        | input               |
 
-### debug
+### debug error
 
 | key    | remaps | action              |
-| -------| ------ | --------------------|
+| ------ | ------ | ------------------- |
 | ctrl-c |        | terminate           |
 | enter  |        | open logs in editor |
 | esc    |        | escape              |
@@ -154,6 +155,14 @@ of [modes][4] and the key mappings for each mode.
 | ------ | ------ | --------- |
 | ctrl-c |        | terminate |
 | enter  |        | rename    |
+| esc    |        | cancel    |
+
+### duplicate as
+
+| key    | remaps | action    |
+| ------ | ------ | --------- |
+| ctrl-c |        | terminate |
+| enter  |        | duplicate |
 | esc    |        | cancel    |
 
 ### delete
