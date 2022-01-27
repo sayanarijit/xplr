@@ -1277,6 +1277,11 @@ pub struct LuaContextLight {
     pub explorer_config: ExplorerConfig,
 }
 
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct Cache {
+    directory_buffers: HashMap<String, Option<DirectoryBuffer>>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
@@ -1297,6 +1302,7 @@ pub struct App {
     pub logs_hidden: bool,
     pub history: History,
     pub last_modes: Vec<Mode>,
+    pub cache: Cache,
 }
 
 impl App {
@@ -1422,6 +1428,7 @@ impl App {
             logs_hidden: Default::default(),
             history: Default::default(),
             last_modes: Default::default(),
+            cache: Default::default(),
         };
 
         let has_errs = !load_errs.is_empty();
@@ -1896,7 +1903,27 @@ impl App {
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
-                self.explore_pwd()
+
+                if let Some(Some(buf)) =
+                    self.cache.directory_buffers.get(&self.pwd).cloned()
+                {
+                    let maybe_focus = self.last_focus.get(&buf.parent).cloned();
+                    self.set_directory(buf).and_then(|app| {
+                        if let Some(Some(focus)) = maybe_focus {
+                            app.focus_by_file_name(&focus, false)
+                        } else {
+                            Ok(app)
+                        }
+                    })
+                } else {
+                    self.explore_pwd().map(|mut app| {
+                        app.cache.directory_buffers.insert(
+                            app.pwd.clone(),
+                            app.directory_buffer.clone(),
+                        );
+                        app
+                    })
+                }
             }
             Err(e) => self.log_error(e.to_string()),
         }
