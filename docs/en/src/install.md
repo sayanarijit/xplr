@@ -122,13 +122,14 @@ One can directly download the standalone binary from the
 
 Currently, the following options are available for direct download:
 
-- [Linux][16]
+- [GNU/Linux][16]
+- [Linux musl][26]
 - [macOS][17]
 
 Command-line instructions:
 
 ```bash
-platform="linux"  # or "macos"
+platform="linux"  # or "macos" / "linux-musl"
 
 # Download
 wget https://github.com/sayanarijit/xplr/releases/latest/download/xplr-$platform.tar.gz
@@ -243,3 +244,4 @@ sudo cp target/release/xplr /usr/local/bin/
 [23]: https://termux.com/
 [24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
 [25]: https://gifyu.com/image/tF2D
+[26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
