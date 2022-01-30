@@ -36,12 +36,6 @@ repositories:
 
 ### Cross-platform
 
-#### [Snap][26]
-
-```
-snap install xplr --classic
-```
-
 #### [Nixpkgs][10]
 
 ```
@@ -249,4 +243,3 @@ sudo cp target/release/xplr /usr/local/bin/
 [23]: https://termux.com/
 [24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
 [25]: https://gifyu.com/image/tF2D
-[26]: https://snapcraft.io/xplr
