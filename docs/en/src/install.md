@@ -58,12 +58,6 @@ sudo pacman -S xplr
 
 #### [AUR][8]
 
-Binary version:
-
-```
-paru -S xplr-bin
-```
-
 Git version:
 
 ```
