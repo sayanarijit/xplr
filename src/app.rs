@@ -2647,6 +2647,10 @@ impl App {
             .unwrap_or_default()
     }
 
+    pub fn pwd_str(&self) -> String {
+        format!("{}\n", &self.pwd)
+    }
+
     pub fn selection_str(&self) -> String {
         self.selection
             .iter()

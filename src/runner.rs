@@ -33,6 +33,22 @@ pub fn get_tty() -> Result<fs::File> {
     }
 }
 
+// In unix system, the std::env::current_dir() calls libc getcwd() that
+// returns physical path. As a workaround, this function tries to use `PWD`
+// environment variable that is configured by shell.
+fn get_current_dir() -> Result<PathBuf, std::io::Error> {
+    let cur = std::env::current_dir();
+    if let Ok(pwd) = std::env::var("PWD") {
+        if pwd.is_empty() {
+            cur
+        } else {
+            Ok(PathBuf::from(pwd))
+        }
+    } else {
+        cur
+    }
+}
+
 fn call_lua_heavy(
     app: &app::App,
     lua: &mlua::Lua,
@@ -110,23 +126,8 @@ pub struct Runner {
     extra_config_files: Vec<PathBuf>,
     on_load: Vec<app::ExternalMsg>,
     read_only: bool,
+    print_pwd_as_result: bool,
     selection: Vec<PathBuf>,
-}
-
-// In unix system, the std::env::current_dir() calls libc getcwd() that
-// returns physical path. As a workaround, this function tries to use `PWD`
-// environment variable that is configured by shell.
-fn get_current_dir() -> Result<PathBuf, std::io::Error> {
-    let cur = std::env::current_dir();
-    if let Ok(pwd) = std::env::var("PWD") {
-        if pwd.is_empty() {
-            cur
-        } else {
-            Ok(PathBuf::from(pwd))
-        }
-    } else {
-        cur
-    }
 }
 
 impl Runner {
@@ -161,6 +162,7 @@ impl Runner {
             extra_config_files: cli.extra_config,
             on_load: cli.on_load,
             read_only: cli.read_only,
+            print_pwd_as_result: cli.print_pwd_as_result,
             selection: paths.collect(),
         })
     }
@@ -297,7 +299,12 @@ impl Runner {
                             }
 
                             PrintResultAndQuit => {
-                                result = Ok(Some(app.result_str()));
+                                result = if self.print_pwd_as_result {
+                                    Ok(Some(app.pwd_str()))
+                                } else {
+                                    Ok(Some(app.result_str()))
+                                };
+
                                 break 'outer;
                             }
 

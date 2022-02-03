@@ -13,6 +13,7 @@ pub struct Cli {
     pub help: bool,
     pub read_only: bool,
     pub force_focus: bool,
+    pub print_pwd_as_result: bool,
     pub config: Option<PathBuf>,
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
@@ -96,6 +97,10 @@ impl Cli {
 
                     "--force-focus" => {
                         cli.force_focus = true;
+                    }
+
+                    "--print-pwd-as-result" => {
+                        cli.print_pwd_as_result = true;
                     }
 
                     // path
