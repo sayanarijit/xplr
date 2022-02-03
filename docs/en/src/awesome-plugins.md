@@ -14,7 +14,7 @@ of the following plugins work for you, it's very easy to
 
 - [**sayanarijit/command-mode.xplr**][37] The missing command mode for xplr.
 - [**igorepst/context-switch.xplr**][42] Context switch plugin for xplr.
-- [**sayanarijit/dual-pane.xplr**][43]  Implements support for dual-pane navigation into xplr.
+- [**sayanarijit/dual-pane.xplr**][43] Implements support for dual-pane navigation into xplr.
 - [**sayanarijit/map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
 - [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
@@ -27,7 +27,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
   support.
 - [**sayanarijit/fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
-  into a directory.
+- [**sayanarijit/find.xplr**][44] An interactive finder plugin to complement [map.xplr][38].
 - [**sayanarijit/nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
   [nvim-ctrl][36].
 - [**dtomvan/ouch.xplr**][40] This plugin uses [ouch][41] to compress and decompress files.
@@ -91,3 +91,4 @@ of the following plugins work for you, it's very easy to
 [41]: https://github.com/ouch-org/ouch
 [42]: https://github.com/igorepst/context-switch.xplr
 [43]: https://github.com/sayanarijit/dual-pane.xplr
+[44]: https://github.com/sayanarijit/find.xplr
