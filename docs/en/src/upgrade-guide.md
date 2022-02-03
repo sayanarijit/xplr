@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.16.4][44] -> [v0.17.1][45]
+#### [v0.16.4][44] -> [v0.17.2][45]
 
 - Deprecated `app.directory_buffer`, `app.history`, and `app.last_modes` in
   the custom dynamic layout renderer context.
@@ -59,8 +59,11 @@ compatibility.
 - `LuaEval` can now return a function that will be called with the Lua Context
   argument. Refer to the `Full List of Messages` doc for example.
 - From version v0.17.1, set `xplr.config.general.disable_debug_error_mode` to
-  `true` to disable switching to the "debug error" mode when startup errors 
+  `true` to disable switching to the "debug error" mode when startup errors
   occur.
+- From version v0.17.2, you can use CLI argument `--print-pwd-as-result` for cd
+  on quit, and key binding `ctrl-d` to duplicate a path in the same directory
+  with a different name.
 
 #### [v0.15.2][43] -> [v0.16.4][44]
 
@@ -317,4 +320,4 @@ Else do the following:
 [42]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.4
 [43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.2
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
-[45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.1
+[45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.2

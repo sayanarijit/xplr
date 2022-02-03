@@ -1,51 +1,88 @@
-[package]
-name = "xplr"
-version = "0.17.1"  # Update lua.rs
-authors = ["Arijit Basu <sayanarijit@gmail.com>"]
-edition = "2018"
-description = "A hackable, minimal, fast TUI file explorer"
-license = "MIT"
-readme = "README.md"
-repository = "https://github.com/sayanarijit/xplr"
-homepage = "https://xplr.dev"
-documentation = "https://xplr.dev/en"
-keywords = ["terminal", "file", "explorer", "manager", "tui"]
-categories = ["command-line-interface", "command-line-utilities"]
-include = ["src/**/*", "docs/en/src/**/*", "LICENSE", "README.md"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [[bin]]
-name = "xplr"
-
-[dependencies]
-tui = { version = "0.16.0", default-features = false, features = ['crossterm', 'serde'] }
-crossterm = "0.22.1"
-dirs = "4.0.0"
-serde = { version = "1.0.133", features = ["derive"] }
-serde_yaml = "0.8.23"
-mime_guess = "2.0.3"
-anyhow = "1.0.52"
-chrono = { version = "0.4.19", features = ["serde"] }
-lazy_static = "1.4.0"
-indexmap = { version = "1.8.0", features = ["serde"] }
-natord = "1.0.9"
-humansize = "1.1.1"
-mlua = { version = "0.7.1", features = ["luajit", "vendored", "serialize", "send"] }
-ansi-to-tui = "0.4.1"
-libc = "0.2.112"
-tui-input = { version = "0.1.2", features = [ "serde" ] }
-
-[dev-dependencies]
-criterion = "0.3.5"
-assert_cmd = "2.0.2"
+name = 'xplr'
 
 [[bench]]
-name = "criterion"
+name = 'criterion'
 harness = false
-path = "./benches/criterion.rs"
+path = './benches/criterion.rs'
 
-# https://github.com/johnthagen/min-sized-rust
+[package]
+name = 'xplr'
+version = '0.17.2'
+authors = ['Arijit Basu <hi@arijitbasu.in>']
+edition = '2018'
+description = 'A hackable, minimal, fast TUI file explorer'
+license = 'MIT'
+readme = 'README.md'
+repository = 'https://github.com/sayanarijit/xplr'
+homepage = 'https://xplr.dev'
+documentation = 'https://xplr.dev/en'
+keywords = [
+    'terminal',
+    'file',
+    'explorer',
+    'manager',
+    'tui',
+]
+categories = [
+    'command-line-interface',
+    'command-line-utilities',
+]
+include = [
+    'src/**/*',
+    'docs/en/src/**/*',
+    'LICENSE',
+    'README.md',
+]
+
+[dependencies]
+crossterm = '0.22'
+dirs = '4.0'
+serde_yaml = '0.8'
+mime_guess = '2.0'
+anyhow = '1.0'
+lazy_static = '1.4'
+natord = '1.0'
+humansize = '1.1'
+ansi-to-tui = '0.4'
+libc = '0.2'
+
+[dependencies.tui]
+version = '0.16'
+default-features = false
+features = [
+    'crossterm',
+    'serde',
+]
+
+[dependencies.serde]
+version = '1.0'
+features = ['derive']
+
+[dependencies.chrono]
+version = '0.4'
+features = ['serde']
+
+[dependencies.indexmap]
+version = '1.8'
+features = ['serde']
+
+[dependencies.mlua]
+version = '0.7'
+features = [
+    'luajit',
+    'vendored',
+    'serialize',
+    'send',
+]
+
+[dependencies.tui-input]
+version = '0.1'
+features = ['serde']
+
+[dev-dependencies]
+criterion = '0.3'
+assert_cmd = '2.0'
 [profile.release]
 lto = true
 codegen-units = 1
