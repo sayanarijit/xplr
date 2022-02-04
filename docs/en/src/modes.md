@@ -20,7 +20,7 @@ This is exposed by the `xplr.config.modes.builtin` API.
 xplr by default provides the following builtin modes:
 
 - default
-- debug
+- debug_error
 - recover
 - selection_ops
 - create
@@ -126,4 +126,4 @@ If specified, this layout will be used to render the UI.
 [8]: configure-key-bindings.md#key-bindings
 [9]: #key-bindings
 [10]: #layout
-[11]: layouts.md#Layout
+[11]: layouts.md#layout
