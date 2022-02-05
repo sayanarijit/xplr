@@ -4,6 +4,7 @@
 - [Quickstart][2]
   - [Install][3]
   - [Post Install][4]
+- [Awesome Hacks][30]
 - [Configuration][5]
   - [Key Bindings][27]
     - [Configure Key Bindings][28]
@@ -59,3 +60,4 @@
 [27]: key-bindings.md
 [28]: configure-key-bindings.md
 [29]: debug-key-bindings.md
+[30]: awesome-hacks.md

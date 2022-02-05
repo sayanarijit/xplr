@@ -4,13 +4,7 @@ Here's a list of awesome xplr plugins that you might want to check out. If none
 of the following plugins work for you, it's very easy to
 [write your own][1].
 
-## Categories
-
-- [Extension][32]
-- [Integration][2]
-- [Theme][3]
-
-## Extension
+### Extension
 
 - [**sayanarijit/command-mode.xplr**][37] The missing command mode for xplr.
 - [**igorepst/context-switch.xplr**][42] Context switch plugin for xplr.
@@ -20,7 +14,7 @@ of the following plugins work for you, it's very easy to
   with some tweaks.
 - [**igorepst/term.xplr**][39] Terminal integration for xplr
 
-## Integration
+### Integration
 
 - [**sayanarijit/alacritty.xplr**][33] [Alacritty][34] integration for xplr.
 - [**sayanarijit/dragon.xplr**][4] Drag and drop files using [dragon][5].
@@ -42,12 +36,17 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
 - [**sayanarijit/zoxide.xplr**][17] Change directory using the [zoxide][18] database.
 
-## Theme
+### Theme
 
 - [**sayanarijit/material-landscape.xplr**][19] Material Landscape
 - [**sayanarijit/material-landscape2.xplr**][20] Material Landscape 2
 - [**sayanarijit/zentable.xplr**][31] A clean, distraction free xplr table UI
 - [**prncss-xyz/icons.xplr**][30] An icon theme for xplr.
+
+## Also See:
+
+- [Awesome Hacks][45]
+- [Awesome Integrations][46]
 
 [1]: ./writing-plugins.md
 [2]: #integration
@@ -92,3 +91,5 @@ of the following plugins work for you, it's very easy to
 [42]: https://github.com/igorepst/context-switch.xplr
 [43]: https://github.com/sayanarijit/dual-pane.xplr
 [44]: https://github.com/sayanarijit/find.xplr
+[45]: awesome-hacks.md
+[46]: awesome-integrations.md
