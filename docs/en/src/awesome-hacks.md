@@ -29,6 +29,8 @@ gracefully cancel "cd on quit".
 alias xcd='cd "$(xplr --print-pwd-as-result)"'
 ```
 
+</details>
+
 ### Spawn multiple sessions in different tabs (iTerm2)
 
 Creating a new session that starts with iTerm2.
