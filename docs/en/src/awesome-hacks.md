@@ -1,12 +1,33 @@
 # Awesome Hacks
 
 Here's a list of cool xplr hacks, i.e. snippets of code that you can just copy
-and paste into your [configuration file][1], that are too small or niche for a
-full fledge [plugins][2].
+and paste into your [configuration file][1] or the appropriate file, that are
+too small or niche for a full fledge [plugins][2].
 
 Do you have something cool to share?
 
 [Edit this file][3] or [share them here][4] or [let us know][5].
+
+### cd on quit
+
+Change directory using xplr.
+
+<details>
+<summary>Expand for details</summary>
+
+- Author: [@sayanarijit][8]
+- Tested on: Linux
+
+With this alias set, you can navigate directories using xplr by entering
+xcd command, and when you quit by pressing enter, you will enter the
+directory.
+
+You can of course, quit with plain Quit (i.e. by pressing q) to
+gracefully cancel "cd on quit".
+
+```bash
+alias xcd='cd "$(xplr --print-pwd-as-result)"'
+```
 
 ### Spawn multiple sessions in different tabs (iTerm2)
 
