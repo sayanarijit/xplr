@@ -1,8 +1,8 @@
 # Awesome Hacks
 
 Here's a list of cool xplr hacks, i.e. snippets of code that you can just copy
-and paste into your [configuration file][1] or the appropriate file, that are
-too small or niche for a full fledge [plugins][2].
+and paste into your [configuration][1] or the appropriate file, that are
+too small or too niche for a full fledge [plugin][2].
 
 Do you have something cool to share?
 
