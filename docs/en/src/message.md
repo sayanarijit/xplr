@@ -5,9 +5,11 @@ requests, xplr listens to [messages][1].
 
 You can send these messages to an xplr session in the following ways:
 
+- Via command-line (currently during start-up only, using `--on-load`)
 - Via [key bindings][2]
 - Via [Lua function calls][3]
 - Via shell command using the [input pipe][4]
+- Via socket (coming soon)
 
 ## Format
 
