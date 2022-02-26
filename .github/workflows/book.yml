@@ -25,7 +25,7 @@ jobs:
           mv docs/index.html gh-pages
           mv docs/CNAME gh-pages
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v2.5.1
+        uses: peaceiris/actions-gh-pages@v3
         with:
           emptyCommits: true
           keepFiles: false
