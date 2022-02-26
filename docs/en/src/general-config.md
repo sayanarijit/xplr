@@ -360,6 +360,24 @@ sort_and_filter_ui.sorter_identifiers.ByCanonicalAbsolutePath = {
 }
 ```
 
+## panel_ui.default.style
+
+Type: [Style][1]
+
+Default style for panels.
+
+## panel_ui.default.title.format
+
+Type: nullable string
+
+The content for panel title.
+
+## panel_ui.default.title.style
+
+Type: [Style][1]
+
+Style for panel title.
+
 ## panel_ui.default.borders
 
 Type: nullable list of strings
@@ -379,32 +397,33 @@ xplr.config.general.panel_ui.default.borders = {
 }
 ```
 
-## panel_ui.default.style
+## panel_ui.default.border_type
+
+Type: string
+
+Defines the type of the borders.
+
+The possible values are any combination of: "Plain", "Rounder", "Double" and
+"Thick".
+
+Example:
+
+```lua
+xplr.config.general.panel_ui.default.border_type = "Thick"
+```
+
+## panel_ui.default.border_style
 
 Type: [Style][1]
 
-Default style for panels.
+Defines the style of the borders.
 
-## panel_ui.default.title.format
+Example:
 
-Type: nullable string
-
-The content for panel title.
-
-## panel_ui.default.title.style
-
-Type: [Style][1]
-
-Style for panel title.
-
-## panel_ui.help_menu.borders
-
-Type: nullable list of strings
-
-Defines where to show borders for the `Help` panel.
-
-The possible values are any combination of: "Top", "Bottom", "Left" and
-"Right".
+```lua
+xplr.config.general.panel_ui.default.border_style.fg = "Black"
+xplr.config.general.panel_ui.default.border_style.bg = "Gray"
+```
 
 ## panel_ui.help_menu.style
 
@@ -424,14 +443,29 @@ Type: [Style][1]
 
 Style for `Help` panel title.
 
-## panel_ui.input_and_logs.borders
+## panel_ui.help_menu.borders
 
 Type: nullable list of strings
 
-Defines where to show borders for the `Input` & `Logs` panel.
+Defines where to show borders for the `Help` panel.
 
 The possible values are any combination of: "Top", "Bottom", "Left" and
 "Right".
+
+## panel_ui.help_menu.border_type
+
+Type: string
+
+Defines the type of the borders.
+
+The possible values are any combination of: "Plain", "Rounder", "Double" and
+"Thick".
+
+## panel_ui.help_menu.border_style
+
+Type: [Style][1]
+
+Defines the style of the borders.
 
 ## panel_ui.input_and_logs.style
 
@@ -451,14 +485,29 @@ Type: [Style][1]
 
 Style for `Input` & `Logs` panel title.
 
-## panel_ui.selection.borders
+## panel_ui.input_and_logs.borders
 
 Type: nullable list of strings
 
-Defines where to show borders for the `Selection` panel.
+Defines where to show borders for the `Input` & `Logs` panel.
 
 The possible values are any combination of: "Top", "Bottom", "Left" and
 "Right".
+
+## panel_ui.input_and_logs.border_type
+
+Type: string
+
+Defines the type of the borders.
+
+The possible values are any combination of: "Plain", "Rounder", "Double" and
+"Thick".
+
+## panel_ui.input_and_logs.border_style
+
+Type: [Style][1]
+
+Defines the style of the borders.
 
 ## panel_ui.selection.style
 
@@ -478,14 +527,29 @@ Type: [Style][1]
 
 Style for `Selection` panel title.
 
-## panel_ui.sort_and_filter.borders
+## panel_ui.selection.borders
 
 Type: nullable list of strings
 
-Defines where to show borders for the `Sort & filter` panel.
+Defines where to show borders for the `Selection` panel.
 
 The possible values are any combination of: "Top", "Bottom", "Left" and
 "Right".
+
+## panel_ui.selection.border_type
+
+Type: string
+
+Defines the type of the borders.
+
+The possible values are any combination of: "Plain", "Rounder", "Double" and
+"Thick".
+
+## panel_ui.selection.border_style
+
+Type: [Style][1]
+
+Defines the style of the borders.
 
 ## panel_ui.sort_and_filter.style
 
@@ -504,6 +568,30 @@ The content for `Sort & filter` panel title.
 Type: [Style][1]
 
 Style for `Sort & filter` panel title.
+
+## panel_ui.sort_and_filter.borders
+
+Type: nullable list of strings
+
+Defines where to show borders for the `Sort & filter` panel.
+
+The possible values are any combination of: "Top", "Bottom", "Left" and
+"Right".
+
+## panel_ui.sort_and_filter.border_type
+
+Type: string
+
+Defines the type of the borders.
+
+The possible values are any combination of: "Plain", "Rounder", "Double" and
+"Thick".
+
+## panel_ui.sort_and_filter.border_style
+
+Type: [Style][1]
+
+Defines the style of the borders.
 
 [1]: style.md
 [2]: layouts.md
