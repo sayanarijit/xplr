@@ -333,6 +333,15 @@ the content and style for the given sorter.</p>
   style = { add_modifiers = nil, bg = nil, fg = &quot;Yellow&quot;, sub_modifiers = nil },
 }
 </code></pre>
+<h2 id="panel_uidefaultstyle"><a class="header" href="#panel_uidefaultstyle">panel_ui.default.style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Default style for panels.</p>
+<h2 id="panel_uidefaulttitleformat"><a class="header" href="#panel_uidefaulttitleformat">panel_ui.default.title.format</a></h2>
+<p>Type: nullable string</p>
+<p>The content for panel title.</p>
+<h2 id="panel_uidefaulttitlestyle"><a class="header" href="#panel_uidefaulttitlestyle">panel_ui.default.title.style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Style for panel title.</p>
 <h2 id="panel_uidefaultborders"><a class="header" href="#panel_uidefaultborders">panel_ui.default.borders</a></h2>
 <p>Type: nullable list of strings</p>
 <p>Defines where to show borders for the panels.</p>
@@ -345,20 +354,21 @@ xplr.config.general.panel_ui.default.borders = {
   &quot;Left&quot;,
 }
 </code></pre>
-<h2 id="panel_uidefaultstyle"><a class="header" href="#panel_uidefaultstyle">panel_ui.default.style</a></h2>
+<h2 id="panel_uidefaultborder_type"><a class="header" href="#panel_uidefaultborder_type">panel_ui.default.border_type</a></h2>
+<p>Type: string</p>
+<p>Defines the type of the borders.</p>
+<p>The possible values are any combination of: &quot;Plain&quot;, &quot;Rounder&quot;, &quot;Double&quot; and
+&quot;Thick&quot;.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.general.panel_ui.default.border_type = &quot;Thick&quot;
+</code></pre>
+<h2 id="panel_uidefaultborder_style"><a class="header" href="#panel_uidefaultborder_style">panel_ui.default.border_style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
-<p>Default style for panels.</p>
-<h2 id="panel_uidefaulttitleformat"><a class="header" href="#panel_uidefaulttitleformat">panel_ui.default.title.format</a></h2>
-<p>Type: nullable string</p>
-<p>The content for panel title.</p>
-<h2 id="panel_uidefaulttitlestyle"><a class="header" href="#panel_uidefaulttitlestyle">panel_ui.default.title.style</a></h2>
-<p>Type: <a href="style.html">Style</a></p>
-<p>Style for panel title.</p>
-<h2 id="panel_uihelp_menuborders"><a class="header" href="#panel_uihelp_menuborders">panel_ui.help_menu.borders</a></h2>
-<p>Type: nullable list of strings</p>
-<p>Defines where to show borders for the <code>Help</code> panel.</p>
-<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
-&quot;Right&quot;.</p>
+<p>Defines the style of the borders.</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.general.panel_ui.default.border_style.fg = &quot;Black&quot;
+xplr.config.general.panel_ui.default.border_style.bg = &quot;Gray&quot;
+</code></pre>
 <h2 id="panel_uihelp_menustyle"><a class="header" href="#panel_uihelp_menustyle">panel_ui.help_menu.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Help</code> panel.</p>
@@ -368,11 +378,19 @@ xplr.config.general.panel_ui.default.borders = {
 <h2 id="panel_uihelp_menutitlestyle"><a class="header" href="#panel_uihelp_menutitlestyle">panel_ui.help_menu.title.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Help</code> panel title.</p>
-<h2 id="panel_uiinput_and_logsborders"><a class="header" href="#panel_uiinput_and_logsborders">panel_ui.input_and_logs.borders</a></h2>
+<h2 id="panel_uihelp_menuborders"><a class="header" href="#panel_uihelp_menuborders">panel_ui.help_menu.borders</a></h2>
 <p>Type: nullable list of strings</p>
-<p>Defines where to show borders for the <code>Input</code> &amp; <code>Logs</code> panel.</p>
+<p>Defines where to show borders for the <code>Help</code> panel.</p>
 <p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
 &quot;Right&quot;.</p>
+<h2 id="panel_uihelp_menuborder_type"><a class="header" href="#panel_uihelp_menuborder_type">panel_ui.help_menu.border_type</a></h2>
+<p>Type: string</p>
+<p>Defines the type of the borders.</p>
+<p>The possible values are any combination of: &quot;Plain&quot;, &quot;Rounder&quot;, &quot;Double&quot; and
+&quot;Thick&quot;.</p>
+<h2 id="panel_uihelp_menuborder_style"><a class="header" href="#panel_uihelp_menuborder_style">panel_ui.help_menu.border_style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Defines the style of the borders.</p>
 <h2 id="panel_uiinput_and_logsstyle"><a class="header" href="#panel_uiinput_and_logsstyle">panel_ui.input_and_logs.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Input</code> &amp; <code>Logs</code> panel.</p>
@@ -382,11 +400,19 @@ xplr.config.general.panel_ui.default.borders = {
 <h2 id="panel_uiinput_and_logstitlestyle"><a class="header" href="#panel_uiinput_and_logstitlestyle">panel_ui.input_and_logs.title.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Input</code> &amp; <code>Logs</code> panel title.</p>
-<h2 id="panel_uiselectionborders"><a class="header" href="#panel_uiselectionborders">panel_ui.selection.borders</a></h2>
+<h2 id="panel_uiinput_and_logsborders"><a class="header" href="#panel_uiinput_and_logsborders">panel_ui.input_and_logs.borders</a></h2>
 <p>Type: nullable list of strings</p>
-<p>Defines where to show borders for the <code>Selection</code> panel.</p>
+<p>Defines where to show borders for the <code>Input</code> &amp; <code>Logs</code> panel.</p>
 <p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
 &quot;Right&quot;.</p>
+<h2 id="panel_uiinput_and_logsborder_type"><a class="header" href="#panel_uiinput_and_logsborder_type">panel_ui.input_and_logs.border_type</a></h2>
+<p>Type: string</p>
+<p>Defines the type of the borders.</p>
+<p>The possible values are any combination of: &quot;Plain&quot;, &quot;Rounder&quot;, &quot;Double&quot; and
+&quot;Thick&quot;.</p>
+<h2 id="panel_uiinput_and_logsborder_style"><a class="header" href="#panel_uiinput_and_logsborder_style">panel_ui.input_and_logs.border_style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Defines the style of the borders.</p>
 <h2 id="panel_uiselectionstyle"><a class="header" href="#panel_uiselectionstyle">panel_ui.selection.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Selection</code> panel.</p>
@@ -396,11 +422,19 @@ xplr.config.general.panel_ui.default.borders = {
 <h2 id="panel_uiselectiontitlestyle"><a class="header" href="#panel_uiselectiontitlestyle">panel_ui.selection.title.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Selection</code> panel title.</p>
-<h2 id="panel_uisort_and_filterborders"><a class="header" href="#panel_uisort_and_filterborders">panel_ui.sort_and_filter.borders</a></h2>
+<h2 id="panel_uiselectionborders"><a class="header" href="#panel_uiselectionborders">panel_ui.selection.borders</a></h2>
 <p>Type: nullable list of strings</p>
-<p>Defines where to show borders for the <code>Sort &amp; filter</code> panel.</p>
+<p>Defines where to show borders for the <code>Selection</code> panel.</p>
 <p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
 &quot;Right&quot;.</p>
+<h2 id="panel_uiselectionborder_type"><a class="header" href="#panel_uiselectionborder_type">panel_ui.selection.border_type</a></h2>
+<p>Type: string</p>
+<p>Defines the type of the borders.</p>
+<p>The possible values are any combination of: &quot;Plain&quot;, &quot;Rounder&quot;, &quot;Double&quot; and
+&quot;Thick&quot;.</p>
+<h2 id="panel_uiselectionborder_style"><a class="header" href="#panel_uiselectionborder_style">panel_ui.selection.border_style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Defines the style of the borders.</p>
 <h2 id="panel_uisort_and_filterstyle"><a class="header" href="#panel_uisort_and_filterstyle">panel_ui.sort_and_filter.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Sort &amp; filter</code> panel.</p>
@@ -410,6 +444,19 @@ xplr.config.general.panel_ui.default.borders = {
 <h2 id="panel_uisort_and_filtertitlestyle"><a class="header" href="#panel_uisort_and_filtertitlestyle">panel_ui.sort_and_filter.title.style</a></h2>
 <p>Type: <a href="style.html">Style</a></p>
 <p>Style for <code>Sort &amp; filter</code> panel title.</p>
+<h2 id="panel_uisort_and_filterborders"><a class="header" href="#panel_uisort_and_filterborders">panel_ui.sort_and_filter.borders</a></h2>
+<p>Type: nullable list of strings</p>
+<p>Defines where to show borders for the <code>Sort &amp; filter</code> panel.</p>
+<p>The possible values are any combination of: &quot;Top&quot;, &quot;Bottom&quot;, &quot;Left&quot; and
+&quot;Right&quot;.</p>
+<h2 id="panel_uisort_and_filterborder_type"><a class="header" href="#panel_uisort_and_filterborder_type">panel_ui.sort_and_filter.border_type</a></h2>
+<p>Type: string</p>
+<p>Defines the type of the borders.</p>
+<p>The possible values are any combination of: &quot;Plain&quot;, &quot;Rounder&quot;, &quot;Double&quot; and
+&quot;Thick&quot;.</p>
+<h2 id="panel_uisort_and_filterborder_style"><a class="header" href="#panel_uisort_and_filterborder_style">panel_ui.sort_and_filter.border_style</a></h2>
+<p>Type: <a href="style.html">Style</a></p>
+<p>Defines the style of the borders.</p>
 
                     </main>
 
