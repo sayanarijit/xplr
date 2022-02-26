@@ -4,6 +4,7 @@ use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
 use crate::ui::Border;
+use crate::ui::BorderType;
 use crate::ui::Constraint;
 use crate::ui::Layout;
 use crate::ui::Style;
@@ -648,17 +649,25 @@ pub struct PanelUiConfig {
     pub title: UiElement,
 
     #[serde(default)]
+    pub style: Style,
+
+    #[serde(default)]
     pub borders: Option<IndexSet<Border>>,
 
     #[serde(default)]
-    pub style: Style,
+    pub border_type: Option<BorderType>,
+
+    #[serde(default)]
+    pub border_style: Style,
 }
 
 impl PanelUiConfig {
     pub fn extend(mut self, other: &Self) -> Self {
         self.title = self.title.extend(&other.title);
-        self.borders = other.borders.to_owned().or(self.borders);
         self.style = self.style.extend(&other.style);
+        self.borders = other.borders.to_owned().or(self.borders);
+        self.border_type = other.border_type.to_owned().or(self.border_type);
+        self.border_style = self.border_style.extend(&other.border_style);
         self
     }
 }

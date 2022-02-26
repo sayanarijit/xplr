@@ -22,7 +22,8 @@ use tui::layout::{
 use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
 use tui::text::{Span, Spans, Text};
 use tui::widgets::{
-    Block, Borders as TuiBorders, Cell, List, ListItem, Paragraph, Row, Table,
+    Block, BorderType as TuiBorderType, Borders as TuiBorders, Cell, List,
+    ListItem, Paragraph, Row, Table,
 };
 use tui::Frame;
 
@@ -179,6 +180,34 @@ impl Border {
             Self::Right => TuiBorders::RIGHT.bits(),
             Self::Bottom => TuiBorders::BOTTOM.bits(),
             Self::Left => TuiBorders::LEFT.bits(),
+        }
+    }
+}
+
+#[derive(
+    Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize,
+)]
+#[serde(deny_unknown_fields)]
+pub enum BorderType {
+    Plain,
+    Rounded,
+    Double,
+    Thick,
+}
+
+impl Default for BorderType {
+    fn default() -> Self {
+        Self::Plain
+    }
+}
+
+impl Into<TuiBorderType> for BorderType {
+    fn into(self) -> TuiBorderType {
+        match self {
+            BorderType::Plain => TuiBorderType::Plain,
+            BorderType::Rounded => TuiBorderType::Rounded,
+            BorderType::Double => TuiBorderType::Double,
+            BorderType::Thick => TuiBorderType::Thick,
         }
     }
 }
@@ -458,6 +487,8 @@ fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
             config.title.style.into(),
         ))
         .style(config.style.into())
+        .border_type(config.border_type.unwrap_or_default().into())
+        .border_style(config.border_style.into())
 }
 
 fn draw_table<B: Backend>(
@@ -898,8 +929,7 @@ fn draw_sort_n_filter<B: Backend>(
             ui.separator.format.to_owned().unwrap_or_default(),
             ui.separator.style.to_owned().into(),
         )))
-        .map(|((a, b), c)| vec![a, b, c])
-        .flatten()
+        .flat_map(|((a, b), c)| vec![a, b, c])
         .collect::<Vec<Span>>();
     spans.pop();
 
