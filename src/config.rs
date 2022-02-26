@@ -303,7 +303,7 @@ pub struct KeyBindings {
 
     #[serde(default)]
     pub default: Option<Action>,
-    // Checklist for adding field:
+    // Checklist for adding new field:
     // - [ ] Update App::handle_key
     // - [ ] Update KeyBindings::sanitized
     // - [ ] Update Mode::help_menu

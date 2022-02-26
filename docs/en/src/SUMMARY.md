@@ -15,6 +15,7 @@
   - [Message][8]
   - [Layouts][9]
   - [Node Types][10]
+  - [Borders][31]
   - [Style][11]
   - [Sorting][12]
   - [Filtering][13]
@@ -61,3 +62,4 @@
 [28]: configure-key-bindings.md
 [29]: debug-key-bindings.md
 [30]: awesome-hacks.md
+[31]: borders.md
