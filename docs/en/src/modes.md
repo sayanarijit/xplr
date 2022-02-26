@@ -30,6 +30,7 @@ xplr by default provides the following builtin modes:
 - go_to
 - rename
 - delete
+- duplicate_as
 - action
 - search
 - filter
@@ -106,7 +107,7 @@ help menu.
 
 ### key_bindings
 
-Type: [Key Bindings][9]
+Type: [Key Bindings][8]
 
 The key bindings available in that mode.
 
