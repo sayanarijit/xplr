@@ -235,6 +235,9 @@ pub struct GeneralConfig {
     pub hide_remaps_in_help_menu: bool,
 
     #[serde(default)]
+    pub enforce_bounded_index_navigation: bool,
+
+    #[serde(default)]
     pub prompt: UiElement,
 
     #[serde(default)]

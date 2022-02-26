@@ -1787,9 +1787,15 @@ impl App {
     }
 
     fn focus_previous(mut self) -> Result<Self> {
+        let bounded = self.config.general.enforce_bounded_index_navigation;
+
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = if dir.focus == 0 {
-                dir.total.max(1) - 1
+                if bounded {
+                    dir.focus
+                } else {
+                    dir.total.max(1) - 1
+                }
             } else {
                 dir.focus.max(1) - 1
             };
@@ -1828,9 +1834,15 @@ impl App {
     }
 
     fn focus_next(mut self) -> Result<Self> {
+        let bounded = self.config.general.enforce_bounded_index_navigation;
+
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = if (dir.focus + 1) == dir.total {
-                0
+                if bounded {
+                    dir.focus
+                } else {
+                    0
+                }
             } else {
                 dir.focus + 1
             }

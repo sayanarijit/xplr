@@ -42,6 +42,15 @@ xplr.config.general.enable_recover_mode = false
 -- Type: boolean
 xplr.config.general.hide_remaps_in_help_menu = false
 
+-- Set it to `true` if you want the cursor to stay in the same position when
+-- the focus is on the first path and you navigate to the previous path
+-- (by pressing `up`/`k`), or when the focus is on the last path and you
+-- navigate to the next path (by pressing `down`/`j`).
+-- The default behavior is to rotate from the last/first path.
+--
+-- Type: boolean
+xplr.config.general.enforce_bounded_index_navigation = false
+
 -- This is the shape of the prompt for the input buffer.
 --
 -- Type: nullable string
