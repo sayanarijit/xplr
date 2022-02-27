@@ -1048,7 +1048,7 @@ xplr.config.node_types.extension = {}
 -- ```
 xplr.config.node_types.special = {}
 
--- ### Layout Configuration ---------------------------------------------------
+-- ### Layouts ----------------------------------------------------------------
 --
 -- xplr layouts define the structure of the UI, i.e. how many panel we see,
 -- placement and size of the panels, how they look etc.
@@ -2728,18 +2728,9 @@ xplr.config.modes.custom = {}
 --
 -- While `xplr.config` defines all the static parts of the configuration,
 -- `xplr.fn` defines all the dynamic parts using functions.
---
--- As always, `xplr.fn.builtin` is where the built-in functions are defined
--- that can be overwritten, and `xplr.fn.custom` is where the custom functions
--- are defined where custom functions can be added or removed.
---
--- There is currently no restriction on what kind of functions can be defined
--- in `xplr.fn.custom`.
---
--- You can also use nested tables such as
--- `xplr.fn.custom.my_plugin.my_function` to define custom functions.
---
 
+-- As always, `xplr.fn.builtin` is where the built-in functions are defined
+-- that can be overwritten.
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   local r = ""
   if m.is_before_focus then
@@ -2884,4 +2875,11 @@ xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   end
 end
 
+-- This is where the custom functions can be added.
+--
+-- There is currently no restriction on what kind of functions can be defined
+-- in `xplr.fn.custom`.
+--
+-- You can also use nested tables such as
+-- `xplr.fn.custom.my_plugin.my_function` to define custom functions.
 xplr.fn.custom = {}
