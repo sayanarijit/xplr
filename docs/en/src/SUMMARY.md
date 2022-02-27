@@ -4,22 +4,28 @@
 - [Quickstart][2]
   - [Install][3]
   - [Post Install][4]
-- [Awesome Hacks][30]
 - [Configuration][5]
+  - [General][6]
+  - [Node Types][10]
+  - [Layouts][9]
+  - [Modes][7]
+- [Concept][32]
   - [Key Bindings][27]
     - [Configure Key Bindings][28]
     - [Default Key Bindings][14]
     - [Debug Key Bindings][29]
-  - [General Config][6]
-  - [Modes][7]
+  - [Node Type][33]
+  - [Layout][34]
+  - [Mode][35]
   - [Message][8]
-  - [Layouts][9]
-  - [Node Types][10]
   - [Borders][31]
   - [Style][11]
   - [Sorting][12]
   - [Filtering][13]
   - [Column Renderer][26]
+  - [Lua Function Calls][36]
+  - [Environment Variables and Pipes][37]
+- [Awesome Hacks][30]
 - [Plugin][15]
   - [Installing Plugins][16]
   - [Writing Plugins][17]
@@ -63,3 +69,9 @@
 [29]: debug-key-bindings.md
 [30]: awesome-hacks.md
 [31]: borders.md
+[32]: concept.md
+[33]: node-type.md
+[34]: layout.md
+[35]: mode.md
+[36]: lua-function-calls.md
+[37]: environment-variables-and-pipes.md
