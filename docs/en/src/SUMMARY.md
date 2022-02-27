@@ -18,6 +18,8 @@
   - [Layout][34]
   - [Mode][35]
   - [Message][8]
+    - [Full List of Messages][38]
+    - [Input Operation][39]
   - [Borders][31]
   - [Style][11]
   - [Sorting][12]
@@ -75,3 +77,5 @@
 [35]: mode.md
 [36]: lua-function-calls.md
 [37]: environment-variables-and-pipes.md
+[38]: messages.md
+[39]: input-operation.md

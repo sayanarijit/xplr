@@ -12,3 +12,5 @@ book/
 
 # Jetbrains config
 .idea/
+
+.venv/

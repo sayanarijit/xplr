@@ -18,8 +18,8 @@ The loaded config can be further extended using the `-C` or `--extra-config`
 command-line option.
 
 > **NEED HELP:** Auto generate rest of the docs from [src/init.lua][1]
-> using [docs/script/generate.lua][2].
+> using [docs/script/generate.py][2].
 
 [1]: https://github.com/sayanarijit/xplr/blob/main/src/init.lua
-[2]: https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.lua
+[2]: https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.py
 [3]: https://www.lua.org
