@@ -17,6 +17,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Install mdBook
         uses: peaceiris/actions-mdbook@v1
+      - name: Install mdbook-linkcheck
+        run: |
+          curl -LSfs https://japaric.github.io/trust/install.sh | \
+            sh -s -- --git Michael-F-Bryan/mdbook-linkcheck
       - name: Render book
         run: |
           mdbook build -d gh-pages docs/en
