@@ -998,7 +998,7 @@ xplr.config.node_types.symlink.meta.icon = "§"
 -- * key: string
 -- * value:
 --   * key: string
---   * value: [Node Type](https://xplr.dev/en/node_type)
+--   * value: [Node Type](https://xplr.dev/en/node-type)
 --
 -- Example:
 --
@@ -1023,7 +1023,7 @@ xplr.config.node_types.mime_essence = {}
 -- Type: mapping of the following key-value pairs:
 --
 -- * key: string
--- * value: [Node Type](https://xplr.dev/en/node_type)
+-- * value: [Node Type](https://xplr.dev/en/node-type)
 --
 -- Example:
 --
@@ -1038,7 +1038,7 @@ xplr.config.node_types.extension = {}
 -- Type: mapping of the following key-value pairs:
 --
 -- * key: string
--- * value: [Node Type](https://xplr.dev/en/node_type)
+-- * value: [Node Type](https://xplr.dev/en/node-type)
 --
 -- Example:
 --
