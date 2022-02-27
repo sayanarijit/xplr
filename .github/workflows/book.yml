@@ -30,6 +30,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           allow_empty_commit: true
           keep_files: false
+          publish_dir: gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISH_BRANCH: gh-pages
