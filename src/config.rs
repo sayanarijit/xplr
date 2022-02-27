@@ -734,13 +734,13 @@ impl LayoutsConfig {
 #[serde(deny_unknown_fields)]
 pub struct Config {
     #[serde(default)]
-    pub layouts: LayoutsConfig,
-
-    #[serde(default)]
     pub general: GeneralConfig,
 
     #[serde(default)]
     pub node_types: NodeTypesConfig,
+
+    #[serde(default)]
+    pub layouts: LayoutsConfig,
 
     #[serde(default)]
     pub modes: ModesConfig,

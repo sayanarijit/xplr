@@ -265,7 +265,7 @@ xplr.config.general.table.col_widths = {
 ```
 
 [1]: #table-renderer-argument
-[2]: layouts.md#table
+[2]: layout.md#table
 [3]: #parent
 [4]: #relative_path
 [5]: #absolute_path
@@ -296,4 +296,4 @@ xplr.config.general.table.col_widths = {
 [30]: #permission
 [31]: #resolved-node-metadata
 [32]: general-config.md#tabletree
-[33]: node_types.md#meta
+[33]: node_type.md#meta

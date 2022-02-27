@@ -74,11 +74,11 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 [4]: https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
 [5]: awesome-plugins.md
 [6]: configure-key-bindings.md#tutorial-adding-a-new-mode
-[7]: message.md#example-using-environment-variables-and-pipes
-[8]: message.md#example-using-lua-function-calls
-[9]: layouts.md#example-defining-custom-layout
+[7]: environment-variables-and-pipes.md#example-using-environment-variables-and-pipes
+[8]: lua-function-calls.md#example-using-lua-function-calls
+[9]: layout.md#example-defining-custom-layout
 [10]: column-renderer.md#example-customizing-table-renderer
-[11]: layouts.md#example-render-a-custom-dynamic-table
+[11]: layout.md#example-render-a-custom-dynamic-table
 [12]: https://github.com/sayanarijit/xplr/discussions/274
 [13]: https://github.com/sayanarijit/xplr/discussions/273
 [14]: https://github.com/sayanarijit/xplr/discussions/250
