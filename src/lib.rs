@@ -5,11 +5,15 @@
 pub mod app;
 pub mod cli;
 pub mod config;
+pub mod directory_buffer;
 pub mod event_reader;
 pub mod explorer;
 pub mod input;
 pub mod lua;
+pub mod msg;
+pub mod node;
 pub mod permissions;
+pub mod pipe;
 pub mod pipe_reader;
 pub mod pwd_watcher;
 pub mod runner;
