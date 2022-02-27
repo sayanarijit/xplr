@@ -27,8 +27,8 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          emptyCommits: true
-          keepFiles: false
+          allow_empty_commit: true
+          keep_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISH_BRANCH: gh-pages

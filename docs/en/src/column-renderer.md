@@ -291,9 +291,9 @@ xplr.config.general.table.col_widths = {
 [25]: #is_selected
 [26]: #is_focused
 [27]: #total
-[28]: meta
+[28]: #meta
 [29]: #size
 [30]: #permission
 [31]: #resolved-node-metadata
 [32]: general-config.md#tabletree
-[33]: node_type.md#meta
+[33]: node-type.md#meta
