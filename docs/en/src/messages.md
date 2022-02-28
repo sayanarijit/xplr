@@ -1,4 +1,3 @@
-
 # Full List of Messages
 
 xplr messages categorized based on their purpose.
@@ -1173,4 +1172,3 @@ Example:
 ## Also See:
 
 - [Message](message.md)
-
