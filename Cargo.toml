@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.17.2'
+version = '0.17.3'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2018'
 description = 'A hackable, minimal, fast TUI file explorer'

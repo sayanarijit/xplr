@@ -15,7 +15,7 @@ xplr messages categorized based on their purpose.
 ## Also See:
 
 - [Message](message.md)
-"""
+""".strip()
 
 
 @dataclass
