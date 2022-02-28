@@ -814,10 +814,17 @@ fn draw_input_buffer<B: Backend>(
             .map(|b| b.contains(&Border::Left))
             .unwrap_or(false)
         {
-            3
+            1
         } else {
-            2
-        };
+            0
+        } + app
+            .config
+            .general
+            .prompt
+            .format
+            .as_ref()
+            .map(|t| t.chars().count() as u16)
+            .unwrap_or(0);
 
         let cursor_offset_right = if config
             .borders
