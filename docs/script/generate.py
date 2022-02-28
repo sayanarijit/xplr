@@ -1,6 +1,23 @@
 from dataclasses import dataclass
 
 
+TEMPLATE = """
+# Full List of Messages
+
+xplr messages categorized based on their purpose.
+
+## Categories
+
+{categories}
+
+{msgs}
+
+## Also See:
+
+- [Message](message.md)
+"""
+
+
 @dataclass
 class Section:
     title: str
@@ -17,23 +34,6 @@ class Category:
 class Result:
     categories: list
     msgs: list
-
-
-TEMPLATE = """
-# Full List of Messages
-
-xplr messages categorized based on their purpose.
-
-## Categories
-
-{categories}
-
-{msgs}
-
-## Also See:
-
-- [Message](message.md)
-"""
 
 
 def gen_messages():
@@ -69,10 +69,11 @@ def gen_messages():
             res[-1].sections[-1].body.append(line)
             continue
 
-        elif not line.strip() or line.strip() == "///":
+        if not line or line == "///":
             res[-1].sections[-1].body.append("")
+            continue
 
-        elif "," in line:
+        if line.endswith(","):
             line = line.split(",")[0].split("(")[0]
             res[-1].sections[-1].title = line
 
