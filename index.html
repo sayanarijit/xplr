@@ -1,12 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/assets/icon/xplr64.png" />
-    <link rel="stylesheet" href="style.css" />
-    <title>xplr</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>xplr - A hackable, minimal, fast TUI file explorer</title>
+    <meta
+      name="description"
+      content="xplr is a hackable, minimal, fast TUI file explorer "
+    />
+
+    <!--Inter UI font-->
+    <link href="https://rsms.me/inter/inter-ui.css" rel="stylesheet" />
+
+    <!--vendors styles-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"
+    />
+
+    <!-- Icons -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="126x128"
+      href="/assets/icon/xplr128.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="64x64"
+      href="/assets/icon/xplr64.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/icon/xplr32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/icon/xplr16.png"
+    />
+
+    <!-- Bootstrap CSS / Color Scheme -->
+    <link rel="stylesheet" href="css/default.css" id="theme-color" />
+
     <!--  -------------  SEO TAGS --------------------->
     <meta name="title" content="xplr" />
     <meta
@@ -49,69 +101,133 @@
       content="A hackable, minimal, fast TUI file explorer"
     />
 
+    <!-- Youtube Embed -->
+
     <link
-      rel="icon"
-      type="image/png"
-      href="https://s3.gifyu.com/images/icon2194563908b29554.png"
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/paulirish/lite-youtube-embed@master/src/lite-yt-embed.min.css"
     />
-    <meta name="theme-color" content="#ffffff" />
+
+    <script
+      defer="defer"
+      src="https://cdn.jsdelivr.net/gh/paulirish/lite-youtube-embed@master/src/lite-yt-embed.min.js"
+    ></script>
+
+    <!-- EthicalAds by "Read The Docs" folks -->
+    <script
+      async
+      src="https://media.ethicalads.io/media/client/ethicalads.min.js"
+    ></script>
   </head>
 
   <body>
-    <div class="main-page">
-      <div class="para">
-        <h1>xplr</h1>
-        <p>
-          <span style="font-size: 4rem">A</span> hackable, minimal, fast TUI
-          file explorer
-        </p>
-        <br />
-        <p><a href="/en/install.html">Try or Install</a></p>
+    <!--navigation-->
+    <section>
+      <div class="container">
+        <nav class="navbar navbar-expand-md navbar-dark">
+          <a class="navbar-brand heading-black" href="/">
+            <img src="/assets/icon/xplr32.png" alt="xplr" />
+          </a>
+          <button
+            class="navbar-toggler navbar-toggler-right border-0"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarCollapse"
+            aria-controls="navbarCollapse"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span data-feather="grid"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a
+                  class="nav-link page-scroll"
+                  href="/en/introduction.html#features"
+                >
+                  Features
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link page-scroll" href="/en">Documentation</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link page-scroll" href="/en/community.html">
+                  Community
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link page-scroll"
+                  href="https://github.com/sayanarijit/xplr"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  GitHub
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <hr />
       </div>
-      <div class="main-video">
-        <iframe
-          src="https://www.youtube.com/embed/Hk6sPhMBOLY"
-          width="100%"
-          height="480"
-          frameborder="0"
-          allowfullscreen=""
-        >
-        </iframe>
+    </section>
+
+    <section>
+      <div class="container">
+        <div
+          class="dark flat"
+          data-ea-publisher="xplrdev"
+          data-ea-type="text"
+        ></div>
       </div>
+    </section>
+
+    <!--hero header-->
+    <section class="bg-hero" id="home">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8 col-sm-10 col-12 mx-auto my-auto text-center">
+            <h1 class="heading-black">xplr</h1>
+            <p class="lead">A hackable, minimal, fast TUI file explorer</p>
+
+            <div id="QyJZzq0v7Z4" class="eleventy-plugin-youtube-embed pb-3">
+              <lite-youtube
+                videoid="Hk6sPhMBOLY"
+                style="
+                  background-image: url('https://i.ytimg.com/vi/Hk6sPhMBOLY/hqdefault.jpg');
+                "
+              >
+                <div class="lty-playbtn"></div>
+              </lite-youtube>
+            </div>
+
+            <a
+              class="btn btn-primary d-inline-flex flex-row align-items-center py-3"
+              href="/en/install.html"
+              class="mb-3"
+            >
+              Try or Install
+              <em class="ml-2" data-feather="arrow-right"></em>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--scroll to top-->
+    <div class="scroll-top">
+      <i class="fa fa-angle-up" aria-hidden="true"></i>
     </div>
-    <div class="links">
-      <a href="/en/">
-        <div class="linkCad mrgL">
-          <img
-            src="/assets/homepage_icons/document_logo.png"
-            alt=""
-            width="35%"
-          />
-          <p>Documentation</p>
-        </div>
-      </a>
-      <a href="https://github.com/sayanarijit/xplr">
-        <div class="linkCad mrgR">
-          <img src="/assets/homepage_icons/pr_logo.png" alt="" width="40%" />
-          <p>Source Code</p>
-        </div>
-      </a>
-      <a href="https://github.com/sayanarijit/xplr/releases">
-        <div class="linkCad mrgL">
-          <img
-            src="/assets/homepage_icons/release_logo.png"
-            alt=""
-            width="35%"
-          />
-          <p>Releases</p>
-        </div>
-      </a>
-      <a href="https://discord.com/invite/JmasSPCcz3">
-        <div class="linkCad mrgR">
-          <img src="/assets/homepage_icons/disc_logo.png" alt="" width="40%" />
-          <p>Discord</p>
-        </div>
-      </a>
-    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.7.3/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script src="js/scripts.js"></script>
   </body>
 </html>
