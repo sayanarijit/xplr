@@ -15,23 +15,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install mdBook
-        uses: peaceiris/actions-mdbook@v1
+      # - name: Install mdBook
+      #   uses: peaceiris/actions-mdbook@v1
       - name: Render book
         run: |
-          mdbook build -d gh-pages docs/en
-          mkdir gh-pages
-          mv docs/en/gh-pages gh-pages/en
-          mv docs/index.html gh-pages
-          mv docs/CNAME gh-pages
+          # From cloudflare pages
+          curl -L https://github.com/rust-lang/mdBook/releases/download/v0.4.15/mdbook-v0.4.15-x86_64-unknown-linux-gnu.tar.gz -o mdbook.tgz && tar xzvf mdbook.tgz && ./mdbook build docs/en && mkdir dist && mv -v docs/en/book/html dist/en && mv -v assets dist && mv -v docs/landing/index.html docs/landing/css docs/landing/js dist
+          mv docs/CNAME dist
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           allow_empty_commit: true
           keep_files: false
-          publish_dir: gh-pages
+          publish_dir: dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: gh-pages
+          PUBLISH_DIR: dist
