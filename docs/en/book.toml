@@ -8,6 +8,8 @@ language = 'en'
 site-url = '/xplr/en/'
 git-repository-url = 'https://github.com/sayanarijit/xplr'
 edit-url-template = 'https://github.com/sayanarijit/xplr/edit/main/docs/en/{path}'
+default-theme = 'dark'
+preferred-dark-theme = 'coal'
 
 [output.linkcheck]
 optional = true
