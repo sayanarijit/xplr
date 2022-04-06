@@ -1,0 +1,561 @@
+/*!
+* Created by Kroplet (https://www.kroplet.com) 
+* The easiest way to create Bootstrap 4 themes. 
+*/
+
+/*****************
+Custom CSS
+*****************/
+body {
+  border-color: $black;
+}
+.small-xl {
+  font-size: 90%;
+}
+
+.img-faded {
+  opacity: 0.5;
+}
+.font-weight-medium {
+  font-weight: 600;
+}
+.heading-black {
+  font-weight: 800;
+}
+
+/* Box shadow */
+.btn {
+  text-transform: uppercase;
+  font-size: 15px;
+
+  @each $color, $value in $theme-colors {
+    &.btn-#{$color} {
+      box-shadow: 0 8px 16px rgba($value, 0.3);
+      transition: all 0.2s ease-out;
+      &:hover {
+        box-shadow: 0 8px 20px rgba($value, 0.35);
+      }
+      &:active {
+        box-shadow: none !important;
+      }
+    }
+  }
+}
+
+/*Navbar*/
+.navbar {
+  &.navbar-transparent {
+    opacity: 0.98;
+  }
+
+  @media (max-width: 992px) {
+    &.navbar-transparent {
+      background-color: rgba($black, 0.4);
+    }
+  }
+
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: $primary;
+    text-transform: uppercase;
+  }
+
+  .navbar-nav .nav-item {
+    margin: 0 0.7rem;
+
+    .nav-link {
+      font-weight: 600;
+    }
+  }
+}
+
+.section-angle {
+  position: relative;
+  border-color: inherit;
+  background: $black;
+
+  &:before,
+  &:after {
+    width: 0;
+    height: 0;
+    position: absolute;
+    content: '';
+    left: 0;
+    border: 0 solid transparent;
+    z-index: 3;
+  }
+
+  &.top-left:before,
+  &.top-right:before {
+    top: 0;
+    border-left-width: 100vw;
+  }
+
+  &.bottom-left:after,
+  &.bottom-right:after {
+    bottom: 0;
+    border-right-width: 100vw;
+  }
+
+  &.bottom-left:after {
+    border-right-color: inherit;
+  }
+
+  &.bottom-right:after {
+    border-bottom-color: inherit;
+  }
+
+  &.top-left:before {
+    border-top-color: inherit;
+  }
+
+  &.top-right:before {
+    border-left-color: inherit;
+  }
+
+  @include media-breakpoint-up('lg') {
+    &.bottom-right:after,
+    &.top-right:before {
+      border-bottom-width: 2rem;
+    }
+    &.bottom-left:after,
+    &.top-left:before {
+      border-top-width: 2rem;
+    }
+  }
+
+  @include media-breakpoint-down('sm') {
+    &.bottom-right:after,
+    &.top-right:before {
+      border-bottom-width: 1rem;
+    }
+    &.bottom-left:after,
+    &.top-left:before {
+      border-top-width: 1rem;
+    }
+  }
+}
+
+/*smart scrolling*/
+.smart-scroll {
+  position: fixed;
+  top: 0;
+  z-index: 1020;
+  width: 100%;
+  transition: all 0.3s ease-out;
+
+  &.scrolling {
+    transform: translateY(-100%);
+
+    &.up {
+      background-color: rgba($black, 0.9);
+      transform: translateY(0);
+      transition: all 0.3s ease-out;
+    }
+  }
+}
+
+/**dividers */
+.divider {
+  position: relative;
+
+  &.top-divider:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: block;
+    height: 1px;
+    background: $gray-900;
+    background: linear-gradient(
+      to right,
+      rgba($primary, 0.1) 0,
+      $gray-900 50%,
+      rgba($primary, 0.1) 100%
+    );
+  }
+
+  &.bottom-divider:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: block;
+    height: 1px;
+    background: $gray-900;
+    background: linear-gradient(
+      to right,
+      rgba($primary, 0.24) 0,
+      $gray-900 50%,
+      rgba($primary, 0.24) 100%
+    );
+  }
+}
+
+/*vertical heights */
+.vh-100 {
+  height: 100vh;
+}
+
+@media (min-width: 576px) {
+  .vh-sm-100 {
+    height: 100vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .vh-md-100 {
+    height: 100vh;
+  }
+}
+
+.bg-hero {
+  background-color: $black;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 800'%3E%3Cg %3E%3Ccircle fill='#{$black}' cx='400' cy='400' r='600'/%3E%3Ccircle fill='#{darken($primary,40%)}' cx='400' cy='400' r='500'/%3E%3Ccircle fill='#{darken($primary,30%)}' cx='400' cy='400' r='400'/%3E%3Ccircle fill='#{darken($primary,20%)}' cx='400' cy='400' r='300'/%3E%3Ccircle fill='#{darken($primary,10%)}' cx='400' cy='400' r='200'/%3E%3Ccircle fill='#{$primary}' cx='400' cy='400' r='100'/%3E%3C/g%3E%3C/svg%3E");
+  /* background by SVGBackgrounds.com */
+  background-attachment: fixed;
+  background-size: cover;
+  position: relative;
+
+  &:before {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+    left: 0;
+    top: 0;
+    content: '';
+    background-color: rgba($black, 0.7);
+  }
+
+  .container {
+    z-index: 2;
+    position: relative;
+  }
+}
+
+/*features boxes*/
+.feature-boxes {
+  text-align: center;
+
+  .box {
+    padding: 3rem;
+  }
+}
+
+/*features-list */
+.features-list {
+  list-style: none;
+
+  li {
+    float: left;
+    width: 50%;
+    margin-top: 0;
+    margin-bottom: 1.75rem;
+    font-size: 1.05rem;
+    padding-left: 1.75rem;
+    font-weight: 500;
+
+    &:before {
+      position: relative;
+      font-family: FontAwesome;
+      font-size: 14px;
+      content: '\f10c';
+      color: $primary;
+      margin: 0 0.75rem 0 0;
+    }
+  }
+}
+
+/*Pricing tables*/
+.pricing-table {
+  .pricing-list {
+    margin-bottom: 3rem;
+    margin-top: 2rem;
+    li {
+      margin-bottom: 1rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+    }
+  }
+
+  .card {
+    transition: all 0.25s ease-out;
+    text-align: center;
+
+    .card-body {
+      padding: 2.25rem 2rem;
+    }
+
+    &.active {
+      color: white;
+      background-color: transparent;
+
+      h2,
+      h3 {
+        color: $white;
+      }
+    }
+  }
+}
+
+/**slick slider */
+.slick-dots {
+  top: -4rem;
+
+  li {
+    button::before {
+      font-size: 0.75rem !important;
+      line-height: 3.5rem !important;
+    }
+
+    button::before,
+    &.slick-active button:before {
+      color: $primary !important;
+    }
+  }
+}
+
+.slick-next:before,
+.slick-prev:before {
+  color: rgba($primary, 0.2);
+}
+
+.slick-next:hover:before,
+.slick-prev:hover:before {
+  color: $primary;
+}
+
+/*footer*/
+footer {
+  ul > li {
+    padding: 0.5rem 0;
+  }
+
+  a {
+    color: rgba($white, 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.25s ease-out;
+
+    &:hover {
+      color: rgba($white, 0.9);
+      text-decoration: underline;
+    }
+  }
+
+  h5 {
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+}
+
+/*social icons*/
+.social {
+  a {
+    width: 45px;
+    height: 45px;
+    background: transparent;
+    display: block;
+    text-align: center;
+    color: gray-100;
+    border-radius: 4px;
+    font-size: 18px;
+    line-height: 45px;
+
+    &:hover {
+      background: $primary;
+      color: $black;
+      transition: all 0.4s ease-in-out;
+    }
+  }
+
+  &.social-sm a {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+    line-height: 35px;
+  }
+
+  &.social-rounded a {
+    border-radius: 50%;
+  }
+}
+
+/*scroll to top */
+.scroll-top {
+  bottom: 20px;
+  font-size: 20px;
+  height: 40px;
+  position: fixed;
+  text-align: center;
+  width: 40px;
+  z-index: 10;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 50%;
+  line-height: 40px;
+  right: -100px;
+  color: $white;
+  background-color: rgba($primary, 0.5);
+
+  &:hover {
+    background-color: rgba($primary, 1);
+    transition: all 0.4s ease-in-out;
+  }
+
+  &.active {
+    right: 20px;
+  }
+}
+
+/* Icon Boxes */
+.icon-box {
+  position: relative;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  background-color: $white;
+  margin: 1rem;
+
+  @each $color, $value in $theme-colors {
+    &.box-#{$color} {
+      color: $value;
+      background-color: rgba($value, 0.1);
+    }
+  }
+
+  .icon-box-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1.5rem;
+
+    &.small {
+      padding: 1.25rem;
+    }
+
+    &.small-xs {
+      padding: 1rem;
+    }
+  }
+}
+
+/*all themes colors*/
+.bg-black {
+  background-color: $black;
+}
+.bg-blue {
+  background-color: $blue;
+}
+.bg-indigo {
+  background-color: $indigo;
+}
+.bg-purple {
+  background-color: $purple;
+}
+.bg-pink {
+  background-color: $pink;
+}
+.bg-red {
+  background-color: $red;
+}
+.bg-orange {
+  background-color: $orange;
+}
+.bg-yellow {
+  background-color: $yellow;
+}
+.bg-green {
+  background-color: $green;
+}
+.bg-teal {
+  background-color: $teal;
+}
+.bg-cyan {
+  background-color: $cyan;
+}
+
+/*theme switcher*/
+.switcher-wrap {
+  position: fixed;
+  top: 250px;
+  width: 250px;
+  background: $gray-900;
+  color: $body-color;
+  z-index: 100;
+  padding: 20px;
+  left: -250px;
+  transition: 0.3s;
+
+  &.active {
+    left: 0;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      margin-bottom: 0.5rem;
+
+      a {
+        color: $body-color;
+
+        &:hover {
+          color: $primary;
+        }
+      }
+    }
+  }
+
+  .color-switcher ul li {
+    width: 28px;
+    height: 28px;
+    float: left;
+    margin: 3px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+
+    &.active {
+      border: 3px solid $gray-800;
+    }
+  }
+
+  .switcher-trigger {
+    position: absolute;
+    left: 100%;
+    width: 40px;
+    height: 40px;
+    background: $gray-900;
+    top: 0;
+    font-size: 20px;
+    text-align: center;
+    color: rgba($primary, 0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 2px 2px 0;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .switcher-wrap {
+    display: none;
+  }
+}
+
+.ea-text {
+  text-align: center;
+}
