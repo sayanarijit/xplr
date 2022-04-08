@@ -218,9 +218,9 @@ Visit [Awesome Plugins][27] for more [integration][28] options.
 [19]: install.md
 [20]: post-install.md
 [21]: https://github.com/junegunn/fzf
-[22]: mode.md#environment-variables
-[23]: mode.md#input-pipe
-[24]: mode.md#output-pipes
+[22]: environment-variables-and-pipes.md#environment-variables
+[23]: environment-variables-and-pipes.md#input-pipe
+[24]: environment-variables-and-pipes.md#output-pipes
 [25]: https://s3.gifyu.com/images/xplr-fzf.gif
 [26]: https://gifyu.com/image/tW86
 [27]: awesome-plugins.md
