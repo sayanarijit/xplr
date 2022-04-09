@@ -2440,8 +2440,6 @@ xplr.config.modes.custom = {}
 --
 -- See: [Lua Function Calls](https://xplr.dev/en/lua-function-calls)
 
--- ### Builtin Functions ------------------------------------------------------
---
 -- As always, `xplr.fn.builtin` is where the built-in functions are defined
 -- that can be overwritten.
 
@@ -2594,8 +2592,6 @@ xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   end
 end
 
--- ### Custom Functions -------------------------------------------------------
---
 -- This is where the custom functions can be added.
 --
 -- There is currently no restriction on what kind of functions can be defined
@@ -2603,5 +2599,4 @@ end
 --
 -- You can also use nested tables such as
 -- `xplr.fn.custom.my_plugin.my_function` to define custom functions.
-
 xplr.fn.custom = {}

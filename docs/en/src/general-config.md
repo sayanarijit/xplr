@@ -211,7 +211,7 @@ The string placed after the item name for a focused row.
 
 Type: nullable string
 
-#### xplr.config.general.focus_ui.style({
+#### xplr.config.general.focus_ui.style
 
 Style for focused item.
 Type: [Style](https://xplr.dev/en/style)
@@ -309,7 +309,7 @@ Type: nullable mapping of the following key-value pairs:
 - key: [Sorter](https://xplr.dev/en/sorting#sorter)
 - value:
   - format: nullable string
-  - style: [Style][https://xplr.dev/en/style]
+  - style: [Style](https://xplr.dev/en/style)
 
 #### xplr.config.general.sort_and_filter_ui.filter_identifiers
 
@@ -320,7 +320,7 @@ Type: nullable mapping of the following key-value pairs:
 - key: [Filter](https://xplr.dev/en/filtering#filter)
 - value:
   - format: nullable string
-  - style: [Style][https://xplr.dev/en/style]
+  - style: [Style](https://xplr.dev/en/style)
 
 #### xplr.config.general.panel_ui.default.title.format
 
