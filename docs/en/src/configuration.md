@@ -39,6 +39,7 @@ While `xplr.config` defines all the static parts of the configuration,
 `xplr.fn` defines all the dynamic parts using functions.
 
 See: [Lua Function Calls](https://xplr.dev/en/lua-function-calls)
+
 As always, `xplr.fn.builtin` is where the built-in functions are defined
 that can be overwritten.
 
