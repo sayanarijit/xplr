@@ -1,7 +1,13 @@
-from dataclasses import dataclass
+"""Generate docs from comments."""
+
+from dataclasses import dataclass, field
+from typing import List
+from enum import Enum
 
 
-TEMPLATE = """
+# Messages --------------------------------------------------------------------
+
+MESSAGES_DOC_TEMPLATE = """
 # Full List of Messages
 
 xplr messages categorized based on their purpose.
@@ -17,26 +23,35 @@ xplr messages categorized based on their purpose.
 - [Message](message.md)
 """.strip()
 
+CONFIGURATION_DOC_TEMPLATE = """
+# Configuration
+
+{doc}
+
+""".strip()
+
 
 @dataclass
-class Section:
+class MsgSection:
     title: str
-    body: list
+    body: List[str]
 
 
 @dataclass
-class Category:
+class MsgCategory:
     title: str
-    sections: list
+    sections: List[MsgSection]
 
 
 @dataclass
-class Result:
-    categories: list
-    msgs: list
+class MsgResult:
+    categories: List[MsgCategory]
+    msgs: List[str]
 
 
 def gen_messages():
+    """Generate messages.md"""
+
     path = "./src/msg/in_/external.rs"
     res = []
     reading = False
@@ -59,8 +74,8 @@ def gen_messages():
 
         if line.startswith("/// ### "):
             line = line.lstrip("/// ### ").rstrip("-").strip()
-            sec = Section(title=None, body=[])
-            cat = Category(title=line, sections=[sec])
+            sec = MsgSection(title=None, body=[])
+            cat = MsgCategory(title=line, sections=[sec])
             res.append(cat)
             continue
 
@@ -77,11 +92,11 @@ def gen_messages():
             line = line.split(",")[0].split("(")[0]
             res[-1].sections[-1].title = line
 
-            sec = Section(title=None, body=[])
+            sec = MsgSection(title=None, body=[])
             res[-1].sections.append(sec)
             continue
 
-    result = Result(categories=[], msgs=[])
+    result = MsgResult(categories=[], msgs=[])
 
     for cat in res:
         slug = cat.title.lower().replace(" ", "-")
@@ -99,18 +114,111 @@ def gen_messages():
                 result.msgs.append(f"{line}")
             result.msgs.append("")
 
-    return result
+    messages = MESSAGES_DOC_TEMPLATE.format(
+        categories="\n".join(result.categories), msgs="\n".join(result.msgs)
+    )
+
+    print(messages)
+    with open("./docs/en/src/messages.md", "w") as f:
+        print(messages, file=f)
+
+
+# Configuration ---------------------------------------------------------------
+
+
+def gen_configuration():
+    """Generate the following docs.
+
+    - configuration.md
+    - general-config.md
+    - node_types.md
+    - layouts.md
+    - modes.md
+    """
+
+    path = "./src/init.lua"
+
+    configuration = [[]]
+    general = [[]]
+    node_types = [[]]
+    layouts = [[]]
+    modes = [[]]
+
+    with open(path) as f:
+        lines = iter(f.read().splitlines())
+
+    reading = None
+
+    for line in lines:
+        if line.startswith("---"):
+            continue
+
+        if (
+            line.startswith("-- # Configuration ")
+            or line.startswith("-- ## Config ")
+            or line.startswith("-- ## Function ")
+        ):
+            reading = configuration
+
+        if line.startswith("-- ### General Configuration "):
+            reading = general
+
+        if line.startswith("-- ### Node Types "):
+            reading = node_types
+
+        if line.startswith("-- ### Layouts "):
+            reading = layouts
+
+        if line.startswith("-- ### Modes "):
+            reading = modes
+
+        if not reading:
+            continue
+
+        if line.startswith("-- ") or line == "--":
+            if line.startswith("-- #") and line.endswith("--"):
+                line = "\n{0}\n".format(line.rstrip("-"))
+
+            reading[-1].append(line[3:])
+            continue
+
+        if line.startswith("xplr.") and reading[-1]:
+            reading[-1].insert(0, "\n#### {0}\n".format(line.split()[0]))
+            continue
+
+        if not line.strip() and reading[-1]:
+            reading.append([])
+            continue
+
+    with open("./docs/en/src/configuration.md", "w") as f:
+        doc = "\n".join(["\n".join(c) for c in configuration])
+        print(doc)
+        print(doc, file=f)
+
+    with open("./docs/en/src/general-config.md", "w") as f:
+        doc = "\n".join(["\n".join(c) for c in general])
+        print(doc)
+        print(doc, file=f)
+
+    with open("./docs/en/src/node_types.md", "w") as f:
+        doc = "\n".join(["\n".join(c) for c in node_types])
+        print(doc)
+        print(doc, file=f)
+
+    with open("./docs/en/src/layouts.md", "w") as f:
+        doc = "\n".join(["\n".join(c) for c in layouts])
+        print(doc)
+        print(doc, file=f)
+
+    with open("./docs/en/src/modes.md", "w") as f:
+        doc = "\n".join(["\n".join(c) for c in modes])
+        print(doc)
+        print(doc, file=f)
 
 
 def main():
-    res = gen_messages()
-    doc = TEMPLATE.format(
-        categories="\n".join(res.categories), msgs="\n".join(res.msgs)
-    )
-
-    print(doc)
-    with open("./docs/en/src/messages.md", "w") as f:
-        print(doc, file=f)
+    gen_messages()
+    gen_configuration()
 
 
 if __name__ == "__main__":

@@ -25,7 +25,6 @@ xplr messages categorized based on their purpose.
 
 #### ExplorePwd
 
-
 Explore the present working directory and register the filtered nodes.
 This operation is expensive. So, try to avoid using it too often.
 
@@ -35,7 +34,6 @@ Example:
 - YAML: `ExplorePwd`
 
 #### ExplorePwdAsync
-
 
 Explore the present working directory and register the filtered nodes
 asynchronously. This operation happens asynchronously. That means, the
@@ -49,7 +47,6 @@ Example:
 - YAML: `ExplorePwdAsync`
 
 #### ExploreParentsAsync
-
 
 Explore the present working directory along with its parents and
 register the filtered nodes. This operation happens asynchronously.
@@ -67,7 +64,6 @@ Example:
 
 #### ClearScreen
 
-
 Clear the screen.
 
 Example:
@@ -76,7 +72,6 @@ Example:
 - YAML: `ClearScreen`
 
 #### Refresh
-
 
 Refresh the screen.
 But it will not re-explore the directory if the working directory is
@@ -93,7 +88,6 @@ Example:
 
 #### FocusNext
 
-
 Focus next node.
 
 Example:
@@ -102,7 +96,6 @@ Example:
 - YAML: `FocusNext`
 
 #### FocusNextByRelativeIndex
-
 
 Focus on the `n`th node relative to the current focus where `n` is a
 given value.
@@ -116,7 +109,6 @@ Example:
 
 #### FocusNextByRelativeIndexFromInput
 
-
 Focus on the `n`th node relative to the current focus where `n` is read
 from the input buffer.
 
@@ -127,7 +119,6 @@ Example:
 
 #### FocusPrevious
 
-
 Focus on the previous item.
 
 Example:
@@ -136,7 +127,6 @@ Example:
 - YAML: `FocusPrevious`
 
 #### FocusPreviousByRelativeIndex
-
 
 Focus on the `-n`th node relative to the current focus where `n` is a
 given value.
@@ -150,7 +140,6 @@ Example:
 
 #### FocusPreviousByRelativeIndexFromInput
 
-
 Focus on the `-n`th node relative to the current focus where `n` is
 read from the input buffer.
 
@@ -161,7 +150,6 @@ Example:
 
 #### FocusFirst
 
-
 Focus on the first node.
 
 Example:
@@ -169,18 +157,16 @@ Example:
 - Lua: "FocusFirst"
 - YAML: `FocusFirst`
 
-
 #### FocusLast
-
 
 Focus on the last node.
 
 Example:
-- Lua:  "FocusLast"
+
+- Lua: "FocusLast"
 - YAML: `FocusLast`
 
 #### FocusPath
-
 
 Focus on the given path.
 
@@ -193,7 +179,6 @@ Example:
 
 #### FocusPathFromInput
 
-
 Focus on the path read from input buffer.
 
 Example:
@@ -202,7 +187,6 @@ Example:
 - YAML: `FocusPathFromInput`
 
 #### FocusByIndex
-
 
 Focus on the absolute `n`th node where `n` is a given value.
 
@@ -215,7 +199,6 @@ Example:
 
 #### FocusByIndexFromInput
 
-
 Focus on the absolute `n`th node where `n` is read from the input buffer.
 
 Example:
@@ -224,8 +207,6 @@ Example:
 - YAML: `FocusByIndexFromInput`
 
 #### FocusByFileName
-
-
 
 **YAML:** `FocusByFileName: string`
 
@@ -240,7 +221,6 @@ Example:
 
 #### ChangeDirectory
 
-
 Change the present working directory ($PWD)
 
 Type: { ChangeDirectory = "string" }
@@ -252,7 +232,6 @@ Example:
 
 #### Enter
 
-
 Enter into the currently focused path if it's a directory.
 
 Example:
@@ -261,7 +240,6 @@ Example:
 - YAML: `Enter`
 
 #### Back
-
 
 Go back to the parent directory.
 
@@ -272,7 +250,6 @@ Example:
 
 #### LastVisitedPath
 
-
 Go to the last path visited.
 
 Example:
@@ -282,7 +259,6 @@ Example:
 
 #### NextVisitedPath
 
-
 Go to the next path visited.
 
 Example:
@@ -291,8 +267,6 @@ Example:
 - YAML: `NextVisitedPath`
 
 #### FollowSymlink
-
-
 
 Follow the symlink under focus to its actual location.
 
@@ -305,7 +279,6 @@ YAML: `FollowSymlink`
 
 #### UpdateInputBuffer
 
-
 Update the input buffer using cursor based operations.
 
 Type: { UpdateInputBuffer = [Input Opertaion](https://xplr.dev/en/input-operation) }
@@ -317,7 +290,6 @@ Example:
 
 #### UpdateInputBufferFromKey
 
-
 Update the input buffer from the key read from keyboard input.
 
 Example:
@@ -326,7 +298,6 @@ Example:
 - YAML: `UpdateInputBufferFromKey`
 
 #### BufferInput
-
 
 Append/buffer the given string into the input buffer.
 
@@ -339,7 +310,6 @@ Example:
 
 #### BufferInputFromKey
 
-
 Append/buffer the characted read from a keyboard input into the
 input buffer.
 
@@ -349,7 +319,6 @@ Example:
 - YAML: `BufferInputFromKey`
 
 #### SetInputBuffer
-
 
 Set/rewrite the input buffer with the given string.
 When the input buffer is not-null (even if empty string)
@@ -364,7 +333,6 @@ Example:
 
 #### RemoveInputBufferLastCharacter
 
-
 Remove input buffer's last character.
 
 Example:
@@ -374,7 +342,6 @@ Example:
 
 #### RemoveInputBufferLastWord
 
-
 Remove input buffer's last word.
 
 Example:
@@ -383,7 +350,6 @@ Example:
 - YAML: `RemoveInputBufferLastWord`
 
 #### ResetInputBuffer
-
 
 Reset the input buffer back to null. It will not show in the UI.
 
@@ -395,7 +361,6 @@ Example:
 ### Switching Mode
 
 #### SwitchMode
-
 
 Switch input [mode](https://xplr.dev/en/modes).
 
@@ -411,7 +376,6 @@ Example:
 > `SwitchModeCustomKeepingInputBuffer` instead.
 
 #### SwitchModeKeepingInputBuffer
-
 
 Switch input [mode](https://xplr.dev/en/modes).
 It keeps the input buffer.
@@ -429,7 +393,6 @@ Example:
 
 #### SwitchModeBuiltin
 
-
 Switch to a [builtin mode](https://xplr.dev/en/modes#builtin).
 It clears the input buffer.
 
@@ -441,7 +404,6 @@ Example:
 - YAML: `SwitchModeBuiltin: default`
 
 #### SwitchModeBuiltinKeepingInputBuffer
-
 
 Switch to a [builtin mode](https://xplr.dev/en/modes#builtin).
 It keeps the input buffer.
@@ -455,7 +417,6 @@ Example:
 
 #### SwitchModeCustom
 
-
 Switch to a [custom mode](https://xplr.dev/en/modes#custom).
 It clears the input buffer.
 
@@ -467,7 +428,6 @@ Example:
 - YAML: `SwitchModeCustom: my_custom_mode`
 
 #### SwitchModeCustomKeepingInputBuffer
-
 
 Switch to a [custom mode](https://xplr.dev/en/modes#custom).
 It keeps the input buffer.
@@ -481,7 +441,6 @@ Example:
 
 #### PopMode
 
-
 Pop the last mode from the history and switch to it.
 It clears the input buffer.
 
@@ -491,7 +450,6 @@ Example:
 - YAML: `PopMode`
 
 #### PopModeKeepingInputBuffer
-
 
 Pop the last mode from the history and switch to it.
 It keeps the input buffer.
@@ -504,7 +462,6 @@ Example:
 ### Switching Layout
 
 #### SwitchLayout
-
 
 Switch [layout](https://xplr.dev/en/layouts).
 
@@ -520,7 +477,6 @@ Example:
 
 #### SwitchLayoutBuiltin
 
-
 Switch to a [builtin layout](https://xplr.dev/en/layouts#builtin).
 
 Type: { SwitchLayoutBuiltin = "string" }
@@ -531,7 +487,6 @@ Example:
 - YAML: `SwitchLayoutBuiltin: default`
 
 #### SwitchLayoutCustom
-
 
 Switch to a [custom layout](https://xplr.dev/en/layouts#custom).
 
@@ -545,7 +500,6 @@ Example:
 ### Executing Commands
 
 #### Call
-
 
 Call a shell command with the given arguments.
 Note that the arguments will be shell-escaped.
@@ -562,7 +516,6 @@ Example:
 
 #### CallSilently
 
-
 Like `Call` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
@@ -575,7 +528,6 @@ Example:
 
 #### BashExec
 
-
 An alias to `Call: {command: bash, args: ["-c", "{string}"], silent: false}`
 where `{string}` is the given value.
 
@@ -587,7 +539,6 @@ Example:
 - YAML: `BashExec: "read -p test"`
 
 #### BashExecSilently
-
 
 Like `BashExec` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
@@ -602,7 +553,6 @@ Example:
 ### Calling Lua Functions
 
 #### CallLua
-
 
 Call a Lua function.
 
@@ -620,7 +570,6 @@ Example:
 
 #### CallLuaSilently
 
-
 Like `CallLua` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
@@ -632,7 +581,6 @@ Example:
 - YAML: `CallLuaSilently: custom.some_custom_function`
 
 #### LuaEval
-
 
 Execute Lua code without needing to define a function.
 
@@ -651,7 +599,6 @@ Example:
 
 #### LuaEvalSilently
 
-
 Like `LuaEval` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
@@ -666,7 +613,6 @@ Example:
 
 #### Select
 
-
 Select the focused node.
 
 Example:
@@ -676,7 +622,6 @@ Example:
 
 #### SelectAll
 
-
 Select all the visible nodes.
 
 Example:
@@ -685,7 +630,6 @@ Example:
 - YAML: `SelectAll`
 
 #### SelectPath
-
 
 Select the given path.
 
@@ -698,7 +642,6 @@ Example:
 
 #### UnSelect
 
-
 Unselect the focused node.
 
 Example:
@@ -708,7 +651,6 @@ Example:
 
 #### UnSelectAll
 
-
 Unselect all the visible nodes.
 
 Example:
@@ -717,7 +659,6 @@ Example:
 - YAML: `UnSelectAll`
 
 #### UnSelectPath
-
 
 UnSelect the given path.
 
@@ -730,7 +671,6 @@ Example:
 
 #### ToggleSelection
 
-
 Toggle selection on the focused node.
 
 Example:
@@ -740,7 +680,6 @@ Example:
 
 #### ToggleSelectAll
 
-
 Toggle between select all and unselect all.
 Example:
 
@@ -748,7 +687,6 @@ Example:
 - YAML: `ToggleSelectAll`
 
 #### ToggleSelectionByPath
-
 
 Toggle selection by file path.
 
@@ -761,7 +699,6 @@ Example:
 
 #### ClearSelection
 
-
 Clear the selection.
 
 Example:
@@ -772,7 +709,6 @@ Example:
 ### Filter Operations
 
 #### AddNodeFilter
-
 
 Add a [filter](https://xplr.dev/en/filtering#filter) to exclude nodes
 while exploring directories.
@@ -786,7 +722,6 @@ Example:
 
 #### RemoveNodeFilter
 
-
 Remove an existing [filter](https://xplr.dev/en/filtering#filter).
 
 Type: { RemoveNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
@@ -797,7 +732,6 @@ Example:
 - YAML: `RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 #### ToggleNodeFilter
-
 
 Remove a [filter](https://xplr.dev/en/filtering#filter) if it exists,
 else, add a it.
@@ -811,7 +745,6 @@ Example:
 
 #### AddNodeFilterFromInput
 
-
 Add a node [filter](https://xplr.dev/en/filtering#filter) reading the
 input from the buffer.
 
@@ -823,7 +756,6 @@ Example:
 - YAML: `AddNodeFilterFromInput: RelativePathDoesStartWith`
 
 #### RemoveNodeFilterFromInput
-
 
 Remove a node [filter](https://xplr.dev/en/filtering#filter) reading
 the input from the buffer.
@@ -837,7 +769,6 @@ Example:
 
 #### RemoveLastNodeFilter
 
-
 Remove the last node [filter](https://xplr.dev/en/filtering).
 
 Example:
@@ -846,7 +777,6 @@ Example:
 - YAML: `RemoveLastNodeFilter`
 
 #### ResetNodeFilters
-
 
 Reset the node [filters](https://xplr.dev/en/filtering) back to the
 default configuration.
@@ -858,7 +788,6 @@ Example:
 
 #### ClearNodeFilters
 
-
 Clear all the node [filters](https://xplr.dev/en/filtering).
 
 Example:
@@ -869,7 +798,6 @@ Example:
 ### Sort Operations
 
 #### AddNodeSorter
-
 
 Add a [sorter](https://xplr.dev/en/sorting#sorter) to sort nodes while
 exploring directories.
@@ -883,7 +811,6 @@ Example:
 
 #### RemoveNodeSorter
 
-
 Remove an existing [sorter](https://xplr.dev/en/sorting#sorter).
 
 Type: { RemoveNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
@@ -895,7 +822,6 @@ Example:
 
 #### ReverseNodeSorter
 
-
 Reverse a node [sorter](https://xplr.dev/en/sorting#sorter).
 
 Type: { ReverseNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
@@ -906,7 +832,6 @@ Example:
 - YAML: `ReverseNodeSorter: ByRelativePath`
 
 #### ToggleNodeSorter
-
 
 Remove a [sorter](https://xplr.dev/en/sorting#sorter) if it exists,
 else, add a it.
@@ -920,7 +845,6 @@ Example:
 
 #### ReverseNodeSorters
 
-
 Reverse the node [sorters](https://xplr.dev/en/sorting#sorter).
 
 Example:
@@ -929,7 +853,6 @@ Example:
 - YAML: `ReverseNodeSorters`
 
 #### RemoveLastNodeSorter
-
 
 Remove the last node [sorter](https://xplr.dev/en/sorting#sorter).
 
@@ -940,7 +863,6 @@ Example:
 
 #### ResetNodeSorters
 
-
 Reset the node [sorters](https://xplr.dev/en/sorting#sorter) back to
 the default configuration.
 
@@ -950,7 +872,6 @@ Example:
 - YAML: `ResetNodeSorters`
 
 #### ClearNodeSorters
-
 
 Clear all the node [sorters](https://xplr.dev/en/sorting#sorter).
 
@@ -963,7 +884,6 @@ Example:
 
 #### EnableMouse
 
-
 Enable mouse
 
 Example:
@@ -973,7 +893,6 @@ Example:
 
 #### DisableMouse
 
-
 Disable mouse
 
 Example:
@@ -982,7 +901,6 @@ Example:
 - YAML: `DisableMouse`
 
 #### ToggleMouse
-
 
 Toggle mouse
 
@@ -995,7 +913,6 @@ Example:
 
 #### StartFifo
 
-
 Start piping the focused path to the given fifo path
 
 Type: { StartFifo = "string" }
@@ -1007,7 +924,6 @@ Example:
 
 #### StopFifo
 
-
 Close the active fifo and stop piping.
 
 Example:
@@ -1016,7 +932,6 @@ Example:
 - YAML: `StopFifo`
 
 #### ToggleFifo
-
 
 Toggle betwen {Start|Stop}Fifo
 
@@ -1031,7 +946,6 @@ Example:
 
 #### LogInfo
 
-
 Log information message.
 
 Type: { LogInfo = "string" }
@@ -1042,7 +956,6 @@ Example:
 - YAML: `LogInfo: launching satellite`
 
 #### LogSuccess
-
 
 Log a success message.
 
@@ -1055,7 +968,6 @@ Example:
 
 #### LogWarning
 
-
 Log an warning message.
 
 Type: { LogWarning = "string" }
@@ -1066,7 +978,6 @@ Example:
 - YAML: `LogWarning: satellite is heating`
 
 #### LogError
-
 
 Log an error message.
 
@@ -1080,7 +991,6 @@ Example:
 ### Debugging
 
 #### Debug
-
 
 Write the application state to a file, without quitting. Also helpful
 for debugging.
@@ -1096,7 +1006,6 @@ Example:
 
 #### Quit
 
-
 Example:
 
 - Lua: "Quit"
@@ -1106,7 +1015,6 @@ Quit with returncode zero (success).
 
 #### PrintPwdAndQuit
 
-
 Print $PWD and quit.
 
 Example:
@@ -1115,7 +1023,6 @@ Example:
 - YAML: `PrintPwdAndQuit`
 
 #### PrintFocusPathAndQuit
-
 
 Print the path under focus and quit. It can be empty string if there's
 nothing to focus.
@@ -1127,7 +1034,6 @@ Example:
 
 #### PrintSelectionAndQuit
 
-
 Print the selected paths and quit. It can be empty is no path is
 selected.
 
@@ -1137,7 +1043,6 @@ Example:
 - YAML: `PrintSelectionAndQuit`
 
 #### PrintResultAndQuit
-
 
 Print the selected paths if it's not empty, else, print the focused
 node's path.
@@ -1149,7 +1054,6 @@ Example:
 
 #### PrintAppStateAndQuit
 
-
 Print the state of application in YAML format. Helpful for debugging or
 generating the default configuration file.
 
@@ -1160,14 +1064,12 @@ Example:
 
 #### Terminate
 
-
 Terminate the application with a non-zero return code.
 
 Example:
 
 - Lua: "Terminate"
 - YAML: `Terminate`
-
 
 ## Also See:
 
