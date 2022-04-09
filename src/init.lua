@@ -45,6 +45,13 @@ local xplr = xplr -- The globally exposed configuration to be overridden.
 --
 -- The xplr configuration, exposed via `xplr.config` Lua API contains the
 -- following sections.
+--
+-- See:
+--
+-- * [xplr.config.general](https://xplr.dev/en/general-config)
+-- * [xplr.config.node_types](https://xplr.dev/en/node_types)
+-- * [xplr.config.layouts](https://xplr.dev/en/layouts)
+-- * [xplr.config.modes](https://xplr.dev/en/modes)
 
 -- ### General Configuration --------------------------------------------------
 --
@@ -101,10 +108,7 @@ xplr.config.general.prompt.format = "❯ "
 -- This is the style of the prompt for the input buffer.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.prompt.style.add_modifiers = nil
-xplr.config.general.prompt.style.sub_modifiers = nil
-xplr.config.general.prompt.style.bg = nil
-xplr.config.general.prompt.style.fg = nil
+xplr.config.general.prompt.style = {}
 
 -- The string to indicate an information in logs.
 --
@@ -114,10 +118,7 @@ xplr.config.general.logs.info.format = "INFO"
 -- The style for the informations logs.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.logs.info.style.add_modifiers = nil
-xplr.config.general.logs.info.style.sub_modifiers = nil
-xplr.config.general.logs.info.style.bg = nil
-xplr.config.general.logs.info.style.fg = "LightBlue"
+xplr.config.general.logs.info.style = { fg = "LightBlue" }
 
 -- The string to indicate an success in logs.
 --
@@ -127,10 +128,7 @@ xplr.config.general.logs.success.format = "SUCCESS"
 -- The style for the success logs.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.logs.success.style.add_modifiers = nil
-xplr.config.general.logs.success.style.bg = nil
-xplr.config.general.logs.success.style.fg = "Green"
-xplr.config.general.logs.success.style.sub_modifiers = nil
+xplr.config.general.logs.success.style = { fg = "Green" }
 
 -- The string to indicate an warnings in logs.
 --
@@ -140,10 +138,7 @@ xplr.config.general.logs.warning.format = "WARNING"
 -- The style for the warnings logs.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.logs.warning.style.add_modifiers = nil
-xplr.config.general.logs.warning.style.bg = nil
-xplr.config.general.logs.warning.style.fg = "Yellow"
-xplr.config.general.logs.warning.style.sub_modifiers = nil
+xplr.config.general.logs.warning.style = { fg = "Yellow" }
 
 -- The string to indicate an error in logs.
 --
@@ -153,47 +148,26 @@ xplr.config.general.logs.error.format = "ERROR"
 -- The style for the error logs.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.logs.error.style.add_modifiers = nil
-xplr.config.general.logs.error.style.sub_modifiers = nil
-xplr.config.general.logs.error.style.bg = nil
-xplr.config.general.logs.error.style.fg = "Red"
+xplr.config.general.logs.error.style = { fg = "Red" }
 
 -- Columns to display in the table header.
 --
 -- Type: nullable list of tables with the following fields:
 --
 -- * format: nullable string
--- * style: [Style][https://xplr.dev/en/style]
+-- * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.header.cols = {
-  {
-    format = " index",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "╭──── path",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "permissions",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "size",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "type",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
+  { format = " index", style = {} },
+  { format = "╭──── path", style = {} },
+  { format = "permissions", style = {} },
+  { format = "size", style = {} },
+  { format = "type", style = {} },
 }
 
 -- Style of the table header.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.table.header.style.add_modifiers = { "Bold" }
-xplr.config.general.table.header.style.sub_modifiers = nil
-xplr.config.general.table.header.style.bg = nil
-xplr.config.general.table.header.style.fg = nil
+xplr.config.general.table.header.style = { add_modifiers = { "Bold" } }
 
 -- Height of the table header.
 --
@@ -209,33 +183,30 @@ xplr.config.general.table.header.height = 1
 xplr.config.general.table.row.cols = {
   {
     format = "builtin.fmt_general_table_row_cols_0",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+    style = {},
   },
   {
     format = "builtin.fmt_general_table_row_cols_1",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+    style = {},
   },
   {
     format = "builtin.fmt_general_table_row_cols_2",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+    style = {},
   },
   {
     format = "builtin.fmt_general_table_row_cols_3",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+    style = {},
   },
   {
     format = "builtin.fmt_general_table_row_cols_4",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
+    style = {},
   },
 }
 
 -- Default style of the table.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.table.row.style.add_modifiers = nil
-xplr.config.general.table.row.style.bg = nil
-xplr.config.general.table.row.style.fg = nil
-xplr.config.general.table.row.style.sub_modifiers = nil
+xplr.config.general.table.row.style = {}
 
 -- Height of the table rows.
 --
@@ -245,10 +216,7 @@ xplr.config.general.table.row.height = 0
 -- Default style of the table.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.table.style.add_modifiers = nil
-xplr.config.general.table.style.bg = nil
-xplr.config.general.table.style.fg = nil
-xplr.config.general.table.style.sub_modifiers = nil
+xplr.config.general.table.style = {}
 
 -- Tree to display in the table.
 --
@@ -257,18 +225,9 @@ xplr.config.general.table.style.sub_modifiers = nil
 -- * format: nullable string
 -- * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.tree = {
-  {
-    format = "├─",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "├─",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  {
-    format = "╰─",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
+  { format = "├─", style = {} },
+  { format = "├─", style = {} },
+  { format = "╰─", style = {} },
 }
 
 -- Spacing between the columns in the table.
@@ -300,10 +259,7 @@ xplr.config.general.default_ui.suffix = ""
 -- The default style of each item for each row.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.default_ui.style.add_modifiers = nil
-xplr.config.general.default_ui.style.sub_modifiers = nil
-xplr.config.general.default_ui.style.bg = nil
-xplr.config.general.default_ui.style.fg = nil
+xplr.config.general.default_ui.style = {}
 
 -- The string placed before the item name for a focused row.
 --
@@ -317,10 +273,7 @@ xplr.config.general.focus_ui.suffix = "]"
 
 -- Style for focused item.
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.focus_ui.style.add_modifiers = { "Bold" }
-xplr.config.general.focus_ui.style.sub_modifiers = nil
-xplr.config.general.focus_ui.style.bg = nil
-xplr.config.general.focus_ui.style.fg = "Blue"
+xplr.config.general.focus_ui.style = { add_modifiers = { "Bold" } }
 
 -- The string placed before the item name for a selected row.
 --
@@ -335,10 +288,10 @@ xplr.config.general.selection_ui.suffix = "}"
 -- Style for selected rows.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.selection_ui.style.add_modifiers = { "Bold" }
-xplr.config.general.selection_ui.style.sub_modifiers = nil
-xplr.config.general.selection_ui.style.bg = nil
-xplr.config.general.selection_ui.style.fg = "LightGreen"
+xplr.config.general.selection_ui.style = {
+  fg = "LightGreen",
+  add_modifiers = { "Bold" },
+}
 
 -- The string placed before item name for a selected row that gets the focus.
 --
@@ -353,10 +306,10 @@ xplr.config.general.focus_selection_ui.suffix = "]"
 -- Style for a selected row that gets the focus.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.focus_selection_ui.style.add_modifiers = { "Bold" }
-xplr.config.general.focus_selection_ui.style.sub_modifiers = nil
-xplr.config.general.focus_selection_ui.style.bg = nil
-xplr.config.general.focus_selection_ui.style.fg = "LightGreen"
+xplr.config.general.focus_selection_ui.style = {
+  fg = "LightGreen",
+  add_modifiers = { "Bold" },
+}
 
 -- The shape of the separator for the Sort & filter panel.
 --
@@ -366,10 +319,9 @@ xplr.config.general.sort_and_filter_ui.separator.format = " › "
 -- The style of the separator for the Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.separator.style.add_modifiers = { "Dim" }
-xplr.config.general.sort_and_filter_ui.separator.style.bg = nil
-xplr.config.general.sort_and_filter_ui.separator.style.fg = nil
-xplr.config.general.sort_and_filter_ui.separator.style.sub_modifiers = nil
+xplr.config.general.sort_and_filter_ui.separator.style = {
+  add_modifiers = { "Dim" },
+}
 
 -- The content of the default identifier in Sort & filter panel.
 --
@@ -379,14 +331,9 @@ xplr.config.general.sort_and_filter_ui.default_identifier.format = nil
 -- Style for the default identifier in Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.default_identifier.style.add_modifiers =
-  {
-    "Bold",
-  }
-xplr.config.general.sort_and_filter_ui.default_identifier.style.bg = nil
-xplr.config.general.sort_and_filter_ui.default_identifier.style.fg = nil
-xplr.config.general.sort_and_filter_ui.default_identifier.style.sub_modifiers =
-  nil
+xplr.config.general.sort_and_filter_ui.default_identifier.style = {
+  add_modifiers = { "Bold" },
+}
 
 -- The shape of the forward direction indicator for sort identifiers in Sort & filter panel.
 --
@@ -397,13 +344,7 @@ xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.format
 -- Style of forward direction indicator in Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.add_modifiers =
-  nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.bg =
-  nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.fg =
-  nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style.sub_modifiers =
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style =
   nil
 
 -- The shape of the reverse direction indicator for sort identifiers in Sort & filter panel.
@@ -415,13 +356,7 @@ xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.format
 -- Style of reverse direction indicator in Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.add_modifiers =
-  nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.bg =
-  nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.fg =
-  nil
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.sub_modifiers =
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style =
   nil
 
 -- The identifiers used to denote applied sorters in the Sort & filter panel.
@@ -431,112 +366,34 @@ xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style.
 -- * key: [Sorter](https://xplr.dev/en/sorting#sorter)
 -- * value:
 --   * format: nullable string
---   * style: [Style][https://xplr.dev/en/style]
+--   * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
-  ByCanonicalAbsolutePath = {
-    format = "[c]abs",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByCanonicalExtension = {
-    format = "[c]ext",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByCanonicalIsDir = {
-    format = "[c]dir",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByCanonicalIsFile = {
-    format = "[c]file",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByCanonicalIsReadonly = {
-    format = "[c]ro",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByCanonicalMimeEssence = {
-    format = "[c]mime",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByCanonicalSize = {
-    format = "[c]size",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByExtension = {
-    format = "ext",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByICanonicalAbsolutePath = {
-    format = "[ci]abs",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByIRelativePath = {
-    format = "[i]rel",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByISymlinkAbsolutePath = {
-    format = "[si]abs",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByIsBroken = {
-    format = "⨯",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByIsDir = {
-    format = "dir",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByIsFile = {
-    format = "file",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByIsReadonly = {
-    format = "ro",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByIsSymlink = {
-    format = "sym",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByMimeEssence = {
-    format = "mime",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  ByRelativePath = {
-    format = "rel",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySize = {
-    format = "size",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkAbsolutePath = {
-    format = "[s]abs",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkExtension = {
-    format = "[s]ext",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkIsDir = {
-    format = "[s]dir",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkIsFile = {
-    format = "[s]file",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkIsReadonly = {
-    format = "[s]ro",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkMimeEssence = {
-    format = "[s]mime",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  BySymlinkSize = {
-    format = "[s]size",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
+  ByCanonicalAbsolutePath = { format = "[c]abs", style = {} },
+  ByCanonicalExtension = { format = "[c]ext", style = {} },
+  ByCanonicalIsDir = { format = "[c]dir", style = {} },
+  ByCanonicalIsFile = { format = "[c]file", style = {} },
+  ByCanonicalIsReadonly = { format = "[c]ro", style = {} },
+  ByCanonicalMimeEssence = { format = "[c]mime", style = {} },
+  ByCanonicalSize = { format = "[c]size", style = {} },
+  ByExtension = { format = "ext", style = {} },
+  ByICanonicalAbsolutePath = { format = "[ci]abs", style = {} },
+  ByIRelativePath = { format = "[i]rel", style = {} },
+  ByISymlinkAbsolutePath = { format = "[si]abs", style = {} },
+  ByIsBroken = { format = "⨯", style = {} },
+  ByIsDir = { format = "dir", style = {} },
+  ByIsFile = { format = "file", style = {} },
+  ByIsReadonly = { format = "ro", style = {} },
+  ByIsSymlink = { format = "sym", style = {} },
+  ByMimeEssence = { format = "mime", style = {} },
+  ByRelativePath = { format = "rel", style = {} },
+  BySize = { format = "size", style = {} },
+  BySymlinkAbsolutePath = { format = "[s]abs", style = {} },
+  BySymlinkExtension = { format = "[s]ext", style = {} },
+  BySymlinkIsDir = { format = "[s]dir", style = {} },
+  BySymlinkIsFile = { format = "[s]file", style = {} },
+  BySymlinkIsReadonly = { format = "[s]ro", style = {} },
+  BySymlinkMimeEssence = { format = "[s]mime", style = {} },
+  BySymlinkSize = { format = "[s]size", style = {} },
 }
 
 -- The identifiers used to denote applied filters in the Sort & filter panel.
@@ -546,136 +403,40 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
 -- * key: [Filter](https://xplr.dev/en/filtering#filter)
 -- * value:
 --   * format: nullable string
---   * style: [Style][https://xplr.dev/en/style]
+--   * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.sort_and_filter_ui.filter_identifiers = {
-  AbsolutePathDoesContain = {
-    format = "abs=~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathDoesEndWith = {
-    format = "abs=$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathDoesNotContain = {
-    format = "abs!~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathDoesNotEndWith = {
-    format = "abs!$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathDoesNotStartWith = {
-    format = "abs!^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathDoesStartWith = {
-    format = "abs=^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathIs = {
-    format = "abs==",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  AbsolutePathIsNot = {
-    format = "abs!=",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathDoesContain = {
-    format = "[i]abs=~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathDoesEndWith = {
-    format = "[i]abs=$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathDoesNotContain = {
-    format = "[i]abs!~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathDoesNotEndWith = {
-    format = "[i]abs!$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathDoesNotStartWith = {
-    format = "[i]abs!^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathDoesStartWith = {
-    format = "[i]abs=^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathIs = {
-    format = "[i]abs==",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IAbsolutePathIsNot = {
-    format = "[i]abs!=",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathDoesContain = {
-    format = "[i]rel=~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathDoesEndWith = {
-    format = "[i]rel=$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathDoesNotContain = {
-    format = "[i]rel!~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathDoesNotEndWith = {
-    format = "[i]rel!$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathDoesNotStartWith = {
-    format = "[i]rel!^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathDoesStartWith = {
-    format = "[i]rel=^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathIs = {
-    format = "[i]rel==",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  IRelativePathIsNot = {
-    format = "[i]rel!=",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathDoesContain = {
-    format = "rel=~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathDoesEndWith = {
-    format = "rel=$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathDoesNotContain = {
-    format = "rel!~",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathDoesNotEndWith = {
-    format = "rel!$",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathDoesNotStartWith = {
-    format = "rel!^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathDoesStartWith = {
-    format = "rel=^",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathIs = {
-    format = "rel==",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
-  RelativePathIsNot = {
-    format = "rel!=",
-    style = { add_modifiers = nil, bg = nil, fg = nil, sub_modifiers = nil },
-  },
+  AbsolutePathDoesContain = { format = "abs=~", style = {} },
+  AbsolutePathDoesEndWith = { format = "abs=$", style = {} },
+  AbsolutePathDoesNotContain = { format = "abs!~", style = {} },
+  AbsolutePathDoesNotEndWith = { format = "abs!$", style = {} },
+  AbsolutePathDoesNotStartWith = { format = "abs!^", style = {} },
+  AbsolutePathDoesStartWith = { format = "abs=^", style = {} },
+  AbsolutePathIs = { format = "abs==", style = {} },
+  AbsolutePathIsNot = { format = "abs!=", style = {} },
+  IAbsolutePathDoesContain = { format = "[i]abs=~", style = {} },
+  IAbsolutePathDoesEndWith = { format = "[i]abs=$", style = {} },
+  IAbsolutePathDoesNotContain = { format = "[i]abs!~", style = {} },
+  IAbsolutePathDoesNotEndWith = { format = "[i]abs!$", style = {} },
+  IAbsolutePathDoesNotStartWith = { format = "[i]abs!^", style = {} },
+  IAbsolutePathDoesStartWith = { format = "[i]abs=^", style = {} },
+  IAbsolutePathIs = { format = "[i]abs==", style = {} },
+  IAbsolutePathIsNot = { format = "[i]abs!=", style = {} },
+  IRelativePathDoesContain = { format = "[i]rel=~", style = {} },
+  IRelativePathDoesEndWith = { format = "[i]rel=$", style = {} },
+  IRelativePathDoesNotContain = { format = "[i]rel!~", style = {} },
+  IRelativePathDoesNotEndWith = { format = "[i]rel!$", style = {} },
+  IRelativePathDoesNotStartWith = { format = "[i]rel!^", style = {} },
+  IRelativePathDoesStartWith = { format = "[i]rel=^", style = {} },
+  IRelativePathIs = { format = "[i]rel==", style = {} },
+  IRelativePathIsNot = { format = "[i]rel!=", style = {} },
+  RelativePathDoesContain = { format = "rel=~", style = {} },
+  RelativePathDoesEndWith = { format = "rel=$", style = {} },
+  RelativePathDoesNotContain = { format = "rel!~", style = {} },
+  RelativePathDoesNotEndWith = { format = "rel!$", style = {} },
+  RelativePathDoesNotStartWith = { format = "rel!^", style = {} },
+  RelativePathDoesStartWith = { format = "rel=^", style = {} },
+  RelativePathIs = { format = "rel==", style = {} },
+  RelativePathIsNot = { format = "rel!=", style = {} },
 }
 
 -- The content for panel title by default.
@@ -686,18 +447,12 @@ xplr.config.general.panel_ui.default.title.format = nil
 -- The style for panel title by default.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.default.title.style.add_modifiers = nil
-xplr.config.general.panel_ui.default.title.style.bg = nil
-xplr.config.general.panel_ui.default.title.style.fg = nil
-xplr.config.general.panel_ui.default.title.style.sub_modifiers = nil
+xplr.config.general.panel_ui.default.title.style = {}
 
 -- Style of the panels by default.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.default.style.add_modifiers = nil
-xplr.config.general.panel_ui.default.style.bg = nil
-xplr.config.general.panel_ui.default.style.fg = nil
-xplr.config.general.panel_ui.default.style.sub_modifiers = nil
+xplr.config.general.panel_ui.default.style = {}
 
 -- Defines where to show borders for the panels by default.
 --
@@ -717,10 +472,7 @@ xplr.config.general.panel_ui.default.border_type = nil
 -- Style of the panel borders by default.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.default.border_style.fg = nil
-xplr.config.general.panel_ui.default.border_style.bg = nil
-xplr.config.general.panel_ui.default.border_style.add_modifiers = nil
-xplr.config.general.panel_ui.default.border_style.sub_modifiers = nil
+xplr.config.general.panel_ui.default.border_style = {}
 
 -- The content for the table panel title.
 --
@@ -730,18 +482,12 @@ xplr.config.general.panel_ui.table.title.format = nil
 -- Style of the table panel title.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.table.title.style.add_modifiers = nil
-xplr.config.general.panel_ui.table.title.style.bg = nil
-xplr.config.general.panel_ui.table.title.style.fg = nil
-xplr.config.general.panel_ui.table.title.style.sub_modifiers = nil
+xplr.config.general.panel_ui.table.title.style = {}
 
 -- Style of the table panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.table.style.add_modifiers = nil
-xplr.config.general.panel_ui.table.style.bg = nil
-xplr.config.general.panel_ui.table.style.fg = nil
-xplr.config.general.panel_ui.table.style.sub_modifiers = nil
+xplr.config.general.panel_ui.table.style = {}
 
 -- Defines where to show borders for the table panel.
 --
@@ -756,10 +502,7 @@ xplr.config.general.panel_ui.table.border_type = nil
 -- Style of the table panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.table.border_style.fg = nil
-xplr.config.general.panel_ui.table.border_style.bg = nil
-xplr.config.general.panel_ui.table.border_style.add_modifiers = nil
-xplr.config.general.panel_ui.table.border_style.sub_modifiers = nil
+xplr.config.general.panel_ui.table.border_style = {}
 
 -- The content for the help menu panel title.
 --
@@ -769,18 +512,12 @@ xplr.config.general.panel_ui.help_menu.title.format = nil
 -- Style of the help menu panel title.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.help_menu.title.style.add_modifiers = nil
-xplr.config.general.panel_ui.help_menu.title.style.bg = nil
-xplr.config.general.panel_ui.help_menu.title.style.fg = nil
-xplr.config.general.panel_ui.help_menu.title.style.sub_modifiers = nil
+xplr.config.general.panel_ui.help_menu.title.style = {}
 
 -- Style of the help menu panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.help_menu.style.add_modifiers = nil
-xplr.config.general.panel_ui.help_menu.style.bg = nil
-xplr.config.general.panel_ui.help_menu.style.fg = nil
-xplr.config.general.panel_ui.help_menu.style.sub_modifiers = nil
+xplr.config.general.panel_ui.help_menu.style = {}
 
 -- Defines where to show borders for the help menu panel.
 --
@@ -795,10 +532,7 @@ xplr.config.general.panel_ui.help_menu.border_type = nil
 -- Style of the help menu panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.help_menu.border_style.fg = nil
-xplr.config.general.panel_ui.help_menu.border_style.bg = nil
-xplr.config.general.panel_ui.help_menu.border_style.add_modifiers = nil
-xplr.config.general.panel_ui.help_menu.border_style.sub_modifiers = nil
+xplr.config.general.panel_ui.help_menu.border_style = {}
 
 -- The content for the input & logs panel title.
 --
@@ -808,18 +542,12 @@ xplr.config.general.panel_ui.input_and_logs.title.format = nil
 -- Style of the input & logs panel title.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.input_and_logs.title.style.add_modifiers = nil
-xplr.config.general.panel_ui.input_and_logs.title.style.bg = nil
-xplr.config.general.panel_ui.input_and_logs.title.style.fg = nil
-xplr.config.general.panel_ui.input_and_logs.title.style.sub_modifiers = nil
+xplr.config.general.panel_ui.input_and_logs.title.style = {}
 
 -- Style of the input & logs panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.input_and_logs.style.add_modifiers = nil
-xplr.config.general.panel_ui.input_and_logs.style.bg = nil
-xplr.config.general.panel_ui.input_and_logs.style.fg = nil
-xplr.config.general.panel_ui.input_and_logs.style.sub_modifiers = nil
+xplr.config.general.panel_ui.input_and_logs.style = {}
 -- Defines where to show borders for the input & logs panel.
 --
 -- Type: nullable list of [Border](https://xplr.dev/en/borders#border)
@@ -833,10 +561,7 @@ xplr.config.general.panel_ui.input_and_logs.border_type = nil
 -- Style of the input & logs panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.input_and_logs.border_style.fg = nil
-xplr.config.general.panel_ui.input_and_logs.border_style.bg = nil
-xplr.config.general.panel_ui.input_and_logs.border_style.add_modifiers = nil
-xplr.config.general.panel_ui.input_and_logs.border_style.sub_modifiers = nil
+xplr.config.general.panel_ui.input_and_logs.border_style = {}
 
 -- The content for the selection panel title.
 --
@@ -846,18 +571,12 @@ xplr.config.general.panel_ui.selection.title.format = nil
 -- Style of the selection panel title.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.selection.title.style.add_modifiers = nil
-xplr.config.general.panel_ui.selection.title.style.bg = nil
-xplr.config.general.panel_ui.selection.title.style.fg = nil
-xplr.config.general.panel_ui.selection.title.style.sub_modifiers = nil
+xplr.config.general.panel_ui.selection.title.style = {}
 
 -- Style of the selection panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.selection.style.add_modifiers = nil
-xplr.config.general.panel_ui.selection.style.bg = nil
-xplr.config.general.panel_ui.selection.style.fg = nil
-xplr.config.general.panel_ui.selection.style.sub_modifiers = nil
+xplr.config.general.panel_ui.selection.style = {}
 -- Defines where to show borders for the selection panel.
 --
 -- Type: nullable list of [Border](https://xplr.dev/en/borders#border)
@@ -871,10 +590,7 @@ xplr.config.general.panel_ui.selection.border_type = nil
 -- Style of the selection panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.selection.border_style.fg = nil
-xplr.config.general.panel_ui.selection.border_style.bg = nil
-xplr.config.general.panel_ui.selection.border_style.add_modifiers = nil
-xplr.config.general.panel_ui.selection.border_style.sub_modifiers = nil
+xplr.config.general.panel_ui.selection.border_style = {}
 
 -- The content for the sort & filter panel title.
 --
@@ -884,18 +600,12 @@ xplr.config.general.panel_ui.sort_and_filter.title.format = nil
 -- Style of the sort & filter panel title.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.sort_and_filter.title.style.add_modifiers = nil
-xplr.config.general.panel_ui.sort_and_filter.title.style.bg = nil
-xplr.config.general.panel_ui.sort_and_filter.title.style.fg = nil
-xplr.config.general.panel_ui.sort_and_filter.title.style.sub_modifiers = nil
+xplr.config.general.panel_ui.sort_and_filter.title.style = {}
 
 -- Style of the sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.sort_and_filter.style.add_modifiers = nil
-xplr.config.general.panel_ui.sort_and_filter.style.bg = nil
-xplr.config.general.panel_ui.sort_and_filter.style.fg = nil
-xplr.config.general.panel_ui.sort_and_filter.style.sub_modifiers = nil
+xplr.config.general.panel_ui.sort_and_filter.style = {}
 
 -- Defines where to show borders for the sort & filter panel.
 --
@@ -910,10 +620,7 @@ xplr.config.general.panel_ui.sort_and_filter.border_type = nil
 -- Style of the sort & filter panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.sort_and_filter.border_style.fg = nil
-xplr.config.general.panel_ui.sort_and_filter.border_style.bg = nil
-xplr.config.general.panel_ui.sort_and_filter.border_style.add_modifiers = nil
-xplr.config.general.panel_ui.sort_and_filter.border_style.sub_modifiers = nil
+xplr.config.general.panel_ui.sort_and_filter.border_style = {}
 
 -- Initial group if sorters applied to the nodes list in the table.
 --
@@ -953,10 +660,10 @@ xplr.config.general.start_fifo = nil
 -- The style for the directory nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.directory.style.add_modifiers = { "Bold" }
-xplr.config.node_types.directory.style.sub_modifiers = nil
-xplr.config.node_types.directory.style.bg = nil
-xplr.config.node_types.directory.style.fg = "Cyan"
+xplr.config.node_types.directory.style = {
+  fg = "Cyan",
+  add_modifiers = { "Bold" },
+}
 
 -- Metadata for the directory nodes
 --
@@ -966,10 +673,7 @@ xplr.config.node_types.directory.meta.icon = "ð"
 -- The style for the file nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.file.style.add_modifiers = nil
-xplr.config.node_types.file.style.sub_modifiers = nil
-xplr.config.node_types.file.style.bg = nil
-xplr.config.node_types.file.style.fg = nil
+xplr.config.node_types.file.style = {}
 
 -- Metadata for the file nodes
 --
@@ -979,10 +683,10 @@ xplr.config.node_types.file.meta.icon = "ƒ"
 -- The style for the symlink nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.symlink.style.add_modifiers = { "Italic" }
-xplr.config.node_types.symlink.style.sub_modifiers = nil
-xplr.config.node_types.symlink.style.bg = nil
-xplr.config.node_types.symlink.style.fg = "Magenta"
+xplr.config.node_types.symlink.style = {
+  fg = "Magenta",
+  add_modifiers = { "Italic" },
+}
 
 -- Metadata for the symlink nodes
 --
@@ -1016,6 +720,7 @@ xplr.config.node_types.symlink.meta.icon = "§"
 --   },
 -- }
 -- ```
+
 xplr.config.node_types.mime_essence = {}
 
 -- Metadata and style based on extension.
@@ -2615,8 +2320,12 @@ xplr.config.modes.builtin.sort = {
       ["n"] = {
         help = "by node type",
         messages = {
-          { AddNodeSorter = { sorter = "ByCanonicalIsDir", reverse = false } },
-          { AddNodeSorter = { sorter = "ByCanonicalIsFile", reverse = false } },
+          {
+            AddNodeSorter = { sorter = "ByCanonicalIsDir", reverse = false },
+          },
+          {
+            AddNodeSorter = { sorter = "ByCanonicalIsFile", reverse = false },
+          },
           {
             AddNodeSorter = { sorter = "ByIsSymlink", reverse = false },
           },
@@ -2728,9 +2437,15 @@ xplr.config.modes.custom = {}
 --
 -- While `xplr.config` defines all the static parts of the configuration,
 -- `xplr.fn` defines all the dynamic parts using functions.
+--
+-- See: [Lua Function Calls](https://xplr.dev/en/lua-function-calls)
 
+-- ### Builtin Functions ------------------------------------------------------
+--
 -- As always, `xplr.fn.builtin` is where the built-in functions are defined
 -- that can be overwritten.
+
+-- Renders the first column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   local r = ""
   if m.is_before_focus then
@@ -2744,6 +2459,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   return r
 end
 
+-- Renders the second column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local r = m.tree .. m.prefix
 
@@ -2778,6 +2494,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   return r
 end
 
+-- Renders the third column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local no_color = os.getenv("NO_COLOR")
 
@@ -2859,6 +2576,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   return r
 end
 
+-- Renders the fourth column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
   if not m.is_dir then
     return m.human_size
@@ -2867,6 +2585,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_3 = function(m)
   end
 end
 
+-- Renders the fifth column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   if m.is_symlink and not m.is_broken then
     return m.symlink.mime_essence
@@ -2875,6 +2594,8 @@ xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   end
 end
 
+-- ### Custom Functions -------------------------------------------------------
+--
 -- This is where the custom functions can be added.
 --
 -- There is currently no restriction on what kind of functions can be defined
@@ -2882,4 +2603,5 @@ end
 --
 -- You can also use nested tables such as
 -- `xplr.fn.custom.my_plugin.my_function` to define custom functions.
+
 xplr.fn.custom = {}
