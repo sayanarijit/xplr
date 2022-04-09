@@ -431,9 +431,8 @@ following sections.</p>
 <h2 id="function"><a class="header" href="#function">Function</a></h2>
 <p>While <code>xplr.config</code> defines all the static parts of the configuration,
 <code>xplr.fn</code> defines all the dynamic parts using functions.</p>
-<p>See: <a href="https://xplr.dev/en/lua-function-calls">Lua Function Calls</a></p>
-<h3 id="builtin-functions"><a class="header" href="#builtin-functions">Builtin Functions</a></h3>
-<p>As always, <code>xplr.fn.builtin</code> is where the built-in functions are defined
+<p>See: <a href="https://xplr.dev/en/lua-function-calls">Lua Function Calls</a>
+As always, <code>xplr.fn.builtin</code> is where the built-in functions are defined
 that can be overwritten.</p>
 <h4 id="xplrfnbuiltinfmt_general_table_row_cols_0"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_0">xplr.fn.builtin.fmt_general_table_row_cols_0</a></h4>
 <p>Renders the first column in the table</p>
@@ -445,7 +444,7 @@ that can be overwritten.</p>
 <p>Renders the fourth column in the table</p>
 <h4 id="xplrfnbuiltinfmt_general_table_row_cols_4"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_4">xplr.fn.builtin.fmt_general_table_row_cols_4</a></h4>
 <p>Renders the fifth column in the table</p>
-<h3 id="custom-functions"><a class="header" href="#custom-functions">Custom Functions</a></h3>
+<h4 id="xplrfncustom"><a class="header" href="#xplrfncustom">xplr.fn.custom</a></h4>
 <p>This is where the custom functions can be added.</p>
 <p>There is currently no restriction on what kind of functions can be defined
 in <code>xplr.fn.custom</code>.</p>
@@ -569,7 +568,7 @@ The default behavior is to rotate from the last/first path.</p>
 <h4 id="xplrconfiggeneralfocus_uisuffix"><a class="header" href="#xplrconfiggeneralfocus_uisuffix">xplr.config.general.focus_ui.suffix</a></h4>
 <p>The string placed after the item name for a focused row.</p>
 <p>Type: nullable string</p>
-<h4 id="xplrconfiggeneralfocus_uistyle"><a class="header" href="#xplrconfiggeneralfocus_uistyle">xplr.config.general.focus_ui.style({</a></h4>
+<h4 id="xplrconfiggeneralfocus_uistyle"><a class="header" href="#xplrconfiggeneralfocus_uistyle">xplr.config.general.focus_ui.style</a></h4>
 <p>Style for focused item.
 Type: <a href="https://xplr.dev/en/style">Style</a></p>
 <h4 id="xplrconfiggeneralselection_uiprefix"><a class="header" href="#xplrconfiggeneralselection_uiprefix">xplr.config.general.selection_ui.prefix</a></h4>
@@ -622,7 +621,7 @@ Type: <a href="https://xplr.dev/en/style">Style</a></p>
 <li>value:
 <ul>
 <li>format: nullable string</li>
-<li>style: [Style][https://xplr.dev/en/style]</li>
+<li>style: <a href="https://xplr.dev/en/style">Style</a></li>
 </ul>
 </li>
 </ul>
@@ -634,7 +633,7 @@ Type: <a href="https://xplr.dev/en/style">Style</a></p>
 <li>value:
 <ul>
 <li>format: nullable string</li>
-<li>style: [Style][https://xplr.dev/en/style]</li>
+<li>style: <a href="https://xplr.dev/en/style">Style</a></li>
 </ul>
 </li>
 </ul>
