@@ -140,13 +140,56 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="layouts"><a class="header" href="#layouts">Layouts</a></h1>
-<p>This configuration is exposed via the <code>xplr.config.layouts</code> API.</p>
-<p>For now, kindly refer to <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua"><strong>init.lua</strong></a></p>
-<blockquote>
-<p><strong>NEED HELP:</strong> Auto generate rest of the docs from <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">src/init.lua</a>
-using <a href="https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.py">docs/script/generate.py</a>.</p>
-</blockquote>
+                        <h3 id="layouts"><a class="header" href="#layouts">Layouts</a></h3>
+<p>xplr layouts define the structure of the UI, i.e. how many panel we see,
+placement and size of the panels, how they look etc.</p>
+<p>This is configuration exposed via the <code>xplr.config.layouts</code> API.</p>
+<p><code>xplr.config.layouts.builtin</code> contain some built-in panels which can be
+overridden, but you can't add or remove panels in it.</p>
+<p>You can add new panels in <code>xplr.config.layouts.custom</code>.</p>
+<h5 id="example-defining-custom-layout"><a class="header" href="#example-defining-custom-layout">Example: Defining Custom Layout</a></h5>
+<p><img src="https://s6.gifyu.com/images/layout.png" alt="demo" /></p>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = {
+  Horizontal = {
+    config = {
+      margin = 1,
+      horizontal_margin = 2,
+      vertical_margin = 3,
+      constraints = {
+        { Percentage = 50 },
+        { Percentage = 50 },
+      }
+    },
+    splits = {
+      &quot;Table&quot;,
+      &quot;HelpMenu&quot;,
+    }
+  }
+}
+</code></pre>
+<h4 id="xplrconfiglayoutsbuiltindefault"><a class="header" href="#xplrconfiglayoutsbuiltindefault">xplr.config.layouts.builtin.default</a></h4>
+<p>The default layout</p>
+<p>Type: <a href="https://xplr.dev/en/layout">Layout</a></p>
+<h4 id="xplrconfiglayoutsbuiltinno_help"><a class="header" href="#xplrconfiglayoutsbuiltinno_help">xplr.config.layouts.builtin.no_help</a></h4>
+<p>The layout without help menu</p>
+<p>Type: <a href="https://xplr.dev/en/layout">Layout</a></p>
+<h4 id="xplrconfiglayoutsbuiltinno_selection"><a class="header" href="#xplrconfiglayoutsbuiltinno_selection">xplr.config.layouts.builtin.no_selection</a></h4>
+<p>The layout without selection panel</p>
+<p>Type: <a href="https://xplr.dev/en/layout">Layout</a></p>
+<h4 id="xplrconfiglayoutsbuiltinno_help_no_selection"><a class="header" href="#xplrconfiglayoutsbuiltinno_help_no_selection">xplr.config.layouts.builtin.no_help_no_selection</a></h4>
+<p>The layout without help menu and selection panel</p>
+<p>Type: <a href="https://xplr.dev/en/layout">Layout</a></p>
+<h4 id="xplrconfiglayoutscustom"><a class="header" href="#xplrconfiglayoutscustom">xplr.config.layouts.custom</a></h4>
+<p>This is where you can define custom layouts</p>
+<p>Type: mapping of the following key-value pairs:</p>
+<ul>
+<li>key: string</li>
+<li>value: <a href="https://xplr.dev/en/layout">Layout</a></li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.layouts.custom.example = &quot;Nothing&quot; -- Show a blank screen
+xplr.config.general.initial_layout = &quot;example&quot; -- Load the example layout
+</code></pre>
 
                     </main>
 

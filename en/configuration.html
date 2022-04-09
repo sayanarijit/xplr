@@ -155,10 +155,39 @@ using the following lookup order:</p>
 <p>The first one found will be loaded by xplr and the lookup will stop.</p>
 <p>The loaded config can be further extended using the <code>-C</code> or <code>--extra-config</code>
 command-line option.</p>
-<blockquote>
-<p><strong>NEED HELP:</strong> Auto generate rest of the docs from <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">src/init.lua</a>
-using <a href="https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.py">docs/script/generate.py</a>.</p>
-</blockquote>
+<h2 id="config"><a class="header" href="#config">Config</a></h2>
+<p>The xplr configuration, exposed via <code>xplr.config</code> Lua API contains the
+following sections.</p>
+<p>See:</p>
+<ul>
+<li><a href="https://xplr.dev/en/general-config">xplr.config.general</a></li>
+<li><a href="https://xplr.dev/en/node_types">xplr.config.node_types</a></li>
+<li><a href="https://xplr.dev/en/layouts">xplr.config.layouts</a></li>
+<li><a href="https://xplr.dev/en/modes">xplr.config.modes</a></li>
+</ul>
+<h2 id="function"><a class="header" href="#function">Function</a></h2>
+<p>While <code>xplr.config</code> defines all the static parts of the configuration,
+<code>xplr.fn</code> defines all the dynamic parts using functions.</p>
+<p>See: <a href="https://xplr.dev/en/lua-function-calls">Lua Function Calls</a></p>
+<h3 id="builtin-functions"><a class="header" href="#builtin-functions">Builtin Functions</a></h3>
+<p>As always, <code>xplr.fn.builtin</code> is where the built-in functions are defined
+that can be overwritten.</p>
+<h4 id="xplrfnbuiltinfmt_general_table_row_cols_0"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_0">xplr.fn.builtin.fmt_general_table_row_cols_0</a></h4>
+<p>Renders the first column in the table</p>
+<h4 id="xplrfnbuiltinfmt_general_table_row_cols_1"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_1">xplr.fn.builtin.fmt_general_table_row_cols_1</a></h4>
+<p>Renders the second column in the table</p>
+<h4 id="xplrfnbuiltinfmt_general_table_row_cols_2"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_2">xplr.fn.builtin.fmt_general_table_row_cols_2</a></h4>
+<p>Renders the third column in the table</p>
+<h4 id="xplrfnbuiltinfmt_general_table_row_cols_3"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_3">xplr.fn.builtin.fmt_general_table_row_cols_3</a></h4>
+<p>Renders the fourth column in the table</p>
+<h4 id="xplrfnbuiltinfmt_general_table_row_cols_4"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_4">xplr.fn.builtin.fmt_general_table_row_cols_4</a></h4>
+<p>Renders the fifth column in the table</p>
+<h3 id="custom-functions"><a class="header" href="#custom-functions">Custom Functions</a></h3>
+<p>This is where the custom functions can be added.</p>
+<p>There is currently no restriction on what kind of functions can be defined
+in <code>xplr.fn.custom</code>.</p>
+<p>You can also use nested tables such as
+<code>xplr.fn.custom.my_plugin.my_function</code> to define custom functions.</p>
 
                     </main>
 

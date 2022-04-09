@@ -140,13 +140,100 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="modes"><a class="header" href="#modes">Modes</a></h1>
-<p>This configuration is exposed via the <code>xplr.config.modes</code> API.</p>
-<p>For now, kindly refer to <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua"><strong>init.lua</strong></a></p>
-<blockquote>
-<p><strong>NEED HELP:</strong> Auto generate rest of the docs from <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">src/init.lua</a>
-using <a href="https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.py">docs/script/generate.py</a>.</p>
-</blockquote>
+                        <h3 id="modes"><a class="header" href="#modes">Modes</a></h3>
+<p>xplr is a modal file explorer. That means the users switch between different
+modes, each containing a different set of key bindings to avoid clashes.
+Users can switch between these modes at run-time.</p>
+<p>The modes can be configured using the <code>xplr.config.modes</code> Lua API.</p>
+<p><code>xplr.config.modes.builtin</code> contain some built-in modes which can be
+overridden, but you can't add or remove modes in it.</p>
+<h4 id="xplrconfigmodesbuiltindefault"><a class="header" href="#xplrconfigmodesbuiltindefault">xplr.config.modes.builtin.default</a></h4>
+<p>The builtin default mode.
+Visit the <a href="https://xplr.dev/en/default-key-bindings">Default Key Bindings</a>
+to see what each mode does.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltindebug_error"><a class="header" href="#xplrconfigmodesbuiltindebug_error">xplr.config.modes.builtin.debug_error</a></h4>
+<p>The builtin debug error mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinrecover"><a class="header" href="#xplrconfigmodesbuiltinrecover">xplr.config.modes.builtin.recover</a></h4>
+<p>The builtin recover mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinselection_ops"><a class="header" href="#xplrconfigmodesbuiltinselection_ops">xplr.config.modes.builtin.selection_ops</a></h4>
+<p>The builtin selection ops mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltincreate"><a class="header" href="#xplrconfigmodesbuiltincreate">xplr.config.modes.builtin.create</a></h4>
+<p>The builtin create mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltincreate_directory"><a class="header" href="#xplrconfigmodesbuiltincreate_directory">xplr.config.modes.builtin.create_directory</a></h4>
+<p>The builtin create directory mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltincreate_file"><a class="header" href="#xplrconfigmodesbuiltincreate_file">xplr.config.modes.builtin.create_file</a></h4>
+<p>The builtin create file mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinnumber"><a class="header" href="#xplrconfigmodesbuiltinnumber">xplr.config.modes.builtin.number</a></h4>
+<p>The builtin number mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltingo_to"><a class="header" href="#xplrconfigmodesbuiltingo_to">xplr.config.modes.builtin.go_to</a></h4>
+<p>The builtin go to mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinrename"><a class="header" href="#xplrconfigmodesbuiltinrename">xplr.config.modes.builtin.rename</a></h4>
+<p>The builtin rename mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinduplicate_as"><a class="header" href="#xplrconfigmodesbuiltinduplicate_as">xplr.config.modes.builtin.duplicate_as</a></h4>
+<p>The builtin duplicate as mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltindelete"><a class="header" href="#xplrconfigmodesbuiltindelete">xplr.config.modes.builtin.delete</a></h4>
+<p>The builtin delete mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinaction"><a class="header" href="#xplrconfigmodesbuiltinaction">xplr.config.modes.builtin.action</a></h4>
+<p>The builtin action mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinquit"><a class="header" href="#xplrconfigmodesbuiltinquit">xplr.config.modes.builtin.quit</a></h4>
+<p>The builtin quit mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinsearch"><a class="header" href="#xplrconfigmodesbuiltinsearch">xplr.config.modes.builtin.search</a></h4>
+<p>The builtin search mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinfilter"><a class="header" href="#xplrconfigmodesbuiltinfilter">xplr.config.modes.builtin.filter</a></h4>
+<p>The builtin filter mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinrelative_path_does_contain"><a class="header" href="#xplrconfigmodesbuiltinrelative_path_does_contain">xplr.config.modes.builtin.relative_path_does_contain</a></h4>
+<p>The builtin relative_path_does_contain mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinrelative_path_does_not_contain"><a class="header" href="#xplrconfigmodesbuiltinrelative_path_does_not_contain">xplr.config.modes.builtin.relative_path_does_not_contain</a></h4>
+<p>The builtin relative_path_does_not_contain mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinsort"><a class="header" href="#xplrconfigmodesbuiltinsort">xplr.config.modes.builtin.sort</a></h4>
+<p>The builtin sort mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinswitch_layout"><a class="header" href="#xplrconfigmodesbuiltinswitch_layout">xplr.config.modes.builtin.switch_layout</a></h4>
+<p>The builtin switch layout mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodescustom"><a class="header" href="#xplrconfigmodescustom">xplr.config.modes.custom</a></h4>
+<p>This is where you define custom modes.</p>
+<p>Type: mapping of the following key-value pairs:</p>
+<ul>
+<li>key: string</li>
+<li>value: <a href="https://xplr.dev/en/mode">Mode</a></li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.modes.custom.example = {
+  name = &quot;example&quot;,
+  key_bindings = {
+    on_key = {
+      enter = {
+        help = &quot;default mode&quot;,
+        messages = {
+          &quot;PopMode&quot;,
+          { SwitchModeBuiltin = &quot;default&quot; },
+        },
+      },
+    },
+  },
+}
+
+xplr.config.general.initial_mode = &quot;example&quot;
+</code></pre>
 
                     </main>
 

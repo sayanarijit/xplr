@@ -140,13 +140,314 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="general-config"><a class="header" href="#general-config">General Config</a></h1>
-<p>This configuration is exposed via the <code>xplr.config.general</code> API.</p>
-<p>For now, kindly refer to <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua"><strong>init.lua</strong></a></p>
-<blockquote>
-<p><strong>NEED HELP:</strong> Auto generate rest of the docs from <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">src/init.lua</a>
-using <a href="https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.py">docs/script/generate.py</a>.</p>
-</blockquote>
+                        <h3 id="general-configuration"><a class="header" href="#general-configuration">General Configuration</a></h3>
+<p>The general configuration properties are grouped together in
+<code>xplr.config.general</code>.</p>
+<h4 id="xplrconfiggeneraldisable_debug_error_mode"><a class="header" href="#xplrconfiggeneraldisable_debug_error_mode">xplr.config.general.disable_debug_error_mode</a></h4>
+<p>Set it to <code>true</code> if you want to ignore the startup errors. You can still see
+the errors in the logs.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralenable_mouse"><a class="header" href="#xplrconfiggeneralenable_mouse">xplr.config.general.enable_mouse</a></h4>
+<p>Set it to <code>true</code> if you want to enable mouse scrolling.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralshow_hidden"><a class="header" href="#xplrconfiggeneralshow_hidden">xplr.config.general.show_hidden</a></h4>
+<p>Set it to <code>true</code> to show hidden files by default.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralread_only"><a class="header" href="#xplrconfiggeneralread_only">xplr.config.general.read_only</a></h4>
+<p>Set it to <code>true</code> to use only a subset of selected operations that forbids
+executing commands or performing write operations on the file-system.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralenable_recover_mode"><a class="header" href="#xplrconfiggeneralenable_recover_mode">xplr.config.general.enable_recover_mode</a></h4>
+<p>Set it to <code>true</code> if you want to enable a safety feature that will save you
+from yourself when you type recklessly.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralhide_remaps_in_help_menu"><a class="header" href="#xplrconfiggeneralhide_remaps_in_help_menu">xplr.config.general.hide_remaps_in_help_menu</a></h4>
+<p>Set it to <code>true</code> if you want to hide all remaps in the help menu.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralenforce_bounded_index_navigation"><a class="header" href="#xplrconfiggeneralenforce_bounded_index_navigation">xplr.config.general.enforce_bounded_index_navigation</a></h4>
+<p>Set it to <code>true</code> if you want the cursor to stay in the same position when
+the focus is on the first path and you navigate to the previous path
+(by pressing <code>up</code>/<code>k</code>), or when the focus is on the last path and you
+navigate to the next path (by pressing <code>down</code>/<code>j</code>).
+The default behavior is to rotate from the last/first path.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralpromptformat"><a class="header" href="#xplrconfiggeneralpromptformat">xplr.config.general.prompt.format</a></h4>
+<p>This is the shape of the prompt for the input buffer.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpromptstyle"><a class="header" href="#xplrconfiggeneralpromptstyle">xplr.config.general.prompt.style</a></h4>
+<p>This is the style of the prompt for the input buffer.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggenerallogsinfoformat"><a class="header" href="#xplrconfiggenerallogsinfoformat">xplr.config.general.logs.info.format</a></h4>
+<p>The string to indicate an information in logs.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggenerallogsinfostyle"><a class="header" href="#xplrconfiggenerallogsinfostyle">xplr.config.general.logs.info.style</a></h4>
+<p>The style for the informations logs.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggenerallogssuccessformat"><a class="header" href="#xplrconfiggenerallogssuccessformat">xplr.config.general.logs.success.format</a></h4>
+<p>The string to indicate an success in logs.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggenerallogssuccessstyle"><a class="header" href="#xplrconfiggenerallogssuccessstyle">xplr.config.general.logs.success.style</a></h4>
+<p>The style for the success logs.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggenerallogswarningformat"><a class="header" href="#xplrconfiggenerallogswarningformat">xplr.config.general.logs.warning.format</a></h4>
+<p>The string to indicate an warnings in logs.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggenerallogswarningstyle"><a class="header" href="#xplrconfiggenerallogswarningstyle">xplr.config.general.logs.warning.style</a></h4>
+<p>The style for the warnings logs.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggenerallogserrorformat"><a class="header" href="#xplrconfiggenerallogserrorformat">xplr.config.general.logs.error.format</a></h4>
+<p>The string to indicate an error in logs.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggenerallogserrorstyle"><a class="header" href="#xplrconfiggenerallogserrorstyle">xplr.config.general.logs.error.style</a></h4>
+<p>The style for the error logs.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneraltableheadercols"><a class="header" href="#xplrconfiggeneraltableheadercols">xplr.config.general.table.header.cols</a></h4>
+<p>Columns to display in the table header.</p>
+<p>Type: nullable list of tables with the following fields:</p>
+<ul>
+<li>format: nullable string</li>
+<li>style: <a href="https://xplr.dev/en/style">Style</a></li>
+</ul>
+<h4 id="xplrconfiggeneraltableheaderstyle"><a class="header" href="#xplrconfiggeneraltableheaderstyle">xplr.config.general.table.header.style</a></h4>
+<p>Style of the table header.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneraltableheaderheight"><a class="header" href="#xplrconfiggeneraltableheaderheight">xplr.config.general.table.header.height</a></h4>
+<p>Height of the table header.</p>
+<p>Type: nullable integer</p>
+<h4 id="xplrconfiggeneraltablerowcols"><a class="header" href="#xplrconfiggeneraltablerowcols">xplr.config.general.table.row.cols</a></h4>
+<p>Columns to display in each row in the table.</p>
+<p>Type: nullable list of tables with the following fields:</p>
+<ul>
+<li>format: nullable string</li>
+<li>style: <a href="https://xplr.dev/en/style">Style</a></li>
+</ul>
+<h4 id="xplrconfiggeneraltablerowstyle"><a class="header" href="#xplrconfiggeneraltablerowstyle">xplr.config.general.table.row.style</a></h4>
+<p>Default style of the table.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneraltablerowheight"><a class="header" href="#xplrconfiggeneraltablerowheight">xplr.config.general.table.row.height</a></h4>
+<p>Height of the table rows.</p>
+<p>Type: nullable integer</p>
+<h4 id="xplrconfiggeneraltablestyle"><a class="header" href="#xplrconfiggeneraltablestyle">xplr.config.general.table.style</a></h4>
+<p>Default style of the table.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneraltabletree"><a class="header" href="#xplrconfiggeneraltabletree">xplr.config.general.table.tree</a></h4>
+<p>Tree to display in the table.</p>
+<p>Type: nullable list of tables with the following fields:</p>
+<ul>
+<li>format: nullable string</li>
+<li>style: <a href="https://xplr.dev/en/style">Style</a></li>
+</ul>
+<h4 id="xplrconfiggeneraltablecol_spacing"><a class="header" href="#xplrconfiggeneraltablecol_spacing">xplr.config.general.table.col_spacing</a></h4>
+<p>Spacing between the columns in the table.</p>
+<p>Type: nullable integer</p>
+<h4 id="xplrconfiggeneraltablecol_widths"><a class="header" href="#xplrconfiggeneraltablecol_widths">xplr.config.general.table.col_widths</a></h4>
+<p>Constraint for the column widths.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/layouts#constraint">Constraint</a></p>
+<h4 id="xplrconfiggeneraldefault_uiprefix"><a class="header" href="#xplrconfiggeneraldefault_uiprefix">xplr.config.general.default_ui.prefix</a></h4>
+<p>The content that is placed before the item name for each row by default.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneraldefault_uisuffix"><a class="header" href="#xplrconfiggeneraldefault_uisuffix">xplr.config.general.default_ui.suffix</a></h4>
+<p>The content which is appended to each item name for each row by default.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneraldefault_uistyle"><a class="header" href="#xplrconfiggeneraldefault_uistyle">xplr.config.general.default_ui.style</a></h4>
+<p>The default style of each item for each row.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralfocus_uiprefix"><a class="header" href="#xplrconfiggeneralfocus_uiprefix">xplr.config.general.focus_ui.prefix</a></h4>
+<p>The string placed before the item name for a focused row.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralfocus_uisuffix"><a class="header" href="#xplrconfiggeneralfocus_uisuffix">xplr.config.general.focus_ui.suffix</a></h4>
+<p>The string placed after the item name for a focused row.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralfocus_uistyle"><a class="header" href="#xplrconfiggeneralfocus_uistyle">xplr.config.general.focus_ui.style({</a></h4>
+<p>Style for focused item.
+Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralselection_uiprefix"><a class="header" href="#xplrconfiggeneralselection_uiprefix">xplr.config.general.selection_ui.prefix</a></h4>
+<p>The string placed before the item name for a selected row.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralselection_uisuffix"><a class="header" href="#xplrconfiggeneralselection_uisuffix">xplr.config.general.selection_ui.suffix</a></h4>
+<p>The string placed after the item name for a selected row.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralselection_uistyle"><a class="header" href="#xplrconfiggeneralselection_uistyle">xplr.config.general.selection_ui.style</a></h4>
+<p>Style for selected rows.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralfocus_selection_uiprefix"><a class="header" href="#xplrconfiggeneralfocus_selection_uiprefix">xplr.config.general.focus_selection_ui.prefix</a></h4>
+<p>The string placed before item name for a selected row that gets the focus.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralfocus_selection_uisuffix"><a class="header" href="#xplrconfiggeneralfocus_selection_uisuffix">xplr.config.general.focus_selection_ui.suffix</a></h4>
+<p>The string placed after the item name for a selected row that gets the focus.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralfocus_selection_uistyle"><a class="header" href="#xplrconfiggeneralfocus_selection_uistyle">xplr.config.general.focus_selection_ui.style</a></h4>
+<p>Style for a selected row that gets the focus.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralsort_and_filter_uiseparatorformat"><a class="header" href="#xplrconfiggeneralsort_and_filter_uiseparatorformat">xplr.config.general.sort_and_filter_ui.separator.format</a></h4>
+<p>The shape of the separator for the Sort &amp; filter panel.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralsort_and_filter_uiseparatorstyle"><a class="header" href="#xplrconfiggeneralsort_and_filter_uiseparatorstyle">xplr.config.general.sort_and_filter_ui.separator.style</a></h4>
+<p>The style of the separator for the Sort &amp; filter panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralsort_and_filter_uidefault_identifierformat"><a class="header" href="#xplrconfiggeneralsort_and_filter_uidefault_identifierformat">xplr.config.general.sort_and_filter_ui.default_identifier.format</a></h4>
+<p>The content of the default identifier in Sort &amp; filter panel.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralsort_and_filter_uidefault_identifierstyle"><a class="header" href="#xplrconfiggeneralsort_and_filter_uidefault_identifierstyle">xplr.config.general.sort_and_filter_ui.default_identifier.style</a></h4>
+<p>Style for the default identifier in Sort &amp; filter panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralsort_and_filter_uisort_direction_identifiersforwardformat"><a class="header" href="#xplrconfiggeneralsort_and_filter_uisort_direction_identifiersforwardformat">xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.format</a></h4>
+<p>The shape of the forward direction indicator for sort identifiers in Sort &amp; filter panel.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralsort_and_filter_uisort_direction_identifiersforwardstyle"><a class="header" href="#xplrconfiggeneralsort_and_filter_uisort_direction_identifiersforwardstyle">xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style</a></h4>
+<p>Style of forward direction indicator in Sort &amp; filter panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralsort_and_filter_uisort_direction_identifiersreverseformat"><a class="header" href="#xplrconfiggeneralsort_and_filter_uisort_direction_identifiersreverseformat">xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.format</a></h4>
+<p>The shape of the reverse direction indicator for sort identifiers in Sort &amp; filter panel.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralsort_and_filter_uisort_direction_identifiersreversestyle"><a class="header" href="#xplrconfiggeneralsort_and_filter_uisort_direction_identifiersreversestyle">xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style</a></h4>
+<p>Style of reverse direction indicator in Sort &amp; filter panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralsort_and_filter_uisorter_identifiers"><a class="header" href="#xplrconfiggeneralsort_and_filter_uisorter_identifiers">xplr.config.general.sort_and_filter_ui.sorter_identifiers</a></h4>
+<p>The identifiers used to denote applied sorters in the Sort &amp; filter panel.</p>
+<p>Type: nullable mapping of the following key-value pairs:</p>
+<ul>
+<li>key: <a href="https://xplr.dev/en/sorting#sorter">Sorter</a></li>
+<li>value:
+<ul>
+<li>format: nullable string</li>
+<li>style: [Style][https://xplr.dev/en/style]</li>
+</ul>
+</li>
+</ul>
+<h4 id="xplrconfiggeneralsort_and_filter_uifilter_identifiers"><a class="header" href="#xplrconfiggeneralsort_and_filter_uifilter_identifiers">xplr.config.general.sort_and_filter_ui.filter_identifiers</a></h4>
+<p>The identifiers used to denote applied filters in the Sort &amp; filter panel.</p>
+<p>Type: nullable mapping of the following key-value pairs:</p>
+<ul>
+<li>key: <a href="https://xplr.dev/en/filtering#filter">Filter</a></li>
+<li>value:
+<ul>
+<li>format: nullable string</li>
+<li>style: [Style][https://xplr.dev/en/style]</li>
+</ul>
+</li>
+</ul>
+<h4 id="xplrconfiggeneralpanel_uidefaulttitleformat"><a class="header" href="#xplrconfiggeneralpanel_uidefaulttitleformat">xplr.config.general.panel_ui.default.title.format</a></h4>
+<p>The content for panel title by default.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpanel_uidefaulttitlestyle"><a class="header" href="#xplrconfiggeneralpanel_uidefaulttitlestyle">xplr.config.general.panel_ui.default.title.style</a></h4>
+<p>The style for panel title by default.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uidefaultstyle"><a class="header" href="#xplrconfiggeneralpanel_uidefaultstyle">xplr.config.general.panel_ui.default.style</a></h4>
+<p>Style of the panels by default.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uidefaultborders"><a class="header" href="#xplrconfiggeneralpanel_uidefaultborders">xplr.config.general.panel_ui.default.borders</a></h4>
+<p>Defines where to show borders for the panels by default.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/borders#border">Border</a></p>
+<h4 id="xplrconfiggeneralpanel_uidefaultborder_type"><a class="header" href="#xplrconfiggeneralpanel_uidefaultborder_type">xplr.config.general.panel_ui.default.border_type</a></h4>
+<p>Type of the borders by default.</p>
+<p>Type: nullable <a href="https://xplr.dev/en/borders#border-type">Border Type</a></p>
+<h4 id="xplrconfiggeneralpanel_uidefaultborder_style"><a class="header" href="#xplrconfiggeneralpanel_uidefaultborder_style">xplr.config.general.panel_ui.default.border_style</a></h4>
+<p>Style of the panel borders by default.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uitabletitleformat"><a class="header" href="#xplrconfiggeneralpanel_uitabletitleformat">xplr.config.general.panel_ui.table.title.format</a></h4>
+<p>The content for the table panel title.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpanel_uitabletitlestyle"><a class="header" href="#xplrconfiggeneralpanel_uitabletitlestyle">xplr.config.general.panel_ui.table.title.style</a></h4>
+<p>Style of the table panel title.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uitablestyle"><a class="header" href="#xplrconfiggeneralpanel_uitablestyle">xplr.config.general.panel_ui.table.style</a></h4>
+<p>Style of the table panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uitableborders"><a class="header" href="#xplrconfiggeneralpanel_uitableborders">xplr.config.general.panel_ui.table.borders</a></h4>
+<p>Defines where to show borders for the table panel.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/borders#border">Border</a></p>
+<h4 id="xplrconfiggeneralpanel_uitableborder_type"><a class="header" href="#xplrconfiggeneralpanel_uitableborder_type">xplr.config.general.panel_ui.table.border_type</a></h4>
+<p>Type of the borders for table panel.</p>
+<p>Type: nullable <a href="https://xplr.dev/en/borders#border-type">Border Type</a></p>
+<h4 id="xplrconfiggeneralpanel_uitableborder_style"><a class="header" href="#xplrconfiggeneralpanel_uitableborder_style">xplr.config.general.panel_ui.table.border_style</a></h4>
+<p>Style of the table panel borders.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uihelp_menutitleformat"><a class="header" href="#xplrconfiggeneralpanel_uihelp_menutitleformat">xplr.config.general.panel_ui.help_menu.title.format</a></h4>
+<p>The content for the help menu panel title.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpanel_uihelp_menutitlestyle"><a class="header" href="#xplrconfiggeneralpanel_uihelp_menutitlestyle">xplr.config.general.panel_ui.help_menu.title.style</a></h4>
+<p>Style of the help menu panel title.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uihelp_menustyle"><a class="header" href="#xplrconfiggeneralpanel_uihelp_menustyle">xplr.config.general.panel_ui.help_menu.style</a></h4>
+<p>Style of the help menu panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uihelp_menuborders"><a class="header" href="#xplrconfiggeneralpanel_uihelp_menuborders">xplr.config.general.panel_ui.help_menu.borders</a></h4>
+<p>Defines where to show borders for the help menu panel.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/borders#border">Border</a></p>
+<h4 id="xplrconfiggeneralpanel_uihelp_menuborder_type"><a class="header" href="#xplrconfiggeneralpanel_uihelp_menuborder_type">xplr.config.general.panel_ui.help_menu.border_type</a></h4>
+<p>Type of the borders for help menu panel.</p>
+<p>Type: nullable <a href="https://xplr.dev/en/borders#border-type">Border Type</a></p>
+<h4 id="xplrconfiggeneralpanel_uihelp_menuborder_style"><a class="header" href="#xplrconfiggeneralpanel_uihelp_menuborder_style">xplr.config.general.panel_ui.help_menu.border_style</a></h4>
+<p>Style of the help menu panel borders.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uiinput_and_logstitleformat"><a class="header" href="#xplrconfiggeneralpanel_uiinput_and_logstitleformat">xplr.config.general.panel_ui.input_and_logs.title.format</a></h4>
+<p>The content for the input &amp; logs panel title.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpanel_uiinput_and_logstitlestyle"><a class="header" href="#xplrconfiggeneralpanel_uiinput_and_logstitlestyle">xplr.config.general.panel_ui.input_and_logs.title.style</a></h4>
+<p>Style of the input &amp; logs panel title.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uiinput_and_logsborders"><a class="header" href="#xplrconfiggeneralpanel_uiinput_and_logsborders">xplr.config.general.panel_ui.input_and_logs.borders</a></h4>
+<h4 id="xplrconfiggeneralpanel_uiinput_and_logsstyle"><a class="header" href="#xplrconfiggeneralpanel_uiinput_and_logsstyle">xplr.config.general.panel_ui.input_and_logs.style</a></h4>
+<p>Style of the input &amp; logs panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a>
+Defines where to show borders for the input &amp; logs panel.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/borders#border">Border</a></p>
+<h4 id="xplrconfiggeneralpanel_uiinput_and_logsborder_type"><a class="header" href="#xplrconfiggeneralpanel_uiinput_and_logsborder_type">xplr.config.general.panel_ui.input_and_logs.border_type</a></h4>
+<p>Type of the borders for input &amp; logs panel.</p>
+<p>Type: nullable <a href="https://xplr.dev/en/borders#border-type">Border Type</a></p>
+<h4 id="xplrconfiggeneralpanel_uiinput_and_logsborder_style"><a class="header" href="#xplrconfiggeneralpanel_uiinput_and_logsborder_style">xplr.config.general.panel_ui.input_and_logs.border_style</a></h4>
+<p>Style of the input &amp; logs panel borders.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uiselectiontitleformat"><a class="header" href="#xplrconfiggeneralpanel_uiselectiontitleformat">xplr.config.general.panel_ui.selection.title.format</a></h4>
+<p>The content for the selection panel title.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpanel_uiselectiontitlestyle"><a class="header" href="#xplrconfiggeneralpanel_uiselectiontitlestyle">xplr.config.general.panel_ui.selection.title.style</a></h4>
+<p>Style of the selection panel title.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uiselectionborders"><a class="header" href="#xplrconfiggeneralpanel_uiselectionborders">xplr.config.general.panel_ui.selection.borders</a></h4>
+<h4 id="xplrconfiggeneralpanel_uiselectionstyle"><a class="header" href="#xplrconfiggeneralpanel_uiselectionstyle">xplr.config.general.panel_ui.selection.style</a></h4>
+<p>Style of the selection panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a>
+Defines where to show borders for the selection panel.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/borders#border">Border</a></p>
+<h4 id="xplrconfiggeneralpanel_uiselectionborder_type"><a class="header" href="#xplrconfiggeneralpanel_uiselectionborder_type">xplr.config.general.panel_ui.selection.border_type</a></h4>
+<p>Type of the borders for selection panel.</p>
+<p>Type: nullable <a href="https://xplr.dev/en/borders#border-type">Border Type</a></p>
+<h4 id="xplrconfiggeneralpanel_uiselectionborder_style"><a class="header" href="#xplrconfiggeneralpanel_uiselectionborder_style">xplr.config.general.panel_ui.selection.border_style</a></h4>
+<p>Style of the selection panel borders.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uisort_and_filtertitleformat"><a class="header" href="#xplrconfiggeneralpanel_uisort_and_filtertitleformat">xplr.config.general.panel_ui.sort_and_filter.title.format</a></h4>
+<p>The content for the sort &amp; filter panel title.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralpanel_uisort_and_filtertitlestyle"><a class="header" href="#xplrconfiggeneralpanel_uisort_and_filtertitlestyle">xplr.config.general.panel_ui.sort_and_filter.title.style</a></h4>
+<p>Style of the sort &amp; filter panel title.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uisort_and_filterstyle"><a class="header" href="#xplrconfiggeneralpanel_uisort_and_filterstyle">xplr.config.general.panel_ui.sort_and_filter.style</a></h4>
+<p>Style of the sort &amp; filter panel.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralpanel_uisort_and_filterborders"><a class="header" href="#xplrconfiggeneralpanel_uisort_and_filterborders">xplr.config.general.panel_ui.sort_and_filter.borders</a></h4>
+<p>Defines where to show borders for the sort &amp; filter panel.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/borders#border">Border</a></p>
+<h4 id="xplrconfiggeneralpanel_uisort_and_filterborder_type"><a class="header" href="#xplrconfiggeneralpanel_uisort_and_filterborder_type">xplr.config.general.panel_ui.sort_and_filter.border_type</a></h4>
+<p>Type of the borders for sort &amp; filter panel.</p>
+<p>Type: nullable <a href="https://xplr.dev/en/borders#border-type">Border Type</a></p>
+<h4 id="xplrconfiggeneralpanel_uisort_and_filterborder_style"><a class="header" href="#xplrconfiggeneralpanel_uisort_and_filterborder_style">xplr.config.general.panel_ui.sort_and_filter.border_style</a></h4>
+<p>Style of the sort &amp; filter panel borders.</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfiggeneralinitial_sorting"><a class="header" href="#xplrconfiggeneralinitial_sorting">xplr.config.general.initial_sorting</a></h4>
+<p>Initial group if sorters applied to the nodes list in the table.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/sorting#node-sorter-applicable">Node Sorter</a></p>
+<h4 id="xplrconfiggeneralinitial_mode"><a class="header" href="#xplrconfiggeneralinitial_mode">xplr.config.general.initial_mode</a></h4>
+<p>The name of one of the modes to use when xplr loads.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralinitial_layout"><a class="header" href="#xplrconfiggeneralinitial_layout">xplr.config.general.initial_layout</a></h4>
+<p>The name of one of the layouts to use when xplr loads.</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfiggeneralstart_fifo"><a class="header" href="#xplrconfiggeneralstart_fifo">xplr.config.general.start_fifo</a></h4>
+<p>Set it to a file path to start fifo when xplr loads.
+Generally it is used to integrate with external tools like previewers.</p>
+<p>Type: nullable string</p>
 
                     </main>
 

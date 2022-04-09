@@ -140,13 +140,79 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="node-types"><a class="header" href="#node-types">Node Types</a></h1>
-<p>This configuration is exposed via the <code>xplr.config.node_types</code> API.</p>
-<p>For now, kindly refer to <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua"><strong>init.lua</strong></a></p>
-<blockquote>
-<p><strong>NEED HELP:</strong> Auto generate rest of the docs from <a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">src/init.lua</a>
-using <a href="https://github.com/sayanarijit/xplr/blob/main/docs/script/generate.py">docs/script/generate.py</a>.</p>
-</blockquote>
+                        <h3 id="node-types"><a class="header" href="#node-types">Node Types</a></h3>
+<p>This section defines how to deal with different kinds of nodes (files,
+directories, symlinks etc.) based on their properties.</p>
+<p>One node can fall into multiple categories. For example, a node can have the
+<em>extension</em> <code>md</code>, and also be a <em>file</em>. In that case, the properties from
+the more specific category i.e. <em>extension</em> will be used.</p>
+<p>This can be configured using the <code>xplr.config.node_types</code> Lua API.</p>
+<h4 id="xplrconfignode_typesdirectorystyle"><a class="header" href="#xplrconfignode_typesdirectorystyle">xplr.config.node_types.directory.style</a></h4>
+<p>The style for the directory nodes</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfignode_typesdirectorymetaicon"><a class="header" href="#xplrconfignode_typesdirectorymetaicon">xplr.config.node_types.directory.meta.icon</a></h4>
+<p>Metadata for the directory nodes</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfignode_typesfilestyle"><a class="header" href="#xplrconfignode_typesfilestyle">xplr.config.node_types.file.style</a></h4>
+<p>The style for the file nodes</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfignode_typesfilemetaicon"><a class="header" href="#xplrconfignode_typesfilemetaicon">xplr.config.node_types.file.meta.icon</a></h4>
+<p>Metadata for the file nodes</p>
+<p>Type: nullable string</p>
+<h4 id="xplrconfignode_typessymlinkstyle"><a class="header" href="#xplrconfignode_typessymlinkstyle">xplr.config.node_types.symlink.style</a></h4>
+<p>The style for the symlink nodes</p>
+<p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
+<h4 id="xplrconfignode_typessymlinkmetaicon"><a class="header" href="#xplrconfignode_typessymlinkmetaicon">xplr.config.node_types.symlink.meta.icon</a></h4>
+<p>Metadata for the symlink nodes</p>
+<p>Type: nullable string
+Metadata and style based on mime types.
+It is possible to use the wildcard <code>*</code> to match all mime sub types. It will
+be overwritten by the more specific sub types that are defined.</p>
+<p>Type: mapping of the following key-value pairs:</p>
+<ul>
+<li>key: string</li>
+<li>value:
+<ul>
+<li>key: string</li>
+<li>value: <a href="https://xplr.dev/en/node-type">Node Type</a></li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.mime_essence = {
+  application = {
+    -- application/*
+    [&quot;*&quot;] = { meta = { icon = &quot;a&quot; } }
+
+    -- application/pdf
+    pdf = { meta = { icon = &quot;&quot; }, style = { fg = &quot;Blue&quot; } },
+    -- application/zip
+    zip = { meta = { icon = &quot;&quot;} },
+  },
+}
+</code></pre>
+<h4 id="xplrconfignode_typesextension"><a class="header" href="#xplrconfignode_typesextension">xplr.config.node_types.extension</a></h4>
+<p>Metadata and style based on extension.</p>
+<p>Type: mapping of the following key-value pairs:</p>
+<ul>
+<li>key: string</li>
+<li>value: <a href="https://xplr.dev/en/node-type">Node Type</a></li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.extension.md = { meta = { icon = &quot;&quot; }, style = { fg = &quot;Blue&quot; } }
+xplr.config.node_types.extension.rs = { meta = { icon = &quot;🦀&quot; } }
+</code></pre>
+<h4 id="xplrconfignode_typesspecial"><a class="header" href="#xplrconfignode_typesspecial">xplr.config.node_types.special</a></h4>
+<p>Metadata and style based on special file names.</p>
+<p>Type: mapping of the following key-value pairs:</p>
+<ul>
+<li>key: string</li>
+<li>value: <a href="https://xplr.dev/en/node-type">Node Type</a></li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.config.node_types.special[&quot;Cargo.toml&quot;] = { meta = { icon = &quot;&quot; } }
+xplr.config.node_types.special[&quot;Downloads&quot;] = { meta = { icon = &quot;&quot; }, style = { fg = &quot;Blue&quot; } }
+</code></pre>
 
                     </main>
 
