@@ -1,6 +1,6 @@
 # Awesome Plugins
 
-Here's a list of awesome xplr plugins that you might want to check out. If none
+Here's a list of awesome xplr plugins that you might want to [check out][48]. If none
 of the following plugins work for you, it's very easy to
 [write your own][1].
 
@@ -49,7 +49,7 @@ of the following plugins work for you, it's very easy to
 - [Awesome Hacks][45]
 - [Awesome Integrations][46]
 
-[1]: ./writing-plugins.md
+[1]: writing-plugins.md
 [2]: #integration
 [3]: #theme
 [4]: https://github.com/sayanarijit/dragon.xplr
@@ -95,3 +95,4 @@ of the following plugins work for you, it's very easy to
 [45]: awesome-hacks.md
 [46]: awesome-integrations.md
 [47]: https://github.com/dtomvan/xpm.xplr
+[48]: installing-plugins.md
