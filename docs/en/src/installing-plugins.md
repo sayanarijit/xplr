@@ -1,7 +1,10 @@
 # Installing Plugins
 
-Until we get a cool plugin manager, let's install plugins manually using the
-following procedure:
+One way to install plugins is to use a plugin manager like [dtomvan/xpm.xplr][1].
+
+But you can also install and manage plugins manually.
+
+## Install Manually
 
 - Add the following line in `~/.config/xplr/init.lua`
 
@@ -30,3 +33,5 @@ following procedure:
   -- The setup arguments might differ for different plugins.
   -- Visit the project README for setup instructions.
   ```
+
+[1]: https://github.com/dtomvan/xpm.xplr
