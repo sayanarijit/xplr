@@ -13,6 +13,7 @@ of the following plugins work for you, it's very easy to
 - [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 - [**igorepst/term.xplr**][39] Terminal integration for xplr
+- [**dtomvan/xpm.xplr**][47] The XPLR Plugin Manager
 
 ### Integration
 
@@ -93,3 +94,4 @@ of the following plugins work for you, it's very easy to
 [44]: https://github.com/sayanarijit/find.xplr
 [45]: awesome-hacks.md
 [46]: awesome-integrations.md
+[47]: https://github.com/dtomvan/xpm.xplr
