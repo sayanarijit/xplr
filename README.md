@@ -31,7 +31,7 @@ A hackable, minimal, fast TUI file explorer
 </p>
 
 <h3 align="center">
-  [<a href="https://xplr.dev/en/introduction">Install</a>]
+  [<a href="https://xplr.dev/en/install">Install</a>]
   [<a href="https://xplr.dev/en">Documentation</a>]
   [<a href="https://xplr.dev/en/awesome-hacks">Hacks</a>]
   [<a href="https://xplr.dev/en/awesome-plugins">Plugins</a>]
