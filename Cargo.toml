@@ -8,81 +8,66 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.17.3'
+version = '0.17.4'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
-edition = '2018'
+edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
 license = 'MIT'
 readme = 'README.md'
 repository = 'https://github.com/sayanarijit/xplr'
 homepage = 'https://xplr.dev'
 documentation = 'https://xplr.dev/en'
-keywords = [
-    'terminal',
-    'file',
-    'explorer',
-    'manager',
-    'tui',
-]
-categories = [
-    'command-line-interface',
-    'command-line-utilities',
-]
-include = [
-    'src/**/*',
-    'docs/en/src/**/*',
-    'LICENSE',
-    'README.md',
-]
+keywords = ['terminal', 'file', 'explorer', 'manager', 'tui']
+categories = ['command-line-interface', 'command-line-utilities']
+include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
 
 [dependencies]
-crossterm = '0.22'
-dirs = '4.0'
-serde_yaml = '0.8'
-mime_guess = '2.0'
-anyhow = '1.0'
-lazy_static = '1.4'
-natord = '1.0'
-humansize = '1.1'
-ansi-to-tui = '0.4'
-libc = '0.2'
+libc = "0.2.123"
+humansize = "1.1.1"
+natord = "1.0.9"
+anyhow = "1.0.56"
+serde_yaml = "0.8.23"
+crossterm = "0.23.2"
+dirs = "4.0.0"
+ansi-to-tui = "0.5.0"
+
+[dependencies.lazy_static]
+version = "1.4.0"
+default-features = false
+
+[dependencies.mime_guess]
+version = "2.0.4"
+features = ["rev-mappings"]
 
 [dependencies.tui]
-version = '0.16'
+version = "0.17.0"
 default-features = false
-features = [
-    'crossterm',
-    'serde',
-]
+features = ['crossterm', 'serde']
 
 [dependencies.serde]
-version = '1.0'
+version = "1.0.136"
 features = ['derive']
 
 [dependencies.chrono]
-version = '0.4'
+version = "0.4.19"
 features = ['serde']
 
 [dependencies.indexmap]
-version = '1.8'
+version = "1.8.1"
 features = ['serde']
 
 [dependencies.mlua]
-version = '0.7'
-features = [
-    'luajit',
-    'vendored',
-    'serialize',
-    'send',
-]
+version = "0.7.4"
+features = ['luajit', 'vendored', 'serialize', 'send']
 
 [dependencies.tui-input]
-version = '0.1'
+version = "0.1.2"
 features = ['serde']
 
 [dev-dependencies]
-criterion = '0.3'
-assert_cmd = '2.0'
+criterion = "0.3.5"
+assert_cmd = "2.0.4"
+
 [profile.release]
 lto = true
 codegen-units = 1
