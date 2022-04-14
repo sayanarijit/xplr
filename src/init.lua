@@ -167,7 +167,7 @@ xplr.config.general.table.header.cols = {
 -- Style of the table header.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.table.header.style = { add_modifiers = { "Bold" } }
+xplr.config.general.table.header.style = {}
 
 -- Height of the table header.
 --
@@ -331,9 +331,7 @@ xplr.config.general.sort_and_filter_ui.default_identifier.format = nil
 -- Style for the default identifier in Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.default_identifier.style = {
-  add_modifiers = { "Bold" },
-}
+xplr.config.general.sort_and_filter_ui.default_identifier.style = {}
 
 -- The shape of the forward direction indicator for sort identifiers in Sort & filter panel.
 --
@@ -447,7 +445,10 @@ xplr.config.general.panel_ui.default.title.format = nil
 -- The style for panel title by default.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.default.title.style = {}
+xplr.config.general.panel_ui.default.title.style = {
+  fg = "Reset",
+  add_modifiers = { "Bold" },
+}
 
 -- Style of the panels by default.
 --
@@ -467,12 +468,12 @@ xplr.config.general.panel_ui.default.borders = {
 -- Type of the borders by default.
 --
 -- Type: nullable [Border Type](https://xplr.dev/en/borders#border-type)
-xplr.config.general.panel_ui.default.border_type = nil
+xplr.config.general.panel_ui.default.border_type = "Rounded"
 
 -- Style of the panel borders by default.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.default.border_style = {}
+xplr.config.general.panel_ui.default.border_style = { fg = "DarkGray" }
 
 -- The content for the table panel title.
 --
@@ -660,10 +661,7 @@ xplr.config.general.start_fifo = nil
 -- The style for the directory nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.directory.style = {
-  fg = "Cyan",
-  add_modifiers = { "Bold" },
-}
+xplr.config.node_types.directory.style = { fg = "Cyan" }
 
 -- Metadata for the directory nodes
 --
