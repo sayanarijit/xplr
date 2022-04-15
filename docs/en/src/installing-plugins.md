@@ -34,4 +34,27 @@ But you can also install and manage plugins manually.
   -- Visit the project README for setup instructions.
   ```
 
+## Luarocks Support
+
+Some plugins may require [luarocks][2] to work.
+
+Setup luarocks with the following steps:
+
+- Install luarocks (via your package managers or follow the [official guide][2]).
+- Add `eval "$(luarocks path --lua-version 5.1)"` in your `.bashrc` or `.zshrc`.
+- Add the following lines in `~/.config/xplr/init.lua`
+
+  ```lua
+  package.path = os.getenv("LUA_PATH") .. ";" .. package.path
+  package.cpath = os.getenv("LUA_CPATH") .. ";" .. package.cpath
+  ```
+Now you can install packages using luarocks. Be sure to append `--lua-version`.
+
+Example:
+
+```bash
+luarocks install luafilesystem --local --lua-version 5.1
+```
+
 [1]: https://github.com/dtomvan/xpm.xplr
+[2]: https://luarocks.org
