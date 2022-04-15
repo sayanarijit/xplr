@@ -29,7 +29,7 @@ anyhow = "1.0.56"
 serde_yaml = "0.8.23"
 crossterm = "0.23.2"
 dirs = "4.0.0"
-ansi-to-tui = "0.5.0"
+ansi-to-tui = { git = "https://github.com/sayanarijit/ansi-to-tui", branch = "test" }
 
 [dependencies.lazy_static]
 version = "1.4.0"
