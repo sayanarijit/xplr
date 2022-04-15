@@ -171,6 +171,27 @@ git clone https://github.com/sayanarijit/material-landscape2.xplr ~/.config/xplr
 </code></pre>
 </li>
 </ul>
+<h2 id="luarocks-support"><a class="header" href="#luarocks-support">Luarocks Support</a></h2>
+<p>Some plugins may require <a href="https://luarocks.org">luarocks</a> to work.</p>
+<p>Setup luarocks with the following steps:</p>
+<ul>
+<li>
+<p>Install luarocks (via your package managers or follow the <a href="https://luarocks.org">official guide</a>).</p>
+</li>
+<li>
+<p>Add <code>eval &quot;$(luarocks path --lua-version 5.1)&quot;</code> in your <code>.bashrc</code> or <code>.zshrc</code>.</p>
+</li>
+<li>
+<p>Add the following lines in <code>~/.config/xplr/init.lua</code></p>
+<pre><code class="language-lua">package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
+package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
+</code></pre>
+</li>
+</ul>
+<p>Now you can install packages using luarocks. Be sure to append <code>--lua-version</code>.</p>
+<p>Example:</p>
+<pre><code class="language-bash">luarocks install luafilesystem --local --lua-version 5.1
+</code></pre>
 
                     </main>
 
