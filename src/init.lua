@@ -661,7 +661,10 @@ xplr.config.general.start_fifo = nil
 -- The style for the directory nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.directory.style = { fg = "Cyan" }
+xplr.config.node_types.directory.style = {
+  fg = "Cyan",
+  add_modifiers = { "Bold" },
+}
 
 -- Metadata for the directory nodes
 --
