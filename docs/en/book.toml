@@ -1,15 +1,5 @@
 [book]
-authors = ['Arijit Basu <sayanarijit@gmail.com>']
-title = 'xplr book'
-description = 'A hackable, minimal, fast TUI file explorer'
-src = 'src'
-language = 'en'
-[output.html]
-site-url = '/xplr/en/'
-git-repository-url = 'https://github.com/sayanarijit/xplr'
-edit-url-template = 'https://github.com/sayanarijit/xplr/edit/main/docs/en/{path}'
-default-theme = 'dark'
-preferred-dark-theme = 'coal'
-
-[output.linkcheck]
-optional = true
+authors = ["Arijit Basu"]
+language = "en"
+multilingual = false
+src = "src"
