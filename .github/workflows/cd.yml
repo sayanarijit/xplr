@@ -18,6 +18,9 @@ jobs:
           - ubuntu-20.04
         rust: [stable]
         include:
+
+          # See the list: https://github.com/cross-rs/cross
+
           - os: macos-latest
             artifact_prefix: macos
             target: x86_64-apple-darwin
@@ -32,6 +35,17 @@ jobs:
             artifact_prefix: linux-musl
             target: x86_64-unknown-linux-musl
             binary_postfix: ''
+
+          - os: ubuntu-latest
+            artifact_prefix: x86_64-android
+            target: x86_64-linux-android
+            binary_postfix: ''
+
+          - os: ubuntu-latest
+            artifact_prefix: aarch64-android
+            target: aarch64-linux-android
+            binary_postfix: ''
+
     steps:
       - uses: actions/checkout@v2
 
@@ -58,6 +72,7 @@ jobs:
       - name: Running cargo build
         uses: actions-rs/cargo@v1
         with:
+          use-cross: true
           command: build
           toolchain: ${{ matrix.rust }}
           args: --locked --release --target ${{ matrix.target }}
