@@ -16,21 +16,20 @@ fn main() {
     xplr [FLAG]... [OPTION]... [PATH] [SELECTION]..."###;
 
         let flags = r###"
-    -                  Reads paths from stdin
-    --                 Denotes the end of command-line flags and options
-        --read-only    Enables read-only mode (config.general.read_only)
-    -h, --help         Prints help information
-    -V, --version      Prints version information"###;
+    -                            Reads paths from stdin
+    --                           Denotes the end of command-line flags and options
+        --force-focus            Focuses on the given <PATH>, even if it is a directory
+    -h, --help                   Prints help information
+        --print-pwd-as-result    Prints the present working directory when quitting 
+                                   with `PrintResultAndQuit`
+        --read-only              Enables read-only mode (config.general.read_only)
+    -V, --version                Prints version information"###;
 
         let options = r###"
     -c, --config <PATH>             Specifies a custom config file (default is
                                       "$HOME/.config/xplr/init.lua")
     -C, --extra-config <PATH>...    Specifies extra config files to load
-        --on-load <MESSAGE>...      Sends messages when xplr loads
-        --force-focus               Focuses on the given <PATH>, even if it is
-                                      a directory
-        --print-pwd-as-result       Prints the last working directory when
-                                      quitting with `PrintResultAndQuit`"###;
+        --on-load <MESSAGE>...      Sends messages when xplr loads"###;
 
         let args = r###"
     <PATH>            Path to focus on, or enter if directory, (default is `.`)
