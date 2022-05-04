@@ -4,7 +4,7 @@ use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
-use ansi_to_tui::ansi_to_text;
+use ansi_to_tui_forked::ansi_to_text;
 use anyhow::Result;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;

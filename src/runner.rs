@@ -6,7 +6,7 @@ use crate::cli::Cli;
 use crate::event_reader::EventReader;
 use crate::explorer;
 use crate::lua;
-use crate::pipe_reader;
+use crate::pipe;
 use crate::pwd_watcher;
 use crate::ui;
 use anyhow::{bail, Error, Result};
@@ -486,7 +486,7 @@ impl Runner {
                                     })
                                     .unwrap_or_else(|e| Err(e.to_string()));
 
-                                match pipe_reader::read_all(&app.pipe.msg_in) {
+                                match pipe::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
                                         app = app
                                             .handle_batch_external_msgs(msgs)?;
@@ -723,7 +723,7 @@ impl Runner {
                                     .unwrap_or_else(|e| Err(e.to_string()));
 
                                 // TODO remove duplicate segment
-                                match pipe_reader::read_all(&app.pipe.msg_in) {
+                                match pipe::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
                                         app = app
                                             .handle_batch_external_msgs(msgs)?;
