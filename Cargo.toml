@@ -20,6 +20,7 @@ documentation = 'https://xplr.dev/en'
 keywords = ['terminal', 'file', 'explorer', 'manager', 'tui']
 categories = ['command-line-interface', 'command-line-utilities']
 include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
+exclude = ["docs/en/landing/", "docs/en/script", "assets/", "benches/", "images/", ".*"]
 
 [dependencies]
 libc = "0.2.125"
