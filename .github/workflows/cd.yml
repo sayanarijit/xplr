@@ -22,16 +22,19 @@ jobs:
             artifact_prefix: macos
             target: x86_64-apple-darwin
             binary_postfix: ''
+
           - os: ubuntu-latest
             artifact_prefix: linux
             target: x86_64-unknown-linux-gnu
             binary_postfix: ''
+
           - os: ubuntu-20.04
             artifact_prefix: linux-musl
             target: x86_64-unknown-linux-musl
             binary_postfix: ''
     steps:
       - uses: actions/checkout@v2
+
       - name: Installing Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -42,6 +45,7 @@ jobs:
       - name: Installing needed macOS dependencies
         if: matrix.os == 'macos-latest'
         run: brew install openssl@1.1
+
       - name: Installing needed Ubuntu dependencies
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
         run: |
@@ -50,6 +54,7 @@ jobs:
 
       - name: Checking out sources
         uses: actions/checkout@v1
+
       - name: Running cargo build
         uses: actions-rs/cargo@v1
         with:
@@ -113,14 +118,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+
       - run: |
           sudo apt-get update
           sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
       - uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: --token ${{ secrets.CARGO_API_KEY }} --allow-dirty
+          args: --allow-dirty
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}

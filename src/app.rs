@@ -369,171 +369,128 @@ impl App {
         if self.config.general.read_only && !msg.is_read_only() {
             self.log_error("Cannot execute code in read-only mode.".into())
         } else {
+            use ExternalMsg::*;
             match msg {
-                ExternalMsg::ExplorePwd => self.explore_pwd(),
-                ExternalMsg::ExploreParentsAsync => {
-                    self.explore_parents_async()
-                }
-                ExternalMsg::ExplorePwdAsync => self.explore_pwd_async(),
-                ExternalMsg::Refresh => self.refresh(),
-                ExternalMsg::ClearScreen => self.clear_screen(),
-                ExternalMsg::FocusFirst => self.focus_first(true),
-                ExternalMsg::FocusLast => self.focus_last(),
-                ExternalMsg::FocusPrevious => self.focus_previous(),
-                ExternalMsg::FocusPreviousByRelativeIndex(i) => {
+                ExplorePwd => self.explore_pwd(),
+                ExploreParentsAsync => self.explore_parents_async(),
+                ExplorePwdAsync => self.explore_pwd_async(),
+                Refresh => self.refresh(),
+                ClearScreen => self.clear_screen(),
+                FocusFirst => self.focus_first(true),
+                FocusLast => self.focus_last(),
+                FocusPrevious => self.focus_previous(),
+                FocusPreviousByRelativeIndex(i) => {
                     self.focus_previous_by_relative_index(i)
                 }
 
-                ExternalMsg::FocusPreviousByRelativeIndexFromInput => {
+                FocusPreviousByRelativeIndexFromInput => {
                     self.focus_previous_by_relative_index_from_input()
                 }
-                ExternalMsg::FocusNext => self.focus_next(),
-                ExternalMsg::FocusNextByRelativeIndex(i) => {
+                FocusNext => self.focus_next(),
+                FocusNextByRelativeIndex(i) => {
                     self.focus_next_by_relative_index(i)
                 }
-                ExternalMsg::FocusNextByRelativeIndexFromInput => {
+                FocusNextByRelativeIndexFromInput => {
                     self.focus_next_by_relative_index_from_input()
                 }
-                ExternalMsg::FocusPath(p) => self.focus_path(&p, true),
-                ExternalMsg::FocusPathFromInput => self.focus_path_from_input(),
-                ExternalMsg::FocusByIndex(i) => self.focus_by_index(i),
-                ExternalMsg::FocusByIndexFromInput => {
-                    self.focus_by_index_from_input()
-                }
-                ExternalMsg::FocusByFileName(n) => {
-                    self.focus_by_file_name(&n, true)
-                }
-                ExternalMsg::ChangeDirectory(dir) => {
-                    self.change_directory(&dir, true)
-                }
-                ExternalMsg::Enter => self.enter(),
-                ExternalMsg::Back => self.back(),
-                ExternalMsg::LastVisitedPath => self.last_visited_path(),
-                ExternalMsg::NextVisitedPath => self.next_visited_path(),
-                ExternalMsg::FollowSymlink => self.follow_symlink(),
-                ExternalMsg::UpdateInputBuffer(op) => {
-                    self.update_input_buffer(op)
-                }
-                ExternalMsg::UpdateInputBufferFromKey => {
+                FocusPath(p) => self.focus_path(&p, true),
+                FocusPathFromInput => self.focus_path_from_input(),
+                FocusByIndex(i) => self.focus_by_index(i),
+                FocusByIndexFromInput => self.focus_by_index_from_input(),
+                FocusByFileName(n) => self.focus_by_file_name(&n, true),
+                ChangeDirectory(dir) => self.change_directory(&dir, true),
+                Enter => self.enter(),
+                Back => self.back(),
+                LastVisitedPath => self.last_visited_path(),
+                NextVisitedPath => self.next_visited_path(),
+                FollowSymlink => self.follow_symlink(),
+                UpdateInputBuffer(op) => self.update_input_buffer(op),
+                UpdateInputBufferFromKey => {
                     self.update_input_buffer_from_key(key)
                 }
-                ExternalMsg::BufferInput(input) => self.buffer_input(&input),
-                ExternalMsg::BufferInputFromKey => {
-                    self.buffer_input_from_key(key)
-                }
-                ExternalMsg::SetInputBuffer(input) => {
-                    self.set_input_buffer(input)
-                }
-                ExternalMsg::RemoveInputBufferLastCharacter => {
+                BufferInput(input) => self.buffer_input(&input),
+                BufferInputFromKey => self.buffer_input_from_key(key),
+                SetInputBuffer(input) => self.set_input_buffer(input),
+                RemoveInputBufferLastCharacter => {
                     self.remove_input_buffer_last_character()
                 }
-                ExternalMsg::RemoveInputBufferLastWord => {
+                RemoveInputBufferLastWord => {
                     self.remove_input_buffer_last_word()
                 }
-                ExternalMsg::ResetInputBuffer => self.reset_input_buffer(),
-                ExternalMsg::SwitchMode(mode) => self.switch_mode(&mode),
-                ExternalMsg::SwitchModeKeepingInputBuffer(mode) => {
+                ResetInputBuffer => self.reset_input_buffer(),
+                SwitchMode(mode) => self.switch_mode(&mode),
+                SwitchModeKeepingInputBuffer(mode) => {
                     self.switch_mode_keeping_input_buffer(&mode)
                 }
-                ExternalMsg::SwitchModeBuiltin(mode) => {
-                    self.switch_mode_builtin(&mode)
-                }
-                ExternalMsg::SwitchModeBuiltinKeepingInputBuffer(mode) => {
+                SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
+                SwitchModeBuiltinKeepingInputBuffer(mode) => {
                     self.switch_mode_builtin_keeping_input_buffer(&mode)
                 }
-                ExternalMsg::SwitchModeCustom(mode) => {
-                    self.switch_mode_custom(&mode)
-                }
-                ExternalMsg::SwitchModeCustomKeepingInputBuffer(mode) => {
+                SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
+                SwitchModeCustomKeepingInputBuffer(mode) => {
                     self.switch_mode_custom_keeping_input_buffer(&mode)
                 }
-                ExternalMsg::PopMode => self.pop_mode(),
-                ExternalMsg::PopModeKeepingInputBuffer => {
+                PopMode => self.pop_mode(),
+                PopModeKeepingInputBuffer => {
                     self.pop_mode_keeping_input_buffer()
                 }
-                ExternalMsg::SwitchLayout(mode) => self.switch_layout(&mode),
-                ExternalMsg::SwitchLayoutBuiltin(mode) => {
-                    self.switch_layout_builtin(&mode)
-                }
-                ExternalMsg::SwitchLayoutCustom(mode) => {
-                    self.switch_layout_custom(&mode)
-                }
-                ExternalMsg::Call(cmd) => self.call(cmd),
-                ExternalMsg::CallSilently(cmd) => self.call_silently(cmd),
-                ExternalMsg::BashExec(cmd) => self.bash_exec(cmd),
-                ExternalMsg::BashExecSilently(cmd) => {
-                    self.bash_exec_silently(cmd)
-                }
-                ExternalMsg::CallLua(func) => self.call_lua(func),
-                ExternalMsg::CallLuaSilently(func) => {
-                    self.call_lua_silently(func)
-                }
-                ExternalMsg::LuaEval(code) => self.lua_eval(code),
-                ExternalMsg::LuaEvalSilently(code) => {
-                    self.lua_eval_silently(code)
-                }
-                ExternalMsg::Select => self.select(),
-                ExternalMsg::SelectAll => self.select_all(),
-                ExternalMsg::SelectPath(p) => self.select_path(p),
-                ExternalMsg::UnSelect => self.un_select(),
-                ExternalMsg::UnSelectAll => self.un_select_all(),
-                ExternalMsg::UnSelectPath(p) => self.un_select_path(p),
-                ExternalMsg::ToggleSelection => self.toggle_selection(),
-                ExternalMsg::ToggleSelectAll => self.toggle_select_all(),
-                ExternalMsg::ToggleSelectionByPath(p) => {
-                    self.toggle_selection_by_path(p)
-                }
-                ExternalMsg::ClearSelection => self.clear_selection(),
-                ExternalMsg::AddNodeFilter(f) => self.add_node_filter(f),
-                ExternalMsg::AddNodeFilterFromInput(f) => {
-                    self.add_node_filter_from_input(f)
-                }
-                ExternalMsg::RemoveNodeFilter(f) => self.remove_node_filter(f),
-                ExternalMsg::RemoveNodeFilterFromInput(f) => {
+                SwitchLayout(mode) => self.switch_layout(&mode),
+                SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
+                SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
+                Call(cmd) => self.call(cmd),
+                CallSilently(cmd) => self.call_silently(cmd),
+                BashExec(cmd) => self.bash_exec(cmd),
+                BashExecSilently(cmd) => self.bash_exec_silently(cmd),
+                CallLua(func) => self.call_lua(func),
+                CallLuaSilently(func) => self.call_lua_silently(func),
+                LuaEval(code) => self.lua_eval(code),
+                LuaEvalSilently(code) => self.lua_eval_silently(code),
+                Select => self.select(),
+                SelectAll => self.select_all(),
+                SelectPath(p) => self.select_path(p),
+                UnSelect => self.un_select(),
+                UnSelectAll => self.un_select_all(),
+                UnSelectPath(p) => self.un_select_path(p),
+                ToggleSelection => self.toggle_selection(),
+                ToggleSelectAll => self.toggle_select_all(),
+                ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
+                ClearSelection => self.clear_selection(),
+                AddNodeFilter(f) => self.add_node_filter(f),
+                AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
+                RemoveNodeFilter(f) => self.remove_node_filter(f),
+                RemoveNodeFilterFromInput(f) => {
                     self.remove_node_filter_from_input(f)
                 }
-                ExternalMsg::ToggleNodeFilter(f) => self.toggle_node_filter(f),
-                ExternalMsg::RemoveLastNodeFilter => {
-                    self.remove_last_node_filter()
-                }
-                ExternalMsg::ResetNodeFilters => self.reset_node_filters(),
-                ExternalMsg::ClearNodeFilters => self.clear_node_filters(),
-                ExternalMsg::AddNodeSorter(f) => self.add_node_sorter(f),
-                ExternalMsg::RemoveNodeSorter(f) => self.remove_node_sorter(f),
-                ExternalMsg::ReverseNodeSorter(f) => {
-                    self.reverse_node_sorter(f)
-                }
-                ExternalMsg::ToggleNodeSorter(f) => self.toggle_node_sorter(f),
-                ExternalMsg::RemoveLastNodeSorter => {
-                    self.remove_last_node_sorter()
-                }
-                ExternalMsg::ReverseNodeSorters => self.reverse_node_sorters(),
-                ExternalMsg::ResetNodeSorters => self.reset_node_sorters(),
-                ExternalMsg::ClearNodeSorters => self.clear_node_sorters(),
-                ExternalMsg::EnableMouse => self.enable_mouse(),
-                ExternalMsg::DisableMouse => self.disable_mouse(),
-                ExternalMsg::ToggleMouse => self.toggle_mouse(),
-                ExternalMsg::StartFifo(f) => self.start_fifo(f),
-                ExternalMsg::StopFifo => self.stop_fifo(),
-                ExternalMsg::ToggleFifo(f) => self.toggle_fifo(f),
-                ExternalMsg::LogInfo(l) => self.log_info(l),
-                ExternalMsg::LogSuccess(l) => self.log_success(l),
-                ExternalMsg::LogWarning(l) => self.log_warning(l),
-                ExternalMsg::LogError(l) => self.log_error(l),
-                ExternalMsg::Quit => self.quit(),
-                ExternalMsg::PrintPwdAndQuit => self.print_pwd_and_quit(),
-                ExternalMsg::PrintFocusPathAndQuit => {
-                    self.print_focus_path_and_quit()
-                }
-                ExternalMsg::PrintSelectionAndQuit => {
-                    self.print_selection_and_quit()
-                }
-                ExternalMsg::PrintResultAndQuit => self.print_result_and_quit(),
-                ExternalMsg::PrintAppStateAndQuit => {
-                    self.print_app_state_and_quit()
-                }
-                ExternalMsg::Debug(path) => self.debug(path),
-                ExternalMsg::Terminate => bail!(""),
+                ToggleNodeFilter(f) => self.toggle_node_filter(f),
+                RemoveLastNodeFilter => self.remove_last_node_filter(),
+                ResetNodeFilters => self.reset_node_filters(),
+                ClearNodeFilters => self.clear_node_filters(),
+                AddNodeSorter(f) => self.add_node_sorter(f),
+                RemoveNodeSorter(f) => self.remove_node_sorter(f),
+                ReverseNodeSorter(f) => self.reverse_node_sorter(f),
+                ToggleNodeSorter(f) => self.toggle_node_sorter(f),
+                RemoveLastNodeSorter => self.remove_last_node_sorter(),
+                ReverseNodeSorters => self.reverse_node_sorters(),
+                ResetNodeSorters => self.reset_node_sorters(),
+                ClearNodeSorters => self.clear_node_sorters(),
+                EnableMouse => self.enable_mouse(),
+                DisableMouse => self.disable_mouse(),
+                ToggleMouse => self.toggle_mouse(),
+                StartFifo(f) => self.start_fifo(f),
+                StopFifo => self.stop_fifo(),
+                ToggleFifo(f) => self.toggle_fifo(f),
+                LogInfo(l) => self.log_info(l),
+                LogSuccess(l) => self.log_success(l),
+                LogWarning(l) => self.log_warning(l),
+                LogError(l) => self.log_error(l),
+                Quit => self.quit(),
+                PrintPwdAndQuit => self.print_pwd_and_quit(),
+                PrintFocusPathAndQuit => self.print_focus_path_and_quit(),
+                PrintSelectionAndQuit => self.print_selection_and_quit(),
+                PrintResultAndQuit => self.print_result_and_quit(),
+                PrintAppStateAndQuit => self.print_app_state_and_quit(),
+                Debug(path) => self.debug(path),
+                Terminate => bail!(""),
             }
         }?
         .refresh_selection()

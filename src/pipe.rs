@@ -1,7 +1,9 @@
-use std::path::PathBuf;
-
+use crate::app::ExternalMsg;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::prelude::*;
+use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pipe {
@@ -51,5 +53,27 @@ impl Pipe {
             logs_out,
             history_out,
         })
+    }
+}
+
+pub fn read_all(pipe: &str) -> Result<Vec<ExternalMsg>> {
+    let mut file = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(false)
+        .open(&pipe)?;
+
+    let mut in_str = String::new();
+    file.read_to_string(&mut in_str)?;
+    file.set_len(0)?;
+
+    if !in_str.is_empty() {
+        let mut msgs = vec![];
+        for msg in in_str.lines().map(|s| serde_yaml::from_str(s.trim())) {
+            msgs.push(msg?);
+        }
+        Ok(msgs)
+    } else {
+        Ok(vec![])
     }
 }

@@ -14,7 +14,6 @@ pub mod msg;
 pub mod node;
 pub mod permissions;
 pub mod pipe;
-pub mod pipe_reader;
 pub mod pwd_watcher;
 pub mod runner;
 pub mod ui;
