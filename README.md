@@ -27,7 +27,9 @@ A hackable, minimal, fast TUI file explorer
 </p>
 
 <p align="center">
-<img src="https://s3.gifyu.com/images/xplr-0.5.0.gif" />
+
+https://user-images.githubusercontent.com/11632726/166747867-8a4573f2-cb2f-43a6-a23d-c99fc30c6594.mp4
+
 </p>
 
 <h3 align="center">
