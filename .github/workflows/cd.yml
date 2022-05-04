@@ -36,15 +36,17 @@ jobs:
             target: x86_64-unknown-linux-musl
             binary_postfix: ''
 
-          - os: ubuntu-latest
-            artifact_prefix: x86_64-android
-            target: x86_64-linux-android
-            binary_postfix: ''
+          # Will see later
 
-          - os: ubuntu-latest
-            artifact_prefix: aarch64-android
-            target: aarch64-linux-android
-            binary_postfix: ''
+          # - os: ubuntu-latest
+          #   artifact_prefix: x86_64-android
+          #   target: x86_64-linux-android
+          #   binary_postfix: ''
+          #
+          # - os: ubuntu-latest
+          #   artifact_prefix: aarch64-android
+          #   target: aarch64-linux-android
+          #   binary_postfix: ''
 
     steps:
       - uses: actions/checkout@v2
