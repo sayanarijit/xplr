@@ -87,6 +87,10 @@ New-line delimited result (selected paths if any, else the focused path)
 
 New-line delimited list of last visited paths (similar to jump list in vim).
 
+#### XPLR_FOCUS_PATH
+
+Single item result -- currently selected node.
+
 #### XPLR_PIPE_DIRECTORY_NODES_OUT
 
 New-line delimited list of paths, filtered and sorted as displayed in the
