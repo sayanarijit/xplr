@@ -160,8 +160,7 @@ called &quot;pipe&quot;s. These environment variables and files are only availab
 a command is being executed.</p>
 <p>Visit the <a href="configure-key-bindings.html#tutorial-adding-a-new-mode"><strong>fzf integration tutorial</strong></a>
 for example.</p>
-<h3 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h3>
-<p>To see the environment variables, invoke the shell by typing <code>:!</code> in default
+<p>To see the environment variables and pipes, invoke the shell by typing <code>:!</code> in default
 mode and run the following command:</p>
 <pre><code>env | grep ^XPLR_
 </code></pre>
@@ -182,15 +181,42 @@ XPLR_APP_VERSION=0.14.3
 XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_nodes_out
 </code></pre>
 <p>The environment variables starting with <code>XPLR_PIPE_</code> are the temporary files
-called &quot;pipe&quot;s.</p>
+called <a href="#pipes">&quot;pipe&quot;s</a>.</p>
+<p>The other variables are single-line variables containing simple information:</p>
+<ul>
+<li><a href="#xplr_app_version">XPLR_APP_VERSION</a></li>
+<li><a href="#xplr_focus_index">XPLR_FOCUS_INDEX</a></li>
+<li><a href="#xplr_focus_path">XPLR_FOCUS_PATH</a></li>
+<li><a href="#xplr_input_buffer">XPLR_INPUT_BUFFER</a></li>
+<li><a href="#xplr_mode">XPLR_MODE</a></li>
+<li><a href="#xplr_pid">XPLR_PID</a></li>
+<li><a href="#xplr_session_path">XPLR_SESSION_PATH</a></li>
+</ul>
+<h3 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h3>
+<h4 id="xplr_app_version"><a class="header" href="#xplr_app_version">XPLR_APP_VERSION</a></h4>
+<p>Self-explanatory.</p>
+<h4 id="xplr_focus_index"><a class="header" href="#xplr_focus_index">XPLR_FOCUS_INDEX</a></h4>
+<p>Contains the index of the currently focused item, as seen in <a href="column-renderer.html#index">column-renderer/index</a>.</p>
+<h4 id="xplr_focus_path"><a class="header" href="#xplr_focus_path">XPLR_FOCUS_PATH</a></h4>
+<p>Contains the full path of the currently focused node.</p>
+<h4 id="xplr_input_buffer"><a class="header" href="#xplr_input_buffer">XPLR_INPUT_BUFFER</a></h4>
+<p>The line currently in displaying in the xplr input buffer. For e.g. the search input while searching. See <a href="messages.html#reading-input">Reading Input</a>.</p>
+<h4 id="xplr_mode"><a class="header" href="#xplr_mode">XPLR_MODE</a></h4>
+<p>Contains the mode xplr is currently in, see <a href="modes.html#modes">modes</a>.</p>
+<h4 id="xplr_pid"><a class="header" href="#xplr_pid">XPLR_PID</a></h4>
+<p>Contains the process ID of the current xplr process.</p>
+<h4 id="xplr_session_path"><a class="header" href="#xplr_session_path">XPLR_SESSION_PATH</a></h4>
+<p>Contains the current session path, like /tmp/runtime-&quot;$USER&quot;/xplr/session/&quot;$XPLR_PID&quot;/, you can find temporary files here, such as pipes.</p>
+<h3 id="pipes"><a class="header" href="#pipes">Pipes</a></h3>
 <h4 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h4>
-<p>Current there is only one input pipe.</p>
+<p>Currently there is only one input pipe.</p>
 <ul>
 <li><a href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></li>
 </ul>
 <h4 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h4>
 <p><code>XPLR_PIPE_*_OUT</code> are the output pipes that contain data which cannot be
-exposed directly via environment variables, like multi-line string.</p>
+exposed directly via environment variables, like multi-line strings. 
+These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.</p>
 <ul>
 <li><a href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></li>
 <li><a href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></li>
@@ -236,6 +262,18 @@ handled by xplr after the command execution.</p>
 
 -- Now, when you press &quot;space&quot; in default mode, you will be prompted for your
 -- name. Enter your name to receive a nice greeting and to know your location.
+</code></pre>
+<h3 id="another-example-simple-file-opener-using-xdg-open-and-xplr_focus_path"><a class="header" href="#another-example-simple-file-opener-using-xdg-open-and-xplr_focus_path">Another example: Simple file opener using xdg-open and $XPLR_FOCUS_PATH</a></h3>
+<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.X = {
+  help = &quot;open&quot;,
+  messages = {
+    {
+      BashExec = [===[
+      xdg-open &quot;${XPLR_FOCUS_PATH:?}&quot;
+      ]===],
+    },
+  },
+}
 </code></pre>
 
                     </main>
