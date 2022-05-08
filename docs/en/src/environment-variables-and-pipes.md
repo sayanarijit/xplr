@@ -191,5 +191,5 @@ xplr.config.modes.builtin.default.key_bindings.on_key.X = {
 [34]: #xplr_mode
 [35]: #xplr_pid
 [36]: #xplr_session_path
-
+[37]: messages.md#reading-input
 
