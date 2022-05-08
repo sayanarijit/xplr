@@ -65,7 +65,7 @@ Contains the index of the currently focused item, as seen in [column-renderer/in
 Contains the full path of the currently focused node.
 
 #### XPLR_INPUT_BUFFER
-{TODO}
+The line currently in displaying in the xplr input buffer. For e.g. the search input while searching. See [Reading Input][37].
 
 #### XPLR_MODE
 
