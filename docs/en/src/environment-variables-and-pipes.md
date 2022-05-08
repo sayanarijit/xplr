@@ -12,9 +12,7 @@ a command is being executed.
 Visit the [**fzf integration tutorial**][19]
 for example.
 
-### Environment variables
-
-To see the environment variables, invoke the shell by typing `:!` in default
+To see the environment variables and pipes, invoke the shell by typing `:!` in default
 mode and run the following command:
 
 ```
@@ -41,18 +39,59 @@ XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_
 ```
 
 The environment variables starting with `XPLR_PIPE_` are the temporary files
-called "pipe"s.
+called ["pipe"s][18].
+
+The other variables are single-line variables containing simple information:
+- [XPLR_APP_VERSION][30]
+- [XPLR_FOCUS_INDEX][31]
+- [XPLR_FOCUS_PATH][32]
+- [XPLR_INPUT_BUFFER][33]
+- [XPLR_MODE][34]
+- [XPLR_PID][35]
+- [XPLR_SESSION_PATH][36]
+
+### Environment variables
+
+#### XPLR_APP_VERSION
+
+Self-explanatory.
+
+#### XPLR_FOCUS_INDEX
+
+Contains the index of the currently focused item, as seen in [column-renderer/index][10].
+
+#### XPLR_FOCUS_PATH
+
+Contains the full path of the currently focused node.
+
+#### XPLR_INPUT_BUFFER
+{TODO}
+
+#### XPLR_MODE
+
+Contains the mode xplr is currently in, see [modes][11].
+
+#### XPLR_PID
+
+Contains the process ID of the current xplr process.
+
+#### XPLR_SESSION_PATH
+
+Contains the current session path, like /tmp/runtime-"$USER"/xplr/session/"$XPLR_PID"/, you can find temporary files here, such as pipes.
+
+### Pipes
 
 #### Input pipe
 
-Current there is only one input pipe.
+Currently there is only one input pipe.
 
 - [XPLR_PIPE_MSG_IN][20]
 
 #### Output pipes
 
 `XPLR_PIPE_*_OUT` are the output pipes that contain data which cannot be
-exposed directly via environment variables, like multi-line string.
+exposed directly via environment variables, like multi-line strings. 
+These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.
 
 - [XPLR_PIPE_SELECTION_OUT][21]
 - [XPLR_PIPE_GLOBAL_HELP_MENU_OUT][22]
@@ -116,7 +155,25 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 -- name. Enter your name to receive a nice greeting and to know your location.
 ```
 
+### Another example: Simple file opener using xdg-open and $XPLR_FOCUS_PATH
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key.X = {
+  help = "open",
+  messages = {
+    {
+      BashExec = [===[
+      xdg-open "${XPLR_FOCUS_PATH:?}"
+      ]===],
+    },
+  },
+}
+```
+
 [7]: https://www.json.org
+[10]: column-renderer.md#index
+[11]: modes.md#modes
+[18]: #pipes
 [19]: configure-key-bindings.md#tutorial-adding-a-new-mode
 [20]: #xplr_pipe_msg_in
 [21]: #xplr_pipe_selection_out
@@ -127,3 +184,12 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [26]: #xplr_pipe_directory_nodes_out
 [27]: https://www.yaml.org
 [28]: layout.md#table
+[30]: #xplr_app_version
+[31]: #xplr_focus_index
+[32]: #xplr_focus_path
+[33]: #xplr_input_buffer
+[34]: #xplr_mode
+[35]: #xplr_pid
+[36]: #xplr_session_path
+
+
