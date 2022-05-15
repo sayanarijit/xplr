@@ -62,7 +62,7 @@ version = "0.7.4"
 features = ['luajit', 'vendored', 'serialize', 'send']
 
 [dependencies.tui-input]
-version = "0.2.0"
+version = "0.2.1"
 features = ['serde']
 
 [dev-dependencies]
