@@ -27,7 +27,7 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
-use tui_input::{Input, InputRequest};
+use tui_input::{Input, InputRequest, InputResponse};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
@@ -800,10 +800,13 @@ impl App {
             self.logs_hidden = true;
         } else {
             let mut buf = Input::default();
-            if buf.handle(op.into()).is_some() {
-                self.input = Some(buf);
-                self.logs_hidden = true;
-            }
+            match buf.handle(op.into()) {
+                InputResponse::StateChanged { .. } => {
+                    self.input = Some(buf);
+                    self.logs_hidden = true;
+                }
+                InputResponse::Unchanged => {}
+            };
         }
         Ok(self)
     }

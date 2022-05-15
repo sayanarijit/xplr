@@ -922,9 +922,9 @@ dependencies = [
 
 [[package]]
 name = "tui-input"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e1bb373b1480296ca2c3f97b717b10f01de4923c189b4037677ec275f46d531"
+checksum = "e355185a96fc6fb1742465c589e992b74eef052294f678813cee9cd13490b653"
 dependencies = [
  "crossterm",
  "serde",
