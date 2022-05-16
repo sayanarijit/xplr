@@ -30,7 +30,7 @@ This operation is expensive. So, try to avoid using it too often.
 
 Example:
 
-- Lua: "ExplorePwd"
+- Lua: `"ExplorePwd"`
 - YAML: `ExplorePwd`
 
 #### ExplorePwdAsync
@@ -43,7 +43,7 @@ $PWD synchronously, use `ExplorePwd` instead.
 
 Example:
 
-- Lua: "ExplorePwdAsync"
+- Lua: `"ExplorePwdAsync"`
 - YAML: `ExplorePwdAsync`
 
 #### ExploreParentsAsync
@@ -57,7 +57,7 @@ instead.
 
 Example:
 
-- Lua: "ExploreParentsAsync"
+- Lua: `"ExploreParentsAsync"`
 - YAML: `ExploreParentsAsync`
 
 ### Screen
@@ -68,7 +68,7 @@ Clear the screen.
 
 Example:
 
-- Lua: "ClearScreen"
+- Lua: `"ClearScreen"``
 - YAML: `ClearScreen`
 
 #### Refresh
@@ -81,7 +81,7 @@ Also, it will not clear the screen. Use `ClearScreen` for that.
 
 Example:
 
-- Lua: "Refresh"
+- Lua: `"Refresh"`
 - YAML: `Refresh`
 
 ### Navigation
@@ -92,7 +92,7 @@ Focus next node.
 
 Example:
 
-- Lua: "FocusNext"
+- Lua: `"FocusNext"`
 - YAML: `FocusNext`
 
 #### FocusNextByRelativeIndex
@@ -104,7 +104,7 @@ Type: { FocusNextByRelativeIndex = int }
 
 Example:
 
-- Lua: { FocusNextByRelativeIndex = 2 }
+- Lua: `{ FocusNextByRelativeIndex = 2 }`
 - YAML: `FocusNextByRelativeIndex: 2`
 
 #### FocusNextByRelativeIndexFromInput
@@ -114,7 +114,7 @@ from the input buffer.
 
 Example:
 
-- Lua: "FocusNextByRelativeIndexFromInput"
+- Lua: `"FocusNextByRelativeIndexFromInput"`
 - YAML: `FocusNextByRelativeIndexFromInput`
 
 #### FocusPrevious
@@ -123,7 +123,7 @@ Focus on the previous item.
 
 Example:
 
-- Lua: "FocusPrevious"
+- Lua: `"FocusPrevious"`
 - YAML: `FocusPrevious`
 
 #### FocusPreviousByRelativeIndex
@@ -145,7 +145,7 @@ read from the input buffer.
 
 Example:
 
-- Lua: "FocusPreviousByRelativeIndexFromInput"
+- Lua: `"FocusPreviousByRelativeIndexFromInput"`
 - YAML: `FocusPreviousByRelativeIndexFromInput`
 
 #### FocusFirst
@@ -154,7 +154,7 @@ Focus on the first node.
 
 Example:
 
-- Lua: "FocusFirst"
+- Lua: `"FocusFirst"`
 - YAML: `FocusFirst`
 
 #### FocusLast
@@ -163,7 +163,7 @@ Focus on the last node.
 
 Example:
 
-- Lua: "FocusLast"
+- Lua: `"FocusLast"`
 - YAML: `FocusLast`
 
 #### FocusPath
@@ -183,7 +183,7 @@ Focus on the path read from input buffer.
 
 Example:
 
-- Lua: "FocusPathFromInput"
+- Lua: `"FocusPathFromInput"`
 - YAML: `FocusPathFromInput`
 
 #### FocusByIndex
@@ -194,7 +194,7 @@ Type: { FocusByIndex = int }
 
 Example:
 
-- Lua: { FocusByIndex = 2 }
+- Lua: `{ FocusByIndex = 2 }`
 - YAML: `FocusByIndex: 2`
 
 #### FocusByIndexFromInput
@@ -203,7 +203,7 @@ Focus on the absolute `n`th node where `n` is read from the input buffer.
 
 Example:
 
-- Lua: "FocusByIndexFromInput"
+- Lua: `"FocusByIndexFromInput"`
 - YAML: `FocusByIndexFromInput`
 
 #### FocusByFileName
@@ -216,7 +216,7 @@ Type: { FocusByFileName = "string" }
 
 Example:
 
-- Lua: { FocusByFileName = "filename.ext" }
+- Lua: `{ FocusByFileName = "filename.ext" }`
 - YAML: `FocusByFileName: filename.ext`
 
 #### ChangeDirectory
@@ -227,7 +227,7 @@ Type: { ChangeDirectory = "string" }
 
 Example:
 
-- Lua: { ChangeDirectory = "/path/to/directory" }
+- Lua: `{ ChangeDirectory = "/path/to/directory" }`
 - YAML: `ChangeDirectory: /path/to/directory`
 
 #### Enter
@@ -236,7 +236,7 @@ Enter into the currently focused path if it's a directory.
 
 Example:
 
-- Lua: "Enter"
+- Lua: `"Enter"`
 - YAML: `Enter`
 
 #### Back
@@ -245,7 +245,7 @@ Go back to the parent directory.
 
 Example:
 
-- Lua:"Back"
+- Lua: `"Back"`
 - YAML: `Back`
 
 #### LastVisitedPath
@@ -254,7 +254,7 @@ Go to the last path visited.
 
 Example:
 
-- Lua: "LastVisitedPath"
+- Lua: `"LastVisitedPath"`
 - YAML: `LastVisitedPath`
 
 #### NextVisitedPath
@@ -263,7 +263,7 @@ Go to the next path visited.
 
 Example:
 
-- Lua: "NextVisitedPath"
+- Lua: `"NextVisitedPath"`
 - YAML: `NextVisitedPath`
 
 #### FollowSymlink
@@ -272,7 +272,7 @@ Follow the symlink under focus to its actual location.
 
 Example:
 
-Lua: "FollowSymlink"
+Lua: `"FollowSymlink"`
 YAML: `FollowSymlink`
 
 ### Reading Input
@@ -285,7 +285,7 @@ Type: { UpdateInputBuffer = [Input Opertaion](https://xplr.dev/en/input-operatio
 
 Example:
 
-- Lua: { UpdateInputBuffer = "GoToPreviousWord" }
+- Lua: `{ UpdateInputBuffer = "GoToPreviousWord" }`
 - YAML: `UpdateInputBuffer: GoToPreviousWord`
 
 #### UpdateInputBufferFromKey
@@ -294,7 +294,7 @@ Update the input buffer from the key read from keyboard input.
 
 Example:
 
-- Lua: "UpdateInputBufferFromKey"
+- Lua: `"UpdateInputBufferFromKey"`
 - YAML: `UpdateInputBufferFromKey`
 
 #### BufferInput
@@ -305,7 +305,7 @@ Type: { BufferInput = "string" }
 
 Example:
 
-- Lua: { BufferInput = "foo" }
+- Lua: `{ BufferInput = "foo" }`
 - YAML: `BufferInput: foo`
 
 #### BufferInputFromKey
@@ -315,7 +315,7 @@ input buffer.
 
 Example:
 
-- Lua: "BufferInputFromKey"
+- Lua: `"BufferInputFromKey"`
 - YAML: `BufferInputFromKey`
 
 #### SetInputBuffer
@@ -328,7 +328,7 @@ Type: { SetInputBuffer = "string" }
 
 Example:
 
-- Lua: { SetInputBuffer = "foo" }
+- Lua: `{ SetInputBuffer = "foo" }`
 - YAML: `SetInputBuffer: foo`
 
 #### RemoveInputBufferLastCharacter
@@ -337,7 +337,7 @@ Remove input buffer's last character.
 
 Example:
 
-- Lua: "RemoveInputBufferLastCharacter"
+- Lua: `"RemoveInputBufferLastCharacter"`
 - YAML: `RemoveInputBufferLastCharacter`
 
 #### RemoveInputBufferLastWord
@@ -346,7 +346,7 @@ Remove input buffer's last word.
 
 Example:
 
-- Lua: "RemoveInputBufferLastWord"
+- Lua: `"RemoveInputBufferLastWord"`
 - YAML: `RemoveInputBufferLastWord`
 
 #### ResetInputBuffer
@@ -355,7 +355,7 @@ Reset the input buffer back to null. It will not show in the UI.
 
 Example:
 
-- Lua: "ResetInputBuffer"
+- Lua: `"ResetInputBuffer"`
 - YAML: `ResetInputBuffer`
 
 ### Switching Mode
@@ -368,7 +368,7 @@ Type : { SwitchMode = "string" }
 
 Example:
 
-- Lua: { SwitchMode = "default" }
+- Lua: `{ SwitchMode = "default" }`
 - YAML: SwitchMode: default
 
 > **NOTE:** To be specific about which mode to switch to, use
@@ -384,7 +384,7 @@ Type: { SwitchModeKeepingInputBuffer = "string" }
 
 Example:
 
-- Lua: { SwitchModeKeepingInputBuffer = "default" }
+- Lua: `{ SwitchModeKeepingInputBuffer = "default" }`
 - YAML: `SwitchModeKeepingInputBuffer: default`
 
 > **NOTE:** To be specific about which mode to switch to, use
@@ -400,7 +400,7 @@ Type: { SwitchModeBuiltin = "string" }
 
 Example:
 
-- Lua: { SwitchModeBuiltin = "default" }
+- Lua: `{ SwitchModeBuiltin = "default" }`
 - YAML: `SwitchModeBuiltin: default`
 
 #### SwitchModeBuiltinKeepingInputBuffer
@@ -412,7 +412,7 @@ Type: { SwitchModeBuiltinKeepingInputBuffer = "string" }
 
 Example:
 
-- Lua: { SwitchModeBuiltinKeepingInputBuffer = "default" }
+- Lua: `{ SwitchModeBuiltinKeepingInputBuffer = "default" }`
 - YAML: `SwitchModeBuiltinKeepingInputBuffer: default`
 
 #### SwitchModeCustom
@@ -424,7 +424,7 @@ Type: { SwitchModeCustom = "string" }
 
 Example:
 
-- Lua: { SwitchModeCustom = "my_custom_mode" }
+- Lua: `{ SwitchModeCustom = "my_custom_mode" }`
 - YAML: `SwitchModeCustom: my_custom_mode`
 
 #### SwitchModeCustomKeepingInputBuffer
@@ -436,7 +436,7 @@ Type: { SwitchModeCustomKeepingInputBuffer = "string" }
 
 Example:
 
-- Lua: { SwitchModeCustomKeepingInputBuffer = "my_custom_mode" }
+- Lua: `{ SwitchModeCustomKeepingInputBuffer = "my_custom_mode" }`
 - YAML: `SwitchModeCustomKeepingInputBuffer: my_custom_mode`
 
 #### PopMode
@@ -446,7 +446,7 @@ It clears the input buffer.
 
 Example:
 
-- Lua: "PopMode"
+- Lua: `"PopMode"`
 - YAML: `PopMode`
 
 #### PopModeKeepingInputBuffer
@@ -456,7 +456,7 @@ It keeps the input buffer.
 
 Example:
 
-- Lua: PopModeKeepingInputBuffer
+- Lua: `PopModeKeepingInputBuffer`
 - YAML: `PopModeKeepingInputBuffer`
 
 ### Switching Layout
@@ -469,7 +469,7 @@ Type: { SwitchLayout = "string" }
 
 Example:
 
-- Lua: { SwitchLayout = "default" }
+- Lua: `{ SwitchLayout = "default" }`
 - YAML: `SwitchLayout: default`
 
 > **NOTE:** To be specific about which layout to switch to, use `SwitchLayoutBuiltin` or
@@ -483,7 +483,7 @@ Type: { SwitchLayoutBuiltin = "string" }
 
 Example:
 
-- Lua: { SwitchLayoutBuiltin = "default" }
+- Lua: `{ SwitchLayoutBuiltin = "default" }`
 - YAML: `SwitchLayoutBuiltin: default`
 
 #### SwitchLayoutCustom
@@ -494,7 +494,7 @@ Type: { SwitchLayoutCustom = "string" }
 
 Example:
 
-- Lua: { SwitchLayoutCustom = "my_custom_layout" }
+- Lua: `{ SwitchLayoutCustom = "my_custom_layout" }`
 - YAML: `SwitchLayoutCustom: my_custom_layout`
 
 ### Executing Commands
@@ -511,7 +511,7 @@ Type: { Call = "string" }
 
 Example:
 
-- Lua: { Call = { command = "bash", args = { "-c", "read -p test" } } }
+- Lua: `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
 - YAML: `Call: { command: bash, args: ["-c", "read -p test"] }`
 
 #### CallSilently
@@ -535,7 +535,7 @@ Type: { BashExec = "string" }
 
 Example:
 
-- Lua: { BashExec = "read -p test" }
+- Lua: `{ BashExec = "read -p test" }`
 - YAML: `BashExec: "read -p test"`
 
 #### BashExecSilently
@@ -547,7 +547,7 @@ Type: { BashExecSilently = "string" }
 
 Example:
 
-- Lua: { BashExecSilently = "tput bell" }
+- Lua: `{ BashExecSilently = "tput bell" }`
 - YAML: `BashExecSilently: "tput bell"`
 
 ### Calling Lua Functions
@@ -565,7 +565,7 @@ Type: { CallLua = "string" }
 
 Example:
 
-- Lua: { CallLua = "custom.some_custom_funtion" }
+- Lua: `{ CallLua = "custom.some_custom_funtion" }`
 - YAML: `CallLua: custom.some_custom_funtion`
 
 #### CallLuaSilently
@@ -577,7 +577,7 @@ Type: { CallLuaSilently = "string" }
 
 Example:
 
-- Lua: { CallLuaSilently = "custom.some_custom_function" }
+- Lua: `{ CallLuaSilently = "custom.some_custom_function" }`
 - YAML: `CallLuaSilently: custom.some_custom_function`
 
 #### LuaEval
@@ -592,8 +592,8 @@ Type: { LuaEval = "string" }
 
 Example:
 
-- Lua: { LuaEval = [[return { { LogInfo = io.read() } }]] }
-- Lua: { LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }
+- Lua: `{ LuaEval = [[return { { LogInfo = io.read() } }]] }`
+- Lua: `{ LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }`
 - YAML: `LuaEval: "return { { LogInfo = io.read() } }"`
 - YAML: `LuaEval: "function(app) return { { LogInfo = app.pwd } } end"`
 
@@ -606,7 +606,7 @@ Type: { LuaEvalSilently = "string" }
 
 Example:
 
-- Lua: { LuaEvalSilently = [[return { { LogInfo = "foo" } }]] }
+- Lua: `{ LuaEvalSilently = [[return { { LogInfo = "foo" } }]] }`
 - YAML: `LuaEvalSilently: "return { { LogInfo = 'foo' } }"`
 
 ### Select Operations
@@ -617,7 +617,7 @@ Select the focused node.
 
 Example:
 
-- Lua: "Select"
+- Lua: `"Select"`
 - YAML: `Select`
 
 #### SelectAll
@@ -626,7 +626,7 @@ Select all the visible nodes.
 
 Example:
 
-- Lua: "SelectAll"
+- Lua: `"SelectAll"`
 - YAML: `SelectAll`
 
 #### SelectPath
@@ -637,7 +637,7 @@ Type: { SelectPath = "string" }
 
 Example:
 
-- Lua: { SelectPath = "/path/to/file" }
+- Lua: `{ SelectPath = "/path/to/file" }`
 - YAML: `SelectPath: /path/to/file`
 
 #### UnSelect
@@ -646,7 +646,7 @@ Unselect the focused node.
 
 Example:
 
-- Lua: "UnSelect"
+- Lua: `"UnSelect"`
 - YAML: `UnSelect`
 
 #### UnSelectAll
@@ -655,7 +655,7 @@ Unselect all the visible nodes.
 
 Example:
 
-- Lua: "UnSelectAll"
+- Lua: `"UnSelectAll"`
 - YAML: `UnSelectAll`
 
 #### UnSelectPath
@@ -666,7 +666,7 @@ Type: { UnSelectPath = "string)" }
 
 Example:
 
-- Lua: { UnSelectPath = "/path/to/file" }
+- Lua: `{ UnSelectPath = "/path/to/file" }`
 - YAML: `UnSelectPath: /path/to/file`
 
 #### ToggleSelection
@@ -675,7 +675,7 @@ Toggle selection on the focused node.
 
 Example:
 
-- Lua: "ToggleSelection"
+- Lua: `"ToggleSelection"`
 - YAML `ToggleSelection`
 
 #### ToggleSelectAll
@@ -683,7 +683,7 @@ Example:
 Toggle between select all and unselect all.
 Example:
 
-- Lua: "ToggleSelectAll"
+- Lua: `"ToggleSelectAll"`
 - YAML: `ToggleSelectAll`
 
 #### ToggleSelectionByPath
@@ -694,7 +694,7 @@ Type: { ToggleSelectionByPath = "string" }
 
 Example:
 
-- Lua: { ToggleSelectionByPath = "/path/to/file" }
+- Lua: `{ ToggleSelectionByPath = "/path/to/file" }`
 - YAML: `ToggleSelectionByPath: /path/to/file`
 
 #### ClearSelection
@@ -703,7 +703,7 @@ Clear the selection.
 
 Example:
 
-- Lua: "ClearSelection"
+- Lua: `"ClearSelection"`
 - YAML: `ClearSelection`
 
 ### Filter Operations
@@ -717,7 +717,7 @@ Type: { AddNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering#filter
 
 Example:
 
-- Lua: { AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }
+- Lua: `{ AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 - YAML: `AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 #### RemoveNodeFilter
@@ -728,7 +728,7 @@ Type: { RemoveNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), i
 
 Example:
 
-- Lua: { RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }
+- Lua: `{ RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }`
 - YAML: `RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 #### ToggleNodeFilter
@@ -740,7 +740,7 @@ Type: { ToggleNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), i
 
 Example:
 
-- Lua: { ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }
+- Lua: `{ ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
 - YAML: `ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
 
 #### AddNodeFilterFromInput
@@ -752,7 +752,7 @@ Type: { AddNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
 
 Example:
 
-- Lua: { AddNodeFilterFromInput = "RelativePathDoesStartWith" }
+- Lua: `{ AddNodeFilterFromInput = "RelativePathDoesStartWith" }`
 - YAML: `AddNodeFilterFromInput: RelativePathDoesStartWith`
 
 #### RemoveNodeFilterFromInput
@@ -764,7 +764,7 @@ Type: { RemoveNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
 
 Example:
 
-- Lua: { RemoveNodeFilterFromInput = "RelativePathDoesStartWith" }
+- Lua: `{ RemoveNodeFilterFromInput = "RelativePathDoesStartWith" }`
 - YAML: `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
 
 #### RemoveLastNodeFilter
@@ -773,7 +773,7 @@ Remove the last node [filter](https://xplr.dev/en/filtering).
 
 Example:
 
-- Lua: "RemoveLastNodeFilter"
+- Lua: `"RemoveLastNodeFilter"`
 - YAML: `RemoveLastNodeFilter`
 
 #### ResetNodeFilters
@@ -783,7 +783,7 @@ default configuration.
 
 Example:
 
-- Lua: "ResetNodeFilters"
+- Lua: `"ResetNodeFilters"`
 - YAML: `ResetNodeFilters`
 
 #### ClearNodeFilters
@@ -792,7 +792,7 @@ Clear all the node [filters](https://xplr.dev/en/filtering).
 
 Example:
 
-- Lua: "ClearNodeFilters"
+- Lua: `"ClearNodeFilters"`
 - YAML: `ClearNodeFilters`
 
 ### Sort Operations
@@ -806,7 +806,7 @@ Type: { AddNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter),
 
 Example:
 
-- Lua: { AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }
+- Lua: `{ AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }`
 - YAML: `AddNodeSorter: { sorter: ByRelativePath, reverse: false }`
 
 #### RemoveNodeSorter
@@ -817,7 +817,7 @@ Type: { RemoveNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
 
 Example:
 
-- Lua: { RemoveNodeSorter = "ByRelativePath" }
+- Lua: `{ RemoveNodeSorter = "ByRelativePath" }`
 - YAML: `RemoveNodeSorter: ByRelativePath`
 
 #### ReverseNodeSorter
@@ -828,7 +828,7 @@ Type: { ReverseNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
 
 Example:
 
-- Lua: { ReverseNodeSorter = "ByRelativePath" }
+- Lua: `{ ReverseNodeSorter = "ByRelativePath" }`
 - YAML: `ReverseNodeSorter: ByRelativePath`
 
 #### ToggleNodeSorter
@@ -840,7 +840,7 @@ Type: { ToggleNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorte
 
 Example:
 
-- Lua: { ToggleSorterSorter: { sorter = "ByRelativePath", reverse = false } }
+- Lua: `{ ToggleSorterSorter: { sorter = "ByRelativePath", reverse = false } }`
 - YAML: `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }`
 
 #### ReverseNodeSorters
@@ -849,7 +849,7 @@ Reverse the node [sorters](https://xplr.dev/en/sorting#sorter).
 
 Example:
 
-- Lua: "ReverseNodeSorters"
+- Lua: `"ReverseNodeSorters"`
 - YAML: `ReverseNodeSorters`
 
 #### RemoveLastNodeSorter
@@ -858,7 +858,7 @@ Remove the last node [sorter](https://xplr.dev/en/sorting#sorter).
 
 Example:
 
-- Lua: "RemoveLastNodeSorter"
+- Lua: `"RemoveLastNodeSorter"`
 - YAML: `RemoveLastNodeSorter`
 
 #### ResetNodeSorters
@@ -868,7 +868,7 @@ the default configuration.
 
 Example:
 
-- Lua: "ResetNodeSorters"
+- Lua: `"ResetNodeSorters"`
 - YAML: `ResetNodeSorters`
 
 #### ClearNodeSorters
@@ -877,7 +877,7 @@ Clear all the node [sorters](https://xplr.dev/en/sorting#sorter).
 
 Example:
 
-- Lua: "ClearNodeSorters"
+- Lua: `"ClearNodeSorters"`
 - YAML: `ClearNodeSorters`
 
 ### Mouse Operations
@@ -888,7 +888,7 @@ Enable mouse
 
 Example:
 
-- Lua: "EnableMouse"
+- Lua: `"EnableMouse"`
 - YAML: `EnableMouse`
 
 #### DisableMouse
@@ -897,7 +897,7 @@ Disable mouse
 
 Example:
 
-- Lua: "DisableMouse"
+- Lua: `"DisableMouse"`
 - YAML: `DisableMouse`
 
 #### ToggleMouse
@@ -906,7 +906,7 @@ Toggle mouse
 
 Example:
 
-- Lua: "ToggleMouse"
+- Lua: `"ToggleMouse"`
 - YAML: `ToggleMouse`
 
 ### Fifo Operations
@@ -919,7 +919,7 @@ Type: { StartFifo = "string" }
 
 Example:
 
-- Lua: { StartFifo = "/tmp/xplr.fifo }
+- Lua: `{ StartFifo = "/tmp/xplr.fifo }`
 - YAML: `StartFifo: /tmp/xplr.fifo`
 
 #### StopFifo
@@ -928,7 +928,7 @@ Close the active fifo and stop piping.
 
 Example:
 
-- Lua: "StopFifo"
+- Lua: `"StopFifo"`
 - YAML: `StopFifo`
 
 #### ToggleFifo
@@ -939,7 +939,7 @@ Type: { ToggleFifo = "string" }
 
 Example:
 
-- Lua: { ToggleFifo = "/path/to/fifo" }
+- Lua: `{ ToggleFifo = "/path/to/fifo" }`
 - YAML: `ToggleFifo: /path/to/fifo`
 
 ### Logging
@@ -952,7 +952,7 @@ Type: { LogInfo = "string" }
 
 Example:
 
-- Lua: { LogInfo = "launching satellite" }
+- Lua: `{ LogInfo = "launching satellite" }`
 - YAML: `LogInfo: launching satellite`
 
 #### LogSuccess
@@ -963,7 +963,7 @@ Type: { LogSuccess = "String" }
 
 Example:
 
-- Lua: { LogSuccess = "satellite reached destination" }
+- Lua: `{ LogSuccess = "satellite reached destination" }`
 - YAML: `LogSuccess: satellite reached destination`
 
 #### LogWarning
@@ -974,7 +974,7 @@ Type: { LogWarning = "string" }
 
 Example:
 
-- Lua: { LogWarning = "satellite is heating" }
+- Lua: `{ LogWarning = "satellite is heating" }`
 - YAML: `LogWarning: satellite is heating`
 
 #### LogError
@@ -985,7 +985,7 @@ Type: { LogError = "string" }
 
 Example:
 
-- Lua: { LogError = "satellite crashed" }
+- Lua: `{ LogError = "satellite crashed" }`
 - YAML: `LogError: satellite crashed`
 
 ### Debugging
@@ -999,7 +999,7 @@ Type: { Debug = "string" }
 
 Example:
 
-- Lua: { Debug = "/path/to/file" }
+- Lua: `{ Debug = "/path/to/file" }`
 - YAML: `Debug: /path/to/file`
 
 ### Quit Options
@@ -1008,7 +1008,7 @@ Example:
 
 Example:
 
-- Lua: "Quit"
+- Lua: `"Quit"`
 - YAML: `Quit`
 
 Quit with returncode zero (success).
@@ -1019,7 +1019,7 @@ Print $PWD and quit.
 
 Example:
 
-- Lua: "PrintPwdAndQuit"
+- Lua: `"PrintPwdAndQuit"`
 - YAML: `PrintPwdAndQuit`
 
 #### PrintFocusPathAndQuit
@@ -1029,7 +1029,7 @@ nothing to focus.
 
 Example:
 
-- Lua: "PrintFocusPathAndQuit"
+- Lua: `"PrintFocusPathAndQuit"`
 - YAML: `PrintFocusPathAndQuit`
 
 #### PrintSelectionAndQuit
@@ -1039,7 +1039,7 @@ selected.
 
 Example:
 
-- Lua: "PrintSelectionAndQuit"
+- Lua: `"PrintSelectionAndQuit"`
 - YAML: `PrintSelectionAndQuit`
 
 #### PrintResultAndQuit
@@ -1049,7 +1049,7 @@ node's path.
 
 Example:
 
-- Lua: "PrintResultAndQuit"
+- Lua: `"PrintResultAndQuit"`
 - YAML: `PrintResultAndQuit`
 
 #### PrintAppStateAndQuit
@@ -1059,7 +1059,7 @@ generating the default configuration file.
 
 Example:
 
-- Lua: "PrintAppStateAndQuit"
+- Lua: `"PrintAppStateAndQuit"`
 - YAML: `PrintAppStateAndQuit`
 
 #### Terminate
@@ -1068,7 +1068,7 @@ Terminate the application with a non-zero return code.
 
 Example:
 
-- Lua: "Terminate"
+- Lua: `"Terminate"`
 - YAML: `Terminate`
 
 ## Also See:

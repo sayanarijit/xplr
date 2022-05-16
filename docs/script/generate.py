@@ -1,8 +1,8 @@
 """Generate docs from comments."""
 
-from dataclasses import dataclass, field
+import os
+from dataclasses import dataclass
 from typing import List
-from enum import Enum
 
 
 # Messages --------------------------------------------------------------------
@@ -216,9 +216,14 @@ def gen_configuration():
         print(doc, file=f)
 
 
+def format_docs():
+    os.system("prettier --write docs/en/src")
+
+
 def main():
     gen_messages()
     gen_configuration()
+    format_docs()
 
 
 if __name__ == "__main__":

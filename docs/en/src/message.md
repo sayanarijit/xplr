@@ -17,17 +17,17 @@ To send messages using the [key bindings][2] or
 [Lua function calls][3], messages are represented in
 [Lua][5] syntax. For example:
 
-- "Quit"
-- { FocusPath = "/path/to/file" }
-- { Call = { command = "bash", args = { "-c", "read -p test" } } }
+- `"Quit"`
+- `{ FocusPath = "/path/to/file" }`
+- `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
 
 However, to send messages using the [input pipe][4], they need to be
 represented using
 [YAML][6] (or [JSON][7]) syntax. For example:
 
-- Quit
-- FocusPath: "/path/to/file"
-- Call: { command: bash, args: ["-c", "read -p test"] }
+- `Quit`
+- `FocusPath: "/path/to/file"`
+- `Call: { command: bash, args: ["-c", "read -p test"] }`
 
 ## Also See:
 

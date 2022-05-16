@@ -42,6 +42,7 @@ The environment variables starting with `XPLR_PIPE_` are the temporary files
 called ["pipe"s][18].
 
 The other variables are single-line variables containing simple information:
+
 - [XPLR_APP_VERSION][30]
 - [XPLR_FOCUS_INDEX][31]
 - [XPLR_FOCUS_PATH][32]
@@ -91,7 +92,7 @@ Currently there is only one input pipe.
 #### Output pipes
 
 `XPLR_PIPE_*_OUT` are the output pipes that contain data which cannot be
-exposed directly via environment variables, like multi-line strings. 
+exposed directly via environment variables, like multi-line strings.
 These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.
 
 - [XPLR_PIPE_SELECTION_OUT][21]

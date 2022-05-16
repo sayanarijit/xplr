@@ -12,7 +12,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ExplorePwd"
+    /// - Lua: `"ExplorePwd"`
     /// - YAML: `ExplorePwd`
     ExplorePwd,
 
@@ -24,7 +24,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ExplorePwdAsync"
+    /// - Lua: `"ExplorePwdAsync"`
     /// - YAML: `ExplorePwdAsync`
     ExplorePwdAsync,
 
@@ -37,7 +37,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ExploreParentsAsync"
+    /// - Lua: `"ExploreParentsAsync"`
     /// - YAML: `ExploreParentsAsync`
     ExploreParentsAsync,
 
@@ -47,7 +47,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ClearScreen"
+    /// - Lua: `"ClearScreen"``
     /// - YAML: `ClearScreen`
     ClearScreen,
 
@@ -59,7 +59,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "Refresh"
+    /// - Lua: `"Refresh"`
     /// - YAML: `Refresh`
     Refresh,
 
@@ -69,7 +69,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusNext"
+    /// - Lua: `"FocusNext"`
     /// - YAML: `FocusNext`
     FocusNext,
 
@@ -80,7 +80,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { FocusNextByRelativeIndex = 2 }
+    /// - Lua: `{ FocusNextByRelativeIndex = 2 }`
     /// - YAML: `FocusNextByRelativeIndex: 2`
     FocusNextByRelativeIndex(usize),
 
@@ -89,7 +89,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusNextByRelativeIndexFromInput"
+    /// - Lua: `"FocusNextByRelativeIndexFromInput"`
     /// - YAML: `FocusNextByRelativeIndexFromInput`
     FocusNextByRelativeIndexFromInput,
 
@@ -97,7 +97,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusPrevious"
+    /// - Lua: `"FocusPrevious"`
     /// - YAML: `FocusPrevious`
     FocusPrevious,
 
@@ -117,7 +117,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusPreviousByRelativeIndexFromInput"
+    /// - Lua: `"FocusPreviousByRelativeIndexFromInput"`
     /// - YAML: `FocusPreviousByRelativeIndexFromInput`
     FocusPreviousByRelativeIndexFromInput,
 
@@ -125,7 +125,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusFirst"
+    /// - Lua: `"FocusFirst"`
     /// - YAML: `FocusFirst`
     ///
     FocusFirst,
@@ -133,7 +133,7 @@ pub enum ExternalMsg {
     /// Focus on the last node.
     ///
     /// Example:
-    /// - Lua:  "FocusLast"
+    /// - Lua:  `"FocusLast"`
     /// - YAML: `FocusLast`
     FocusLast,
 
@@ -151,7 +151,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusPathFromInput"
+    /// - Lua: `"FocusPathFromInput"`
     /// - YAML: `FocusPathFromInput`
     FocusPathFromInput,
 
@@ -161,7 +161,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { FocusByIndex = 2 }
+    /// - Lua: `{ FocusByIndex = 2 }`
     /// - YAML: `FocusByIndex: 2`
     FocusByIndex(usize),
 
@@ -169,7 +169,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "FocusByIndexFromInput"
+    /// - Lua: `"FocusByIndexFromInput"`
     /// - YAML: `FocusByIndexFromInput`
     FocusByIndexFromInput,
 
@@ -182,7 +182,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { FocusByFileName = "filename.ext" }
+    /// - Lua: `{ FocusByFileName = "filename.ext" }`
     /// - YAML: `FocusByFileName: filename.ext`
     FocusByFileName(String),
 
@@ -192,7 +192,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { ChangeDirectory = "/path/to/directory" }
+    /// - Lua: `{ ChangeDirectory = "/path/to/directory" }`
     /// - YAML: `ChangeDirectory: /path/to/directory`
     ChangeDirectory(String),
 
@@ -200,7 +200,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "Enter"
+    /// - Lua: `"Enter"`
     /// - YAML: `Enter`
     Enter,
 
@@ -208,7 +208,7 @@ pub enum ExternalMsg {
     ///  
     /// Example:
     ///
-    /// - Lua:"Back"
+    /// - Lua: `"Back"`
     /// - YAML: `Back`
     Back,
 
@@ -216,7 +216,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "LastVisitedPath"
+    /// - Lua: `"LastVisitedPath"`
     /// - YAML: `LastVisitedPath`
     LastVisitedPath,
 
@@ -224,7 +224,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "NextVisitedPath"
+    /// - Lua: `"NextVisitedPath"`
     /// - YAML: `NextVisitedPath`
     NextVisitedPath,
 
@@ -233,7 +233,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// Lua: "FollowSymlink"
+    /// Lua: `"FollowSymlink"`
     /// YAML: `FollowSymlink`
     FollowSymlink,
 
@@ -245,7 +245,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { UpdateInputBuffer = "GoToPreviousWord" }
+    /// - Lua: `{ UpdateInputBuffer = "GoToPreviousWord" }`
     /// - YAML: `UpdateInputBuffer: GoToPreviousWord`
     UpdateInputBuffer(InputOperation),
 
@@ -253,7 +253,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "UpdateInputBufferFromKey"
+    /// - Lua: `"UpdateInputBufferFromKey"`
     /// - YAML: `UpdateInputBufferFromKey`
     UpdateInputBufferFromKey,
 
@@ -263,7 +263,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { BufferInput = "foo" }
+    /// - Lua: `{ BufferInput = "foo" }`
     /// - YAML: `BufferInput: foo`
     BufferInput(String),
 
@@ -272,7 +272,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "BufferInputFromKey"
+    /// - Lua: `"BufferInputFromKey"`
     /// - YAML: `BufferInputFromKey`
     BufferInputFromKey,
 
@@ -284,7 +284,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SetInputBuffer = "foo" }
+    /// - Lua: `{ SetInputBuffer = "foo" }`
     /// - YAML: `SetInputBuffer: foo`
     SetInputBuffer(String),
 
@@ -292,7 +292,7 @@ pub enum ExternalMsg {
     ///  
     ///  Example:
     ///
-    ///  - Lua: "RemoveInputBufferLastCharacter"
+    ///  - Lua: `"RemoveInputBufferLastCharacter"`
     ///  - YAML: `RemoveInputBufferLastCharacter`
     RemoveInputBufferLastCharacter,
 
@@ -300,7 +300,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "RemoveInputBufferLastWord"
+    /// - Lua: `"RemoveInputBufferLastWord"`
     /// - YAML: `RemoveInputBufferLastWord`
     RemoveInputBufferLastWord,
 
@@ -308,7 +308,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ResetInputBuffer"
+    /// - Lua: `"ResetInputBuffer"`
     /// - YAML: `ResetInputBuffer`
     ResetInputBuffer,
 
@@ -320,7 +320,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchMode = "default" }
+    /// - Lua: `{ SwitchMode = "default" }`
     /// - YAML: SwitchMode: default
     ///
     /// > **NOTE:** To be specific about which mode to switch to, use
@@ -335,7 +335,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchModeKeepingInputBuffer = "default" }
+    /// - Lua: `{ SwitchModeKeepingInputBuffer = "default" }`
     /// - YAML: `SwitchModeKeepingInputBuffer: default`
     ///
     /// > **NOTE:** To be specific about which mode to switch to, use
@@ -350,7 +350,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchModeBuiltin = "default" }
+    /// - Lua: `{ SwitchModeBuiltin = "default" }`
     /// - YAML: `SwitchModeBuiltin: default`
     SwitchModeBuiltin(String),
 
@@ -361,7 +361,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchModeBuiltinKeepingInputBuffer = "default" }
+    /// - Lua: `{ SwitchModeBuiltinKeepingInputBuffer = "default" }`
     /// - YAML: `SwitchModeBuiltinKeepingInputBuffer: default`
     SwitchModeBuiltinKeepingInputBuffer(String),
 
@@ -372,7 +372,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchModeCustom = "my_custom_mode" }
+    /// - Lua: `{ SwitchModeCustom = "my_custom_mode" }`
     /// - YAML: `SwitchModeCustom: my_custom_mode`
     SwitchModeCustom(String),
 
@@ -383,7 +383,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchModeCustomKeepingInputBuffer = "my_custom_mode" }
+    /// - Lua: `{ SwitchModeCustomKeepingInputBuffer = "my_custom_mode" }`
     /// - YAML: `SwitchModeCustomKeepingInputBuffer: my_custom_mode`
     SwitchModeCustomKeepingInputBuffer(String),
 
@@ -392,7 +392,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "PopMode"
+    /// - Lua: `"PopMode"`
     /// - YAML: `PopMode`
     PopMode,
 
@@ -401,7 +401,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: PopModeKeepingInputBuffer
+    /// - Lua: `PopModeKeepingInputBuffer`
     /// - YAML: `PopModeKeepingInputBuffer`
     PopModeKeepingInputBuffer,
 
@@ -413,7 +413,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchLayout = "default" }
+    /// - Lua: `{ SwitchLayout = "default" }`
     /// - YAML: `SwitchLayout: default`
     ///
     /// > **NOTE:** To be specific about which layout to switch to, use `SwitchLayoutBuiltin` or
@@ -426,7 +426,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchLayoutBuiltin = "default" }
+    /// - Lua: `{ SwitchLayoutBuiltin = "default" }`
     /// - YAML: `SwitchLayoutBuiltin: default`
     SwitchLayoutBuiltin(String),
 
@@ -436,7 +436,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SwitchLayoutCustom = "my_custom_layout" }
+    /// - Lua: `{ SwitchLayoutCustom = "my_custom_layout" }`
     /// - YAML: `SwitchLayoutCustom: my_custom_layout`
     SwitchLayoutCustom(String),
 
@@ -452,7 +452,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { Call = { command = "bash", args = { "-c", "read -p test" } } }
+    /// - Lua: `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
     /// - YAML: `Call: { command: bash, args: ["-c", "read -p test"] }`
     Call(Command),
 
@@ -474,7 +474,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { BashExec = "read -p test" }
+    /// - Lua: `{ BashExec = "read -p test" }`
     /// - YAML: `BashExec: "read -p test"`
     BashExec(String),
 
@@ -485,7 +485,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { BashExecSilently = "tput bell" }
+    /// - Lua: `{ BashExecSilently = "tput bell" }`
     /// - YAML: `BashExecSilently: "tput bell"`
     BashExecSilently(String),
 
@@ -502,7 +502,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { CallLua = "custom.some_custom_funtion" }
+    /// - Lua: `{ CallLua = "custom.some_custom_funtion" }`
     /// - YAML: `CallLua: custom.some_custom_funtion`
     CallLua(String),
 
@@ -513,7 +513,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { CallLuaSilently = "custom.some_custom_function" }
+    /// - Lua: `{ CallLuaSilently = "custom.some_custom_function" }`
     /// - YAML: `CallLuaSilently: custom.some_custom_function`
     CallLuaSilently(String),
 
@@ -527,8 +527,8 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { LuaEval = [[return { { LogInfo = io.read() } }]] }
-    /// - Lua: { LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }
+    /// - Lua: `{ LuaEval = [[return { { LogInfo = io.read() } }]] }`
+    /// - Lua: `{ LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }`
     /// - YAML: `LuaEval: "return { { LogInfo = io.read() } }"`
     /// - YAML: `LuaEval: "function(app) return { { LogInfo = app.pwd } } end"`
     LuaEval(String),
@@ -540,7 +540,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { LuaEvalSilently = [[return { { LogInfo = "foo" } }]] }
+    /// - Lua: `{ LuaEvalSilently = [[return { { LogInfo = "foo" } }]] }`
     /// - YAML: `LuaEvalSilently: "return { { LogInfo = 'foo' } }"`
     LuaEvalSilently(String),
 
@@ -550,7 +550,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "Select"
+    /// - Lua: `"Select"`
     /// - YAML: `Select`
     Select,
 
@@ -558,7 +558,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "SelectAll"
+    /// - Lua: `"SelectAll"`
     /// - YAML: `SelectAll`
     SelectAll,
 
@@ -568,7 +568,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { SelectPath = "/path/to/file" }
+    /// - Lua: `{ SelectPath = "/path/to/file" }`
     /// - YAML: `SelectPath: /path/to/file`
     SelectPath(String),
 
@@ -576,7 +576,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "UnSelect"
+    /// - Lua: `"UnSelect"`
     /// - YAML: `UnSelect`
     UnSelect,
 
@@ -584,7 +584,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "UnSelectAll"
+    /// - Lua: `"UnSelectAll"`
     /// - YAML: `UnSelectAll`
     UnSelectAll,
 
@@ -594,7 +594,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { UnSelectPath = "/path/to/file" }
+    /// - Lua: `{ UnSelectPath = "/path/to/file" }`
     /// - YAML: `UnSelectPath: /path/to/file`
     UnSelectPath(String),
 
@@ -602,14 +602,14 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ToggleSelection"
+    /// - Lua: `"ToggleSelection"`
     /// - YAML `ToggleSelection`
     ToggleSelection,
 
     /// Toggle between select all and unselect all.
     /// Example:
     ///
-    /// - Lua: "ToggleSelectAll"
+    /// - Lua: `"ToggleSelectAll"`
     /// - YAML: `ToggleSelectAll`
     ToggleSelectAll,
 
@@ -619,7 +619,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { ToggleSelectionByPath = "/path/to/file" }
+    /// - Lua: `{ ToggleSelectionByPath = "/path/to/file" }`
     /// - YAML: `ToggleSelectionByPath: /path/to/file`
     ToggleSelectionByPath(String),
 
@@ -627,7 +627,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ClearSelection"
+    /// - Lua: `"ClearSelection"`
     /// - YAML: `ClearSelection`
     ClearSelection,
 
@@ -640,7 +640,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }
+    /// - Lua: `{ AddNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
     /// - YAML: `AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
     AddNodeFilter(NodeFilterApplicable),
 
@@ -650,7 +650,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }
+    /// - Lua: `{ RemoveNodeFilter: { filter: "RelativePathDoesStartWith", input: "foo" } }`
     /// - YAML: `RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
     RemoveNodeFilter(NodeFilterApplicable),
 
@@ -661,7 +661,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }
+    /// - Lua: `{ ToggleNodeFilter = { filter = "RelativePathDoesStartWith", input = "foo" } }`
     /// - YAML: `ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }`
     ToggleNodeFilter(NodeFilterApplicable),
 
@@ -672,7 +672,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { AddNodeFilterFromInput = "RelativePathDoesStartWith" }
+    /// - Lua: `{ AddNodeFilterFromInput = "RelativePathDoesStartWith" }`
     /// - YAML: `AddNodeFilterFromInput: RelativePathDoesStartWith`
     AddNodeFilterFromInput(NodeFilter),
 
@@ -683,7 +683,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { RemoveNodeFilterFromInput = "RelativePathDoesStartWith" }
+    /// - Lua: `{ RemoveNodeFilterFromInput = "RelativePathDoesStartWith" }`
     /// - YAML: `RemoveNodeFilterFromInput: RelativePathDoesStartWith`
     RemoveNodeFilterFromInput(NodeFilter),
 
@@ -691,7 +691,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "RemoveLastNodeFilter"
+    /// - Lua: `"RemoveLastNodeFilter"`
     /// - YAML: `RemoveLastNodeFilter`
     RemoveLastNodeFilter,
 
@@ -700,7 +700,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ResetNodeFilters"
+    /// - Lua: `"ResetNodeFilters"`
     /// - YAML: `ResetNodeFilters`
     ResetNodeFilters,
 
@@ -708,7 +708,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ClearNodeFilters"
+    /// - Lua: `"ClearNodeFilters"`
     /// - YAML: `ClearNodeFilters`
     ClearNodeFilters,
 
@@ -721,7 +721,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }
+    /// - Lua: `{ AddNodeSorter = { sorter = "ByRelativePath", reverse = false } }`
     /// - YAML: `AddNodeSorter: { sorter: ByRelativePath, reverse: false }`
     AddNodeSorter(NodeSorterApplicable),
 
@@ -731,7 +731,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { RemoveNodeSorter = "ByRelativePath" }
+    /// - Lua: `{ RemoveNodeSorter = "ByRelativePath" }`
     /// - YAML: `RemoveNodeSorter: ByRelativePath`
     RemoveNodeSorter(NodeSorter),
 
@@ -741,7 +741,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { ReverseNodeSorter = "ByRelativePath" }
+    /// - Lua: `{ ReverseNodeSorter = "ByRelativePath" }`
     /// - YAML: `ReverseNodeSorter: ByRelativePath`
     ReverseNodeSorter(NodeSorter),
 
@@ -752,7 +752,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { ToggleSorterSorter: { sorter = "ByRelativePath", reverse = false } }
+    /// - Lua: `{ ToggleSorterSorter: { sorter = "ByRelativePath", reverse = false } }`
     /// - YAML: `ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }`
     ToggleNodeSorter(NodeSorterApplicable),
 
@@ -760,7 +760,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ReverseNodeSorters"
+    /// - Lua: `"ReverseNodeSorters"`
     /// - YAML: `ReverseNodeSorters`
     ReverseNodeSorters,
 
@@ -768,7 +768,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "RemoveLastNodeSorter"
+    /// - Lua: `"RemoveLastNodeSorter"`
     /// - YAML: `RemoveLastNodeSorter`
     RemoveLastNodeSorter,
 
@@ -777,7 +777,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ResetNodeSorters"
+    /// - Lua: `"ResetNodeSorters"`
     /// - YAML: `ResetNodeSorters`
     ResetNodeSorters,
 
@@ -785,7 +785,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ClearNodeSorters"
+    /// - Lua: `"ClearNodeSorters"`
     /// - YAML: `ClearNodeSorters`
     ClearNodeSorters,
 
@@ -795,7 +795,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "EnableMouse"
+    /// - Lua: `"EnableMouse"`
     /// - YAML: `EnableMouse`
     EnableMouse,
 
@@ -803,7 +803,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "DisableMouse"
+    /// - Lua: `"DisableMouse"`
     /// - YAML: `DisableMouse`
     DisableMouse,
 
@@ -811,7 +811,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "ToggleMouse"
+    /// - Lua: `"ToggleMouse"`
     /// - YAML: `ToggleMouse`
     ToggleMouse,
 
@@ -823,7 +823,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { StartFifo = "/tmp/xplr.fifo }
+    /// - Lua: `{ StartFifo = "/tmp/xplr.fifo }`
     /// - YAML: `StartFifo: /tmp/xplr.fifo`
     StartFifo(String),
 
@@ -831,7 +831,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "StopFifo"
+    /// - Lua: `"StopFifo"`
     /// - YAML: `StopFifo`
     StopFifo,
 
@@ -841,7 +841,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { ToggleFifo = "/path/to/fifo" }
+    /// - Lua: `{ ToggleFifo = "/path/to/fifo" }`
     /// - YAML: `ToggleFifo: /path/to/fifo`
     ToggleFifo(String),
 
@@ -853,7 +853,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { LogInfo = "launching satellite" }
+    /// - Lua: `{ LogInfo = "launching satellite" }`
     /// - YAML: `LogInfo: launching satellite`
     LogInfo(String),
 
@@ -863,7 +863,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { LogSuccess = "satellite reached destination" }
+    /// - Lua: `{ LogSuccess = "satellite reached destination" }`
     /// - YAML: `LogSuccess: satellite reached destination`
     LogSuccess(String),
 
@@ -873,7 +873,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { LogWarning = "satellite is heating" }
+    /// - Lua: `{ LogWarning = "satellite is heating" }`
     /// - YAML: `LogWarning: satellite is heating`
     LogWarning(String),
 
@@ -883,7 +883,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { LogError = "satellite crashed" }
+    /// - Lua: `{ LogError = "satellite crashed" }`
     /// - YAML: `LogError: satellite crashed`
     LogError(String),
 
@@ -896,7 +896,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: { Debug = "/path/to/file" }
+    /// - Lua: `{ Debug = "/path/to/file" }`
     /// - YAML: `Debug: /path/to/file`
     Debug(String),
 
@@ -904,7 +904,7 @@ pub enum ExternalMsg {
 
     /// Example:
     ///
-    /// - Lua: "Quit"
+    /// - Lua: `"Quit"`
     /// - YAML: `Quit`
     ///
     /// Quit with returncode zero (success).
@@ -914,7 +914,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "PrintPwdAndQuit"
+    /// - Lua: `"PrintPwdAndQuit"`
     /// - YAML: `PrintPwdAndQuit`
     PrintPwdAndQuit,
 
@@ -923,7 +923,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "PrintFocusPathAndQuit"
+    /// - Lua: `"PrintFocusPathAndQuit"`
     /// - YAML: `PrintFocusPathAndQuit`
     PrintFocusPathAndQuit,
 
@@ -932,7 +932,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "PrintSelectionAndQuit"
+    /// - Lua: `"PrintSelectionAndQuit"`
     /// - YAML: `PrintSelectionAndQuit`
     PrintSelectionAndQuit,
 
@@ -941,7 +941,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "PrintResultAndQuit"
+    /// - Lua: `"PrintResultAndQuit"`
     /// - YAML: `PrintResultAndQuit`
     PrintResultAndQuit,
 
@@ -950,7 +950,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "PrintAppStateAndQuit"
+    /// - Lua: `"PrintAppStateAndQuit"`
     /// - YAML: `PrintAppStateAndQuit`
     PrintAppStateAndQuit,
 
@@ -958,7 +958,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: "Terminate"
+    /// - Lua: `"Terminate"`
     /// - YAML: `Terminate`
     Terminate,
 }

@@ -48,7 +48,8 @@ Setup luarocks with the following steps:
   package.path = os.getenv("LUA_PATH") .. ";" .. package.path
   package.cpath = os.getenv("LUA_CPATH") .. ";" .. package.cpath
   ```
-Now you can install packages using luarocks. Be sure to append `--lua-version`.
+
+  Now you can install packages using luarocks. Be sure to append `--lua-version`.
 
 Example:
 

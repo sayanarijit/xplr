@@ -26,19 +26,21 @@ xplr.config.layouts.builtin.default = {
 
 A layout can be one of the following:
 
-- ["Nothing"][8]
-- ["Table"][9]
-- ["InputAndLogs"][10]
-- ["Selection"][11]
-- ["HelpMenu"][12]
-- ["SortAndFilter"][13]
-- { [CustomContent][25] = { [title][33], [body][34] }
-- { [Horizontal][14] = { [config][15], [splits][17] }
-- { [Vertical][16] = { [config][15], [splits][17] }
+- [Nothing][8]
+- [Table][9]
+- [InputAndLogs][10]
+- [Selection][11]
+- [HelpMenu][12]
+- [SortAndFilter][13]
+- [CustomContent][25]
+- [Horizontal][14]
+- [Vertical][16]
 
 ### Nothing
 
 This layout contains a blank panel.
+
+Example: "Nothing"
 
 ### Table
 
@@ -49,19 +51,37 @@ current directory.
 
 This layout contains the panel displaying the input prompt and logs.
 
+Example: "InputAndLogs"
+
 ### Selection
 
 This layout contains the panel displaying the selected paths.
+
+Example: "Selection"
 
 ### HelpMenu
 
 This layout contains the panel displaying the help menu for the current mode in
 real-time.
 
+Example: "HelpMenu"
+
 ### SortAndFilter
 
 This layout contains the panel displaying the pipeline of sorters and filters
 applied of the list of paths being displayed.
+
+Example: "SortAndFilter"
+
+### Custom Content
+
+Custom content is a special layout to render something custom.
+It contains the following information:
+
+- [title][33]
+- [body][34]
+
+Example: { CustomContent = { title = [title][33], body = [body][34] }
 
 ### Horizontal
 
@@ -72,6 +92,8 @@ It contains the following information:
 - [config][15]
 - [splits][17]
 
+Example: { Horizontal = { config = [config][15], splits = [splits][17] }
+
 ### Vertical
 
 This is a special layout that splits the panel into two vertical parts.
@@ -80,6 +102,8 @@ It contains the following information:
 
 - [config][15]
 - [splits][17]
+
+Example: { Vertical = { config = [config][15], splits = [splits][17] }
 
 ## Layout Config
 
@@ -144,21 +168,13 @@ Type: list of [Layout][3]
 
 The list of child layouts to fit into the parent layout.
 
-## Custom Content
-
-Custom content is a special layout to render something custom.
-It contains the following information:
-
-- [title][33]
-- [body][34]
-
-### title
+## title
 
 Type: nullable string
 
 The title of the panel.
 
-### body
+## body
 
 Type: [Content Body][26]
 
@@ -175,7 +191,7 @@ Content body can be one of the following:
 - [StaticTable][31]
 - [DynamicTable][32]
 
-### Static Paragraph
+## Static Paragraph
 
 A paragraph to render. It contains the following fields:
 
@@ -194,7 +210,7 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
-### Dynamic Paragraph
+## Dynamic Paragraph
 
 A [Lua function][35] to render a custom paragraph.
 It contains the following fields:
@@ -217,7 +233,7 @@ xplr.fn.custom.render_layout = function(ctx)
 end
 ```
 
-### Static List
+## Static List
 
 A list to render. It contains the following fields:
 
@@ -236,7 +252,7 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
-### Dynamic List
+## Dynamic List
 
 A [Lua function][35] to render a custom list.
 It contains the following fields:
@@ -262,7 +278,7 @@ xplr.fn.custom.render_layout = function(ctx)
 end
 ```
 
-### Static Table
+## Static Table
 
 A table to render. It contains the following fields:
 
@@ -293,7 +309,7 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
-### Dynamic Table
+## Dynamic Table
 
 A [Lua function][35] to render a custom table.
 It contains the following fields:
