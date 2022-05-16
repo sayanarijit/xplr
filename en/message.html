@@ -166,17 +166,17 @@ requests, xplr listens to <a href="messages.html">messages</a>.</p>
 <a href="lua-function-calls.html">Lua function calls</a>, messages are represented in
 <a href="https://www.lua.org/">Lua</a> syntax. For example:</p>
 <ul>
-<li>&quot;Quit&quot;</li>
-<li>{ FocusPath = &quot;/path/to/file&quot; }</li>
-<li>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</li>
+<li><code>&quot;Quit&quot;</code></li>
+<li><code>{ FocusPath = &quot;/path/to/file&quot; }</code></li>
+<li><code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
 </ul>
 <p>However, to send messages using the <a href="environment-variables-and-pipes.html#input-pipe">input pipe</a>, they need to be
 represented using
 <a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. For example:</p>
 <ul>
-<li>Quit</li>
-<li>FocusPath: &quot;/path/to/file&quot;</li>
-<li>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</li>
+<li><code>Quit</code></li>
+<li><code>FocusPath: &quot;/path/to/file&quot;</code></li>
+<li><code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
 </ul>
 <h2 id="also-see"><a class="header" href="#also-see">Also See:</a></h2>
 <ul>

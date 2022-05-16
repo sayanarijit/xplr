@@ -196,9 +196,9 @@ git clone https://github.com/sayanarijit/material-landscape2.xplr ~/.config/xplr
 <pre><code class="language-lua">package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
 package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
 </code></pre>
+<p>Now you can install packages using luarocks. Be sure to append <code>--lua-version</code>.</p>
 </li>
 </ul>
-<p>Now you can install packages using luarocks. Be sure to append <code>--lua-version</code>.</p>
 <p>Example:</p>
 <pre><code class="language-bash">luarocks install luafilesystem --local --lua-version 5.1
 </code></pre>

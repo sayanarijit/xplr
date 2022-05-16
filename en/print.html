@@ -1495,31 +1495,44 @@ metadata is set for the <a href="node_types.html#directory">directory</a>, <a hr
 </code></pre>
 <p>A layout can be one of the following:</p>
 <ul>
-<li><a href="layout.html#nothing">&quot;Nothing&quot;</a></li>
-<li><a href="layout.html#table">&quot;Table&quot;</a></li>
-<li><a href="layout.html#inputandlogs">&quot;InputAndLogs&quot;</a></li>
-<li><a href="layout.html#selection">&quot;Selection&quot;</a></li>
-<li><a href="layout.html#helpmenu">&quot;HelpMenu&quot;</a></li>
-<li><a href="layout.html#sortandfilter">&quot;SortAndFilter&quot;</a></li>
-<li>{ <a href="layout.html#custom-content">CustomContent</a> = { <a href="layout.html#title">title</a>, <a href="layout.html#body">body</a> }</li>
-<li>{ <a href="layout.html#horizontal">Horizontal</a> = { <a href="layout.html#layout-config">config</a>, <a href="layout.html#splits">splits</a> }</li>
-<li>{ <a href="layout.html#vertical">Vertical</a> = { <a href="layout.html#layout-config">config</a>, <a href="layout.html#splits">splits</a> }</li>
+<li><a href="layout.html#nothing">Nothing</a></li>
+<li><a href="layout.html#table">Table</a></li>
+<li><a href="layout.html#inputandlogs">InputAndLogs</a></li>
+<li><a href="layout.html#selection">Selection</a></li>
+<li><a href="layout.html#helpmenu">HelpMenu</a></li>
+<li><a href="layout.html#sortandfilter">SortAndFilter</a></li>
+<li><a href="layout.html#custom-content">CustomContent</a></li>
+<li><a href="layout.html#horizontal">Horizontal</a></li>
+<li><a href="layout.html#vertical">Vertical</a></li>
 </ul>
 <h3 id="nothing"><a class="header" href="#nothing">Nothing</a></h3>
 <p>This layout contains a blank panel.</p>
+<p>Example: &quot;Nothing&quot;</p>
 <h3 id="table"><a class="header" href="#table">Table</a></h3>
 <p>This layout contains the table displaying the files and directories in the
 current directory.</p>
 <h3 id="inputandlogs"><a class="header" href="#inputandlogs">InputAndLogs</a></h3>
 <p>This layout contains the panel displaying the input prompt and logs.</p>
+<p>Example: &quot;InputAndLogs&quot;</p>
 <h3 id="selection"><a class="header" href="#selection">Selection</a></h3>
 <p>This layout contains the panel displaying the selected paths.</p>
+<p>Example: &quot;Selection&quot;</p>
 <h3 id="helpmenu"><a class="header" href="#helpmenu">HelpMenu</a></h3>
 <p>This layout contains the panel displaying the help menu for the current mode in
 real-time.</p>
+<p>Example: &quot;HelpMenu&quot;</p>
 <h3 id="sortandfilter"><a class="header" href="#sortandfilter">SortAndFilter</a></h3>
 <p>This layout contains the panel displaying the pipeline of sorters and filters
 applied of the list of paths being displayed.</p>
+<p>Example: &quot;SortAndFilter&quot;</p>
+<h3 id="custom-content"><a class="header" href="#custom-content">Custom Content</a></h3>
+<p>Custom content is a special layout to render something custom.
+It contains the following information:</p>
+<ul>
+<li><a href="layout.html#title">title</a></li>
+<li><a href="layout.html#body">body</a></li>
+</ul>
+<p>Example: { CustomContent = { title = <a href="layout.html#title">title</a>, body = <a href="layout.html#body">body</a> }</p>
 <h3 id="horizontal"><a class="header" href="#horizontal">Horizontal</a></h3>
 <p>This is a special layout that splits the panel into two horizontal parts.</p>
 <p>It contains the following information:</p>
@@ -1527,6 +1540,7 @@ applied of the list of paths being displayed.</p>
 <li><a href="layout.html#layout-config">config</a></li>
 <li><a href="layout.html#splits">splits</a></li>
 </ul>
+<p>Example: { Horizontal = { config = <a href="layout.html#layout-config">config</a>, splits = <a href="layout.html#splits">splits</a> }</p>
 <h3 id="vertical"><a class="header" href="#vertical">Vertical</a></h3>
 <p>This is a special layout that splits the panel into two vertical parts.</p>
 <p>It contains the following information:</p>
@@ -1534,6 +1548,7 @@ applied of the list of paths being displayed.</p>
 <li><a href="layout.html#layout-config">config</a></li>
 <li><a href="layout.html#splits">splits</a></li>
 </ul>
+<p>Example: { Vertical = { config = <a href="layout.html#layout-config">config</a>, splits = <a href="layout.html#splits">splits</a> }</p>
 <h2 id="layout-config"><a class="header" href="#layout-config">Layout Config</a></h2>
 <p>A layout config contains the following information:</p>
 <ul>
@@ -1579,17 +1594,10 @@ applied of the list of paths being displayed.</p>
 <h2 id="splits"><a class="header" href="#splits">splits</a></h2>
 <p>Type: list of <a href="layout.html#layout">Layout</a></p>
 <p>The list of child layouts to fit into the parent layout.</p>
-<h2 id="custom-content"><a class="header" href="#custom-content">Custom Content</a></h2>
-<p>Custom content is a special layout to render something custom.
-It contains the following information:</p>
-<ul>
-<li><a href="layout.html#title">title</a></li>
-<li><a href="layout.html#body">body</a></li>
-</ul>
-<h3 id="title"><a class="header" href="#title">title</a></h3>
+<h2 id="title"><a class="header" href="#title">title</a></h2>
 <p>Type: nullable string</p>
 <p>The title of the panel.</p>
-<h3 id="body"><a class="header" href="#body">body</a></h3>
+<h2 id="body"><a class="header" href="#body">body</a></h2>
 <p>Type: <a href="layout.html#content-body">Content Body</a></p>
 <p>The body of the panel.</p>
 <h2 id="content-body"><a class="header" href="#content-body">Content Body</a></h2>
@@ -1602,7 +1610,7 @@ It contains the following information:</p>
 <li><a href="layout.html#static-table">StaticTable</a></li>
 <li><a href="layout.html#dynamic-table">DynamicTable</a></li>
 </ul>
-<h3 id="static-paragraph"><a class="header" href="#static-paragraph">Static Paragraph</a></h3>
+<h2 id="static-paragraph"><a class="header" href="#static-paragraph">Static Paragraph</a></h2>
 <p>A paragraph to render. It contains the following fields:</p>
 <ul>
 <li><strong>render</strong> (string): The string to render.</li>
@@ -1617,7 +1625,7 @@ It contains the following information:</p>
   },
 }
 </code></pre>
-<h3 id="dynamic-paragraph"><a class="header" href="#dynamic-paragraph">Dynamic Paragraph</a></h3>
+<h2 id="dynamic-paragraph"><a class="header" href="#dynamic-paragraph">Dynamic Paragraph</a></h2>
 <p>A <a href="layout.html#content-renderer">Lua function</a> to render a custom paragraph.
 It contains the following fields:</p>
 <ul>
@@ -1636,7 +1644,7 @@ xplr.fn.custom.render_layout = function(ctx)
   return ctx.app.pwd
 end
 </code></pre>
-<h3 id="static-list"><a class="header" href="#static-list">Static List</a></h3>
+<h2 id="static-list"><a class="header" href="#static-list">Static List</a></h2>
 <p>A list to render. It contains the following fields:</p>
 <ul>
 <li><strong>render</strong> (list of string): The list to render.</li>
@@ -1651,7 +1659,7 @@ end
   },
 }
 </code></pre>
-<h3 id="dynamic-list"><a class="header" href="#dynamic-list">Dynamic List</a></h3>
+<h2 id="dynamic-list"><a class="header" href="#dynamic-list">Dynamic List</a></h2>
 <p>A <a href="layout.html#content-renderer">Lua function</a> to render a custom list.
 It contains the following fields:</p>
 <ul>
@@ -1673,7 +1681,7 @@ xplr.fn.custom.render_layout = function(ctx)
   }
 end
 </code></pre>
-<h3 id="static-table"><a class="header" href="#static-table">Static Table</a></h3>
+<h2 id="static-table"><a class="header" href="#static-table">Static Table</a></h2>
 <p>A table to render. It contains the following fields:</p>
 <ul>
 <li><strong>widths</strong> (list of <a href="layout.html#constraint">Constraint</a>): Width of the columns.</li>
@@ -1700,7 +1708,7 @@ end
   },
 }
 </code></pre>
-<h3 id="dynamic-table"><a class="header" href="#dynamic-table">Dynamic Table</a></h3>
+<h2 id="dynamic-table"><a class="header" href="#dynamic-table">Dynamic Table</a></h2>
 <p>A <a href="layout.html#content-renderer">Lua function</a> to render a custom table.
 It contains the following fields:</p>
 <ul>
@@ -1823,17 +1831,17 @@ requests, xplr listens to <a href="messages.html">messages</a>.</p>
 <a href="lua-function-calls.html">Lua function calls</a>, messages are represented in
 <a href="https://www.lua.org/">Lua</a> syntax. For example:</p>
 <ul>
-<li>&quot;Quit&quot;</li>
-<li>{ FocusPath = &quot;/path/to/file&quot; }</li>
-<li>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</li>
+<li><code>&quot;Quit&quot;</code></li>
+<li><code>{ FocusPath = &quot;/path/to/file&quot; }</code></li>
+<li><code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
 </ul>
 <p>However, to send messages using the <a href="environment-variables-and-pipes.html#input-pipe">input pipe</a>, they need to be
 represented using
 <a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. For example:</p>
 <ul>
-<li>Quit</li>
-<li>FocusPath: &quot;/path/to/file&quot;</li>
-<li>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</li>
+<li><code>Quit</code></li>
+<li><code>FocusPath: &quot;/path/to/file&quot;</code></li>
+<li><code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
 </ul>
 <h2 id="also-see-3"><a class="header" href="#also-see-3">Also See:</a></h2>
 <ul>
@@ -1866,7 +1874,7 @@ represented using
 This operation is expensive. So, try to avoid using it too often.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ExplorePwd&quot;</li>
+<li>Lua: <code>&quot;ExplorePwd&quot;</code></li>
 <li>YAML: <code>ExplorePwd</code></li>
 </ul>
 <h4 id="explorepwdasync"><a class="header" href="#explorepwdasync">ExplorePwdAsync</a></h4>
@@ -1877,7 +1885,7 @@ be used with care and probably with special checks in place. To explore
 $PWD synchronously, use <code>ExplorePwd</code> instead.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ExplorePwdAsync&quot;</li>
+<li>Lua: <code>&quot;ExplorePwdAsync&quot;</code></li>
 <li>YAML: <code>ExplorePwdAsync</code></li>
 </ul>
 <h4 id="exploreparentsasync"><a class="header" href="#exploreparentsasync">ExploreParentsAsync</a></h4>
@@ -1889,7 +1897,7 @@ in place. To explore just the <code>$PWD</code> synchronously, use <code>Explore
 instead.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ExploreParentsAsync&quot;</li>
+<li>Lua: <code>&quot;ExploreParentsAsync&quot;</code></li>
 <li>YAML: <code>ExploreParentsAsync</code></li>
 </ul>
 <h3 id="screen"><a class="header" href="#screen">Screen</a></h3>
@@ -1897,7 +1905,7 @@ instead.</p>
 <p>Clear the screen.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ClearScreen&quot;</li>
+<li>Lua: `&quot;ClearScreen&quot;``</li>
 <li>YAML: <code>ClearScreen</code></li>
 </ul>
 <h4 id="refresh"><a class="header" href="#refresh">Refresh</a></h4>
@@ -1908,7 +1916,7 @@ to re-explore it, use the <code>Explore</code> message instead.
 Also, it will not clear the screen. Use <code>ClearScreen</code> for that.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;Refresh&quot;</li>
+<li>Lua: <code>&quot;Refresh&quot;</code></li>
 <li>YAML: <code>Refresh</code></li>
 </ul>
 <h3 id="navigation"><a class="header" href="#navigation">Navigation</a></h3>
@@ -1916,7 +1924,7 @@ Also, it will not clear the screen. Use <code>ClearScreen</code> for that.</p>
 <p>Focus next node.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusNext&quot;</li>
+<li>Lua: <code>&quot;FocusNext&quot;</code></li>
 <li>YAML: <code>FocusNext</code></li>
 </ul>
 <h4 id="focusnextbyrelativeindex"><a class="header" href="#focusnextbyrelativeindex">FocusNextByRelativeIndex</a></h4>
@@ -1925,7 +1933,7 @@ given value.</p>
 <p>Type: { FocusNextByRelativeIndex = int }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { FocusNextByRelativeIndex = 2 }</li>
+<li>Lua: <code>{ FocusNextByRelativeIndex = 2 }</code></li>
 <li>YAML: <code>FocusNextByRelativeIndex: 2</code></li>
 </ul>
 <h4 id="focusnextbyrelativeindexfrominput"><a class="header" href="#focusnextbyrelativeindexfrominput">FocusNextByRelativeIndexFromInput</a></h4>
@@ -1933,14 +1941,14 @@ given value.</p>
 from the input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusNextByRelativeIndexFromInput&quot;</li>
+<li>Lua: <code>&quot;FocusNextByRelativeIndexFromInput&quot;</code></li>
 <li>YAML: <code>FocusNextByRelativeIndexFromInput</code></li>
 </ul>
 <h4 id="focusprevious"><a class="header" href="#focusprevious">FocusPrevious</a></h4>
 <p>Focus on the previous item.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusPrevious&quot;</li>
+<li>Lua: <code>&quot;FocusPrevious&quot;</code></li>
 <li>YAML: <code>FocusPrevious</code></li>
 </ul>
 <h4 id="focuspreviousbyrelativeindex"><a class="header" href="#focuspreviousbyrelativeindex">FocusPreviousByRelativeIndex</a></h4>
@@ -1957,21 +1965,21 @@ given value.</p>
 read from the input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusPreviousByRelativeIndexFromInput&quot;</li>
+<li>Lua: <code>&quot;FocusPreviousByRelativeIndexFromInput&quot;</code></li>
 <li>YAML: <code>FocusPreviousByRelativeIndexFromInput</code></li>
 </ul>
 <h4 id="focusfirst"><a class="header" href="#focusfirst">FocusFirst</a></h4>
 <p>Focus on the first node.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusFirst&quot;</li>
+<li>Lua: <code>&quot;FocusFirst&quot;</code></li>
 <li>YAML: <code>FocusFirst</code></li>
 </ul>
 <h4 id="focuslast"><a class="header" href="#focuslast">FocusLast</a></h4>
 <p>Focus on the last node.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusLast&quot;</li>
+<li>Lua: <code>&quot;FocusLast&quot;</code></li>
 <li>YAML: <code>FocusLast</code></li>
 </ul>
 <h4 id="focuspath"><a class="header" href="#focuspath">FocusPath</a></h4>
@@ -1986,7 +1994,7 @@ read from the input buffer.</p>
 <p>Focus on the path read from input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusPathFromInput&quot;</li>
+<li>Lua: <code>&quot;FocusPathFromInput&quot;</code></li>
 <li>YAML: <code>FocusPathFromInput</code></li>
 </ul>
 <h4 id="focusbyindex"><a class="header" href="#focusbyindex">FocusByIndex</a></h4>
@@ -1994,14 +2002,14 @@ read from the input buffer.</p>
 <p>Type: { FocusByIndex = int }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { FocusByIndex = 2 }</li>
+<li>Lua: <code>{ FocusByIndex = 2 }</code></li>
 <li>YAML: <code>FocusByIndex: 2</code></li>
 </ul>
 <h4 id="focusbyindexfrominput"><a class="header" href="#focusbyindexfrominput">FocusByIndexFromInput</a></h4>
 <p>Focus on the absolute <code>n</code>th node where <code>n</code> is read from the input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;FocusByIndexFromInput&quot;</li>
+<li>Lua: <code>&quot;FocusByIndexFromInput&quot;</code></li>
 <li>YAML: <code>FocusByIndexFromInput</code></li>
 </ul>
 <h4 id="focusbyfilename"><a class="header" href="#focusbyfilename">FocusByFileName</a></h4>
@@ -2010,7 +2018,7 @@ read from the input buffer.</p>
 <p>Type: { FocusByFileName = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { FocusByFileName = &quot;filename.ext&quot; }</li>
+<li>Lua: <code>{ FocusByFileName = &quot;filename.ext&quot; }</code></li>
 <li>YAML: <code>FocusByFileName: filename.ext</code></li>
 </ul>
 <h4 id="changedirectory"><a class="header" href="#changedirectory">ChangeDirectory</a></h4>
@@ -2018,41 +2026,41 @@ read from the input buffer.</p>
 <p>Type: { ChangeDirectory = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { ChangeDirectory = &quot;/path/to/directory&quot; }</li>
+<li>Lua: <code>{ ChangeDirectory = &quot;/path/to/directory&quot; }</code></li>
 <li>YAML: <code>ChangeDirectory: /path/to/directory</code></li>
 </ul>
 <h4 id="enter"><a class="header" href="#enter">Enter</a></h4>
 <p>Enter into the currently focused path if it's a directory.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;Enter&quot;</li>
+<li>Lua: <code>&quot;Enter&quot;</code></li>
 <li>YAML: <code>Enter</code></li>
 </ul>
 <h4 id="back"><a class="header" href="#back">Back</a></h4>
 <p>Go back to the parent directory.</p>
 <p>Example:</p>
 <ul>
-<li>Lua:&quot;Back&quot;</li>
+<li>Lua: <code>&quot;Back&quot;</code></li>
 <li>YAML: <code>Back</code></li>
 </ul>
 <h4 id="lastvisitedpath"><a class="header" href="#lastvisitedpath">LastVisitedPath</a></h4>
 <p>Go to the last path visited.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;LastVisitedPath&quot;</li>
+<li>Lua: <code>&quot;LastVisitedPath&quot;</code></li>
 <li>YAML: <code>LastVisitedPath</code></li>
 </ul>
 <h4 id="nextvisitedpath"><a class="header" href="#nextvisitedpath">NextVisitedPath</a></h4>
 <p>Go to the next path visited.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;NextVisitedPath&quot;</li>
+<li>Lua: <code>&quot;NextVisitedPath&quot;</code></li>
 <li>YAML: <code>NextVisitedPath</code></li>
 </ul>
 <h4 id="followsymlink"><a class="header" href="#followsymlink">FollowSymlink</a></h4>
 <p>Follow the symlink under focus to its actual location.</p>
 <p>Example:</p>
-<p>Lua: &quot;FollowSymlink&quot;
+<p>Lua: <code>&quot;FollowSymlink&quot;</code>
 YAML: <code>FollowSymlink</code></p>
 <h3 id="reading-input"><a class="header" href="#reading-input">Reading Input</a></h3>
 <h4 id="updateinputbuffer"><a class="header" href="#updateinputbuffer">UpdateInputBuffer</a></h4>
@@ -2060,14 +2068,14 @@ YAML: <code>FollowSymlink</code></p>
 <p>Type: { UpdateInputBuffer = <a href="https://xplr.dev/en/input-operation">Input Opertaion</a> }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { UpdateInputBuffer = &quot;GoToPreviousWord&quot; }</li>
+<li>Lua: <code>{ UpdateInputBuffer = &quot;GoToPreviousWord&quot; }</code></li>
 <li>YAML: <code>UpdateInputBuffer: GoToPreviousWord</code></li>
 </ul>
 <h4 id="updateinputbufferfromkey"><a class="header" href="#updateinputbufferfromkey">UpdateInputBufferFromKey</a></h4>
 <p>Update the input buffer from the key read from keyboard input.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;UpdateInputBufferFromKey&quot;</li>
+<li>Lua: <code>&quot;UpdateInputBufferFromKey&quot;</code></li>
 <li>YAML: <code>UpdateInputBufferFromKey</code></li>
 </ul>
 <h4 id="bufferinput"><a class="header" href="#bufferinput">BufferInput</a></h4>
@@ -2075,7 +2083,7 @@ YAML: <code>FollowSymlink</code></p>
 <p>Type: { BufferInput = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { BufferInput = &quot;foo&quot; }</li>
+<li>Lua: <code>{ BufferInput = &quot;foo&quot; }</code></li>
 <li>YAML: <code>BufferInput: foo</code></li>
 </ul>
 <h4 id="bufferinputfromkey"><a class="header" href="#bufferinputfromkey">BufferInputFromKey</a></h4>
@@ -2083,7 +2091,7 @@ YAML: <code>FollowSymlink</code></p>
 input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;BufferInputFromKey&quot;</li>
+<li>Lua: <code>&quot;BufferInputFromKey&quot;</code></li>
 <li>YAML: <code>BufferInputFromKey</code></li>
 </ul>
 <h4 id="setinputbuffer"><a class="header" href="#setinputbuffer">SetInputBuffer</a></h4>
@@ -2093,28 +2101,28 @@ it will show in the UI.</p>
 <p>Type: { SetInputBuffer = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SetInputBuffer = &quot;foo&quot; }</li>
+<li>Lua: <code>{ SetInputBuffer = &quot;foo&quot; }</code></li>
 <li>YAML: <code>SetInputBuffer: foo</code></li>
 </ul>
 <h4 id="removeinputbufferlastcharacter"><a class="header" href="#removeinputbufferlastcharacter">RemoveInputBufferLastCharacter</a></h4>
 <p>Remove input buffer's last character.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;RemoveInputBufferLastCharacter&quot;</li>
+<li>Lua: <code>&quot;RemoveInputBufferLastCharacter&quot;</code></li>
 <li>YAML: <code>RemoveInputBufferLastCharacter</code></li>
 </ul>
 <h4 id="removeinputbufferlastword"><a class="header" href="#removeinputbufferlastword">RemoveInputBufferLastWord</a></h4>
 <p>Remove input buffer's last word.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;RemoveInputBufferLastWord&quot;</li>
+<li>Lua: <code>&quot;RemoveInputBufferLastWord&quot;</code></li>
 <li>YAML: <code>RemoveInputBufferLastWord</code></li>
 </ul>
 <h4 id="resetinputbuffer"><a class="header" href="#resetinputbuffer">ResetInputBuffer</a></h4>
 <p>Reset the input buffer back to null. It will not show in the UI.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ResetInputBuffer&quot;</li>
+<li>Lua: <code>&quot;ResetInputBuffer&quot;</code></li>
 <li>YAML: <code>ResetInputBuffer</code></li>
 </ul>
 <h3 id="switching-mode"><a class="header" href="#switching-mode">Switching Mode</a></h3>
@@ -2123,7 +2131,7 @@ it will show in the UI.</p>
 <p>Type : { SwitchMode = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchMode = &quot;default&quot; }</li>
+<li>Lua: <code>{ SwitchMode = &quot;default&quot; }</code></li>
 <li>YAML: SwitchMode: default</li>
 </ul>
 <blockquote>
@@ -2137,7 +2145,7 @@ It keeps the input buffer.</p>
 <p>Type: { SwitchModeKeepingInputBuffer = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchModeKeepingInputBuffer = &quot;default&quot; }</li>
+<li>Lua: <code>{ SwitchModeKeepingInputBuffer = &quot;default&quot; }</code></li>
 <li>YAML: <code>SwitchModeKeepingInputBuffer: default</code></li>
 </ul>
 <blockquote>
@@ -2151,7 +2159,7 @@ It clears the input buffer.</p>
 <p>Type: { SwitchModeBuiltin = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchModeBuiltin = &quot;default&quot; }</li>
+<li>Lua: <code>{ SwitchModeBuiltin = &quot;default&quot; }</code></li>
 <li>YAML: <code>SwitchModeBuiltin: default</code></li>
 </ul>
 <h4 id="switchmodebuiltinkeepinginputbuffer"><a class="header" href="#switchmodebuiltinkeepinginputbuffer">SwitchModeBuiltinKeepingInputBuffer</a></h4>
@@ -2160,7 +2168,7 @@ It keeps the input buffer.</p>
 <p>Type: { SwitchModeBuiltinKeepingInputBuffer = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchModeBuiltinKeepingInputBuffer = &quot;default&quot; }</li>
+<li>Lua: <code>{ SwitchModeBuiltinKeepingInputBuffer = &quot;default&quot; }</code></li>
 <li>YAML: <code>SwitchModeBuiltinKeepingInputBuffer: default</code></li>
 </ul>
 <h4 id="switchmodecustom"><a class="header" href="#switchmodecustom">SwitchModeCustom</a></h4>
@@ -2169,7 +2177,7 @@ It clears the input buffer.</p>
 <p>Type: { SwitchModeCustom = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchModeCustom = &quot;my_custom_mode&quot; }</li>
+<li>Lua: <code>{ SwitchModeCustom = &quot;my_custom_mode&quot; }</code></li>
 <li>YAML: <code>SwitchModeCustom: my_custom_mode</code></li>
 </ul>
 <h4 id="switchmodecustomkeepinginputbuffer"><a class="header" href="#switchmodecustomkeepinginputbuffer">SwitchModeCustomKeepingInputBuffer</a></h4>
@@ -2178,7 +2186,7 @@ It keeps the input buffer.</p>
 <p>Type: { SwitchModeCustomKeepingInputBuffer = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchModeCustomKeepingInputBuffer = &quot;my_custom_mode&quot; }</li>
+<li>Lua: <code>{ SwitchModeCustomKeepingInputBuffer = &quot;my_custom_mode&quot; }</code></li>
 <li>YAML: <code>SwitchModeCustomKeepingInputBuffer: my_custom_mode</code></li>
 </ul>
 <h4 id="popmode"><a class="header" href="#popmode">PopMode</a></h4>
@@ -2186,7 +2194,7 @@ It keeps the input buffer.</p>
 It clears the input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;PopMode&quot;</li>
+<li>Lua: <code>&quot;PopMode&quot;</code></li>
 <li>YAML: <code>PopMode</code></li>
 </ul>
 <h4 id="popmodekeepinginputbuffer"><a class="header" href="#popmodekeepinginputbuffer">PopModeKeepingInputBuffer</a></h4>
@@ -2194,7 +2202,7 @@ It clears the input buffer.</p>
 It keeps the input buffer.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: PopModeKeepingInputBuffer</li>
+<li>Lua: <code>PopModeKeepingInputBuffer</code></li>
 <li>YAML: <code>PopModeKeepingInputBuffer</code></li>
 </ul>
 <h3 id="switching-layout"><a class="header" href="#switching-layout">Switching Layout</a></h3>
@@ -2203,7 +2211,7 @@ It keeps the input buffer.</p>
 <p>Type: { SwitchLayout = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchLayout = &quot;default&quot; }</li>
+<li>Lua: <code>{ SwitchLayout = &quot;default&quot; }</code></li>
 <li>YAML: <code>SwitchLayout: default</code></li>
 </ul>
 <blockquote>
@@ -2215,7 +2223,7 @@ It keeps the input buffer.</p>
 <p>Type: { SwitchLayoutBuiltin = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchLayoutBuiltin = &quot;default&quot; }</li>
+<li>Lua: <code>{ SwitchLayoutBuiltin = &quot;default&quot; }</code></li>
 <li>YAML: <code>SwitchLayoutBuiltin: default</code></li>
 </ul>
 <h4 id="switchlayoutcustom"><a class="header" href="#switchlayoutcustom">SwitchLayoutCustom</a></h4>
@@ -2223,7 +2231,7 @@ It keeps the input buffer.</p>
 <p>Type: { SwitchLayoutCustom = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SwitchLayoutCustom = &quot;my_custom_layout&quot; }</li>
+<li>Lua: <code>{ SwitchLayoutCustom = &quot;my_custom_layout&quot; }</code></li>
 <li>YAML: <code>SwitchLayoutCustom: my_custom_layout</code></li>
 </ul>
 <h3 id="executing-commands"><a class="header" href="#executing-commands">Executing Commands</a></h3>
@@ -2236,7 +2244,7 @@ You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
 <p>Type: { Call = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</li>
+<li>Lua: <code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
 <li>YAML: <code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
 </ul>
 <h4 id="callsilently"><a class="header" href="#callsilently">CallSilently</a></h4>
@@ -2254,7 +2262,7 @@ where <code>{string}</code> is the given value.</p>
 <p>Type: { BashExec = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { BashExec = &quot;read -p test&quot; }</li>
+<li>Lua: <code>{ BashExec = &quot;read -p test&quot; }</code></li>
 <li>YAML: <code>BashExec: &quot;read -p test&quot;</code></li>
 </ul>
 <h4 id="bashexecsilently"><a class="header" href="#bashexecsilently">BashExecSilently</a></h4>
@@ -2263,7 +2271,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p>Type: { BashExecSilently = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { BashExecSilently = &quot;tput bell&quot; }</li>
+<li>Lua: <code>{ BashExecSilently = &quot;tput bell&quot; }</code></li>
 <li>YAML: <code>BashExecSilently: &quot;tput bell&quot;</code></li>
 </ul>
 <h3 id="calling-lua-functions"><a class="header" href="#calling-lua-functions">Calling Lua Functions</a></h3>
@@ -2276,7 +2284,7 @@ handle after the executing the function.</p>
 <p>Type: { CallLua = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { CallLua = &quot;custom.some_custom_funtion&quot; }</li>
+<li>Lua: <code>{ CallLua = &quot;custom.some_custom_funtion&quot; }</code></li>
 <li>YAML: <code>CallLua: custom.some_custom_funtion</code></li>
 </ul>
 <h4 id="callluasilently"><a class="header" href="#callluasilently">CallLuaSilently</a></h4>
@@ -2285,7 +2293,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p>Type: { CallLuaSilently = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { CallLuaSilently = &quot;custom.some_custom_function&quot; }</li>
+<li>Lua: <code>{ CallLuaSilently = &quot;custom.some_custom_function&quot; }</code></li>
 <li>YAML: <code>CallLuaSilently: custom.some_custom_function</code></li>
 </ul>
 <h4 id="luaeval"><a class="header" href="#luaeval">LuaEval</a></h4>
@@ -2296,8 +2304,8 @@ argument.</p>
 <p>Type: { LuaEval = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { LuaEval = [[return { { LogInfo = io.read() } }]] }</li>
-<li>Lua: { LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }</li>
+<li>Lua: <code>{ LuaEval = [[return { { LogInfo = io.read() } }]] }</code></li>
+<li>Lua: <code>{ LuaEval = [[function(app) return { { LogInfo = app.pwd } } end]] }</code></li>
 <li>YAML: <code>LuaEval: &quot;return { { LogInfo = io.read() } }&quot;</code></li>
 <li>YAML: <code>LuaEval: &quot;function(app) return { { LogInfo = app.pwd } } end&quot;</code></li>
 </ul>
@@ -2307,7 +2315,7 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p>Type: { LuaEvalSilently = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { LuaEvalSilently = [[return { { LogInfo = &quot;foo&quot; } }]] }</li>
+<li>Lua: <code>{ LuaEvalSilently = [[return { { LogInfo = &quot;foo&quot; } }]] }</code></li>
 <li>YAML: <code>LuaEvalSilently: &quot;return { { LogInfo = 'foo' } }&quot;</code></li>
 </ul>
 <h3 id="select-operations"><a class="header" href="#select-operations">Select Operations</a></h3>
@@ -2315,14 +2323,14 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p>Select the focused node.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;Select&quot;</li>
+<li>Lua: <code>&quot;Select&quot;</code></li>
 <li>YAML: <code>Select</code></li>
 </ul>
 <h4 id="selectall"><a class="header" href="#selectall">SelectAll</a></h4>
 <p>Select all the visible nodes.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;SelectAll&quot;</li>
+<li>Lua: <code>&quot;SelectAll&quot;</code></li>
 <li>YAML: <code>SelectAll</code></li>
 </ul>
 <h4 id="selectpath"><a class="header" href="#selectpath">SelectPath</a></h4>
@@ -2330,21 +2338,21 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p>Type: { SelectPath = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { SelectPath = &quot;/path/to/file&quot; }</li>
+<li>Lua: <code>{ SelectPath = &quot;/path/to/file&quot; }</code></li>
 <li>YAML: <code>SelectPath: /path/to/file</code></li>
 </ul>
 <h4 id="unselect"><a class="header" href="#unselect">UnSelect</a></h4>
 <p>Unselect the focused node.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;UnSelect&quot;</li>
+<li>Lua: <code>&quot;UnSelect&quot;</code></li>
 <li>YAML: <code>UnSelect</code></li>
 </ul>
 <h4 id="unselectall"><a class="header" href="#unselectall">UnSelectAll</a></h4>
 <p>Unselect all the visible nodes.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;UnSelectAll&quot;</li>
+<li>Lua: <code>&quot;UnSelectAll&quot;</code></li>
 <li>YAML: <code>UnSelectAll</code></li>
 </ul>
 <h4 id="unselectpath"><a class="header" href="#unselectpath">UnSelectPath</a></h4>
@@ -2352,21 +2360,21 @@ stderr will be piped to null. So it's non-interactive.</p>
 <p>Type: { UnSelectPath = &quot;string)&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { UnSelectPath = &quot;/path/to/file&quot; }</li>
+<li>Lua: <code>{ UnSelectPath = &quot;/path/to/file&quot; }</code></li>
 <li>YAML: <code>UnSelectPath: /path/to/file</code></li>
 </ul>
 <h4 id="toggleselection"><a class="header" href="#toggleselection">ToggleSelection</a></h4>
 <p>Toggle selection on the focused node.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ToggleSelection&quot;</li>
+<li>Lua: <code>&quot;ToggleSelection&quot;</code></li>
 <li>YAML <code>ToggleSelection</code></li>
 </ul>
 <h4 id="toggleselectall"><a class="header" href="#toggleselectall">ToggleSelectAll</a></h4>
 <p>Toggle between select all and unselect all.
 Example:</p>
 <ul>
-<li>Lua: &quot;ToggleSelectAll&quot;</li>
+<li>Lua: <code>&quot;ToggleSelectAll&quot;</code></li>
 <li>YAML: <code>ToggleSelectAll</code></li>
 </ul>
 <h4 id="toggleselectionbypath"><a class="header" href="#toggleselectionbypath">ToggleSelectionByPath</a></h4>
@@ -2374,14 +2382,14 @@ Example:</p>
 <p>Type: { ToggleSelectionByPath = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { ToggleSelectionByPath = &quot;/path/to/file&quot; }</li>
+<li>Lua: <code>{ ToggleSelectionByPath = &quot;/path/to/file&quot; }</code></li>
 <li>YAML: <code>ToggleSelectionByPath: /path/to/file</code></li>
 </ul>
 <h4 id="clearselection"><a class="header" href="#clearselection">ClearSelection</a></h4>
 <p>Clear the selection.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ClearSelection&quot;</li>
+<li>Lua: <code>&quot;ClearSelection&quot;</code></li>
 <li>YAML: <code>ClearSelection</code></li>
 </ul>
 <h3 id="filter-operations"><a class="header" href="#filter-operations">Filter Operations</a></h3>
@@ -2391,7 +2399,7 @@ while exploring directories.</p>
 <p>Type: { AddNodeFilter = { filter = <a href="https://xplr.dev/en/filtering#filter">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { AddNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</li>
+<li>Lua: <code>{ AddNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></li>
 <li>YAML: <code>AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></li>
 </ul>
 <h4 id="removenodefilter"><a class="header" href="#removenodefilter">RemoveNodeFilter</a></h4>
@@ -2399,7 +2407,7 @@ while exploring directories.</p>
 <p>Type: { RemoveNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { RemoveNodeFilter: { filter: &quot;RelativePathDoesStartWith&quot;, input: &quot;foo&quot; } }</li>
+<li>Lua: <code>{ RemoveNodeFilter: { filter: &quot;RelativePathDoesStartWith&quot;, input: &quot;foo&quot; } }</code></li>
 <li>YAML: <code>RemoveNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></li>
 </ul>
 <h4 id="togglenodefilter"><a class="header" href="#togglenodefilter">ToggleNodeFilter</a></h4>
@@ -2408,7 +2416,7 @@ else, add a it.</p>
 <p>Type: { ToggleNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { ToggleNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</li>
+<li>Lua: <code>{ ToggleNodeFilter = { filter = &quot;RelativePathDoesStartWith&quot;, input = &quot;foo&quot; } }</code></li>
 <li>YAML: <code>ToggleNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></li>
 </ul>
 <h4 id="addnodefilterfrominput"><a class="header" href="#addnodefilterfrominput">AddNodeFilterFromInput</a></h4>
@@ -2417,7 +2425,7 @@ input from the buffer.</p>
 <p>Type: { AddNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { AddNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</li>
+<li>Lua: <code>{ AddNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</code></li>
 <li>YAML: <code>AddNodeFilterFromInput: RelativePathDoesStartWith</code></li>
 </ul>
 <h4 id="removenodefilterfrominput"><a class="header" href="#removenodefilterfrominput">RemoveNodeFilterFromInput</a></h4>
@@ -2426,14 +2434,14 @@ the input from the buffer.</p>
 <p>Type: { RemoveNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { RemoveNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</li>
+<li>Lua: <code>{ RemoveNodeFilterFromInput = &quot;RelativePathDoesStartWith&quot; }</code></li>
 <li>YAML: <code>RemoveNodeFilterFromInput: RelativePathDoesStartWith</code></li>
 </ul>
 <h4 id="removelastnodefilter"><a class="header" href="#removelastnodefilter">RemoveLastNodeFilter</a></h4>
 <p>Remove the last node <a href="https://xplr.dev/en/filtering">filter</a>.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;RemoveLastNodeFilter&quot;</li>
+<li>Lua: <code>&quot;RemoveLastNodeFilter&quot;</code></li>
 <li>YAML: <code>RemoveLastNodeFilter</code></li>
 </ul>
 <h4 id="resetnodefilters"><a class="header" href="#resetnodefilters">ResetNodeFilters</a></h4>
@@ -2441,14 +2449,14 @@ the input from the buffer.</p>
 default configuration.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ResetNodeFilters&quot;</li>
+<li>Lua: <code>&quot;ResetNodeFilters&quot;</code></li>
 <li>YAML: <code>ResetNodeFilters</code></li>
 </ul>
 <h4 id="clearnodefilters"><a class="header" href="#clearnodefilters">ClearNodeFilters</a></h4>
 <p>Clear all the node <a href="https://xplr.dev/en/filtering">filters</a>.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ClearNodeFilters&quot;</li>
+<li>Lua: <code>&quot;ClearNodeFilters&quot;</code></li>
 <li>YAML: <code>ClearNodeFilters</code></li>
 </ul>
 <h3 id="sort-operations"><a class="header" href="#sort-operations">Sort Operations</a></h3>
@@ -2458,7 +2466,7 @@ exploring directories.</p>
 <p>Type: { AddNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { AddNodeSorter = { sorter = &quot;ByRelativePath&quot;, reverse = false } }</li>
+<li>Lua: <code>{ AddNodeSorter = { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></li>
 <li>YAML: <code>AddNodeSorter: { sorter: ByRelativePath, reverse: false }</code></li>
 </ul>
 <h4 id="removenodesorter"><a class="header" href="#removenodesorter">RemoveNodeSorter</a></h4>
@@ -2466,7 +2474,7 @@ exploring directories.</p>
 <p>Type: { RemoveNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { RemoveNodeSorter = &quot;ByRelativePath&quot; }</li>
+<li>Lua: <code>{ RemoveNodeSorter = &quot;ByRelativePath&quot; }</code></li>
 <li>YAML: <code>RemoveNodeSorter: ByRelativePath</code></li>
 </ul>
 <h4 id="reversenodesorter"><a class="header" href="#reversenodesorter">ReverseNodeSorter</a></h4>
@@ -2474,7 +2482,7 @@ exploring directories.</p>
 <p>Type: { ReverseNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { ReverseNodeSorter = &quot;ByRelativePath&quot; }</li>
+<li>Lua: <code>{ ReverseNodeSorter = &quot;ByRelativePath&quot; }</code></li>
 <li>YAML: <code>ReverseNodeSorter: ByRelativePath</code></li>
 </ul>
 <h4 id="togglenodesorter"><a class="header" href="#togglenodesorter">ToggleNodeSorter</a></h4>
@@ -2483,21 +2491,21 @@ else, add a it.</p>
 <p>Type: { ToggleNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { ToggleSorterSorter: { sorter = &quot;ByRelativePath&quot;, reverse = false } }</li>
+<li>Lua: <code>{ ToggleSorterSorter: { sorter = &quot;ByRelativePath&quot;, reverse = false } }</code></li>
 <li>YAML: <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code></li>
 </ul>
 <h4 id="reversenodesorters"><a class="header" href="#reversenodesorters">ReverseNodeSorters</a></h4>
 <p>Reverse the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ReverseNodeSorters&quot;</li>
+<li>Lua: <code>&quot;ReverseNodeSorters&quot;</code></li>
 <li>YAML: <code>ReverseNodeSorters</code></li>
 </ul>
 <h4 id="removelastnodesorter"><a class="header" href="#removelastnodesorter">RemoveLastNodeSorter</a></h4>
 <p>Remove the last node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;RemoveLastNodeSorter&quot;</li>
+<li>Lua: <code>&quot;RemoveLastNodeSorter&quot;</code></li>
 <li>YAML: <code>RemoveLastNodeSorter</code></li>
 </ul>
 <h4 id="resetnodesorters"><a class="header" href="#resetnodesorters">ResetNodeSorters</a></h4>
@@ -2505,14 +2513,14 @@ else, add a it.</p>
 the default configuration.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ResetNodeSorters&quot;</li>
+<li>Lua: <code>&quot;ResetNodeSorters&quot;</code></li>
 <li>YAML: <code>ResetNodeSorters</code></li>
 </ul>
 <h4 id="clearnodesorters"><a class="header" href="#clearnodesorters">ClearNodeSorters</a></h4>
 <p>Clear all the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ClearNodeSorters&quot;</li>
+<li>Lua: <code>&quot;ClearNodeSorters&quot;</code></li>
 <li>YAML: <code>ClearNodeSorters</code></li>
 </ul>
 <h3 id="mouse-operations"><a class="header" href="#mouse-operations">Mouse Operations</a></h3>
@@ -2520,21 +2528,21 @@ the default configuration.</p>
 <p>Enable mouse</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;EnableMouse&quot;</li>
+<li>Lua: <code>&quot;EnableMouse&quot;</code></li>
 <li>YAML: <code>EnableMouse</code></li>
 </ul>
 <h4 id="disablemouse"><a class="header" href="#disablemouse">DisableMouse</a></h4>
 <p>Disable mouse</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;DisableMouse&quot;</li>
+<li>Lua: <code>&quot;DisableMouse&quot;</code></li>
 <li>YAML: <code>DisableMouse</code></li>
 </ul>
 <h4 id="togglemouse"><a class="header" href="#togglemouse">ToggleMouse</a></h4>
 <p>Toggle mouse</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;ToggleMouse&quot;</li>
+<li>Lua: <code>&quot;ToggleMouse&quot;</code></li>
 <li>YAML: <code>ToggleMouse</code></li>
 </ul>
 <h3 id="fifo-operations"><a class="header" href="#fifo-operations">Fifo Operations</a></h3>
@@ -2543,14 +2551,14 @@ the default configuration.</p>
 <p>Type: { StartFifo = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { StartFifo = &quot;/tmp/xplr.fifo }</li>
+<li>Lua: <code>{ StartFifo = &quot;/tmp/xplr.fifo }</code></li>
 <li>YAML: <code>StartFifo: /tmp/xplr.fifo</code></li>
 </ul>
 <h4 id="stopfifo"><a class="header" href="#stopfifo">StopFifo</a></h4>
 <p>Close the active fifo and stop piping.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;StopFifo&quot;</li>
+<li>Lua: <code>&quot;StopFifo&quot;</code></li>
 <li>YAML: <code>StopFifo</code></li>
 </ul>
 <h4 id="togglefifo"><a class="header" href="#togglefifo">ToggleFifo</a></h4>
@@ -2558,7 +2566,7 @@ the default configuration.</p>
 <p>Type: { ToggleFifo = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { ToggleFifo = &quot;/path/to/fifo&quot; }</li>
+<li>Lua: <code>{ ToggleFifo = &quot;/path/to/fifo&quot; }</code></li>
 <li>YAML: <code>ToggleFifo: /path/to/fifo</code></li>
 </ul>
 <h3 id="logging"><a class="header" href="#logging">Logging</a></h3>
@@ -2567,7 +2575,7 @@ the default configuration.</p>
 <p>Type: { LogInfo = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { LogInfo = &quot;launching satellite&quot; }</li>
+<li>Lua: <code>{ LogInfo = &quot;launching satellite&quot; }</code></li>
 <li>YAML: <code>LogInfo: launching satellite</code></li>
 </ul>
 <h4 id="logsuccess"><a class="header" href="#logsuccess">LogSuccess</a></h4>
@@ -2575,7 +2583,7 @@ the default configuration.</p>
 <p>Type: { LogSuccess = &quot;String&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { LogSuccess = &quot;satellite reached destination&quot; }</li>
+<li>Lua: <code>{ LogSuccess = &quot;satellite reached destination&quot; }</code></li>
 <li>YAML: <code>LogSuccess: satellite reached destination</code></li>
 </ul>
 <h4 id="logwarning"><a class="header" href="#logwarning">LogWarning</a></h4>
@@ -2583,7 +2591,7 @@ the default configuration.</p>
 <p>Type: { LogWarning = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { LogWarning = &quot;satellite is heating&quot; }</li>
+<li>Lua: <code>{ LogWarning = &quot;satellite is heating&quot; }</code></li>
 <li>YAML: <code>LogWarning: satellite is heating</code></li>
 </ul>
 <h4 id="logerror"><a class="header" href="#logerror">LogError</a></h4>
@@ -2591,7 +2599,7 @@ the default configuration.</p>
 <p>Type: { LogError = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { LogError = &quot;satellite crashed&quot; }</li>
+<li>Lua: <code>{ LogError = &quot;satellite crashed&quot; }</code></li>
 <li>YAML: <code>LogError: satellite crashed</code></li>
 </ul>
 <h3 id="debugging"><a class="header" href="#debugging">Debugging</a></h3>
@@ -2601,14 +2609,14 @@ for debugging.</p>
 <p>Type: { Debug = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: { Debug = &quot;/path/to/file&quot; }</li>
+<li>Lua: <code>{ Debug = &quot;/path/to/file&quot; }</code></li>
 <li>YAML: <code>Debug: /path/to/file</code></li>
 </ul>
 <h3 id="quit-options"><a class="header" href="#quit-options">Quit Options</a></h3>
 <h4 id="quit"><a class="header" href="#quit">Quit</a></h4>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;Quit&quot;</li>
+<li>Lua: <code>&quot;Quit&quot;</code></li>
 <li>YAML: <code>Quit</code></li>
 </ul>
 <p>Quit with returncode zero (success).</p>
@@ -2616,7 +2624,7 @@ for debugging.</p>
 <p>Print $PWD and quit.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;PrintPwdAndQuit&quot;</li>
+<li>Lua: <code>&quot;PrintPwdAndQuit&quot;</code></li>
 <li>YAML: <code>PrintPwdAndQuit</code></li>
 </ul>
 <h4 id="printfocuspathandquit"><a class="header" href="#printfocuspathandquit">PrintFocusPathAndQuit</a></h4>
@@ -2624,7 +2632,7 @@ for debugging.</p>
 nothing to focus.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;PrintFocusPathAndQuit&quot;</li>
+<li>Lua: <code>&quot;PrintFocusPathAndQuit&quot;</code></li>
 <li>YAML: <code>PrintFocusPathAndQuit</code></li>
 </ul>
 <h4 id="printselectionandquit"><a class="header" href="#printselectionandquit">PrintSelectionAndQuit</a></h4>
@@ -2632,7 +2640,7 @@ nothing to focus.</p>
 selected.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;PrintSelectionAndQuit&quot;</li>
+<li>Lua: <code>&quot;PrintSelectionAndQuit&quot;</code></li>
 <li>YAML: <code>PrintSelectionAndQuit</code></li>
 </ul>
 <h4 id="printresultandquit"><a class="header" href="#printresultandquit">PrintResultAndQuit</a></h4>
@@ -2640,7 +2648,7 @@ selected.</p>
 node's path.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;PrintResultAndQuit&quot;</li>
+<li>Lua: <code>&quot;PrintResultAndQuit&quot;</code></li>
 <li>YAML: <code>PrintResultAndQuit</code></li>
 </ul>
 <h4 id="printappstateandquit"><a class="header" href="#printappstateandquit">PrintAppStateAndQuit</a></h4>
@@ -2648,14 +2656,14 @@ node's path.</p>
 generating the default configuration file.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;PrintAppStateAndQuit&quot;</li>
+<li>Lua: <code>&quot;PrintAppStateAndQuit&quot;</code></li>
 <li>YAML: <code>PrintAppStateAndQuit</code></li>
 </ul>
 <h4 id="terminate"><a class="header" href="#terminate">Terminate</a></h4>
 <p>Terminate the application with a non-zero return code.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: &quot;Terminate&quot;</li>
+<li>Lua: <code>&quot;Terminate&quot;</code></li>
 <li>YAML: <code>Terminate</code></li>
 </ul>
 <h2 id="also-see-4"><a class="header" href="#also-see-4">Also See:</a></h2>
@@ -3325,7 +3333,7 @@ called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a
 </ul>
 <h4 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h4>
 <p><code>XPLR_PIPE_*_OUT</code> are the output pipes that contain data which cannot be
-exposed directly via environment variables, like multi-line strings. 
+exposed directly via environment variables, like multi-line strings.
 These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.</p>
 <ul>
 <li><a href="environment-variables-and-pipes.html#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></li>
@@ -3719,9 +3727,9 @@ git clone https://github.com/sayanarijit/material-landscape2.xplr ~/.config/xplr
 <pre><code class="language-lua">package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
 package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
 </code></pre>
+<p>Now you can install packages using luarocks. Be sure to append <code>--lua-version</code>.</p>
 </li>
 </ul>
-<p>Now you can install packages using luarocks. Be sure to append <code>--lua-version</code>.</p>
 <p>Example:</p>
 <pre><code class="language-bash">luarocks install luafilesystem --local --lua-version 5.1
 </code></pre>

@@ -173,31 +173,44 @@
 </code></pre>
 <p>A layout can be one of the following:</p>
 <ul>
-<li><a href="#nothing">&quot;Nothing&quot;</a></li>
-<li><a href="#table">&quot;Table&quot;</a></li>
-<li><a href="#inputandlogs">&quot;InputAndLogs&quot;</a></li>
-<li><a href="#selection">&quot;Selection&quot;</a></li>
-<li><a href="#helpmenu">&quot;HelpMenu&quot;</a></li>
-<li><a href="#sortandfilter">&quot;SortAndFilter&quot;</a></li>
-<li>{ <a href="#custom-content">CustomContent</a> = { <a href="#title">title</a>, <a href="#body">body</a> }</li>
-<li>{ <a href="#horizontal">Horizontal</a> = { <a href="#layout-config">config</a>, <a href="#splits">splits</a> }</li>
-<li>{ <a href="#vertical">Vertical</a> = { <a href="#layout-config">config</a>, <a href="#splits">splits</a> }</li>
+<li><a href="#nothing">Nothing</a></li>
+<li><a href="#table">Table</a></li>
+<li><a href="#inputandlogs">InputAndLogs</a></li>
+<li><a href="#selection">Selection</a></li>
+<li><a href="#helpmenu">HelpMenu</a></li>
+<li><a href="#sortandfilter">SortAndFilter</a></li>
+<li><a href="#custom-content">CustomContent</a></li>
+<li><a href="#horizontal">Horizontal</a></li>
+<li><a href="#vertical">Vertical</a></li>
 </ul>
 <h3 id="nothing"><a class="header" href="#nothing">Nothing</a></h3>
 <p>This layout contains a blank panel.</p>
+<p>Example: &quot;Nothing&quot;</p>
 <h3 id="table"><a class="header" href="#table">Table</a></h3>
 <p>This layout contains the table displaying the files and directories in the
 current directory.</p>
 <h3 id="inputandlogs"><a class="header" href="#inputandlogs">InputAndLogs</a></h3>
 <p>This layout contains the panel displaying the input prompt and logs.</p>
+<p>Example: &quot;InputAndLogs&quot;</p>
 <h3 id="selection"><a class="header" href="#selection">Selection</a></h3>
 <p>This layout contains the panel displaying the selected paths.</p>
+<p>Example: &quot;Selection&quot;</p>
 <h3 id="helpmenu"><a class="header" href="#helpmenu">HelpMenu</a></h3>
 <p>This layout contains the panel displaying the help menu for the current mode in
 real-time.</p>
+<p>Example: &quot;HelpMenu&quot;</p>
 <h3 id="sortandfilter"><a class="header" href="#sortandfilter">SortAndFilter</a></h3>
 <p>This layout contains the panel displaying the pipeline of sorters and filters
 applied of the list of paths being displayed.</p>
+<p>Example: &quot;SortAndFilter&quot;</p>
+<h3 id="custom-content"><a class="header" href="#custom-content">Custom Content</a></h3>
+<p>Custom content is a special layout to render something custom.
+It contains the following information:</p>
+<ul>
+<li><a href="#title">title</a></li>
+<li><a href="#body">body</a></li>
+</ul>
+<p>Example: { CustomContent = { title = <a href="#title">title</a>, body = <a href="#body">body</a> }</p>
 <h3 id="horizontal"><a class="header" href="#horizontal">Horizontal</a></h3>
 <p>This is a special layout that splits the panel into two horizontal parts.</p>
 <p>It contains the following information:</p>
@@ -205,6 +218,7 @@ applied of the list of paths being displayed.</p>
 <li><a href="#layout-config">config</a></li>
 <li><a href="#splits">splits</a></li>
 </ul>
+<p>Example: { Horizontal = { config = <a href="#layout-config">config</a>, splits = <a href="#splits">splits</a> }</p>
 <h3 id="vertical"><a class="header" href="#vertical">Vertical</a></h3>
 <p>This is a special layout that splits the panel into two vertical parts.</p>
 <p>It contains the following information:</p>
@@ -212,6 +226,7 @@ applied of the list of paths being displayed.</p>
 <li><a href="#layout-config">config</a></li>
 <li><a href="#splits">splits</a></li>
 </ul>
+<p>Example: { Vertical = { config = <a href="#layout-config">config</a>, splits = <a href="#splits">splits</a> }</p>
 <h2 id="layout-config"><a class="header" href="#layout-config">Layout Config</a></h2>
 <p>A layout config contains the following information:</p>
 <ul>
@@ -257,17 +272,10 @@ applied of the list of paths being displayed.</p>
 <h2 id="splits"><a class="header" href="#splits">splits</a></h2>
 <p>Type: list of <a href="#layout">Layout</a></p>
 <p>The list of child layouts to fit into the parent layout.</p>
-<h2 id="custom-content"><a class="header" href="#custom-content">Custom Content</a></h2>
-<p>Custom content is a special layout to render something custom.
-It contains the following information:</p>
-<ul>
-<li><a href="#title">title</a></li>
-<li><a href="#body">body</a></li>
-</ul>
-<h3 id="title"><a class="header" href="#title">title</a></h3>
+<h2 id="title"><a class="header" href="#title">title</a></h2>
 <p>Type: nullable string</p>
 <p>The title of the panel.</p>
-<h3 id="body"><a class="header" href="#body">body</a></h3>
+<h2 id="body"><a class="header" href="#body">body</a></h2>
 <p>Type: <a href="#content-body">Content Body</a></p>
 <p>The body of the panel.</p>
 <h2 id="content-body"><a class="header" href="#content-body">Content Body</a></h2>
@@ -280,7 +288,7 @@ It contains the following information:</p>
 <li><a href="#static-table">StaticTable</a></li>
 <li><a href="#dynamic-table">DynamicTable</a></li>
 </ul>
-<h3 id="static-paragraph"><a class="header" href="#static-paragraph">Static Paragraph</a></h3>
+<h2 id="static-paragraph"><a class="header" href="#static-paragraph">Static Paragraph</a></h2>
 <p>A paragraph to render. It contains the following fields:</p>
 <ul>
 <li><strong>render</strong> (string): The string to render.</li>
@@ -295,7 +303,7 @@ It contains the following information:</p>
   },
 }
 </code></pre>
-<h3 id="dynamic-paragraph"><a class="header" href="#dynamic-paragraph">Dynamic Paragraph</a></h3>
+<h2 id="dynamic-paragraph"><a class="header" href="#dynamic-paragraph">Dynamic Paragraph</a></h2>
 <p>A <a href="#content-renderer">Lua function</a> to render a custom paragraph.
 It contains the following fields:</p>
 <ul>
@@ -314,7 +322,7 @@ xplr.fn.custom.render_layout = function(ctx)
   return ctx.app.pwd
 end
 </code></pre>
-<h3 id="static-list"><a class="header" href="#static-list">Static List</a></h3>
+<h2 id="static-list"><a class="header" href="#static-list">Static List</a></h2>
 <p>A list to render. It contains the following fields:</p>
 <ul>
 <li><strong>render</strong> (list of string): The list to render.</li>
@@ -329,7 +337,7 @@ end
   },
 }
 </code></pre>
-<h3 id="dynamic-list"><a class="header" href="#dynamic-list">Dynamic List</a></h3>
+<h2 id="dynamic-list"><a class="header" href="#dynamic-list">Dynamic List</a></h2>
 <p>A <a href="#content-renderer">Lua function</a> to render a custom list.
 It contains the following fields:</p>
 <ul>
@@ -351,7 +359,7 @@ xplr.fn.custom.render_layout = function(ctx)
   }
 end
 </code></pre>
-<h3 id="static-table"><a class="header" href="#static-table">Static Table</a></h3>
+<h2 id="static-table"><a class="header" href="#static-table">Static Table</a></h2>
 <p>A table to render. It contains the following fields:</p>
 <ul>
 <li><strong>widths</strong> (list of <a href="#constraint">Constraint</a>): Width of the columns.</li>
@@ -378,7 +386,7 @@ end
   },
 }
 </code></pre>
-<h3 id="dynamic-table"><a class="header" href="#dynamic-table">Dynamic Table</a></h3>
+<h2 id="dynamic-table"><a class="header" href="#dynamic-table">Dynamic Table</a></h2>
 <p>A <a href="#content-renderer">Lua function</a> to render a custom table.
 It contains the following fields:</p>
 <ul>
