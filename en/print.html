@@ -3668,6 +3668,61 @@ xplr.config.modes.custom.bookmark = {
 }
 </code></pre>
 </details>
+<h3 id="image-viewer-imv"><a class="header" href="#image-viewer-imv">Image viewer (imv)</a></h3>
+<p>Preview images using <a href="https://sr.ht/%7Eexec64/imv">imv</a>.</p>
+<details>
+<summary>Expand for details</summary>
+<ul>
+<li>Author: <a href="https://github.com/sayanarijit">@sayanarijit</a></li>
+<li>Requires: <a href="https://sr.ht/%7Eexec64/imv">imv</a>, <a href="https://www.semicomplete.com/projects/xdotool">xdotool</a></li>
+<li>Tested on: Linux</li>
+</ul>
+<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.P = {
+  help = &quot;preview&quot;,
+  messages = {
+    {
+      BashExecSilently = [===[
+        FIFO_PATH=&quot;/tmp/xplr.fifo&quot;
+
+        if [ -e &quot;$FIFO_PATH&quot; ]; then
+          echo StopFifo &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;
+          rm &quot;$FIFO_PATH&quot;
+        else
+          mkfifo &quot;$FIFO_PATH&quot;
+          &quot;$HOME/.local/bin/imv-open.sh&quot; &quot;$FIFO_PATH&quot; &quot;$XPLR_FOCUS_PATH&quot; &amp;
+          echo &quot;StartFifo: '$FIFO_PATH'&quot; &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;
+        fi
+      ]===],
+    },
+  },
+}
+</code></pre>
+<p>$HOME/.local/bin/imv-open.sh</p>
+<pre><code class="language-bash">#!/usr/bin/env bash
+
+FIFO_PATH=&quot;$1&quot;
+IMAGE=&quot;$2&quot;
+MAINWINDOW=&quot;$(xdotool getactivewindow)&quot;
+IMV_PID=&quot;$(pgrep imv)&quot;
+
+if [ ! &quot;$IMV_PID&quot; ]; then
+  imv &quot;$IMAGE&quot; &amp;
+  IMV_PID=$!
+fi
+
+sleep 0.5
+
+xdotool windowactivate &quot;$MAINWINDOW&quot;
+
+while read -r path; do
+  imv-msg &quot;$IMV_PID&quot; close all
+  imv-msg &quot;$IMV_PID&quot; open &quot;$path&quot;
+done &lt; &quot;$FIFO_PATH&quot;
+
+imv-msg &quot;$IMV_PID&quot; quit
+[ -e &quot;$FIFO_PATH&quot; ] &amp;&amp; rm -f &quot;$FIFO_PATH&quot;
+</code></pre>
+</details>
 <h2 id="also-see-6"><a class="header" href="#also-see-6">Also See:</a></h2>
 <ul>
 <li><a href="awesome-plugins.html">Awesome Plugins</a></li>
