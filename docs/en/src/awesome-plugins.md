@@ -10,6 +10,7 @@ of the following plugins work for you, it's very easy to
 - [**igorepst/context-switch.xplr**][42] Context switch plugin for xplr.
 - [**sayanarijit/dual-pane.xplr**][43] Implements support for dual-pane navigation into xplr.
 - [**sayanarijit/map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
+- [**sayanarijit/registers.xplr**][49] Use multiple registers to store the selected paths.
 - [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 - [**igorepst/term.xplr**][39] Terminal integration for xplr
@@ -96,3 +97,4 @@ of the following plugins work for you, it's very easy to
 [46]: awesome-integrations.md
 [47]: https://github.com/dtomvan/xpm.xplr
 [48]: installing-plugins.md
+[49]: https://github.com/sayanarijit/registers.xplr
