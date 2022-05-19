@@ -321,6 +321,69 @@ xplr.config.modes.builtin.default.key_bindings.on_key.S = {
 
 </details>
 
+### Image viewer (imv)
+
+Preview images using [imv][17].
+
+<details>
+<summary>Expand for details</summary>
+
+- Author: [@sayanarijit][8]
+- Requires: [imv][17], [xdotool][18]
+- Tested on: Linux
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key.P = {
+  help = "preview",
+  messages = {
+    {
+      BashExecSilently = [===[
+        FIFO_PATH="/tmp/xplr.fifo"
+
+        if [ -e "$FIFO_PATH" ]; then
+          echo StopFifo >> "$XPLR_PIPE_MSG_IN"
+          rm "$FIFO_PATH"
+        else
+          mkfifo "$FIFO_PATH"
+          "$HOME/.local/bin/imv-open.sh" "$FIFO_PATH" "$XPLR_FOCUS_PATH" &
+          echo "StartFifo: '$FIFO_PATH'" >> "$XPLR_PIPE_MSG_IN"
+        fi
+      ]===],
+    },
+  },
+}
+```
+
+$HOME/.local/bin/imv-open.sh
+
+```bash
+#!/usr/bin/env bash
+
+FIFO_PATH="$1"
+IMAGE="$2"
+MAINWINDOW="$(xdotool getactivewindow)"
+IMV_PID="$(pgrep imv)"
+
+if [ ! "$IMV_PID" ]; then
+  imv "$IMAGE" &
+  IMV_PID=$!
+fi
+
+sleep 0.5
+
+xdotool windowactivate "$MAINWINDOW"
+
+while read -r path; do
+  imv-msg "$IMV_PID" close all
+  imv-msg "$IMV_PID" open "$path"
+done < "$FIFO_PATH"
+
+imv-msg "$IMV_PID" quit
+[ -e "$FIFO_PATH" ] && rm -f "$FIFO_PATH"
+```
+
+</details>
+
 ## Also See:
 
 - [Awesome Plugins][15]
@@ -342,3 +405,5 @@ xplr.config.modes.builtin.default.key_bindings.on_key.S = {
 [14]: https://github.com/weihanglo/sfz
 [15]: awesome-plugins.md
 [16]: awesome-integrations.md
+[17]: https://sr.ht/~exec64/imv
+[18]: https://www.semicomplete.com/projects/xdotool
