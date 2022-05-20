@@ -2006,7 +2006,7 @@ xplr.config.modes.builtin.search = {
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Enter",
-          { SetInputBuffer = "" },
+          { SetInputBuffer = "(?i)" },
           "ExplorePwdAsync",
         },
       },
@@ -2015,7 +2015,7 @@ xplr.config.modes.builtin.search = {
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Back",
-          { SetInputBuffer = "" },
+          { SetInputBuffer = "(?i)" },
           "ExplorePwdAsync",
         },
       },
