@@ -80,6 +80,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
         .env(
             "XPLR_INPUT_BUFFER",
             app.input
+                .buffer
                 .as_ref()
                 .map(|i| i.value().to_string())
                 .unwrap_or_default(),

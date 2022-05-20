@@ -277,6 +277,17 @@ YAML: `FollowSymlink`
 
 ### Reading Input
 
+#### SetInputPrompt
+
+Set the input prompt temporarily, until the input buffer is reset.
+
+Type: { SetInputPrompt = { format = nullable string }
+
+Example:
+
+- Lua: `{ SetInputPrompt = "→" }`
+- YAML: `SetInputPrompt: →`
+
 #### UpdateInputBuffer
 
 Update the input buffer using cursor based operations.

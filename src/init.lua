@@ -403,30 +403,6 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
 --   * format: nullable string
 --   * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.sort_and_filter_ui.filter_identifiers = {
-  AbsolutePathDoesContain = { format = "abs=~", style = {} },
-  AbsolutePathDoesEndWith = { format = "abs=$", style = {} },
-  AbsolutePathDoesNotContain = { format = "abs!~", style = {} },
-  AbsolutePathDoesNotEndWith = { format = "abs!$", style = {} },
-  AbsolutePathDoesNotStartWith = { format = "abs!^", style = {} },
-  AbsolutePathDoesStartWith = { format = "abs=^", style = {} },
-  AbsolutePathIs = { format = "abs==", style = {} },
-  AbsolutePathIsNot = { format = "abs!=", style = {} },
-  IAbsolutePathDoesContain = { format = "[i]abs=~", style = {} },
-  IAbsolutePathDoesEndWith = { format = "[i]abs=$", style = {} },
-  IAbsolutePathDoesNotContain = { format = "[i]abs!~", style = {} },
-  IAbsolutePathDoesNotEndWith = { format = "[i]abs!$", style = {} },
-  IAbsolutePathDoesNotStartWith = { format = "[i]abs!^", style = {} },
-  IAbsolutePathDoesStartWith = { format = "[i]abs=^", style = {} },
-  IAbsolutePathIs = { format = "[i]abs==", style = {} },
-  IAbsolutePathIsNot = { format = "[i]abs!=", style = {} },
-  IRelativePathDoesContain = { format = "[i]rel=~", style = {} },
-  IRelativePathDoesEndWith = { format = "[i]rel=$", style = {} },
-  IRelativePathDoesNotContain = { format = "[i]rel!~", style = {} },
-  IRelativePathDoesNotEndWith = { format = "[i]rel!$", style = {} },
-  IRelativePathDoesNotStartWith = { format = "[i]rel!^", style = {} },
-  IRelativePathDoesStartWith = { format = "[i]rel=^", style = {} },
-  IRelativePathIs = { format = "[i]rel==", style = {} },
-  IRelativePathIsNot = { format = "[i]rel!=", style = {} },
   RelativePathDoesContain = { format = "rel=~", style = {} },
   RelativePathDoesEndWith = { format = "rel=$", style = {} },
   RelativePathDoesNotContain = { format = "rel!~", style = {} },
@@ -435,6 +411,41 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
   RelativePathDoesStartWith = { format = "rel=^", style = {} },
   RelativePathIs = { format = "rel==", style = {} },
   RelativePathIsNot = { format = "rel!=", style = {} },
+  RelativePathDoesMatchRegex = { format = "rel=/", style = {} },
+  RelativePathDoesNotMatchRegex = { format = "rel!/", style = {} },
+
+  IRelativePathDoesContain = { format = "[i]rel=~", style = {} },
+  IRelativePathDoesEndWith = { format = "[i]rel=$", style = {} },
+  IRelativePathDoesNotContain = { format = "[i]rel!~", style = {} },
+  IRelativePathDoesNotEndWith = { format = "[i]rel!$", style = {} },
+  IRelativePathDoesNotStartWith = { format = "[i]rel!^", style = {} },
+  IRelativePathDoesStartWith = { format = "[i]rel=^", style = {} },
+  IRelativePathIs = { format = "[i]rel==", style = {} },
+  IRelativePathIsNot = { format = "[i]rel!=", style = {} },
+  IRelativePathDoesMatchRegex = { format = "[i]rel=/", style = {} },
+  IRelativePathDoesNotMatchRegex = { format = "[i]rel!/", style = {} },
+
+  AbsolutePathDoesContain = { format = "abs=~", style = {} },
+  AbsolutePathDoesEndWith = { format = "abs=$", style = {} },
+  AbsolutePathDoesNotContain = { format = "abs!~", style = {} },
+  AbsolutePathDoesNotEndWith = { format = "abs!$", style = {} },
+  AbsolutePathDoesNotStartWith = { format = "abs!^", style = {} },
+  AbsolutePathDoesStartWith = { format = "abs=^", style = {} },
+  AbsolutePathIs = { format = "abs==", style = {} },
+  AbsolutePathIsNot = { format = "abs!=", style = {} },
+  AbsolutePathDoesMatchRegex = { format = "abs=/", style = {} },
+  AbsolutePathDoesNotMatchRegex = { format = "abs!/", style = {} },
+
+  IAbsolutePathDoesContain = { format = "[i]abs=~", style = {} },
+  IAbsolutePathDoesEndWith = { format = "[i]abs=$", style = {} },
+  IAbsolutePathDoesNotContain = { format = "[i]abs!~", style = {} },
+  IAbsolutePathDoesNotEndWith = { format = "[i]abs!$", style = {} },
+  IAbsolutePathDoesNotStartWith = { format = "[i]abs!^", style = {} },
+  IAbsolutePathDoesStartWith = { format = "[i]abs=^", style = {} },
+  IAbsolutePathIs = { format = "[i]abs==", style = {} },
+  IAbsolutePathIsNot = { format = "[i]abs!=", style = {} },
+  IAbsolutePathDoesMatchRegex = { format = "[i]abs=/", style = {} },
+  IAbsolutePathDoesNotMatchRegex = { format = "[i]abs!/", style = {} },
 }
 
 -- The content for panel title by default.
@@ -1016,7 +1027,8 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "search" },
-          { SetInputBuffer = "" },
+          { SetInputPrompt = "/" },
+          { SetInputBuffer = "(?i)" },
           "ExplorePwdAsync",
         },
       },
@@ -1984,7 +1996,7 @@ xplr.config.modes.builtin.search = {
       enter = {
         help = "focus",
         messages = {
-          { RemoveNodeFilterFromInput = "IRelativePathDoesContain" },
+          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "PopMode",
           "ExplorePwdAsync",
         },
@@ -1992,7 +2004,7 @@ xplr.config.modes.builtin.search = {
       right = {
         help = "enter",
         messages = {
-          { RemoveNodeFilterFromInput = "IRelativePathDoesContain" },
+          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Enter",
           { SetInputBuffer = "" },
           "ExplorePwdAsync",
@@ -2001,7 +2013,7 @@ xplr.config.modes.builtin.search = {
       left = {
         help = "back",
         messages = {
-          { RemoveNodeFilterFromInput = "IRelativePathDoesContain" },
+          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Back",
           { SetInputBuffer = "" },
           "ExplorePwdAsync",
@@ -2023,9 +2035,9 @@ xplr.config.modes.builtin.search = {
     },
     default = {
       messages = {
-        { RemoveNodeFilterFromInput = "IRelativePathDoesContain" },
+        { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
         "UpdateInputBufferFromKey",
-        { AddNodeFilterFromInput = "IRelativePathDoesContain" },
+        { AddNodeFilterFromInput = "RelativePathDoesMatchRegex" },
         "ExplorePwdAsync",
       },
     },
@@ -2046,19 +2058,34 @@ xplr.config.modes.builtin.filter = {
   name = "filter",
   key_bindings = {
     on_key = {
-      ["R"] = {
-        help = "relative does not contain",
+      ["r"] = {
+        help = "relative path does match regex",
         messages = {
-          { SwitchModeBuiltin = "relative_path_does_not_contain" },
+          { SwitchModeBuiltin = "relative_path_does_match_regex" },
+          {
+            SetInputPrompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesMatchRegex.format,
+          },
           { SetInputBuffer = "" },
-          { AddNodeFilterFromInput = "IRelativePathDoesNotContain" },
+          { AddNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "ExplorePwdAsync",
         },
       },
-      ["ctrl-c"] = {
-        help = "terminate",
+      ["R"] = {
+        help = "relative path does not match regex",
         messages = {
-          "Terminate",
+          { SwitchModeBuiltin = "relative_path_does_not_match_regex" },
+          {
+            SetInputPrompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesNotMatchRegex.format,
+          },
+          { SetInputBuffer = "" },
+          { AddNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
+          "ExplorePwdAsync",
+        },
+      },
+      enter = {
+        help = "done",
+        messages = {
+          "PopMode",
         },
       },
       ["ctrl-r"] = {
@@ -2075,19 +2102,10 @@ xplr.config.modes.builtin.filter = {
           "ExplorePwdAsync",
         },
       },
-      enter = {
-        help = "done",
+      ["ctrl-c"] = {
+        help = "terminate",
         messages = {
-          "PopMode",
-        },
-      },
-      ["r"] = {
-        help = "relative does contain",
-        messages = {
-          { SwitchModeBuiltin = "relative_path_does_contain" },
-          { SetInputBuffer = "" },
-          { AddNodeFilterFromInput = "IRelativePathDoesContain" },
-          "ExplorePwdAsync",
+          "Terminate",
         },
       },
     },
@@ -2097,11 +2115,11 @@ xplr.config.modes.builtin.filter = {
 xplr.config.modes.builtin.filter.key_bindings.on_key["esc"] =
   xplr.config.modes.builtin.filter.key_bindings.on_key.enter
 
--- The builtin relative_path_does_contain mode.
+-- The builtin relative_path_does_match_regex mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
-xplr.config.modes.builtin.relative_path_does_contain = {
-  name = "relative path does contain",
+xplr.config.modes.builtin.relative_path_does_match_regex = {
+  name = "relative path does match regex",
   key_bindings = {
     on_key = {
       ["ctrl-c"] = {
@@ -2119,7 +2137,7 @@ xplr.config.modes.builtin.relative_path_does_contain = {
       esc = {
         help = "cancel",
         messages = {
-          { RemoveNodeFilterFromInput = "IRelativePathDoesContain" },
+          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "PopMode",
           "ExplorePwdAsync",
         },
@@ -2127,20 +2145,20 @@ xplr.config.modes.builtin.relative_path_does_contain = {
     },
     default = {
       messages = {
-        { RemoveNodeFilterFromInput = "IRelativePathDoesContain" },
+        { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
         "UpdateInputBufferFromKey",
-        { AddNodeFilterFromInput = "IRelativePathDoesContain" },
+        { AddNodeFilterFromInput = "RelativePathDoesMatchRegex" },
         "ExplorePwdAsync",
       },
     },
   },
 }
 
--- The builtin relative_path_does_not_contain mode.
+-- The builtin relative_path_does_not_match_regex mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
-xplr.config.modes.builtin.relative_path_does_not_contain = {
-  name = "relative path does not contain",
+xplr.config.modes.builtin.relative_path_does_not_match_regex = {
+  name = "relative path does not match regex",
   key_bindings = {
     on_key = {
       ["ctrl-c"] = {
@@ -2158,7 +2176,7 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
       esc = {
         help = "cancel",
         messages = {
-          { RemoveNodeFilterFromInput = "IRelativePathDoesNotContain" },
+          { RemoveNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
           "PopMode",
           "ExplorePwdAsync",
         },
@@ -2166,9 +2184,9 @@ xplr.config.modes.builtin.relative_path_does_not_contain = {
     },
     default = {
       messages = {
-        { RemoveNodeFilterFromInput = "IRelativePathDoesNotContain" },
+        { RemoveNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
         "UpdateInputBufferFromKey",
-        { AddNodeFilterFromInput = "IRelativePathDoesNotContain" },
+        { AddNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
         "ExplorePwdAsync",
       },
     },

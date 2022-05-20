@@ -107,15 +107,15 @@ The builtin filter mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
-#### xplr.config.modes.builtin.relative_path_does_contain
+#### xplr.config.modes.builtin.relative_path_does_match_regex
 
-The builtin relative_path_does_contain mode.
+The builtin relative_path_does_match_regex mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
-#### xplr.config.modes.builtin.relative_path_does_not_contain
+#### xplr.config.modes.builtin.relative_path_does_not_match_regex
 
-The builtin relative_path_does_not_contain mode.
+The builtin relative_path_does_not_match_regex mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
