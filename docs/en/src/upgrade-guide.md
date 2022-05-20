@@ -356,3 +356,4 @@ Else do the following:
 [43]: https://github.com/sayanarijit/xplr/releases/tag/v0.15.2
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
+[46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
