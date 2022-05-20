@@ -1210,14 +1210,32 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>esc</td><td></td><td>escape</td></tr>
 </tbody></table>
-<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
+<h3 id="selection-ops"><a class="header" href="#selection-ops">selection ops</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>R</td><td></td><td>relative path does not match regex</td></tr>
+<tr><td>c</td><td></td><td>copy here</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
-<tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
-<tr><td>enter</td><td>esc</td><td>done</td></tr>
-<tr><td>r</td><td></td><td>relative path does match regex</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>m</td><td></td><td>move here</td></tr>
+<tr><td>x</td><td></td><td>open in gui</td></tr>
+</tbody></table>
+<h3 id="create"><a class="header" href="#create">create</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>d</td><td></td><td>create directory</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>create file</td></tr>
+</tbody></table>
+<h3 id="create-directory"><a class="header" href="#create-directory">create directory</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>create directory</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="create-file"><a class="header" href="#create-file">create file</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>create file</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
 <h3 id="number"><a class="header" href="#number">number</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -1235,56 +1253,6 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>f</td><td></td><td>follow symlink</td></tr>
 <tr><td>g</td><td></td><td>top</td></tr>
 <tr><td>x</td><td></td><td>open in gui</td></tr>
-</tbody></table>
-<h3 id="search"><a class="header" href="#search">search</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
-<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
-<tr><td>enter</td><td>esc</td><td>focus</td></tr>
-<tr><td>left</td><td></td><td>back</td></tr>
-<tr><td>right</td><td></td><td>enter</td></tr>
-<tr><td>tab</td><td></td><td>toggle selection</td></tr>
-</tbody></table>
-<h3 id="selection-ops"><a class="header" href="#selection-ops">selection ops</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>c</td><td></td><td>copy here</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>m</td><td></td><td>move here</td></tr>
-<tr><td>x</td><td></td><td>open in gui</td></tr>
-</tbody></table>
-<h3 id="action-to"><a class="header" href="#action-to">action to</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>!</td><td></td><td>shell</td></tr>
-<tr><td>c</td><td></td><td>create</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>e</td><td></td><td>open in editor</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>l</td><td></td><td>logs</td></tr>
-<tr><td>m</td><td></td><td>toggle mouse</td></tr>
-<tr><td>q</td><td></td><td>quit options</td></tr>
-<tr><td>s</td><td></td><td>selection operations</td></tr>
-<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
-</tbody></table>
-<h3 id="create"><a class="header" href="#create">create</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>d</td><td></td><td>create directory</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>f</td><td></td><td>create file</td></tr>
-</tbody></table>
-<h3 id="create-file"><a class="header" href="#create-file">create file</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>create file</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-</tbody></table>
-<h3 id="create-directory"><a class="header" href="#create-directory">create directory</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>create directory</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
 <h3 id="rename"><a class="header" href="#rename">rename</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -1305,28 +1273,33 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>d</td><td></td><td>delete</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
-<h3 id="sort"><a class="header" href="#sort">sort</a></h3>
+<h3 id="action-to"><a class="header" href="#action-to">action to</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>!</td><td></td><td>reverse sorters</td></tr>
-<tr><td>E</td><td></td><td>by canonical extension reverse</td></tr>
-<tr><td>M</td><td></td><td>by canonical mime essence reverse</td></tr>
-<tr><td>N</td><td></td><td>by node type reverse</td></tr>
-<tr><td>R</td><td></td><td>by relative path reverse</td></tr>
-<tr><td>S</td><td></td><td>by size reverse</td></tr>
-<tr><td>backspace</td><td></td><td>remove last sorter</td></tr>
+<tr><td>!</td><td></td><td>shell</td></tr>
+<tr><td>c</td><td></td><td>create</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-r</td><td></td><td>reset sorters</td></tr>
-<tr><td>ctrl-u</td><td></td><td>clear sorters</td></tr>
-<tr><td>e</td><td></td><td>by canonical extension</td></tr>
-<tr><td>enter</td><td>esc</td><td>done</td></tr>
-<tr><td>m</td><td></td><td>by canonical mime essence</td></tr>
-<tr><td>n</td><td></td><td>by node type</td></tr>
-<tr><td>r</td><td></td><td>by relative path</td></tr>
-<tr><td>s</td><td></td><td>by size</td></tr>
+<tr><td>e</td><td></td><td>open in editor</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>l</td><td></td><td>logs</td></tr>
+<tr><td>m</td><td></td><td>toggle mouse</td></tr>
+<tr><td>q</td><td></td><td>quit options</td></tr>
+<tr><td>s</td><td></td><td>selection operations</td></tr>
+<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
 </tbody></table>
-<h3 id="filter-1"><a class="header" href="#filter-1">filter</a></h3>
+<h3 id="search"><a class="header" href="#search">search</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
+<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
+<tr><td>enter</td><td>esc</td><td>focus</td></tr>
+<tr><td>left</td><td></td><td>back</td></tr>
+<tr><td>right</td><td></td><td>enter</td></tr>
+<tr><td>tab</td><td></td><td>toggle selection</td></tr>
+</tbody></table>
+<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>R</td><td></td><td>relative path does not match regex</td></tr>
+<tr><td>backspace</td><td></td><td>remove last filter</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
 <tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
@@ -1345,6 +1318,29 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>enter</td><td></td><td>apply filter</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
+<h3 id="sort"><a class="header" href="#sort">sort</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>!</td><td></td><td>reverse sorters</td></tr>
+<tr><td>C</td><td></td><td>by created reverse</td></tr>
+<tr><td>E</td><td></td><td>by canonical extension reverse</td></tr>
+<tr><td>L</td><td></td><td>by last modified reverse</td></tr>
+<tr><td>M</td><td></td><td>by canonical mime essence reverse</td></tr>
+<tr><td>N</td><td></td><td>by node type reverse</td></tr>
+<tr><td>R</td><td></td><td>by relative path reverse</td></tr>
+<tr><td>S</td><td></td><td>by size reverse</td></tr>
+<tr><td>backspace</td><td></td><td>remove last sorter</td></tr>
+<tr><td>c</td><td></td><td>by created</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset sorters</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear sorters</td></tr>
+<tr><td>e</td><td></td><td>by canonical extension</td></tr>
+<tr><td>enter</td><td>esc</td><td>done</td></tr>
+<tr><td>l</td><td></td><td>by last modified</td></tr>
+<tr><td>m</td><td></td><td>by canonical mime essence</td></tr>
+<tr><td>n</td><td></td><td>by node type</td></tr>
+<tr><td>r</td><td></td><td>by relative path</td></tr>
+<tr><td>s</td><td></td><td>by size</td></tr>
+</tbody></table>
 <h3 id="switch-layout"><a class="header" href="#switch-layout">switch layout</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>1</td><td></td><td>default</td></tr>
@@ -1353,6 +1349,16 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>4</td><td></td><td>no help or selection</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="quit"><a class="header" href="#quit">quit</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>just quit</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>quit printing focus</td></tr>
+<tr><td>p</td><td></td><td>quit printing pwd</td></tr>
+<tr><td>r</td><td></td><td>quit printing result</td></tr>
+<tr><td>s</td><td></td><td>quit printing selection</td></tr>
 </tbody></table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="debug-key-bindings"><a class="header" href="#debug-key-bindings">Debug Key Bindings</a></h1>
 <p>If you need help debugging or understanding key bindings DYI way, you can
@@ -2621,7 +2627,7 @@ for debugging.</p>
 <li>YAML: <code>Debug: /path/to/file</code></li>
 </ul>
 <h3 id="quit-options"><a class="header" href="#quit-options">Quit Options</a></h3>
-<h4 id="quit"><a class="header" href="#quit">Quit</a></h4>
+<h4 id="quit-1"><a class="header" href="#quit-1">Quit</a></h4>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;Quit&quot;</code></li>
@@ -2817,6 +2823,8 @@ the node is a symlink.</p>
 <li>&quot;ByIsReadonly&quot;</li>
 <li>&quot;ByMimeEssence&quot;</li>
 <li>&quot;BySize&quot;</li>
+<li>&quot;ByCreated&quot;</li>
+<li>&quot;ByLastModified&quot;</li>
 <li>&quot;ByCanonicalAbsolutePath&quot;</li>
 <li>&quot;ByICanonicalAbsolutePath&quot;</li>
 <li>&quot;ByCanonicalExtension&quot;</li>
@@ -2825,6 +2833,8 @@ the node is a symlink.</p>
 <li>&quot;ByCanonicalIsReadonly&quot;</li>
 <li>&quot;ByCanonicalMimeEssence&quot;</li>
 <li>&quot;ByCanonicalSize&quot;</li>
+<li>&quot;ByCanonicalCreated&quot;</li>
+<li>&quot;ByCanonicalLastModified&quot;</li>
 <li>&quot;BySymlinkAbsolutePath&quot;</li>
 <li>&quot;ByISymlinkAbsolutePath&quot;</li>
 <li>&quot;BySymlinkExtension&quot;</li>
@@ -2833,6 +2843,8 @@ the node is a symlink.</p>
 <li>&quot;BySymlinkIsReadonly&quot;</li>
 <li>&quot;BySymlinkMimeEssence&quot;</li>
 <li>&quot;BySymlinkSize&quot;</li>
+<li>&quot;BySymlinkSize&quot;</li>
+<li>&quot;BySymlinkCreated&quot;</li>
 </ul>
 <p>TODO: document each</p>
 <h3 id="reverse"><a class="header" href="#reverse">reverse</a></h3>
@@ -2862,7 +2874,7 @@ condition: <em>relative path does not contain <code>xyz</code></em> (case insens
 <li><a href="filtering.html#filter">filter</a></li>
 <li><a href="filtering.html#input">input</a></li>
 </ul>
-<h3 id="filter-2"><a class="header" href="#filter-2">filter</a></h3>
+<h3 id="filter-1"><a class="header" href="#filter-1">filter</a></h3>
 <p>A filter can be one of the following:</p>
 <ul>
 <li>&quot;RelativePathIs&quot;</li>
@@ -2949,6 +2961,8 @@ returns a string that will be displayed in each specific field of the
 <li><a href="column-renderer.html#size">size</a></li>
 <li><a href="column-renderer.html#human_size">human_size</a></li>
 <li><a href="column-renderer.html#permissions">permissions</a></li>
+<li><a href="column-renderer.html#created">created</a></li>
+<li><a href="column-renderer.html#last_modified">last_modified</a></li>
 <li><a href="column-renderer.html#canonical">canonical</a></li>
 <li><a href="column-renderer.html#symlink">symlink</a></li>
 <li><a href="column-renderer.html#index">index</a></li>
@@ -3003,6 +3017,12 @@ recursively.</p>
 <h3 id="permissions"><a class="header" href="#permissions">permissions</a></h3>
 <p>Type: <a href="column-renderer.html#permission">Permission</a></p>
 <p>The <a href="column-renderer.html#permission">permissions</a> applied to the node.</p>
+<h3 id="created"><a class="header" href="#created">created</a></h3>
+<p>Type: nullable integer</p>
+<p>Creation time in nanosecond since UNIX epoch.</p>
+<h3 id="last_modified"><a class="header" href="#last_modified">last_modified</a></h3>
+<p>Type: nullable integer</p>
+<p>Last modification time in nanosecond since UNIX epoch.</p>
 <h3 id="canonical"><a class="header" href="#canonical">canonical</a></h3>
 <p>Type: nullable <a href="column-renderer.html#resolved-node-metadata">Resolved Node Metadata</a></p>
 <p>If the node is a symlink, it will hold information about the symlink resolved
@@ -3074,6 +3094,8 @@ node. It will instead be null.</p>
 <li><a href="column-renderer.html#mime_essence">mime_essence</a></li>
 <li><a href="column-renderer.html#size">size</a></li>
 <li><a href="column-renderer.html#human_size">human_size</a></li>
+<li><a href="column-renderer.html#created">created</a></li>
+<li><a href="column-renderer.html#last_modified">last_modified</a></li>
 </ul>
 <h2 id="example-customizing-table-renderer"><a class="header" href="#example-customizing-table-renderer">Example: Customizing Table Renderer</a></h2>
 <pre><code class="language-lua">xplr.fn.custom.fmt_simple_column = function(m)
@@ -3197,6 +3219,12 @@ recursively.</p>
 <h3 id="permissions-1"><a class="header" href="#permissions-1">permissions</a></h3>
 <p>Type: <a href="column-renderer.html#permission">Permission</a></p>
 <p>The <a href="column-renderer.html#permission">permissions</a> applied to the node.</p>
+<h3 id="created-1"><a class="header" href="#created-1">created</a></h3>
+<p>Type: nullable integer</p>
+<p>Creation time in nanosecond since UNIX epoch.</p>
+<h3 id="last_modified-1"><a class="header" href="#last_modified-1">last_modified</a></h3>
+<p>Type: nullable integer</p>
+<p>Last modification time in nanosecond since UNIX epoch.</p>
 <h3 id="canonical-1"><a class="header" href="#canonical-1">canonical</a></h3>
 <p>Type: nullable <a href="column-renderer.html#resolved-node-metadata">Resolved Node Metadata</a></p>
 <p>If the node is a symlink, it will hold information about the symlink resolved
@@ -3223,6 +3251,8 @@ node. It will instead be null.</p>
 <li><a href="lua-function-calls.html#size">size</a></li>
 <li><a href="lua-function-calls.html#human_size">human_size</a></li>
 <li><a href="lua-function-calls.html#permissions">permissions</a></li>
+<li><a href="lua-function-calls.html#created">created</a></li>
+<li><a href="lua-function-calls.html#last_modified">last_modified</a></li>
 <li><a href="lua-function-calls.html#canonical">canonical</a></li>
 <li><a href="lua-function-calls.html#symlink">symlink</a></li>
 </ul>

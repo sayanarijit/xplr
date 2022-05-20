@@ -181,6 +181,8 @@ returns a string that will be displayed in each specific field of the
 <li><a href="#size">size</a></li>
 <li><a href="#human_size">human_size</a></li>
 <li><a href="#permissions">permissions</a></li>
+<li><a href="#created">created</a></li>
+<li><a href="#last_modified">last_modified</a></li>
 <li><a href="#canonical">canonical</a></li>
 <li><a href="#symlink">symlink</a></li>
 <li><a href="#index">index</a></li>
@@ -235,6 +237,12 @@ recursively.</p>
 <h3 id="permissions"><a class="header" href="#permissions">permissions</a></h3>
 <p>Type: <a href="#permission">Permission</a></p>
 <p>The <a href="#permission">permissions</a> applied to the node.</p>
+<h3 id="created"><a class="header" href="#created">created</a></h3>
+<p>Type: nullable integer</p>
+<p>Creation time in nanosecond since UNIX epoch.</p>
+<h3 id="last_modified"><a class="header" href="#last_modified">last_modified</a></h3>
+<p>Type: nullable integer</p>
+<p>Last modification time in nanosecond since UNIX epoch.</p>
 <h3 id="canonical"><a class="header" href="#canonical">canonical</a></h3>
 <p>Type: nullable <a href="#resolved-node-metadata">Resolved Node Metadata</a></p>
 <p>If the node is a symlink, it will hold information about the symlink resolved
@@ -306,6 +314,8 @@ node. It will instead be null.</p>
 <li><a href="#mime_essence">mime_essence</a></li>
 <li><a href="#size">size</a></li>
 <li><a href="#human_size">human_size</a></li>
+<li><a href="#created">created</a></li>
+<li><a href="#last_modified">last_modified</a></li>
 </ul>
 <h2 id="example-customizing-table-renderer"><a class="header" href="#example-customizing-table-renderer">Example: Customizing Table Renderer</a></h2>
 <pre><code class="language-lua">xplr.fn.custom.fmt_simple_column = function(m)

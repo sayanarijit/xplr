@@ -198,14 +198,32 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>esc</td><td></td><td>escape</td></tr>
 </tbody></table>
-<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
+<h3 id="selection-ops"><a class="header" href="#selection-ops">selection ops</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>R</td><td></td><td>relative path does not match regex</td></tr>
+<tr><td>c</td><td></td><td>copy here</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
-<tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
-<tr><td>enter</td><td>esc</td><td>done</td></tr>
-<tr><td>r</td><td></td><td>relative path does match regex</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>m</td><td></td><td>move here</td></tr>
+<tr><td>x</td><td></td><td>open in gui</td></tr>
+</tbody></table>
+<h3 id="create"><a class="header" href="#create">create</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>d</td><td></td><td>create directory</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>create file</td></tr>
+</tbody></table>
+<h3 id="create-directory"><a class="header" href="#create-directory">create directory</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>create directory</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="create-file"><a class="header" href="#create-file">create file</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>create file</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
 <h3 id="number"><a class="header" href="#number">number</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -223,56 +241,6 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>f</td><td></td><td>follow symlink</td></tr>
 <tr><td>g</td><td></td><td>top</td></tr>
 <tr><td>x</td><td></td><td>open in gui</td></tr>
-</tbody></table>
-<h3 id="search"><a class="header" href="#search">search</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
-<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
-<tr><td>enter</td><td>esc</td><td>focus</td></tr>
-<tr><td>left</td><td></td><td>back</td></tr>
-<tr><td>right</td><td></td><td>enter</td></tr>
-<tr><td>tab</td><td></td><td>toggle selection</td></tr>
-</tbody></table>
-<h3 id="selection-ops"><a class="header" href="#selection-ops">selection ops</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>c</td><td></td><td>copy here</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>m</td><td></td><td>move here</td></tr>
-<tr><td>x</td><td></td><td>open in gui</td></tr>
-</tbody></table>
-<h3 id="action-to"><a class="header" href="#action-to">action to</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>!</td><td></td><td>shell</td></tr>
-<tr><td>c</td><td></td><td>create</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>e</td><td></td><td>open in editor</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>l</td><td></td><td>logs</td></tr>
-<tr><td>m</td><td></td><td>toggle mouse</td></tr>
-<tr><td>q</td><td></td><td>quit options</td></tr>
-<tr><td>s</td><td></td><td>selection operations</td></tr>
-<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
-</tbody></table>
-<h3 id="create"><a class="header" href="#create">create</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>d</td><td></td><td>create directory</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>f</td><td></td><td>create file</td></tr>
-</tbody></table>
-<h3 id="create-file"><a class="header" href="#create-file">create file</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>create file</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-</tbody></table>
-<h3 id="create-directory"><a class="header" href="#create-directory">create directory</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>create directory</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
 <h3 id="rename"><a class="header" href="#rename">rename</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -293,28 +261,33 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>d</td><td></td><td>delete</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
-<h3 id="sort"><a class="header" href="#sort">sort</a></h3>
+<h3 id="action-to"><a class="header" href="#action-to">action to</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>!</td><td></td><td>reverse sorters</td></tr>
-<tr><td>E</td><td></td><td>by canonical extension reverse</td></tr>
-<tr><td>M</td><td></td><td>by canonical mime essence reverse</td></tr>
-<tr><td>N</td><td></td><td>by node type reverse</td></tr>
-<tr><td>R</td><td></td><td>by relative path reverse</td></tr>
-<tr><td>S</td><td></td><td>by size reverse</td></tr>
-<tr><td>backspace</td><td></td><td>remove last sorter</td></tr>
+<tr><td>!</td><td></td><td>shell</td></tr>
+<tr><td>c</td><td></td><td>create</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-r</td><td></td><td>reset sorters</td></tr>
-<tr><td>ctrl-u</td><td></td><td>clear sorters</td></tr>
-<tr><td>e</td><td></td><td>by canonical extension</td></tr>
-<tr><td>enter</td><td>esc</td><td>done</td></tr>
-<tr><td>m</td><td></td><td>by canonical mime essence</td></tr>
-<tr><td>n</td><td></td><td>by node type</td></tr>
-<tr><td>r</td><td></td><td>by relative path</td></tr>
-<tr><td>s</td><td></td><td>by size</td></tr>
+<tr><td>e</td><td></td><td>open in editor</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>l</td><td></td><td>logs</td></tr>
+<tr><td>m</td><td></td><td>toggle mouse</td></tr>
+<tr><td>q</td><td></td><td>quit options</td></tr>
+<tr><td>s</td><td></td><td>selection operations</td></tr>
+<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
 </tbody></table>
-<h3 id="filter-1"><a class="header" href="#filter-1">filter</a></h3>
+<h3 id="search"><a class="header" href="#search">search</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
+<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
+<tr><td>enter</td><td>esc</td><td>focus</td></tr>
+<tr><td>left</td><td></td><td>back</td></tr>
+<tr><td>right</td><td></td><td>enter</td></tr>
+<tr><td>tab</td><td></td><td>toggle selection</td></tr>
+</tbody></table>
+<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>R</td><td></td><td>relative path does not match regex</td></tr>
+<tr><td>backspace</td><td></td><td>remove last filter</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
 <tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
@@ -333,6 +306,29 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>enter</td><td></td><td>apply filter</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
+<h3 id="sort"><a class="header" href="#sort">sort</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>!</td><td></td><td>reverse sorters</td></tr>
+<tr><td>C</td><td></td><td>by created reverse</td></tr>
+<tr><td>E</td><td></td><td>by canonical extension reverse</td></tr>
+<tr><td>L</td><td></td><td>by last modified reverse</td></tr>
+<tr><td>M</td><td></td><td>by canonical mime essence reverse</td></tr>
+<tr><td>N</td><td></td><td>by node type reverse</td></tr>
+<tr><td>R</td><td></td><td>by relative path reverse</td></tr>
+<tr><td>S</td><td></td><td>by size reverse</td></tr>
+<tr><td>backspace</td><td></td><td>remove last sorter</td></tr>
+<tr><td>c</td><td></td><td>by created</td></tr>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset sorters</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear sorters</td></tr>
+<tr><td>e</td><td></td><td>by canonical extension</td></tr>
+<tr><td>enter</td><td>esc</td><td>done</td></tr>
+<tr><td>l</td><td></td><td>by last modified</td></tr>
+<tr><td>m</td><td></td><td>by canonical mime essence</td></tr>
+<tr><td>n</td><td></td><td>by node type</td></tr>
+<tr><td>r</td><td></td><td>by relative path</td></tr>
+<tr><td>s</td><td></td><td>by size</td></tr>
+</tbody></table>
 <h3 id="switch-layout"><a class="header" href="#switch-layout">switch layout</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>1</td><td></td><td>default</td></tr>
@@ -341,6 +337,16 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>4</td><td></td><td>no help or selection</td></tr>
 <tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
+</tbody></table>
+<h3 id="quit"><a class="header" href="#quit">quit</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+<tr><td>enter</td><td></td><td>just quit</td></tr>
+<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>quit printing focus</td></tr>
+<tr><td>p</td><td></td><td>quit printing pwd</td></tr>
+<tr><td>r</td><td></td><td>quit printing result</td></tr>
+<tr><td>s</td><td></td><td>quit printing selection</td></tr>
 </tbody></table>
 
                     </main>
