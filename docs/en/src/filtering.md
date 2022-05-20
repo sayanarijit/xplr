@@ -43,6 +43,10 @@ A filter can be one of the following:
 - "RelativePathDoesNotEndWith"
 - "IRelativePathDoesEndWith"
 - "IRelativePathDoesNotEndWith"
+- "RelativePathDoesMatchRegex"
+- "RelativePathDoesNotMatchRegex"
+- "IRelativePathDoesMatchRegex"
+- "IRelativePathDoesNotMatchRegex"
 - "AbsolutePathIs"
 - "AbsolutePathIsNot"
 - "IAbsolutePathIs"
@@ -59,6 +63,10 @@ A filter can be one of the following:
 - "AbsolutePathDoesNotEndWith"
 - "IAbsolutePathDoesEndWith"
 - "IAbsolutePathDoesNotEndWith"
+- "AbsolutePathDoesMatchRegex"
+- "AbsolutePathDoesNotMatchRegex"
+- "IAbsolutePathDoesMatchRegex"
+- "IAbsolutePathDoesNotMatchRegex"
 
 TODO: document each
 
