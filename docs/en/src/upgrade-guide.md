@@ -45,6 +45,40 @@ compatibility.
 
 ### Instructions
 
+#### [v0.17.6][45] -> [v0.18.0][46]
+
+- Added new command-line arguments `--read0`, `--write0` and `-0`/`--null` to
+  support reading and printing null character delimited file paths.
+- Added support for filtering with regex using the new filters:
+  - `RelativePathDoesMatchRegex`
+  - `RelativePathDoesNotMatchRegex`
+  - `IRelativePathDoesMatchRegex`
+  - `IRelativePathDoesNotMatchRegex`
+  - `AbsolutePathDoesMatchRegex`
+  - `AbsolutePathDoesNotMatchRegex`
+  - `IAbsolutePathDoesMatchRegex`
+  - `IAbsolutePathDoesNotMatchRegex`
+- Key binding `f` `r` and `f` `R` will now filter using regex.
+- Added key binding `f` `backspace` to remove the last filter.
+- Search mode now defaults to regex search.
+- Added a new message `SetInputPrompt` to set the input prompt dynamically.
+- Added new node properties (available via teh Lua API):
+  - `created`
+  - `last_modified`
+- Added support for sorting with timestamp using the new sorters:
+  - "ByCreated"
+  - "ByLastModified"
+  - "ByCanonicalCreated"
+  - "ByCanonicalLastModified"
+  - "BySymlinkCreated"
+  - "BySymlinkLastModified"
+- The last column in the files table now displays the last modification time.
+- Fixed a bug causing crashes when handling unicode characters in the input 
+  buffer.
+- Improved docs.
+
+<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
+
 #### [v0.16.4][44] -> [v0.17.6][45]
 
 - Deprecated `app.directory_buffer`, `app.history`, and `app.last_modes` in
@@ -53,8 +87,8 @@ compatibility.
   `app.history` and `app.last_modes` can be re-added upon request
   (with justification), `app.directory_buffer` has been deprecated for good.
   However, there's no change in the `CallLua*` context.
-- Set `xplr.config.general.hide_remaps_in_help_menu` to `true` to hide the remaps in
-  help menu.
+- Set `xplr.config.general.hide_remaps_in_help_menu` to `true` to hide the
+  remaps in help menu.
 - `None` will be serialized to `nil` in Lua.
 - `LuaEval` can now return a function that will be called with the Lua Context
   argument. Refer to the `Full List of Messages` doc for example.
@@ -88,8 +122,6 @@ compatibility.
   - on_character
   - on_navigation
   - on_function
-
-<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
 #### [v0.14.7][3] -> [v0.15.2][43]
 

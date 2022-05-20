@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.17.6'
+version = '0.18.0'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
@@ -20,10 +20,17 @@ documentation = 'https://xplr.dev/en'
 keywords = ['terminal', 'file', 'explorer', 'manager', 'tui']
 categories = ['command-line-interface', 'command-line-utilities']
 include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
-exclude = ["docs/en/landing/", "docs/en/script", "assets/", "benches/", "images/", ".*"]
+exclude = [
+  "docs/en/landing/",
+  "docs/en/script",
+  "assets/",
+  "benches/",
+  "images/",
+  ".*",
+]
 
 [dependencies]
-libc = "0.2.125"
+libc = "0.2.126"
 humansize = "1.1.1"
 natord = "1.0.9"
 anyhow = "1.0.57"
@@ -31,7 +38,7 @@ serde_yaml = "0.8.24"
 crossterm = "0.23.2"
 dirs = "4.0.0"
 ansi-to-tui-forked = "0.5.2-fix.offset"
-regex = "1.5.5"
+regex = "1.5.6"
 
 [dependencies.lazy_static]
 version = "1.4.0"
