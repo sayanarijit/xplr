@@ -16,13 +16,16 @@ fn main() {
     xplr [FLAG]... [OPTION]... [PATH] [SELECTION]..."###;
 
         let flags = r###"
-    -                            Reads paths from stdin
+    -                            Reads new-line (\n) separated paths from stdin
     --                           Denotes the end of command-line flags and options
         --force-focus            Focuses on the given <PATH>, even if it is a directory
     -h, --help                   Prints help information
         --print-pwd-as-result    Prints the present working directory when quitting 
                                    with `PrintResultAndQuit`
         --read-only              Enables read-only mode (config.general.read_only)
+        --read0                  Reads paths separated using the null character (\0)
+        --write0                 Prints paths separated using the null character (\0)
+    -0  --null                   Combines --read0 and --write0
     -V, --version                Prints version information"###;
 
         let options = r###"
@@ -51,8 +54,14 @@ fn main() {
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else {
+        let write0 = cli.write0;
         match runner::from_cli(cli).and_then(|a| a.run()) {
-            Ok(Some(out)) => print!("{}", out),
+            Ok(Some(mut out)) => {
+                if write0 {
+                    out = out.trim_end().replace('\n', "\0");
+                }
+                print!("{}", out);
+            }
             Ok(None) => {}
             Err(err) => {
                 if !err.to_string().is_empty() {
