@@ -281,7 +281,7 @@ YAML: `FollowSymlink`
 
 Set the input prompt temporarily, until the input buffer is reset.
 
-Type: { SetInputPrompt = { format = nullable string }
+Type: { SetInputPrompt = nullable string }
 
 Example:
 
