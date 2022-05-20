@@ -57,14 +57,14 @@ of [modes][4] and the key mappings for each mode.
 
 ### filter
 
-| key    | remaps | action                    |
-| ------ | ------ | ------------------------- |
-| R      |        | relative does not contain |
-| ctrl-c |        | terminate                 |
-| ctrl-r |        | reset filters             |
-| ctrl-u |        | clear filters             |
-| enter  | esc    | done                      |
-| r      |        | relative does contain     |
+| key    | remaps | action                             |
+| ------ | ------ | ---------------------------------- |
+| R      |        | relative path does not match regex |
+| ctrl-c |        | terminate                          |
+| ctrl-r |        | reset filters                      |
+| ctrl-u |        | clear filters                      |
+| enter  | esc    | done                               |
+| r      |        | relative path does match regex     |
 
 ### number
 
@@ -197,16 +197,16 @@ of [modes][4] and the key mappings for each mode.
 
 ### filter
 
-| key    | remaps | action                    |
-| ------ | ------ | ------------------------- |
-| R      |        | relative does not contain |
-| ctrl-c |        | terminate                 |
-| ctrl-r |        | reset filters             |
-| ctrl-u |        | clear filters             |
-| enter  | esc    | done                      |
-| r      |        | relative does contain     |
+| key    | remaps | action                             |
+| ------ | ------ | ---------------------------------- |
+| R      |        | relative path does not match regex |
+| ctrl-c |        | terminate                          |
+| ctrl-r |        | reset filters                      |
+| ctrl-u |        | clear filters                      |
+| enter  | esc    | done                               |
+| r      |        | relative path does match regex     |
 
-### relative path does contain
+### relative path does match regex
 
 | key    | remaps | action       |
 | ------ | ------ | ------------ |
@@ -214,7 +214,7 @@ of [modes][4] and the key mappings for each mode.
 | enter  |        | apply filter |
 | esc    |        | cancel       |
 
-### relative path does not contain
+### relative path does not match regex
 
 | key    | remaps | action       |
 | ------ | ------ | ------------ |
