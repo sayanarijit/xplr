@@ -2843,8 +2843,8 @@ the node is a symlink.</p>
 <li>&quot;BySymlinkIsReadonly&quot;</li>
 <li>&quot;BySymlinkMimeEssence&quot;</li>
 <li>&quot;BySymlinkSize&quot;</li>
-<li>&quot;BySymlinkSize&quot;</li>
 <li>&quot;BySymlinkCreated&quot;</li>
+<li>&quot;BySymlinkLastModified&quot;</li>
 </ul>
 <p>TODO: document each</p>
 <h3 id="reverse"><a class="header" href="#reverse">reverse</a></h3>
@@ -4061,6 +4061,48 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="v0176---v018046"><a class="header" href="#v0176---v018046"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a> -&gt; [v0.18.0][46]</a></h4>
+<ul>
+<li>Added new command-line arguments <code>--read0</code>, <code>--write0</code> and <code>-0</code>/<code>--null</code> to
+support reading and printing null character delimited file paths.</li>
+<li>Added support for filtering with regex using the new filters:
+<ul>
+<li><code>RelativePathDoesMatchRegex</code></li>
+<li><code>RelativePathDoesNotMatchRegex</code></li>
+<li><code>IRelativePathDoesMatchRegex</code></li>
+<li><code>IRelativePathDoesNotMatchRegex</code></li>
+<li><code>AbsolutePathDoesMatchRegex</code></li>
+<li><code>AbsolutePathDoesNotMatchRegex</code></li>
+<li><code>IAbsolutePathDoesMatchRegex</code></li>
+<li><code>IAbsolutePathDoesNotMatchRegex</code></li>
+</ul>
+</li>
+<li>Key binding <code>f</code> <code>r</code> and <code>f</code> <code>R</code> will now filter using regex.</li>
+<li>Added key binding <code>f</code> <code>backspace</code> to remove the last filter.</li>
+<li>Search mode now defaults to regex search.</li>
+<li>Added a new message <code>SetInputPrompt</code> to set the input prompt dynamically.</li>
+<li>Added new node properties (available via teh Lua API):
+<ul>
+<li><code>created</code></li>
+<li><code>last_modified</code></li>
+</ul>
+</li>
+<li>Added support for sorting with timestamp using the new sorters:
+<ul>
+<li>&quot;ByCreated&quot;</li>
+<li>&quot;ByLastModified&quot;</li>
+<li>&quot;ByCanonicalCreated&quot;</li>
+<li>&quot;ByCanonicalLastModified&quot;</li>
+<li>&quot;BySymlinkCreated&quot;</li>
+<li>&quot;BySymlinkLastModified&quot;</li>
+</ul>
+</li>
+<li>The last column in the files table now displays the last modification time.</li>
+<li>Fixed a bug causing crashes when handling unicode characters in the input 
+buffer.</li>
+<li>Improved docs.</li>
+</ul>
+<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0164---v0176"><a class="header" href="#v0164---v0176"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.16.4">v0.16.4</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a></a></h4>
 <ul>
 <li>Deprecated <code>app.directory_buffer</code>, <code>app.history</code>, and <code>app.last_modes</code> in
@@ -4069,8 +4111,8 @@ As of now, there's no way to access these fields in dynamic layouts. While
 <code>app.history</code> and <code>app.last_modes</code> can be re-added upon request
 (with justification), <code>app.directory_buffer</code> has been deprecated for good.
 However, there's no change in the <code>CallLua*</code> context.</li>
-<li>Set <code>xplr.config.general.hide_remaps_in_help_menu</code> to <code>true</code> to hide the remaps in
-help menu.</li>
+<li>Set <code>xplr.config.general.hide_remaps_in_help_menu</code> to <code>true</code> to hide the
+remaps in help menu.</li>
 <li><code>None</code> will be serialized to <code>nil</code> in Lua.</li>
 <li><code>LuaEval</code> can now return a function that will be called with the Lua Context
 argument. Refer to the <code>Full List of Messages</code> doc for example.</li>
@@ -4108,7 +4150,6 @@ needing to define a function. However, the <code>app</code> context won't be ava
 </ul>
 </li>
 </ul>
-<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0147---v0152"><a class="header" href="#v0147---v0152"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.14.7">v0.14.7</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.15.2">v0.15.2</a></a></h4>
 <ul>
 <li>Deprecated <code>config</code> field from <code>CallLua</code> argument. Use the globally available
