@@ -154,7 +154,7 @@ pub struct LuaContextLight {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InputBuffer {
     pub buffer: Option<Input>,
-    pub prompt: Option<String>,
+    pub prompt: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -285,7 +285,7 @@ impl App {
 
         let input = InputBuffer {
             buffer: Default::default(),
-            prompt: config.general.prompt.format.clone(),
+            prompt: config.general.prompt.format.clone().unwrap_or_default(),
         };
 
         let mut app = Self {
@@ -808,7 +808,7 @@ impl App {
         }
     }
 
-    fn set_input_prompt(mut self, p: Option<String>) -> Result<Self> {
+    fn set_input_prompt(mut self, p: String) -> Result<Self> {
         self.input.prompt = p;
         Ok(self)
     }
@@ -883,7 +883,13 @@ impl App {
     fn reset_input_buffer(mut self) -> Result<Self> {
         self.input = InputBuffer {
             buffer: Default::default(),
-            prompt: self.config.general.prompt.format.clone(),
+            prompt: self
+                .config
+                .general
+                .prompt
+                .format
+                .to_owned()
+                .unwrap_or_default(),
         };
         Ok(self)
     }

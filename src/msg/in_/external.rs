@@ -242,13 +242,13 @@ pub enum ExternalMsg {
 
     /// Set the input prompt temporarily, until the input buffer is reset.
     ///
-    /// Type: { SetInputPrompt = nullable string }
+    /// Type: { SetInputPrompt = string }
     ///
     /// Example:
     ///
     /// - Lua: `{ SetInputPrompt = "→" }`
     /// - YAML: `SetInputPrompt: →`
-    SetInputPrompt(Option<String>),
+    SetInputPrompt(String),
 
     /// Update the input buffer using cursor based operations.
     ///

@@ -817,12 +817,7 @@ fn draw_input_buffer<B: Backend>(
             1
         } else {
             0
-        } + app
-            .input
-            .prompt
-            .as_ref()
-            .map(|t| t.chars().count() as u16)
-            .unwrap_or(0);
+        } + app.input.prompt.chars().count() as u16;
 
         let cursor_offset_right = if config
             .borders
@@ -841,7 +836,7 @@ fn draw_input_buffer<B: Backend>(
 
         let input_buf = Paragraph::new(Spans::from(vec![
             Span::styled(
-                app.input.prompt.to_owned().unwrap_or_default(),
+                app.input.prompt.to_owned(),
                 app.config.general.prompt.style.to_owned().into(),
             ),
             Span::raw(input.value()),
