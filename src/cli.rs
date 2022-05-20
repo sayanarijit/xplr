@@ -14,6 +14,8 @@ pub struct Cli {
     pub read_only: bool,
     pub force_focus: bool,
     pub print_pwd_as_result: bool,
+    pub read0: bool,
+    pub write0: bool,
     pub config: Option<PathBuf>,
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
@@ -49,9 +51,16 @@ impl Cli {
                 match arg.as_str() {
                     // Flags
                     "-" => {
-                        for path in BufReader::new(std::io::stdin()).lines() {
-                            cli.read_path(&path?)?;
-                        }
+                        let reader = BufReader::new(std::io::stdin());
+                        if cli.read0 {
+                            for path in reader.split(b'\0') {
+                                cli.read_path(&String::from_utf8(path?)?)?;
+                            }
+                        } else {
+                            for path in reader.lines() {
+                                cli.read_path(&path?)?;
+                            }
+                        };
                     }
 
                     "-h" | "--help" => {
@@ -60,6 +69,19 @@ impl Cli {
 
                     "-V" | "--version" => {
                         cli.version = true;
+                    }
+
+                    "--read0" => {
+                        cli.read0 = true;
+                    }
+
+                    "--write0" => {
+                        cli.write0 = true;
+                    }
+
+                    "-0" | "--null" => {
+                        cli.read0 = true;
+                        cli.write0 = true;
                     }
 
                     "--" => {
