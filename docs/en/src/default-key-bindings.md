@@ -55,17 +55,40 @@ of [modes][4] and the key mappings for each mode.
 | ctrl-c |        | terminate |
 | esc    |        | escape    |
 
-### filter
+### selection ops
 
-| key       | remaps | action                             |
-| --------- | ------ | ---------------------------------- |
-| R         |        | relative path does not match regex |
-| backspace |        | remove last filter                 |
-| ctrl-c    |        | terminate                          |
-| ctrl-r    |        | reset filters                      |
-| ctrl-u    |        | clear filters                      |
-| enter     | esc    | done                               |
-| r         |        | relative path does match regex     |
+| key    | remaps | action      |
+| ------ | ------ | ----------- |
+| c      |        | copy here   |
+| ctrl-c |        | terminate   |
+| esc    |        | cancel      |
+| m      |        | move here   |
+| x      |        | open in gui |
+
+### create
+
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-c |        | terminate        |
+| d      |        | create directory |
+| esc    |        | cancel           |
+| f      |        | create file      |
+
+### create directory
+
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-c |        | terminate        |
+| enter  |        | create directory |
+| esc    |        | cancel           |
+
+### create file
+
+| key    | remaps | action      |
+| ------ | ------ | ----------- |
+| ctrl-c |        | terminate   |
+| enter  |        | create file |
+| esc    |        | cancel      |
 
 ### number
 
@@ -87,68 +110,6 @@ of [modes][4] and the key mappings for each mode.
 | f      |        | follow symlink |
 | g      |        | top            |
 | x      |        | open in gui    |
-
-### search
-
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-c |        | terminate        |
-| ctrl-n | down   | down             |
-| ctrl-p | up     | up               |
-| enter  | esc    | focus            |
-| left   |        | back             |
-| right  |        | enter            |
-| tab    |        | toggle selection |
-
-### selection ops
-
-| key    | remaps | action      |
-| ------ | ------ | ----------- |
-| c      |        | copy here   |
-| ctrl-c |        | terminate   |
-| esc    |        | cancel      |
-| m      |        | move here   |
-| x      |        | open in gui |
-
-### action to
-
-| key    | remaps | action               |
-| ------ | ------ | -------------------- |
-| !      |        | shell                |
-| c      |        | create               |
-| ctrl-c |        | terminate            |
-| e      |        | open in editor       |
-| esc    |        | cancel               |
-| l      |        | logs                 |
-| m      |        | toggle mouse         |
-| q      |        | quit options         |
-| s      |        | selection operations |
-| [0-9]  |        | go to index          |
-
-### create
-
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-c |        | terminate        |
-| d      |        | create directory |
-| esc    |        | cancel           |
-| f      |        | create file      |
-
-### create file
-
-| key    | remaps | action      |
-| ------ | ------ | ----------- |
-| ctrl-c |        | terminate   |
-| enter  |        | create file |
-| esc    |        | cancel      |
-
-### create directory
-
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-c |        | terminate        |
-| enter  |        | create directory |
-| esc    |        | cancel           |
 
 ### rename
 
@@ -175,30 +136,32 @@ of [modes][4] and the key mappings for each mode.
 | d      |        | delete       |
 | esc    |        | cancel       |
 
-### sort
+### action to
 
-| key       | remaps | action                            |
-| --------- | ------ | --------------------------------- |
-| !         |        | reverse sorters                   |
-| C         |        | by created reverse                |
-| E         |        | by canonical extension reverse    |
-| L         |        | by last modified reverse          |
-| M         |        | by canonical mime essence reverse |
-| N         |        | by node type reverse              |
-| R         |        | by relative path reverse          |
-| S         |        | by size reverse                   |
-| backspace |        | remove last sorter                |
-| c         |        | by created                        |
-| ctrl-c    |        | terminate                         |
-| ctrl-r    |        | reset sorters                     |
-| ctrl-u    |        | clear sorters                     |
-| e         |        | by canonical extension            |
-| enter     | esc    | done                              |
-| l         |        | by last modified                  |
-| m         |        | by canonical mime essence         |
-| n         |        | by node type                      |
-| r         |        | by relative path                  |
-| s         |        | by size                           |
+| key    | remaps | action               |
+| ------ | ------ | -------------------- |
+| !      |        | shell                |
+| c      |        | create               |
+| ctrl-c |        | terminate            |
+| e      |        | open in editor       |
+| esc    |        | cancel               |
+| l      |        | logs                 |
+| m      |        | toggle mouse         |
+| q      |        | quit options         |
+| s      |        | selection operations |
+| [0-9]  |        | go to index          |
+
+### search
+
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-c |        | terminate        |
+| ctrl-n | down   | down             |
+| ctrl-p | up     | up               |
+| enter  | esc    | focus            |
+| left   |        | back             |
+| right  |        | enter            |
+| tab    |        | toggle selection |
 
 ### filter
 
@@ -228,6 +191,31 @@ of [modes][4] and the key mappings for each mode.
 | enter  |        | apply filter |
 | esc    |        | cancel       |
 
+### sort
+
+| key       | remaps | action                            |
+| --------- | ------ | --------------------------------- |
+| !         |        | reverse sorters                   |
+| C         |        | by created reverse                |
+| E         |        | by canonical extension reverse    |
+| L         |        | by last modified reverse          |
+| M         |        | by canonical mime essence reverse |
+| N         |        | by node type reverse              |
+| R         |        | by relative path reverse          |
+| S         |        | by size reverse                   |
+| backspace |        | remove last sorter                |
+| c         |        | by created                        |
+| ctrl-c    |        | terminate                         |
+| ctrl-r    |        | reset sorters                     |
+| ctrl-u    |        | clear sorters                     |
+| e         |        | by canonical extension            |
+| enter     | esc    | done                              |
+| l         |        | by last modified                  |
+| m         |        | by canonical mime essence         |
+| n         |        | by node type                      |
+| r         |        | by relative path                  |
+| s         |        | by size                           |
+
 ### switch layout
 
 | key    | remaps | action               |
@@ -238,6 +226,18 @@ of [modes][4] and the key mappings for each mode.
 | 4      |        | no help or selection |
 | ctrl-c |        | terminate            |
 | esc    |        | cancel               |
+
+### quit
+
+| key    | remaps | action                  |
+| ------ | ------ | ----------------------- |
+| ctrl-c |        | terminate               |
+| enter  |        | just quit               |
+| esc    |        | cancel                  |
+| f      |        | quit printing focus     |
+| p      |        | quit printing pwd       |
+| r      |        | quit printing result    |
+| s      |        | quit printing selection |
 
 [1]: https://www.vim.org/
 [2]: https://github.com/jarun/nnn/
