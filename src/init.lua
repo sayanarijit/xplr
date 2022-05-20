@@ -2094,6 +2094,13 @@ xplr.config.modes.builtin.filter = {
           "PopMode",
         },
       },
+      backspace = {
+        help = "remove last filter",
+        messages = {
+          "RemoveLastNodeFilter",
+          "ExplorePwdAsync",
+        },
+      },
       ["ctrl-r"] = {
         help = "reset filters",
         messages = {
