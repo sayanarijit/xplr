@@ -68,7 +68,7 @@ Clear the screen.
 
 Example:
 
-- Lua: `"ClearScreen"``
+- Lua: `"ClearScreen"`
 - YAML: `ClearScreen`
 
 #### Refresh
