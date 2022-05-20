@@ -1,5 +1,6 @@
 use crate::{app::Node, input::InputOperation};
 use indexmap::IndexSet;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
@@ -47,7 +48,7 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: `"ClearScreen"``
+    /// - Lua: `"ClearScreen"`
     /// - YAML: `ClearScreen`
     ClearScreen,
 
@@ -103,7 +104,7 @@ pub enum ExternalMsg {
 
     /// Focus on the `-n`th node relative to the current focus where `n` is a
     /// given value.
-    ///  
+    ///
     /// Type: { FocusPreviousByRelativeIndex = int }
     ///
     /// Example:
@@ -237,7 +238,17 @@ pub enum ExternalMsg {
     /// YAML: `FollowSymlink`
     FollowSymlink,
 
-    /// ### Reading Input ------------------------------------------------------
+    /// ### Reading Input -----------------------------------------------------
+
+    /// Set the input prompt temporarily, until the input buffer is reset.
+    ///
+    /// Type: { SetInputPrompt = { format = nullable string }
+    ///
+    /// Example:
+    ///
+    /// - Lua: `{ SetInputPrompt = "→" }`
+    /// - YAML: `SetInputPrompt: →`
+    SetInputPrompt(Option<String>),
 
     /// Update the input buffer using cursor based operations.
     ///
@@ -258,7 +269,7 @@ pub enum ExternalMsg {
     UpdateInputBufferFromKey,
 
     /// Append/buffer the given string into the input buffer.
-    ///  
+    ///
     /// Type: { BufferInput = "string" }
     ///
     /// Example:
@@ -279,7 +290,7 @@ pub enum ExternalMsg {
     /// Set/rewrite the input buffer with the given string.
     /// When the input buffer is not-null (even if empty string)
     /// it will show in the UI.
-    ///  
+    ///
     /// Type: { SetInputBuffer = "string" }
     ///
     /// Example:
@@ -289,7 +300,7 @@ pub enum ExternalMsg {
     SetInputBuffer(String),
 
     /// Remove input buffer's last character.
-    ///  
+    ///
     ///  Example:
     ///
     ///  - Lua: `"RemoveInputBufferLastCharacter"`
@@ -1208,6 +1219,12 @@ pub enum NodeFilter {
     IRelativePathDoesEndWith,
     IRelativePathDoesNotEndWith,
 
+    RelativePathDoesMatchRegex,
+    RelativePathDoesNotMatchRegex,
+
+    IRelativePathDoesMatchRegex,
+    IRelativePathDoesNotMatchRegex,
+
     AbsolutePathIs,
     AbsolutePathIsNot,
 
@@ -1231,6 +1248,12 @@ pub enum NodeFilter {
 
     IAbsolutePathDoesEndWith,
     IAbsolutePathDoesNotEndWith,
+
+    AbsolutePathDoesMatchRegex,
+    AbsolutePathDoesNotMatchRegex,
+
+    IAbsolutePathDoesMatchRegex,
+    IAbsolutePathDoesNotMatchRegex,
 }
 
 impl NodeFilter {
@@ -1293,6 +1316,24 @@ impl NodeFilter {
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
+            Self::RelativePathDoesMatchRegex => Regex::new(input)
+                .map(|r| r.is_match(&node.relative_path))
+                .unwrap_or(false),
+            Self::IRelativePathDoesMatchRegex => {
+                Regex::new(&input.to_lowercase())
+                    .map(|r| r.is_match(&node.relative_path.to_lowercase()))
+                    .unwrap_or(false)
+            }
+
+            Self::RelativePathDoesNotMatchRegex => !Regex::new(input)
+                .map(|r| r.is_match(&node.relative_path))
+                .unwrap_or(false),
+            Self::IRelativePathDoesNotMatchRegex => {
+                !Regex::new(&input.to_lowercase())
+                    .map(|r| r.is_match(&node.relative_path.to_lowercase()))
+                    .unwrap_or(false)
+            }
+
             Self::AbsolutePathIs => node.absolute_path.eq(input),
             Self::IAbsolutePathIs => {
                 node.absolute_path.eq_ignore_ascii_case(input)
@@ -1348,6 +1389,24 @@ impl NodeFilter {
                 .absolute_path
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
+
+            Self::AbsolutePathDoesMatchRegex => Regex::new(input)
+                .map(|r| r.is_match(&node.absolute_path))
+                .unwrap_or(false),
+            Self::IAbsolutePathDoesMatchRegex => {
+                Regex::new(&input.to_lowercase())
+                    .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
+                    .unwrap_or(false)
+            }
+
+            Self::AbsolutePathDoesNotMatchRegex => !Regex::new(input)
+                .map(|r| r.is_match(&node.absolute_path))
+                .unwrap_or(false),
+            Self::IAbsolutePathDoesNotMatchRegex => {
+                !Regex::new(&input.to_lowercase())
+                    .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
+                    .unwrap_or(false)
+            }
         }
     }
 }

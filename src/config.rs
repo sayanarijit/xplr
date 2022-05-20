@@ -570,10 +570,10 @@ pub struct BuiltinModesConfig {
     pub filter: Mode,
 
     #[serde(default)]
-    pub relative_path_does_contain: Mode,
+    pub relative_path_does_match_regex: Mode,
 
     #[serde(default)]
-    pub relative_path_does_not_contain: Mode,
+    pub relative_path_does_not_match_regex: Mode,
 
     #[serde(default)]
     pub sort: Mode,
@@ -609,17 +609,17 @@ impl BuiltinModesConfig {
             "search" => Some(&self.search),
             "sort" => Some(&self.sort),
             "filter" => Some(&self.filter),
-            "relative_path_does_contain" => {
-                Some(&self.relative_path_does_contain)
+            "relative_path_does_match_regex" => {
+                Some(&self.relative_path_does_match_regex)
             }
-            "relative path does contain" => {
-                Some(&self.relative_path_does_contain)
+            "relative path does match regex" => {
+                Some(&self.relative_path_does_match_regex)
             }
-            "relative_path_does_not_contain" => {
-                Some(&self.relative_path_does_not_contain)
+            "relative_path_does_not_match_regex" => {
+                Some(&self.relative_path_does_not_match_regex)
             }
-            "relative path does not contain" => {
-                Some(&self.relative_path_does_not_contain)
+            "relative path does not match regex" => {
+                Some(&self.relative_path_does_not_match_regex)
             }
             "switch layout" => Some(&self.switch_layout),
             "switch_layout" => Some(&self.switch_layout),

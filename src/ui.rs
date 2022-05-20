@@ -801,7 +801,7 @@ fn draw_input_buffer<B: Backend>(
     app: &app::App,
     _: &Lua,
 ) {
-    if let Some(input) = app.input.as_ref() {
+    if let Some(input) = app.input.buffer.as_ref() {
         let panel_config = &app.config.general.panel_ui;
         let config = panel_config
             .default
@@ -818,10 +818,8 @@ fn draw_input_buffer<B: Backend>(
         } else {
             0
         } + app
-            .config
-            .general
+            .input
             .prompt
-            .format
             .as_ref()
             .map(|t| t.chars().count() as u16)
             .unwrap_or(0);
@@ -843,12 +841,7 @@ fn draw_input_buffer<B: Backend>(
 
         let input_buf = Paragraph::new(Spans::from(vec![
             Span::styled(
-                app.config
-                    .general
-                    .prompt
-                    .format
-                    .to_owned()
-                    .unwrap_or_default(),
+                app.input.prompt.to_owned().unwrap_or_default(),
                 app.config.general.prompt.style.to_owned().into(),
             ),
             Span::raw(input.value()),
@@ -1271,7 +1264,7 @@ pub fn draw_layout<B: Backend>(
             draw_selection(f, screen_size, layout_size, app, lua)
         }
         Layout::InputAndLogs => {
-            if app.input.is_some() {
+            if app.input.buffer.is_some() {
                 draw_input_buffer(f, screen_size, layout_size, app, lua);
             } else {
                 draw_logs(f, screen_size, layout_size, app, lua);

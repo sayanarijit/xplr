@@ -31,6 +31,7 @@ serde_yaml = "0.8.24"
 crossterm = "0.23.2"
 dirs = "4.0.0"
 ansi-to-tui-forked = "0.5.2-fix.offset"
+regex = "1.5.5"
 
 [dependencies.lazy_static]
 version = "1.4.0"
