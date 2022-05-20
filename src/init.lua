@@ -208,7 +208,6 @@ xplr.config.general.table.row.cols = {
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.row.style = {}
 
-<<<<<<< HEAD
 -- Height of the table rows.
 --
 -- Type: nullable integer
@@ -241,8 +240,8 @@ xplr.config.general.table.col_spacing = 1
 -- Type: nullable list of [Constraint](https://xplr.dev/en/layouts#constraint)
 xplr.config.general.table.col_widths = {
   { Percentage = 10 },
-  { Percentage = 40 },
-  { Percentage = 20 },
+  { Percentage = 50 },
+  { Percentage = 10 },
   { Percentage = 10 },
   { Percentage = 20 },
 }

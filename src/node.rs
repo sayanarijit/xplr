@@ -3,8 +3,9 @@ use humansize::{file_size_opts as options, FileSize};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::path::{Path, PathBuf};
+use std::time::UNIX_EPOCH;
 
-fn to_humansize(size: u64) -> String {
+fn to_human_size(size: u64) -> String {
     size.file_size(options::CONVENTIONAL)
         .unwrap_or_else(|_| format!("{} B", size))
 }
@@ -30,6 +31,8 @@ pub struct ResolvedNode {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
+    pub created: Option<u64>,
+    pub last_modified: Option<u64>,
 }
 
 impl ResolvedNode {
@@ -39,15 +42,28 @@ impl ResolvedNode {
             .map(|e| e.to_string_lossy().to_string())
             .unwrap_or_default();
 
-        let (is_dir, is_file, is_readonly, size) = path
+        let (is_dir, is_file, is_readonly, size, created, last_modified) = path
             .metadata()
             .map(|m| {
-                (m.is_dir(), m.is_file(), m.permissions().readonly(), m.len())
+                (
+                    m.is_dir(),
+                    m.is_file(),
+                    m.permissions().readonly(),
+                    m.len(),
+                    m.created()
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| d.as_secs()),
+                    m.modified()
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| d.as_secs()),
+                )
             })
-            .unwrap_or((false, false, false, 0));
+            .unwrap_or((false, false, false, 0, None, None));
 
         let mime_essence = mime_essence(&path, is_dir);
-        let human_size = to_humansize(size);
+        let human_size = to_human_size(size);
 
         Self {
             absolute_path: path.to_string_lossy().to_string(),
@@ -58,6 +74,8 @@ impl ResolvedNode {
             mime_essence,
             size,
             human_size,
+            created,
+            last_modified,
         }
     }
 }
@@ -77,6 +95,9 @@ pub struct Node {
     pub size: u64,
     pub human_size: String,
     pub permissions: Permissions,
+    pub created: Option<u64>,
+    pub last_modified: Option<u64>,
+
     pub canonical: Option<ResolvedNode>,
     pub symlink: Option<ResolvedNode>,
 }
@@ -100,24 +121,50 @@ impl Node {
             .map(|p| (false, Some(ResolvedNode::from(p))))
             .unwrap_or_else(|_| (true, None));
 
-        let (is_symlink, is_dir, is_file, is_readonly, size, permissions) =
-            path.symlink_metadata()
-                .map(|m| {
-                    (
-                        m.file_type().is_symlink(),
-                        m.is_dir(),
-                        m.is_file(),
-                        m.permissions().readonly(),
-                        m.len(),
-                        Permissions::from(&m),
-                    )
-                })
-                .unwrap_or_else(|_| {
-                    (false, false, false, false, 0, Permissions::default())
-                });
+        let (
+            is_symlink,
+            is_dir,
+            is_file,
+            is_readonly,
+            size,
+            permissions,
+            created,
+            last_modified,
+        ) = path
+            .symlink_metadata()
+            .map(|m| {
+                (
+                    m.file_type().is_symlink(),
+                    m.is_dir(),
+                    m.is_file(),
+                    m.permissions().readonly(),
+                    m.len(),
+                    Permissions::from(&m),
+                    m.created()
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| d.as_secs()),
+                    m.modified()
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| d.as_secs()),
+                )
+            })
+            .unwrap_or_else(|_| {
+                (
+                    false,
+                    false,
+                    false,
+                    false,
+                    0,
+                    Permissions::default(),
+                    None,
+                    None,
+                )
+            });
 
         let mime_essence = mime_essence(&path, is_dir);
-        let human_size = to_humansize(size);
+        let human_size = to_human_size(size);
 
         Self {
             parent,
@@ -133,6 +180,8 @@ impl Node {
             size,
             human_size,
             permissions,
+            created,
+            last_modified,
             canonical: maybe_canonical_meta.clone(),
             symlink: if is_symlink {
                 maybe_canonical_meta

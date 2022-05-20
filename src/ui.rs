@@ -375,10 +375,8 @@ pub struct ResolvedNodeUiMetadata {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
-    pub created: Option<i64>,
-    pub human_created: String,
-    pub last_modified: Option<i64>,
-    pub human_last_modified: String,
+    pub created: Option<u64>,
+    pub last_modified: Option<u64>,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
@@ -393,9 +391,7 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
             size: node.size,
             human_size: node.human_size,
             created: node.created,
-            human_created: node.human_created,
             last_modified: node.last_modified.to_owned(),
-            human_last_modified: node.human_last_modified,
         }
     }
 }
@@ -418,10 +414,8 @@ pub struct NodeUiMetadata {
     pub permissions: Permissions,
     pub canonical: Option<ResolvedNodeUiMetadata>,
     pub symlink: Option<ResolvedNodeUiMetadata>,
-    pub created: Option<i64>,
-    pub human_created: String,
-    pub last_modified: Option<i64>,
-    pub human_last_modified: String,
+    pub created: Option<u64>,
+    pub last_modified: Option<u64>,
 
     // Extra
     pub index: usize,
@@ -469,9 +463,7 @@ impl NodeUiMetadata {
             canonical: node.canonical.to_owned().map(ResolvedNode::into),
             symlink: node.symlink.to_owned().map(ResolvedNode::into),
             created: node.created,
-            human_created: node.human_created.to_owned(),
             last_modified: node.last_modified,
-            human_last_modified: node.human_last_modified.to_owned(),
             index,
             relative_index,
             is_before_focus,
