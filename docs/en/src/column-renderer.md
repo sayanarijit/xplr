@@ -34,6 +34,8 @@ The special argument contains the following fields
 - [size][13]
 - [human_size][14]
 - [permissions][15]
+- [created][34]
+- [last_modified][35]
 - [canonical][16]
 - [symlink][17]
 - [index][18]
@@ -126,6 +128,18 @@ Like [size][29] but in human readable format.
 Type: [Permission][30]
 
 The [permissions][30] applied to the node.
+
+### created
+
+Type: nullable integer
+
+Created time in nanosecond since UNIX epoch.
+
+### last_modified
+
+Type: nullable integer
+
+Last modification time in nanosecond since UNIX epoch.
 
 ### canonical
 
@@ -240,6 +254,8 @@ It contains the following fields.
 - [mime_essence][12]
 - [size][13]
 - [human_size][14]
+- [created][34]
+- [last_modified][35]
 
 ## Example: Customizing Table Renderer
 
@@ -297,3 +313,5 @@ xplr.config.general.table.col_widths = {
 [31]: #resolved-node-metadata
 [32]: general-config.md#tabletree
 [33]: node-type.md#meta
+[34]: #created
+[35]: #last_modified
