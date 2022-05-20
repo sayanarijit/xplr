@@ -1003,6 +1003,8 @@ pub enum NodeSorter {
     ByIsReadonly,
     ByMimeEssence,
     BySize,
+    ByCreated,
+    ByLastModified,
 
     ByCanonicalAbsolutePath,
     ByICanonicalAbsolutePath,
@@ -1012,6 +1014,8 @@ pub enum NodeSorter {
     ByCanonicalIsReadonly,
     ByCanonicalMimeEssence,
     ByCanonicalSize,
+    ByCanonicalCreated,
+    ByCanonicalLastModified,
 
     BySymlinkAbsolutePath,
     ByISymlinkAbsolutePath,
@@ -1021,6 +1025,8 @@ pub enum NodeSorter {
     BySymlinkIsReadonly,
     BySymlinkMimeEssence,
     BySymlinkSize,
+    BySymlinkCreated,
+    BySymlinkLastModified,
 }
 
 #[derive(Debug, Clone, Eq, Serialize, Deserialize)]
@@ -1065,6 +1071,8 @@ impl NodeSorterApplicable {
             NodeSorter::ByIsReadonly => a.is_readonly.cmp(&b.is_readonly),
             NodeSorter::ByMimeEssence => a.mime_essence.cmp(&b.mime_essence),
             NodeSorter::BySize => a.size.cmp(&b.size),
+            NodeSorter::ByCreated => a.created.cmp(&b.created),
+            NodeSorter::ByLastModified => a.last_modified.cmp(&b.last_modified),
 
             NodeSorter::ByCanonicalAbsolutePath => natord::compare(
                 &a.canonical
@@ -1126,6 +1134,18 @@ impl NodeSorterApplicable {
                 .map(|s| &s.size)
                 .cmp(&b.canonical.as_ref().map(|s| &s.size)),
 
+            NodeSorter::ByCanonicalCreated => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.created)
+                .cmp(&b.canonical.as_ref().map(|s| &s.created)),
+
+            NodeSorter::ByCanonicalLastModified => a
+                .canonical
+                .as_ref()
+                .map(|s| &s.last_modified)
+                .cmp(&b.canonical.as_ref().map(|s| &s.last_modified)),
+
             NodeSorter::BySymlinkAbsolutePath => natord::compare(
                 &a.symlink
                     .as_ref()
@@ -1183,6 +1203,18 @@ impl NodeSorterApplicable {
                 .as_ref()
                 .map(|s| &s.size)
                 .cmp(&b.symlink.as_ref().map(|s| &s.size)),
+
+            NodeSorter::BySymlinkCreated => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.created)
+                .cmp(&b.symlink.as_ref().map(|s| &s.created)),
+
+            NodeSorter::BySymlinkLastModified => a
+                .symlink
+                .as_ref()
+                .map(|s| &s.last_modified)
+                .cmp(&b.symlink.as_ref().map(|s| &s.last_modified)),
         };
         if self.reverse {
             order.reverse()
