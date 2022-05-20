@@ -375,8 +375,8 @@ pub struct ResolvedNodeUiMetadata {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
-    pub created: Option<u64>,
-    pub last_modified: Option<u64>,
+    pub created: Option<u128>,
+    pub last_modified: Option<u128>,
 }
 
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
@@ -391,7 +391,7 @@ impl From<ResolvedNode> for ResolvedNodeUiMetadata {
             size: node.size,
             human_size: node.human_size,
             created: node.created,
-            last_modified: node.last_modified.to_owned(),
+            last_modified: node.last_modified,
         }
     }
 }
@@ -414,8 +414,8 @@ pub struct NodeUiMetadata {
     pub permissions: Permissions,
     pub canonical: Option<ResolvedNodeUiMetadata>,
     pub symlink: Option<ResolvedNodeUiMetadata>,
-    pub created: Option<u64>,
-    pub last_modified: Option<u64>,
+    pub created: Option<u128>,
+    pub last_modified: Option<u128>,
 
     // Extra
     pub index: usize,
