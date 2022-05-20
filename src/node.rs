@@ -31,8 +31,8 @@ pub struct ResolvedNode {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
-    pub created: Option<u64>,
-    pub last_modified: Option<u64>,
+    pub created: Option<u128>,
+    pub last_modified: Option<u128>,
 }
 
 impl ResolvedNode {
@@ -53,11 +53,11 @@ impl ResolvedNode {
                     m.created()
                         .ok()
                         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .map(|d| d.as_secs()),
+                        .map(|d| d.as_nanos()),
                     m.modified()
                         .ok()
                         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .map(|d| d.as_secs()),
+                        .map(|d| d.as_nanos()),
                 )
             })
             .unwrap_or((false, false, false, 0, None, None));
@@ -95,8 +95,8 @@ pub struct Node {
     pub size: u64,
     pub human_size: String,
     pub permissions: Permissions,
-    pub created: Option<u64>,
-    pub last_modified: Option<u64>,
+    pub created: Option<u128>,
+    pub last_modified: Option<u128>,
 
     pub canonical: Option<ResolvedNode>,
     pub symlink: Option<ResolvedNode>,
@@ -143,11 +143,11 @@ impl Node {
                     m.created()
                         .ok()
                         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .map(|d| d.as_secs()),
+                        .map(|d| d.as_nanos()),
                     m.modified()
                         .ok()
                         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .map(|d| d.as_secs()),
+                        .map(|d| d.as_nanos()),
                 )
             })
             .unwrap_or_else(|_| {

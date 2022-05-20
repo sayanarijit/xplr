@@ -161,7 +161,7 @@ xplr.config.general.table.header.cols = {
   { format = "╭──── path", style = {} },
   { format = "permissions", style = {} },
   { format = "size", style = {} },
-  { format = "type", style = {} },
+  { format = "modified", style = {} },
 }
 
 -- Style of the table header.
@@ -366,13 +366,6 @@ xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style 
 --   * format: nullable string
 --   * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
-  ByCanonicalAbsolutePath = { format = "[c]abs", style = {} },
-  ByCanonicalExtension = { format = "[c]ext", style = {} },
-  ByCanonicalIsDir = { format = "[c]dir", style = {} },
-  ByCanonicalIsFile = { format = "[c]file", style = {} },
-  ByCanonicalIsReadonly = { format = "[c]ro", style = {} },
-  ByCanonicalMimeEssence = { format = "[c]mime", style = {} },
-  ByCanonicalSize = { format = "[c]size", style = {} },
   ByExtension = { format = "ext", style = {} },
   ByICanonicalAbsolutePath = { format = "[ci]abs", style = {} },
   ByIRelativePath = { format = "[i]rel", style = {} },
@@ -385,6 +378,17 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
   ByMimeEssence = { format = "mime", style = {} },
   ByRelativePath = { format = "rel", style = {} },
   BySize = { format = "size", style = {} },
+  ByCreated = { format = "created", style = {} },
+  ByLastModified = { format = "modified", style = {} },
+  ByCanonicalAbsolutePath = { format = "[c]abs", style = {} },
+  ByCanonicalExtension = { format = "[c]ext", style = {} },
+  ByCanonicalIsDir = { format = "[c]dir", style = {} },
+  ByCanonicalIsFile = { format = "[c]file", style = {} },
+  ByCanonicalIsReadonly = { format = "[c]ro", style = {} },
+  ByCanonicalMimeEssence = { format = "[c]mime", style = {} },
+  ByCanonicalSize = { format = "[c]size", style = {} },
+  ByCanonicalCreated = { format = "[c]created", style = {} },
+  ByCanonicalLastModified = { format = "[c]modified", style = {} },
   BySymlinkAbsolutePath = { format = "[s]abs", style = {} },
   BySymlinkExtension = { format = "[s]ext", style = {} },
   BySymlinkIsDir = { format = "[s]dir", style = {} },
@@ -392,6 +396,8 @@ xplr.config.general.sort_and_filter_ui.sorter_identifiers = {
   BySymlinkIsReadonly = { format = "[s]ro", style = {} },
   BySymlinkMimeEssence = { format = "[s]mime", style = {} },
   BySymlinkSize = { format = "[s]size", style = {} },
+  BySymlinkCreated = { format = "[s]created", style = {} },
+  BySymlinkLastModified = { format = "[s]modified", style = {} },
 }
 
 -- The identifiers used to denote applied filters in the Sort & filter panel.
@@ -2636,11 +2642,7 @@ end
 
 -- Renders the fifth column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
-  if m.is_symlink and not m.is_broken then
-    return m.symlink.mime_essence
-  else
-    return m.mime_essence
-  end
+  return tostring(os.date("%a %b %d %H:%M:%S %Y", m.last_modified / 1000000000))
 end
 
 -- This is where the custom functions can be added.
