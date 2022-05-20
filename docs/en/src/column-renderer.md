@@ -133,7 +133,7 @@ The [permissions][30] applied to the node.
 
 Type: nullable integer
 
-Created time in nanosecond since UNIX epoch.
+Creation time in nanosecond since UNIX epoch.
 
 ### last_modified
 

@@ -39,6 +39,8 @@ A sorter can be one of the following:
 - "ByIsReadonly"
 - "ByMimeEssence"
 - "BySize"
+- "ByCreated"
+- "ByLastModified"
 - "ByCanonicalAbsolutePath"
 - "ByICanonicalAbsolutePath"
 - "ByCanonicalExtension"
@@ -47,6 +49,8 @@ A sorter can be one of the following:
 - "ByCanonicalIsReadonly"
 - "ByCanonicalMimeEssence"
 - "ByCanonicalSize"
+- "ByCanonicalCreated"
+- "ByCanonicalLastModified"
 - "BySymlinkAbsolutePath"
 - "ByISymlinkAbsolutePath"
 - "BySymlinkExtension"
@@ -55,6 +59,8 @@ A sorter can be one of the following:
 - "BySymlinkIsReadonly"
 - "BySymlinkMimeEssence"
 - "BySymlinkSize"
+- "BySymlinkSize"
+- "BySymlinkCreated"
 
 TODO: document each
 

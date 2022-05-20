@@ -182,6 +182,18 @@ Type: [Permission][60]
 
 The [permissions][60] applied to the node.
 
+### created
+
+Type: nullable integer
+
+Creation time in nanosecond since UNIX epoch.
+
+### last_modified
+
+Type: nullable integer
+
+Last modification time in nanosecond since UNIX epoch.
+
 ### canonical
 
 Type: nullable [Resolved Node Metadata][61]
@@ -215,6 +227,8 @@ A node contains the following fields:
 - [size][55]
 - [human_size][56]
 - [permissions][57]
+- [created][71]
+- [last_modified][72]
 - [canonical][58]
 - [symlink][59]
 
@@ -352,3 +366,5 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [68]: #loc
 [69]: #paths
 [70]: #history-1
+[71]: #created
+[72]: #last_modified
