@@ -59,8 +59,8 @@ A sorter can be one of the following:
 - "BySymlinkIsReadonly"
 - "BySymlinkMimeEssence"
 - "BySymlinkSize"
-- "BySymlinkSize"
 - "BySymlinkCreated"
+- "BySymlinkLastModified"
 
 TODO: document each
 
