@@ -57,14 +57,15 @@ of [modes][4] and the key mappings for each mode.
 
 ### filter
 
-| key    | remaps | action                             |
-| ------ | ------ | ---------------------------------- |
-| R      |        | relative path does not match regex |
-| ctrl-c |        | terminate                          |
-| ctrl-r |        | reset filters                      |
-| ctrl-u |        | clear filters                      |
-| enter  | esc    | done                               |
-| r      |        | relative path does match regex     |
+| key       | remaps | action                             |
+| --------- | ------ | ---------------------------------- |
+| R         |        | relative path does not match regex |
+| backspace |        | remove last filter                 |
+| ctrl-c    |        | terminate                          |
+| ctrl-r    |        | reset filters                      |
+| ctrl-u    |        | clear filters                      |
+| enter     | esc    | done                               |
+| r         |        | relative path does match regex     |
 
 ### number
 
@@ -179,17 +180,21 @@ of [modes][4] and the key mappings for each mode.
 | key       | remaps | action                            |
 | --------- | ------ | --------------------------------- |
 | !         |        | reverse sorters                   |
+| C         |        | by created reverse                |
 | E         |        | by canonical extension reverse    |
+| L         |        | by last modified reverse          |
 | M         |        | by canonical mime essence reverse |
 | N         |        | by node type reverse              |
 | R         |        | by relative path reverse          |
 | S         |        | by size reverse                   |
 | backspace |        | remove last sorter                |
+| c         |        | by created                        |
 | ctrl-c    |        | terminate                         |
 | ctrl-r    |        | reset sorters                     |
 | ctrl-u    |        | clear sorters                     |
 | e         |        | by canonical extension            |
 | enter     | esc    | done                              |
+| l         |        | by last modified                  |
 | m         |        | by canonical mime essence         |
 | n         |        | by node type                      |
 | r         |        | by relative path                  |
@@ -197,14 +202,15 @@ of [modes][4] and the key mappings for each mode.
 
 ### filter
 
-| key    | remaps | action                             |
-| ------ | ------ | ---------------------------------- |
-| R      |        | relative path does not match regex |
-| ctrl-c |        | terminate                          |
-| ctrl-r |        | reset filters                      |
-| ctrl-u |        | clear filters                      |
-| enter  | esc    | done                               |
-| r      |        | relative path does match regex     |
+| key       | remaps | action                             |
+| --------- | ------ | ---------------------------------- |
+| R         |        | relative path does not match regex |
+| backspace |        | remove last filter                 |
+| ctrl-c    |        | terminate                          |
+| ctrl-r    |        | reset filters                      |
+| ctrl-u    |        | clear filters                      |
+| enter     | esc    | done                               |
+| r         |        | relative path does match regex     |
 
 ### relative path does match regex
 
