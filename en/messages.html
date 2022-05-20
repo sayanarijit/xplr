@@ -208,7 +208,7 @@ instead.</p>
 <p>Clear the screen.</p>
 <p>Example:</p>
 <ul>
-<li>Lua: `&quot;ClearScreen&quot;``</li>
+<li>Lua: <code>&quot;ClearScreen&quot;</code></li>
 <li>YAML: <code>ClearScreen</code></li>
 </ul>
 <h4 id="refresh"><a class="header" href="#refresh">Refresh</a></h4>
@@ -366,6 +366,14 @@ read from the input buffer.</p>
 <p>Lua: <code>&quot;FollowSymlink&quot;</code>
 YAML: <code>FollowSymlink</code></p>
 <h3 id="reading-input"><a class="header" href="#reading-input">Reading Input</a></h3>
+<h4 id="setinputprompt"><a class="header" href="#setinputprompt">SetInputPrompt</a></h4>
+<p>Set the input prompt temporarily, until the input buffer is reset.</p>
+<p>Type: { SetInputPrompt = string }</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>{ SetInputPrompt = &quot;→&quot; }</code></li>
+<li>YAML: <code>SetInputPrompt: →</code></li>
+</ul>
 <h4 id="updateinputbuffer"><a class="header" href="#updateinputbuffer">UpdateInputBuffer</a></h4>
 <p>Update the input buffer using cursor based operations.</p>
 <p>Type: { UpdateInputBuffer = <a href="https://xplr.dev/en/input-operation">Input Opertaion</a> }</p>
