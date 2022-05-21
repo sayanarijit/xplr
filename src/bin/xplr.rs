@@ -58,7 +58,11 @@ fn main() {
         match runner::from_cli(cli).and_then(|a| a.run()) {
             Ok(Some(mut out)) => {
                 if write0 {
-                    out = out.trim_end().replace('\n', "\0");
+                    out = out
+                        .trim_end()
+                        .chars()
+                        .map(|c| if c == '\n' { '\0' } else { c })
+                        .collect();
                 }
                 print!("{}", out);
             }

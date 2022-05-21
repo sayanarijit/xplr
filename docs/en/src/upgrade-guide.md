@@ -62,7 +62,7 @@ compatibility.
 - Added key binding `f` `backspace` to remove the last filter.
 - Search mode now defaults to regex search.
 - Added a new message `SetInputPrompt` to set the input prompt dynamically.
-- Added new node properties (available via teh Lua API):
+- Added new node properties (available via the Lua API):
   - `created`
   - `last_modified`
 - Added support for sorting with timestamp using the new sorters:
