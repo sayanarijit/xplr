@@ -164,7 +164,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.X = {
   help = "open",
   messages = {
     {
-      BashExec = [===[
+      BashExecSilently = [===[
       xdg-open "${XPLR_FOCUS_PATH:?}"
       ]===],
     },

@@ -8,7 +8,7 @@ When called the function receives a [special argument][14] that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.
 
-### Lua Context
+## Lua Context
 
 This is a special argument passed to the lua functions when called using the
 `CallLua`, `CallLuaSilently` messages.
@@ -102,6 +102,28 @@ Type: [History][70]
 Type: list of [Mode][8]
 
 Last modes, not popped yet.
+
+## Node
+
+A node contains the following fields:
+
+- [parent][45]
+- [relative_path][46]
+- [absolute_path][47]
+- [extension][48]
+- [is_symlink][49]
+- [is_broken][50]
+- [is_dir][51]
+- [is_file][52]
+- [is_readonly][53]
+- [mime_essence][54]
+- [size][55]
+- [human_size][56]
+- [permissions][57]
+- [created][71]
+- [last_modified][72]
+- [canonical][58]
+- [symlink][59]
 
 ### parent
 
@@ -210,29 +232,7 @@ If the node is a symlink and is not broken, it will hold information about the
 symlink resolved node. However, it will never hold information about the actual
 node. It will instead be null.
 
-### Node
-
-A node contains the following fields:
-
-- [parent][45]
-- [relative_path][46]
-- [absolute_path][47]
-- [extension][48]
-- [is_symlink][49]
-- [is_broken][50]
-- [is_dir][51]
-- [is_file][52]
-- [is_readonly][53]
-- [mime_essence][54]
-- [size][55]
-- [human_size][56]
-- [permissions][57]
-- [created][71]
-- [last_modified][72]
-- [canonical][58]
-- [symlink][59]
-
-### Directory Buffer
+## Directory Buffer
 
 Directory buffer contains the following fields:
 
@@ -241,51 +241,51 @@ Directory buffer contains the following fields:
 - [total][64]
 - [focus][65]
 
-#### parent
+### parent
 
 Type: string
 
 The parent path of the node.
 
-#### nodes
+### nodes
 
 Type: list of [Node][44]s
 
 A list of visible nodes.
 
-#### total
+### total
 
 Type: int
 
 The count of nodes being rendered.
 
-#### focus
+### focus
 
 Type: int
 
 The index of the node under focus. It can be `0` even when there's no node to
 focus on.
 
-### History
+## History
 
 History contains the following fields:
 
 - [loc][68]
 - [paths][69]
 
-#### loc
+### loc
 
 Type: int
 
 Location of the current path in history.
 
-#### paths
+### paths
 
 Type: list of string
 
 Visited paths.
 
-### Example: Using Lua Function Calls
+## Example: Using Lua Function Calls
 
 ```lua
 -- Define the function
