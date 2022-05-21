@@ -189,9 +189,19 @@ compatibility.</p>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
 <h4 id="v0176---v0180"><a class="header" href="#v0176---v0180"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a></a></h4>
 <ul>
-<li>Added new command-line arguments <code>--read0</code>, <code>--write0</code> and <code>-0</code>/<code>--null</code> to
-support reading and printing null character delimited file paths.</li>
-<li>Added support for filtering with regex using the new filters:
+<li>Key binding <code>f</code> <code>r</code> and <code>f</code> <code>R</code> will now filter using regex.</li>
+<li>Key binding <code>f</code> <code>backspace</code> will now remove the last filter.</li>
+<li>Search mode now defaults to regex search.</li>
+<li><code>Node</code> metadata in the Lua API will contain two new fields:
+<ul>
+<li><code>created</code></li>
+<li><code>last_modified</code></li>
+</ul>
+</li>
+<li>The last column in the files table now displays the last modification time.</li>
+<li>You can now use <code>--read0</code>, <code>--write0</code> and <code>-0</code>/<code>--null</code> to read and/or print
+null character delimited paths.</li>
+<li>You can now the following regex filters:
 <ul>
 <li><code>RelativePathDoesMatchRegex</code></li>
 <li><code>RelativePathDoesNotMatchRegex</code></li>
@@ -203,17 +213,8 @@ support reading and printing null character delimited file paths.</li>
 <li><code>IAbsolutePathDoesNotMatchRegex</code></li>
 </ul>
 </li>
-<li>Key binding <code>f</code> <code>r</code> and <code>f</code> <code>R</code> will now filter using regex.</li>
-<li>Added key binding <code>f</code> <code>backspace</code> to remove the last filter.</li>
-<li>Search mode now defaults to regex search.</li>
-<li>Added a new message <code>SetInputPrompt</code> to set the input prompt dynamically.</li>
-<li>Added new node properties (available via the Lua API):
-<ul>
-<li><code>created</code></li>
-<li><code>last_modified</code></li>
-</ul>
-</li>
-<li>Added support for sorting with timestamp using the new sorters:
+<li>You can use a new <code>SetInputPrompt</code> to set the input prompt dynamically.</li>
+<li>You can now use the following timestamp based sorters:
 <ul>
 <li>&quot;ByCreated&quot;</li>
 <li>&quot;ByLastModified&quot;</li>
@@ -223,10 +224,6 @@ support reading and printing null character delimited file paths.</li>
 <li>&quot;BySymlinkLastModified&quot;</li>
 </ul>
 </li>
-<li>The last column in the files table now displays the last modification time.</li>
-<li>Fixed a bug causing crashes when handling unicode characters in the input 
-buffer.</li>
-<li>Improved docs.</li>
 </ul>
 <p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0164---v0176"><a class="header" href="#v0164---v0176"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.16.4">v0.16.4</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a></a></h4>
