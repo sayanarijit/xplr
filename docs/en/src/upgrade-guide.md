@@ -47,9 +47,16 @@ compatibility.
 
 #### [v0.17.6][45] -> [v0.18.0][46]
 
-- Added new command-line arguments `--read0`, `--write0` and `-0`/`--null` to
-  support reading and printing null character delimited file paths.
-- Added support for filtering with regex using the new filters:
+- Key binding `f` `r` and `f` `R` will now filter using regex.
+- Key binding `f` `backspace` will now remove the last filter.
+- Search mode now defaults to regex search.
+- `Node` metadata in the Lua API will contain two new fields:
+  - `created`
+  - `last_modified`
+- The last column in the files table now displays the last modification time.
+- You can now use `--read0`, `--write0` and `-0`/`--null` to read and/or print
+  null character delimited paths.
+- You can now the following regex filters:
   - `RelativePathDoesMatchRegex`
   - `RelativePathDoesNotMatchRegex`
   - `IRelativePathDoesMatchRegex`
@@ -58,24 +65,14 @@ compatibility.
   - `AbsolutePathDoesNotMatchRegex`
   - `IAbsolutePathDoesMatchRegex`
   - `IAbsolutePathDoesNotMatchRegex`
-- Key binding `f` `r` and `f` `R` will now filter using regex.
-- Added key binding `f` `backspace` to remove the last filter.
-- Search mode now defaults to regex search.
-- Added a new message `SetInputPrompt` to set the input prompt dynamically.
-- Added new node properties (available via the Lua API):
-  - `created`
-  - `last_modified`
-- Added support for sorting with timestamp using the new sorters:
+- You can use a new `SetInputPrompt` to set the input prompt dynamically.
+- You can now use the following timestamp based sorters:
   - "ByCreated"
   - "ByLastModified"
   - "ByCanonicalCreated"
   - "ByCanonicalLastModified"
   - "BySymlinkCreated"
   - "BySymlinkLastModified"
-- The last column in the files table now displays the last modification time.
-- Fixed a bug causing crashes when handling unicode characters in the input 
-  buffer.
-- Improved docs.
 
 <sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
