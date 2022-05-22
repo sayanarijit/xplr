@@ -100,3 +100,4 @@ of the following plugins work for you, it's very easy to
 [47]: https://github.com/dtomvan/xpm.xplr
 [48]: installing-plugins.md
 [49]: https://github.com/sayanarijit/registers.xplr
+[50]: https://github.com/dtomvan/extra-icons.xplr
