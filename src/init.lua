@@ -762,7 +762,6 @@ xplr.config.node_types.symlink.meta.icon = "§"
 --   },
 -- }
 -- ```
-
 xplr.config.node_types.mime_essence = {}
 
 -- Metadata and style based on extension.

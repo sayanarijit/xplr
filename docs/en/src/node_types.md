@@ -90,6 +90,9 @@ xplr.config.node_types.mime_essence = {
 
     -- application/pdf
     pdf = { meta = { icon = "" }, style = { fg = "Blue" } },
+
+#### xplr.config.node_types.mime_essence
+
     -- application/zip
     zip = { meta = { icon = ""} },
   },
