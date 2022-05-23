@@ -69,6 +69,8 @@ xplr.config.node_types.symlink.meta.foo = "foo"
 xplr.config.node_types.symlink.meta.bar = "bar"
 ```
 
+#### xplr.config.node_types.mime_essence
+
 Metadata and style based on mime types.
 It is possible to use the wildcard `*` to match all mime sub types. It will
 be overwritten by the more specific sub types that are defined.
@@ -90,8 +92,6 @@ xplr.config.node_types.mime_essence = {
 
     -- application/pdf
     pdf = { meta = { icon = "" }, style = { fg = "Blue" } },
-
-#### xplr.config.node_types.mime_essence
 
     -- application/zip
     zip = { meta = { icon = ""} },

@@ -756,7 +756,7 @@ xplr.config.node_types.symlink.meta.icon = "§"
 --
 --     -- application/pdf
 --     pdf = { meta = { icon = "" }, style = { fg = "Blue" } },
-
+--
 --     -- application/zip
 --     zip = { meta = { icon = ""} },
 --   },
