@@ -14,7 +14,7 @@ integers. They will be plugged using the `require()` function in Lua.
 A minimal plugin should confirm to the following structure:
 
 ```
-plugin-name
+.
 ├── README.md
 └── init.lua
 ```
