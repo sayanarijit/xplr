@@ -683,22 +683,38 @@ xplr.config.node_types.directory.style = {
   add_modifiers = { "Bold" },
 }
 
--- Metadata for the directory nodes
+-- Metadata for the directory nodes.
+-- You can set as many metadata as you want.
 --
 -- Type: nullable string
+--
+-- Example:
+--
+-- ```lua
+-- xplr.config.node_types.directory.meta.foo = "foo"
+-- xplr.config.node_types.directory.meta.bar = "bar"
+-- ```
 xplr.config.node_types.directory.meta.icon = "ð"
 
--- The style for the file nodes
+-- The style for the file nodes.
 --
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.node_types.file.style = {}
 
 -- Metadata for the file nodes
+-- You can set as many metadata as you want.
 --
 -- Type: nullable string
+--
+-- Example:
+--
+-- ```lua
+-- xplr.config.node_types.file.meta.foo = "foo"
+-- xplr.config.node_types.file.meta.bar = "bar"
+-- ``
 xplr.config.node_types.file.meta.icon = "ƒ"
 
--- The style for the symlink nodes
+-- The style for the symlink nodes.
 --
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.node_types.symlink.style = {
@@ -707,8 +723,16 @@ xplr.config.node_types.symlink.style = {
 }
 
 -- Metadata for the symlink nodes
+-- You can set as many metadata as you want.
 --
 -- Type: nullable string
+--
+-- Example:
+--
+-- ```lua
+-- xplr.config.node_types.symlink.meta.foo = "foo"
+-- xplr.config.node_types.symlink.meta.bar = "bar"
+-- ```
 xplr.config.node_types.symlink.meta.icon = "§"
 
 -- Metadata and style based on mime types.
