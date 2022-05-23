@@ -37,17 +37,17 @@ Type: [Style](https://xplr.dev/en/style)
 
 #### xplr.config.node_types.file.meta.icon
 
-Metadata for the file nodes
+Metadata for the file nodes.
 You can set as many metadata as you want.
 
 Type: nullable string
 
 Example:
 
-````lua
+```lua
 xplr.config.node_types.file.meta.foo = "foo"
 xplr.config.node_types.file.meta.bar = "bar"
-``
+```
 
 #### xplr.config.node_types.symlink.style
 
@@ -57,7 +57,7 @@ Type: [Style](https://xplr.dev/en/style)
 
 #### xplr.config.node_types.symlink.meta.icon
 
-Metadata for the symlink nodes
+Metadata for the symlink nodes.
 You can set as many metadata as you want.
 
 Type: nullable string
@@ -67,7 +67,7 @@ Example:
 ```lua
 xplr.config.node_types.symlink.meta.foo = "foo"
 xplr.config.node_types.symlink.meta.bar = "bar"
-````
+```
 
 Metadata and style based on mime types.
 It is possible to use the wildcard `*` to match all mime sub types. It will

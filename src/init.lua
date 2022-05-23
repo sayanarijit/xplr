@@ -701,7 +701,7 @@ xplr.config.node_types.directory.meta.icon = "ð"
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.node_types.file.style = {}
 
--- Metadata for the file nodes
+-- Metadata for the file nodes.
 -- You can set as many metadata as you want.
 --
 -- Type: nullable string
@@ -711,7 +711,7 @@ xplr.config.node_types.file.style = {}
 -- ```lua
 -- xplr.config.node_types.file.meta.foo = "foo"
 -- xplr.config.node_types.file.meta.bar = "bar"
--- ``
+-- ```
 xplr.config.node_types.file.meta.icon = "ƒ"
 
 -- The style for the symlink nodes.
@@ -722,7 +722,7 @@ xplr.config.node_types.symlink.style = {
   add_modifiers = { "Italic" },
 }
 
--- Metadata for the symlink nodes
+-- Metadata for the symlink nodes.
 -- You can set as many metadata as you want.
 --
 -- Type: nullable string
