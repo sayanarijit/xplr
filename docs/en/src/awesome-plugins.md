@@ -10,7 +10,7 @@ of the following plugins work for you, it's very easy to
 - [**igorepst/context-switch.xplr**][42] Context switch plugin for xplr.
 - [**sayanarijit/dual-pane.xplr**][43] Implements support for dual-pane navigation into xplr.
 - [**sayanarijit/map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
-- [**sayanarijit/offline-docs.xplr**][51] Fetch the latest xplr docs and browse offline.
+- [**sayanarijit/offline-docs.xplr**][51] Fetch the appropriate version of xplr docs and browse offline.
 - [**sayanarijit/registers.xplr**][49] Use multiple registers to store the selected paths.
 - [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
