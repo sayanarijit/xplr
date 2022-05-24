@@ -9,7 +9,6 @@ If none of the following integrations work for you, you can create your own and
 
 - [**fm-nvim**][10] Neovim plugin that lets you use your favorite terminal file managers from within Neovim.
 - [**vim-floaterm**][6] xplr integrated in vim-floaterm (Neo)vim plugin.
-- [**xplr.nvim**][9] Opens xplr inside nvim, and hosts a msgpack client inside xplr.
 - [**xplr.vim**][5] Pick files in Vim using xplr.
 
 ### Shell
@@ -33,7 +32,6 @@ If none of the following integrations work for you, you can create your own and
 [6]: https://github.com/voldikss/vim-floaterm#xplr
 [7]: https://github.com/romkatv/powerlevel10k/blob/191d1b89e325ee3b6d2d75a394654aaf4f077a7c/internal/p10k.zsh#L4756-L4768
 [8]: https://github.com/orhun/gpg-tui#importreceive
-[9]: https://github.com/fhill2/xplr.nvim
 [10]: https://github.com/is0n/fm-nvim
 [11]: awesome-hacks.md
 [12]: awesome-plugins.md
