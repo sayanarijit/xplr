@@ -10,8 +10,11 @@ You can contribute to this project in the following ways
   - **Designers:** You can make the logo even more awesome, donate stickers and blog post worthy pictures.
   - **Bloggers, YouTubers & broadcasters:** You can help spread the word.
 
-- Contribute by donating.
-  - You can [fuel me with coins of encouragement][2] or [buy me a coffee][3].
+- Contribute by donating or sponsoring me via any of the following ways.
+  - [GitHub Sponsors][5]
+  - [Open Collective][2]
+  - [ko-fi][3]
+  - [liberapay][6]
 
 For further queries or concern related to `xplr`, [just ask us][4].
 
@@ -23,3 +26,5 @@ For further queries or concern related to `xplr`, [just ask us][4].
 [2]: https://opencollective.com/xplr
 [3]: https://ko-fi.com/sayanarijit
 [4]: community.md
+[5]: https://github.com/sponsors/sayanarijit?o=esb
+[6]: https://liberapay.com/sayanarijit
