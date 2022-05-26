@@ -3787,6 +3787,79 @@ imv-msg &quot;$IMV_PID&quot; quit
 [ -e &quot;$FIFO_PATH&quot; ] &amp;&amp; rm -f &quot;$FIFO_PATH&quot;
 </code></pre>
 </details>
+<h3 id="text-preview-pane"><a class="header" href="#text-preview-pane">Text preview pane</a></h3>
+<p>Preview text files in a native xplr pane (should be fast enough).</p>
+<details>
+<summary>Expand for details</summary>
+<ul>
+<li>Author: <a href="https://github.com/sayanarijit">@sayanarijit</a></li>
+<li>Requires: none</li>
+<li>Tested on: Linux</li>
+</ul>
+<pre><code class="language-lua">local function stat(node)
+  return node.mime_essence
+end
+
+local function read(path, lines)
+  local out = &quot;&quot;
+  local p = io.open(path)
+
+  if p == nil then
+    return stat(path)
+  end
+
+  local i = 0
+  for line in p:lines() do
+    out = out .. line .. &quot;\n&quot;
+    if i == lines then
+      break
+    end
+    i = i + 1
+  end
+  p:close()
+
+  return out
+end
+
+xplr.config.layouts.builtin.default = {
+  Horizontal = {
+    config = {
+      constraints = {
+        { Percentage = 60 },
+        { Percentage = 40 },
+      },
+    },
+    splits = {
+      &quot;Table&quot;,
+      {
+        CustomContent = {
+          title = &quot;preview&quot;,
+          body = { DynamicParagraph = { render = &quot;custom.render_layout&quot; } },
+        },
+      },
+    },
+  },
+}
+
+xplr.fn.custom.render_layout = function(ctx)
+  local n = ctx.app.focused_node
+
+  if n.canonical then
+    n = n.canonical
+  end
+
+  if n then
+    if n.is_file and not n.is_symlink then
+      return read(n.absolute_path, ctx.layout_size.height)
+    else
+      return stat(n)
+    end
+  else
+    return &quot;&quot;
+  end
+end
+</code></pre>
+</details>
 <h2 id="also-see-6"><a class="header" href="#also-see-6">Also See:</a></h2>
 <ul>
 <li><a href="awesome-plugins.html">Awesome Plugins</a></li>
