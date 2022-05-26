@@ -434,14 +434,15 @@ xplr.config.layouts.builtin.default = {
       {
         CustomContent = {
           title = "preview",
-          body = { DynamicParagraph = { render = "custom.render_layout" } },
+          body = { DynamicParagraph = { render = "custom.preview_pane.render" } },
         },
       },
     },
   },
 }
 
-xplr.fn.custom.render_layout = function(ctx)
+xplr.fn.custom.preview_pane = {}
+xplr.fn.custom.preview_pane.render = function(ctx)
   local n = ctx.app.focused_node
 
   if n.canonical then
@@ -449,7 +450,7 @@ xplr.fn.custom.render_layout = function(ctx)
   end
 
   if n then
-    if n.is_file and not n.is_symlink then
+    if n.is_file then
       return read(n.absolute_path, ctx.layout_size.height)
     else
       return stat(n)
