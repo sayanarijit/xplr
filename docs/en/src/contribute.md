@@ -15,6 +15,7 @@ You can contribute to this project in the following ways
   - [Open Collective][2]
   - [ko-fi][3]
   - [liberapay][6]
+  - [PayPal][7]
 
 For further queries or concern related to `xplr`, [just ask us][4].
 
@@ -28,3 +29,4 @@ For further queries or concern related to `xplr`, [just ask us][4].
 [4]: community.md
 [5]: https://github.com/sponsors/sayanarijit?o=esb
 [6]: https://liberapay.com/sayanarijit
+[7]: https://paypal.me/sayanarijit
