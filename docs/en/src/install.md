@@ -44,6 +44,8 @@ nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
 
 ### Arch Linux
 
+(same for Manjaro Linux)
+
 #### [Official Community Repo][7]
 
 ```
@@ -58,9 +60,24 @@ Git version:
 paru -S xplr-git
 ```
 
+### Alpine Linux
+
+#### [Edge Testing Repo][27]
+
+```
+# Add the following line in /etc/apk/repositories:
+# https://dl-cdn.alpinelinux.org/alpine/edge/testing
+
+apk add xplr bash less
+```
+
 ### Void Linux
 
 #### [void-templates by shubham][9]
+
+### Gentoo
+
+#### [Overlay GURU][28]
 
 ### macOS
 
@@ -245,3 +262,5 @@ sudo cp target/release/xplr /usr/local/bin/
 [24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
 [25]: https://gifyu.com/image/tF2D
 [26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
+[27]: https://pkgs.alpinelinux.org/packages?name=xplr
+[28]: https://gpo.zugaina.org/Overlays/guru/app-misc/xplr
