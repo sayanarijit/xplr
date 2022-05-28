@@ -15,6 +15,7 @@ of the following plugins work for you, it's very easy to
 - [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 - [**igorepst/term.xplr**][39] Terminal integration for xplr
+- [**sayanarijit/wl-clipboard.xplr**][52] Copy and paste with system clipboard using wl-clipboard 
 - [**dtomvan/xpm.xplr**][47] The XPLR Plugin Manager
 
 ### Integration
@@ -103,3 +104,4 @@ of the following plugins work for you, it's very easy to
 [49]: https://github.com/sayanarijit/registers.xplr
 [50]: https://github.com/dtomvan/extra-icons.xplr
 [51]: https://github.com/sayanarijit/offline-docs.xplr
+[52]: https://github.com/sayanarijit/wl-clipboard.xplr
