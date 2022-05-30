@@ -1289,7 +1289,13 @@ pub enum NodeFilter {
 }
 
 impl NodeFilter {
-    fn apply(&self, node: &Node, input: &str) -> bool {
+    fn apply(
+        &self,
+        node: &Node,
+        input: &str,
+        regex: Option<&Regex>,
+        iregex: Option<&Regex>,
+    ) -> bool {
         match self {
             Self::RelativePathIs => node.relative_path.eq(input),
             Self::IRelativePathIs => {
@@ -1312,7 +1318,6 @@ impl NodeFilter {
             Self::RelativePathDoesNotStartWith => {
                 !node.relative_path.starts_with(input)
             }
-
             Self::IRelativePathDoesNotStartWith => !node
                 .relative_path
                 .to_lowercase()
@@ -1348,23 +1353,19 @@ impl NodeFilter {
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesMatchRegex => Regex::new(input)
+            Self::RelativePathDoesMatchRegex => regex
                 .map(|r| r.is_match(&node.relative_path))
                 .unwrap_or(false),
-            Self::IRelativePathDoesMatchRegex => {
-                Regex::new(&input.to_lowercase())
-                    .map(|r| r.is_match(&node.relative_path.to_lowercase()))
-                    .unwrap_or(false)
-            }
+            Self::IRelativePathDoesMatchRegex => iregex
+                .map(|r| r.is_match(&node.relative_path.to_lowercase()))
+                .unwrap_or(false),
 
-            Self::RelativePathDoesNotMatchRegex => !Regex::new(input)
+            Self::RelativePathDoesNotMatchRegex => !regex
                 .map(|r| r.is_match(&node.relative_path))
                 .unwrap_or(false),
-            Self::IRelativePathDoesNotMatchRegex => {
-                !Regex::new(&input.to_lowercase())
-                    .map(|r| r.is_match(&node.relative_path.to_lowercase()))
-                    .unwrap_or(false)
-            }
+            Self::IRelativePathDoesNotMatchRegex => !iregex
+                .map(|r| r.is_match(&node.relative_path.to_lowercase()))
+                .unwrap_or(false),
 
             Self::AbsolutePathIs => node.absolute_path.eq(input),
             Self::IAbsolutePathIs => {
@@ -1422,24 +1423,49 @@ impl NodeFilter {
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesMatchRegex => Regex::new(input)
+            Self::AbsolutePathDoesMatchRegex => regex
                 .map(|r| r.is_match(&node.absolute_path))
                 .unwrap_or(false),
-            Self::IAbsolutePathDoesMatchRegex => {
-                Regex::new(&input.to_lowercase())
-                    .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
-                    .unwrap_or(false)
-            }
+            Self::IAbsolutePathDoesMatchRegex => iregex
+                .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
+                .unwrap_or(false),
 
-            Self::AbsolutePathDoesNotMatchRegex => !Regex::new(input)
+            Self::AbsolutePathDoesNotMatchRegex => !regex
                 .map(|r| r.is_match(&node.absolute_path))
                 .unwrap_or(false),
-            Self::IAbsolutePathDoesNotMatchRegex => {
-                !Regex::new(&input.to_lowercase())
-                    .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
-                    .unwrap_or(false)
-            }
+            Self::IAbsolutePathDoesNotMatchRegex => !iregex
+                .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
+                .unwrap_or(false),
         }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CmpRegex(Regex);
+
+impl std::hash::Hash for CmpRegex {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.as_str().hash(state)
+    }
+}
+
+impl PartialEq for CmpRegex {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.as_str() == other.0.as_str()
+    }
+}
+
+impl Eq for CmpRegex {}
+
+impl From<Regex> for CmpRegex {
+    fn from(r: Regex) -> Self {
+        CmpRegex(r)
+    }
+}
+
+impl From<CmpRegex> for Regex {
+    fn from(r: CmpRegex) -> Self {
+        r.0
     }
 }
 
@@ -1448,15 +1474,33 @@ impl NodeFilter {
 pub struct NodeFilterApplicable {
     pub filter: NodeFilter,
     pub input: String,
+
+    #[serde(skip)]
+    pub regex: Option<CmpRegex>,
+
+    #[serde(skip)]
+    pub iregex: Option<CmpRegex>,
 }
 
 impl NodeFilterApplicable {
     pub fn new(filter: NodeFilter, input: String) -> Self {
-        Self { filter, input }
+        let regex = Regex::new(&input).ok().map(CmpRegex);
+        let iregex = Regex::new(&input.to_lowercase()).ok().map(CmpRegex);
+        Self {
+            filter,
+            input,
+            regex,
+            iregex,
+        }
     }
 
     fn apply(&self, node: &Node) -> bool {
-        self.filter.apply(node, &self.input)
+        self.filter.apply(
+            node,
+            &self.input,
+            self.regex.as_ref().map(|r| &r.0),
+            self.iregex.as_ref().map(|r| &r.0),
+        )
     }
 }
 
