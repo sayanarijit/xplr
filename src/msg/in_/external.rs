@@ -1289,13 +1289,7 @@ pub enum NodeFilter {
 }
 
 impl NodeFilter {
-    fn apply(
-        &self,
-        node: &Node,
-        input: &str,
-        regex: Option<&Regex>,
-        iregex: Option<&Regex>,
-    ) -> bool {
+    fn apply(&self, node: &Node, input: &str, regex: Option<&Regex>) -> bool {
         match self {
             Self::RelativePathIs => node.relative_path.eq(input),
             Self::IRelativePathIs => {
@@ -1356,14 +1350,14 @@ impl NodeFilter {
             Self::RelativePathDoesMatchRegex => regex
                 .map(|r| r.is_match(&node.relative_path))
                 .unwrap_or(false),
-            Self::IRelativePathDoesMatchRegex => iregex
+            Self::IRelativePathDoesMatchRegex => regex
                 .map(|r| r.is_match(&node.relative_path.to_lowercase()))
                 .unwrap_or(false),
 
             Self::RelativePathDoesNotMatchRegex => !regex
                 .map(|r| r.is_match(&node.relative_path))
                 .unwrap_or(false),
-            Self::IRelativePathDoesNotMatchRegex => !iregex
+            Self::IRelativePathDoesNotMatchRegex => !regex
                 .map(|r| r.is_match(&node.relative_path.to_lowercase()))
                 .unwrap_or(false),
 
@@ -1426,14 +1420,14 @@ impl NodeFilter {
             Self::AbsolutePathDoesMatchRegex => regex
                 .map(|r| r.is_match(&node.absolute_path))
                 .unwrap_or(false),
-            Self::IAbsolutePathDoesMatchRegex => iregex
+            Self::IAbsolutePathDoesMatchRegex => regex
                 .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
                 .unwrap_or(false),
 
             Self::AbsolutePathDoesNotMatchRegex => !regex
                 .map(|r| r.is_match(&node.absolute_path))
                 .unwrap_or(false),
-            Self::IAbsolutePathDoesNotMatchRegex => !iregex
+            Self::IAbsolutePathDoesNotMatchRegex => !regex
                 .map(|r| r.is_match(&node.absolute_path.to_lowercase()))
                 .unwrap_or(false),
         }
@@ -1467,49 +1461,42 @@ pub struct NodeFilterApplicable {
 
     #[serde(skip)]
     pub regex: Option<CmpRegex>,
-
-    #[serde(skip)]
-    pub iregex: Option<CmpRegex>,
 }
 
 impl NodeFilterApplicable {
     pub fn new(filter: NodeFilter, input: String) -> Self {
         use NodeFilter::*;
 
-        let (regex, iregex) = if matches!(
+        let regex = if matches!(
             filter,
             RelativePathDoesMatchRegex
-                | IRelativePathDoesMatchRegex
                 | RelativePathDoesNotMatchRegex
-                | IRelativePathDoesNotMatchRegex
                 | AbsolutePathDoesMatchRegex
-                | IAbsolutePathDoesMatchRegex
                 | AbsolutePathDoesNotMatchRegex
+        ) {
+            Regex::new(&input).ok().map(CmpRegex)
+        } else if matches!(
+            filter,
+            IRelativePathDoesMatchRegex
+                | IRelativePathDoesNotMatchRegex
+                | IAbsolutePathDoesMatchRegex
                 | IAbsolutePathDoesNotMatchRegex
         ) {
-            (
-                Regex::new(&input).ok().map(CmpRegex),
-                Regex::new(&input.to_lowercase()).ok().map(CmpRegex),
-            )
+            Regex::new(&input.to_lowercase()).ok().map(CmpRegex)
         } else {
-            (None, None)
+            None
         };
 
         Self {
             filter,
             input,
             regex,
-            iregex,
         }
     }
 
     fn apply(&self, node: &Node) -> bool {
-        self.filter.apply(
-            node,
-            &self.input,
-            self.regex.as_ref().map(|r| &r.0),
-            self.iregex.as_ref().map(|r| &r.0),
-        )
+        self.filter
+            .apply(node, &self.input, self.regex.as_ref().map(|r| &r.0))
     }
 }
 
