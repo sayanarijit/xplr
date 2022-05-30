@@ -1474,8 +1474,27 @@ pub struct NodeFilterApplicable {
 
 impl NodeFilterApplicable {
     pub fn new(filter: NodeFilter, input: String) -> Self {
-        let regex = Regex::new(&input).ok().map(CmpRegex);
-        let iregex = Regex::new(&input.to_lowercase()).ok().map(CmpRegex);
+        use NodeFilter::*;
+
+        let (regex, iregex) = if matches!(
+            filter,
+            RelativePathDoesMatchRegex
+                | IRelativePathDoesMatchRegex
+                | RelativePathDoesNotMatchRegex
+                | IRelativePathDoesNotMatchRegex
+                | AbsolutePathDoesMatchRegex
+                | IAbsolutePathDoesMatchRegex
+                | AbsolutePathDoesNotMatchRegex
+                | IAbsolutePathDoesNotMatchRegex
+        ) {
+            (
+                Regex::new(&input).ok().map(CmpRegex),
+                Regex::new(&input.to_lowercase()).ok().map(CmpRegex),
+            )
+        } else {
+            (None, None)
+        };
+
         Self {
             filter,
             input,
