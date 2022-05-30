@@ -1440,6 +1440,8 @@ impl NodeFilter {
     }
 }
 
+// Regex doesn't implement Hash and Eq. But we need them.
+
 #[derive(Debug, Clone)]
 pub struct CmpRegex(Regex);
 
@@ -1456,18 +1458,6 @@ impl PartialEq for CmpRegex {
 }
 
 impl Eq for CmpRegex {}
-
-impl From<Regex> for CmpRegex {
-    fn from(r: Regex) -> Self {
-        CmpRegex(r)
-    }
-}
-
-impl From<CmpRegex> for Regex {
-    fn from(r: CmpRegex) -> Self {
-        r.0
-    }
-}
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
