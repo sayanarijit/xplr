@@ -158,7 +158,7 @@ xplr.config.general.logs.error.style = { fg = "Red" }
 -- * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.header.cols = {
   { format = " index", style = {} },
-  { format = "╭──── path", style = {} },
+  { format = "╭─── path", style = {} },
   { format = "permissions", style = {} },
   { format = "size", style = {} },
   { format = "modified", style = {} },
@@ -225,9 +225,9 @@ xplr.config.general.table.style = {}
 -- * format: nullable string
 -- * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.tree = {
-  { format = "├─", style = {} },
-  { format = "├─", style = {} },
-  { format = "╰─", style = {} },
+  { format = "├", style = {} },
+  { format = "├", style = {} },
+  { format = "╰", style = {} },
 }
 
 -- Spacing between the columns in the table.
@@ -249,9 +249,9 @@ xplr.config.general.table.col_widths = {
 -- The content that is placed before the item name for each row by default.
 --
 -- Type: nullable string
-xplr.config.general.default_ui.prefix = "  "
+xplr.config.general.default_ui.prefix = "─ "
 
--- The content which is appended to each item name for each row by default.
+-- The content which is appended to each it─em name for each row by default.
 --
 -- Type: nullable string
 xplr.config.general.default_ui.suffix = ""
@@ -278,7 +278,7 @@ xplr.config.general.focus_ui.style = { add_modifiers = { "Bold" } }
 -- The string placed before the item name for a selected row.
 --
 -- Type: nullable string
-xplr.config.general.selection_ui.prefix = " {"
+xplr.config.general.selection_ui.prefix = "─{"
 
 -- The string placed after the item name for a selected row.
 --
