@@ -11,6 +11,10 @@ If none of the following integrations work for you, you can create your own and
 - [**vim-floaterm**][6] xplr integrated in vim-floaterm (Neo)vim plugin.
 - [**xplr.vim**][5] Pick files in Vim using xplr.
 
+### Github
+
+- [**gh-xplr**][13] Explore GitHub repos using xplr via GitHub CLI.
+
 ### Shell
 
 - [**powerlevel10k**][7] Powerlevel10k prompt for xplr shell.
@@ -35,3 +39,4 @@ If none of the following integrations work for you, you can create your own and
 [10]: https://github.com/is0n/fm-nvim
 [11]: awesome-hacks.md
 [12]: awesome-plugins.md
+[13]: https://github.com/sayanarijit/gh-xplr
