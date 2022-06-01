@@ -35,6 +35,14 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
 
+fn set_current_dir(path: &str, hostname: &str) -> std::io::Result<()> {
+    env::set_current_dir(path).map(|r| {
+        print!("\x1b]7;file://{}{}\x1b\\", hostname, path);
+        std::io::stdout().flush().ok();
+        r
+    })
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Task {
     pub msg: MsgIn,
@@ -283,15 +291,14 @@ impl App {
             explorer_config.sorters = sorters.clone();
         };
 
-        env::set_current_dir(&pwd)?;
+        let hostname = gethostname().to_string_lossy().to_string();
         let pwd = pwd.to_string_lossy().to_string();
+        set_current_dir(&pwd, &hostname)?;
 
         let input = InputBuffer {
             buffer: Default::default(),
             prompt: config.general.prompt.format.clone().unwrap_or_default(),
         };
-
-        let hostname = gethostname().to_string_lossy().to_string();
 
         let mut app = Self {
             version: VERSION.to_string(),
@@ -749,18 +756,18 @@ impl App {
             dir = PathBuf::from(self.pwd.clone()).join(dir);
         }
 
-        match env::set_current_dir(&dir) {
+        let dir = dir.to_string_lossy().to_string();
+
+        match set_current_dir(&dir, &self.hostname) {
             Ok(()) => {
                 let pwd = self.pwd.clone();
                 let focus =
                     self.focused_node().map(|n| n.relative_path.clone());
                 self = self.add_last_focus(pwd, focus)?;
-                self.pwd = dir.to_string_lossy().to_string();
+                self.pwd = dir;
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
-                print!("\x1b]7;file://{}{}\x1b\\", &self.hostname, &self.pwd);
-                std::io::stdout().flush().ok();
                 self.explore_pwd()
             }
             Err(e) => self.log_error(e.to_string()),
