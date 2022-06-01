@@ -758,7 +758,8 @@ impl App {
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
-                print!("\x1b]7;file://{}{};\x1b\\", &self.hostname, &self.pwd);
+                print!("\x1b]7;file://{}{}\x1b\\", &self.hostname, &self.pwd);
+                std::io::stdout().flush().ok();
                 self.explore_pwd()
             }
             Err(e) => self.log_error(e.to_string()),
