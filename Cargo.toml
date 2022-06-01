@@ -31,6 +31,7 @@ crossterm = "0.23.2"
 dirs = "4.0.0"
 ansi-to-tui-forked = "0.5.2-fix.offset"
 regex = "1.5.6"
+gethostname = "0.2.3"
 
 [dependencies.lazy_static]
 version = "1.4.0"

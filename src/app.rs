@@ -20,6 +20,7 @@ pub use crate::pipe::Pipe;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
+use gethostname::gethostname;
 use indexmap::set::IndexSet;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -177,6 +178,7 @@ pub struct App {
     pub logs_hidden: bool,
     pub history: History,
     pub last_modes: Vec<Mode>,
+    pub hostname: String,
 }
 
 impl App {
@@ -288,6 +290,8 @@ impl App {
             prompt: config.general.prompt.format.clone().unwrap_or_default(),
         };
 
+        let hostname = gethostname().to_string_lossy().to_string();
+
         let mut app = Self {
             version: VERSION.to_string(),
             config,
@@ -307,6 +311,7 @@ impl App {
             logs_hidden: Default::default(),
             history: Default::default(),
             last_modes: Default::default(),
+            hostname,
         };
 
         let has_errs = !load_errs.is_empty();
@@ -753,6 +758,7 @@ impl App {
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
+                print!("\x1b]7;file://{}{};\x1b\\", &self.hostname, &self.pwd);
                 self.explore_pwd()
             }
             Err(e) => self.log_error(e.to_string()),
