@@ -27,6 +27,7 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
 use std::fs;
+use std::io::Write;
 use std::path::PathBuf;
 use tui_input::{Input, InputRequest};
 
