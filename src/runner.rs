@@ -236,6 +236,7 @@ impl Runner {
             };
 
         let mut last_focus: Option<app::Node> = None;
+        let mut last_pwd = app.pwd.clone();
 
         let mut mouse_enabled = app.config.general.enable_mouse;
         if mouse_enabled {
@@ -356,8 +357,6 @@ impl Runner {
                             }
 
                             Refresh => {
-                                // $PWD watcher
-                                tx_pwd_watcher.send(app.pwd.clone())?;
                                 // Fifo
                                 let focus = app.focused_node();
                                 if focus != last_focus.as_ref() {
@@ -369,6 +368,11 @@ impl Runner {
                                         )?;
                                     };
                                     last_focus = focus.cloned();
+                                }
+
+                                if app.pwd != last_pwd {
+                                    // $PWD watcher
+                                    tx_pwd_watcher.send(app.pwd.clone())?;
 
                                     // OSC 7: Change CWD
                                     if !(*ui::NO_COLOR) {
@@ -380,6 +384,8 @@ impl Runner {
                                             .as_bytes(),
                                         )?;
                                     }
+
+                                    last_pwd = app.pwd.clone();
                                 }
 
                                 // UI
