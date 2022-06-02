@@ -5,7 +5,6 @@ use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
 use ansi_to_tui_forked::ansi_to_text;
-use anyhow::Result;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use mlua::Lua;
@@ -37,6 +36,15 @@ fn read_only_indicator(app: &app::App) -> &str {
         "(r)"
     } else {
         ""
+    }
+}
+
+fn string_to_text<'a>(string: String) -> Text<'a> {
+    if *NO_COLOR {
+        Text::raw(string)
+    } else {
+        ansi_to_text(string.bytes())
+            .unwrap_or_else(|e| Text::raw(format!("{:?}", e)))
     }
 }
 
@@ -648,18 +656,9 @@ fn draw_table<B: Backend>(
                                 .iter()
                                 .filter_map(|c| {
                                     c.format.as_ref().map(|f| {
-                                        let out: Result<String> =
-                                            lua::call(lua, f, v.clone());
-                                        match out {
-                                            Ok(o) => ansi_to_text(o.bytes())
-                                                .unwrap_or_else(|e| {
-                                                    Text::raw(format!(
-                                                        "{:?}",
-                                                        e
-                                                    ))
-                                                }),
-                                            Err(e) => Text::raw(e.to_string()),
-                                        }
+                                        let out = lua::call(lua, f, v.clone())
+                                            .unwrap_or_else(|e| e.to_string());
+                                        string_to_text(out)
                                     })
                                 })
                                 .collect::<Vec<Text>>()
@@ -1054,8 +1053,7 @@ pub fn draw_custom_content<B: Backend>(
 
     match body {
         ContentBody::StaticParagraph { render } => {
-            let render = ansi_to_text(render.bytes())
-                .unwrap_or_else(|e| Text::raw(e.to_string()));
+            let render = string_to_text(render);
             let content = Paragraph::new(render).block(block(
                 config,
                 title.map(|t| format!(" {} ", t)).unwrap_or_default(),
@@ -1077,8 +1075,7 @@ pub fn draw_custom_content<B: Backend>(
                 })
                 .unwrap_or_else(|e| e.to_string());
 
-            let render = ansi_to_text(render.bytes())
-                .unwrap_or_else(|e| Text::raw(e.to_string()));
+            let render = string_to_text(render);
 
             let content = Paragraph::new(render).block(block(
                 config,
@@ -1090,10 +1087,7 @@ pub fn draw_custom_content<B: Backend>(
         ContentBody::StaticList { render } => {
             let items = render
                 .into_iter()
-                .map(|item| {
-                    ansi_to_text(item.bytes())
-                        .unwrap_or_else(|e| Text::raw(e.to_string()))
-                })
+                .map(string_to_text)
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
@@ -1118,10 +1112,7 @@ pub fn draw_custom_content<B: Backend>(
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
                 .into_iter()
-                .map(|item| {
-                    ansi_to_text(item.bytes())
-                        .unwrap_or_else(|e| Text::raw(e.to_string()))
-                })
+                .map(string_to_text)
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
@@ -1142,11 +1133,7 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|cols| {
                     Row::new(
                         cols.into_iter()
-                            .map(|item| {
-                                ansi_to_text(item.bytes()).unwrap_or_else(|e| {
-                                    Text::raw(e.to_string())
-                                })
-                            })
+                            .map(string_to_text)
                             .map(Cell::from)
                             .collect::<Vec<Cell>>(),
                     )
@@ -1190,11 +1177,7 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|cols| {
                     Row::new(
                         cols.into_iter()
-                            .map(|item| {
-                                ansi_to_text(item.bytes()).unwrap_or_else(|e| {
-                                    Text::raw(e.to_string())
-                                })
-                            })
+                            .map(string_to_text)
                             .map(Cell::from)
                             .collect::<Vec<Cell>>(),
                     )
