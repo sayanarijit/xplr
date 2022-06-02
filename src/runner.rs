@@ -358,8 +358,6 @@ impl Runner {
                             Refresh => {
                                 // $PWD watcher
                                 tx_pwd_watcher.send(app.pwd.clone())?;
-                                // UI
-                                terminal.draw(|f| ui::draw(f, &app, &lua))?;
                                 // Fifo
                                 let focus = app.focused_node();
                                 if focus != last_focus.as_ref() {
@@ -371,7 +369,19 @@ impl Runner {
                                         )?;
                                     };
                                     last_focus = focus.cloned();
+
+                                    // OSC 7: Change CWD
+                                    terminal.backend_mut().write(
+                                        format!(
+                                            "\x1b]7;file://{}{}\x1b\\",
+                                            &app.hostname, &app.pwd
+                                        )
+                                        .as_bytes(),
+                                    )?;
                                 }
+
+                                // UI
+                                terminal.draw(|f| ui::draw(f, &app, &lua))?;
                             }
 
                             EnableMouse => {

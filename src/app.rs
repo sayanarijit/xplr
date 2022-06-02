@@ -27,21 +27,12 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
 use std::fs;
-use std::io::Write;
 use std::path::PathBuf;
 use tui_input::{Input, InputRequest};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const TEMPLATE_TABLE_ROW: &str = "TEMPLATE_TABLE_ROW";
 pub const UNSUPPORTED_STR: &str = "???";
-
-fn set_current_dir(path: &str, hostname: &str) -> std::io::Result<()> {
-    env::set_current_dir(path).map(|r| {
-        print!("\x1b]7;file://{}{}\x1b\\", hostname, path);
-        std::io::stdout().flush().ok();
-        r
-    })
-}
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Task {
@@ -293,7 +284,7 @@ impl App {
 
         let hostname = gethostname().to_string_lossy().to_string();
         let pwd = pwd.to_string_lossy().to_string();
-        set_current_dir(&pwd, &hostname)?;
+        env::set_current_dir(&pwd)?;
 
         let input = InputBuffer {
             buffer: Default::default(),
@@ -756,15 +747,13 @@ impl App {
             dir = PathBuf::from(self.pwd.clone()).join(dir);
         }
 
-        let dir = dir.to_string_lossy().to_string();
-
-        match set_current_dir(&dir, &self.hostname) {
+        match env::set_current_dir(&dir) {
             Ok(()) => {
                 let pwd = self.pwd.clone();
                 let focus =
                     self.focused_node().map(|n| n.relative_path.clone());
                 self = self.add_last_focus(pwd, focus)?;
-                self.pwd = dir;
+                self.pwd = dir.to_string_lossy().to_string();
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
