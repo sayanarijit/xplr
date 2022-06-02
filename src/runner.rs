@@ -376,13 +376,16 @@ impl Runner {
 
                                     // OSC 7: Change CWD
                                     if !(*ui::NO_COLOR) {
-                                        terminal.backend_mut().write(
-                                            format!(
-                                                "\x1b]7;file://{}{}\x1b\\",
-                                                &app.hostname, &app.pwd
+                                        terminal
+                                            .backend_mut()
+                                            .write(
+                                                format!(
+                                                    "\x1b]7;file://{}{}\x1b\\",
+                                                    &app.hostname, &app.pwd
+                                                )
+                                                .as_bytes(),
                                             )
-                                            .as_bytes(),
-                                        )?;
+                                            .unwrap_or_default();
                                     }
 
                                     last_pwd = app.pwd.clone();
