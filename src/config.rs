@@ -323,21 +323,16 @@ impl KeyBindings {
                 .filter_map(|(k, a)| a.sanitized(read_only).map(|a| (k, a)))
                 .collect();
 
-            self.on_alphabet =
-                self.on_alphabet.and_then(|a| a.sanitized(read_only));
-            self.on_number =
-                self.on_number.and_then(|a| a.sanitized(read_only));
+            self.on_alphabet = self.on_alphabet.and_then(|a| a.sanitized(read_only));
+            self.on_number = self.on_number.and_then(|a| a.sanitized(read_only));
             self.on_alphanumeric =
                 self.on_alphanumeric.and_then(|a| a.sanitized(read_only));
             self.on_special_character = self
                 .on_special_character
                 .and_then(|a| a.sanitized(read_only));
-            self.on_character =
-                self.on_character.and_then(|a| a.sanitized(read_only));
-            self.on_navigation =
-                self.on_navigation.and_then(|a| a.sanitized(read_only));
-            self.on_function =
-                self.on_function.and_then(|a| a.sanitized(read_only));
+            self.on_character = self.on_character.and_then(|a| a.sanitized(read_only));
+            self.on_navigation = self.on_navigation.and_then(|a| a.sanitized(read_only));
+            self.on_function = self.on_function.and_then(|a| a.sanitized(read_only));
             self.default = self.default.and_then(|a| a.sanitized(read_only));
         };
         self
@@ -387,36 +382,32 @@ impl Mode {
                 let lines = extra_help_lines
                     .unwrap_or_default()
                     .into_iter()
-                    .chain(self.key_bindings.on_key.iter().filter_map(
-                        |(k, a)| {
-                            let remaps = self
-                                .key_bindings
-                                .on_key
-                                .iter()
-                                .filter_map(|(rk, ra)| {
-                                    if rk == k {
-                                        None
-                                    } else if a == ra {
-                                        Some(rk.clone())
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .collect::<Vec<String>>();
-                            a.help.clone().map(|h| {
-                                HelpMenuLine::KeyMap(k.into(), remaps, h)
+                    .chain(self.key_bindings.on_key.iter().filter_map(|(k, a)| {
+                        let remaps = self
+                            .key_bindings
+                            .on_key
+                            .iter()
+                            .filter_map(|(rk, ra)| {
+                                if rk == k {
+                                    None
+                                } else if a == ra {
+                                    Some(rk.clone())
+                                } else {
+                                    None
+                                }
                             })
-                        },
-                    ))
+                            .collect::<Vec<String>>();
+                        a.help
+                            .clone()
+                            .map(|h| HelpMenuLine::KeyMap(k.into(), remaps, h))
+                    }))
                     .chain(
                         self.key_bindings
                             .on_alphabet
                             .iter()
                             .map(|a| ("[a-Z]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -425,9 +416,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[0-9]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -436,9 +425,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[0-Z]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -447,9 +434,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[^0-Z]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -458,9 +443,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[*]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -469,9 +452,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[nav]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -480,9 +461,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[f1-f12]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     )
                     .chain(
@@ -491,9 +470,7 @@ impl Mode {
                             .iter()
                             .map(|a| ("[default]", a.help.clone()))
                             .filter_map(|(k, mh)| {
-                                mh.map(|h| {
-                                    HelpMenuLine::KeyMap(k.into(), vec![], h)
-                                })
+                                mh.map(|h| HelpMenuLine::KeyMap(k.into(), vec![], h))
                             }),
                     );
 

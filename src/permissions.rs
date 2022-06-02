@@ -3,9 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs::Metadata;
 
-#[derive(
-    Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize, Hash, Default,
-)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Serialize, Deserialize, Hash, Default)]
 pub struct Permissions {
     pub user_read: bool,
     pub user_write: bool,

@@ -1,6 +1,5 @@
 use crate::app::{
-    DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node,
-    Task,
+    DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task,
 };
 use anyhow::{Error, Result};
 use std::fs;

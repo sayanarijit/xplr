@@ -200,8 +200,7 @@ impl App {
                 None
             }
         } else {
-            let path =
-                PathBuf::from("/").join("etc").join("xplr").join("init.lua");
+            let path = PathBuf::from("/").join("etc").join("xplr").join("init.lua");
             if path.exists() {
                 Some(path)
             } else {
@@ -342,10 +341,7 @@ impl App {
         self
     }
 
-    pub fn handle_batch_external_msgs(
-        mut self,
-        msgs: Vec<ExternalMsg>,
-    ) -> Result<Self> {
+    pub fn handle_batch_external_msgs(mut self, msgs: Vec<ExternalMsg>) -> Result<Self> {
         for task in msgs
             .into_iter()
             .map(|msg| Task::new(MsgIn::External(msg), None))
@@ -376,11 +372,7 @@ impl App {
         }
     }
 
-    fn handle_external(
-        self,
-        msg: ExternalMsg,
-        key: Option<Key>,
-    ) -> Result<Self> {
+    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
         if self.config.general.read_only && !msg.is_read_only() {
             self.log_error("Cannot execute code in read-only mode.".into())
         } else {
@@ -402,9 +394,7 @@ impl App {
                     self.focus_previous_by_relative_index_from_input()
                 }
                 FocusNext => self.focus_next(),
-                FocusNextByRelativeIndex(i) => {
-                    self.focus_next_by_relative_index(i)
-                }
+                FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
                 FocusNextByRelativeIndexFromInput => {
                     self.focus_next_by_relative_index_from_input()
                 }
@@ -421,18 +411,14 @@ impl App {
                 FollowSymlink => self.follow_symlink(),
                 SetInputPrompt(p) => self.set_input_prompt(p),
                 UpdateInputBuffer(op) => self.update_input_buffer(op),
-                UpdateInputBufferFromKey => {
-                    self.update_input_buffer_from_key(key)
-                }
+                UpdateInputBufferFromKey => self.update_input_buffer_from_key(key),
                 BufferInput(input) => self.buffer_input(&input),
                 BufferInputFromKey => self.buffer_input_from_key(key),
                 SetInputBuffer(input) => self.set_input_buffer(input),
                 RemoveInputBufferLastCharacter => {
                     self.remove_input_buffer_last_character()
                 }
-                RemoveInputBufferLastWord => {
-                    self.remove_input_buffer_last_word()
-                }
+                RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
                 ResetInputBuffer => self.reset_input_buffer(),
                 SwitchMode(mode) => self.switch_mode(&mode),
                 SwitchModeKeepingInputBuffer(mode) => {
@@ -447,9 +433,7 @@ impl App {
                     self.switch_mode_custom_keeping_input_buffer(&mode)
                 }
                 PopMode => self.pop_mode(),
-                PopModeKeepingInputBuffer => {
-                    self.pop_mode_keeping_input_buffer()
-                }
+                PopModeKeepingInputBuffer => self.pop_mode_keeping_input_buffer(),
                 SwitchLayout(mode) => self.switch_layout(&mode),
                 SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
                 SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
@@ -474,9 +458,7 @@ impl App {
                 AddNodeFilter(f) => self.add_node_filter(f),
                 AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
                 RemoveNodeFilter(f) => self.remove_node_filter(f),
-                RemoveNodeFilterFromInput(f) => {
-                    self.remove_node_filter_from_input(f)
-                }
+                RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
                 ToggleNodeFilter(f) => self.toggle_node_filter(f),
                 RemoveLastNodeFilter => self.remove_last_node_filter(),
                 ResetNodeFilters => self.reset_node_filters(),
@@ -650,10 +632,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_previous_by_relative_index(
-        mut self,
-        index: usize,
-    ) -> Result<Self> {
+    fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
@@ -737,11 +716,7 @@ impl App {
         }
     }
 
-    fn change_directory(
-        mut self,
-        dir: &str,
-        save_history: bool,
-    ) -> Result<Self> {
+    fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
         let mut dir = PathBuf::from(dir);
         if dir.is_relative() {
             dir = PathBuf::from(self.pwd.clone()).join(dir);
@@ -750,8 +725,7 @@ impl App {
         match env::set_current_dir(&dir) {
             Ok(()) => {
                 let pwd = self.pwd.clone();
-                let focus =
-                    self.focused_node().map(|n| n.relative_path.clone());
+                let focus = self.focused_node().map(|n| n.relative_path.clone());
                 self = self.add_last_focus(pwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
                 if save_history {
@@ -922,11 +896,7 @@ impl App {
         }
     }
 
-    pub fn focus_by_file_name(
-        mut self,
-        name: &str,
-        save_history: bool,
-    ) -> Result<Self> {
+    pub fn focus_by_file_name(mut self, name: &str, save_history: bool) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir_buf) = self.directory_buffer_mut() {
             if let Some(focus) = dir_buf
@@ -964,14 +934,11 @@ impl App {
         }
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
-                self.change_directory(
-                    &parent.to_string_lossy().to_string(),
-                    false,
-                )?
-                .focus_by_file_name(
-                    &filename.to_string_lossy().to_string(),
-                    save_history,
-                )
+                self.change_directory(&parent.to_string_lossy().to_string(), false)?
+                    .focus_by_file_name(
+                        &filename.to_string_lossy().to_string(),
+                        save_history,
+                    )
             } else {
                 self.log_error(format!("{} not found", path))
             }
@@ -1033,10 +1000,7 @@ impl App {
             .and_then(App::reset_input_buffer)
     }
 
-    fn switch_mode_builtin_keeping_input_buffer(
-        mut self,
-        mode: &str,
-    ) -> Result<Self> {
+    fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.builtin.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
@@ -1051,10 +1015,7 @@ impl App {
             .and_then(App::reset_input_buffer)
     }
 
-    fn switch_mode_custom_keeping_input_buffer(
-        mut self,
-        mode: &str,
-    ) -> Result<Self> {
+    fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.custom.get(mode).cloned() {
             self = self.push_mode();
             self.mode = mode.sanitized(self.config.general.read_only);
@@ -1174,8 +1135,7 @@ impl App {
             path = PathBuf::from(self.pwd.clone()).join(path);
         }
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
-        let filename =
-            path.file_name().map(|p| p.to_string_lossy().to_string());
+        let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
             self.selection.insert(Node::new(p, n));
         }
@@ -1265,33 +1225,21 @@ impl App {
         Ok(self)
     }
 
-    fn add_node_filter_from_input(
-        mut self,
-        filter: NodeFilter,
-    ) -> Result<Self> {
+    fn add_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
         if let Some(input) = self.input.buffer.as_ref() {
             self.explorer_config
                 .filters
-                .insert(NodeFilterApplicable::new(
-                    filter,
-                    input.value().into(),
-                ));
+                .insert(NodeFilterApplicable::new(filter, input.value().into()));
         };
         Ok(self)
     }
 
-    fn remove_node_filter(
-        mut self,
-        filter: NodeFilterApplicable,
-    ) -> Result<Self> {
+    fn remove_node_filter(mut self, filter: NodeFilterApplicable) -> Result<Self> {
         self.explorer_config.filters.retain(|f| f != &filter);
         Ok(self)
     }
 
-    fn remove_node_filter_from_input(
-        mut self,
-        filter: NodeFilter,
-    ) -> Result<Self> {
+    fn remove_node_filter_from_input(mut self, filter: NodeFilter) -> Result<Self> {
         if let Some(input) = self.input.buffer.as_ref() {
             let nfa = NodeFilterApplicable::new(filter, input.value().into());
             self.explorer_config.filters.retain(|f| f != &nfa);
@@ -1486,9 +1434,8 @@ impl App {
 
     fn refresh_selection(mut self) -> Result<Self> {
         // Should be able to select broken symlink
-        self.selection.retain(|n| {
-            PathBuf::from(&n.absolute_path).symlink_metadata().is_ok()
-        });
+        self.selection
+            .retain(|n| PathBuf::from(&n.absolute_path).symlink_metadata().is_ok());
         Ok(self)
     }
 
