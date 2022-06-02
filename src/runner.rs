@@ -371,13 +371,15 @@ impl Runner {
                                     last_focus = focus.cloned();
 
                                     // OSC 7: Change CWD
-                                    terminal.backend_mut().write(
-                                        format!(
-                                            "\x1b]7;file://{}{}\x1b\\",
-                                            &app.hostname, &app.pwd
-                                        )
-                                        .as_bytes(),
-                                    )?;
+                                    if !(*ui::NO_COLOR) {
+                                        terminal.backend_mut().write(
+                                            format!(
+                                                "\x1b]7;file://{}{}\x1b\\",
+                                                &app.hostname, &app.pwd
+                                            )
+                                            .as_bytes(),
+                                        )?;
+                                    }
                                 }
 
                                 // UI
