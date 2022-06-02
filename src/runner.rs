@@ -172,12 +172,8 @@ impl Runner {
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
-        let mut app = app::App::create(
-            self.pwd,
-            &lua,
-            self.config_file,
-            self.extra_config_files,
-        )?;
+        let mut app =
+            app::App::create(self.pwd, &lua, self.config_file, self.extra_config_files)?;
         app.config.general.read_only = self.read_only;
 
         fs::create_dir_all(app.session_path.clone())?;
@@ -250,11 +246,7 @@ impl Runner {
         terminal.hide_cursor()?;
 
         // Threads
-        pwd_watcher::keep_watching(
-            app.pwd.as_ref(),
-            tx_msg_in.clone(),
-            rx_pwd_watcher,
-        )?;
+        pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
         let mut event_reader = EventReader::new(tx_msg_in.clone());
         event_reader.start();
 
@@ -328,9 +320,8 @@ impl Runner {
                                 explorer::explore_async(
                                     app.explorer_config.clone(),
                                     app.pwd.clone().into(),
-                                    app.focused_node().map(|n| {
-                                        n.relative_path.clone().into()
-                                    }),
+                                    app.focused_node()
+                                        .map(|n| n.relative_path.clone().into()),
                                     app.directory_buffer
                                         .as_ref()
                                         .map(|d| d.focus)
@@ -344,9 +335,8 @@ impl Runner {
                                 explorer::explore_recursive_async(
                                     app.explorer_config.clone(),
                                     app.pwd.clone().into(),
-                                    app.focused_node().map(|n| {
-                                        n.relative_path.clone().into()
-                                    }),
+                                    app.focused_node()
+                                        .map(|n| n.relative_path.clone().into()),
                                     app.directory_buffer
                                         .as_ref()
                                         .map(|d| d.focus)
@@ -361,11 +351,7 @@ impl Runner {
                                 let focus = app.focused_node();
                                 if focus != last_focus.as_ref() {
                                     if let Some(ref mut file) = fifo {
-                                        writeln!(
-                                            file,
-                                            "{}",
-                                            app.focused_node_str()
-                                        )?;
+                                        writeln!(file, "{}", app.focused_node_str())?;
                                     };
                                     last_focus = focus.cloned();
                                 }
@@ -376,16 +362,12 @@ impl Runner {
 
                                     // OSC 7: Change CWD
                                     if !(*ui::NO_COLOR) {
-                                        terminal
-                                            .backend_mut()
-                                            .write(
-                                                format!(
-                                                    "\x1b]7;file://{}{}\x1b\\",
-                                                    &app.hostname, &app.pwd
-                                                )
-                                                .as_bytes(),
-                                            )
-                                            .unwrap_or_default();
+                                        write!(
+                                            terminal.backend_mut(),
+                                            "\x1b]7;file://{}{}\x1b\\",
+                                            &app.hostname,
+                                            &app.pwd
+                                        )?;
                                     }
 
                                     last_pwd = app.pwd.clone();
@@ -405,8 +387,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app =
-                                                app.log_error(e.to_string())?;
+                                            app = app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -434,18 +415,14 @@ impl Runner {
                                             mouse_enabled = false;
                                         }
                                         Err(e) => {
-                                            app =
-                                                app.log_error(e.to_string())?;
+                                            app = app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
                             }
 
                             StartFifo(path) => {
-                                fifo = match start_fifo(
-                                    &path,
-                                    &app.focused_node_str(),
-                                ) {
+                                fifo = match start_fifo(&path, &app.focused_node_str()) {
                                     Ok(file) => Some(file),
                                     Err(e) => {
                                         app = app.log_error(e.to_string())?;
@@ -466,25 +443,22 @@ impl Runner {
                                     fifo = None;
                                     std::mem::drop(file);
                                 } else {
-                                    fifo = match start_fifo(
-                                        &path,
-                                        &app.focused_node_str(),
-                                    ) {
-                                        Ok(file) => Some(file),
-                                        Err(e) => {
-                                            app =
-                                                app.log_error(e.to_string())?;
-                                            None
+                                    fifo =
+                                        match start_fifo(&path, &app.focused_node_str())
+                                        {
+                                            Ok(file) => Some(file),
+                                            Err(e) => {
+                                                app = app.log_error(e.to_string())?;
+                                                None
+                                            }
                                         }
-                                    }
                                 }
                             }
 
                             CallLuaSilently(func) => {
                                 match call_lua_heavy(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
-                                        app = app
-                                            .handle_batch_external_msgs(msgs)?;
+                                        app = app.handle_batch_external_msgs(msgs)?;
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
@@ -510,8 +484,7 @@ impl Runner {
 
                                 match pipe::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
-                                        app = app
-                                            .handle_batch_external_msgs(msgs)?;
+                                        app = app.handle_batch_external_msgs(msgs)?;
                                     }
                                     Err(err) => {
                                         app = app.log_error(err.to_string())?;
@@ -541,8 +514,7 @@ impl Runner {
 
                                 match call_lua_heavy(&app, &lua, &func, false) {
                                     Ok(Some(msgs)) => {
-                                        app = app
-                                            .handle_batch_external_msgs(msgs)?;
+                                        app = app.handle_batch_external_msgs(msgs)?;
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
@@ -564,8 +536,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app =
-                                                app.log_error(e.to_string())?;
+                                            app = app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -591,9 +562,7 @@ impl Runner {
                                 match res {
                                     Ok(Value::Function(f)) => {
                                         let arg = app.to_lua_ctx_heavy();
-                                        let res: Result<
-                                            Option<Vec<ExternalMsg>>,
-                                        > = lua
+                                        let res: Result<Option<Vec<ExternalMsg>>> = lua
                                             .to_value(&arg)
                                             .and_then(|a| f.call(a))
                                             .and_then(|v| lua.from_value(v))
@@ -601,36 +570,25 @@ impl Runner {
                                         match res {
                                             Ok(Some(msgs)) => {
                                                 app = app
-                                                    .handle_batch_external_msgs(
-                                                        msgs,
-                                                    )?;
+                                                    .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(
-                                                    err.to_string(),
-                                                )?;
+                                                app = app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
                                     Ok(v) => {
-                                        let res: Result<
-                                            Option<Vec<ExternalMsg>>,
-                                        > = lua
-                                            .from_value(v)
-                                            .map_err(Error::from);
+                                        let res: Result<Option<Vec<ExternalMsg>>> =
+                                            lua.from_value(v).map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
                                                 app = app
-                                                    .handle_batch_external_msgs(
-                                                        msgs,
-                                                    )?;
+                                                    .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(
-                                                    err.to_string(),
-                                                )?;
+                                                app = app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
@@ -653,8 +611,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app =
-                                                app.log_error(e.to_string())?;
+                                            app = app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -667,9 +624,7 @@ impl Runner {
                                 match res {
                                     Ok(Value::Function(f)) => {
                                         let arg = app.to_lua_ctx_heavy();
-                                        let res: Result<
-                                            Option<Vec<ExternalMsg>>,
-                                        > = lua
+                                        let res: Result<Option<Vec<ExternalMsg>>> = lua
                                             .to_value(&arg)
                                             .and_then(|a| f.call(a))
                                             .and_then(|v| lua.from_value(v))
@@ -677,36 +632,25 @@ impl Runner {
                                         match res {
                                             Ok(Some(msgs)) => {
                                                 app = app
-                                                    .handle_batch_external_msgs(
-                                                        msgs,
-                                                    )?;
+                                                    .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(
-                                                    err.to_string(),
-                                                )?;
+                                                app = app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
                                     Ok(v) => {
-                                        let res: Result<
-                                            Option<Vec<ExternalMsg>>,
-                                        > = lua
-                                            .from_value(v)
-                                            .map_err(Error::from);
+                                        let res: Result<Option<Vec<ExternalMsg>>> =
+                                            lua.from_value(v).map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
                                                 app = app
-                                                    .handle_batch_external_msgs(
-                                                        msgs,
-                                                    )?;
+                                                    .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(
-                                                    err.to_string(),
-                                                )?;
+                                                app = app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
@@ -747,8 +691,7 @@ impl Runner {
                                 // TODO remove duplicate segment
                                 match pipe::read_all(&app.pipe.msg_in) {
                                     Ok(msgs) => {
-                                        app = app
-                                            .handle_batch_external_msgs(msgs)?;
+                                        app = app.handle_batch_external_msgs(msgs)?;
                                     }
                                     Err(err) => {
                                         app = app.log_error(err.to_string())?;
@@ -775,8 +718,7 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app =
-                                                app.log_error(e.to_string())?;
+                                            app = app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -795,8 +737,7 @@ impl Runner {
         terminal.clear()?;
         terminal.set_cursor(0, 0)?;
         execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
-        execute!(terminal.backend_mut(), event::DisableMouseCapture)
-            .unwrap_or_default();
+        execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
         term::disable_raw_mode()?;
         terminal.show_cursor()?;
 

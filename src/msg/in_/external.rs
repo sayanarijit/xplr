@@ -1085,18 +1085,16 @@ impl NodeSorterApplicable {
                     .unwrap_or_default(),
             ),
 
-            NodeSorter::ByICanonicalAbsolutePath => {
-                natord::compare_ignore_case(
-                    &a.canonical
-                        .as_ref()
-                        .map(|s| s.absolute_path.clone())
-                        .unwrap_or_default(),
-                    &b.canonical
-                        .as_ref()
-                        .map(|s| s.absolute_path.clone())
-                        .unwrap_or_default(),
-                )
-            }
+            NodeSorter::ByICanonicalAbsolutePath => natord::compare_ignore_case(
+                &a.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+                &b.canonical
+                    .as_ref()
+                    .map(|s| s.absolute_path.clone())
+                    .unwrap_or_default(),
+            ),
 
             NodeSorter::ByCanonicalExtension => a
                 .canonical
@@ -1292,26 +1290,18 @@ impl NodeFilter {
     fn apply(&self, node: &Node, input: &str, regex: Option<&Regex>) -> bool {
         match self {
             Self::RelativePathIs => node.relative_path.eq(input),
-            Self::IRelativePathIs => {
-                node.relative_path.eq_ignore_ascii_case(input)
-            }
+            Self::IRelativePathIs => node.relative_path.eq_ignore_ascii_case(input),
 
             Self::RelativePathIsNot => !node.relative_path.eq(input),
-            Self::IRelativePathIsNot => {
-                !node.relative_path.eq_ignore_ascii_case(input)
-            }
+            Self::IRelativePathIsNot => !node.relative_path.eq_ignore_ascii_case(input),
 
-            Self::RelativePathDoesStartWith => {
-                node.relative_path.starts_with(input)
-            }
+            Self::RelativePathDoesStartWith => node.relative_path.starts_with(input),
             Self::IRelativePathDoesStartWith => node
                 .relative_path
                 .to_lowercase()
                 .starts_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotStartWith => {
-                !node.relative_path.starts_with(input)
-            }
+            Self::RelativePathDoesNotStartWith => !node.relative_path.starts_with(input),
             Self::IRelativePathDoesNotStartWith => !node
                 .relative_path
                 .to_lowercase()
@@ -1323,25 +1313,19 @@ impl NodeFilter {
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotContain => {
-                !node.relative_path.contains(input)
-            }
+            Self::RelativePathDoesNotContain => !node.relative_path.contains(input),
             Self::IRelativePathDoesNotContain => !node
                 .relative_path
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::RelativePathDoesEndWith => {
-                node.relative_path.ends_with(input)
-            }
+            Self::RelativePathDoesEndWith => node.relative_path.ends_with(input),
             Self::IRelativePathDoesEndWith => node
                 .relative_path
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
-            Self::RelativePathDoesNotEndWith => {
-                !node.relative_path.ends_with(input)
-            }
+            Self::RelativePathDoesNotEndWith => !node.relative_path.ends_with(input),
             Self::IRelativePathDoesNotEndWith => !node
                 .relative_path
                 .to_lowercase()
@@ -1362,26 +1346,18 @@ impl NodeFilter {
                 .unwrap_or(false),
 
             Self::AbsolutePathIs => node.absolute_path.eq(input),
-            Self::IAbsolutePathIs => {
-                node.absolute_path.eq_ignore_ascii_case(input)
-            }
+            Self::IAbsolutePathIs => node.absolute_path.eq_ignore_ascii_case(input),
 
             Self::AbsolutePathIsNot => !node.absolute_path.eq(input),
-            Self::IAbsolutePathIsNot => {
-                !node.absolute_path.eq_ignore_ascii_case(input)
-            }
+            Self::IAbsolutePathIsNot => !node.absolute_path.eq_ignore_ascii_case(input),
 
-            Self::AbsolutePathDoesStartWith => {
-                node.absolute_path.starts_with(input)
-            }
+            Self::AbsolutePathDoesStartWith => node.absolute_path.starts_with(input),
             Self::IAbsolutePathDoesStartWith => node
                 .absolute_path
                 .to_lowercase()
                 .starts_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotStartWith => {
-                !node.absolute_path.starts_with(input)
-            }
+            Self::AbsolutePathDoesNotStartWith => !node.absolute_path.starts_with(input),
             Self::IAbsolutePathDoesNotStartWith => !node
                 .absolute_path
                 .to_lowercase()
@@ -1393,25 +1369,19 @@ impl NodeFilter {
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotContain => {
-                !node.absolute_path.contains(input)
-            }
+            Self::AbsolutePathDoesNotContain => !node.absolute_path.contains(input),
             Self::IAbsolutePathDoesNotContain => !node
                 .absolute_path
                 .to_lowercase()
                 .contains(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesEndWith => {
-                node.absolute_path.ends_with(input)
-            }
+            Self::AbsolutePathDoesEndWith => node.absolute_path.ends_with(input),
             Self::IAbsolutePathDoesEndWith => node
                 .absolute_path
                 .to_lowercase()
                 .ends_with(&input.to_lowercase()),
 
-            Self::AbsolutePathDoesNotEndWith => {
-                !node.absolute_path.ends_with(input)
-            }
+            Self::AbsolutePathDoesNotEndWith => !node.absolute_path.ends_with(input),
             Self::IAbsolutePathDoesNotEndWith => !node
                 .absolute_path
                 .to_lowercase()

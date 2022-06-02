@@ -17,11 +17,8 @@ pub fn serialize<'lua, T: Serialize + Sized>(
     lua: &'lua mlua::Lua,
     value: &T,
 ) -> Result<mlua::Value<'lua>> {
-    lua.to_value_with(
-        value,
-        SerializeOptions::new().serialize_none_to_null(false),
-    )
-    .map_err(Error::from)
+    lua.to_value_with(value, SerializeOptions::new().serialize_none_to_null(false))
+        .map_err(Error::from)
 }
 
 fn parse_version(version: &str) -> Result<(u16, u16, u16, Option<u16>)> {
@@ -46,11 +43,7 @@ pub fn check_version(version: &str, path: &str) -> Result<()> {
     let (rmajor, rminor, rbugfix, rbeta) = parse_version(VERSION)?;
     let (smajor, sminor, sbugfix, sbeta) = parse_version(version)?;
 
-    if rmajor == smajor
-        && rminor == sminor
-        && rbugfix >= sbugfix
-        && rbeta == sbeta
-    {
+    if rmajor == smajor && rminor == sminor && rbugfix >= sbugfix && rbeta == sbeta {
         Ok(())
     } else {
         bail!(
@@ -95,11 +88,10 @@ pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
 
     lua.load(&script).set_name("init")?.exec()?;
 
-    let version: String =
-        match globals.get("version").and_then(|v| lua.from_value(v)) {
-            Ok(v) => v,
-            Err(_) => bail!("'version' must be defined globally in {}", path),
-        };
+    let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
+        Ok(v) => v,
+        Err(_) => bail!("'version' must be defined globally in {}", path),
+    };
 
     check_version(&version, path)?;
 

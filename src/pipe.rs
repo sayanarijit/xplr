@@ -23,8 +23,7 @@ impl Pipe {
 
         let msg_in = path.join("msg_in").to_string_lossy().to_string();
 
-        let selection_out =
-            path.join("selection_out").to_string_lossy().to_string();
+        let selection_out = path.join("selection_out").to_string_lossy().to_string();
 
         let result_out = path.join("result_out").to_string_lossy().to_string();
 
@@ -40,8 +39,7 @@ impl Pipe {
 
         let logs_out = path.join("logs_out").to_string_lossy().to_string();
 
-        let history_out =
-            path.join("history_out").to_string_lossy().to_string();
+        let history_out = path.join("history_out").to_string_lossy().to_string();
 
         Ok(Self {
             path: path.to_string_lossy().to_string(),

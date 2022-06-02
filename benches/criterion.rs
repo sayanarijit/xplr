@@ -14,8 +14,7 @@ const PWD: &str = "/tmp/xplr_bench";
 fn navigation_benchmark(c: &mut Criterion) {
     fs::create_dir_all(PWD).unwrap();
     (1..10000).for_each(|i| {
-        fs::File::create(std::path::Path::new(PWD).join(i.to_string()))
-            .unwrap();
+        fs::File::create(std::path::Path::new(PWD).join(i.to_string())).unwrap();
     });
 
     let lua = mlua::Lua::new();
@@ -94,8 +93,7 @@ fn navigation_benchmark(c: &mut Criterion) {
 fn draw_benchmark(c: &mut Criterion) {
     fs::create_dir_all(PWD).unwrap();
     (1..10000).for_each(|i| {
-        fs::File::create(std::path::Path::new(PWD).join(i.to_string()))
-            .unwrap();
+        fs::File::create(std::path::Path::new(PWD).join(i.to_string())).unwrap();
     });
 
     let lua = mlua::Lua::new();
