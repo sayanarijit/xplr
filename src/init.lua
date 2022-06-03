@@ -1833,6 +1833,12 @@ xplr.config.modes.builtin.duplicate_as = {
           "Terminate",
         },
       },
+      tab = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
       enter = {
         help = "duplicate",
         messages = {
