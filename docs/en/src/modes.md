@@ -29,6 +29,12 @@ The builtin recover mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
+#### xplr.config.modes.builtin.go_to_path
+
+The builtin go to path mode.
+
+Type: [Mode](https://xplr.dev/en/mode)
+
 #### xplr.config.modes.builtin.selection_ops
 
 The builtin selection ops mode.

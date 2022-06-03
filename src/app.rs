@@ -956,7 +956,7 @@ impl App {
     }
 
     fn push_mode(mut self) -> Self {
-        if self.mode != self.config.modes.builtin.recover
+        if Some(&self.mode) != self.config.modes.builtin.get("recover")
             && self
                 .last_modes
                 .last()
@@ -1492,29 +1492,7 @@ impl App {
         let builtin = &self.config.modes.builtin;
         let custom = &self.config.modes.custom;
 
-        [
-            &builtin.default,
-            &builtin.debug_error,
-            &builtin.recover,
-            &builtin.selection_ops,
-            &builtin.create,
-            &builtin.create_directory,
-            &builtin.create_file,
-            &builtin.number,
-            &builtin.go_to,
-            &builtin.rename,
-            &builtin.duplicate_as,
-            &builtin.delete,
-            &builtin.action,
-            &builtin.search,
-            &builtin.filter,
-            &builtin.relative_path_does_match_regex,
-            &builtin.relative_path_does_not_match_regex,
-            &builtin.sort,
-            &builtin.switch_layout,
-            &builtin.quit,
-        ]
-        .iter().map(|m| (&m.name, m.to_owned()))
+        builtin.iter()
         .chain(custom.iter())
         .map(|(name, mode)| {
             let help = mode

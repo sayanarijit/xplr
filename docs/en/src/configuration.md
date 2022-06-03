@@ -43,6 +43,10 @@ See: [Lua Function Calls](https://xplr.dev/en/lua-function-calls)
 As always, `xplr.fn.builtin` is where the built-in functions are defined
 that can be overwritten.
 
+#### xplr.fn.builtin.try_complete_path
+
+Tries to auto complete the path in the input buffer
+
 #### xplr.fn.builtin.fmt_general_table_row_cols_0
 
 Renders the first column in the table
