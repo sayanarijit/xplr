@@ -251,7 +251,7 @@ xplr.config.general.table.col_widths = {
 -- Type: nullable string
 xplr.config.general.default_ui.prefix = "─ "
 
--- The content which is appended to each it─em name for each row by default.
+-- The content which is appended to each item name for each row by default.
 --
 -- Type: nullable string
 xplr.config.general.default_ui.suffix = ""
@@ -336,26 +336,22 @@ xplr.config.general.sort_and_filter_ui.default_identifier.style = {}
 -- The shape of the forward direction indicator for sort identifiers in Sort & filter panel.
 --
 -- Type: nullable string
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.format =
-  "↓"
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.format = "↓"
 
 -- Style of forward direction indicator in Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style =
-  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.forward.style = nil
 
 -- The shape of the reverse direction indicator for sort identifiers in Sort & filter panel.
 --
 -- Type: nullable string
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.format =
-  "↑"
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.format = "↑"
 
 -- Style of reverse direction indicator in Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style =
-  nil
+xplr.config.general.sort_and_filter_ui.sort_direction_identifiers.reverse.style = nil
 
 -- The identifiers used to denote applied sorters in the Sort & filter panel.
 --
