@@ -1369,9 +1369,9 @@ xplr.config.modes.builtin.go_to_path = {
         messages = {
           {
             BashExecSilently = [===[
-              if [ -d "${XPLR_INPUT_BUFFER:?}" ]; then
+              if [ -d "$XPLR_INPUT_BUFFER" ]; then
                 echo ChangeDirectory: "'"$XPLR_INPUT_BUFFER"'" >> "${XPLR_PIPE_MSG_IN:?}"
-              else
+              elif [ -e "$XPLR_INPUT_BUFFER" ]; then
                 echo FocusPath: "'"$XPLR_INPUT_BUFFER"'" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
