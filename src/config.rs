@@ -500,117 +500,9 @@ impl Mode {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct BuiltinModesConfig {
-    #[serde(default)]
-    pub default: Mode,
-
-    #[serde(default)]
-    pub debug_error: Mode,
-
-    #[serde(default)]
-    pub recover: Mode,
-
-    #[serde(default)]
-    pub selection_ops: Mode,
-
-    #[serde(default)]
-    pub create: Mode,
-
-    #[serde(default)]
-    pub create_directory: Mode,
-
-    #[serde(default)]
-    pub create_file: Mode,
-
-    #[serde(default)]
-    pub number: Mode,
-
-    #[serde(default)]
-    pub go_to: Mode,
-
-    #[serde(default)]
-    pub rename: Mode,
-
-    #[serde(default)]
-    pub duplicate_as: Mode,
-
-    #[serde(default)]
-    pub delete: Mode,
-
-    #[serde(default)]
-    pub action: Mode,
-
-    #[serde(default)]
-    pub search: Mode,
-
-    #[serde(default)]
-    pub filter: Mode,
-
-    #[serde(default)]
-    pub relative_path_does_match_regex: Mode,
-
-    #[serde(default)]
-    pub relative_path_does_not_match_regex: Mode,
-
-    #[serde(default)]
-    pub sort: Mode,
-
-    #[serde(default)]
-    pub switch_layout: Mode,
-
-    #[serde(default)]
-    pub quit: Mode,
-}
-
-impl BuiltinModesConfig {
-    pub fn get(&self, name: &str) -> Option<&Mode> {
-        match name {
-            "default" => Some(&self.default),
-            "debug_error" => Some(&self.debug_error),
-            "recover" => Some(&self.recover),
-            "selection ops" => Some(&self.selection_ops),
-            "selection_ops" => Some(&self.selection_ops),
-            "create" => Some(&self.create),
-            "create file" => Some(&self.create_file),
-            "create_file" => Some(&self.create_file),
-            "create directory" => Some(&self.create_directory),
-            "create_directory" => Some(&self.create_directory),
-            "number" => Some(&self.number),
-            "go to" => Some(&self.go_to),
-            "go_to" => Some(&self.go_to),
-            "rename" => Some(&self.rename),
-            "duplicate as" => Some(&self.duplicate_as),
-            "duplicate_as" => Some(&self.duplicate_as),
-            "delete" => Some(&self.delete),
-            "action" => Some(&self.action),
-            "search" => Some(&self.search),
-            "sort" => Some(&self.sort),
-            "filter" => Some(&self.filter),
-            "relative_path_does_match_regex" => {
-                Some(&self.relative_path_does_match_regex)
-            }
-            "relative path does match regex" => {
-                Some(&self.relative_path_does_match_regex)
-            }
-            "relative_path_does_not_match_regex" => {
-                Some(&self.relative_path_does_not_match_regex)
-            }
-            "relative path does not match regex" => {
-                Some(&self.relative_path_does_not_match_regex)
-            }
-            "switch layout" => Some(&self.switch_layout),
-            "switch_layout" => Some(&self.switch_layout),
-            "quit" => Some(&self.quit),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct ModesConfig {
     #[serde(default)]
-    pub builtin: BuiltinModesConfig,
+    pub builtin: HashMap<String, Mode>,
 
     #[serde(default)]
     pub custom: HashMap<String, Mode>,
@@ -654,40 +546,9 @@ impl PanelUiConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct BuiltinLayoutsConfig {
-    #[serde(default)]
-    pub default: Layout,
-
-    #[serde(default)]
-    pub no_help: Layout,
-
-    #[serde(default)]
-    pub no_selection: Layout,
-
-    #[serde(default)]
-    pub no_help_no_selection: Layout,
-}
-
-impl BuiltinLayoutsConfig {
-    pub fn get(&self, name: &str) -> Option<&Layout> {
-        match name {
-            "default" => Some(&self.default),
-            "no_help" => Some(&self.no_help),
-            "no help" => Some(&self.no_help),
-            "no_selection" => Some(&self.no_selection),
-            "no selection" => Some(&self.no_selection),
-            "no_help_no_selection" => Some(&self.no_help_no_selection),
-            "no help no selection" => Some(&self.no_help_no_selection),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
 pub struct LayoutsConfig {
     #[serde(default)]
-    pub builtin: BuiltinLayoutsConfig,
+    pub builtin: HashMap<String, Layout>,
 
     #[serde(default)]
     pub custom: HashMap<String, Layout>,

@@ -460,8 +460,8 @@ xplr.fn.custom.preview_pane.render = function(ctx)
   end
 end
 ```
-</details>
 
+</details>
 
 ## Also See:
 

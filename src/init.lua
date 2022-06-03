@@ -1143,7 +1143,9 @@ xplr.config.modes.builtin.default = {
           { SwitchModeBuiltin = "rename" },
           {
             BashExecSilently = [===[
-              echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              NAME=$(basename "${XPLR_FOCUS_PATH:?}")
+              echo SetInputPrompt: "'"${NAME:?} ❯ "'" >> "${XPLR_PIPE_MSG_IN:?}"
+              echo SetInputBuffer: "'"${NAME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1202,6 +1204,7 @@ xplr.config.modes.builtin.default = {
       messages = {
         "PopMode",
         { SwitchModeBuiltin = "number" },
+        { SetInputPrompt = ":" },
         "BufferInputFromKey",
       },
     },
@@ -1354,6 +1357,55 @@ xplr.config.modes.builtin.recover = {
   },
 }
 
+-- The builtin go to path mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.go_to_path = {
+  name = "go to path",
+  key_bindings = {
+    on_key = {
+      enter = {
+        help = "submit",
+        messages = {
+          {
+            BashExecSilently = [===[
+              if [ -d "${XPLR_INPUT_BUFFER:?}" ]; then
+                echo ChangeDirectory: "'"$XPLR_INPUT_BUFFER"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                echo FocusPath: "'"$XPLR_INPUT_BUFFER"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      tab = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
+      ["ctrl-c"] = {
+        help = "terminate",
+        messages = {
+          "Terminate",
+        },
+      },
+      esc = {
+        help = "cancel",
+        messages = {
+          "PopMode",
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
 -- The builtin selection ops mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
@@ -1453,11 +1505,12 @@ xplr.config.modes.builtin.create = {
           "Terminate",
         },
       },
-      ["d"] = {
+      d = {
         help = "create directory",
         messages = {
           "PopMode",
-          { SwitchModeBuiltin = "create directory" },
+          { SwitchModeBuiltin = "create_directory" },
+          { SetInputPrompt = "ð ❯ " },
           { SetInputBuffer = "" },
         },
       },
@@ -1467,11 +1520,12 @@ xplr.config.modes.builtin.create = {
           "PopMode",
         },
       },
-      ["f"] = {
+      f = {
         help = "create file",
         messages = {
           "PopMode",
-          { SwitchModeBuiltin = "create file" },
+          { SwitchModeBuiltin = "create_file" },
+          { SetInputPrompt = "ƒ ❯ " },
           { SetInputBuffer = "" },
         },
       },
@@ -1492,8 +1546,14 @@ xplr.config.modes.builtin.create_directory = {
           "Terminate",
         },
       },
+      tab = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
       enter = {
-        help = "create directory",
+        help = "submit",
         messages = {
           {
             BashExecSilently = [===[
@@ -1537,8 +1597,14 @@ xplr.config.modes.builtin.create_file = {
         help = "terminate",
         messages = { "Terminate" },
       },
+      tab = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
       enter = {
-        help = "create file",
+        help = "submit",
         messages = {
           {
             BashExecSilently = [===[
@@ -1651,21 +1717,30 @@ xplr.config.modes.builtin.go_to = {
           "PopMode",
         },
       },
-      ["f"] = {
+      f = {
         help = "follow symlink",
         messages = {
           "FollowSymlink",
           "PopMode",
         },
       },
-      ["g"] = {
+      g = {
         help = "top",
         messages = {
           "FocusFirst",
           "PopMode",
         },
       },
-      ["x"] = {
+      p = {
+        help = "path",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "go_to_path" },
+          { SetInputBuffer = "" },
+          { SetInputPrompt = "❯ " },
+        },
+      },
+      x = {
         help = "open in gui",
         messages = {
           {
@@ -1702,6 +1777,12 @@ xplr.config.modes.builtin.rename = {
         help = "terminate",
         messages = {
           "Terminate",
+        },
+      },
+      tab = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
         },
       },
       enter = {
@@ -1940,6 +2021,7 @@ xplr.config.modes.builtin.action = {
       messages = {
         "PopMode",
         { SwitchModeBuiltin = "number" },
+        { SetInputPrompt = ":" },
         "BufferInputFromKey",
       },
     },
@@ -2108,7 +2190,7 @@ xplr.config.modes.builtin.filter = {
         },
       },
       enter = {
-        help = "done",
+        help = "submit",
         messages = {
           "PopMode",
         },
@@ -2161,7 +2243,7 @@ xplr.config.modes.builtin.relative_path_does_match_regex = {
         },
       },
       enter = {
-        help = "apply filter",
+        help = "submit",
         messages = {
           "PopMode",
         },
@@ -2200,7 +2282,7 @@ xplr.config.modes.builtin.relative_path_does_not_match_regex = {
         },
       },
       enter = {
-        help = "apply filter",
+        help = "submit",
         messages = {
           "PopMode",
         },
@@ -2351,7 +2433,7 @@ xplr.config.modes.builtin.sort = {
         },
       },
       enter = {
-        help = "done",
+        help = "submit",
         messages = {
           "PopMode",
         },
@@ -2525,6 +2607,62 @@ xplr.config.modes.custom = {}
 --
 -- As always, `xplr.fn.builtin` is where the built-in functions are defined
 -- that can be overwritten.
+
+-- Tries to auto complete the path in the input buffer
+xplr.fn.builtin.try_complete_path = function(m)
+  if not m.input_buffer then
+    return
+  end
+
+  local function splitlines(str)
+    local res = {}
+    for s in str:gmatch("[^\r\n]+") do
+      table.insert(res, s)
+    end
+    return res
+  end
+
+  local function matches_all(str, files)
+    for _, p in ipairs(files) do
+      if string.sub(p, 1, #str) ~= str then
+        return false
+      end
+    end
+    return true
+  end
+
+  local path = m.input_buffer
+
+  local p = assert(io.popen(string.format("ls -d %q* 2>/dev/null", path)))
+  local out = p:read("*all")
+  p:close()
+
+  local found = splitlines(out)
+  local count = #found
+
+  if count == 0 then
+    return
+  elseif count == 1 then
+    return {
+      { SetInputBuffer = found[1] },
+    }
+  else
+    local first = found[1]
+    while #first > #path and matches_all(path, found) do
+      path = string.sub(found[1], 1, #path + 1)
+    end
+
+    if matches_all(path, found) then
+      return {
+        { SetInputBuffer = path },
+      }
+    end
+
+    return {
+      { SetInputBuffer = string.sub(path, 1, #path - 1) },
+    }
+  end
+end
 
 -- Renders the first column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
