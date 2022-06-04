@@ -1157,7 +1157,9 @@ xplr.config.modes.builtin.default = {
           { SwitchModeBuiltin = "duplicate_as" },
           {
             BashExecSilently = [===[
-              echo SetInputBuffer: "'"$(basename "${XPLR_FOCUS_PATH}")"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              NAME=$(basename "${XPLR_FOCUS_PATH:?}")
+              echo SetInputPrompt: "'"${NAME:?} ❯ "'" >> "${XPLR_PIPE_MSG_IN:?}"
+              echo SetInputBuffer: "'"${NAME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
