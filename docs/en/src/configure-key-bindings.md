@@ -5,6 +5,8 @@ In xplr, each keyboard input passes through a bunch of handlers (e.g. `on_key`,
 configured to with an [action][16], it will intercept the key and produce
 [messages][18] for xplr to handle.
 
+Try [debug key bindings][31] to understand how key bindings actually work.
+
 ## Key Bindings
 
 Key bindings contains the following information:
