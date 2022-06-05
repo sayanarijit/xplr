@@ -1144,7 +1144,6 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
               NAME=$(basename "${XPLR_FOCUS_PATH:?}")
-              echo SetInputPrompt: "'"${NAME:?} ❯ "'" >> "${XPLR_PIPE_MSG_IN:?}"
               echo SetInputBuffer: "'"${NAME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
@@ -1158,7 +1157,6 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
               NAME=$(basename "${XPLR_FOCUS_PATH:?}")
-              echo SetInputPrompt: "'"${NAME:?} ❯ "'" >> "${XPLR_PIPE_MSG_IN:?}"
               echo SetInputBuffer: "'"${NAME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
@@ -1739,7 +1737,6 @@ xplr.config.modes.builtin.go_to = {
           "PopMode",
           { SwitchModeBuiltin = "go_to_path" },
           { SetInputBuffer = "" },
-          { SetInputPrompt = "❯ " },
         },
       },
       x = {
