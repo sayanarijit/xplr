@@ -188,6 +188,33 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="v0180---v0190"><a class="header" href="#v0180---v0190"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.0">v0.19.0</a></a></h4>
+<ul>
+<li>BREAKING: The builtin modes cannot be accessed using space separated names
+anymore. Use underscore separated mode names. For e.g.
+<code>SwitchModeBuiltin: create file</code> becomes <code>SwitchModeBuiltin: create_file</code> and
+so on. Kindly go through your config, find and update them, or copy from the 
+latest <code>init.lua</code>.</li>
+<li>Now you can use <code>xplr.config.general.global_key_bindings</code> to define a set of
+key bindings that are available by default in every mode. e.g. <code>esc</code>
+and <code>ctrl-c</code>, and remove boilerplate code from your config.</li>
+<li>You can use the new builtin mode <code>go_to_path</code> which can be used for typing or
+pasting paths to enter into or to focus on. Type <code>g</code> <code>p</code> to enter this mode.</li>
+<li>Now you can use basic tab completion in the <code>go_to_path</code>, <code>create_file</code>,
+<code>create_directory</code>, <code>rename</code> and <code>duplicate_as</code> modes.</li>
+<li>Use the builtin function <code>xplr.fn.builtin.try_complete_path</code> to add easy tab
+completion support into your own configuration.</li>
+<li>Now you can open OSC 7 compatible terminals into the <code>xplr</code>'s current working
+directory by spawning new terminal sessions via the terminal supported key
+bindings.</li>
+<li>Use <code>NO_COLOR</code> environment variable to disable OSC 7 compliance along with
+colors.</li>
+<li>If you have fully copied the default <code>init.lua</code> locally, you might want to
+go through the latest improvements in <code>init.lua</code>. Specifically the <code>search</code>,
+<code>filter</code> and <code>sort</code> modes. Also, search for <code>SetInputPrompt</code> and the <code>tab</code>
+key bindings.</li>
+</ul>
+<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0176---v0180"><a class="header" href="#v0176---v0180"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a></a></h4>
 <ul>
 <li>Key binding <code>f</code> <code>r</code> and <code>f</code> <code>R</code> will now filter using regex.</li>
@@ -226,7 +253,6 @@ null character delimited paths.</li>
 </ul>
 </li>
 </ul>
-<p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0164---v0176"><a class="header" href="#v0164---v0176"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.16.4">v0.16.4</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a></a></h4>
 <ul>
 <li>Deprecated <code>app.directory_buffer</code>, <code>app.history</code>, and <code>app.last_modes</code> in
