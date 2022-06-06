@@ -155,51 +155,62 @@
 <p>If you need help debugging or understanding key bindings DYI way, you can
 create a <code>test.lua</code> file with the following script, launch xplr with
 <code>xplr --extra-config test.lua</code>, press <code>#</code> and play around.</p>
-<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key[&quot;#&quot;] = {
-  help = &quot;test&quot;,
-  messages = {
-    &quot;PopMode&quot;,
-    { SwitchModeCustom = &quot;test&quot; },
+<pre><code class="language-lua">-- The global key bindings inherited by all the modes.
+xplr.config.general.global_key_bindings = {
+  on_key = {
+    esc = {
+      help = &quot;escape&quot;,
+      messages = {
+        { LogInfo = &quot;global on_key(esc) called&quot; },
+        &quot;PopMode&quot;,
+      },
+    },
+    [&quot;ctrl-c&quot;] = {
+      help = &quot;terminate&quot;,
+      messages = {
+        &quot;Terminate&quot;,
+      },
+    },
   },
 }
 
-xplr.config.modes.custom.test = {
-  name = &quot;test&quot;,
+-- Press `#` to enter the `debug key bindings` mode.
+xplr.config.modes.builtin.default.key_bindings.on_key[&quot;#&quot;] = {
+  help = &quot;test&quot;,
+  messages = {
+    &quot;PopMode&quot;,
+    { SwitchModeCustom = &quot;debug_key_bindings&quot; },
+  },
+}
+
+-- The `debug key bindings` mode.
+xplr.config.modes.custom.debug_key_bindings = {
+  name = &quot;debug key bindings&quot;,
   key_bindings = {
     on_key = {
       [&quot;1&quot;] = {
         messages = {
-          { LogInfo = &quot;on_key called&quot; },
+          { LogInfo = &quot;on_key(1) called&quot; },
         },
       },
       a = {
         messages = {
-          { LogInfo = &quot;on_key called&quot; },
+          { LogInfo = &quot;on_key(a) called&quot; },
         },
       },
       [&quot;`&quot;] = {
         messages = {
-          { LogInfo = &quot;on_key called&quot; },
+          { LogInfo = &quot;on_key(`) called&quot; },
         },
       },
       tab = {
         messages = {
-          { LogInfo = &quot;on_key called&quot; },
-        },
-      },
-      esc = {
-        messages = {
-          &quot;PopMode&quot;,
-        },
-      },
-      [&quot;ctrl-c&quot;] = {
-        messages = {
-          &quot;Terminate&quot;,
+          { LogInfo = &quot;on_key(tab) called&quot; },
         },
       },
       f1 = {
         messages = {
-          { LogInfo = &quot;on_key called&quot; },
+          { LogInfo = &quot;on_key(f1) called&quot; },
         },
       },
     },
