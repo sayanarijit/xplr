@@ -45,6 +45,34 @@ compatibility.
 
 ### Instructions
 
+#### [v0.18.0][46] -> [v0.19.0][47]
+
+- BREAKING: The builtin modes cannot be accessed using space separated names
+  anymore. Use underscore separated mode names. For e.g.
+  `SwitchModeBuiltin: create file` becomes `SwitchModeBuiltin: create_file` and
+  so on. Kindly go through your config, find and update them, or copy from the 
+  latest `init.lua`.
+- Now you can use `xplr.config.general.global_key_bindings` to define a set of
+  key bindings that are available by default in every mode. e.g. `esc`
+  and `ctrl-c`, and remove boilerplate code from your config.
+- You can use the new builtin mode `go_to_path` which can be used for typing or
+  pasting paths to enter into or to focus on. Type `g` `p` to enter this mode.
+- Now you can use basic tab completion in the `go_to_path`, `create_file`,
+  `create_directory`, `rename` and `duplicate_as` modes.
+- Use the builtin function `xplr.fn.builtin.try_complete_path` to add easy tab
+  completion support into your own configuration.
+- Now you can open OSC 7 compatible terminals into the `xplr`'s current working
+  directory by spawning new terminal sessions via the terminal supported key
+  bindings.
+- Use `NO_COLOR` environment variable to disable OSC 7 compliance along with
+  colors.
+- If you have fully copied the default `init.lua` locally, you might want to
+  go through the latest improvements in `init.lua`. Specifically the `search`,
+  `filter` and `sort` modes. Also, search for `SetInputPrompt` and the `tab`
+  key bindings.
+
+<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
+
 #### [v0.17.6][45] -> [v0.18.0][46]
 
 - Key binding `f` `r` and `f` `R` will now filter using regex.
@@ -73,8 +101,6 @@ compatibility.
   - "ByCanonicalLastModified"
   - "BySymlinkCreated"
   - "BySymlinkLastModified"
-
-<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
 #### [v0.16.4][44] -> [v0.17.6][45]
 
@@ -354,3 +380,4 @@ Else do the following:
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
+[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.0
