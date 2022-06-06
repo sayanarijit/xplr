@@ -231,7 +231,10 @@ impl App {
                 .to_owned()
                 .unwrap_or_else(|| "default".into()),
         ) {
-            Some(m) => m.clone().sanitized(config.general.read_only),
+            Some(m) => m.clone().sanitized(
+                config.general.read_only,
+                config.general.global_key_bindings.to_owned(),
+            ),
             None => {
                 bail!("'default' mode is missing")
             }
@@ -988,7 +991,10 @@ impl App {
     fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.get(mode).cloned() {
             self = self.push_mode();
-            self.mode = mode.sanitized(self.config.general.read_only);
+            self.mode = mode.sanitized(
+                self.config.general.read_only,
+                self.config.general.global_key_bindings.to_owned(),
+            );
             Ok(self)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
@@ -1003,7 +1009,10 @@ impl App {
     fn switch_mode_builtin_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.builtin.get(mode).cloned() {
             self = self.push_mode();
-            self.mode = mode.sanitized(self.config.general.read_only);
+            self.mode = mode.sanitized(
+                self.config.general.read_only,
+                self.config.general.global_key_bindings.to_owned(),
+            );
             Ok(self)
         } else {
             self.log_error(format!("Builtin mode not found: {}", mode))
@@ -1018,7 +1027,10 @@ impl App {
     fn switch_mode_custom_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
         if let Some(mode) = self.config.modes.custom.get(mode).cloned() {
             self = self.push_mode();
-            self.mode = mode.sanitized(self.config.general.read_only);
+            self.mode = mode.sanitized(
+                self.config.general.read_only,
+                self.config.general.global_key_bindings.to_owned(),
+            );
             Ok(self)
         } else {
             self.log_error(format!("Custom mode not found: {}", mode))
@@ -1489,11 +1501,16 @@ impl App {
     }
 
     pub fn global_help_menu_str(&self) -> String {
-        let builtin = &self.config.modes.builtin;
-        let custom = &self.config.modes.custom;
+        let builtin = self.config.modes.builtin.clone();
+        let custom = self.config.modes.custom.clone();
+        let read_only = self.config.general.read_only;
+        let global_kb = &self.config.general.global_key_bindings;
 
-        builtin.iter()
-        .chain(custom.iter())
+        builtin.into_iter()
+        .chain(custom.into_iter())
+        .map(|(name, mode)| {
+            (name, mode.sanitized(read_only, global_kb.clone()))
+        })
         .map(|(name, mode)| {
             let help = mode
                 .help_menu()
