@@ -275,6 +275,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub start_fifo: Option<String>,
+
+    #[serde(default)]
+    pub global_key_bindings: KeyBindings,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -337,6 +340,20 @@ impl KeyBindings {
         };
         self
     }
+
+    pub fn extend(mut self, other: Self) -> Self {
+        self.on_key.extend(other.on_key);
+        self.on_alphabet = other.on_alphabet.or(self.on_alphabet);
+        self.on_number = other.on_number.or(self.on_number);
+        self.on_alphanumeric = other.on_alphanumeric.or(self.on_alphanumeric);
+        self.on_special_character =
+            other.on_special_character.or(self.on_special_character);
+        self.on_character = other.on_character.or(self.on_character);
+        self.on_navigation = other.on_navigation.or(self.on_navigation);
+        self.on_function = other.on_function.or(self.on_function);
+        self.default = other.default.or(self.default);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -359,8 +376,14 @@ pub struct Mode {
 }
 
 impl Mode {
-    pub fn sanitized(mut self, read_only: bool) -> Self {
-        self.key_bindings = self.key_bindings.sanitized(read_only);
+    pub fn sanitized(
+        mut self,
+        read_only: bool,
+        global_key_bindings: KeyBindings,
+    ) -> Self {
+        self.key_bindings = global_key_bindings
+            .sanitized(read_only)
+            .extend(self.key_bindings.sanitized(read_only));
         self
     }
 

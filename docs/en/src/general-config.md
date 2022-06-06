@@ -560,3 +560,10 @@ Set it to a file path to start fifo when xplr loads.
 Generally it is used to integrate with external tools like previewers.
 
 Type: nullable string
+
+#### xplr.config.general.global_key_bindings
+
+Use it to define a set of key bindings that are available by default in
+every [mode](https://xplr.dev/en/mode). They can be overwritten.
+
+Type: [Key Bindings](https://xplr.dev/en/configure-key-bindings#key-bindings)

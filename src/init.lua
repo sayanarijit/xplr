@@ -660,6 +660,25 @@ xplr.config.general.initial_layout = "default"
 -- Type: nullable string
 xplr.config.general.start_fifo = nil
 
+-- Use it to define a set of key bindings that are available by default in
+-- every [mode](https://xplr.dev/en/mode). They can be overwritten.
+--
+-- Type: [Key Bindings](https://xplr.dev/en/configure-key-bindings#key-bindings)
+xplr.config.general.global_key_bindings = {
+  on_key = {
+    esc = {
+      messages = {
+        "PopMode",
+      },
+    },
+    ["ctrl-c"] = {
+      messages = {
+        "Terminate",
+      },
+    },
+  },
+}
+
 -- ### Node Types -------------------------------------------------------------
 --
 -- This section defines how to deal with different kinds of nodes (files,
@@ -1041,12 +1060,6 @@ xplr.config.modes.builtin.default = {
           "ToggleSelectAll",
         },
       },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       ["ctrl-f"] = {
         help = "search",
         messages = {
@@ -1105,10 +1118,6 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PrintResultAndQuit",
         },
-      },
-      esc = {
-        help = nil,
-        messages = {},
       },
       ["f"] = {
         help = "filter",
@@ -1277,12 +1286,6 @@ xplr.config.modes.builtin.debug_error = {
   },
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       enter = {
         help = "open logs in editor",
         messages = {
@@ -1291,12 +1294,6 @@ xplr.config.modes.builtin.debug_error = {
               ${EDITOR:-vi} "${XPLR_PIPE_LOGS_OUT:?}"
             ]===],
           },
-        },
-      },
-      esc = {
-        help = "escape",
-        messages = {
-          "PopMode",
         },
       },
       q = {
@@ -1337,20 +1334,6 @@ xplr.config.modes.builtin.recover = {
     },
   },
   key_bindings = {
-    on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
-      esc = {
-        help = "escape",
-        messages = {
-          "PopMode",
-        },
-      },
-    },
     default = {
       messages = {},
     },
@@ -1383,18 +1366,6 @@ xplr.config.modes.builtin.go_to_path = {
         help = "try complete",
         messages = {
           { CallLuaSilently = "builtin.try_complete_path" },
-        },
-      },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
-          "PopMode",
         },
       },
     },
@@ -1430,18 +1401,6 @@ xplr.config.modes.builtin.selection_ops = {
               read -p "[enter to continue]"
             ]===],
           },
-          "PopMode",
-        },
-      },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
@@ -1499,12 +1458,6 @@ xplr.config.modes.builtin.create = {
   name = "create",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       d = {
         help = "create directory",
         messages = {
@@ -1512,12 +1465,6 @@ xplr.config.modes.builtin.create = {
           { SwitchModeBuiltin = "create_directory" },
           { SetInputPrompt = "ð ❯ " },
           { SetInputBuffer = "" },
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
-          "PopMode",
         },
       },
       f = {
@@ -1540,12 +1487,6 @@ xplr.config.modes.builtin.create_directory = {
   name = "create directory",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       tab = {
         help = "try complete",
         messages = {
@@ -1571,12 +1512,6 @@ xplr.config.modes.builtin.create_directory = {
           },
         },
       },
-      esc = {
-        help = "cancel",
-        messages = {
-          "PopMode",
-        },
-      },
     },
     default = {
       messages = {
@@ -1593,10 +1528,6 @@ xplr.config.modes.builtin.create_file = {
   name = "create file",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = { "Terminate" },
-      },
       tab = {
         help = "try complete",
         messages = {
@@ -1623,12 +1554,6 @@ xplr.config.modes.builtin.create_file = {
           },
         },
       },
-      esc = {
-        help = "cancel",
-        messages = {
-          "PopMode",
-        },
-      },
     },
     default = {
       messages = {
@@ -1645,12 +1570,6 @@ xplr.config.modes.builtin.number = {
   name = "number",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       down = {
         help = "to down",
         messages = {
@@ -1662,12 +1581,6 @@ xplr.config.modes.builtin.number = {
         help = "to index",
         messages = {
           "FocusByIndexFromInput",
-          "PopMode",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
@@ -1705,18 +1618,6 @@ xplr.config.modes.builtin.go_to = {
   name = "go to",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
-          "PopMode",
-        },
-      },
       f = {
         help = "follow symlink",
         messages = {
@@ -1772,12 +1673,6 @@ xplr.config.modes.builtin.rename = {
   name = "rename",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       tab = {
         help = "try complete",
         messages = {
@@ -1785,7 +1680,7 @@ xplr.config.modes.builtin.rename = {
         },
       },
       enter = {
-        help = "rename",
+        help = "submit",
         messages = {
           {
             BashExecSilently = [===[
@@ -1801,12 +1696,6 @@ xplr.config.modes.builtin.rename = {
               fi
             ]===],
           },
-          "PopMode",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
@@ -1826,12 +1715,6 @@ xplr.config.modes.builtin.duplicate_as = {
   name = "duplicate as",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       tab = {
         help = "try complete",
         messages = {
@@ -1839,7 +1722,7 @@ xplr.config.modes.builtin.duplicate_as = {
         },
       },
       enter = {
-        help = "duplicate",
+        help = "submit",
         messages = {
           {
             BashExecSilently = [===[
@@ -1855,12 +1738,6 @@ xplr.config.modes.builtin.duplicate_as = {
               fi
             ]===],
           },
-          "PopMode",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
@@ -1899,12 +1776,6 @@ xplr.config.modes.builtin.delete = {
           "PopMode",
         },
       },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       ["d"] = {
         help = "delete",
         messages = {
@@ -1929,12 +1800,6 @@ xplr.config.modes.builtin.delete = {
               read -p "[enter to continue]"
             ]===],
           },
-          "PopMode",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
@@ -1964,12 +1829,6 @@ xplr.config.modes.builtin.action = {
           { SwitchModeBuiltin = "create" },
         },
       },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       ["e"] = {
         help = "open in editor",
         messages = {
@@ -1978,12 +1837,6 @@ xplr.config.modes.builtin.action = {
               ${EDITOR:-vi} "${XPLR_FOCUS_PATH:?}"
             ]===],
           },
-          "PopMode",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
@@ -2070,18 +1923,6 @@ xplr.config.modes.builtin.quit = {
           "PrintResultAndQuit",
         },
       },
-      esc = {
-        help = "cancel",
-        messages = {
-          "PopMode",
-        },
-      },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
     },
   },
 }
@@ -2093,12 +1934,6 @@ xplr.config.modes.builtin.search = {
   name = "search",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       down = {
         help = "down",
         messages = {
@@ -2106,7 +1941,7 @@ xplr.config.modes.builtin.search = {
         },
       },
       enter = {
-        help = "focus",
+        help = "submit",
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "PopMode",
@@ -2194,12 +2029,6 @@ xplr.config.modes.builtin.filter = {
           "ExplorePwdAsync",
         },
       },
-      enter = {
-        help = "submit",
-        messages = {
-          "PopMode",
-        },
-      },
       backspace = {
         help = "remove last filter",
         messages = {
@@ -2221,18 +2050,9 @@ xplr.config.modes.builtin.filter = {
           "ExplorePwdAsync",
         },
       },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
     },
   },
 }
-
-xplr.config.modes.builtin.filter.key_bindings.on_key["esc"] =
-  xplr.config.modes.builtin.filter.key_bindings.on_key.enter
 
 -- The builtin relative_path_does_match_regex mode.
 --
@@ -2241,12 +2061,6 @@ xplr.config.modes.builtin.relative_path_does_match_regex = {
   name = "relative path does match regex",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       enter = {
         help = "submit",
         messages = {
@@ -2254,7 +2068,6 @@ xplr.config.modes.builtin.relative_path_does_match_regex = {
         },
       },
       esc = {
-        help = "cancel",
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "PopMode",
@@ -2280,12 +2093,6 @@ xplr.config.modes.builtin.relative_path_does_not_match_regex = {
   name = "relative path does not match regex",
   key_bindings = {
     on_key = {
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       enter = {
         help = "submit",
         messages = {
@@ -2293,7 +2100,6 @@ xplr.config.modes.builtin.relative_path_does_not_match_regex = {
         },
       },
       esc = {
-        help = "cancel",
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
           "PopMode",
@@ -2405,12 +2211,6 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
       ["ctrl-r"] = {
         help = "reset sorters",
         messages = {
@@ -2520,9 +2320,6 @@ xplr.config.modes.builtin.sort = {
   },
 }
 
-xplr.config.modes.builtin.sort.key_bindings.on_key["esc"] =
-  xplr.config.modes.builtin.sort.key_bindings.on_key.enter
-
 -- The builtin switch layout mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
@@ -2555,18 +2352,6 @@ xplr.config.modes.builtin.switch_layout = {
         help = "no help or selection",
         messages = {
           { SwitchLayoutBuiltin = "no_help_no_selection" },
-          "PopMode",
-        },
-      },
-      ["ctrl-c"] = {
-        help = "terminate",
-        messages = {
-          "Terminate",
-        },
-      },
-      esc = {
-        help = "cancel",
-        messages = {
           "PopMode",
         },
       },
