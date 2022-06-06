@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.18.0'
+version = '0.19.0'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
@@ -55,7 +55,7 @@ version = "0.4.19"
 features = ['serde']
 
 [dependencies.indexmap]
-version = "1.8.1"
+version = "1.8.2"
 features = ['serde']
 
 [dependencies.mlua]
@@ -63,7 +63,7 @@ version = "0.7.4"
 features = ['luajit', 'vendored', 'serialize', 'send']
 
 [dependencies.tui-input]
-version = "0.4.0"
+version = "0.4.2"
 features = ['serde']
 
 [dev-dependencies]
