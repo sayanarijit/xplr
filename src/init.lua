@@ -877,8 +877,8 @@ xplr.config.layouts.builtin.default = {
         Vertical = {
           config = {
             constraints = {
-              { Percentage = 50 },
-              { Percentage = 50 },
+              { Percentage = 30 },
+              { Percentage = 70 },
             },
           },
           splits = {
