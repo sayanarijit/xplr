@@ -1066,7 +1066,7 @@ xplr.config.modes.builtin.default = {
           "PopMode",
           { SwitchModeBuiltin = "search" },
           { SetInputPrompt = "/" },
-          { SetInputBuffer = "(?i)" },
+          { SetInputBuffer = "(?i)^" },
           "ExplorePwdAsync",
         },
       },
@@ -1953,7 +1953,7 @@ xplr.config.modes.builtin.search = {
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Enter",
-          { SetInputBuffer = "(?i)" },
+          { SetInputBuffer = "(?i)^" },
           "ExplorePwdAsync",
         },
       },
@@ -1962,7 +1962,7 @@ xplr.config.modes.builtin.search = {
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Back",
-          { SetInputBuffer = "(?i)" },
+          { SetInputBuffer = "(?i)^" },
           "ExplorePwdAsync",
         },
       },
