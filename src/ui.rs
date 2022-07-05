@@ -3,6 +3,7 @@ use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
+use crate::owner::Owner;
 use crate::permissions::Permissions;
 use ansi_to_tui_forked::ansi_to_text;
 use indexmap::IndexSet;
@@ -405,6 +406,7 @@ pub struct NodeUiMetadata {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
+    pub owner: Owner,
     pub permissions: Permissions,
     pub canonical: Option<ResolvedNodeUiMetadata>,
     pub symlink: Option<ResolvedNodeUiMetadata>,
@@ -453,6 +455,7 @@ impl NodeUiMetadata {
             mime_essence: node.mime_essence.to_owned(),
             size: node.size,
             human_size: node.human_size.to_owned(),
+            owner: node.owner.to_owned(),
             permissions: node.permissions.to_owned(),
             canonical: node.canonical.to_owned().map(ResolvedNode::into),
             symlink: node.symlink.to_owned().map(ResolvedNode::into),

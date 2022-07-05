@@ -1,4 +1,5 @@
 use crate::permissions::Permissions;
+use crate::owner::Owner;
 use humansize::{file_size_opts as options, FileSize};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -94,6 +95,7 @@ pub struct Node {
     pub mime_essence: String,
     pub size: u64,
     pub human_size: String,
+    pub owner: Owner,
     pub permissions: Permissions,
     pub created: Option<u128>,
     pub last_modified: Option<u128>,
@@ -127,6 +129,7 @@ impl Node {
             is_file,
             is_readonly,
             size,
+            owner,
             permissions,
             created,
             last_modified,
@@ -139,6 +142,7 @@ impl Node {
                     m.is_file(),
                     m.permissions().readonly(),
                     m.len(),
+                    Owner::from(&m),
                     Permissions::from(&m),
                     m.created()
                         .ok()
@@ -157,6 +161,7 @@ impl Node {
                     false,
                     false,
                     0,
+                    Owner::default(),
                     Permissions::default(),
                     None,
                     None,
@@ -179,6 +184,7 @@ impl Node {
             mime_essence,
             size,
             human_size,
+            owner,
             permissions,
             created,
             last_modified,
