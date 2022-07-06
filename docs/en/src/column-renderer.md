@@ -33,6 +33,7 @@ The special argument contains the following fields
 - [mime_essence][12]
 - [size][13]
 - [human_size][14]
+- [owner][36]
 - [permissions][15]
 - [created][34]
 - [last_modified][35]
@@ -122,6 +123,12 @@ recursively.
 Type: string
 
 Like [size][29] but in human readable format.
+
+### owner
+
+Type: [Owner][37]
+
+The [owner][37] applied to the node.
 
 ### permissions
 
@@ -223,7 +230,16 @@ Type: mapping of string and string
 
 The applicable [meta object][33] for the node.
 
-## Permission
+## Owner object
+
+Owner contains the following fields:
+
+- group
+- user
+
+Each field holds a string value.
+
+## Permission object
 
 Permission contains the following fields:
 
@@ -309,9 +325,11 @@ xplr.config.general.table.col_widths = {
 [27]: #total
 [28]: #meta
 [29]: #size
-[30]: #permission
+[30]: #permission-object
 [31]: #resolved-node-metadata
 [32]: general-config.md#tabletree
 [33]: node-type.md#meta
 [34]: #created
 [35]: #last_modified
+[36]: #owner
+[37]: #owner-object
