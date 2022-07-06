@@ -1,5 +1,5 @@
-use crate::permissions::Permissions;
 use crate::owner::Owner;
+use crate::permissions::Permissions;
 use humansize::{file_size_opts as options, FileSize};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
