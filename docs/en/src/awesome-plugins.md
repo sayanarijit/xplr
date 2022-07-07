@@ -26,6 +26,7 @@ of the following plugins work for you, it's very easy to
   support.
 - [**sayanarijit/fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
 - [**sayanarijit/find.xplr**][44] An interactive finder plugin to complement [map.xplr][38].
+- [**Junker/nuke.xplr**][53] Open files in apps by file type or mime
 - [**sayanarijit/nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
   [nvim-ctrl][36].
 - [**dtomvan/ouch.xplr**][40] This plugin uses [ouch][41] to compress and decompress files.
@@ -105,3 +106,4 @@ of the following plugins work for you, it's very easy to
 [50]: https://github.com/dtomvan/extra-icons.xplr
 [51]: https://github.com/sayanarijit/offline-docs.xplr
 [52]: https://github.com/sayanarijit/wl-clipboard.xplr
+[53]: https://github.com/Junker/nuke.xplr
