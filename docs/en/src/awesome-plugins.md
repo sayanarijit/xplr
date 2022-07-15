@@ -12,7 +12,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/map.xplr**][38] Visually inspect and interactively execute batch commands using xplr.
 - [**sayanarijit/offline-docs.xplr**][51] Fetch the appropriate version of xplr docs and browse offline.
 - [**sayanarijit/registers.xplr**][49] Use multiple registers to store the selected paths.
-- [**prncss-xyz/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
+- [**sayanarijit/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 - [**igorepst/term.xplr**][39] Terminal integration for xplr
 - [**sayanarijit/wl-clipboard.xplr**][52] Copy and paste with system clipboard using wl-clipboard
@@ -81,7 +81,7 @@ of the following plugins work for you, it's very easy to
 [25]: https://github.com/sayanarijit/completion.xplr
 [26]: https://github.com/sayanarijit/qrcp.xplr
 [27]: https://github.com/claudiodangelis/qrcp
-[28]: https://github.com/prncss-xyz/type-to-nav.xplr
+[28]: https://github.com/sayanarijit/type-to-nav.xplr
 [29]: https://github.com/jarun/nnn/wiki/concepts#type-to-nav
 [30]: https://github.com/prncss-xyz/icons.xplr
 [31]: https://github.com/sayanarijit/zentable.xplr
