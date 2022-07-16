@@ -3903,6 +3903,23 @@ xplr.fn.custom.preview_pane.render = function(ctx)
 end
 </code></pre>
 </details>
+<h3 id="tere-navigation"><a class="header" href="#tere-navigation">Tere Navigation</a></h3>
+<p>Navigate using the <a href="https://github.com/mgunyho/tere">tere</a> file explorer (defaults to type-to-nav system).</p>
+<details>
+<summary>Expand for details</summary>
+<ul>
+<li>Author: <a href="https://github.com/sayanarijit">@sayanarijit</a></li>
+<li>Requires: <a href="https://github.com/mgunyho/tere">tere</a></li>
+<li>Tested on: Linux</li>
+</ul>
+<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.T = {
+  help = &quot;tere nav&quot;,
+  messages = {
+    { BashExec = [[echo ChangeDirectory: &quot;'&quot;$(tere)&quot;'&quot; &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;]] },
+  },
+}
+</code></pre>
+</details>
 <h2 id="also-see-6"><a class="header" href="#also-see-6">Also See:</a></h2>
 <ul>
 <li><a href="awesome-plugins.html">Awesome Plugins</a></li>
