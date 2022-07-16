@@ -463,6 +463,27 @@ end
 
 </details>
 
+### Tere Navigation
+
+Navigate using the [tere][19] file explorer (defaults to type-to-nav system).
+
+<details>
+<summary>Expand for details</summary>
+
+- Author: [@sayanarijit][8]
+- Requires: [tere][19]
+- Tested on: Linux
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key.T = {
+  help = "tere nav",
+  messages = {
+    { BashExec = [[echo ChangeDirectory: "'"$(tere)"'" >> "$XPLR_PIPE_MSG_IN"]] },
+  },
+}
+```
+</details>
+
 ## Also See:
 
 - [Awesome Plugins][15]
@@ -486,3 +507,4 @@ end
 [16]: awesome-integrations.md
 [17]: https://sr.ht/~exec64/imv
 [18]: https://www.semicomplete.com/projects/xdotool
+[19]: https://github.com/mgunyho/tere
