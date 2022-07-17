@@ -459,7 +459,7 @@ pub enum ExternalMsg {
     /// can be used.
     /// You may need to pass `ExplorePwd` depening on the expectation.
     ///
-    /// Type: { Call = "string" }
+    /// Type: { Call = { command = string, args = { "list", "of", "string" } }
     ///
     /// Example:
     ///

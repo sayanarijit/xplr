@@ -50,7 +50,7 @@ compatibility.
 - BREAKING: The builtin modes cannot be accessed using space separated names
   anymore. Use underscore separated mode names. For e.g.
   `SwitchModeBuiltin: create file` becomes `SwitchModeBuiltin: create_file` and
-  so on. Kindly go through your config, find and update them, or copy from the 
+  so on. Kindly go through your config, find and update them, or copy from the
   latest `init.lua`.
 - Now you can use `xplr.config.general.global_key_bindings` to define a set of
   key bindings that are available by default in every mode. e.g. `esc`

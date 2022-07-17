@@ -482,6 +482,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.T = {
   },
 }
 ```
+
 </details>
 
 ## Also See:
