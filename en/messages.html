@@ -553,7 +553,7 @@ Note that the arguments will be shell-escaped.
 So to read the variables, the <code>-c</code> option of the shell
 can be used.
 You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
-<p>Type: { Call = &quot;string&quot; }</p>
+<p>Type: { Call = { command = string, args = { &quot;list&quot;, &quot;of&quot;, &quot;string&quot; } }</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>

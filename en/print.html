@@ -2315,7 +2315,7 @@ Note that the arguments will be shell-escaped.
 So to read the variables, the <code>-c</code> option of the shell
 can be used.
 You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
-<p>Type: { Call = &quot;string&quot; }</p>
+<p>Type: { Call = { command = string, args = { &quot;list&quot;, &quot;of&quot;, &quot;string&quot; } }</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
@@ -4225,7 +4225,7 @@ compatibility.</p>
 <li>BREAKING: The builtin modes cannot be accessed using space separated names
 anymore. Use underscore separated mode names. For e.g.
 <code>SwitchModeBuiltin: create file</code> becomes <code>SwitchModeBuiltin: create_file</code> and
-so on. Kindly go through your config, find and update them, or copy from the 
+so on. Kindly go through your config, find and update them, or copy from the
 latest <code>init.lua</code>.</li>
 <li>Now you can use <code>xplr.config.general.global_key_bindings</code> to define a set of
 key bindings that are available by default in every mode. e.g. <code>esc</code>
