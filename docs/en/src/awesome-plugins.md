@@ -35,6 +35,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/preview-tabbed.xplr**][10] Preview paths using suckless [tabbed][11] and
   [nnn preview-tabbed][12].
 - [**sayanarijit/qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
+- [**sayanarijit/scp.xplr**][54] Integrate xplr with scp.
 - [**sayanarijit/trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
 - [**sayanarijit/xargs.xplr**][22] Batch execute commands on the focused or selected files
   using `xargs`.
@@ -107,3 +108,4 @@ of the following plugins work for you, it's very easy to
 [51]: https://github.com/sayanarijit/offline-docs.xplr
 [52]: https://github.com/sayanarijit/wl-clipboard.xplr
 [53]: https://github.com/Junker/nuke.xplr
+[54]: https://github.com/sayanarijit/scp.xplr
