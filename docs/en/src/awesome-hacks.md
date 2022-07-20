@@ -330,7 +330,7 @@ Preview images using [imv][17].
 
 - Author: [@sayanarijit][8]
 - Requires: [imv][17], [xdotool][18]
-- Tested on: Linux
+- Tested on: Linux, FreeBSD 13.1-RELEASE
 
 ```lua
 xplr.config.modes.builtin.default.key_bindings.on_key.P = {
@@ -393,7 +393,7 @@ Preview text files in a native xplr pane (should be fast enough).
 
 - Author: [@sayanarijit][8]
 - Requires: none
-- Tested on: Linux
+- Tested on: Linux, FreeBSD 13.1-RELEASE
 
 ```lua
 local function stat(node)
