@@ -342,7 +342,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.P = {
 
         if [ -e "$FIFO_PATH" ]; then
           echo StopFifo >> "$XPLR_PIPE_MSG_IN"
-          rm "$FIFO_PATH"
+          rm -f -- "$FIFO_PATH"
         else
           mkfifo "$FIFO_PATH"
           "$HOME/.local/bin/imv-open.sh" "$FIFO_PATH" "$XPLR_FOCUS_PATH" &
@@ -379,7 +379,7 @@ while read -r path; do
 done < "$FIFO_PATH"
 
 imv-msg "$IMV_PID" quit
-[ -e "$FIFO_PATH" ] && rm -f "$FIFO_PATH"
+[ -e "$FIFO_PATH" ] && rm -f -- "$FIFO_PATH"
 ```
 
 </details>
@@ -445,7 +445,7 @@ xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
   local n = ctx.app.focused_node
 
-  if n.canonical then
+  if n and n.canonical then
     n = n.canonical
   end
 
