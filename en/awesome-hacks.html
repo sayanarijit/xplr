@@ -444,7 +444,7 @@ xplr.config.modes.custom.bookmark = {
 
         if [ -e &quot;$FIFO_PATH&quot; ]; then
           echo StopFifo &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;
-          rm &quot;$FIFO_PATH&quot;
+          rm -f -- &quot;$FIFO_PATH&quot;
         else
           mkfifo &quot;$FIFO_PATH&quot;
           &quot;$HOME/.local/bin/imv-open.sh&quot; &quot;$FIFO_PATH&quot; &quot;$XPLR_FOCUS_PATH&quot; &amp;
@@ -478,7 +478,7 @@ while read -r path; do
 done &lt; &quot;$FIFO_PATH&quot;
 
 imv-msg &quot;$IMV_PID&quot; quit
-[ -e &quot;$FIFO_PATH&quot; ] &amp;&amp; rm -f &quot;$FIFO_PATH&quot;
+[ -e &quot;$FIFO_PATH&quot; ] &amp;&amp; rm -f -- &quot;$FIFO_PATH&quot;
 </code></pre>
 </details>
 <h3 id="text-preview-pane"><a class="header" href="#text-preview-pane">Text preview pane</a></h3>
@@ -539,7 +539,7 @@ xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
   local n = ctx.app.focused_node
 
-  if n.canonical then
+  if n and n.canonical then
     n = n.canonical
   end
 
