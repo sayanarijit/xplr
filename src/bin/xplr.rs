@@ -36,7 +36,7 @@ fn main() {
 
         let args = r###"
     <PATH>            Path to focus on, or enter if directory, (default is `.`)
-    <SELECTION>...    Paths to select, requires <PATH> to be set explicitely"###;
+    <SELECTION>...    Paths to select, requires <PATH> to be set explicitly"###;
 
         let help = format!(
             "xplr {}\n{}\n{}\n\nUSAGE:{}\n\nFLAGS:{}\n\nOPTIONS:{}\n\nARGS:{}",
