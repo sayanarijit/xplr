@@ -188,7 +188,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="v0180---v0190"><a class="header" href="#v0180---v0190"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.0">v0.19.0</a></a></h4>
+<h4 id="v0180---v0191"><a class="header" href="#v0180---v0191"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.1">v0.19.1</a></a></h4>
 <ul>
 <li>BREAKING: The builtin modes cannot be accessed using space separated names
 anymore. Use underscore separated mode names. For e.g.
@@ -213,6 +213,13 @@ colors.</li>
 go through the latest improvements in <code>init.lua</code>. Specifically the <code>search</code>,
 <code>filter</code> and <code>sort</code> modes. Also, search for <code>SetInputPrompt</code> and the <code>tab</code>
 key bindings.</li>
+<li>Since version 0.19.1, you can access uid and gid of the file owner in the Lua
+API.</li>
+<li>The input buffer will support more readline-like keys.
+Also, added &quot;DeleteTillEnd&quot; as another cursor based &quot;InputOperation&quot; option.</li>
+<li>Fixed applying regex based filters via the CLI and <code>$XPLR_PIPE_MSG_IN</code> pipe.</li>
+<li>You can use the <code>prompt</code> field to define input prompt for each mode, instead
+of using the <code>SetInputPrompt</code> message.</li>
 </ul>
 <p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0176---v0180"><a class="header" href="#v0176---v0180"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a></a></h4>
