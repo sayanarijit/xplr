@@ -122,6 +122,8 @@ A node contains the following fields:
 - [permissions][57]
 - [created][71]
 - [last_modified][72]
+- [uid][73]
+- [gid][74]
 - [canonical][58]
 - [symlink][59]
 
@@ -215,6 +217,18 @@ Creation time in nanosecond since UNIX epoch.
 Type: nullable integer
 
 Last modification time in nanosecond since UNIX epoch.
+
+### uid
+
+Type: integer
+
+User ID of the file owner.
+
+### gid
+
+Type: integer
+
+Group ID of the file owner.
 
 ### canonical
 
@@ -368,3 +382,5 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [70]: #history-1
 [71]: #created
 [72]: #last_modified
+[73]: #uid
+[74]: #gid
