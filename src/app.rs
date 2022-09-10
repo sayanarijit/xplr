@@ -862,11 +862,11 @@ impl App {
         self.input = InputBuffer {
             buffer: Default::default(),
             prompt: self
-                .config
-                .general
+                .mode
                 .prompt
-                .format
-                .to_owned()
+                .as_ref()
+                .or(self.config.general.prompt.format.as_ref())
+                .cloned()
                 .unwrap_or_default(),
         };
         Ok(self)

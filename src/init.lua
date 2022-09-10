@@ -1065,7 +1065,6 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "search" },
-          { SetInputPrompt = "/" },
           { SetInputBuffer = "(?i)" },
           "ExplorePwdAsync",
         },
@@ -1213,7 +1212,6 @@ xplr.config.modes.builtin.default = {
       messages = {
         "PopMode",
         { SwitchModeBuiltin = "number" },
-        { SetInputPrompt = ":" },
         "BufferInputFromKey",
       },
     },
@@ -1463,7 +1461,6 @@ xplr.config.modes.builtin.create = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "create_directory" },
-          { SetInputPrompt = "ð ❯ " },
           { SetInputBuffer = "" },
         },
       },
@@ -1472,7 +1469,6 @@ xplr.config.modes.builtin.create = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "create_file" },
-          { SetInputPrompt = "ƒ ❯ " },
           { SetInputBuffer = "" },
         },
       },
@@ -1485,6 +1481,7 @@ xplr.config.modes.builtin.create = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.create_directory = {
   name = "create directory",
+  prompt = "ð ❯ ",
   key_bindings = {
     on_key = {
       tab = {
@@ -1526,6 +1523,7 @@ xplr.config.modes.builtin.create_directory = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.create_file = {
   name = "create file",
+  prompt = "ƒ ❯ ",
   key_bindings = {
     on_key = {
       tab = {
@@ -1568,6 +1566,7 @@ xplr.config.modes.builtin.create_file = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.number = {
   name = "number",
+  prompt = ":",
   key_bindings = {
     on_key = {
       down = {
@@ -1879,7 +1878,6 @@ xplr.config.modes.builtin.action = {
       messages = {
         "PopMode",
         { SwitchModeBuiltin = "number" },
-        { SetInputPrompt = ":" },
         "BufferInputFromKey",
       },
     },
@@ -1932,6 +1930,7 @@ xplr.config.modes.builtin.quit = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.search = {
   name = "search",
+  prompt = "/",
   key_bindings = {
     on_key = {
       down = {
@@ -2009,9 +2008,6 @@ xplr.config.modes.builtin.filter = {
         help = "relative path does match regex",
         messages = {
           { SwitchModeBuiltin = "relative_path_does_match_regex" },
-          {
-            SetInputPrompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesMatchRegex.format,
-          },
           { SetInputBuffer = "" },
           { AddNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "ExplorePwdAsync",
@@ -2021,9 +2017,6 @@ xplr.config.modes.builtin.filter = {
         help = "relative path does not match regex",
         messages = {
           { SwitchModeBuiltin = "relative_path_does_not_match_regex" },
-          {
-            SetInputPrompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesNotMatchRegex.format,
-          },
           { SetInputBuffer = "" },
           { AddNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
           "ExplorePwdAsync",
@@ -2059,6 +2052,7 @@ xplr.config.modes.builtin.filter = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.relative_path_does_match_regex = {
   name = "relative path does match regex",
+  prompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesMatchRegex.format,
   key_bindings = {
     on_key = {
       enter = {
@@ -2091,6 +2085,7 @@ xplr.config.modes.builtin.relative_path_does_match_regex = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.relative_path_does_not_match_regex = {
   name = "relative path does not match regex",
+  prompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesNotMatchRegex.format,
   key_bindings = {
     on_key = {
       enter = {
