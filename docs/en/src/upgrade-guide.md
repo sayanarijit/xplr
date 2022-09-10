@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.18.0][46] -> [v0.19.0][47]
+#### [v0.18.0][46] -> [v0.19.1][47]
 
 - BREAKING: The builtin modes cannot be accessed using space separated names
   anymore. Use underscore separated mode names. For e.g.
@@ -70,6 +70,13 @@ compatibility.
   go through the latest improvements in `init.lua`. Specifically the `search`,
   `filter` and `sort` modes. Also, search for `SetInputPrompt` and the `tab`
   key bindings.
+- Since version 0.19.1, you can access uid and gid of the file owner in the Lua
+  API.
+- The input buffer will support more readline-like keys.
+  Also, added "DeleteTillEnd" as another cursor based "InputOperation" option.
+- Fixed applying regex based filters via the CLI and `$XPLR_PIPE_MSG_IN` pipe.
+- You can use the `prompt` field to define input prompt for each mode, instead
+  of using the `SetInputPrompt` message.
 
 <sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
@@ -380,4 +387,4 @@ Else do the following:
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
-[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.0
+[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.1
