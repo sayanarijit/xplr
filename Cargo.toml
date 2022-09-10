@@ -22,15 +22,15 @@ categories = ['command-line-interface', 'command-line-utilities']
 include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
 
 [dependencies]
-libc = "0.2.126"
+libc = "0.2.132"
 humansize = "1.1.1"
 natord = "1.0.9"
-anyhow = "1.0.57"
-serde_yaml = "0.8.24"
-crossterm = "0.23.2"
+anyhow = "1.0.64"
+serde_yaml = "0.9.11"
+crossterm = "0.25.0"
 dirs = "4.0.0"
-ansi-to-tui-forked = "0.5.2-fix.offset"
-regex = "1.5.6"
+ansi-to-tui = "1.0.1"
+regex = "1.6.0"
 gethostname = "0.2.3"
 
 [dependencies.lazy_static]
@@ -47,27 +47,27 @@ default-features = false
 features = ['crossterm', 'serde']
 
 [dependencies.serde]
-version = "1.0.137"
+version = "1.0.144"
 features = ['derive']
 
 [dependencies.chrono]
-version = "0.4.19"
+version = "0.4.22"
 features = ['serde']
 
 [dependencies.indexmap]
-version = "1.9.0"
+version = "1.9.1"
 features = ['serde']
 
 [dependencies.mlua]
-version = "0.8.0"
+version = "0.8.3"
 features = ['luajit', 'vendored', 'serialize', 'send']
 
 [dependencies.tui-input]
-version = "0.4.2"
+version = "0.5.1"
 features = ['serde']
 
 [dev-dependencies]
-criterion = "0.3.5"
+criterion = "0.3.6"
 assert_cmd = "2.0.4"
 
 [profile.release]

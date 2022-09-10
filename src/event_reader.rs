@@ -81,6 +81,14 @@ fn keep_reading(
                     tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
                 }
 
+                Ok(Event::FocusGained) => Ok(()),
+                Ok(Event::FocusLost) => Ok(()),
+
+                Ok(Event::Paste(text)) => {
+                    let msg = MsgIn::External(ExternalMsg::BufferInput(text));
+                    tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
+                }
+
                 Err(e) => Err(Error::new(e)),
             };
 
