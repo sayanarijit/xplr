@@ -410,6 +410,8 @@ pub struct NodeUiMetadata {
     pub symlink: Option<ResolvedNodeUiMetadata>,
     pub created: Option<u128>,
     pub last_modified: Option<u128>,
+    pub uid: u32,
+    pub gid: u32,
 
     // Extra
     pub index: usize,
@@ -458,6 +460,8 @@ impl NodeUiMetadata {
             symlink: node.symlink.to_owned().map(ResolvedNode::into),
             created: node.created,
             last_modified: node.last_modified,
+            uid: node.uid,
+            gid: node.gid,
             index,
             relative_index,
             is_before_focus,

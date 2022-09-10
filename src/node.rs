@@ -2,6 +2,7 @@ use crate::permissions::Permissions;
 use humansize::{file_size_opts as options, FileSize};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use std::os::unix::prelude::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
@@ -33,6 +34,8 @@ pub struct ResolvedNode {
     pub human_size: String,
     pub created: Option<u128>,
     pub last_modified: Option<u128>,
+    pub uid: u32,
+    pub gid: u32,
 }
 
 impl ResolvedNode {
@@ -42,25 +45,27 @@ impl ResolvedNode {
             .map(|e| e.to_string_lossy().to_string())
             .unwrap_or_default();
 
-        let (is_dir, is_file, is_readonly, size, created, last_modified) = path
-            .metadata()
-            .map(|m| {
-                (
-                    m.is_dir(),
-                    m.is_file(),
-                    m.permissions().readonly(),
-                    m.len(),
-                    m.created()
-                        .ok()
-                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .map(|d| d.as_nanos()),
-                    m.modified()
-                        .ok()
-                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .map(|d| d.as_nanos()),
-                )
-            })
-            .unwrap_or((false, false, false, 0, None, None));
+        let (is_dir, is_file, is_readonly, size, created, last_modified, uid, gid) =
+            path.metadata()
+                .map(|m| {
+                    (
+                        m.is_dir(),
+                        m.is_file(),
+                        m.permissions().readonly(),
+                        m.len(),
+                        m.created()
+                            .ok()
+                            .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                            .map(|d| d.as_nanos()),
+                        m.modified()
+                            .ok()
+                            .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                            .map(|d| d.as_nanos()),
+                        m.uid(),
+                        m.gid(),
+                    )
+                })
+                .unwrap_or((false, false, false, 0, None, None, 0, 0));
 
         let mime_essence = mime_essence(&path, is_dir);
         let human_size = to_human_size(size);
@@ -76,6 +81,8 @@ impl ResolvedNode {
             human_size,
             created,
             last_modified,
+            uid,
+            gid,
         }
     }
 }
@@ -97,6 +104,8 @@ pub struct Node {
     pub permissions: Permissions,
     pub created: Option<u128>,
     pub last_modified: Option<u128>,
+    pub uid: u32,
+    pub gid: u32,
 
     pub canonical: Option<ResolvedNode>,
     pub symlink: Option<ResolvedNode>,
@@ -130,6 +139,8 @@ impl Node {
             permissions,
             created,
             last_modified,
+            uid,
+            gid,
         ) = path
             .symlink_metadata()
             .map(|m| {
@@ -148,6 +159,8 @@ impl Node {
                         .ok()
                         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
                         .map(|d| d.as_nanos()),
+                    m.uid(),
+                    m.gid(),
                 )
             })
             .unwrap_or_else(|_| {
@@ -160,6 +173,8 @@ impl Node {
                     Permissions::default(),
                     None,
                     None,
+                    0,
+                    0,
                 )
             });
 
@@ -182,6 +197,8 @@ impl Node {
             permissions,
             created,
             last_modified,
+            uid,
+            gid,
             canonical: maybe_canonical_meta.clone(),
             symlink: if is_symlink {
                 maybe_canonical_meta
