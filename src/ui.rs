@@ -48,7 +48,7 @@ fn string_to_text<'a>(string: String) -> Text<'a> {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct LayoutOptions {
     #[serde(default)]
@@ -74,7 +74,7 @@ impl LayoutOptions {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum ContentBody {
     /// A paragraph to render
@@ -292,7 +292,7 @@ impl Into<TuiStyle> for Style {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum Constraint {
     Percentage(u16),
@@ -1169,7 +1169,7 @@ pub fn draw_custom_content<B: Backend>(
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Rect {
     x: u16,
     y: u16,
