@@ -7,6 +7,7 @@ A mode contains the following information:
 - [extra_help][7]
 - [key_bindings][9]
 - [layout][10]
+- [prompt][13]
 
 ### name
 
@@ -40,6 +41,12 @@ Type: nullable [Layout][11]
 
 If specified, this layout will be used to render the UI.
 
+### prompt
+
+Type: nullable string
+
+If set, this prompt will be displayed in the input buffer when in this mode.
+
 ## Also See:
 
 - [xplr.config.modes][12]
@@ -56,3 +63,4 @@ If specified, this layout will be used to render the UI.
 [10]: #layout
 [11]: layout.md#layout
 [12]: modes.md
+[13]: #prompt

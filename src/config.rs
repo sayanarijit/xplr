@@ -373,6 +373,9 @@ pub struct Mode {
 
     #[serde(default)]
     pub layout: Option<Layout>,
+
+    #[serde(default)]
+    pub prompt: Option<String>,
 }
 
 impl Mode {
