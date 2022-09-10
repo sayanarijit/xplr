@@ -15,6 +15,7 @@ Cursor based input operation can be one of the following:
 - "DeletePreviousWord"
 - "DeleteNextWord"
 - "DeleteLine"
+- "DeleteTillEnd"
 
 ## Also See:
 
