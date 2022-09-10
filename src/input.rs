@@ -755,6 +755,7 @@ pub enum InputOperation {
     DeletePreviousWord,
     DeleteNextWord,
     DeleteLine,
+    DeleteTillEnd,
 }
 
 impl Into<InputRequest> for InputOperation {
@@ -773,6 +774,7 @@ impl Into<InputRequest> for InputOperation {
             Self::DeletePreviousWord => InputRequest::DeletePrevWord,
             Self::DeleteNextWord => InputRequest::DeleteNextWord,
             Self::DeleteLine => InputRequest::DeleteLine,
+            Self::DeleteTillEnd => InputRequest::DeleteTillEnd,
         }
     }
 }

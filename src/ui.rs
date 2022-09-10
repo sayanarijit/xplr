@@ -4,7 +4,7 @@ use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
-use ansi_to_tui_forked::ansi_to_text;
+use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use mlua::Lua;
@@ -41,7 +41,10 @@ fn string_to_text<'a>(string: String) -> Text<'a> {
     if *NO_COLOR {
         Text::raw(string)
     } else {
-        ansi_to_text(string.bytes()).unwrap_or_else(|e| Text::raw(format!("{:?}", e)))
+        string
+            .as_bytes()
+            .into_text()
+            .unwrap_or_else(|e| Text::raw(format!("{:?}", e)))
     }
 }
 
