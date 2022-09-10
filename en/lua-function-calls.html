@@ -231,6 +231,8 @@ messages which will be handled by xplr.</p>
 <li><a href="#permissions">permissions</a></li>
 <li><a href="#created">created</a></li>
 <li><a href="#last_modified">last_modified</a></li>
+<li><a href="#uid">uid</a></li>
+<li><a href="#gid">gid</a></li>
 <li><a href="#canonical">canonical</a></li>
 <li><a href="#symlink">symlink</a></li>
 </ul>
@@ -280,6 +282,12 @@ recursively.</p>
 <h3 id="last_modified"><a class="header" href="#last_modified">last_modified</a></h3>
 <p>Type: nullable integer</p>
 <p>Last modification time in nanosecond since UNIX epoch.</p>
+<h3 id="uid"><a class="header" href="#uid">uid</a></h3>
+<p>Type: integer</p>
+<p>User ID of the file owner.</p>
+<h3 id="gid"><a class="header" href="#gid">gid</a></h3>
+<p>Type: integer</p>
+<p>Group ID of the file owner.</p>
 <h3 id="canonical"><a class="header" href="#canonical">canonical</a></h3>
 <p>Type: nullable <a href="column-renderer.html#resolved-node-metadata">Resolved Node Metadata</a></p>
 <p>If the node is a symlink, it will hold information about the symlink resolved

@@ -3272,6 +3272,8 @@ messages which will be handled by xplr.</p>
 <li><a href="lua-function-calls.html#permissions">permissions</a></li>
 <li><a href="lua-function-calls.html#created">created</a></li>
 <li><a href="lua-function-calls.html#last_modified">last_modified</a></li>
+<li><a href="lua-function-calls.html#uid">uid</a></li>
+<li><a href="lua-function-calls.html#gid">gid</a></li>
 <li><a href="lua-function-calls.html#canonical">canonical</a></li>
 <li><a href="lua-function-calls.html#symlink">symlink</a></li>
 </ul>
@@ -3321,6 +3323,12 @@ recursively.</p>
 <h3 id="last_modified-1"><a class="header" href="#last_modified-1">last_modified</a></h3>
 <p>Type: nullable integer</p>
 <p>Last modification time in nanosecond since UNIX epoch.</p>
+<h3 id="uid-1"><a class="header" href="#uid-1">uid</a></h3>
+<p>Type: integer</p>
+<p>User ID of the file owner.</p>
+<h3 id="gid-1"><a class="header" href="#gid-1">gid</a></h3>
+<p>Type: integer</p>
+<p>Group ID of the file owner.</p>
 <h3 id="canonical-1"><a class="header" href="#canonical-1">canonical</a></h3>
 <p>Type: nullable <a href="column-renderer.html#resolved-node-metadata">Resolved Node Metadata</a></p>
 <p>If the node is a symlink, it will hold information about the symlink resolved
