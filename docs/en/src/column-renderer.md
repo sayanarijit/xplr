@@ -36,6 +36,8 @@ The special argument contains the following fields
 - [permissions][15]
 - [created][34]
 - [last_modified][35]
+- [uid][36]
+- [gid][37]
 - [canonical][16]
 - [symlink][17]
 - [index][18]
@@ -140,6 +142,18 @@ Creation time in nanosecond since UNIX epoch.
 Type: nullable integer
 
 Last modification time in nanosecond since UNIX epoch.
+
+### uid
+
+Type: integer
+
+User ID of the file owner.
+
+### gid
+
+Type: integer
+
+Group ID of the file owner.
 
 ### canonical
 
@@ -256,6 +270,8 @@ It contains the following fields.
 - [human_size][14]
 - [created][34]
 - [last_modified][35]
+- [uid][36]
+- [gid][37]
 
 ## Example: Customizing Table Renderer
 
@@ -315,3 +331,5 @@ xplr.config.general.table.col_widths = {
 [33]: node-type.md#meta
 [34]: #created
 [35]: #last_modified
+[36]: #uid
+[37]: #gid
