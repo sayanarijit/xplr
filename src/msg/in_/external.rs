@@ -1423,14 +1423,28 @@ impl PartialEq for CmpRegex {
 
 impl Eq for CmpRegex {}
 
-#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
+// See https://github.com/sayanarijit/xplr/issues/503
+#[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
+struct NodeFilterApplicableDeserializer {
+    pub filter: NodeFilter,
+    pub input: String,
+}
+
+#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, from = "NodeFilterApplicableDeserializer")]
 pub struct NodeFilterApplicable {
     pub filter: NodeFilter,
     pub input: String,
 
     #[serde(skip)]
     pub regex: Option<CmpRegex>,
+}
+
+impl From<NodeFilterApplicableDeserializer> for NodeFilterApplicable {
+    fn from(f: NodeFilterApplicableDeserializer) -> Self {
+        NodeFilterApplicable::new(f.filter, f.input)
+    }
 }
 
 impl NodeFilterApplicable {
