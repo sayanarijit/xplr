@@ -142,42 +142,42 @@ mod tests {
             .stderr("");
     }
 
-    // TODO: Fix running GitHub action
+    // TODO fix GitHub CI failures
     //
     // #[test]
     // fn test_cli_path_arg_valid() {
     //     Command::cargo_bin("xplr")
     //         .unwrap()
-    //         .arg("/tmp")
+    //         .arg("src")
     //         .arg("--on-load")
     //         .arg("PrintResultAndQuit")
     //         .assert()
     //         .success()
     //         .code(0)
     //         .stderr("");
-
+    //
     //     Command::cargo_bin("xplr")
     //         .unwrap()
-    //         .arg("/tmp")
+    //         .arg("src")
     //         .arg("--on-load")
     //         .arg("PrintResultAndQuit")
     //         .assert()
     //         .success()
     //         .code(0)
     //         .stderr("");
-
+    //
     //     Command::cargo_bin("xplr")
     //         .unwrap()
     //         .arg("--on-load")
     //         .arg("PrintResultAndQuit")
     //         .arg("--")
-    //         .arg("/tmp")
+    //         .arg("src")
     //         .assert()
     //         .success()
     //         .code(0)
     //         .stderr("");
     // }
-
+    //
     // #[test]
     // fn test_cli_path_stdin_valid() {
     //     Command::cargo_bin("xplr")
@@ -185,10 +185,25 @@ mod tests {
     //         .arg("-")
     //         .arg("--on-load")
     //         .arg("PrintResultAndQuit")
-    //         .write_stdin("/tmp\n")
+    //         .write_stdin("src\n")
     //         .assert()
     //         .success()
     //         .code(0)
     //         .stderr("");
+    // }
+    //
+    // #[test]
+    // fn test_on_load_yaml_parsing() {
+    //     Command::cargo_bin("xplr")
+    //         .unwrap()
+    //         .arg("--on-load")
+    //         .arg("Call: {command: touch, args: [foo]}")
+    //         .arg("Quit")
+    //         .assert()
+    //         .success()
+    //         .code(0)
+    //         .stderr("");
+    //
+    //     std::fs::remove_file("foo").unwrap();
     // }
 }

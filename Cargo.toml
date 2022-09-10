@@ -26,7 +26,10 @@ libc = "0.2.132"
 humansize = "1.1.1"
 natord = "1.0.9"
 anyhow = "1.0.64"
-serde_yaml = "0.9.11"
+
+# Let's keep this locked. See https://docs.rs/serde_yaml/0.9.11/serde_yaml/
+serde_yaml = "0.8.26"
+
 crossterm = "0.25.0"
 dirs = "4.0.0"
 ansi-to-tui = "1.0.1"
