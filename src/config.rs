@@ -14,7 +14,7 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Action {
     #[serde(default)]
@@ -280,7 +280,7 @@ pub struct GeneralConfig {
     pub global_key_bindings: KeyBindings,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct KeyBindings {
     #[serde(default)]

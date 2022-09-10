@@ -214,7 +214,7 @@ impl App {
 
         let mut load_errs = vec![];
         for config_file in config_files {
-            match lua::extend(lua, &config_file.to_string_lossy().to_string()) {
+            match lua::extend(lua, &config_file.to_string_lossy()) {
                 Ok(c) => {
                     config = c;
                 }
@@ -750,10 +750,7 @@ impl App {
     fn back(self) -> Result<Self> {
         PathBuf::from(self.pwd.clone())
             .parent()
-            .map(|p| {
-                self.clone()
-                    .change_directory(&p.to_string_lossy().to_string(), true)
-            })
+            .map(|p| self.clone().change_directory(&p.to_string_lossy(), true))
             .unwrap_or(Ok(self))
     }
 
@@ -937,11 +934,8 @@ impl App {
         }
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
-                self.change_directory(&parent.to_string_lossy().to_string(), false)?
-                    .focus_by_file_name(
-                        &filename.to_string_lossy().to_string(),
-                        save_history,
-                    )
+                self.change_directory(&parent.to_string_lossy(), false)?
+                    .focus_by_file_name(&filename.to_string_lossy(), save_history)
             } else {
                 self.log_error(format!("{} not found", path))
             }
