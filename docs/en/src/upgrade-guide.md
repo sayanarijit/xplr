@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.18.0][46] -> [v0.19.1][47]
+#### [v0.18.0][46] -> [v0.19.2][47]
 
 - BREAKING: The builtin modes cannot be accessed using space separated names
   anymore. Use underscore separated mode names. For e.g.
@@ -387,4 +387,4 @@ Else do the following:
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
-[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.1
+[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.2

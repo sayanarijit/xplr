@@ -213,19 +213,20 @@ impl Key {
         use Key::*;
 
         match self {
-            Backspace => Some(DeletePreviousCharacter),
+            Backspace | CtrlH => Some(DeletePreviousCharacter),
             Delete => Some(DeleteNextCharacter),
             Tab => Some(InsertCharacter('\t')),
             Space => Some(InsertCharacter(' ')),
-            Left => Some(GoToPreviousCharacter),
+            Left | CtrlB => Some(GoToPreviousCharacter),
             CtrlLeft => Some(GoToPreviousWord),
-            Right => Some(GoToNextCharacter),
+            Right | CtrlF => Some(GoToNextCharacter),
             CtrlRight => Some(GoToNextWord),
             CtrlU => Some(DeleteLine),
             CtrlW => Some(DeletePreviousWord),
             CtrlDelete => Some(DeleteNextWord),
-            CtrlA => Some(GoToStart),
-            CtrlE => Some(GoToEnd),
+            CtrlA | Home => Some(GoToStart),
+            CtrlE | End => Some(GoToEnd),
+            CtrlK => Some(DeleteTillEnd),
             key => key.to_char().map(InsertCharacter),
         }
     }
