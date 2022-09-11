@@ -1109,6 +1109,15 @@ impl App {
     }
 
     pub fn set_directory(mut self, dir: DirectoryBuffer) -> Result<Self> {
+        if self
+            .directory_buffer
+            .as_ref()
+            .map(|d| d.explored_at >= dir.explored_at)
+            .unwrap_or(false)
+        {
+            return Ok(self);
+        };
+
         self = self.add_last_focus(
             dir.parent.clone(),
             dir.focused_node().map(|n| n.relative_path.clone()),
