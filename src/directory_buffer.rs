@@ -1,4 +1,5 @@
 use crate::node::Node;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -7,6 +8,9 @@ pub struct DirectoryBuffer {
     pub nodes: Vec<Node>,
     pub total: usize,
     pub focus: usize,
+
+    #[serde(skip)]
+    pub explored_at: DateTime<Utc>,
 }
 
 impl DirectoryBuffer {
@@ -17,6 +21,7 @@ impl DirectoryBuffer {
             nodes,
             total,
             focus,
+            explored_at: Utc::now(),
         }
     }
 
