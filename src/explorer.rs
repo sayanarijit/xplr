@@ -2,10 +2,17 @@ use crate::app::{
     DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task,
 };
 use anyhow::{Error, Result};
+use fuzzy_matcher::skim::SkimMatcherV2;
+use fuzzy_matcher::FuzzyMatcher;
+use lazy_static::lazy_static;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
 use std::thread;
+
+lazy_static! {
+    static ref FUZZY_MATCHER: SkimMatcherV2 = SkimMatcherV2::default();
+}
 
 pub(crate) fn explore_sync(
     config: ExplorerConfig,
@@ -27,9 +34,26 @@ pub(crate) fn explore_sync(
         .filter(|n| config.filter(n))
         .collect::<Vec<Node>>();
 
-    nodes.sort_by(|a, b| config.sort(a, b));
+    nodes = if let Some(pattern) = config.searcher.as_ref().map(|s| &s.pattern) {
+        let mut nodes = nodes
+            .into_iter()
+            .filter_map(|n| {
+                FUZZY_MATCHER
+                    .fuzzy_match(&n.relative_path, pattern)
+                    .map(|score| (n, score))
+            })
+            .collect::<Vec<(_, _)>>();
 
-    let focus_index = if let Some(focus) = focused_path {
+        nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
+        nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>()
+    } else {
+        nodes.sort_by(|a, b| config.sort(a, b));
+        nodes
+    };
+
+    let focus_index = if config.searcher.is_some() {
+        0
+    } else if let Some(focus) = focused_path {
         let focus_str = focus.to_string_lossy().to_string();
         nodes
             .iter()

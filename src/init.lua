@@ -450,6 +450,14 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
   IAbsolutePathDoesNotMatchRegex = { format = "[i]abs!/", style = {} },
 }
 
+-- The identifiers used to denote applied search input.
+--
+-- Type: { format = nullable string, style = [Style](https://xplr.dev/en/style) }
+xplr.config.general.sort_and_filter_ui.search_identifier = {
+  format = "search:",
+  style = {},
+}
+
 -- The content for panel title by default.
 --
 -- Type: nullable string
@@ -666,7 +674,7 @@ xplr.config.general.start_fifo = nil
 -- Type: [Key Bindings](https://xplr.dev/en/configure-key-bindings#key-bindings)
 xplr.config.general.global_key_bindings = {
   on_key = {
-    esc = {
+    ["esc"] = {
       messages = {
         "PopMode",
       },
@@ -1065,8 +1073,7 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "search" },
-          { SetInputBuffer = "(?i)" },
-          "ExplorePwdAsync",
+          { SetInputBuffer = "" },
         },
       },
       ["ctrl-i"] = {
@@ -1106,13 +1113,13 @@ xplr.config.modes.builtin.default = {
           { SwitchModeBuiltin = "delete" },
         },
       },
-      down = {
+      ["down"] = {
         help = "down",
         messages = {
           "FocusNext",
         },
       },
-      enter = {
+      ["enter"] = {
         help = "quit with result",
         messages = {
           "PrintResultAndQuit",
@@ -1132,7 +1139,7 @@ xplr.config.modes.builtin.default = {
           { SwitchModeBuiltin = "go_to" },
         },
       },
-      left = {
+      ["left"] = {
         help = "back",
         messages = {
           "Back",
@@ -1170,7 +1177,7 @@ xplr.config.modes.builtin.default = {
           },
         },
       },
-      right = {
+      ["right"] = {
         help = "enter",
         messages = {
           "Enter",
@@ -1183,14 +1190,14 @@ xplr.config.modes.builtin.default = {
           { SwitchModeBuiltin = "sort" },
         },
       },
-      space = {
+      ["space"] = {
         help = "toggle selection",
         messages = {
           "ToggleSelection",
           "FocusNext",
         },
       },
-      up = {
+      ["up"] = {
         help = "up",
         messages = {
           "FocusPrevious",
@@ -1308,7 +1315,7 @@ xplr.config.modes.builtin.debug_error = {
   },
   key_bindings = {
     on_key = {
-      enter = {
+      ["enter"] = {
         help = "open logs in editor",
         messages = {
           {
@@ -1318,7 +1325,7 @@ xplr.config.modes.builtin.debug_error = {
           },
         },
       },
-      q = {
+      ["q"] = {
         help = "quit",
         messages = {
           "Quit",
@@ -1369,7 +1376,7 @@ xplr.config.modes.builtin.go_to_path = {
   name = "go to path",
   key_bindings = {
     on_key = {
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           {
@@ -1384,7 +1391,7 @@ xplr.config.modes.builtin.go_to_path = {
           "PopMode",
         },
       },
-      tab = {
+      ["tab"] = {
         help = "try complete",
         messages = {
           { CallLuaSilently = "builtin.try_complete_path" },
@@ -1445,6 +1452,13 @@ xplr.config.modes.builtin.selection_ops = {
           "PopMode",
         },
       },
+      ["u"] = {
+        help = "clear selection",
+        messages = {
+          "ClearSelection",
+          "PopMode",
+        },
+      },
       ["x"] = {
         help = "open in gui",
         messages = {
@@ -1480,7 +1494,7 @@ xplr.config.modes.builtin.create = {
   name = "create",
   key_bindings = {
     on_key = {
-      d = {
+      ["d"] = {
         help = "create directory",
         messages = {
           "PopMode",
@@ -1488,7 +1502,7 @@ xplr.config.modes.builtin.create = {
           { SetInputBuffer = "" },
         },
       },
-      f = {
+      ["f"] = {
         help = "create file",
         messages = {
           "PopMode",
@@ -1508,13 +1522,13 @@ xplr.config.modes.builtin.create_directory = {
   prompt = "ð ❯ ",
   key_bindings = {
     on_key = {
-      tab = {
+      ["tab"] = {
         help = "try complete",
         messages = {
           { CallLuaSilently = "builtin.try_complete_path" },
         },
       },
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           {
@@ -1550,13 +1564,13 @@ xplr.config.modes.builtin.create_file = {
   prompt = "ƒ ❯ ",
   key_bindings = {
     on_key = {
-      tab = {
+      ["tab"] = {
         help = "try complete",
         messages = {
           { CallLuaSilently = "builtin.try_complete_path" },
         },
       },
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           {
@@ -1593,21 +1607,21 @@ xplr.config.modes.builtin.number = {
   prompt = ":",
   key_bindings = {
     on_key = {
-      down = {
+      ["down"] = {
         help = "to down",
         messages = {
           "FocusNextByRelativeIndexFromInput",
           "PopMode",
         },
       },
-      enter = {
+      ["enter"] = {
         help = "to index",
         messages = {
           "FocusByIndexFromInput",
           "PopMode",
         },
       },
-      up = {
+      ["up"] = {
         help = "to up",
         messages = {
           "FocusPreviousByRelativeIndexFromInput",
@@ -1641,21 +1655,21 @@ xplr.config.modes.builtin.go_to = {
   name = "go to",
   key_bindings = {
     on_key = {
-      f = {
+      ["f"] = {
         help = "follow symlink",
         messages = {
           "FollowSymlink",
           "PopMode",
         },
       },
-      g = {
+      ["g"] = {
         help = "top",
         messages = {
           "FocusFirst",
           "PopMode",
         },
       },
-      p = {
+      ["p"] = {
         help = "path",
         messages = {
           "PopMode",
@@ -1663,7 +1677,7 @@ xplr.config.modes.builtin.go_to = {
           { SetInputBuffer = "" },
         },
       },
-      x = {
+      ["x"] = {
         help = "open in gui",
         messages = {
           {
@@ -1696,13 +1710,13 @@ xplr.config.modes.builtin.rename = {
   name = "rename",
   key_bindings = {
     on_key = {
-      tab = {
+      ["tab"] = {
         help = "try complete",
         messages = {
           { CallLuaSilently = "builtin.try_complete_path" },
         },
       },
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           {
@@ -1738,13 +1752,13 @@ xplr.config.modes.builtin.duplicate_as = {
   name = "duplicate as",
   key_bindings = {
     on_key = {
-      tab = {
+      ["tab"] = {
         help = "try complete",
         messages = {
           { CallLuaSilently = "builtin.try_complete_path" },
         },
       },
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           {
@@ -1915,31 +1929,31 @@ xplr.config.modes.builtin.quit = {
   name = "quit",
   key_bindings = {
     on_key = {
-      enter = {
+      ["enter"] = {
         help = "just quit",
         messages = {
           "Quit",
         },
       },
-      p = {
+      ["p"] = {
         help = "quit printing pwd",
         messages = {
           "PrintPwdAndQuit",
         },
       },
-      f = {
+      ["f"] = {
         help = "quit printing focus",
         messages = {
           "PrintFocusPathAndQuit",
         },
       },
-      s = {
+      ["s"] = {
         help = "quit printing selection",
         messages = {
           "PrintSelectionAndQuit",
         },
       },
-      r = {
+      ["r"] = {
         help = "quit printing result",
         messages = {
           "PrintResultAndQuit",
@@ -1957,65 +1971,64 @@ xplr.config.modes.builtin.search = {
   prompt = "/",
   key_bindings = {
     on_key = {
-      down = {
+      ["up"] = {
+        help = "up",
+        messages = {
+          "FocusPrevious",
+        },
+      },
+      ["down"] = {
         help = "down",
         messages = {
           "FocusNext",
         },
       },
-      enter = {
-        help = "submit",
-        messages = {
-          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
-          "PopMode",
-          "ExplorePwdAsync",
-        },
-      },
-      right = {
+      ["right"] = {
         help = "enter",
         messages = {
-          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Enter",
-          { SetInputBuffer = "(?i)" },
-          "ExplorePwdAsync",
+          { SetInputBuffer = "" },
         },
       },
-      left = {
+      ["left"] = {
         help = "back",
         messages = {
-          { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "Back",
-          { SetInputBuffer = "(?i)" },
-          "ExplorePwdAsync",
+          { SetInputBuffer = "" },
         },
       },
-      tab = {
+      ["tab"] = {
         help = "toggle selection",
         messages = {
           "ToggleSelection",
           "FocusNext",
         },
       },
-      up = {
-        help = "up",
+      ["enter"] = {
+        help = "submit",
         messages = {
-          "FocusPrevious",
+          "AcceptSearch",
+          "PopMode",
+        },
+      },
+      ["esc"] = {
+        help = "cancel",
+        messages = {
+          "CancelSearch",
+          "PopMode",
         },
       },
     },
     default = {
       messages = {
-        { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
         "UpdateInputBufferFromKey",
-        { AddNodeFilterFromInput = "RelativePathDoesMatchRegex" },
+        "SearchFuzzyFromInput",
         "ExplorePwdAsync",
       },
     },
   },
 }
 
-xplr.config.modes.builtin.search.key_bindings.on_key["esc"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key.enter
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
   xplr.config.modes.builtin.search.key_bindings.on_key.down
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
@@ -2046,7 +2059,7 @@ xplr.config.modes.builtin.filter = {
           "ExplorePwdAsync",
         },
       },
-      backspace = {
+      ["backspace"] = {
         help = "remove last filter",
         messages = {
           "RemoveLastNodeFilter",
@@ -2079,13 +2092,13 @@ xplr.config.modes.builtin.relative_path_does_match_regex = {
   prompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesMatchRegex.format,
   key_bindings = {
     on_key = {
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           "PopMode",
         },
       },
-      esc = {
+      ["esc"] = {
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesMatchRegex" },
           "PopMode",
@@ -2112,13 +2125,13 @@ xplr.config.modes.builtin.relative_path_does_not_match_regex = {
   prompt = xplr.config.general.sort_and_filter_ui.filter_identifiers.RelativePathDoesNotMatchRegex.format,
   key_bindings = {
     on_key = {
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           "PopMode",
         },
       },
-      esc = {
+      ["esc"] = {
         messages = {
           { RemoveNodeFilterFromInput = "RelativePathDoesNotMatchRegex" },
           "PopMode",
@@ -2223,7 +2236,7 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-      backspace = {
+      ["backspace"] = {
         help = "remove last sorter",
         messages = {
           "RemoveLastNodeSorter",
@@ -2256,7 +2269,7 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-      enter = {
+      ["enter"] = {
         help = "submit",
         messages = {
           "PopMode",

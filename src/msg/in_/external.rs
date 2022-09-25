@@ -675,6 +675,8 @@ pub enum ExternalMsg {
 
     /// Add a [filter](https://xplr.dev/en/filtering#filter) to exclude nodes
     /// while exploring directories.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// Filters get automatically cleared when changing directories.
     ///
     /// Type: { AddNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering#filter), input = "string" }
     ///
@@ -685,6 +687,7 @@ pub enum ExternalMsg {
     AddNodeFilter(NodeFilterApplicable),
 
     /// Remove an existing [filter](https://xplr.dev/en/filtering#filter).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { RemoveNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
     ///
@@ -696,6 +699,7 @@ pub enum ExternalMsg {
 
     /// Remove a [filter](https://xplr.dev/en/filtering#filter) if it exists,
     /// else, add a it.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { ToggleNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
     ///
@@ -707,6 +711,7 @@ pub enum ExternalMsg {
 
     /// Add a node [filter](https://xplr.dev/en/filtering#filter) reading the
     /// input from the buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { AddNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
     ///
@@ -718,6 +723,7 @@ pub enum ExternalMsg {
 
     /// Remove a node [filter](https://xplr.dev/en/filtering#filter) reading
     /// the input from the buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { RemoveNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
     ///
@@ -728,6 +734,7 @@ pub enum ExternalMsg {
     RemoveNodeFilterFromInput(NodeFilter),
 
     /// Remove the last node [filter](https://xplr.dev/en/filtering).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
@@ -737,6 +744,7 @@ pub enum ExternalMsg {
 
     /// Reset the node [filters](https://xplr.dev/en/filtering) back to the
     /// default configuration.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
@@ -745,6 +753,7 @@ pub enum ExternalMsg {
     ResetNodeFilters,
 
     /// Clear all the node [filters](https://xplr.dev/en/filtering).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
@@ -756,6 +765,7 @@ pub enum ExternalMsg {
 
     /// Add a [sorter](https://xplr.dev/en/sorting#sorter) to sort nodes while
     /// exploring directories.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { AddNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
     ///
@@ -766,6 +776,7 @@ pub enum ExternalMsg {
     AddNodeSorter(NodeSorterApplicable),
 
     /// Remove an existing [sorter](https://xplr.dev/en/sorting#sorter).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { RemoveNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
     ///
@@ -776,6 +787,7 @@ pub enum ExternalMsg {
     RemoveNodeSorter(NodeSorter),
 
     /// Reverse a node [sorter](https://xplr.dev/en/sorting#sorter).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { ReverseNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
     ///
@@ -787,6 +799,7 @@ pub enum ExternalMsg {
 
     /// Remove a [sorter](https://xplr.dev/en/sorting#sorter) if it exists,
     /// else, add a it.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Type: { ToggleNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
     ///
@@ -797,6 +810,7 @@ pub enum ExternalMsg {
     ToggleNodeSorter(NodeSorterApplicable),
 
     /// Reverse the node [sorters](https://xplr.dev/en/sorting#sorter).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
@@ -805,6 +819,7 @@ pub enum ExternalMsg {
     ReverseNodeSorters,
 
     /// Remove the last node [sorter](https://xplr.dev/en/sorting#sorter).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
@@ -814,6 +829,7 @@ pub enum ExternalMsg {
 
     /// Reset the node [sorters](https://xplr.dev/en/sorting#sorter) back to
     /// the default configuration.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
@@ -822,12 +838,56 @@ pub enum ExternalMsg {
     ResetNodeSorters,
 
     /// Clear all the node [sorters](https://xplr.dev/en/sorting#sorter).
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
     /// - Lua: `"ClearNodeSorters"`
     /// - YAML: `ClearNodeSorters`
     ClearNodeSorters,
+
+    /// ### Search Operations --------------------------------------------------
+
+    /// Search files using fuzzy match algorithm.
+    /// It keeps the filters, but overrides the sorters.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Type: { SearchFuzzy = "string" }
+    ///
+    /// Example:
+    ///
+    /// - Lua: `{ SearchFuzzy = "pattern" }`
+    /// - YAML: `SearchFuzzy: pattern`
+    SearchFuzzy(String),
+
+    /// Calls `SearchFuzzy` with the input taken from the input buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"SearchFuzzyFromInput"`
+    /// - YAML: `SearchFuzzyFromInput`
+    SearchFuzzyFromInput,
+
+    /// Accepts the search by keeping the latest focus while in search mode.
+    /// Automatically calls `ExplorePwd`.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"AcceptSearch"`
+    /// - YAML: `AcceptSearch`
+    AcceptSearch,
+
+    /// Cancels the search by discarding the latest focus and recovering
+    /// the focus before search.
+    /// Automatically calls `ExplorePwd`.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"CancelSearch"`
+    /// - YAML: `CancelSearch`
+    CancelSearch,
 
     /// ### Mouse Operations ---------------------------------------------------
 
@@ -1513,10 +1573,26 @@ impl NodeFilterApplicable {
     }
 }
 
+#[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
+pub struct NodeSearcher {
+    pub pattern: String,
+    pub recoverable_focus: Option<String>,
+}
+
+impl NodeSearcher {
+    pub fn new(pattern: String, recoverable_focus: Option<String>) -> Self {
+        Self {
+            pattern,
+            recoverable_focus,
+        }
+    }
+}
+
 #[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ExplorerConfig {
     pub filters: IndexSet<NodeFilterApplicable>,
     pub sorters: IndexSet<NodeSorterApplicable>,
+    pub searcher: Option<NodeSearcher>,
 }
 
 impl ExplorerConfig {
