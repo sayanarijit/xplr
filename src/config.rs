@@ -80,7 +80,7 @@ pub struct NodeTypesConfig {
     pub special: HashMap<String, NodeTypeConfig>,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct UiConfig {
     #[serde(default)]
@@ -93,7 +93,7 @@ pub struct UiConfig {
     pub style: Style,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct UiElement {
     #[serde(default)]
@@ -189,6 +189,9 @@ pub struct SortAndFilterUi {
 
     #[serde(default)]
     pub filter_identifiers: HashMap<NodeFilter, UiElement>,
+
+    #[serde(default)]
+    pub search_identifier: Option<UiElement>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -356,7 +359,7 @@ impl KeyBindings {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Mode {
     #[serde(default)]
@@ -540,7 +543,7 @@ impl ModesConfig {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct PanelUiConfig {
     #[serde(default)]

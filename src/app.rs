@@ -8,6 +8,7 @@ pub use crate::msg::in_::external::Command;
 pub use crate::msg::in_::external::ExplorerConfig;
 pub use crate::msg::in_::external::NodeFilter;
 pub use crate::msg::in_::external::NodeFilterApplicable;
+use crate::msg::in_::external::NodeSearcher;
 pub use crate::msg::in_::external::NodeSorter;
 pub use crate::msg::in_::external::NodeSorterApplicable;
 pub use crate::msg::in_::ExternalMsg;
@@ -478,6 +479,10 @@ impl App {
                 ReverseNodeSorters => self.reverse_node_sorters(),
                 ResetNodeSorters => self.reset_node_sorters(),
                 ClearNodeSorters => self.clear_node_sorters(),
+                SearchFuzzy(p) => self.search_fuzzy(p),
+                SearchFuzzyFromInput => self.search_fuzzy_from_input(),
+                AcceptSearch => self.accept_search(),
+                CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),
                 DisableMouse => self.disable_mouse(),
                 ToggleMouse => self.toggle_mouse(),
@@ -735,6 +740,7 @@ impl App {
                 let focus = self.focused_node().map(|n| n.relative_path.clone());
                 self = self.add_last_focus(pwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
+                self.explorer_config.searcher = None;
                 if save_history {
                     self.history = self.history.push(format!("{}/", self.pwd));
                 }
@@ -1146,9 +1152,11 @@ impl App {
             dir.parent.clone(),
             dir.focused_node().map(|n| n.relative_path.clone()),
         )?;
+
         if dir.parent == self.pwd {
             self.directory_buffer = Some(dir);
-        }
+        };
+
         Ok(self)
     }
 
@@ -1371,6 +1379,58 @@ impl App {
 
     fn clear_node_sorters(mut self) -> Result<Self> {
         self.explorer_config.sorters.clear();
+        Ok(self)
+    }
+
+    pub fn search_fuzzy(mut self, pattern: String) -> Result<Self> {
+        let rf = self
+            .explorer_config
+            .searcher
+            .as_ref()
+            .map(|s| s.recoverable_focus.clone())
+            .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
+
+        self.explorer_config.searcher = Some(NodeSearcher::new(pattern, rf));
+        Ok(self)
+    }
+
+    fn search_fuzzy_from_input(self) -> Result<Self> {
+        if let Some(pattern) = self.input.buffer.as_ref().map(Input::to_string) {
+            self.search_fuzzy(pattern)
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn accept_search(mut self) -> Result<Self> {
+        let focus = self
+            .directory_buffer
+            .as_ref()
+            .and_then(|dir| dir.focused_node())
+            .map(|n| n.relative_path.clone());
+
+        self.explorer_config.searcher = None;
+        self = self.explore_pwd()?;
+
+        if let Some(f) = focus {
+            self = self.focus_path(&f, true)?;
+        }
+        Ok(self)
+    }
+
+    fn cancel_search(mut self) -> Result<Self> {
+        let focus = self
+            .explorer_config
+            .searcher
+            .as_ref()
+            .and_then(|s| s.recoverable_focus.clone());
+
+        self.explorer_config.searcher = None;
+        self = self.explore_pwd()?;
+
+        if let Some(f) = focus {
+            self = self.focus_path(&f, true)?;
+        }
         Ok(self)
     }
 

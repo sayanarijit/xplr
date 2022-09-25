@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.19.3'
+version = '0.19.4'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
@@ -22,19 +22,20 @@ categories = ['command-line-interface', 'command-line-utilities']
 include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
 
 [dependencies]
-libc = "0.2.132"
-humansize = "1.1.1"
+libc = "0.2.134"
+humansize = "2.1.0"
 natord = "1.0.9"
-anyhow = "1.0.64"
+anyhow = "1.0.65"
 
-# Let's keep this locked. See https://docs.rs/serde_yaml/0.9.11/serde_yaml/
+# Let's keep this locked to 0.8.26. See https://docs.rs/serde_yaml/0.9.11/serde_yaml/
 serde_yaml = "0.8.26"
 
 crossterm = "0.25.0"
 dirs = "4.0.0"
-ansi-to-tui = "1.0.1"
+ansi-to-tui = "2.0.0"
 regex = "1.6.0"
 gethostname = "0.2.3"
+fuzzy-matcher = "0.3.7"
 
 [dependencies.lazy_static]
 version = "1.4.0"
@@ -45,12 +46,12 @@ version = "2.0.4"
 features = ["rev-mappings"]
 
 [dependencies.tui]
-version = "0.18.0"
+version = "0.19.0"
 default-features = false
 features = ['crossterm', 'serde']
 
 [dependencies.serde]
-version = "1.0.144"
+version = "1.0.145"
 features = ['derive']
 
 [dependencies.chrono]
@@ -66,11 +67,11 @@ version = "0.8.3"
 features = ['luajit', 'vendored', 'serialize', 'send']
 
 [dependencies.tui-input]
-version = "0.5.1"
+version = "0.6.0"
 features = ['serde']
 
 [dev-dependencies]
-criterion = "0.3.6"
+criterion = "0.4.0"
 assert_cmd = "2.0.4"
 
 [profile.release]

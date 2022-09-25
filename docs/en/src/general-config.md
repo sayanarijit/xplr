@@ -322,6 +322,12 @@ Type: nullable mapping of the following key-value pairs:
   - format: nullable string
   - style: [Style](https://xplr.dev/en/style)
 
+#### xplr.config.general.sort_and_filter_ui.search_identifier
+
+The identifiers used to denote applied search input.
+
+Type: { format = nullable string, style = [Style](https://xplr.dev/en/style) }
+
 #### xplr.config.general.panel_ui.default.title.format
 
 The content for panel title by default.

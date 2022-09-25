@@ -104,7 +104,7 @@ pub enum ContentBody {
     },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum Layout {
     Nothing,
@@ -251,7 +251,7 @@ impl Modifier {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
     pub fg: Option<Color>,
@@ -861,6 +861,12 @@ fn draw_sort_n_filter<B: Backend>(
     let ui = app.config.general.sort_and_filter_ui.to_owned();
     let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
     let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
+    let search = app
+        .explorer_config
+        .searcher
+        .as_ref()
+        .map(|s| s.pattern.clone());
+
     let defaultui = &ui.default_identifier;
     let forwardui = defaultui
         .to_owned()
@@ -886,25 +892,45 @@ fn draw_sort_n_filter<B: Backend>(
                 })
                 .unwrap_or((Span::raw("f"), Span::raw("")))
         })
-        .chain(sort_by.iter().map(|s| {
-            let direction = if s.reverse { &reverseui } else { &forwardui };
+        .chain(
+            sort_by
+                .iter()
+                .map(|s| {
+                    let direction = if s.reverse { &reverseui } else { &forwardui };
 
-            ui.sorter_identifiers
-                .get(&s.sorter)
+                    ui.sorter_identifiers
+                        .get(&s.sorter)
+                        .map(|u| {
+                            let ui = defaultui.to_owned().extend(u);
+                            (
+                                Span::styled(
+                                    ui.format.to_owned().unwrap_or_default(),
+                                    ui.style.into(),
+                                ),
+                                Span::styled(
+                                    direction.format.to_owned().unwrap_or_default(),
+                                    direction.style.to_owned().into(),
+                                ),
+                            )
+                        })
+                        .unwrap_or((Span::raw("s"), Span::raw("")))
+                })
+                .take(if search.is_some() { 0 } else { sort_by.len() }),
+        )
+        .chain(search.iter().map(|s| {
+            ui.search_identifier
+                .as_ref()
                 .map(|u| {
                     let ui = defaultui.to_owned().extend(u);
                     (
                         Span::styled(
                             ui.format.to_owned().unwrap_or_default(),
-                            ui.style.into(),
+                            ui.style.to_owned().into(),
                         ),
-                        Span::styled(
-                            direction.format.to_owned().unwrap_or_default(),
-                            direction.style.to_owned().into(),
-                        ),
+                        Span::styled(s, ui.style.into()),
                     )
                 })
-                .unwrap_or((Span::raw("s"), Span::raw("")))
+                .unwrap_or((Span::raw("/"), Span::raw(s)))
         }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
@@ -912,6 +938,7 @@ fn draw_sort_n_filter<B: Backend>(
         )))
         .flat_map(|((a, b), c)| vec![a, b, c])
         .collect::<Vec<Span>>();
+
     spans.pop();
 
     let p = Paragraph::new(Spans::from(spans)).block(block(

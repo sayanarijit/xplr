@@ -1,5 +1,5 @@
 use crate::permissions::Permissions;
-use humansize::{file_size_opts as options, FileSize};
+use humansize::{format_size, DECIMAL};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::os::unix::prelude::MetadataExt;
@@ -7,8 +7,7 @@ use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
 fn to_human_size(size: u64) -> String {
-    size.file_size(options::CONVENTIONAL)
-        .unwrap_or_else(|_| format!("{} B", size))
+    format_size(size, DECIMAL)
 }
 
 fn mime_essence(path: &Path, is_dir: bool) -> String {

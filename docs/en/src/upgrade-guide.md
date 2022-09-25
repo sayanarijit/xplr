@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.18.0][46] -> [v0.19.3][47]
+#### [v0.18.0][46] -> [v0.19.4][47]
 
 - BREAKING: The builtin modes cannot be accessed using space separated names
   anymore. Use underscore separated mode names. For e.g.
@@ -77,6 +77,20 @@ compatibility.
 - Fixed applying regex based filters via the CLI and `$XPLR_PIPE_MSG_IN` pipe.
 - You can use the `prompt` field to define input prompt for each mode, instead
   of using the `SetInputPrompt` message.
+- Since version v0.19.4, the native search will default to skim-v2 based fuzzy
+  matching. `esc` while in search mode will recover the initial focus. People
+  who prefer the regex based search, can use the `regex-search.xplr` plugin.
+  The following messages will be available for search based operations:
+  - SearchFuzzy
+  - SearchFuzzyFromInput
+  - AcceptSearch
+  - CancelSearch
+- Since version v0.19.4, quick scrolling operations are supported using the
+  following messages and keys:
+  - ScrollUp -------- page-up
+  - ScrollDown ------ page-down
+  - ScrollUpHalf ---- {
+  - ScrollDownHalf -- }
 
 <sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
@@ -387,4 +401,4 @@ Else do the following:
 [44]: https://github.com/sayanarijit/xplr/releases/tag/v0.16.4
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
-[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.3
+[47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4

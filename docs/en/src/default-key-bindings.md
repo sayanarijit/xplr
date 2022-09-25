@@ -7,14 +7,10 @@ requirements.
 When you press `?` in [default mode][3], you can see the complete list
 of [modes][4] and the key mappings for each mode.
 
-### create_directory
-
-| key    | remaps | action       |
-| ------ | ------ | ------------ |
-| ctrl-c |        | terminate    |
-| enter  |        | submit       |
-| esc    |        | cancel       |
-| tab    |        | try complete |
+[1]: https://www.vim.org/
+[2]: https://github.com/jarun/nnn/
+[3]: #default
+[4]: modes.md
 
 ### default
 
@@ -26,7 +22,6 @@ of [modes][4] and the key mappings for each mode.
 | ?      |        | global help menu    |
 | G      |        | go to bottom        |
 | V      | ctrl-a | select/unselect all |
-| ctrl-c |        | terminate           |
 | ctrl-d |        | duplicate as        |
 | ctrl-i | tab    | next visited path   |
 | ctrl-o |        | last visited path   |
@@ -48,86 +43,64 @@ of [modes][4] and the key mappings for each mode.
 | ~      |        | go home             |
 | [0-9]  |        | input               |
 
-### duplicate_as
+### go_to_path
 
-| key    | remaps | action    |
-| ------ | ------ | --------- |
-| ctrl-c |        | terminate |
-| enter  |        | duplicate |
-| esc    |        | cancel    |
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
 
 ### relative_path_does_not_match_regex
 
-| key    | remaps | action    |
-| ------ | ------ | --------- |
-| ctrl-c |        | terminate |
-| enter  |        | submit    |
-| esc    |        | cancel    |
+| key   | remaps | action |
+| ----- | ------ | ------ |
+| enter |        | submit |
 
 ### number
 
-| key    | remaps | action    |
-| ------ | ------ | --------- |
-| ctrl-c |        | terminate |
-| down   | j      | to down   |
-| enter  |        | to index  |
-| esc    |        | cancel    |
-| k      | up     | to up     |
-| [0-9]  |        | input     |
+| key   | remaps | action   |
+| ----- | ------ | -------- |
+| down  | j      | to down  |
+| enter |        | to index |
+| k     | up     | to up    |
+| [0-9] |        | input    |
 
-### search
+### selection_ops
 
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-c |        | terminate        |
-| ctrl-n | down   | down             |
-| ctrl-p | up     | up               |
-| enter  | esc    | focus            |
-| left   |        | back             |
-| right  |        | enter            |
-| tab    |        | toggle selection |
+| key | remaps | action      |
+| --- | ------ | ----------- |
+| c   |        | copy here   |
+| m   |        | move here   |
+| x   |        | open in gui |
 
-### quit
+### duplicate_as
 
-| key    | remaps | action                  |
-| ------ | ------ | ----------------------- |
-| ctrl-c |        | terminate               |
-| enter  |        | just quit               |
-| esc    |        | cancel                  |
-| f      |        | quit printing focus     |
-| p      |        | quit printing pwd       |
-| r      |        | quit printing result    |
-| s      |        | quit printing selection |
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
 
-### create
+### action
 
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-c |        | terminate        |
-| d      |        | create directory |
-| esc    |        | cancel           |
-| f      |        | create file      |
+| key   | remaps | action               |
+| ----- | ------ | -------------------- |
+| !     |        | shell                |
+| c     |        | create               |
+| e     |        | open in editor       |
+| l     |        | logs                 |
+| m     |        | toggle mouse         |
+| q     |        | quit options         |
+| s     |        | selection operations |
+| [0-9] |        | go to index          |
 
-### filter
+### go_to
 
-| key       | remaps | action                             |
-| --------- | ------ | ---------------------------------- |
-| R         |        | relative path does not match regex |
-| backspace |        | remove last filter                 |
-| ctrl-c    |        | terminate                          |
-| ctrl-r    |        | reset filters                      |
-| ctrl-u    |        | clear filters                      |
-| enter     | esc    | submit                             |
-| r         |        | relative path does match regex     |
-
-### delete
-
-| key    | remaps | action       |
-| ------ | ------ | ------------ |
-| D      |        | force delete |
-| ctrl-c |        | terminate    |
-| d      |        | delete       |
-| esc    |        | cancel       |
+| key | remaps | action         |
+| --- | ------ | -------------- |
+| f   |        | follow symlink |
+| g   |        | top            |
+| p   |        | path           |
+| x   |        | open in gui    |
 
 ### sort
 
@@ -143,116 +116,106 @@ of [modes][4] and the key mappings for each mode.
 | S         |        | by size reverse                   |
 | backspace |        | remove last sorter                |
 | c         |        | by created                        |
-| ctrl-c    |        | terminate                         |
 | ctrl-r    |        | reset sorters                     |
 | ctrl-u    |        | clear sorters                     |
 | e         |        | by canonical extension            |
-| enter     | esc    | submit                            |
+| enter     |        | submit                            |
 | l         |        | by last modified                  |
 | m         |        | by canonical mime essence         |
 | n         |        | by node type                      |
 | r         |        | by relative path                  |
 | s         |        | by size                           |
 
-### go_to
+### rename
 
-| key    | remaps | action         |
-| ------ | ------ | -------------- |
-| ctrl-c |        | terminate      |
-| esc    |        | cancel         |
-| f      |        | follow symlink |
-| g      |        | top            |
-| p      |        | path           |
-| x      |        | open in gui    |
-
-### create_file
-
-| key    | remaps | action       |
-| ------ | ------ | ------------ |
-| ctrl-c |        | terminate    |
-| enter  |        | submit       |
-| esc    |        | cancel       |
-| tab    |        | try complete |
-
-### recover
-
-| key    | remaps | action    |
-| ------ | ------ | --------- |
-| ctrl-c |        | terminate |
-| esc    |        | escape    |
-
-### action
-
-| key    | remaps | action               |
-| ------ | ------ | -------------------- |
-| !      |        | shell                |
-| c      |        | create               |
-| ctrl-c |        | terminate            |
-| e      |        | open in editor       |
-| esc    |        | cancel               |
-| l      |        | logs                 |
-| m      |        | toggle mouse         |
-| q      |        | quit options         |
-| s      |        | selection operations |
-| [0-9]  |        | go to index          |
-
-### switch_layout
-
-| key    | remaps | action               |
-| ------ | ------ | -------------------- |
-| 1      |        | default              |
-| 2      |        | no help menu         |
-| 3      |        | no selection panel   |
-| 4      |        | no help or selection |
-| ctrl-c |        | terminate            |
-| esc    |        | cancel               |
-
-### relative_path_does_match_regex
-
-| key    | remaps | action    |
-| ------ | ------ | --------- |
-| ctrl-c |        | terminate |
-| enter  |        | submit    |
-| esc    |        | cancel    |
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
 
 ### debug_error
 
-| key    | remaps | action              |
-| ------ | ------ | ------------------- |
-| ctrl-c |        | terminate           |
-| enter  |        | open logs in editor |
-| esc    |        | escape              |
-| q      |        | quit                |
+| key   | remaps | action              |
+| ----- | ------ | ------------------- |
+| enter |        | open logs in editor |
+| q     |        | quit                |
 
-### go_to_path
+### switch_layout
 
-| key    | remaps | action       |
-| ------ | ------ | ------------ |
-| ctrl-c |        | terminate    |
-| enter  |        | submit       |
-| esc    |        | cancel       |
-| tab    |        | try complete |
+| key | remaps | action               |
+| --- | ------ | -------------------- |
+| 1   |        | default              |
+| 2   |        | no help menu         |
+| 3   |        | no selection panel   |
+| 4   |        | no help or selection |
 
-### selection_ops
+### search
 
-| key    | remaps | action      |
-| ------ | ------ | ----------- |
-| c      |        | copy here   |
-| ctrl-c |        | terminate   |
-| esc    |        | cancel      |
-| m      |        | move here   |
-| x      |        | open in gui |
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-n | down   | down             |
+| ctrl-p | up     | up               |
+| enter  |        | submit           |
+| esc    |        | cancel           |
+| left   |        | back             |
+| right  |        | enter            |
+| tab    |        | toggle selection |
 
-### rename
+### create_file
 
-| key    | remaps | action       |
-| ------ | ------ | ------------ |
-| ctrl-c |        | terminate    |
-| enter  |        | rename       |
-| esc    |        | cancel       |
-| tab    |        | try complete |
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
 
-[1]: https://www.vim.org/
-[2]: https://github.com/jarun/nnn/
-[3]: #default
-[4]: modes.md
+### recover
+
+| key | remaps | action |
+| --- | ------ | ------ |
+
+### create
+
+| key | remaps | action           |
+| --- | ------ | ---------------- |
+| d   |        | create directory |
+| f   |        | create file      |
+
+### filter
+
+| key       | remaps | action                             |
+| --------- | ------ | ---------------------------------- |
+| R         |        | relative path does not match regex |
+| backspace |        | remove last filter                 |
+| ctrl-r    |        | reset filters                      |
+| ctrl-u    |        | clear filters                      |
+| r         |        | relative path does match regex     |
+
+### delete
+
+| key | remaps | action       |
+| --- | ------ | ------------ |
+| D   |        | force delete |
+| d   |        | delete       |
+
+### create_directory
+
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
+
+### quit
+
+| key   | remaps | action                  |
+| ----- | ------ | ----------------------- |
+| enter |        | just quit               |
+| f     |        | quit printing focus     |
+| p     |        | quit printing pwd       |
+| r     |        | quit printing result    |
+| s     |        | quit printing selection |
+
+### relative_path_does_match_regex
+
+| key   | remaps | action |
+| ----- | ------ | ------ |
+| enter |        | submit |

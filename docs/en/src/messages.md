@@ -15,6 +15,7 @@ xplr messages categorized based on their purpose.
 - [Select Operations](#select-operations)
 - [Filter Operations](#filter-operations)
 - [Sort Operations](#sort-operations)
+- [Search Operations](#search-operations)
 - [Mouse Operations](#mouse-operations)
 - [Fifo Operations](#fifo-operations)
 - [Logging](#logging)
@@ -757,6 +758,8 @@ Example:
 
 Add a [filter](https://xplr.dev/en/filtering#filter) to exclude nodes
 while exploring directories.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+Filters get automatically cleared when changing directories.
 
 Type: { AddNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering#filter), input = "string" }
 
@@ -768,6 +771,7 @@ Example:
 #### RemoveNodeFilter
 
 Remove an existing [filter](https://xplr.dev/en/filtering#filter).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { RemoveNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
 
@@ -780,6 +784,7 @@ Example:
 
 Remove a [filter](https://xplr.dev/en/filtering#filter) if it exists,
 else, add a it.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { ToggleNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
 
@@ -792,6 +797,7 @@ Example:
 
 Add a node [filter](https://xplr.dev/en/filtering#filter) reading the
 input from the buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { AddNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
 
@@ -804,6 +810,7 @@ Example:
 
 Remove a node [filter](https://xplr.dev/en/filtering#filter) reading
 the input from the buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { RemoveNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
 
@@ -815,6 +822,7 @@ Example:
 #### RemoveLastNodeFilter
 
 Remove the last node [filter](https://xplr.dev/en/filtering).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
@@ -825,6 +833,7 @@ Example:
 
 Reset the node [filters](https://xplr.dev/en/filtering) back to the
 default configuration.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
@@ -834,6 +843,7 @@ Example:
 #### ClearNodeFilters
 
 Clear all the node [filters](https://xplr.dev/en/filtering).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
@@ -846,6 +856,7 @@ Example:
 
 Add a [sorter](https://xplr.dev/en/sorting#sorter) to sort nodes while
 exploring directories.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { AddNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
 
@@ -857,6 +868,7 @@ Example:
 #### RemoveNodeSorter
 
 Remove an existing [sorter](https://xplr.dev/en/sorting#sorter).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { RemoveNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
 
@@ -868,6 +880,7 @@ Example:
 #### ReverseNodeSorter
 
 Reverse a node [sorter](https://xplr.dev/en/sorting#sorter).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { ReverseNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
 
@@ -880,6 +893,7 @@ Example:
 
 Remove a [sorter](https://xplr.dev/en/sorting#sorter) if it exists,
 else, add a it.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Type: { ToggleNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
 
@@ -891,6 +905,7 @@ Example:
 #### ReverseNodeSorters
 
 Reverse the node [sorters](https://xplr.dev/en/sorting#sorter).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
@@ -900,6 +915,7 @@ Example:
 #### RemoveLastNodeSorter
 
 Remove the last node [sorter](https://xplr.dev/en/sorting#sorter).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
@@ -910,6 +926,7 @@ Example:
 
 Reset the node [sorters](https://xplr.dev/en/sorting#sorter) back to
 the default configuration.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
@@ -919,11 +936,59 @@ Example:
 #### ClearNodeSorters
 
 Clear all the node [sorters](https://xplr.dev/en/sorting#sorter).
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
 - Lua: `"ClearNodeSorters"`
 - YAML: `ClearNodeSorters`
+
+### Search Operations
+
+#### SearchFuzzy
+
+Search files using fuzzy match algorithm.
+It keeps the filters, but overrides the sorters.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Type: { SearchFuzzy = "string" }
+
+Example:
+
+- Lua: `{ SearchFuzzy = "pattern" }`
+- YAML: `SearchFuzzy: pattern`
+
+#### SearchFuzzyFromInput
+
+Calls `SearchFuzzy` with the input taken from the input buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+
+Example:
+
+- Lua: `"SearchFuzzyFromInput"`
+- YAML: `SearchFuzzyFromInput`
+
+#### AcceptSearch
+
+Accepts the search by keeping the latest focus while in search mode.
+Automatically calls `ExplorePwd`.
+
+Example:
+
+- Lua: `"AcceptSearch"`
+- YAML: `AcceptSearch`
+
+#### CancelSearch
+
+Cancels the search by discarding the latest focus and recovering
+the focus before search.
+Automatically calls `ExplorePwd`.
+
+Example:
+
+- Lua: `"CancelSearch"`
+- YAML: `CancelSearch`
 
 ### Mouse Operations
 
