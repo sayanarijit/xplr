@@ -316,6 +316,30 @@ impl Runner {
                                 terminal.clear()?;
                             }
 
+                            ScrollUp => {
+                                app = app.focus_previous_by_relative_index(
+                                    terminal.size()?.height as usize,
+                                )?;
+                            }
+
+                            ScrollDown => {
+                                app = app.focus_next_by_relative_index(
+                                    terminal.size()?.height as usize,
+                                )?;
+                            }
+
+                            ScrollUpHalf => {
+                                app = app.focus_next_by_relative_index(
+                                    terminal.size()?.height as usize / 2,
+                                )?;
+                            }
+
+                            ScrollDownHalf => {
+                                app = app.focus_next_by_relative_index(
+                                    terminal.size()?.height as usize / 2,
+                                )?;
+                            }
+
                             ExplorePwdAsync => {
                                 explorer::explore_async(
                                     app.explorer_config.clone(),
