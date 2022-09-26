@@ -174,9 +174,6 @@ pub enum ExternalMsg {
     /// - YAML: `FocusByIndexFromInput`
     FocusByIndexFromInput,
 
-    ///
-    /// **YAML:** `FocusByFileName: string`
-    ///
     /// Focus on the file by name from the present working directory.
     ///
     /// Type: { FocusByFileName = "string" }
@@ -186,6 +183,38 @@ pub enum ExternalMsg {
     /// - Lua: `{ FocusByFileName = "filename.ext" }`
     /// - YAML: `FocusByFileName: filename.ext`
     FocusByFileName(String),
+
+    /// Scroll up by terminal height.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ScrollUp"`
+    /// - YAML: `ScrollUp`
+    ScrollUp,
+
+    /// Scroll down by terminal height.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ScrollDown"`
+    /// - YAML: `ScrollDown`
+    ScrollDown,
+
+    /// Scroll up by half of terminal height.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ScrollUpHalf"`
+    /// - YAML: `ScrollUpHalf`
+    ScrollUpHalf,
+
+    /// Scroll down by half of terminal height.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ScrollDownHalf"`
+    /// - YAML: `ScrollDownHalf`
+    ScrollDownHalf,
 
     /// Change the present working directory ($PWD)
     ///

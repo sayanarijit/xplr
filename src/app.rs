@@ -406,6 +406,10 @@ impl App {
                 FocusByIndex(i) => self.focus_by_index(i),
                 FocusByIndexFromInput => self.focus_by_index_from_input(),
                 FocusByFileName(n) => self.focus_by_file_name(&n, true),
+                ScrollUp => self.scroll_up(),
+                ScrollDown => self.scroll_down(),
+                ScrollUpHalf => self.scroll_up_half(),
+                ScrollDownHalf => self.scroll_down_half(),
                 ChangeDirectory(dir) => self.change_directory(&dir, true),
                 Enter => self.enter(),
                 Back => self.back(),
@@ -635,7 +639,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
+    pub fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
@@ -680,7 +684,7 @@ impl App {
         Ok(self)
     }
 
-    fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
+    pub fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
             if let Some(n) = dir.focused_node() {
@@ -925,6 +929,26 @@ impl App {
         } else {
             Ok(self)
         }
+    }
+
+    pub fn scroll_up(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ScrollUp);
+        Ok(self)
+    }
+
+    pub fn scroll_down(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ScrollDown);
+        Ok(self)
+    }
+
+    pub fn scroll_up_half(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ScrollUp);
+        Ok(self)
+    }
+
+    pub fn scroll_down_half(mut self) -> Result<Self> {
+        self.msg_out.push_back(MsgOut::ScrollDownHalf);
+        Ok(self)
     }
 
     pub fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {

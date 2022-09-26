@@ -208,8 +208,6 @@ Example:
 
 #### FocusByFileName
 
-**YAML:** `FocusByFileName: string`
-
 Focus on the file by name from the present working directory.
 
 Type: { FocusByFileName = "string" }
@@ -218,6 +216,42 @@ Example:
 
 - Lua: `{ FocusByFileName = "filename.ext" }`
 - YAML: `FocusByFileName: filename.ext`
+
+#### ScrollUp
+
+Scroll up by terminal height.
+
+Example:
+
+- Lua: `"ScrollUp"`
+- YAML: `ScrollUp`
+
+#### ScrollDown
+
+Scroll down by terminal height.
+
+Example:
+
+- Lua: `"ScrollDown"`
+- YAML: `ScrollDown`
+
+#### ScrollUpHalf
+
+Scroll up by half of terminal height.
+
+Example:
+
+- Lua: `"ScrollUpHalf"`
+- YAML: `ScrollUpHalf`
+
+#### ScrollDownHalf
+
+Scroll down by half of terminal height.
+
+Example:
+
+- Lua: `"ScrollDownHalf"`
+- YAML: `ScrollDownHalf`
 
 #### ChangeDirectory
 

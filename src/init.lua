@@ -1206,6 +1206,30 @@ xplr.config.modes.builtin.default = {
           },
         },
       },
+      ["page-up"] = {
+        help = "scroll up",
+        messages = {
+          "ScrollUp",
+        },
+      },
+      ["page-down"] = {
+        help = "scroll down",
+        messages = {
+          "ScrollDown",
+        },
+      },
+      ["{"] = {
+        help = "scroll up half",
+        messages = {
+          "ScrollUpHalf",
+        },
+      },
+      ["}"] = {
+        help = "scroll down half",
+        messages = {
+          "ScrollDownHalf",
+        },
+      },
     },
     on_number = {
       help = "input",
