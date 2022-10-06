@@ -188,7 +188,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="v0180---v0193"><a class="header" href="#v0180---v0193"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.3">v0.19.3</a></a></h4>
+<h4 id="v0180---v0194"><a class="header" href="#v0180---v0194"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a></a></h4>
 <ul>
 <li>BREAKING: The builtin modes cannot be accessed using space separated names
 anymore. Use underscore separated mode names. For e.g.
@@ -220,6 +220,26 @@ Also, added &quot;DeleteTillEnd&quot; as another cursor based &quot;InputOperati
 <li>Fixed applying regex based filters via the CLI and <code>$XPLR_PIPE_MSG_IN</code> pipe.</li>
 <li>You can use the <code>prompt</code> field to define input prompt for each mode, instead
 of using the <code>SetInputPrompt</code> message.</li>
+<li>Since version v0.19.4, the native search will default to skim-v2 based fuzzy
+matching. <code>esc</code> while in search mode will recover the initial focus. People
+who prefer the regex based search, can use the <code>regex-search.xplr</code> plugin.
+The following messages will be available for search based operations:
+<ul>
+<li>SearchFuzzy</li>
+<li>SearchFuzzyFromInput</li>
+<li>AcceptSearch</li>
+<li>CancelSearch</li>
+</ul>
+</li>
+<li>Since version v0.19.4, quick scrolling operations are supported using the
+following messages and keys:
+<ul>
+<li>ScrollUp -------- page-up</li>
+<li>ScrollDown ------ page-down</li>
+<li>ScrollUpHalf ---- {</li>
+<li>ScrollDownHalf -- }</li>
+</ul>
+</li>
 </ul>
 <p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0176---v0180"><a class="header" href="#v0176---v0180"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a></a></h4>

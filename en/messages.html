@@ -166,6 +166,7 @@
 <li><a href="#select-operations">Select Operations</a></li>
 <li><a href="#filter-operations">Filter Operations</a></li>
 <li><a href="#sort-operations">Sort Operations</a></li>
+<li><a href="#search-operations">Search Operations</a></li>
 <li><a href="#mouse-operations">Mouse Operations</a></li>
 <li><a href="#fifo-operations">Fifo Operations</a></li>
 <li><a href="#logging">Logging</a></li>
@@ -734,7 +735,9 @@ Example:</p>
 <h3 id="filter-operations"><a class="header" href="#filter-operations">Filter Operations</a></h3>
 <h4 id="addnodefilter"><a class="header" href="#addnodefilter">AddNodeFilter</a></h4>
 <p>Add a <a href="https://xplr.dev/en/filtering#filter">filter</a> to exclude nodes
-while exploring directories.</p>
+while exploring directories.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+Filters get automatically cleared when changing directories.</p>
 <p>Type: { AddNodeFilter = { filter = <a href="https://xplr.dev/en/filtering#filter">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -742,7 +745,8 @@ while exploring directories.</p>
 <li>YAML: <code>AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></li>
 </ul>
 <h4 id="removenodefilter"><a class="header" href="#removenodefilter">RemoveNodeFilter</a></h4>
-<p>Remove an existing <a href="https://xplr.dev/en/filtering#filter">filter</a>.</p>
+<p>Remove an existing <a href="https://xplr.dev/en/filtering#filter">filter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { RemoveNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -751,7 +755,8 @@ while exploring directories.</p>
 </ul>
 <h4 id="togglenodefilter"><a class="header" href="#togglenodefilter">ToggleNodeFilter</a></h4>
 <p>Remove a <a href="https://xplr.dev/en/filtering#filter">filter</a> if it exists,
-else, add a it.</p>
+else, add a it.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { ToggleNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -760,7 +765,8 @@ else, add a it.</p>
 </ul>
 <h4 id="addnodefilterfrominput"><a class="header" href="#addnodefilterfrominput">AddNodeFilterFromInput</a></h4>
 <p>Add a node <a href="https://xplr.dev/en/filtering#filter">filter</a> reading the
-input from the buffer.</p>
+input from the buffer.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { AddNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -769,7 +775,8 @@ input from the buffer.</p>
 </ul>
 <h4 id="removenodefilterfrominput"><a class="header" href="#removenodefilterfrominput">RemoveNodeFilterFromInput</a></h4>
 <p>Remove a node <a href="https://xplr.dev/en/filtering#filter">filter</a> reading
-the input from the buffer.</p>
+the input from the buffer.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { RemoveNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -777,7 +784,8 @@ the input from the buffer.</p>
 <li>YAML: <code>RemoveNodeFilterFromInput: RelativePathDoesStartWith</code></li>
 </ul>
 <h4 id="removelastnodefilter"><a class="header" href="#removelastnodefilter">RemoveLastNodeFilter</a></h4>
-<p>Remove the last node <a href="https://xplr.dev/en/filtering">filter</a>.</p>
+<p>Remove the last node <a href="https://xplr.dev/en/filtering">filter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;RemoveLastNodeFilter&quot;</code></li>
@@ -785,14 +793,16 @@ the input from the buffer.</p>
 </ul>
 <h4 id="resetnodefilters"><a class="header" href="#resetnodefilters">ResetNodeFilters</a></h4>
 <p>Reset the node <a href="https://xplr.dev/en/filtering">filters</a> back to the
-default configuration.</p>
+default configuration.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetNodeFilters&quot;</code></li>
 <li>YAML: <code>ResetNodeFilters</code></li>
 </ul>
 <h4 id="clearnodefilters"><a class="header" href="#clearnodefilters">ClearNodeFilters</a></h4>
-<p>Clear all the node <a href="https://xplr.dev/en/filtering">filters</a>.</p>
+<p>Clear all the node <a href="https://xplr.dev/en/filtering">filters</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ClearNodeFilters&quot;</code></li>
@@ -801,7 +811,8 @@ default configuration.</p>
 <h3 id="sort-operations"><a class="header" href="#sort-operations">Sort Operations</a></h3>
 <h4 id="addnodesorter"><a class="header" href="#addnodesorter">AddNodeSorter</a></h4>
 <p>Add a <a href="https://xplr.dev/en/sorting#sorter">sorter</a> to sort nodes while
-exploring directories.</p>
+exploring directories.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { AddNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
@@ -809,7 +820,8 @@ exploring directories.</p>
 <li>YAML: <code>AddNodeSorter: { sorter: ByRelativePath, reverse: false }</code></li>
 </ul>
 <h4 id="removenodesorter"><a class="header" href="#removenodesorter">RemoveNodeSorter</a></h4>
-<p>Remove an existing <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
+<p>Remove an existing <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { RemoveNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -817,7 +829,8 @@ exploring directories.</p>
 <li>YAML: <code>RemoveNodeSorter: ByRelativePath</code></li>
 </ul>
 <h4 id="reversenodesorter"><a class="header" href="#reversenodesorter">ReverseNodeSorter</a></h4>
-<p>Reverse a node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
+<p>Reverse a node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { ReverseNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -826,7 +839,8 @@ exploring directories.</p>
 </ul>
 <h4 id="togglenodesorter"><a class="header" href="#togglenodesorter">ToggleNodeSorter</a></h4>
 <p>Remove a <a href="https://xplr.dev/en/sorting#sorter">sorter</a> if it exists,
-else, add a it.</p>
+else, add a it.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { ToggleNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
@@ -834,14 +848,16 @@ else, add a it.</p>
 <li>YAML: <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code></li>
 </ul>
 <h4 id="reversenodesorters"><a class="header" href="#reversenodesorters">ReverseNodeSorters</a></h4>
-<p>Reverse the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.</p>
+<p>Reverse the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ReverseNodeSorters&quot;</code></li>
 <li>YAML: <code>ReverseNodeSorters</code></li>
 </ul>
 <h4 id="removelastnodesorter"><a class="header" href="#removelastnodesorter">RemoveLastNodeSorter</a></h4>
-<p>Remove the last node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
+<p>Remove the last node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;RemoveLastNodeSorter&quot;</code></li>
@@ -849,18 +865,57 @@ else, add a it.</p>
 </ul>
 <h4 id="resetnodesorters"><a class="header" href="#resetnodesorters">ResetNodeSorters</a></h4>
 <p>Reset the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a> back to
-the default configuration.</p>
+the default configuration.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetNodeSorters&quot;</code></li>
 <li>YAML: <code>ResetNodeSorters</code></li>
 </ul>
 <h4 id="clearnodesorters"><a class="header" href="#clearnodesorters">ClearNodeSorters</a></h4>
-<p>Clear all the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.</p>
+<p>Clear all the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ClearNodeSorters&quot;</code></li>
 <li>YAML: <code>ClearNodeSorters</code></li>
+</ul>
+<h3 id="search-operations"><a class="header" href="#search-operations">Search Operations</a></h3>
+<h4 id="searchfuzzy"><a class="header" href="#searchfuzzy">SearchFuzzy</a></h4>
+<p>Search files using fuzzy match algorithm.
+It keeps the filters, but overrides the sorters.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+It gets reset automatically when changing directory.</p>
+<p>Type: { SearchFuzzy = &quot;string&quot; }</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>{ SearchFuzzy = &quot;pattern&quot; }</code></li>
+<li>YAML: <code>SearchFuzzy: pattern</code></li>
+</ul>
+<h4 id="searchfuzzyfrominput"><a class="header" href="#searchfuzzyfrominput">SearchFuzzyFromInput</a></h4>
+<p>Calls <code>SearchFuzzy</code> with the input taken from the input buffer.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;SearchFuzzyFromInput&quot;</code></li>
+<li>YAML: <code>SearchFuzzyFromInput</code></li>
+</ul>
+<h4 id="acceptsearch"><a class="header" href="#acceptsearch">AcceptSearch</a></h4>
+<p>Accepts the search by keeping the latest focus while in search mode.
+Automatically calls <code>ExplorePwd</code>.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;AcceptSearch&quot;</code></li>
+<li>YAML: <code>AcceptSearch</code></li>
+</ul>
+<h4 id="cancelsearch"><a class="header" href="#cancelsearch">CancelSearch</a></h4>
+<p>Cancels the search by discarding the latest focus and recovering
+the focus before search.
+Automatically calls <code>ExplorePwd</code>.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;CancelSearch&quot;</code></li>
+<li>YAML: <code>CancelSearch</code></li>
 </ul>
 <h3 id="mouse-operations"><a class="header" href="#mouse-operations">Mouse Operations</a></h3>
 <h4 id="enablemouse"><a class="header" href="#enablemouse">EnableMouse</a></h4>

@@ -660,6 +660,9 @@ Type: <a href="https://xplr.dev/en/style">Style</a></p>
 </ul>
 </li>
 </ul>
+<h4 id="xplrconfiggeneralsort_and_filter_uisearch_identifier"><a class="header" href="#xplrconfiggeneralsort_and_filter_uisearch_identifier">xplr.config.general.sort_and_filter_ui.search_identifier</a></h4>
+<p>The identifiers used to denote applied search input.</p>
+<p>Type: { format = nullable string, style = <a href="https://xplr.dev/en/style">Style</a> }</p>
 <h4 id="xplrconfiggeneralpanel_uidefaulttitleformat"><a class="header" href="#xplrconfiggeneralpanel_uidefaulttitleformat">xplr.config.general.panel_ui.default.title.format</a></h4>
 <p>The content for panel title by default.</p>
 <p>Type: nullable string</p>
@@ -1206,13 +1209,6 @@ overlaps with <a href="https://github.com/jarun/nnn/">nnn</a>, but it's supposed
 requirements.</p>
 <p>When you press <code>?</code> in <a href="default-key-bindings.html#default">default mode</a>, you can see the complete list
 of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
-<h3 id="create_directory"><a class="header" href="#create_directory">create_directory</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>submit</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>tab</td><td></td><td>try complete</td></tr>
-</tbody></table>
 <h3 id="default-1"><a class="header" href="#default-1">default</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>.</td><td></td><td>show hidden</td></tr>
@@ -1221,7 +1217,6 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>?</td><td></td><td>global help menu</td></tr>
 <tr><td>G</td><td></td><td>go to bottom</td></tr>
 <tr><td>V</td><td>ctrl-a</td><td>select/unselect all</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>ctrl-d</td><td></td><td>duplicate as</td></tr>
 <tr><td>ctrl-i</td><td>tab</td><td>next visited path</td></tr>
 <tr><td>ctrl-o</td><td></td><td>last visited path</td></tr>
@@ -1243,70 +1238,50 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>~</td><td></td><td>go home</td></tr>
 <tr><td>[0-9]</td><td></td><td>input</td></tr>
 </tbody></table>
-<h3 id="duplicate_as"><a class="header" href="#duplicate_as">duplicate_as</a></h3>
+<h3 id="go_to_path"><a class="header" href="#go_to_path">go_to_path</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>duplicate</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>enter</td><td></td><td>submit</td></tr>
+<tr><td>tab</td><td></td><td>try complete</td></tr>
 </tbody></table>
 <h3 id="relative_path_does_not_match_regex"><a class="header" href="#relative_path_does_not_match_regex">relative_path_does_not_match_regex</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>enter</td><td></td><td>submit</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
 </tbody></table>
 <h3 id="number"><a class="header" href="#number">number</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>down</td><td>j</td><td>to down</td></tr>
 <tr><td>enter</td><td></td><td>to index</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
 <tr><td>k</td><td>up</td><td>to up</td></tr>
 <tr><td>[0-9]</td><td></td><td>input</td></tr>
 </tbody></table>
-<h3 id="search"><a class="header" href="#search">search</a></h3>
+<h3 id="selection_ops"><a class="header" href="#selection_ops">selection_ops</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
-<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
-<tr><td>enter</td><td>esc</td><td>focus</td></tr>
-<tr><td>left</td><td></td><td>back</td></tr>
-<tr><td>right</td><td></td><td>enter</td></tr>
-<tr><td>tab</td><td></td><td>toggle selection</td></tr>
+<tr><td>c</td><td></td><td>copy here</td></tr>
+<tr><td>m</td><td></td><td>move here</td></tr>
+<tr><td>x</td><td></td><td>open in gui</td></tr>
 </tbody></table>
-<h3 id="quit"><a class="header" href="#quit">quit</a></h3>
+<h3 id="duplicate_as"><a class="header" href="#duplicate_as">duplicate_as</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>just quit</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>f</td><td></td><td>quit printing focus</td></tr>
-<tr><td>p</td><td></td><td>quit printing pwd</td></tr>
-<tr><td>r</td><td></td><td>quit printing result</td></tr>
-<tr><td>s</td><td></td><td>quit printing selection</td></tr>
+<tr><td>enter</td><td></td><td>submit</td></tr>
+<tr><td>tab</td><td></td><td>try complete</td></tr>
 </tbody></table>
-<h3 id="create"><a class="header" href="#create">create</a></h3>
+<h3 id="action-1"><a class="header" href="#action-1">action</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>d</td><td></td><td>create directory</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>f</td><td></td><td>create file</td></tr>
+<tr><td>!</td><td></td><td>shell</td></tr>
+<tr><td>c</td><td></td><td>create</td></tr>
+<tr><td>e</td><td></td><td>open in editor</td></tr>
+<tr><td>l</td><td></td><td>logs</td></tr>
+<tr><td>m</td><td></td><td>toggle mouse</td></tr>
+<tr><td>q</td><td></td><td>quit options</td></tr>
+<tr><td>s</td><td></td><td>selection operations</td></tr>
+<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
 </tbody></table>
-<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
+<h3 id="go_to"><a class="header" href="#go_to">go_to</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>R</td><td></td><td>relative path does not match regex</td></tr>
-<tr><td>backspace</td><td></td><td>remove last filter</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
-<tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
-<tr><td>enter</td><td>esc</td><td>submit</td></tr>
-<tr><td>r</td><td></td><td>relative path does match regex</td></tr>
-</tbody></table>
-<h3 id="delete"><a class="header" href="#delete">delete</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>D</td><td></td><td>force delete</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>d</td><td></td><td>delete</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>f</td><td></td><td>follow symlink</td></tr>
+<tr><td>g</td><td></td><td>top</td></tr>
+<tr><td>p</td><td></td><td>path</td></tr>
+<tr><td>x</td><td></td><td>open in gui</td></tr>
 </tbody></table>
 <h3 id="sort"><a class="header" href="#sort">sort</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -1320,50 +1295,25 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>S</td><td></td><td>by size reverse</td></tr>
 <tr><td>backspace</td><td></td><td>remove last sorter</td></tr>
 <tr><td>c</td><td></td><td>by created</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>ctrl-r</td><td></td><td>reset sorters</td></tr>
 <tr><td>ctrl-u</td><td></td><td>clear sorters</td></tr>
 <tr><td>e</td><td></td><td>by canonical extension</td></tr>
-<tr><td>enter</td><td>esc</td><td>submit</td></tr>
+<tr><td>enter</td><td></td><td>submit</td></tr>
 <tr><td>l</td><td></td><td>by last modified</td></tr>
 <tr><td>m</td><td></td><td>by canonical mime essence</td></tr>
 <tr><td>n</td><td></td><td>by node type</td></tr>
 <tr><td>r</td><td></td><td>by relative path</td></tr>
 <tr><td>s</td><td></td><td>by size</td></tr>
 </tbody></table>
-<h3 id="go_to"><a class="header" href="#go_to">go_to</a></h3>
+<h3 id="rename"><a class="header" href="#rename">rename</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>f</td><td></td><td>follow symlink</td></tr>
-<tr><td>g</td><td></td><td>top</td></tr>
-<tr><td>p</td><td></td><td>path</td></tr>
-<tr><td>x</td><td></td><td>open in gui</td></tr>
-</tbody></table>
-<h3 id="create_file"><a class="header" href="#create_file">create_file</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>enter</td><td></td><td>submit</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
 <tr><td>tab</td><td></td><td>try complete</td></tr>
 </tbody></table>
-<h3 id="recover"><a class="header" href="#recover">recover</a></h3>
+<h3 id="debug_error"><a class="header" href="#debug_error">debug_error</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>esc</td><td></td><td>escape</td></tr>
-</tbody></table>
-<h3 id="action-1"><a class="header" href="#action-1">action</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>!</td><td></td><td>shell</td></tr>
-<tr><td>c</td><td></td><td>create</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>e</td><td></td><td>open in editor</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>l</td><td></td><td>logs</td></tr>
-<tr><td>m</td><td></td><td>toggle mouse</td></tr>
-<tr><td>q</td><td></td><td>quit options</td></tr>
-<tr><td>s</td><td></td><td>selection operations</td></tr>
-<tr><td>[0-9]</td><td></td><td>go to index</td></tr>
+<tr><td>enter</td><td></td><td>open logs in editor</td></tr>
+<tr><td>q</td><td></td><td>quit</td></tr>
 </tbody></table>
 <h3 id="switch_layout"><a class="header" href="#switch_layout">switch_layout</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -1371,43 +1321,59 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <tr><td>2</td><td></td><td>no help menu</td></tr>
 <tr><td>3</td><td></td><td>no selection panel</td></tr>
 <tr><td>4</td><td></td><td>no help or selection</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
+</tbody></table>
+<h3 id="search"><a class="header" href="#search">search</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>ctrl-n</td><td>down</td><td>down</td></tr>
+<tr><td>ctrl-p</td><td>up</td><td>up</td></tr>
+<tr><td>enter</td><td></td><td>submit</td></tr>
 <tr><td>esc</td><td></td><td>cancel</td></tr>
+<tr><td>left</td><td></td><td>back</td></tr>
+<tr><td>right</td><td></td><td>enter</td></tr>
+<tr><td>tab</td><td></td><td>toggle selection</td></tr>
+</tbody></table>
+<h3 id="create_file"><a class="header" href="#create_file">create_file</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>enter</td><td></td><td>submit</td></tr>
+<tr><td>tab</td><td></td><td>try complete</td></tr>
+</tbody></table>
+<h3 id="recover"><a class="header" href="#recover">recover</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+</tbody></table>
+<h3 id="create"><a class="header" href="#create">create</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>d</td><td></td><td>create directory</td></tr>
+<tr><td>f</td><td></td><td>create file</td></tr>
+</tbody></table>
+<h3 id="filter"><a class="header" href="#filter">filter</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>R</td><td></td><td>relative path does not match regex</td></tr>
+<tr><td>backspace</td><td></td><td>remove last filter</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset filters</td></tr>
+<tr><td>ctrl-u</td><td></td><td>clear filters</td></tr>
+<tr><td>r</td><td></td><td>relative path does match regex</td></tr>
+</tbody></table>
+<h3 id="delete"><a class="header" href="#delete">delete</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>D</td><td></td><td>force delete</td></tr>
+<tr><td>d</td><td></td><td>delete</td></tr>
+</tbody></table>
+<h3 id="create_directory"><a class="header" href="#create_directory">create_directory</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>enter</td><td></td><td>submit</td></tr>
+<tr><td>tab</td><td></td><td>try complete</td></tr>
+</tbody></table>
+<h3 id="quit"><a class="header" href="#quit">quit</a></h3>
+<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
+<tr><td>enter</td><td></td><td>just quit</td></tr>
+<tr><td>f</td><td></td><td>quit printing focus</td></tr>
+<tr><td>p</td><td></td><td>quit printing pwd</td></tr>
+<tr><td>r</td><td></td><td>quit printing result</td></tr>
+<tr><td>s</td><td></td><td>quit printing selection</td></tr>
 </tbody></table>
 <h3 id="relative_path_does_match_regex"><a class="header" href="#relative_path_does_match_regex">relative_path_does_match_regex</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
 <tr><td>enter</td><td></td><td>submit</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-</tbody></table>
-<h3 id="debug_error"><a class="header" href="#debug_error">debug_error</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>open logs in editor</td></tr>
-<tr><td>esc</td><td></td><td>escape</td></tr>
-<tr><td>q</td><td></td><td>quit</td></tr>
-</tbody></table>
-<h3 id="go_to_path"><a class="header" href="#go_to_path">go_to_path</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>submit</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>tab</td><td></td><td>try complete</td></tr>
-</tbody></table>
-<h3 id="selection_ops"><a class="header" href="#selection_ops">selection_ops</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>c</td><td></td><td>copy here</td></tr>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>m</td><td></td><td>move here</td></tr>
-<tr><td>x</td><td></td><td>open in gui</td></tr>
-</tbody></table>
-<h3 id="rename"><a class="header" href="#rename">rename</a></h3>
-<table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
-<tr><td>ctrl-c</td><td></td><td>terminate</td></tr>
-<tr><td>enter</td><td></td><td>rename</td></tr>
-<tr><td>esc</td><td></td><td>cancel</td></tr>
-<tr><td>tab</td><td></td><td>try complete</td></tr>
 </tbody></table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="debug-key-bindings"><a class="header" href="#debug-key-bindings">Debug Key Bindings</a></h1>
 <p>If you need help debugging or understanding key bindings DYI way, you can
@@ -1932,6 +1898,7 @@ represented using
 <li><a href="messages.html#select-operations">Select Operations</a></li>
 <li><a href="messages.html#filter-operations">Filter Operations</a></li>
 <li><a href="messages.html#sort-operations">Sort Operations</a></li>
+<li><a href="messages.html#search-operations">Search Operations</a></li>
 <li><a href="messages.html#mouse-operations">Mouse Operations</a></li>
 <li><a href="messages.html#fifo-operations">Fifo Operations</a></li>
 <li><a href="messages.html#logging">Logging</a></li>
@@ -2500,7 +2467,9 @@ Example:</p>
 <h3 id="filter-operations"><a class="header" href="#filter-operations">Filter Operations</a></h3>
 <h4 id="addnodefilter"><a class="header" href="#addnodefilter">AddNodeFilter</a></h4>
 <p>Add a <a href="https://xplr.dev/en/filtering#filter">filter</a> to exclude nodes
-while exploring directories.</p>
+while exploring directories.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+Filters get automatically cleared when changing directories.</p>
 <p>Type: { AddNodeFilter = { filter = <a href="https://xplr.dev/en/filtering#filter">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -2508,7 +2477,8 @@ while exploring directories.</p>
 <li>YAML: <code>AddNodeFilter: { filter: RelativePathDoesStartWith, input: foo }</code></li>
 </ul>
 <h4 id="removenodefilter"><a class="header" href="#removenodefilter">RemoveNodeFilter</a></h4>
-<p>Remove an existing <a href="https://xplr.dev/en/filtering#filter">filter</a>.</p>
+<p>Remove an existing <a href="https://xplr.dev/en/filtering#filter">filter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { RemoveNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -2517,7 +2487,8 @@ while exploring directories.</p>
 </ul>
 <h4 id="togglenodefilter"><a class="header" href="#togglenodefilter">ToggleNodeFilter</a></h4>
 <p>Remove a <a href="https://xplr.dev/en/filtering#filter">filter</a> if it exists,
-else, add a it.</p>
+else, add a it.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { ToggleNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -2526,7 +2497,8 @@ else, add a it.</p>
 </ul>
 <h4 id="addnodefilterfrominput"><a class="header" href="#addnodefilterfrominput">AddNodeFilterFromInput</a></h4>
 <p>Add a node <a href="https://xplr.dev/en/filtering#filter">filter</a> reading the
-input from the buffer.</p>
+input from the buffer.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { AddNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2535,7 +2507,8 @@ input from the buffer.</p>
 </ul>
 <h4 id="removenodefilterfrominput"><a class="header" href="#removenodefilterfrominput">RemoveNodeFilterFromInput</a></h4>
 <p>Remove a node <a href="https://xplr.dev/en/filtering#filter">filter</a> reading
-the input from the buffer.</p>
+the input from the buffer.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { RemoveNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2543,7 +2516,8 @@ the input from the buffer.</p>
 <li>YAML: <code>RemoveNodeFilterFromInput: RelativePathDoesStartWith</code></li>
 </ul>
 <h4 id="removelastnodefilter"><a class="header" href="#removelastnodefilter">RemoveLastNodeFilter</a></h4>
-<p>Remove the last node <a href="https://xplr.dev/en/filtering">filter</a>.</p>
+<p>Remove the last node <a href="https://xplr.dev/en/filtering">filter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;RemoveLastNodeFilter&quot;</code></li>
@@ -2551,14 +2525,16 @@ the input from the buffer.</p>
 </ul>
 <h4 id="resetnodefilters"><a class="header" href="#resetnodefilters">ResetNodeFilters</a></h4>
 <p>Reset the node <a href="https://xplr.dev/en/filtering">filters</a> back to the
-default configuration.</p>
+default configuration.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetNodeFilters&quot;</code></li>
 <li>YAML: <code>ResetNodeFilters</code></li>
 </ul>
 <h4 id="clearnodefilters"><a class="header" href="#clearnodefilters">ClearNodeFilters</a></h4>
-<p>Clear all the node <a href="https://xplr.dev/en/filtering">filters</a>.</p>
+<p>Clear all the node <a href="https://xplr.dev/en/filtering">filters</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ClearNodeFilters&quot;</code></li>
@@ -2567,7 +2543,8 @@ default configuration.</p>
 <h3 id="sort-operations"><a class="header" href="#sort-operations">Sort Operations</a></h3>
 <h4 id="addnodesorter"><a class="header" href="#addnodesorter">AddNodeSorter</a></h4>
 <p>Add a <a href="https://xplr.dev/en/sorting#sorter">sorter</a> to sort nodes while
-exploring directories.</p>
+exploring directories.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { AddNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
@@ -2575,7 +2552,8 @@ exploring directories.</p>
 <li>YAML: <code>AddNodeSorter: { sorter: ByRelativePath, reverse: false }</code></li>
 </ul>
 <h4 id="removenodesorter"><a class="header" href="#removenodesorter">RemoveNodeSorter</a></h4>
-<p>Remove an existing <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
+<p>Remove an existing <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { RemoveNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2583,7 +2561,8 @@ exploring directories.</p>
 <li>YAML: <code>RemoveNodeSorter: ByRelativePath</code></li>
 </ul>
 <h4 id="reversenodesorter"><a class="header" href="#reversenodesorter">ReverseNodeSorter</a></h4>
-<p>Reverse a node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
+<p>Reverse a node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { ReverseNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2592,7 +2571,8 @@ exploring directories.</p>
 </ul>
 <h4 id="togglenodesorter"><a class="header" href="#togglenodesorter">ToggleNodeSorter</a></h4>
 <p>Remove a <a href="https://xplr.dev/en/sorting#sorter">sorter</a> if it exists,
-else, add a it.</p>
+else, add a it.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Type: { ToggleNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
@@ -2600,14 +2580,16 @@ else, add a it.</p>
 <li>YAML: <code>ToggleSorterSorter: {sorter: ByRelativePath, reverse: false }</code></li>
 </ul>
 <h4 id="reversenodesorters"><a class="header" href="#reversenodesorters">ReverseNodeSorters</a></h4>
-<p>Reverse the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.</p>
+<p>Reverse the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ReverseNodeSorters&quot;</code></li>
 <li>YAML: <code>ReverseNodeSorters</code></li>
 </ul>
 <h4 id="removelastnodesorter"><a class="header" href="#removelastnodesorter">RemoveLastNodeSorter</a></h4>
-<p>Remove the last node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.</p>
+<p>Remove the last node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;RemoveLastNodeSorter&quot;</code></li>
@@ -2615,18 +2597,57 @@ else, add a it.</p>
 </ul>
 <h4 id="resetnodesorters"><a class="header" href="#resetnodesorters">ResetNodeSorters</a></h4>
 <p>Reset the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a> back to
-the default configuration.</p>
+the default configuration.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetNodeSorters&quot;</code></li>
 <li>YAML: <code>ResetNodeSorters</code></li>
 </ul>
 <h4 id="clearnodesorters"><a class="header" href="#clearnodesorters">ClearNodeSorters</a></h4>
-<p>Clear all the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.</p>
+<p>Clear all the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ClearNodeSorters&quot;</code></li>
 <li>YAML: <code>ClearNodeSorters</code></li>
+</ul>
+<h3 id="search-operations"><a class="header" href="#search-operations">Search Operations</a></h3>
+<h4 id="searchfuzzy"><a class="header" href="#searchfuzzy">SearchFuzzy</a></h4>
+<p>Search files using fuzzy match algorithm.
+It keeps the filters, but overrides the sorters.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+It gets reset automatically when changing directory.</p>
+<p>Type: { SearchFuzzy = &quot;string&quot; }</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>{ SearchFuzzy = &quot;pattern&quot; }</code></li>
+<li>YAML: <code>SearchFuzzy: pattern</code></li>
+</ul>
+<h4 id="searchfuzzyfrominput"><a class="header" href="#searchfuzzyfrominput">SearchFuzzyFromInput</a></h4>
+<p>Calls <code>SearchFuzzy</code> with the input taken from the input buffer.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;SearchFuzzyFromInput&quot;</code></li>
+<li>YAML: <code>SearchFuzzyFromInput</code></li>
+</ul>
+<h4 id="acceptsearch"><a class="header" href="#acceptsearch">AcceptSearch</a></h4>
+<p>Accepts the search by keeping the latest focus while in search mode.
+Automatically calls <code>ExplorePwd</code>.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;AcceptSearch&quot;</code></li>
+<li>YAML: <code>AcceptSearch</code></li>
+</ul>
+<h4 id="cancelsearch"><a class="header" href="#cancelsearch">CancelSearch</a></h4>
+<p>Cancels the search by discarding the latest focus and recovering
+the focus before search.
+Automatically calls <code>ExplorePwd</code>.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;CancelSearch&quot;</code></li>
+<li>YAML: <code>CancelSearch</code></li>
 </ul>
 <h3 id="mouse-operations"><a class="header" href="#mouse-operations">Mouse Operations</a></h3>
 <h4 id="enablemouse"><a class="header" href="#enablemouse">EnableMouse</a></h4>
@@ -4098,6 +4119,7 @@ of the following plugins work for you, it's very easy to
 <li><a href="https://github.com/sayanarijit/dual-pane.xplr"><strong>sayanarijit/dual-pane.xplr</strong></a> Implements support for dual-pane navigation into xplr.</li>
 <li><a href="https://github.com/sayanarijit/map.xplr"><strong>sayanarijit/map.xplr</strong></a> Visually inspect and interactively execute batch commands using xplr.</li>
 <li><a href="https://github.com/sayanarijit/offline-docs.xplr"><strong>sayanarijit/offline-docs.xplr</strong></a> Fetch the appropriate version of xplr docs and browse offline.</li>
+<li><a href="https://github.com/sayanarijit/regex-search.xplr"><strong>sayanarijit/regex-search.xplr</strong></a> Bring back the regex based seach in xplr.</li>
 <li><a href="https://github.com/sayanarijit/registers.xplr"><strong>sayanarijit/registers.xplr</strong></a> Use multiple registers to store the selected paths.</li>
 <li><a href="https://github.com/sayanarijit/type-to-nav.xplr"><strong>sayanarijit/type-to-nav.xplr</strong></a> Inspired by <a href="https://github.com/jarun/nnn/wiki/concepts#type-to-nav">nnn's type-to-nav mode</a> for xplr,
 with some tweaks.</li>
@@ -4275,7 +4297,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="v0180---v0193"><a class="header" href="#v0180---v0193"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.3">v0.19.3</a></a></h4>
+<h4 id="v0180---v0194"><a class="header" href="#v0180---v0194"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a></a></h4>
 <ul>
 <li>BREAKING: The builtin modes cannot be accessed using space separated names
 anymore. Use underscore separated mode names. For e.g.
@@ -4307,6 +4329,26 @@ Also, added &quot;DeleteTillEnd&quot; as another cursor based &quot;InputOperati
 <li>Fixed applying regex based filters via the CLI and <code>$XPLR_PIPE_MSG_IN</code> pipe.</li>
 <li>You can use the <code>prompt</code> field to define input prompt for each mode, instead
 of using the <code>SetInputPrompt</code> message.</li>
+<li>Since version v0.19.4, the native search will default to skim-v2 based fuzzy
+matching. <code>esc</code> while in search mode will recover the initial focus. People
+who prefer the regex based search, can use the <code>regex-search.xplr</code> plugin.
+The following messages will be available for search based operations:
+<ul>
+<li>SearchFuzzy</li>
+<li>SearchFuzzyFromInput</li>
+<li>AcceptSearch</li>
+<li>CancelSearch</li>
+</ul>
+</li>
+<li>Since version v0.19.4, quick scrolling operations are supported using the
+following messages and keys:
+<ul>
+<li>ScrollUp -------- page-up</li>
+<li>ScrollDown ------ page-down</li>
+<li>ScrollUpHalf ---- {</li>
+<li>ScrollDownHalf -- }</li>
+</ul>
+</li>
 </ul>
 <p><sub>Like this project so far? <strong><a href="contribute.html">Please consider contributing</a></strong>.</sub></p>
 <h4 id="v0176---v0180"><a class="header" href="#v0176---v0180"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.17.6">v0.17.6</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a></a></h4>
