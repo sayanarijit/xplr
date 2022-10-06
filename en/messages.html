@@ -317,13 +317,40 @@ read from the input buffer.</p>
 <li>YAML: <code>FocusByIndexFromInput</code></li>
 </ul>
 <h4 id="focusbyfilename"><a class="header" href="#focusbyfilename">FocusByFileName</a></h4>
-<p><strong>YAML:</strong> <code>FocusByFileName: string</code></p>
 <p>Focus on the file by name from the present working directory.</p>
 <p>Type: { FocusByFileName = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>{ FocusByFileName = &quot;filename.ext&quot; }</code></li>
 <li>YAML: <code>FocusByFileName: filename.ext</code></li>
+</ul>
+<h4 id="scrollup"><a class="header" href="#scrollup">ScrollUp</a></h4>
+<p>Scroll up by terminal height.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;ScrollUp&quot;</code></li>
+<li>YAML: <code>ScrollUp</code></li>
+</ul>
+<h4 id="scrolldown"><a class="header" href="#scrolldown">ScrollDown</a></h4>
+<p>Scroll down by terminal height.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;ScrollDown&quot;</code></li>
+<li>YAML: <code>ScrollDown</code></li>
+</ul>
+<h4 id="scrolluphalf"><a class="header" href="#scrolluphalf">ScrollUpHalf</a></h4>
+<p>Scroll up by half of terminal height.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;ScrollUpHalf&quot;</code></li>
+<li>YAML: <code>ScrollUpHalf</code></li>
+</ul>
+<h4 id="scrolldownhalf"><a class="header" href="#scrolldownhalf">ScrollDownHalf</a></h4>
+<p>Scroll down by half of terminal height.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;ScrollDownHalf&quot;</code></li>
+<li>YAML: <code>ScrollDownHalf</code></li>
 </ul>
 <h4 id="changedirectory"><a class="header" href="#changedirectory">ChangeDirectory</a></h4>
 <p>Change the present working directory ($PWD)</p>
