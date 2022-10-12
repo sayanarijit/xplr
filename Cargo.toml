@@ -22,19 +22,16 @@ categories = ['command-line-interface', 'command-line-utilities']
 include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
 
 [dependencies]
-libc = "0.2.134"
+libc = "0.2.135"
 humansize = "2.1.0"
 natord = "1.0.9"
 anyhow = "1.0.65"
-
-# Let's keep this locked to 0.8.26. See https://docs.rs/serde_yaml/0.9.11/serde_yaml/
-serde_yaml = "0.8.26"
-
+serde_yaml = "0.9.13"
 crossterm = "0.25.0"
 dirs = "4.0.0"
 ansi-to-tui = "2.0.0"
 regex = "1.6.0"
-gethostname = "0.2.3"
+gethostname = "0.3.0"
 fuzzy-matcher = "0.3.7"
 
 [dependencies.lazy_static]
@@ -63,7 +60,7 @@ version = "1.9.1"
 features = ['serde']
 
 [dependencies.mlua]
-version = "0.8.3"
+version = "0.8.4"
 features = ['luajit', 'vendored', 'serialize', 'send']
 
 [dependencies.tui-input]

@@ -67,8 +67,8 @@ pub fn read_all(pipe: &str) -> Result<Vec<ExternalMsg>> {
 
     if !in_str.is_empty() {
         let mut msgs = vec![];
-        for msg in in_str.lines().map(|s| serde_yaml::from_str(s.trim())) {
-            msgs.push(msg?);
+        for msg in in_str.lines() {
+            msgs.push(msg.trim().try_into()?);
         }
         Ok(msgs)
     } else {

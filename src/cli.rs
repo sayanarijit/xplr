@@ -112,7 +112,7 @@ impl Cli {
                                 args.push_front(msg);
                                 break;
                             } else {
-                                cli.on_load.push(serde_yaml::from_str(&msg)?);
+                                cli.on_load.push(msg.trim().try_into()?);
                             }
                         }
                     }
