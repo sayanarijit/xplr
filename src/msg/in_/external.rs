@@ -1063,6 +1063,21 @@ pub enum ExternalMsg {
     Terminate,
 }
 
+impl TryFrom<&str> for ExternalMsg {
+    type Error = serde_yaml::Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        if value.starts_with('!') {
+            serde_yaml::from_str(value)
+        } else if let Some((msg, args)) = value.split_once(' ') {
+            let msg = format!("!{} {}", msg.trim_end_matches(':'), args);
+            serde_yaml::from_str(&msg)
+        } else {
+            serde_yaml::from_str(value)
+        }
+    }
+}
+
 impl ExternalMsg {
     pub fn is_read_only(&self) -> bool {
         !matches!(
