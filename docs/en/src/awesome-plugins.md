@@ -13,6 +13,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/offline-docs.xplr**][51] Fetch the appropriate version of xplr docs and browse offline.
 - [**sayanarijit/regex-search.xplr**][55] Bring back the regex based seach in xplr.
 - [**sayanarijit/registers.xplr**][49] Use multiple registers to store the selected paths.
+- [**sayanarijit/tri-pane.xplr**][56] xplr plugin that implements ranger-like three pane layout.
 - [**sayanarijit/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
 - [**igorepst/term.xplr**][39] Terminal integration for xplr
@@ -111,3 +112,4 @@ of the following plugins work for you, it's very easy to
 [53]: https://github.com/Junker/nuke.xplr
 [54]: https://github.com/sayanarijit/scp.xplr
 [55]: https://github.com/sayanarijit/regex-search.xplr
+[56]: https://github.com/sayanarijit/tri-pane.xplr
