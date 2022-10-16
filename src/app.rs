@@ -15,6 +15,7 @@ pub use crate::msg::in_::ExternalMsg;
 pub use crate::msg::in_::InternalMsg;
 pub use crate::msg::in_::MsgIn;
 pub use crate::msg::out::MsgOut;
+use crate::newlines::unescape_string;
 pub use crate::node::Node;
 pub use crate::node::ResolvedNode;
 pub use crate::pipe::Pipe;
@@ -171,6 +172,7 @@ pub struct App {
     pub mode: Mode,
     pub layout: Layout,
     pub input: InputBuffer,
+    pub input_unescaped: String,
     pub pid: u32,
     pub session_path: String,
     pub pipe: Pipe,
@@ -305,6 +307,7 @@ impl App {
             mode,
             layout,
             input,
+            input_unescaped: Default::default(),
             pid,
             session_path: session_path.clone(),
             pipe: Pipe::from_session_path(&session_path)?,
@@ -550,6 +553,14 @@ impl App {
                     vec![ExternalMsg::LogWarning("Key map not found.".into())]
                 }
             });
+
+        self.input_unescaped = unescape_string(
+            &self.input
+                .buffer
+                .as_ref()
+                .map(|i| i.value().to_string())
+                .unwrap_or_default(),
+        )?;
 
         for msg in msgs {
             self = self.enqueue(Task::new(MsgIn::External(msg), Some(key)));
