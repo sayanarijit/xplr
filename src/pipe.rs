@@ -65,10 +65,12 @@ pub fn read_all(pipe: &str) -> Result<Vec<ExternalMsg>> {
     file.read_to_string(&mut in_str)?;
     file.set_len(0)?;
 
+    let delim = '\0';
+
     if !in_str.is_empty() {
         let mut msgs = vec![];
-        for msg in in_str.lines() {
-            msgs.push(msg.trim().try_into()?);
+        for msg in in_str.trim_matches(delim).split(delim) {
+            msgs.push(msg.try_into()?);
         }
         Ok(msgs)
     } else {

@@ -3,6 +3,7 @@ use indexmap::IndexSet;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use crate::newlines::escape_string;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
@@ -1070,7 +1071,7 @@ impl TryFrom<&str> for ExternalMsg {
         if value.starts_with('!') {
             serde_yaml::from_str(value)
         } else if let Some((msg, args)) = value.split_once(' ') {
-            let msg = format!("!{} {}", msg.trim_end_matches(':'), args);
+            let msg = format!("!{} {}", msg.trim_end_matches(':'), escape_string(args));
             serde_yaml::from_str(&msg)
         } else {
             serde_yaml::from_str(value)

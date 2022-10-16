@@ -1156,7 +1156,7 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
               NAME=$(basename "${XPLR_FOCUS_PATH:?}")
-              echo SetInputBuffer: "'${NAME:?}'" >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "SetInputBuffer: %s\0" "${NAME:?}" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1169,7 +1169,7 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
               NAME=$(basename "${XPLR_FOCUS_PATH:?}")
-              echo SetInputBuffer: "'${NAME:?}'" >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "SetInputBuffer: %s\0" "${NAME:?}" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1205,7 +1205,7 @@ xplr.config.modes.builtin.default = {
         messages = {
           {
             BashExecSilently = [===[
-              echo ChangeDirectory: "'${HOME:?}'" >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "ChangeDirectory: %s\0" "${HOME:?}" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1364,9 +1364,9 @@ xplr.config.modes.builtin.go_to_path = {
           {
             BashExecSilently = [===[
               if [ -d "$XPLR_INPUT_BUFFER" ]; then
-                echo ChangeDirectory: "'$XPLR_INPUT_BUFFER'" >> "${XPLR_PIPE_MSG_IN:?}"
+                printf "ChangeDirectory: %s\0" "$XPLR_INPUT_BUFFER" >> "${XPLR_PIPE_MSG_IN:?}"
               elif [ -e "$XPLR_INPUT_BUFFER" ]; then
-                echo FocusPath: "'$XPLR_INPUT_BUFFER'" >> "${XPLR_PIPE_MSG_IN:?}"
+                printf "FocusPath: %s\0" "$XPLR_INPUT_BUFFER" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1400,15 +1400,15 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec = [===[
-              (while IFS= read -r line; do
-                if cp -vr -- "${line:?}" ./; then
-                  echo LogSuccess: "'$line copied to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
-                else
-                  echo LogError: "'Failed to copy $line to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
-                fi
+              (while IFS= read -r -d '' line; do
+              if cp -vr -- "${line:?}" ./; then
+                printf "LogSuccess: %s\0" "$line copied to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                printf "LogError: %s\0" "Failed to copy $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
-              echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "ExplorePwdAsync\0" >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "ClearSelection\0" >> "${XPLR_PIPE_MSG_IN:?}"
               read -p "[enter to continue]"
             ]===],
           },
@@ -1420,14 +1420,14 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec = [===[
-              (while IFS= read -r line; do
-                if mv -v -- "${line:?}" ./; then
-                  echo LogSuccess: "'$line moved to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
-                else
-                  echo LogError: "'Failed to move $line to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
-                fi
+              (while IFS= read -r -d '' line; do
+              if mv -v -- "${line:?}" ./; then
+                printf "LogSuccess: %s\0" "$line moved to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                printf "LogError: %s\0" "Failed to move $line to $PWD" >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "ExplorePwdAsync\0" >> "${XPLR_PIPE_MSG_IN:?}"
               read -p "[enter to continue]"
             ]===],
           },
@@ -1452,12 +1452,12 @@ xplr.config.modes.builtin.selection_ops = {
                   elif command -v open; then
                   OPENER=open
                 else
-                  echo LogError: '$OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                  printf "LogError: %s\0" "$OPENER not found" >> "${XPLR_PIPE_MSG_IN:?}"
                   exit 1
                 fi
               fi
-              (while IFS= read -r line; do
-                $OPENER "${line:?}" > /dev/null 2>&1
+              (while IFS= read -r -d '' line; do
+              $OPENER "${line:?}" > /dev/null 2>&1
               done < "${XPLR_PIPE_RESULT_OUT:?}")
             ]===],
           },
@@ -1518,12 +1518,12 @@ xplr.config.modes.builtin.create_directory = {
               PTH="$XPLR_INPUT_BUFFER"
               if [ "${PTH}" ]; then
                 mkdir -p -- "${PTH:?}" \
-                && echo SetInputBuffer: "''" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo LogSuccess: "'$PTH created'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusPath: "'$PTH'" >> "${XPLR_PIPE_MSG_IN:?}"
+                && printf "SetInputBuffer: ''\0" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf "ExplorePwd\0" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf "LogSuccess: %s\0" "$PTH created" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf "FocusPath: %s\0" "$PTH" >> "${XPLR_PIPE_MSG_IN:?}"
               else
-                echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
+                printf "PopMode\0" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1561,12 +1561,12 @@ xplr.config.modes.builtin.create_file = {
               if [ "$PTH" ]; then
                 mkdir -p -- "$(dirname $PTH)" \
                 && touch -- "$PTH" \
-                && echo SetInputBuffer: "''" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo LogSuccess: "'$PTH created'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusPath: "'$PTH'" >> "${XPLR_PIPE_MSG_IN:?}"
+                && printf "SetInputBuffer: ''\0" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf "LogSuccess: %s\0" "$PTH created" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf "ExplorePwd\0" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf "FocusPath: %s\0" "$PTH" >> "${XPLR_PIPE_MSG_IN:?}"
               else
-                echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
+                printf "PopMode\0" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1668,7 +1668,7 @@ xplr.config.modes.builtin.go_to = {
                   elif command -v open; then
                   OPENER=open
                 else
-                  echo LogError: '$OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                  printf "LogError: %s\0" "$OPENER not found" >> "${XPLR_PIPE_MSG_IN:?}"
                   exit 1
                 fi
               fi
@@ -1704,12 +1704,12 @@ xplr.config.modes.builtin.rename = {
               SRC="${XPLR_FOCUS_PATH:?}"
               TARGET="${XPLR_INPUT_BUFFER:?}"
               if [ -e "${TARGET:?}" ]; then
-                echo LogError: "'$TARGET already exists'" >> "${XPLR_PIPE_MSG_IN:?}"
+                printf "LogError: %s\0" "$TARGET already exists" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 mv -- "${SRC:?}" "${TARGET:?}" \
-                  && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo FocusPath: "'$TARGET'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo LogSuccess: "'$SRC renamed to $TARGET'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  && printf "ExplorePwd\0" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && printf "FocusPath: %s\0" "$TARGET" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && printf "LogSuccess: %s\0" "$SRC renamed to $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1746,12 +1746,12 @@ xplr.config.modes.builtin.duplicate_as = {
               SRC="${XPLR_FOCUS_PATH:?}"
               TARGET="${XPLR_INPUT_BUFFER:?}"
               if [ -e "${TARGET:?}" ]; then
-                echo LogError: "'$TARGET already exists'" >> "${XPLR_PIPE_MSG_IN:?}"
+                printf "LogError: %s\0" "$TARGET already exists" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 cp -r -- "${SRC:?}" "${TARGET:?}" \
-                  && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo FocusPath: "'$TARGET'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo LogSuccess: "'$SRC duplicated as $TARGET'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  && printf "ExplorePwd\0" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && printf "FocusPath: %s\0" "$TARGET" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && printf "LogSuccess: %s\0" "$SRC duplicated as $TARGET" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1779,14 +1779,14 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec = [===[
-              (while IFS= read -r line; do
-                if rm -rfv -- "${line:?}"; then
-                  echo LogSuccess: "'$line deleted'" >> "${XPLR_PIPE_MSG_IN:?}"
-                else
-                  echo LogError: "'Failed to delete $line'" >> "${XPLR_PIPE_MSG_IN:?}"
-                fi
+              (while IFS= read -r -d '' line; do
+              if rm -rfv -- "${line:?}"; then
+                printf "LogSuccess: %s\0" "$line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+              else
+                printf "LogError: %s\0" "Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+              fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
-              echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "ExplorePwdAsync\0" >> "${XPLR_PIPE_MSG_IN:?}"
               read -p "[enter to continue]"
             ]===],
           },
@@ -1798,22 +1798,22 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec = [===[
-              (while IFS= read -r line; do
+              (while IFS= read -r -d '' line; do
               if [ -d "$line" ] && [ ! -L "$line" ]; then
                 if rmdir -v -- "${line:?}"; then
-                  echo LogSuccess: "'$line deleted'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  printf "LogSuccess: %s\0" "$line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                 else
-                  echo LogError: "'Failed to delete $line'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  printf "LogError: %s\0" "Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                 fi
               else
                 if rm -v -- "${line:?}"; then
-                  echo LogSuccess: "'$line deleted'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  printf "LogSuccess: %s\0" "$line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                 else
-                  echo LogError: "'Failed to delete $line'" >> "${XPLR_PIPE_MSG_IN:?}"
+                  printf "LogError: %s\0" "Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
                 fi
               fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
-              echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+              printf "ExplorePwdAsync\0" >> "${XPLR_PIPE_MSG_IN:?}"
               read -p "[enter to continue]"
             ]===],
           },
@@ -2431,13 +2431,17 @@ end
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local r = m.tree .. m.prefix
 
+  local function path_escape(path)
+    return string.gsub(string.gsub(path, "\\", "\\\\"), "\n", "\\n")
+  end
+
   if m.meta.icon == nil then
     r = r .. ""
   else
     r = r .. m.meta.icon .. " "
   end
 
-  r = r .. m.relative_path
+  r = r .. path_escape(m.relative_path)
 
   if m.is_dir then
     r = r .. "/"
@@ -2451,7 +2455,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      r = r .. m.symlink.absolute_path
+      r = r .. path_escape(m.symlink.absolute_path)
 
       if m.symlink.is_dir then
         r = r .. "/"

@@ -77,14 +77,7 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
     Command::new(cmd.command.clone())
         .env("XPLR_APP_VERSION", app.version.clone())
         .env("XPLR_PID", &app.pid.to_string())
-        .env(
-            "XPLR_INPUT_BUFFER",
-            app.input
-                .buffer
-                .as_ref()
-                .map(|i| i.value().to_string())
-                .unwrap_or_default(),
-        )
+        .env("XPLR_INPUT_BUFFER", &app.input_unescaped)
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
         .env("XPLR_FOCUS_INDEX", focus_index)
         .env("XPLR_SESSION_PATH", &app.session_path)
