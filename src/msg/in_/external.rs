@@ -1067,14 +1067,16 @@ impl TryFrom<&str> for ExternalMsg {
     type Error = serde_yaml::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        if value.starts_with('!') {
-            serde_yaml::from_str(value)
+        let value = value.replace('\0', "\n");
+        let value = if value.starts_with('!') {
+            value
         } else if let Some((msg, args)) = value.split_once(' ') {
             let msg = format!("!{} {}", msg.trim_end_matches(':'), args);
-            serde_yaml::from_str(&msg)
+            msg
         } else {
-            serde_yaml::from_str(value)
-        }
+            value
+        };
+        serde_yaml::from_str(&value)
     }
 }
 

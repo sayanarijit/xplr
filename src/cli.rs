@@ -28,7 +28,7 @@ impl Cli {
             bail!("empty string passed")
         };
 
-        let path = PathBuf::from(arg);
+        let path = PathBuf::from(arg.replace('\0', "\n"));
         if path.exists() {
             self.paths.push(path);
             Ok(())

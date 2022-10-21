@@ -67,7 +67,7 @@ impl Log {
     pub fn new(level: LogLevel, message: String) -> Self {
         Self {
             level,
-            message,
+            message: message.replace('\n', "\0"),
             created_at: Local::now(),
         }
     }
@@ -162,7 +162,10 @@ pub struct InputBuffer {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
+
+    #[serde(with = "serde_yaml::with::singleton_map_recursive")]
     pub config: Config,
+
     pub pwd: String,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub last_focus: HashMap<String, Option<String>>,
@@ -1552,7 +1555,7 @@ impl App {
             .map(|d| {
                 d.nodes
                     .iter()
-                    .map(|n| format!("{}\n", n.absolute_path))
+                    .map(|n| format!("{}\n", n.absolute_path.replace('\n', "\0")))
                     .collect::<Vec<String>>()
                     .join("")
             })
@@ -1566,7 +1569,7 @@ impl App {
     pub fn selection_str(&self) -> String {
         self.selection
             .iter()
-            .map(|n| format!("{}\n", n.absolute_path))
+            .map(|n| format!("{}\n", n.absolute_path.replace('\n', "\0")))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1574,7 +1577,7 @@ impl App {
     pub fn result_str(&self) -> String {
         self.result()
             .into_iter()
-            .map(|n| format!("{}\n", n.absolute_path))
+            .map(|n| format!("{}\n", n.absolute_path.replace('\n', "\0")))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1625,7 +1628,7 @@ impl App {
         self.history
             .paths
             .iter()
-            .map(|p| format!("{}\n", &p))
+            .map(|p| format!("{}\n", p.replace('\n', "\0")))
             .collect::<Vec<String>>()
             .join("")
     }
