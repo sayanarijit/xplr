@@ -159,7 +159,7 @@ pub struct InputBuffer {
     pub prompt: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
 
@@ -610,7 +610,7 @@ impl App {
             dir.focus = 0;
 
             if save_history {
-                if let Some(n) = self.clone().focused_node() {
+                if let Some(n) = self.focused_node() {
                     self.history = history.push(n.absolute_path.clone())
                 }
             }
@@ -758,29 +758,31 @@ impl App {
     }
 
     fn enter(self) -> Result<Self> {
-        self.focused_node()
-            .map(|n| n.absolute_path.clone())
-            .map(|p| self.clone().change_directory(&p, true))
-            .unwrap_or(Ok(self))
+        if let Some(path) = self.focused_node().map(|n| n.absolute_path.clone()) {
+            self.change_directory(&path, true)
+        } else {
+            Ok(self)
+        }
     }
 
     fn back(self) -> Result<Self> {
-        PathBuf::from(self.pwd.clone())
+        if let Some(p) = PathBuf::from(self.pwd.clone())
             .parent()
-            .map(|p| self.clone().change_directory(&p.to_string_lossy(), true))
-            .unwrap_or(Ok(self))
+            .and_then(|p| p.to_str())
+        {
+            self.change_directory(p, true)
+        } else {
+            Ok(self)
+        }
     }
 
     fn last_visited_path(mut self) -> Result<Self> {
         self.history = self.history.visit_last();
-        if let Some(target) = self.history.peek() {
-            if target.ends_with('/') {
-                target
-                    .strip_suffix('/')
-                    .map(|s| self.clone().change_directory(s, false))
-                    .unwrap_or(Ok(self))
+        if let Some(target) = self.history.peek().cloned() {
+            if let Some(path) = target.strip_suffix('/') {
+                self.change_directory(path, false)
             } else {
-                self.clone().focus_path(target, false)
+                self.focus_path(&target, false)
             }
         } else {
             Ok(self)
@@ -789,14 +791,11 @@ impl App {
 
     fn next_visited_path(mut self) -> Result<Self> {
         self.history = self.history.visit_next();
-        if let Some(target) = self.history.peek() {
-            if target.ends_with('/') {
-                target
-                    .strip_suffix('/')
-                    .map(|s| self.clone().change_directory(s, false))
-                    .unwrap_or(Ok(self))
+        if let Some(target) = self.history.peek().cloned() {
+            if let Some(path) = target.strip_suffix('/') {
+                self.change_directory(path, false)
             } else {
-                self.clone().focus_path(target, false)
+                self.focus_path(&target, false)
             }
         } else {
             Ok(self)
