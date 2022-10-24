@@ -162,7 +162,10 @@ pub struct InputBuffer {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct App {
     pub version: String,
+
+    #[serde(with = "serde_yaml::with::singleton_map_recursive")]
     pub config: Config,
+
     pub pwd: String,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub last_focus: HashMap<String, Option<String>>,
