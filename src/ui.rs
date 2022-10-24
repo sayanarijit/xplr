@@ -989,9 +989,9 @@ fn draw_logs<B: Backend>(
                     .enumerate()
                     .map(|(i, line)| {
                         if i == 0 {
-                            format!("{} {}", &prefix, line)
+                            format!("{}: {}", &prefix, line)
                         } else {
-                            format!("{} {}", &padding, line)
+                            format!("{}  {}", &padding, line)
                         }
                     })
                     .take(layout_size.height as usize)
