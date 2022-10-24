@@ -570,7 +570,7 @@ Example:
 
 Like `CallSilently0`, but it uses `\n` as the delimiter in input/output
 pipes, hence it cannot handle files with `\n` in the name.
-You may want to use `Call0Silently` instead.
+You may want to use `CallSilently0` instead.
 
 #### CallSilently0
 
@@ -606,14 +606,14 @@ Example:
 
 Like `BashExecSilently0`, but it uses `\n` as the delimiter in
 input/output pipes, hence it cannot handle files with `\n` in the name.
-You may want to use `BashExec0Silently` instead.
+You may want to use `BashExecSilently0` instead.
 
 #### BashExecSilently0
 
 Like `BashExec0` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
-Type: { BashExec0Silently = "string" }
+Type: { BashExecSilently0 = "string" }
 
 Example:
 
