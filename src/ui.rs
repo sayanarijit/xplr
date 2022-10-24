@@ -969,41 +969,36 @@ fn draw_logs<B: Backend>(
             .iter()
             .rev()
             .take(layout_size.height as usize)
-            .map(|l| {
-                let time = l.created_at.format("%r");
-                match l.level {
-                    app::LogLevel::Info => ListItem::new(format!(
-                        "{} | {} | {}",
-                        &time,
-                        &logs_config.info.format.to_owned().unwrap_or_default(),
-                        l.message
-                    ))
-                    .style(logs_config.info.style.to_owned().into()),
+            .map(|log| {
+                let time = log.created_at.format("%r");
+                let cfg = match log.level {
+                    app::LogLevel::Info => &logs_config.info,
+                    app::LogLevel::Warning => &logs_config.warning,
+                    app::LogLevel::Success => &logs_config.success,
+                    app::LogLevel::Error => &logs_config.error,
+                };
 
-                    app::LogLevel::Warning => ListItem::new(format!(
-                        "{} | {} | {}",
-                        &time,
-                        &logs_config.warning.format.to_owned().unwrap_or_default(),
-                        l.message
-                    ))
-                    .style(logs_config.warning.style.to_owned().into()),
+                let prefix =
+                    format!("{}|{}", time, cfg.format.to_owned().unwrap_or_default());
 
-                    app::LogLevel::Success => ListItem::new(format!(
-                        "{} | {} | {}",
-                        &time,
-                        &logs_config.success.format.to_owned().unwrap_or_default(),
-                        l.message
-                    ))
-                    .style(logs_config.success.style.to_owned().into()),
+                let padding = " ".repeat(prefix.chars().count());
 
-                    app::LogLevel::Error => ListItem::new(format!(
-                        "{} | {} | {}",
-                        &time,
-                        &logs_config.error.format.to_owned().unwrap_or_default(),
-                        l.message
-                    ))
-                    .style(logs_config.error.style.to_owned().into()),
-                }
+                let txt = log
+                    .message
+                    .lines()
+                    .enumerate()
+                    .map(|(i, line)| {
+                        if i == 0 {
+                            format!("{} {}", &prefix, line)
+                        } else {
+                            format!("{} {}", &padding, line)
+                        }
+                    })
+                    .take(layout_size.height as usize)
+                    .collect::<Vec<_>>()
+                    .join("\n");
+
+                ListItem::new(txt).style(cfg.style.to_owned().into())
             })
             .collect::<Vec<ListItem>>()
     };
