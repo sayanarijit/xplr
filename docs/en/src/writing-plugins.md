@@ -19,8 +19,7 @@ A minimal plugin should confirm to the following structure:
 └── init.lua
 ```
 
-You can also use
-[this template][2].
+You can also use [this template][2].
 
 ### README.md
 
@@ -50,6 +49,18 @@ to append `.xplr` to the name to make them distinguishable. Similar to the
 
 Finally, after publishing, don't hesitate to
 [let us know][4].
+
+## Best practices
+
+- Try not to execute a lot of commands at startup, it may make xplr slow to
+  start.
+- When executing commands, prefer `Call0` over `Call`, `BashExec0` over
+  `BashExec` and so on. File names may contain newline characters
+  (e.g. `foo$'\n'bar`).
+- File names may also contain quotes. Use the syntax
+  `printf 'Call0: "%s"' "${FOO_ESC}"` where `FOO_ESC=${FOO//\"/\\\"}`.
+- Check for empty variables using the syntax `${FOO:?}` or use a default value
+  `${FOO:-defaultvalue}`.
 
 ## Examples
 

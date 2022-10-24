@@ -1803,9 +1803,9 @@ xplr.config.modes.builtin.delete = {
                   fi
                 else
                   if rm -v -- "${LINE:?}"; then
-                    printf 'LogSuccess: "%s"\0' "$line deleted" >> "${XPLR_PIPE_MSG_IN:?}"
+                    printf 'LogSuccess: "%s"\0' "$LINE_ESC deleted" >> "${XPLR_PIPE_MSG_IN:?}"
                   else
-                    printf 'LogError: "%s"\0' "Failed to delete $line" >> "${XPLR_PIPE_MSG_IN:?}"
+                    printf 'LogError: "%s"\0' "Failed to delete $LINE_ESC" >> "${XPLR_PIPE_MSG_IN:?}"
                   fi
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
