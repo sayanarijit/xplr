@@ -1561,10 +1561,10 @@ xplr.config.modes.builtin.create_file = {
               if [ "$PTH" ]; then
                 mkdir -p -- "$(dirname $PTH)" \
                 && touch -- "$PTH" \
-                && printf "SetInputBuffer: ''\0" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && printf "LogSuccess: %s\0" "$PTH created" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && printf "ExplorePwd\0" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && printf "FocusPath: %s\0" "$PTH" >> "${XPLR_PIPE_MSG_IN:?}"
+                && printf 'SetInputBuffer: ""\0' >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf 'LogSuccess: "%s"\0' "$PTH_ESC created" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf 'ExplorePwd\0' >> "${XPLR_PIPE_MSG_IN:?}" \
+                && printf 'FocusPath: "%s"\0' "$PTH_ESC" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 printf "PopMode\0" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
