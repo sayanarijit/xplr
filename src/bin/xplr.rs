@@ -58,6 +58,9 @@ fn main() {
         match runner::from_cli(cli).and_then(|a| a.run()) {
             Ok(Some(mut out)) => {
                 if write0 {
+                    if out.ends_with('\n') {
+                        out = out.chars().take(out.chars().count() - 1).collect()
+                    };
                     out = out
                         .trim_end()
                         .chars()

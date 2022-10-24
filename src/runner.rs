@@ -255,6 +255,12 @@ impl Runner {
             tx_msg_in.send(app::Task::new(app::MsgIn::External(msg), None))?;
         }
 
+        // Refresh once after loading
+        tx_msg_in.send(app::Task::new(
+            app::MsgIn::External(app::ExternalMsg::Refresh),
+            None,
+        ))?;
+
         'outer: for task in rx_msg_in {
             match app.handle_task(task) {
                 Ok(a) => {

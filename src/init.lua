@@ -1029,10 +1029,7 @@ xplr.config.modes.builtin.default = {
         help = "show hidden",
         messages = {
           {
-            ToggleNodeFilter = {
-              filter = "RelativePathDoesNotStartWith",
-              input = ".",
-            },
+            ToggleNodeFilter = { filter = "RelativePathDoesNotStartWith", input = "." },
           },
           "ExplorePwdAsync",
         },
@@ -1159,7 +1156,7 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
               NAME=$(basename "${XPLR_FOCUS_PATH:?}")
-              echo SetInputBuffer: "'"${NAME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              echo SetInputBuffer: "'${NAME:?}'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1172,7 +1169,7 @@ xplr.config.modes.builtin.default = {
           {
             BashExecSilently = [===[
               NAME=$(basename "${XPLR_FOCUS_PATH:?}")
-              echo SetInputBuffer: "'"${NAME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              echo SetInputBuffer: "'${NAME:?}'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1208,7 +1205,7 @@ xplr.config.modes.builtin.default = {
         messages = {
           {
             BashExecSilently = [===[
-              echo ChangeDirectory: "'"${HOME:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+              echo ChangeDirectory: "'${HOME:?}'" >> "${XPLR_PIPE_MSG_IN:?}"
             ]===],
           },
         },
@@ -1249,29 +1246,14 @@ xplr.config.modes.builtin.default = {
   },
 }
 
-xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
-
-xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key.space
-
-xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
-
-xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
-
-xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key.left
-
-xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key.down
-
-xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key.up
-
-xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key.right
+xplr.config.modes.builtin.default.key_bindings.on_key["tab"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
+xplr.config.modes.builtin.default.key_bindings.on_key["v"] = xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+xplr.config.modes.builtin.default.key_bindings.on_key["V"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+xplr.config.modes.builtin.default.key_bindings.on_key["/"] = xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+xplr.config.modes.builtin.default.key_bindings.on_key["h"] = xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+xplr.config.modes.builtin.default.key_bindings.on_key["j"] = xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+xplr.config.modes.builtin.default.key_bindings.on_key["k"] = xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+xplr.config.modes.builtin.default.key_bindings.on_key["l"] = xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 
 -- The builtin debug error mode.
 --
@@ -1320,7 +1302,7 @@ xplr.config.modes.builtin.debug_error = {
         messages = {
           {
             BashExec = [===[
-              ${EDITOR:-vi} "${XPLR_PIPE_LOGS_OUT:?}"
+              cat "${XPLR_PIPE_LOGS_OUT:?}" | ${EDITOR:-vi} -
             ]===],
           },
         },
@@ -1382,9 +1364,9 @@ xplr.config.modes.builtin.go_to_path = {
           {
             BashExecSilently = [===[
               if [ -d "$XPLR_INPUT_BUFFER" ]; then
-                echo ChangeDirectory: "'"$XPLR_INPUT_BUFFER"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                echo ChangeDirectory: "'$XPLR_INPUT_BUFFER'" >> "${XPLR_PIPE_MSG_IN:?}"
               elif [ -e "$XPLR_INPUT_BUFFER" ]; then
-                echo FocusPath: "'"$XPLR_INPUT_BUFFER"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                echo FocusPath: "'$XPLR_INPUT_BUFFER'" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1419,11 +1401,11 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec = [===[
               (while IFS= read -r line; do
-              if cp -vr -- "${line:?}" ./; then
-                echo LogSuccess: $line copied to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-              else
-                echo LogError: Failed to copy $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-              fi
+                if cp -vr -- "${line:?}" ./; then
+                  echo LogSuccess: "'$line copied to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
+                else
+                  echo LogError: "'Failed to copy $line to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
+                fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
               echo ClearSelection >> "${XPLR_PIPE_MSG_IN:?}"
@@ -1439,11 +1421,11 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec = [===[
               (while IFS= read -r line; do
-              if mv -v -- "${line:?}" ./; then
-                echo LogSuccess: $line moved to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-              else
-                echo LogError: Failed to move $line to $PWD >> "${XPLR_PIPE_MSG_IN:?}"
-              fi
+                if mv -v -- "${line:?}" ./; then
+                  echo LogSuccess: "'$line moved to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
+                else
+                  echo LogError: "'Failed to move $line to $PWD'" >> "${XPLR_PIPE_MSG_IN:?}"
+                fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
               read -p "[enter to continue]"
@@ -1470,12 +1452,12 @@ xplr.config.modes.builtin.selection_ops = {
                   elif command -v open; then
                   OPENER=open
                 else
-                  echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo LogError: '$OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
                   exit 1
                 fi
               fi
               (while IFS= read -r line; do
-              $OPENER "${line:?}" > /dev/null 2>&1
+                $OPENER "${line:?}" > /dev/null 2>&1
               done < "${XPLR_PIPE_RESULT_OUT:?}")
             ]===],
           },
@@ -1536,10 +1518,10 @@ xplr.config.modes.builtin.create_directory = {
               PTH="$XPLR_INPUT_BUFFER"
               if [ "${PTH}" ]; then
                 mkdir -p -- "${PTH:?}" \
-                && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && echo SetInputBuffer: "''" >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusPath: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                && echo LogSuccess: "'$PTH created'" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && echo FocusPath: "'$PTH'" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
               fi
@@ -1579,10 +1561,10 @@ xplr.config.modes.builtin.create_file = {
               if [ "$PTH" ]; then
                 mkdir -p -- "$(dirname $PTH)" \
                 && touch -- "$PTH" \
-                && echo "SetInputBuffer: ''" >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo LogSuccess: $PTH created >> "${XPLR_PIPE_MSG_IN:?}" \
+                && echo SetInputBuffer: "''" >> "${XPLR_PIPE_MSG_IN:?}" \
+                && echo LogSuccess: "'$PTH created'" >> "${XPLR_PIPE_MSG_IN:?}" \
                 && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                && echo FocusPath: "'"$PTH"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                && echo FocusPath: "'$PTH'" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 echo PopMode >> "${XPLR_PIPE_MSG_IN:?}"
               fi
@@ -1643,10 +1625,8 @@ xplr.config.modes.builtin.number = {
   },
 }
 
-xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key.down
-xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key.up
+xplr.config.modes.builtin.number.key_bindings.on_key["j"] = xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+xplr.config.modes.builtin.number.key_bindings.on_key["k"] = xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -1688,7 +1668,7 @@ xplr.config.modes.builtin.go_to = {
                   elif command -v open; then
                   OPENER=open
                 else
-                  echo 'LogError: $OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo LogError: '$OPENER not found' >> "${XPLR_PIPE_MSG_IN:?}"
                   exit 1
                 fi
               fi
@@ -1724,12 +1704,12 @@ xplr.config.modes.builtin.rename = {
               SRC="${XPLR_FOCUS_PATH:?}"
               TARGET="${XPLR_INPUT_BUFFER:?}"
               if [ -e "${TARGET:?}" ]; then
-                echo LogError: $TARGET already exists >> "${XPLR_PIPE_MSG_IN:?}"
+                echo LogError: "'$TARGET already exists'" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 mv -- "${SRC:?}" "${TARGET:?}" \
                   && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo FocusPath: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo LogSuccess: $SRC renamed to $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
+                  && echo FocusPath: "'$TARGET'" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && echo LogSuccess: "'$SRC renamed to $TARGET'" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1766,12 +1746,12 @@ xplr.config.modes.builtin.duplicate_as = {
               SRC="${XPLR_FOCUS_PATH:?}"
               TARGET="${XPLR_INPUT_BUFFER:?}"
               if [ -e "${TARGET:?}" ]; then
-                echo LogError: $TARGET already exists >> "${XPLR_PIPE_MSG_IN:?}"
+                echo LogError: "'$TARGET already exists'" >> "${XPLR_PIPE_MSG_IN:?}"
               else
                 cp -r -- "${SRC:?}" "${TARGET:?}" \
                   && echo ExplorePwd >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo FocusPath: "'"$TARGET"'" >> "${XPLR_PIPE_MSG_IN:?}" \
-                  && echo LogSuccess: $SRC duplicated as $TARGET >> "${XPLR_PIPE_MSG_IN:?}"
+                  && echo FocusPath: "'$TARGET'" >> "${XPLR_PIPE_MSG_IN:?}" \
+                  && echo LogSuccess: "'$SRC duplicated as $TARGET'" >> "${XPLR_PIPE_MSG_IN:?}"
               fi
             ]===],
           },
@@ -1800,11 +1780,11 @@ xplr.config.modes.builtin.delete = {
           {
             BashExec = [===[
               (while IFS= read -r line; do
-              if rm -rfv -- "${line:?}"; then
-                echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
-              else
-                echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
-              fi
+                if rm -rfv -- "${line:?}"; then
+                  echo LogSuccess: "'$line deleted'" >> "${XPLR_PIPE_MSG_IN:?}"
+                else
+                  echo LogError: "'Failed to delete $line'" >> "${XPLR_PIPE_MSG_IN:?}"
+                fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
               echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
               read -p "[enter to continue]"
@@ -1821,15 +1801,15 @@ xplr.config.modes.builtin.delete = {
               (while IFS= read -r line; do
               if [ -d "$line" ] && [ ! -L "$line" ]; then
                 if rmdir -v -- "${line:?}"; then
-                  echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo LogSuccess: "'$line deleted'" >> "${XPLR_PIPE_MSG_IN:?}"
                 else
-                  echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo LogError: "'Failed to delete $line'" >> "${XPLR_PIPE_MSG_IN:?}"
                 fi
               else
                 if rm -v -- "${line:?}"; then
-                  echo LogSuccess: $line deleted >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo LogSuccess: "'$line deleted'" >> "${XPLR_PIPE_MSG_IN:?}"
                 else
-                  echo LogError: Failed to delete $line >> "${XPLR_PIPE_MSG_IN:?}"
+                  echo LogError: "'Failed to delete $line'" >> "${XPLR_PIPE_MSG_IN:?}"
                 fi
               fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
@@ -2029,10 +2009,8 @@ xplr.config.modes.builtin.search = {
   },
 }
 
-xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key.down
-xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key.up
+xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] = xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] = xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -2167,72 +2145,37 @@ xplr.config.modes.builtin.sort = {
       ["E"] = {
         help = "by canonical extension reverse",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByCanonicalExtension",
-              reverse = true,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByCanonicalExtension", reverse = true } },
           "ExplorePwdAsync",
         },
       },
       ["M"] = {
         help = "by canonical mime essence reverse",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByCanonicalMimeEssence",
-              reverse = true,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByCanonicalMimeEssence", reverse = true } },
           "ExplorePwdAsync",
         },
       },
       ["N"] = {
         help = "by node type reverse",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByCanonicalIsDir",
-              reverse = true,
-            },
-          },
-          {
-            AddNodeSorter = {
-              sorter = "ByCanonicalIsFile",
-              reverse = true,
-            },
-          },
-          {
-            AddNodeSorter = {
-              sorter = "ByIsSymlink",
-              reverse = true,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByCanonicalIsDir", reverse = true } },
+          { AddNodeSorter = { sorter = "ByCanonicalIsFile", reverse = true } },
+          { AddNodeSorter = { sorter = "ByIsSymlink", reverse = true } },
           "ExplorePwdAsync",
         },
       },
       ["R"] = {
         help = "by relative path reverse",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByIRelativePath",
-              reverse = true,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByIRelativePath", reverse = true } },
           "ExplorePwdAsync",
         },
       },
       ["S"] = {
         help = "by size reverse",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "BySize",
-              reverse = true,
-            },
-          },
+          { AddNodeSorter = { sorter = "BySize", reverse = true } },
           "ExplorePwdAsync",
         },
       },
@@ -2260,12 +2203,7 @@ xplr.config.modes.builtin.sort = {
       ["e"] = {
         help = "by canonical extension",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByCanonicalExtension",
-              reverse = false,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByCanonicalExtension", reverse = false } },
           "ExplorePwdAsync",
         },
       },
@@ -2278,27 +2216,16 @@ xplr.config.modes.builtin.sort = {
       ["m"] = {
         help = "by canonical mime essence",
         messages = {
-          {
-            AddNodeSorter = {
-              sorter = "ByCanonicalMimeEssence",
-              reverse = false,
-            },
-          },
+          { AddNodeSorter = { sorter = "ByCanonicalMimeEssence", reverse = false } },
           "ExplorePwdAsync",
         },
       },
       ["n"] = {
         help = "by node type",
         messages = {
-          {
-            AddNodeSorter = { sorter = "ByCanonicalIsDir", reverse = false },
-          },
-          {
-            AddNodeSorter = { sorter = "ByCanonicalIsFile", reverse = false },
-          },
-          {
-            AddNodeSorter = { sorter = "ByIsSymlink", reverse = false },
-          },
+          { AddNodeSorter = { sorter = "ByCanonicalIsDir", reverse = false } },
+          { AddNodeSorter = { sorter = "ByCanonicalIsFile", reverse = false } },
+          { AddNodeSorter = { sorter = "ByIsSymlink", reverse = false } },
           "ExplorePwdAsync",
         },
       },
