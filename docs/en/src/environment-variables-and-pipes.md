@@ -1,7 +1,7 @@
 # Environment Variables and Pipes
 
 Alternative to `CallLua`, `CallLuaSilently` messages that call Lua functions,
-there are `Call`, `CallSilently`, `BashExec`, `BashExecSilently` messages
+there are `Call0`, `CallSilently0`, `BashExec0`, `BashExecSilently0` messages
 that call shell commands.
 
 However, unlike the Lua functions, these shell commands have to read the useful
@@ -16,12 +16,13 @@ To see the environment variables and pipes, invoke the shell by typing `:!` in d
 mode and run the following command:
 
 ```
-env | grep ^XPLR_
+env | grep ^XPLR
 ```
 
 You will see something like:
 
 ```
+XPLR=xplr
 XPLR_FOCUS_INDEX=0
 XPLR_MODE=action to
 XPLR_PIPE_SELECTION_OUT=/run/user/1000/xplr/session/122278/pipe/selection_out
@@ -43,6 +44,7 @@ called ["pipe"s][18].
 
 The other variables are single-line variables containing simple information:
 
+- [XPLR][38]
 - [XPLR_APP_VERSION][30]
 - [XPLR_FOCUS_INDEX][31]
 - [XPLR_FOCUS_PATH][32]
@@ -53,13 +55,18 @@ The other variables are single-line variables containing simple information:
 
 ### Environment variables
 
+#### XPLR
+
+The binary path of xplr command.
+
 #### XPLR_APP_VERSION
 
 Self-explanatory.
 
 #### XPLR_FOCUS_INDEX
 
-Contains the index of the currently focused item, as seen in [column-renderer/index][10].
+Contains the index of the currently focused item, as seen in
+[column-renderer/index][10].
 
 #### XPLR_FOCUS_PATH
 
@@ -67,7 +74,8 @@ Contains the full path of the currently focused node.
 
 #### XPLR_INPUT_BUFFER
 
-The line currently in displaying in the xplr input buffer. For e.g. the search input while searching. See [Reading Input][37].
+The line currently in displaying in the xplr input buffer. For e.g. the search
+input while searching. See [Reading Input][37].
 
 #### XPLR_MODE
 
@@ -79,7 +87,8 @@ Contains the process ID of the current xplr process.
 
 #### XPLR_SESSION_PATH
 
-Contains the current session path, like /tmp/runtime-"$USER"/xplr/session/"$XPLR_PID"/, you can find temporary files here, such as pipes.
+Contains the current session path, like /tmp/runtime-"$USER"/xplr/session/"$XPLR_PID"/,
+you can find temporary files here, such as pipes.
 
 ### Pipes
 
@@ -93,7 +102,10 @@ Currently there is only one input pipe.
 
 `XPLR_PIPE_*_OUT` are the output pipes that contain data which cannot be
 exposed directly via environment variables, like multi-line strings.
-These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.
+These pipes can be accessed as plain text files located in $XPLR_SESSION_PATH.
+
+Depending on the message (e.g. `Call` or `Call0`), each line will be separated
+by newline or null character (`\n` or `\0`).
 
 - [XPLR_PIPE_SELECTION_OUT][21]
 - [XPLR_PIPE_GLOBAL_HELP_MENU_OUT][22]
@@ -104,13 +116,21 @@ These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.
 
 #### XPLR_PIPE_MSG_IN
 
-Append new-line delimited messages to this pipe in [YAML][27]
-(or [JSON][7]) syntax. These messages will be read and
-handled by xplr after the command execution.
+Append new messages to this pipe in [YAML][27] (or [JSON][7]) syntax. These
+messages will be read and handled by xplr after the command execution.
+
+Depending on the message (e.g. `Call` or `Call0`) you need to separate each
+message using newline or null character (`\n` or `\0`).
+
+> **_NOTE:_** Since version `v0.20.0`, it's recommended to avoid writing
+> directly to this file, as safely escaping YAML strings is a lot of work. Use
+> `xplr -m` / `xplr --pipe-msg-in` to pass messages to xplr in a safer way.
+>
+> Example: `"$XPLR" -m 'ChangeDirectory: %q' "${HOME:?}"`
 
 #### XPLR_PIPE_SELECTION_OUT
 
-New-line delimited list of selected paths.
+List of selected paths.
 
 #### XPLR_PIPE_GLOBAL_HELP_MENU_OUT
 
@@ -118,20 +138,19 @@ The full help menu.
 
 #### XPLR_PIPE_LOGS_OUT
 
-New-line delimited list of logs.
+List of logs.
 
 #### XPLR_PIPE_RESULT_OUT
 
-New-line delimited result (selected paths if any, else the focused path)
+Result (selected paths if any, else the focused path)
 
 #### XPLR_PIPE_HISTORY_OUT
 
-New-line delimited list of last visited paths (similar to jump list in vim).
+List of last visited paths (similar to jump list in vim).
 
 #### XPLR_PIPE_DIRECTORY_NODES_OUT
 
-New-line delimited list of paths, filtered and sorted as displayed in the
-[files table][28].
+List of paths, filtered and sorted as displayed in the [files table][28].
 
 ### Example: Using Environment Variables and Pipes
 
@@ -140,14 +159,14 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
   help = "ask name and greet",
   messages = {
     {
-      BashExec = [===[
-      echo "What's your name?"
+      BashExec0 = [===[
+        echo "What's your name?"
 
-      read name
-      greeting="Hello $name!"
-      message="$greeting You are inside $PWD"
+        read name
+        greeting="Hello $name!"
+        message="$greeting You are inside $PWD"
 
-      echo LogSuccess: '"'$message'"' >> "${XPLR_PIPE_MSG_IN:?}"
+        "$XPLR" -m 'LogSuccess: %q' "$message"
       ]===]
     }
   }
@@ -164,8 +183,8 @@ xplr.config.modes.builtin.default.key_bindings.on_key.X = {
   help = "open",
   messages = {
     {
-      BashExecSilently = [===[
-      xdg-open "${XPLR_FOCUS_PATH:?}"
+      BashExecSilently0 = [===[
+        xdg-open "${XPLR_FOCUS_PATH:?}"
       ]===],
     },
   },
@@ -194,3 +213,4 @@ xplr.config.modes.builtin.default.key_bindings.on_key.X = {
 [35]: #xplr_pid
 [36]: #xplr_session_path
 [37]: messages.md#reading-input
+[38]: #xplr

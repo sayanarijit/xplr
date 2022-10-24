@@ -727,7 +727,7 @@ fn draw_selection<B: Backend>(
         .rev()
         .take((layout_size.height.max(2) - 2).into())
         .rev()
-        .map(|n| n.absolute_path.to_owned())
+        .map(|n| n.absolute_path.replace('\\', "\\\\").replace('\n', "\\n"))
         .map(ListItem::new)
         .collect();
 

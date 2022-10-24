@@ -58,7 +58,8 @@ Finally, after publishing, don't hesitate to
   `BashExec` and so on. File names may contain newline characters
   (e.g. `foo$'\n'bar`).
 - File names may also contain quotes. Use the syntax
-  `printf 'Call0: "%s"' "${FOO_ESC}"` where `FOO_ESC=${FOO//\"/\\\"}`.
+  `printf 'Call0: "%s"' "${FOO_ESC}"` where `FOO_ESC=${FOO//\"/\\\"}` and
+  `FOO_ESC=${FOO_ESC//$'\n'/\\n}`.
 - Check for empty variables using the syntax `${FOO:?}` or use a default value
   `${FOO:-defaultvalue}`.
 
