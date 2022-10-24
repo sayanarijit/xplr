@@ -1084,9 +1084,13 @@ impl ExternalMsg {
         !matches!(
             self,
             Self::Call(_)
+                | Self::Call0(_)
                 | Self::CallSilently(_)
+                | Self::Call0Silently(_)
                 | Self::BashExec(_)
+                | Self::BashExec0(_)
                 | Self::BashExecSilently(_)
+                | Self::BashExec0Silently(_)
                 | Self::CallLua(_)
                 | Self::CallLuaSilently(_)
                 | Self::LuaEval(_)
