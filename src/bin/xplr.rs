@@ -54,19 +54,8 @@ fn main() {
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else {
-        let write0 = cli.write0;
         match runner::from_cli(cli).and_then(|a| a.run()) {
-            Ok(Some(mut out)) => {
-                if write0 {
-                    if out.ends_with('\n') {
-                        out = out.chars().take(out.chars().count() - 1).collect()
-                    };
-                    out = out
-                        .trim_end()
-                        .chars()
-                        .map(|c| if c == '\n' { '\0' } else { c })
-                        .collect();
-                }
+            Ok(Some(out)) => {
                 print!("{}", out);
             }
             Ok(None) => {}

@@ -1,5 +1,4 @@
 use anyhow::{bail, Result};
-use std::collections::VecDeque;
 use std::env;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -39,12 +38,12 @@ impl Cli {
 
     /// Parse arguments from the command-line
     pub fn parse(args: env::Args) -> Result<Self> {
-        let mut args: VecDeque<String> = args.skip(1).collect();
+        let mut args = args.skip(1).peekable();
         let mut cli = Self::default();
 
         let mut flag_ends = false;
 
-        while let Some(arg) = args.pop_front() {
+        while let Some(arg) = args.next() {
             if flag_ends {
                 cli.read_path(&arg)?;
             } else {
@@ -89,31 +88,21 @@ impl Cli {
                     }
 
                     // Options
-                    "-c" | "--config" => {
-                        cli.config = args.pop_front().map(PathBuf::from)
-                    }
+                    "-c" | "--config" => cli.config = args.next().map(PathBuf::from),
 
                     "-C" | "--extra-config" => {
-                        while let Some(path) = args.pop_front() {
-                            if path.starts_with('-') {
-                                args.push_front(path);
-                                break;
-                            } else {
-                                cli.extra_config.push(PathBuf::from(path));
-                            }
+                        while let Some(path) =
+                            args.next_if(|path| !path.starts_with('-'))
+                        {
+                            cli.extra_config.push(PathBuf::from(path));
                         }
                     }
 
                     "--read-only" => cli.read_only = true,
 
                     "--on-load" => {
-                        while let Some(msg) = args.pop_front() {
-                            if msg.starts_with('-') {
-                                args.push_front(msg);
-                                break;
-                            } else {
-                                cli.on_load.push(msg.trim().try_into()?);
-                            }
+                        while let Some(msg) = args.next_if(|msg| !msg.starts_with('-')) {
+                            cli.on_load.push(msg.trim().try_into()?);
                         }
                     }
 
