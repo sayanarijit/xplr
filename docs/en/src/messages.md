@@ -547,54 +547,78 @@ Example:
 
 #### Call
 
+Like `Call0`, but it uses `\n` as the delimiter in input/output pipes,
+hence it cannot handle files with `\n` in the name.
+You may want to use `Call0` instead.
+
+#### Call0
+
 Call a shell command with the given arguments.
 Note that the arguments will be shell-escaped.
 So to read the variables, the `-c` option of the shell
 can be used.
-You may need to pass `ExplorePwd` depening on the expectation.
+You may need to pass `ExplorePwd` depending on the expectation.
 
-Type: { Call = { command = string, args = { "list", "of", "string" } }
+Type: { Call0 = { command = "string", args = { "list", "of", "string" } }
 
 Example:
 
-- Lua: `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
-- YAML: `Call: { command: bash, args: ["-c", "read -p test"] }`
+- Lua: `{ Call0 = { command = "bash", args = { "-c", "read -p test" } } }`
+- YAML: `Call0: { command: bash, args: ["-c", "read -p test"] }`
 
 #### CallSilently
 
-Like `Call` but without the flicker. The stdin, stdout
+Like `CallSilently0`, but it uses `\n` as the delimiter in input/output
+pipes, hence it cannot handle files with `\n` in the name.
+You may want to use `Call0Silently` instead.
+
+#### CallSilently0
+
+Like `Call0` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
-Type: { CallSilently = "string" }
+Type: { CallSilently0 = { command = "string", args = {"list", "of", "string"} } }
 
 Example:
 
-- Lua: `{ CallSilently = { command = "tput", args = { "bell" } } }`
-- YAML: `CallSilently: { command: tput, args: ["bell"] }`
+- Lua: `{ CallSilently0 = { command = "tput", args = { "bell" } } }`
+- YAML: `CallSilently0: { command: tput, args: ["bell"] }`
 
 #### BashExec
+
+Like `BashExec0`, but it uses `\n` as the delimiter in input/output
+pipes, hence it cannot handle files with `\n` in the name.
+You may want to use `BashExec0` instead.
+
+#### BashExec0
 
 An alias to `Call: {command: bash, args: ["-c", "{string}"], silent: false}`
 where `{string}` is the given value.
 
-Type: { BashExec = "string" }
+Type: { BashExec0 = "string" }
 
 Example:
 
-- Lua: `{ BashExec = "read -p test" }`
-- YAML: `BashExec: "read -p test"`
+- Lua: `{ BashExec0 = "read -p test" }`
+- YAML: `BashExec0: "read -p test"`
 
 #### BashExecSilently
 
-Like `BashExec` but without the flicker. The stdin, stdout
+Like `BashExecSilently0`, but it uses `\n` as the delimiter in
+input/output pipes, hence it cannot handle files with `\n` in the name.
+You may want to use `BashExec0Silently` instead.
+
+#### BashExecSilently0
+
+Like `BashExec0` but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.
 
-Type: { BashExecSilently = "string" }
+Type: { BashExec0Silently = "string" }
 
 Example:
 
-- Lua: `{ BashExecSilently = "tput bell" }`
-- YAML: `BashExecSilently: "tput bell"`
+- Lua: `{ BashExecSilently0 = "tput bell" }`
+- YAML: `BashExecSilently0: "tput bell"`
 
 ### Calling Lua Functions
 

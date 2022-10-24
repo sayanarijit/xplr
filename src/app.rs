@@ -15,7 +15,6 @@ pub use crate::msg::in_::ExternalMsg;
 pub use crate::msg::in_::InternalMsg;
 pub use crate::msg::in_::MsgIn;
 pub use crate::msg::out::MsgOut;
-use crate::newlines::unescape_string;
 pub use crate::node::Node;
 pub use crate::node::ResolvedNode;
 pub use crate::pipe::Pipe;
@@ -175,7 +174,6 @@ pub struct App {
     pub mode: Mode,
     pub layout: Layout,
     pub input: InputBuffer,
-    pub input_unescaped: String,
     pub pid: u32,
     pub session_path: String,
     pub pipe: Pipe,
@@ -310,7 +308,6 @@ impl App {
             mode,
             layout,
             input,
-            input_unescaped: Default::default(),
             pid,
             session_path: session_path.clone(),
             pipe: Pipe::from_session_path(&session_path)?,
@@ -452,9 +449,13 @@ impl App {
                 SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
                 SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
                 Call(cmd) => self.call(cmd),
+                Call0(cmd) => self.call0(cmd),
                 CallSilently(cmd) => self.call_silently(cmd),
+                CallSilently0(cmd) => self.call_silently0(cmd),
                 BashExec(cmd) => self.bash_exec(cmd),
+                BashExec0(cmd) => self.bash_exec0(cmd),
                 BashExecSilently(cmd) => self.bash_exec_silently(cmd),
+                BashExecSilently0(cmd) => self.bash_exec_silently0(cmd),
                 CallLua(func) => self.call_lua(func),
                 CallLuaSilently(func) => self.call_lua_silently(func),
                 LuaEval(code) => self.lua_eval(code),
@@ -556,14 +557,6 @@ impl App {
                     vec![ExternalMsg::LogWarning("Key map not found.".into())]
                 }
             });
-
-        self.input_unescaped = unescape_string(
-            &self.input
-                .buffer
-                .as_ref()
-                .map(|i| i.value().to_string())
-                .unwrap_or_default(),
-        )?;
 
         for msg in msgs {
             self = self.enqueue(Task::new(MsgIn::External(msg), Some(key)));
@@ -1108,9 +1101,21 @@ impl App {
         Ok(self)
     }
 
+    fn call0(mut self, command: Command) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::Call0(command));
+        Ok(self)
+    }
+
     fn call_silently(mut self, command: Command) -> Result<Self> {
         self.logs_hidden = true;
         self.msg_out.push_back(MsgOut::CallSilently(command));
+        Ok(self)
+    }
+
+    fn call_silently0(mut self, command: Command) -> Result<Self> {
+        self.logs_hidden = true;
+        self.msg_out.push_back(MsgOut::CallSilently0(command));
         Ok(self)
     }
 
@@ -1121,8 +1126,22 @@ impl App {
         })
     }
 
+    fn bash_exec0(self, script: String) -> Result<Self> {
+        self.call0(Command {
+            command: "bash".into(),
+            args: vec!["-c".into(), script],
+        })
+    }
+
     fn bash_exec_silently(self, script: String) -> Result<Self> {
         self.call_silently(Command {
+            command: "bash".into(),
+            args: vec!["-c".into(), script],
+        })
+    }
+
+    fn bash_exec_silently0(self, script: String) -> Result<Self> {
+        self.call_silently0(Command {
             command: "bash".into(),
             args: vec!["-c".into(), script],
         })
@@ -1560,48 +1579,48 @@ impl App {
         }
     }
 
-    pub fn directory_nodes_str(&self) -> String {
+    pub fn directory_nodes_str(&self, delimiter: char) -> String {
         self.directory_buffer
             .as_ref()
             .map(|d| {
                 d.nodes
                     .iter()
-                    .map(|n| format!("{}\n", n.absolute_path))
+                    .map(|n| format!("{}{}", n.absolute_path, delimiter))
                     .collect::<Vec<String>>()
                     .join("")
             })
             .unwrap_or_default()
     }
 
-    pub fn pwd_str(&self) -> String {
-        format!("{}\n", &self.pwd)
+    pub fn pwd_str(&self, delimiter: char) -> String {
+        format!("{}{}", &self.pwd, delimiter)
     }
 
-    pub fn selection_str(&self) -> String {
+    pub fn selection_str(&self, delimiter: char) -> String {
         self.selection
             .iter()
-            .map(|n| format!("{}\n", n.absolute_path))
+            .map(|n| format!("{}{}", n.absolute_path, delimiter))
             .collect::<Vec<String>>()
             .join("")
     }
 
-    pub fn result_str(&self) -> String {
+    pub fn result_str(&self, delimiter: char) -> String {
         self.result()
             .into_iter()
-            .map(|n| format!("{}\n", n.absolute_path))
+            .map(|n| format!("{}{}", n.absolute_path, delimiter))
             .collect::<Vec<String>>()
             .join("")
     }
 
-    pub fn logs_str(&self) -> String {
+    pub fn logs_str(&self, delimiter: char) -> String {
         self.logs
             .iter()
-            .map(|l| format!("{}\n", l))
+            .map(|l| format!("{}{}", l, delimiter))
             .collect::<Vec<String>>()
             .join("")
     }
 
-    pub fn global_help_menu_str(&self) -> String {
+    pub fn global_help_menu_str(&self, delimiter: char) -> String {
         let builtin = self.config.modes.builtin.clone();
         let custom = self.config.modes.custom.clone();
         let read_only = self.config.general.read_only;
@@ -1617,53 +1636,53 @@ impl App {
                 .help_menu()
                 .iter()
                 .map(|l| match l {
-                    HelpMenuLine::Paragraph(p) => format!("\t{}\n", p),
+                    HelpMenuLine::Paragraph(p) => format!("\t{}{}", p, delimiter),
                     HelpMenuLine::KeyMap(k, remaps, h) => {
                         let remaps = remaps.join(", ");
-                        format!(" {:15} | {:25} | {}\n", k, remaps, h)
+                        format!(" {:15} | {:25} | {}{}", k, remaps, h , delimiter)
                     }
                 })
                 .collect::<Vec<String>>()
                 .join("");
 
             format!(
-                "### {}\n\n key             | remaps                    | action\n --------------- | ------------------------- | ------\n{}\n",
-                name, help
+                "### {}{d}{d} key             | remaps                    | action\n --------------- | ------------------------- | ------{d}{}{d}",
+                name, help, d = delimiter
             )
         })
         .collect::<Vec<String>>()
-        .join("\n")
+        .join(&delimiter.to_string())
     }
 
-    pub fn history_str(&self) -> String {
+    pub fn history_str(&self, delimiter: char) -> String {
         self.history
             .paths
             .iter()
-            .map(|p| format!("{}\n", &p))
+            .map(|p| format!("{}{}", &p, delimiter))
             .collect::<Vec<String>>()
             .join("")
     }
 
-    pub fn write_pipes(&self) -> Result<()> {
+    pub fn write_pipes(&self, delimiter: char) -> Result<()> {
         fs::create_dir_all(self.pipe.path.clone())?;
         fs::write(&self.pipe.msg_in, "")?;
 
-        let selection_str = self.selection_str();
+        let selection_str = self.selection_str(delimiter);
         fs::write(&self.pipe.selection_out, selection_str)?;
 
-        let history_str = self.history_str();
+        let history_str = self.history_str(delimiter);
         fs::write(&self.pipe.history_out, history_str)?;
 
-        let directory_nodes_str = self.directory_nodes_str();
+        let directory_nodes_str = self.directory_nodes_str(delimiter);
         fs::write(&self.pipe.directory_nodes_out, directory_nodes_str)?;
 
-        let logs_str = self.logs_str();
+        let logs_str = self.logs_str(delimiter);
         fs::write(&self.pipe.logs_out, logs_str)?;
 
-        let result_str = self.result_str();
+        let result_str = self.result_str(delimiter);
         fs::write(&self.pipe.result_out, result_str)?;
 
-        let global_help_menu_str = self.global_help_menu_str();
+        let global_help_menu_str = self.global_help_menu_str(delimiter);
         fs::write(&self.pipe.global_help_menu_out, global_help_menu_str)?;
 
         Ok(())
