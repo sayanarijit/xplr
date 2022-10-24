@@ -3,7 +3,6 @@ use indexmap::IndexSet;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-use crate::newlines::escape_string;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
@@ -483,52 +482,72 @@ pub enum ExternalMsg {
 
     /// ### Executing Commands ------------------------------------------------
 
+    /// Like `Call0`, but it uses `\n` as the delimiter in input/output pipes,
+    /// hence it cannot handle files with `\n` in the name.
+    /// You may want to use `Call0` instead.
+    Call(Command),
+
     /// Call a shell command with the given arguments.
     /// Note that the arguments will be shell-escaped.
     /// So to read the variables, the `-c` option of the shell
     /// can be used.
-    /// You may need to pass `ExplorePwd` depening on the expectation.
+    /// You may need to pass `ExplorePwd` depending on the expectation.
     ///
-    /// Type: { Call = { command = string, args = { "list", "of", "string" } }
+    /// Type: { Call0 = { command = "string", args = { "list", "of", "string" } }
     ///
     /// Example:
     ///
-    /// - Lua: `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
-    /// - YAML: `Call: { command: bash, args: ["-c", "read -p test"] }`
-    Call(Command),
+    /// - Lua: `{ Call0 = { command = "bash", args = { "-c", "read -p test" } } }`
+    /// - YAML: `Call0: { command: bash, args: ["-c", "read -p test"] }`
+    Call0(Command),
 
-    /// Like `Call` but without the flicker. The stdin, stdout
+    /// Like `CallSilently0`, but it uses `\n` as the delimiter in input/output
+    /// pipes, hence it cannot handle files with `\n` in the name.
+    /// You may want to use `Call0Silently` instead.
+    CallSilently(Command),
+
+    /// Like `Call0` but without the flicker. The stdin, stdout
     /// stderr will be piped to null. So it's non-interactive.
     ///
-    /// Type: { CallSilently = "string" }
+    /// Type: { CallSilently0 = { command = "string", args = {"list", "of", "string"} } }
     ///
     /// Example:
     ///
-    /// - Lua: `{ CallSilently = { command = "tput", args = { "bell" } } }`
-    /// - YAML: `CallSilently: { command: tput, args: ["bell"] }`
-    CallSilently(Command),
+    /// - Lua: `{ CallSilently0 = { command = "tput", args = { "bell" } } }`
+    /// - YAML: `CallSilently0: { command: tput, args: ["bell"] }`
+    CallSilently0(Command),
+
+    /// Like `BashExec0`, but it uses `\n` as the delimiter in input/output
+    /// pipes, hence it cannot handle files with `\n` in the name.
+    /// You may want to use `BashExec0` instead.
+    BashExec(String),
 
     /// An alias to `Call: {command: bash, args: ["-c", "{string}"], silent: false}`
     /// where `{string}` is the given value.
     ///
-    /// Type: { BashExec = "string" }
+    /// Type: { BashExec0 = "string" }
     ///
     /// Example:
     ///
-    /// - Lua: `{ BashExec = "read -p test" }`
-    /// - YAML: `BashExec: "read -p test"`
-    BashExec(String),
+    /// - Lua: `{ BashExec0 = "read -p test" }`
+    /// - YAML: `BashExec0: "read -p test"`
+    BashExec0(String),
 
-    /// Like `BashExec` but without the flicker. The stdin, stdout
+    /// Like `BashExecSilently0`, but it uses `\n` as the delimiter in
+    /// input/output pipes, hence it cannot handle files with `\n` in the name.
+    /// You may want to use `BashExec0Silently` instead.
+    BashExecSilently(String),
+
+    /// Like `BashExec0` but without the flicker. The stdin, stdout
     /// stderr will be piped to null. So it's non-interactive.
     ///
-    /// Type: { BashExecSilently = "string" }
+    /// Type: { BashExec0Silently = "string" }
     ///
     /// Example:
     ///
-    /// - Lua: `{ BashExecSilently = "tput bell" }`
-    /// - YAML: `BashExecSilently: "tput bell"`
-    BashExecSilently(String),
+    /// - Lua: `{ BashExecSilently0 = "tput bell" }`
+    /// - YAML: `BashExecSilently0: "tput bell"`
+    BashExecSilently0(String),
 
     /// ### Calling Lua Functions ----------------------------------------------
 
@@ -1071,7 +1090,7 @@ impl TryFrom<&str> for ExternalMsg {
         if value.starts_with('!') {
             serde_yaml::from_str(value)
         } else if let Some((msg, args)) = value.split_once(' ') {
-            let msg = format!("!{} {}", msg.trim_end_matches(':'), escape_string(args));
+            let msg = format!("!{} {}", msg.trim_end_matches(':'), args);
             serde_yaml::from_str(&msg)
         } else {
             serde_yaml::from_str(value)
@@ -1086,11 +1105,11 @@ impl ExternalMsg {
             Self::Call(_)
                 | Self::Call0(_)
                 | Self::CallSilently(_)
-                | Self::Call0Silently(_)
+                | Self::CallSilently0(_)
                 | Self::BashExec(_)
                 | Self::BashExec0(_)
                 | Self::BashExecSilently(_)
-                | Self::BashExec0Silently(_)
+                | Self::BashExecSilently0(_)
                 | Self::CallLua(_)
                 | Self::CallLuaSilently(_)
                 | Self::LuaEval(_)

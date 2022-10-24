@@ -16,12 +16,14 @@ use crossterm::terminal as term;
 use mlua::LuaSerdeExt;
 use mlua::Value;
 use std::fs;
+use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use std::process::{Command, ExitStatus, Stdio};
+use std::process::{Command, Stdio};
 use std::sync::mpsc;
 use tui::backend::CrosstermBackend;
 use tui::Terminal;
+use tui_input::Input;
 
 pub fn get_tty() -> Result<fs::File> {
     let tty = "/dev/tty";
@@ -60,7 +62,30 @@ fn call_lua_heavy(
     lua::call(lua, func, arg)
 }
 
-fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
+fn call(
+    mut app: app::App,
+    cmd: app::Command,
+    silent: bool,
+    terminal: &mut Terminal<CrosstermBackend<File>>,
+    event_reader: &mut EventReader,
+    mouse_enabled: &mut bool,
+    delimiter: char,
+) -> Result<app::App> {
+    if !silent {
+        if *mouse_enabled {
+            execute!(terminal.backend_mut(), event::DisableMouseCapture)
+                .unwrap_or_default();
+        }
+
+        event_reader.stop();
+
+        terminal.clear()?;
+        terminal.set_cursor(0, 0)?;
+        term::disable_raw_mode()?;
+        terminal.show_cursor()?;
+    }
+
+    app.write_pipes(delimiter)?;
     let focus_index = app
         .directory_buffer
         .as_ref()
@@ -74,10 +99,17 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
         (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
     };
 
-    Command::new(cmd.command.clone())
+    let input_buffer = app
+        .input
+        .buffer
+        .as_ref()
+        .map(Input::to_string)
+        .unwrap_or_default();
+
+    let status = Command::new(cmd.command.clone())
         .env("XPLR_APP_VERSION", app.version.clone())
         .env("XPLR_PID", &app.pid.to_string())
-        .env("XPLR_INPUT_BUFFER", &app.input_unescaped)
+        .env("XPLR_INPUT_BUFFER", input_buffer)
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
         .env("XPLR_FOCUS_INDEX", focus_index)
         .env("XPLR_SESSION_PATH", &app.session_path)
@@ -100,7 +132,49 @@ fn call(app: &app::App, cmd: app::Command, silent: bool) -> Result<ExitStatus> {
         .stderr(stderr)
         .args(cmd.args)
         .status()
-        .map_err(Error::new)
+        .map(|s| {
+            if s.success() {
+                Ok(())
+            } else {
+                Err(format!("process exited with code {}", &s))
+            }
+        })
+        .unwrap_or_else(|e| Err(e.to_string()));
+
+    match pipe::read_all(&app.pipe.msg_in, delimiter) {
+        Ok(msgs) => {
+            app = app.handle_batch_external_msgs(msgs)?;
+        }
+        Err(err) => {
+            app = app.log_error(err.to_string())?;
+        }
+    };
+
+    app.cleanup_pipes()?;
+
+    if let Err(e) = status {
+        app = app.log_error(e)?;
+    };
+
+    if !silent {
+        terminal.clear()?;
+        term::enable_raw_mode()?;
+        terminal.hide_cursor()?;
+        event_reader.start();
+
+        if *mouse_enabled {
+            match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
+                Ok(_) => {
+                    *mouse_enabled = true;
+                }
+                Err(e) => {
+                    app = app.log_error(e.to_string())?;
+                }
+            }
+        }
+    }
+
+    Ok(app)
 }
 
 fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
@@ -122,6 +196,7 @@ pub struct Runner {
     read_only: bool,
     print_pwd_as_result: bool,
     selection: Vec<PathBuf>,
+    delimiter: char,
 }
 
 impl Runner {
@@ -158,6 +233,7 @@ impl Runner {
             read_only: cli.read_only,
             print_pwd_as_result: cli.print_pwd_as_result,
             selection: paths.collect(),
+            delimiter: if cli.write0 { '\0' } else { '\n' },
         })
     }
 
@@ -275,27 +351,27 @@ impl Runner {
                             }
 
                             PrintPwdAndQuit => {
-                                result = Ok(Some(format!("{}\n", app.pwd)));
+                                result = Ok(Some(app.pwd_str(self.delimiter)));
                                 break 'outer;
                             }
 
                             PrintFocusPathAndQuit => {
-                                result = Ok(app
-                                    .focused_node()
-                                    .map(|n| format!("{}\n", n.absolute_path)));
+                                result = Ok(app.focused_node().map(|n| {
+                                    format!("{}{}", n.absolute_path, self.delimiter)
+                                }));
                                 break 'outer;
                             }
 
                             PrintSelectionAndQuit => {
-                                result = Ok(Some(app.selection_str()));
+                                result = Ok(Some(app.selection_str(self.delimiter)));
                                 break 'outer;
                             }
 
                             PrintResultAndQuit => {
                                 result = if self.print_pwd_as_result {
-                                    Ok(Some(app.pwd_str()))
+                                    Ok(Some(app.pwd_str(self.delimiter)))
                                 } else {
-                                    Ok(Some(app.result_str()))
+                                    Ok(Some(app.result_str(self.delimiter)))
                                 };
 
                                 break 'outer;
@@ -490,37 +566,6 @@ impl Runner {
                                 };
                             }
 
-                            CallSilently(cmd) => {
-                                app.write_pipes()?;
-                                let status = call(&app, cmd, true)
-                                    .map(|s| {
-                                        if s.success() {
-                                            Ok(())
-                                        } else {
-                                            Err(format!(
-                                                "process exited with code {}",
-                                                &s
-                                            ))
-                                        }
-                                    })
-                                    .unwrap_or_else(|e| Err(e.to_string()));
-
-                                match pipe::read_all(&app.pipe.msg_in) {
-                                    Ok(msgs) => {
-                                        app = app.handle_batch_external_msgs(msgs)?;
-                                    }
-                                    Err(err) => {
-                                        app = app.log_error(err.to_string())?;
-                                    }
-                                };
-
-                                app.cleanup_pipes()?;
-
-                                if let Err(e) = status {
-                                    app = app.log_error(e.to_string())?;
-                                };
-                            }
-
                             CallLua(func) => {
                                 execute!(
                                     terminal.backend_mut(),
@@ -684,67 +729,51 @@ impl Runner {
                             }
 
                             Call(cmd) => {
-                                execute!(
-                                    terminal.backend_mut(),
-                                    event::DisableMouseCapture
-                                )
-                                .unwrap_or_default();
+                                app = call(
+                                    app,
+                                    cmd,
+                                    false,
+                                    &mut terminal,
+                                    &mut event_reader,
+                                    &mut mouse_enabled,
+                                    '\n',
+                                )?;
+                            }
 
-                                event_reader.stop();
+                            Call0(cmd) => {
+                                app = call(
+                                    app,
+                                    cmd,
+                                    false,
+                                    &mut terminal,
+                                    &mut event_reader,
+                                    &mut mouse_enabled,
+                                    '\0',
+                                )?;
+                            }
 
-                                terminal.clear()?;
-                                terminal.set_cursor(0, 0)?;
-                                term::disable_raw_mode()?;
-                                terminal.show_cursor()?;
+                            CallSilently(cmd) => {
+                                app = call(
+                                    app,
+                                    cmd,
+                                    true,
+                                    &mut terminal,
+                                    &mut event_reader,
+                                    &mut mouse_enabled,
+                                    '\n',
+                                )?;
+                            }
 
-                                app.write_pipes()?;
-                                let status = call(&app, cmd, false)
-                                    .map(|s| {
-                                        if s.success() {
-                                            Ok(())
-                                        } else {
-                                            Err(format!(
-                                                "process exited with code {}",
-                                                &s
-                                            ))
-                                        }
-                                    })
-                                    .unwrap_or_else(|e| Err(e.to_string()));
-
-                                // TODO remove duplicate segment
-                                match pipe::read_all(&app.pipe.msg_in) {
-                                    Ok(msgs) => {
-                                        app = app.handle_batch_external_msgs(msgs)?;
-                                    }
-                                    Err(err) => {
-                                        app = app.log_error(err.to_string())?;
-                                    }
-                                };
-
-                                app.cleanup_pipes()?;
-
-                                if let Err(e) = status {
-                                    app = app.log_error(e.to_string())?;
-                                };
-
-                                terminal.clear()?;
-                                term::enable_raw_mode()?;
-                                terminal.hide_cursor()?;
-                                event_reader.start();
-
-                                if mouse_enabled {
-                                    match execute!(
-                                        terminal.backend_mut(),
-                                        event::EnableMouseCapture
-                                    ) {
-                                        Ok(_) => {
-                                            mouse_enabled = true;
-                                        }
-                                        Err(e) => {
-                                            app = app.log_error(e.to_string())?;
-                                        }
-                                    }
-                                }
+                            CallSilently0(cmd) => {
+                                app = call(
+                                    app,
+                                    cmd,
+                                    true,
+                                    &mut terminal,
+                                    &mut event_reader,
+                                    &mut mouse_enabled,
+                                    '\0',
+                                )?;
                             }
                         };
                     }
