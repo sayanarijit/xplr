@@ -155,12 +155,12 @@ xplr.config.modes.custom.fzxplr = {
         messages = {
           {
             BashExec = [===[
-            PTH=$(cat "${XPLR_PIPE_DIRECTORY_NODES_OUT:?}" | awk -F/ '{print $NF}' | fzf)
-            if [ -d "$PTH" ]; then
-              echo ChangeDirectory: "'"${PWD:?}/${PTH:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
-            else
-              echo FocusPath: "'"${PWD:?}/${PTH:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
-            fi
+              PTH=$(cat "${XPLR_PIPE_DIRECTORY_NODES_OUT:?}" | awk -F/ '{print $NF}' | fzf)
+              if [ -d "$PTH" ]; then
+                "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
+              else
+                "$XPLR" -m 'FocusPath: %q' "$PTH"
+              fi
             ]===]
           },
           "PopMode",
@@ -180,12 +180,10 @@ As you can see, the key `F` in mode `fzxplr` (the name can be anything)
 executes a script in `bash`.
 
 `BashExec`, `PopMode`, `SwitchModeBuiltin`, `ChangeDirectory` and `FocusPath`
-are [messages][18], `$XPLR_PIPE_MSG_IN`,
-`$XPLR_PIPE_DIRECTORY_NODES_OUT` are
-[environment variables][22] exported by `xplr`
-before executing the command. They contain the path to the
-[input][23] and [output][24] pipes that
-allows external tools to interact with `xplr`.
+are [messages][18], `$XPLR`, `$XPLR_PIPE_DIRECTORY_NODES_OUT` are
+[environment variables][22] exported by `xplr` before executing the command.
+They contain the path to the [input][23] and [output][24] pipes that allows
+external tools to interact with `xplr`.
 
 Now that we have our new mode ready, let's add an entry point to this mode via
 the `default` mode.

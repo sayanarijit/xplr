@@ -24,8 +24,7 @@ version of xplr, but they have one common drawback - the user will need to keep
 an eye on the releases, and manually upgrade xplr when a new version is
 available.
 
-One way to keep an eye on the releases is to
-[watch the repository][4].
+One way to keep an eye on the releases is to [watch the repository][4].
 
 ## Community Maintained Repositories
 
