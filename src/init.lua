@@ -1364,12 +1364,13 @@ xplr.config.modes.builtin.go_to_path = {
           {
             BashExecSilently0 = [===[
               PTH=${XPLR_INPUT_BUFFER}
+              PTH_ESC=$(printf %q "$PTH")
               if [ -d "$PTH" ]; then
-                "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
+                "$XPLR" -m 'ChangeDirectory: %q' "$PTH_ESC"
               elif [ -e "$PTH" ]; then
-                "$XPLR" -m 'FocusPath: %q' "$PTH"
+                "$XPLR" -m 'FocusPath: %q' "$PTH_ESC"
               else
-                "$XPLR" -m 'LogError: %q' "could not find $PTH"
+                "$XPLR" -m 'LogError: %q' "could not find $PTH_ESC"
               fi
             ]===],
           },
@@ -1403,11 +1404,12 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec0 = [===[
-              (while IFS= read -r -d '' LINE; do
-                if cp -vr -- "${LINE:?}" ./; then
-                  "$XPLR" -m 'LogSuccess: %q' "$LINE copied to ."
+              (while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                if cp -vr -- "${PTH:?}" ./; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ."
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to copy $LINE to ."
+                  "$XPLR" -m 'LogError: %q' "Failed to copy $PTH_ESC to ."
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               "$XPLR" -m ExplorePwdAsync
@@ -1423,11 +1425,12 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec0 = [===[
-              (while IFS= read -r -d '' LINE; do
-                if mv -v -- "${LINE:?}" ./; then
-                  "$XPLR" -m 'LogSuccess: %q' "$LINE moved to ."
+              (while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                if mv -v -- "${PTH:?}" ./; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ."
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to move $LINE to ."
+                  "$XPLR" -m 'LogError: %q' "Failed to move $PTH_ESC to ."
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               "$XPLR" -m ExplorePwdAsync
@@ -1495,11 +1498,12 @@ xplr.config.modes.builtin.create_directory = {
           {
             BashExecSilently0 = [===[
               PTH="$XPLR_INPUT_BUFFER"
+              PTH_ESC=$(printf %q "$PTH")
               if [ "$PTH" ]; then
                 mkdir -p -- "$PTH" \
                 && "$XPLR" -m 'SetInputBuffer: ""' \
                 && "$XPLR" -m ExplorePwd \
-                && "$XPLR" -m 'LogSuccess: %q' "$PTH created" \
+                && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
                 && "$XPLR" -m 'FocusPath: %q' "$PTH"
               else
                 "$XPLR" -m PopMode
@@ -1537,11 +1541,12 @@ xplr.config.modes.builtin.create_file = {
           {
             BashExecSilently0 = [===[
               PTH="$XPLR_INPUT_BUFFER"
+              PTH_ESC=$(printf %q "$PTH")
               if [ "$PTH" ]; then
                 mkdir -p -- "$(dirname $PTH)" \
                 && touch -- "$PTH" \
                 && "$XPLR" -m 'SetInputBuffer: ""' \
-                && "$XPLR" -m 'LogSuccess: %q' "$PTH created" \
+                && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
                 && "$XPLR" -m 'ExplorePwd' \
                 && "$XPLR" -m 'FocusPath: %q' "$PTH"
               else
@@ -1652,8 +1657,8 @@ xplr.config.modes.builtin.go_to = {
                   exit 1
                 fi
               fi
-              (while IFS= read -r -d '' LINE; do
-                $OPENER "${LINE:?}" > /dev/null 2>&1
+              (while IFS= read -r -d '' PTH; do
+                $OPENER "${PTH:?}" > /dev/null 2>&1
               done < "${XPLR_PIPE_RESULT_OUT:?}")
             ]===],
           },
@@ -1761,11 +1766,12 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
-              (while IFS= read -r -d '' LINE; do
-                if rm -rfv -- "${LINE:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$LINE deleted"
+              (while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                if rm -rfv -- "${PTH:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to delete $LINE"
+                  "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
               "$XPLR" -m ExplorePwdAsync
@@ -1780,18 +1786,19 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
-              (while IFS= read -r -d '' LINE; do
-                if [ -d "$LINE" ] && [ ! -L "$LINE" ]; then
-                  if rmdir -v -- "${LINE:?}"; then
-                    "$XPLR" -m 'LogSuccess: %q' "$LINE deleted"
+              (while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                if [ -d "$PTH" ] && [ ! -L "$PTH" ]; then
+                  if rmdir -v -- "${PTH:?}"; then
+                    "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                   else
-                    "$XPLR" -m 'LogError: %q' "Failed to delete $LINE"
+                    "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
                   fi
                 else
-                  if rm -v -- "${LINE:?}"; then
-                    "$XPLR" -m 'LogSuccess: %q' "$LINE deleted"
+                  if rm -v -- "${PTH:?}"; then
+                    "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                   else
-                    "$XPLR" -m 'LogError: %q' "Failed to delete $LINE"
+                    "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
                   fi
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
