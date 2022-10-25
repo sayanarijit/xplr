@@ -17,7 +17,6 @@ pub mod pipe;
 pub mod pwd_watcher;
 pub mod runner;
 pub mod ui;
-pub mod newlines;
 
 #[cfg(test)]
 mod tests {
