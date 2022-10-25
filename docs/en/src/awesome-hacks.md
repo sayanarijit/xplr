@@ -87,12 +87,13 @@ xplr.config.modes.builtin.default.key_bindings.on_key.m = {
   help = "bookmark",
   messages = {
     {
-      BashExecSilently = [===[
+      BashExecSilently0 = [===[
         PTH="${XPLR_FOCUS_PATH:?}"
+        PTH_ESC=$(printf %q "$PTH")
         if echo "${PTH:?}" >> "${XPLR_SESSION_PATH:?}/bookmarks"; then
-          echo "LogSuccess: ${PTH:?} added to bookmarks" >> "${XPLR_PIPE_MSG_IN:?}"
+          "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC added to bookmarks"
         else
-          echo "LogError: Failed to bookmark ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+          "$XPLR" -m 'LogError: %q' "Failed to bookmark $PTH_ESC"
         fi
       ]===],
     },
@@ -103,10 +104,11 @@ xplr.config.modes.builtin.default.key_bindings.on_key["`"] = {
   help = "go to bookmark",
   messages = {
     {
-      BashExec = [===[
+      BashExec0 = [===[
         PTH=$(cat "${XPLR_SESSION_PATH:?}/bookmarks" | fzf --no-sort)
+        PTH_ESC=$(printf %q "$PTH")
         if [ "$PTH" ]; then
-          echo FocusPath: "'"${PTH:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+          "$XPLR" -m 'FocusPath: %q' "$PTH"
         fi
       ]===],
     },
@@ -138,17 +140,18 @@ xplr.config.modes.custom.bookmark = {
       m = {
         help = "bookmark dir",
         messages = {
-          { BashExecSilently = [[
+          { BashExecSilently0 = [[
               PTH="${XPLR_FOCUS_PATH:?}"
               if [ -d "${PTH}" ]; then
                 PTH="${PTH}"
               elif [ -f "${PTH}" ]; then
                 PTH="$(dirname "${PTH}")"
               fi
+              PTH_ESC=$(printf %q "$PTH")
               if echo "${PTH:?}" >> "${XPLR_BOOKMARK_FILE:?}"; then
-                echo "LogSuccess: ${PTH:?} added to bookmarks" >> "${XPLR_PIPE_MSG_IN:?}"
+                "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC added to bookmarks"
               else
-                echo "LogError: Failed to bookmark ${PTH:?}" >> "${XPLR_PIPE_MSG_IN:?}"
+                "$XPLR" -m 'LogError: %q' "Failed to bookmark $PTH_ESC"
               fi
             ]]
           },
@@ -158,10 +161,10 @@ xplr.config.modes.custom.bookmark = {
         help = "go to bookmark",
         messages = {
           {
-            BashExec = [===[
+            BashExec0 = [===[
               PTH=$(cat "${XPLR_BOOKMARK_FILE:?}" | fzf --no-sort)
               if [ "$PTH" ]; then
-                echo FocusPath: "'"${PTH:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+                "$XPLR" -m 'FocusPath: %q' "$PTH"
               fi
             ]===]
           },
@@ -170,7 +173,7 @@ xplr.config.modes.custom.bookmark = {
       d = {
         help = "delete bookmark",
         messages = {
-          { BashExec = [[
+          { BashExec0 = [[
               PTH=$(cat "${XPLR_BOOKMARK_FILE:?}" | fzf --no-sort)
               sd "$PTH\n" "" "${XPLR_BOOKMARK_FILE:?}"
             ]]
@@ -206,7 +209,7 @@ xplr.config.modes.builtin.go_to.key_bindings.on_key.b = {
   help = "bookmark jump",
   messages = {
     "PopMode",
-    { BashExec = [===[
+    { BashExec0 = [===[
         field='\(\S\+\s*\)'
         esc=$(printf '\033')
         N="${esc}[0m"
@@ -223,7 +226,7 @@ xplr.config.modes.builtin.go_to.key_bindings.on_key.b = {
             --preview-window="right:50%" \
         | sed 's#.*->  ##')
         if [ "$PTH" ]; then
-          echo ChangeDirectory: "'"${PTH:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+          "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
         fi
       ]===]
     },
@@ -250,10 +253,10 @@ xplr.config.modes.builtin.go_to.key_bindings.on_key.h = {
   messages = {
     "PopMode",
     {
-      BashExec = [===[
-        PTH=$(cat "${XPLR_PIPE_HISTORY_OUT:?}" | sort -u | fzf --no-sort)
+      BashExec0 = [===[
+        PTH=$(cat "${XPLR_PIPE_HISTORY_OUT:?}" | sort -z -u | fzf --read0)
         if [ "$PTH" ]; then
-          echo ChangeDirectory: "'"${PTH:?}"'" >> "${XPLR_PIPE_MSG_IN:?}"
+          "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
         fi
       ]===],
     },
@@ -286,7 +289,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.R = {
        NODES=${SELECTION:-$(cat "${XPLR_PIPE_DIRECTORY_NODES_OUT:?}")}
        if [ "$NODES" ]; then
          echo -e "$NODES" | renamer
-         echo ExplorePwdAsync >> "${XPLR_PIPE_MSG_IN:?}"
+         "$XPLR" -m ExplorePwdAsync
        fi
      ]===],
     },
@@ -312,7 +315,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.S = {
   help = "serve $PWD",
   messages = {
     {
-      BashExec = [===[
+      BashExec0 = [===[
         IP=$(ip addr | grep -w inet | cut -d/ -f1 | grep -Eo '[0-9]{1,3}\.[0-9]{      1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt 'Select IP > ')
         echo "IP: ${IP:?}"
         read -p "Port (default 5000): " PORT
@@ -344,16 +347,16 @@ xplr.config.modes.builtin.default.key_bindings.on_key.P = {
   help = "preview",
   messages = {
     {
-      BashExecSilently = [===[
+      BashExecSilently0 = [===[
         FIFO_PATH="/tmp/xplr.fifo"
 
         if [ -e "$FIFO_PATH" ]; then
-          echo StopFifo >> "$XPLR_PIPE_MSG_IN"
+          "$XPLR" -m StopFifo
           rm -f -- "$FIFO_PATH"
         else
           mkfifo "$FIFO_PATH"
           "$HOME/.local/bin/imv-open.sh" "$FIFO_PATH" "$XPLR_FOCUS_PATH" &
-          echo "StartFifo: '$FIFO_PATH'" >> "$XPLR_PIPE_MSG_IN"
+          "$XPLR" -m 'StartFifo: %q' "$FIFO_PATH"
         fi
       ]===],
     },
@@ -407,26 +410,32 @@ local function stat(node)
   return node.mime_essence
 end
 
-local function read(path, lines)
-  local out = ""
+local function read(path, height)
   local p = io.open(path)
 
   if p == nil then
-    return stat(path)
+    return nil
   end
 
   local i = 0
+  local res = ""
   for line in p:lines() do
-    out = out .. line .. "\n"
-    if i == lines then
+    if line:match("[^ -~\n\t]") then
+      p:close()
+      return
+    end
+
+    res = res .. line .. "\n"
+    if i == height then
       break
     end
     i = i + 1
   end
   p:close()
 
-  return out
+  return res
 end
+
 
 xplr.config.layouts.builtin.default = {
   Horizontal = {
@@ -485,7 +494,7 @@ Navigate using the [tere][19] file explorer (defaults to type-to-nav system).
 xplr.config.modes.builtin.default.key_bindings.on_key.T = {
   help = "tere nav",
   messages = {
-    { BashExec = [[echo ChangeDirectory: "'"$(tere)"'" >> "$XPLR_PIPE_MSG_IN"]] },
+    { BashExec0 = [[xplr -m 'ChangeDirectory: %q' "$(tere)"]] },
   },
 }
 ```

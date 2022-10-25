@@ -7,11 +7,9 @@ Once [installed][1], use the following steps to setup and run xplr.
 ```bash
 mkdir -p ~/.config/xplr
 
-version="$(xplr | grep ^version: | cut -d' ' -f 2)"
+version="$(xplr --version | awk '{print $2}')"
 
-# When the app loads, press `#`
-
-echo version = '"'${version:?}'"' > ~/.config/xplr/init.lua
+echo "version = '${version:?}'" > ~/.config/xplr/init.lua
 ```
 
 Then

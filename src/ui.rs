@@ -678,7 +678,7 @@ fn draw_table<B: Backend>(
             config,
             format!(
                 " {} ({}) ",
-                app.pwd,
+                app.pwd.replace('\\', "\\\\").replace('\n', "\\n"),
                 app.directory_buffer
                     .as_ref()
                     .map(|d| d.total)

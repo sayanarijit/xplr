@@ -20,8 +20,11 @@ fn main() {
     --                           Denotes the end of command-line flags and options
         --force-focus            Focuses on the given <PATH>, even if it is a directory
     -h, --help                   Prints help information
-    -m, --pipe-msg-in            Helps passing messages to the active xplr session
-        --print-pwd-as-result    Prints the present working directory when quitting 
+    -m, --pipe-msg-in            Helps safely passing messages to the active xplr
+                                   session, use %%, %s and %q as the placeholders
+    -M, --print-msg-in           Like --pipe-msg-in, but prints the message instead of
+                                   passing to the active xplr session
+        --print-pwd-as-result    Prints the present working directory when quitting
                                    with `PrintResultAndQuit`
         --read-only              Enables read-only mode (config.general.read_only)
         --read0                  Reads paths separated using the null character (\0)
@@ -56,6 +59,11 @@ fn main() {
         println!("xplr {}", xplr::app::VERSION);
     } else if !cli.pipe_msg_in.is_empty() {
         if let Err(err) = cli::pipe_msg_in(cli.pipe_msg_in) {
+            eprintln!("error: {}", err);
+            std::process::exit(1);
+        }
+    } else if !cli.print_msg_in.is_empty() {
+        if let Err(err) = cli::print_msg_in(cli.print_msg_in) {
             eprintln!("error: {}", err);
             std::process::exit(1);
         }

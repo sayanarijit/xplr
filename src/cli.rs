@@ -22,6 +22,7 @@ pub struct Cli {
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
     pub pipe_msg_in: Vec<String>,
+    pub print_msg_in: Vec<String>,
     pub paths: Vec<PathBuf>,
 }
 
@@ -120,9 +121,11 @@ impl Cli {
                     }
 
                     "-m" | "--pipe-msg-in" => {
-                        for arg in args.by_ref() {
-                            cli.pipe_msg_in.push(arg);
-                        }
+                        cli.pipe_msg_in.extend(args.by_ref());
+                    }
+
+                    "-M" | "--print-msg-in" => {
+                        cli.print_msg_in.extend(args.by_ref());
                     }
 
                     // path
@@ -137,15 +140,39 @@ impl Cli {
 }
 
 pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
+    let mut msg = fmt_msg_in(args)?;
+
+    if let Ok(path) = std::env::var("XPLR_PIPE_MSG_IN") {
+        let delimiter = fs::read(&path)?
+            .first()
+            .cloned()
+            .context("failed to detect delimmiter")?;
+
+        msg.push(delimiter.try_into()?);
+        File::options()
+            .append(true)
+            .open(&path)?
+            .write_all(msg.as_bytes())?;
+    } else {
+        println!("{}", msg);
+    };
+
+    Ok(())
+}
+
+pub fn print_msg_in(args: Vec<String>) -> Result<()> {
+    let msg = fmt_msg_in(args)?;
+    print!("{}", msg);
+    Ok(())
+}
+
+fn fmt_msg_in(args: Vec<String>) -> Result<String> {
     let mut args = args.into_iter();
-
-    let format = args.next().context("usage: xplr -m FORMAT [ARGUMENT]...")?;
+    let format = args.next().context("usage: FORMAT [ARGUMENT]...")?;
     let mut msg = "".to_string();
-
     let mut last_char = None;
-    let chars = format.chars();
 
-    for ch in chars {
+    for ch in format.chars() {
         match (ch, last_char) {
             ('%', Some('%')) => {
                 msg.push(ch);
@@ -183,22 +210,6 @@ pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
     }
 
     // Validate
-    let mut msg = json::to_string(&ExternalMsg::try_from(msg.as_str())?)?;
-
-    if let Ok(path) = std::env::var("XPLR_PIPE_MSG_IN") {
-        let delimiter = fs::read(&path)?
-            .first()
-            .cloned()
-            .context("failed to detect delimmiter")?;
-
-        msg.push(delimiter.try_into()?);
-        File::options()
-            .append(true)
-            .open(&path)?
-            .write_all(msg.as_bytes())?;
-    } else {
-        println!("{}", msg);
-    }
-
-    Ok(())
+    let msg = json::to_string(&ExternalMsg::try_from(msg.as_str())?)?;
+    Ok(msg)
 }
