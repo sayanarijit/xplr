@@ -1089,7 +1089,7 @@ impl TryFrom<&str> for ExternalMsg {
     type Error = anyhow::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let msg = if let Ok(val) = json::from_str(&value) {
+        let msg = if let Ok(val) = json::from_str(value) {
             val
         } else if value.starts_with('!') {
             yaml::from_str(value)?

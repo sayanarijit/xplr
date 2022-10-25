@@ -120,7 +120,7 @@ impl Cli {
                     }
 
                     "-m" | "--pipe-msg-in" => {
-                        while let Some(arg) = args.next_if(|arg| !arg.starts_with('-')) {
+                        for arg in args.by_ref() {
                             cli.pipe_msg_in.push(arg);
                         }
                     }
