@@ -57,9 +57,8 @@ Finally, after publishing, don't hesitate to
 - When executing commands, prefer `Call0` over `Call`, `BashExec0` over
   `BashExec` and so on. File names may contain newline characters
   (e.g. `foo$'\n'bar`).
-- File names may also contain quotes. Use the syntax
-  `printf 'Call0: "%s"' "${FOO_ESC}"` where `FOO_ESC=${FOO//\"/\\\"}` and
-  `FOO_ESC=${FOO_ESC//$'\n'/\\n}`.
+- File names may also contain quotes. Avoid writing directly to
+  `$XPLR_PIPE_MSG_IN`. Use `xplr -m` / `xplr --pipe-msg-in` instead.
 - Check for empty variables using the syntax `${FOO:?}` or use a default value
   `${FOO:-defaultvalue}`.
 

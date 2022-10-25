@@ -1,13 +1,15 @@
-use anyhow::{bail, Result};
-use std::env;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
-
 use crate::app;
+use anyhow::{bail, Context, Result};
+use serde_json as json;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Write};
+use std::path::PathBuf;
+use std::{env, fs};
 
 /// The arguments to pass
 #[derive(Debug, Clone, Default)]
 pub struct Cli {
+    pub bin: String,
     pub version: bool,
     pub help: bool,
     pub read_only: bool,
@@ -18,6 +20,7 @@ pub struct Cli {
     pub config: Option<PathBuf>,
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
+    pub pipe_msg_in: Vec<String>,
     pub paths: Vec<PathBuf>,
 }
 
@@ -38,8 +41,9 @@ impl Cli {
 
     /// Parse arguments from the command-line
     pub fn parse(args: env::Args) -> Result<Self> {
-        let mut args = args.skip(1).peekable();
         let mut cli = Self::default();
+        let mut args = args.peekable();
+        cli.bin = args.next().context("failed to parse xplr binary path")?;
 
         let mut flag_ends = false;
 
@@ -114,6 +118,12 @@ impl Cli {
                         cli.print_pwd_as_result = true;
                     }
 
+                    "-m" | "--pipe-msg-in" => {
+                        while let Some(arg) = args.next_if(|arg| !arg.starts_with('-')) {
+                            cli.pipe_msg_in.push(arg);
+                        }
+                    }
+
                     // path
                     path => {
                         cli.read_path(path)?;
@@ -123,4 +133,67 @@ impl Cli {
         }
         Ok(cli)
     }
+}
+
+pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
+    let mut args = args.into_iter();
+
+    let format = args.next().context("usage: xplr -m FORMAT [ARGUMENT]...")?;
+    let mut msg = "".to_string();
+
+    let mut last_char = None;
+    let chars = format.chars();
+
+    for ch in chars {
+        match (ch, last_char) {
+            ('%', Some('%')) => {
+                msg.push(ch);
+                last_char = None;
+            }
+            ('%', _) => {
+                last_char = Some(ch);
+            }
+            ('q', Some('%')) => {
+                let arg = args.next().context("not enough arguments")?;
+                msg.push_str(&json::to_string(&arg)?);
+                last_char = None;
+            }
+            ('s', Some('%')) => {
+                let arg = args.next().context("not enough arguments")?;
+                msg.push_str(&arg);
+                last_char = None;
+            }
+            (ch, Some('%')) => {
+                bail!(format!("invalid placeholder: %{}, use %s, %q or %%", ch));
+            }
+            (ch, _) => {
+                msg.push(ch);
+                last_char = Some(ch);
+            }
+        }
+    }
+
+    if last_char == Some('%') {
+        bail!("message ended with incomplete placeholder");
+    }
+
+    if args.count() != 0 {
+        bail!("too many arguments")
+    }
+
+    let path = std::env::var("XPLR_PIPE_MSG_IN")
+        .context("passing messages in only works inside xplr shell")?;
+
+    let delimiter = fs::read(&path)?
+        .first()
+        .cloned()
+        .context("failed to detect delimmiter")?;
+
+    msg.push(delimiter.try_into()?);
+    File::options()
+        .append(true)
+        .open(&path)?
+        .write(msg.as_bytes())?;
+
+    Ok(())
 }

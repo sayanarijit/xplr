@@ -161,6 +161,8 @@ pub struct InputBuffer {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct App {
+    pub bin: String,
+
     pub version: String,
 
     #[serde(with = "serde_yaml::with::singleton_map_recursive")]
@@ -187,6 +189,7 @@ pub struct App {
 
 impl App {
     pub fn create(
+        bin: String,
         pwd: PathBuf,
         lua: &mlua::Lua,
         config_file: Option<PathBuf>,
@@ -298,6 +301,7 @@ impl App {
         };
 
         let mut app = Self {
+            bin,
             version: VERSION.to_string(),
             config,
             pwd,
@@ -1664,7 +1668,7 @@ impl App {
 
     pub fn write_pipes(&self, delimiter: char) -> Result<()> {
         fs::create_dir_all(self.pipe.path.clone())?;
-        fs::write(&self.pipe.msg_in, "")?;
+        fs::write(&self.pipe.msg_in, &[delimiter as u8])?;
 
         let selection_str = self.selection_str(delimiter);
         fs::write(&self.pipe.selection_out, selection_str)?;

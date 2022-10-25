@@ -107,7 +107,8 @@ fn call(
         .unwrap_or_default();
 
     let status = Command::new(cmd.command.clone())
-        .env("XPLR_APP_VERSION", app.version.clone())
+        .env("XPLR", &app.bin)
+        .env("XPLR_APP_VERSION", &app.version)
         .env("XPLR_PID", &app.pid.to_string())
         .env("XPLR_INPUT_BUFFER", input_buffer)
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
@@ -188,6 +189,7 @@ fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
 }
 
 pub struct Runner {
+    bin: String,
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
     config_file: Option<PathBuf>,
@@ -225,6 +227,7 @@ impl Runner {
         }
 
         Ok(Self {
+            bin: cli.bin,
             pwd,
             focused_path,
             config_file: cli.config,
@@ -241,8 +244,13 @@ impl Runner {
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
-        let mut app =
-            app::App::create(self.pwd, &lua, self.config_file, self.extra_config_files)?;
+        let mut app = app::App::create(
+            self.bin,
+            self.pwd,
+            &lua,
+            self.config_file,
+            self.extra_config_files,
+        )?;
         app.config.general.read_only = self.read_only;
 
         fs::create_dir_all(app.session_path.clone())?;
