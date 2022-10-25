@@ -44,7 +44,7 @@ called ["pipe"s][18].
 
 The other variables are single-line variables containing simple information:
 
-- [XPLR][38]
+- [XPLR][30]
 - [XPLR_APP_VERSION][30]
 - [XPLR_FOCUS_INDEX][31]
 - [XPLR_FOCUS_PATH][32]

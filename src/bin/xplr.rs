@@ -2,7 +2,7 @@
 
 use std::env;
 
-use xplr::cli::Cli;
+use xplr::cli::{self, Cli};
 use xplr::runner;
 
 fn main() {
@@ -20,6 +20,7 @@ fn main() {
     --                           Denotes the end of command-line flags and options
         --force-focus            Focuses on the given <PATH>, even if it is a directory
     -h, --help                   Prints help information
+    -m, --pipe-msg-in            Helps passing messages to the active xplr session
         --print-pwd-as-result    Prints the present working directory when quitting 
                                    with `PrintResultAndQuit`
         --read-only              Enables read-only mode (config.general.read_only)
@@ -53,6 +54,11 @@ fn main() {
         println!("{}", help);
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
+    } else if !cli.pipe_msg_in.is_empty() {
+        if let Err(err) = cli::pipe_msg_in(cli.pipe_msg_in) {
+            eprintln!("error: {}", err);
+            std::process::exit(1);
+        }
     } else {
         match runner::from_cli(cli).and_then(|a| a.run()) {
             Ok(Some(out)) => {
