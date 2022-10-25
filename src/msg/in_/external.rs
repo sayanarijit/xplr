@@ -2,6 +2,8 @@ use crate::{app::Node, input::InputOperation};
 use indexmap::IndexSet;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use serde_json as json;
+use serde_yaml as yaml;
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -1084,17 +1086,20 @@ pub enum ExternalMsg {
 }
 
 impl TryFrom<&str> for ExternalMsg {
-    type Error = serde_yaml::Error;
+    type Error = anyhow::Error;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        if value.starts_with('!') {
-            serde_yaml::from_str(value)
+        let msg = if let Ok(val) = json::from_str(&value) {
+            val
+        } else if value.starts_with('!') {
+            yaml::from_str(value)?
         } else if let Some((msg, args)) = value.split_once(' ') {
             let msg = format!("!{} {}", msg.trim_end_matches(':'), args);
-            serde_yaml::from_str(&msg)
+            yaml::from_str(&msg)?
         } else {
-            serde_yaml::from_str(value)
-        }
+            yaml::from_str(value)?
+        };
+        Ok(msg)
     }
 }
 
