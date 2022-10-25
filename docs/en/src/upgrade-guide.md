@@ -45,6 +45,24 @@ compatibility.
 
 ### Instructions
 
+#### [v0.19.4][47] -> v0.20.0-beta.0
+
+- BREAKING: xplr shell (`:!`) will default to null (`\0`) delimited pipes, as
+  opposed to newline (`\n`) delimited ones (i.e. will use `Call0` instead of
+  `Call`).
+- Use new messages for safer file path handling (`\0` delimited):
+  - Call0
+  - CallSilently0
+  - BashExec0
+  - BashExecSilently0
+- Use new sub-commands for safer message passing:
+  - `-m FORMAT [ARGUMENT]...` / `--pipe-msg-in FORMAT [ARGUMENT]...`
+  - `-M FORMAT [ARGUMENT]...` / `--print-msg-in FORMAT [ARGUMENT]...`
+    Where FORMAT is a YAML string that may contain `%s`, `%q` and `%%`
+    placeholders and ARGUMENT is the value per placeholder. See `init.lua`.
+- Handling and displaying file paths with newline (`\n`) characters are now
+  supported.
+
 #### [v0.18.0][46] -> [v0.19.4][47]
 
 - BREAKING: The builtin modes cannot be accessed using space separated names
