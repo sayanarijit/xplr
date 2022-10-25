@@ -193,7 +193,7 @@ pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
     File::options()
         .append(true)
         .open(&path)?
-        .write(msg.as_bytes())?;
+        .write_all(msg.as_bytes())?;
 
     Ok(())
 }
