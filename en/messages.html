@@ -576,43 +576,59 @@ It keeps the input buffer.</p>
 </ul>
 <h3 id="executing-commands"><a class="header" href="#executing-commands">Executing Commands</a></h3>
 <h4 id="call"><a class="header" href="#call">Call</a></h4>
+<p>Like <code>Call0</code>, but it uses <code>\n</code> as the delimiter in input/output pipes,
+hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>Call0</code> instead.</p>
+<h4 id="call0"><a class="header" href="#call0">Call0</a></h4>
 <p>Call a shell command with the given arguments.
 Note that the arguments will be shell-escaped.
 So to read the variables, the <code>-c</code> option of the shell
 can be used.
-You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
-<p>Type: { Call = { command = string, args = { &quot;list&quot;, &quot;of&quot;, &quot;string&quot; } }</p>
+You may need to pass <code>ExplorePwd</code> depending on the expectation.</p>
+<p>Type: { Call0 = { command = &quot;string&quot;, args = { &quot;list&quot;, &quot;of&quot;, &quot;string&quot; } }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
-<li>YAML: <code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
+<li>Lua: <code>{ Call0 = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
+<li>YAML: <code>Call0: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
 </ul>
 <h4 id="callsilently"><a class="header" href="#callsilently">CallSilently</a></h4>
-<p>Like <code>Call</code> but without the flicker. The stdin, stdout
+<p>Like <code>CallSilently0</code>, but it uses <code>\n</code> as the delimiter in input/output
+pipes, hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>CallSilently0</code> instead.</p>
+<h4 id="callsilently0"><a class="header" href="#callsilently0">CallSilently0</a></h4>
+<p>Like <code>Call0</code> but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.</p>
-<p>Type: { CallSilently = &quot;string&quot; }</p>
+<p>Type: { CallSilently0 = { command = &quot;string&quot;, args = {&quot;list&quot;, &quot;of&quot;, &quot;string&quot;} } }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ CallSilently = { command = &quot;tput&quot;, args = { &quot;bell&quot; } } }</code></li>
-<li>YAML: <code>CallSilently: { command: tput, args: [&quot;bell&quot;] }</code></li>
+<li>Lua: <code>{ CallSilently0 = { command = &quot;tput&quot;, args = { &quot;bell&quot; } } }</code></li>
+<li>YAML: <code>CallSilently0: { command: tput, args: [&quot;bell&quot;] }</code></li>
 </ul>
 <h4 id="bashexec"><a class="header" href="#bashexec">BashExec</a></h4>
+<p>Like <code>BashExec0</code>, but it uses <code>\n</code> as the delimiter in input/output
+pipes, hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>BashExec0</code> instead.</p>
+<h4 id="bashexec0"><a class="header" href="#bashexec0">BashExec0</a></h4>
 <p>An alias to <code>Call: {command: bash, args: [&quot;-c&quot;, &quot;{string}&quot;], silent: false}</code>
 where <code>{string}</code> is the given value.</p>
-<p>Type: { BashExec = &quot;string&quot; }</p>
+<p>Type: { BashExec0 = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ BashExec = &quot;read -p test&quot; }</code></li>
-<li>YAML: <code>BashExec: &quot;read -p test&quot;</code></li>
+<li>Lua: <code>{ BashExec0 = &quot;read -p test&quot; }</code></li>
+<li>YAML: <code>BashExec0: &quot;read -p test&quot;</code></li>
 </ul>
 <h4 id="bashexecsilently"><a class="header" href="#bashexecsilently">BashExecSilently</a></h4>
-<p>Like <code>BashExec</code> but without the flicker. The stdin, stdout
+<p>Like <code>BashExecSilently0</code>, but it uses <code>\n</code> as the delimiter in
+input/output pipes, hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>BashExecSilently0</code> instead.</p>
+<h4 id="bashexecsilently0"><a class="header" href="#bashexecsilently0">BashExecSilently0</a></h4>
+<p>Like <code>BashExec0</code> but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.</p>
-<p>Type: { BashExecSilently = &quot;string&quot; }</p>
+<p>Type: { BashExecSilently0 = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ BashExecSilently = &quot;tput bell&quot; }</code></li>
-<li>YAML: <code>BashExecSilently: &quot;tput bell&quot;</code></li>
+<li>Lua: <code>{ BashExecSilently0 = &quot;tput bell&quot; }</code></li>
+<li>YAML: <code>BashExecSilently0: &quot;tput bell&quot;</code></li>
 </ul>
 <h3 id="calling-lua-functions"><a class="header" href="#calling-lua-functions">Calling Lua Functions</a></h3>
 <h4 id="calllua"><a class="header" href="#calllua">CallLua</a></h4>

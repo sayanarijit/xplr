@@ -153,7 +153,7 @@
                     <main>
                         <h1 id="environment-variables-and-pipes"><a class="header" href="#environment-variables-and-pipes">Environment Variables and Pipes</a></h1>
 <p>Alternative to <code>CallLua</code>, <code>CallLuaSilently</code> messages that call Lua functions,
-there are <code>Call</code>, <code>CallSilently</code>, <code>BashExec</code>, <code>BashExecSilently</code> messages
+there are <code>Call0</code>, <code>CallSilently0</code>, <code>BashExec0</code>, <code>BashExecSilently0</code> messages
 that call shell commands.</p>
 <p>However, unlike the Lua functions, these shell commands have to read the useful
 information and send messages via environment variables and temporary files
@@ -163,10 +163,11 @@ a command is being executed.</p>
 for example.</p>
 <p>To see the environment variables and pipes, invoke the shell by typing <code>:!</code> in default
 mode and run the following command:</p>
-<pre><code>env | grep ^XPLR_
+<pre><code>env | grep ^XPLR
 </code></pre>
 <p>You will see something like:</p>
-<pre><code>XPLR_FOCUS_INDEX=0
+<pre><code>XPLR=xplr
+XPLR_FOCUS_INDEX=0
 XPLR_MODE=action to
 XPLR_PIPE_SELECTION_OUT=/run/user/1000/xplr/session/122278/pipe/selection_out
 XPLR_INPUT_BUFFER=
@@ -185,6 +186,7 @@ XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_
 called <a href="#pipes">&quot;pipe&quot;s</a>.</p>
 <p>The other variables are single-line variables containing simple information:</p>
 <ul>
+<li><a href="#xplr">XPLR</a></li>
 <li><a href="#xplr_app_version">XPLR_APP_VERSION</a></li>
 <li><a href="#xplr_focus_index">XPLR_FOCUS_INDEX</a></li>
 <li><a href="#xplr_focus_path">XPLR_FOCUS_PATH</a></li>
@@ -194,20 +196,25 @@ called <a href="#pipes">&quot;pipe&quot;s</a>.</p>
 <li><a href="#xplr_session_path">XPLR_SESSION_PATH</a></li>
 </ul>
 <h3 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h3>
+<h4 id="xplr"><a class="header" href="#xplr">XPLR</a></h4>
+<p>The binary path of xplr command.</p>
 <h4 id="xplr_app_version"><a class="header" href="#xplr_app_version">XPLR_APP_VERSION</a></h4>
 <p>Self-explanatory.</p>
 <h4 id="xplr_focus_index"><a class="header" href="#xplr_focus_index">XPLR_FOCUS_INDEX</a></h4>
-<p>Contains the index of the currently focused item, as seen in <a href="column-renderer.html#index">column-renderer/index</a>.</p>
+<p>Contains the index of the currently focused item, as seen in
+<a href="column-renderer.html#index">column-renderer/index</a>.</p>
 <h4 id="xplr_focus_path"><a class="header" href="#xplr_focus_path">XPLR_FOCUS_PATH</a></h4>
 <p>Contains the full path of the currently focused node.</p>
 <h4 id="xplr_input_buffer"><a class="header" href="#xplr_input_buffer">XPLR_INPUT_BUFFER</a></h4>
-<p>The line currently in displaying in the xplr input buffer. For e.g. the search input while searching. See <a href="messages.html#reading-input">Reading Input</a>.</p>
+<p>The line currently in displaying in the xplr input buffer. For e.g. the search
+input while searching. See <a href="messages.html#reading-input">Reading Input</a>.</p>
 <h4 id="xplr_mode"><a class="header" href="#xplr_mode">XPLR_MODE</a></h4>
 <p>Contains the mode xplr is currently in, see <a href="modes.html#modes">modes</a>.</p>
 <h4 id="xplr_pid"><a class="header" href="#xplr_pid">XPLR_PID</a></h4>
 <p>Contains the process ID of the current xplr process.</p>
 <h4 id="xplr_session_path"><a class="header" href="#xplr_session_path">XPLR_SESSION_PATH</a></h4>
-<p>Contains the current session path, like /tmp/runtime-&quot;$USER&quot;/xplr/session/&quot;$XPLR_PID&quot;/, you can find temporary files here, such as pipes.</p>
+<p>Contains the current session path, like /tmp/runtime-&quot;$USER&quot;/xplr/session/&quot;$XPLR_PID&quot;/,
+you can find temporary files here, such as pipes.</p>
 <h3 id="pipes"><a class="header" href="#pipes">Pipes</a></h3>
 <h4 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h4>
 <p>Currently there is only one input pipe.</p>
@@ -217,7 +224,9 @@ called <a href="#pipes">&quot;pipe&quot;s</a>.</p>
 <h4 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h4>
 <p><code>XPLR_PIPE_*_OUT</code> are the output pipes that contain data which cannot be
 exposed directly via environment variables, like multi-line strings.
-These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.</p>
+These pipes can be accessed as plain text files located in $XPLR_SESSION_PATH.</p>
+<p>Depending on the message (e.g. <code>Call</code> or <code>Call0</code>), each line will be separated
+by newline or null character (<code>\n</code> or <code>\0</code>).</p>
 <ul>
 <li><a href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></li>
 <li><a href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></li>
@@ -227,35 +236,41 @@ These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.</p
 <li><a href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></li>
 </ul>
 <h4 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h4>
-<p>Append new-line delimited messages to this pipe in <a href="https://www.yaml.org">YAML</a>
-(or <a href="https://www.json.org">JSON</a>) syntax. These messages will be read and
-handled by xplr after the command execution.</p>
+<p>Append new messages to this pipe in <a href="https://www.yaml.org">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. These
+messages will be read and handled by xplr after the command execution.</p>
+<p>Depending on the message (e.g. <code>Call</code> or <code>Call0</code>) you need to separate each
+message using newline or null character (<code>\n</code> or <code>\0</code>).</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> Since version <code>v0.20.0</code>, it's recommended to avoid writing
+directly to this file, as safely escaping YAML strings is a lot of work. Use
+<code>xplr -m</code> / <code>xplr --pipe-msg-in</code> to pass messages to xplr in a safer way.</p>
+<p>Example: <code>&quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;${HOME:?}&quot;</code></p>
+</blockquote>
 <h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>
-<p>New-line delimited list of selected paths.</p>
+<p>List of selected paths.</p>
 <h4 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h4>
 <p>The full help menu.</p>
 <h4 id="xplr_pipe_logs_out"><a class="header" href="#xplr_pipe_logs_out">XPLR_PIPE_LOGS_OUT</a></h4>
-<p>New-line delimited list of logs.</p>
+<p>List of logs.</p>
 <h4 id="xplr_pipe_result_out"><a class="header" href="#xplr_pipe_result_out">XPLR_PIPE_RESULT_OUT</a></h4>
-<p>New-line delimited result (selected paths if any, else the focused path)</p>
+<p>Result (selected paths if any, else the focused path)</p>
 <h4 id="xplr_pipe_history_out"><a class="header" href="#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></h4>
-<p>New-line delimited list of last visited paths (similar to jump list in vim).</p>
+<p>List of last visited paths (similar to jump list in vim).</p>
 <h4 id="xplr_pipe_directory_nodes_out"><a class="header" href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></h4>
-<p>New-line delimited list of paths, filtered and sorted as displayed in the
-<a href="layout.html#table">files table</a>.</p>
+<p>List of paths, filtered and sorted as displayed in the <a href="layout.html#table">files table</a>.</p>
 <h3 id="example-using-environment-variables-and-pipes"><a class="header" href="#example-using-environment-variables-and-pipes">Example: Using Environment Variables and Pipes</a></h3>
 <pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.space = {
   help = &quot;ask name and greet&quot;,
   messages = {
     {
-      BashExec = [===[
-      echo &quot;What's your name?&quot;
+      BashExec0 = [===[
+        echo &quot;What's your name?&quot;
 
-      read name
-      greeting=&quot;Hello $name!&quot;
-      message=&quot;$greeting You are inside $PWD&quot;
+        read name
+        greeting=&quot;Hello $name!&quot;
+        message=&quot;$greeting You are inside $PWD&quot;
 
-      echo LogSuccess: '&quot;'$message'&quot;' &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+        &quot;$XPLR&quot; -m 'LogSuccess: %q' &quot;$message&quot;
       ]===]
     }
   }
@@ -269,8 +284,8 @@ handled by xplr after the command execution.</p>
   help = &quot;open&quot;,
   messages = {
     {
-      BashExecSilently = [===[
-      xdg-open &quot;${XPLR_FOCUS_PATH:?}&quot;
+      BashExecSilently0 = [===[
+        xdg-open &quot;${XPLR_FOCUS_PATH:?}&quot;
       ]===],
     },
   },

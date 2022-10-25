@@ -253,8 +253,7 @@ advantages and limitations.</p>
 version of xplr, but they have one common drawback - the user will need to keep
 an eye on the releases, and manually upgrade xplr when a new version is
 available.</p>
-<p>One way to keep an eye on the releases is to
-<a href="https://github.com/sayanarijit/xplr/watchers">watch the repository</a>.</p>
+<p>One way to keep an eye on the releases is to <a href="https://github.com/sayanarijit/xplr/watchers">watch the repository</a>.</p>
 <h2 id="community-maintained-repositories"><a class="header" href="#community-maintained-repositories">Community Maintained Repositories</a></h2>
 <p>xplr can be installed from one of the following community maintained
 repositories:</p>
@@ -403,11 +402,9 @@ mkdir -p &quot;$XDG_CONFIG_HOME&quot; &quot;$XDG_RUNTIME_DIR&quot;
 <h2 id="create-the-customizable-config-file"><a class="header" href="#create-the-customizable-config-file">Create the customizable config file</a></h2>
 <pre><code class="language-bash">mkdir -p ~/.config/xplr
 
-version=&quot;$(xplr | grep ^version: | cut -d' ' -f 2)&quot;
+version=&quot;$(xplr --version | awk '{print $2}')&quot;
 
-# When the app loads, press `#`
-
-echo version = '&quot;'${version:?}'&quot;' &gt; ~/.config/xplr/init.lua
+echo &quot;version = '${version:?}'&quot; &gt; ~/.config/xplr/init.lua
 </code></pre>
 <p>Then
 <strong><a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">copy from here</a></strong>
@@ -1161,12 +1158,12 @@ directory.</p>
         messages = {
           {
             BashExec = [===[
-            PTH=$(cat &quot;${XPLR_PIPE_DIRECTORY_NODES_OUT:?}&quot; | awk -F/ '{print $NF}' | fzf)
-            if [ -d &quot;$PTH&quot; ]; then
-              echo ChangeDirectory: &quot;'&quot;${PWD:?}/${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
-            else
-              echo FocusPath: &quot;'&quot;${PWD:?}/${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
-            fi
+              PTH=$(cat &quot;${XPLR_PIPE_DIRECTORY_NODES_OUT:?}&quot; | awk -F/ '{print $NF}' | fzf)
+              if [ -d &quot;$PTH&quot; ]; then
+                &quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;$PTH&quot;
+              else
+                &quot;$XPLR&quot; -m 'FocusPath: %q' &quot;$PTH&quot;
+              fi
             ]===]
           },
           &quot;PopMode&quot;,
@@ -1184,12 +1181,10 @@ directory.</p>
 <p>As you can see, the key <code>F</code> in mode <code>fzxplr</code> (the name can be anything)
 executes a script in <code>bash</code>.</p>
 <p><code>BashExec</code>, <code>PopMode</code>, <code>SwitchModeBuiltin</code>, <code>ChangeDirectory</code> and <code>FocusPath</code>
-are <a href="message.html#message">messages</a>, <code>$XPLR_PIPE_MSG_IN</code>,
-<code>$XPLR_PIPE_DIRECTORY_NODES_OUT</code> are
-<a href="environment-variables-and-pipes.html#environment-variables">environment variables</a> exported by <code>xplr</code>
-before executing the command. They contain the path to the
-<a href="environment-variables-and-pipes.html#input-pipe">input</a> and <a href="environment-variables-and-pipes.html#output-pipes">output</a> pipes that
-allows external tools to interact with <code>xplr</code>.</p>
+are <a href="message.html#message">messages</a>, <code>$XPLR</code>, <code>$XPLR_PIPE_DIRECTORY_NODES_OUT</code> are
+<a href="environment-variables-and-pipes.html#environment-variables">environment variables</a> exported by <code>xplr</code> before executing the command.
+They contain the path to the <a href="environment-variables-and-pipes.html#input-pipe">input</a> and <a href="environment-variables-and-pipes.html#output-pipes">output</a> pipes that allows
+external tools to interact with <code>xplr</code>.</p>
 <p>Now that we have our new mode ready, let's add an entry point to this mode via
 the <code>default</code> mode.</p>
 <pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key[&quot;F&quot;] = {
@@ -2308,43 +2303,59 @@ It keeps the input buffer.</p>
 </ul>
 <h3 id="executing-commands"><a class="header" href="#executing-commands">Executing Commands</a></h3>
 <h4 id="call"><a class="header" href="#call">Call</a></h4>
+<p>Like <code>Call0</code>, but it uses <code>\n</code> as the delimiter in input/output pipes,
+hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>Call0</code> instead.</p>
+<h4 id="call0"><a class="header" href="#call0">Call0</a></h4>
 <p>Call a shell command with the given arguments.
 Note that the arguments will be shell-escaped.
 So to read the variables, the <code>-c</code> option of the shell
 can be used.
-You may need to pass <code>ExplorePwd</code> depening on the expectation.</p>
-<p>Type: { Call = { command = string, args = { &quot;list&quot;, &quot;of&quot;, &quot;string&quot; } }</p>
+You may need to pass <code>ExplorePwd</code> depending on the expectation.</p>
+<p>Type: { Call0 = { command = &quot;string&quot;, args = { &quot;list&quot;, &quot;of&quot;, &quot;string&quot; } }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
-<li>YAML: <code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
+<li>Lua: <code>{ Call0 = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
+<li>YAML: <code>Call0: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
 </ul>
 <h4 id="callsilently"><a class="header" href="#callsilently">CallSilently</a></h4>
-<p>Like <code>Call</code> but without the flicker. The stdin, stdout
+<p>Like <code>CallSilently0</code>, but it uses <code>\n</code> as the delimiter in input/output
+pipes, hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>CallSilently0</code> instead.</p>
+<h4 id="callsilently0"><a class="header" href="#callsilently0">CallSilently0</a></h4>
+<p>Like <code>Call0</code> but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.</p>
-<p>Type: { CallSilently = &quot;string&quot; }</p>
+<p>Type: { CallSilently0 = { command = &quot;string&quot;, args = {&quot;list&quot;, &quot;of&quot;, &quot;string&quot;} } }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ CallSilently = { command = &quot;tput&quot;, args = { &quot;bell&quot; } } }</code></li>
-<li>YAML: <code>CallSilently: { command: tput, args: [&quot;bell&quot;] }</code></li>
+<li>Lua: <code>{ CallSilently0 = { command = &quot;tput&quot;, args = { &quot;bell&quot; } } }</code></li>
+<li>YAML: <code>CallSilently0: { command: tput, args: [&quot;bell&quot;] }</code></li>
 </ul>
 <h4 id="bashexec"><a class="header" href="#bashexec">BashExec</a></h4>
+<p>Like <code>BashExec0</code>, but it uses <code>\n</code> as the delimiter in input/output
+pipes, hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>BashExec0</code> instead.</p>
+<h4 id="bashexec0"><a class="header" href="#bashexec0">BashExec0</a></h4>
 <p>An alias to <code>Call: {command: bash, args: [&quot;-c&quot;, &quot;{string}&quot;], silent: false}</code>
 where <code>{string}</code> is the given value.</p>
-<p>Type: { BashExec = &quot;string&quot; }</p>
+<p>Type: { BashExec0 = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ BashExec = &quot;read -p test&quot; }</code></li>
-<li>YAML: <code>BashExec: &quot;read -p test&quot;</code></li>
+<li>Lua: <code>{ BashExec0 = &quot;read -p test&quot; }</code></li>
+<li>YAML: <code>BashExec0: &quot;read -p test&quot;</code></li>
 </ul>
 <h4 id="bashexecsilently"><a class="header" href="#bashexecsilently">BashExecSilently</a></h4>
-<p>Like <code>BashExec</code> but without the flicker. The stdin, stdout
+<p>Like <code>BashExecSilently0</code>, but it uses <code>\n</code> as the delimiter in
+input/output pipes, hence it cannot handle files with <code>\n</code> in the name.
+You may want to use <code>BashExecSilently0</code> instead.</p>
+<h4 id="bashexecsilently0"><a class="header" href="#bashexecsilently0">BashExecSilently0</a></h4>
+<p>Like <code>BashExec0</code> but without the flicker. The stdin, stdout
 stderr will be piped to null. So it's non-interactive.</p>
-<p>Type: { BashExecSilently = &quot;string&quot; }</p>
+<p>Type: { BashExecSilently0 = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
-<li>Lua: <code>{ BashExecSilently = &quot;tput bell&quot; }</code></li>
-<li>YAML: <code>BashExecSilently: &quot;tput bell&quot;</code></li>
+<li>Lua: <code>{ BashExecSilently0 = &quot;tput bell&quot; }</code></li>
+<li>YAML: <code>BashExecSilently0: &quot;tput bell&quot;</code></li>
 </ul>
 <h3 id="calling-lua-functions"><a class="header" href="#calling-lua-functions">Calling Lua Functions</a></h3>
 <h4 id="calllua"><a class="header" href="#calllua">CallLua</a></h4>
@@ -3447,7 +3458,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="environment-variables-and-pipes"><a class="header" href="#environment-variables-and-pipes">Environment Variables and Pipes</a></h1>
 <p>Alternative to <code>CallLua</code>, <code>CallLuaSilently</code> messages that call Lua functions,
-there are <code>Call</code>, <code>CallSilently</code>, <code>BashExec</code>, <code>BashExecSilently</code> messages
+there are <code>Call0</code>, <code>CallSilently0</code>, <code>BashExec0</code>, <code>BashExecSilently0</code> messages
 that call shell commands.</p>
 <p>However, unlike the Lua functions, these shell commands have to read the useful
 information and send messages via environment variables and temporary files
@@ -3457,10 +3468,11 @@ a command is being executed.</p>
 for example.</p>
 <p>To see the environment variables and pipes, invoke the shell by typing <code>:!</code> in default
 mode and run the following command:</p>
-<pre><code>env | grep ^XPLR_
+<pre><code>env | grep ^XPLR
 </code></pre>
 <p>You will see something like:</p>
-<pre><code>XPLR_FOCUS_INDEX=0
+<pre><code>XPLR=xplr
+XPLR_FOCUS_INDEX=0
 XPLR_MODE=action to
 XPLR_PIPE_SELECTION_OUT=/run/user/1000/xplr/session/122278/pipe/selection_out
 XPLR_INPUT_BUFFER=
@@ -3479,6 +3491,7 @@ XPLR_PIPE_DIRECTORY_NODES_OUT=/run/user/1000/xplr/session/122278/pipe/directory_
 called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a>.</p>
 <p>The other variables are single-line variables containing simple information:</p>
 <ul>
+<li><a href="environment-variables-and-pipes.html#xplr">XPLR</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_app_version">XPLR_APP_VERSION</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_focus_index">XPLR_FOCUS_INDEX</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_focus_path">XPLR_FOCUS_PATH</a></li>
@@ -3488,20 +3501,25 @@ called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a
 <li><a href="environment-variables-and-pipes.html#xplr_session_path">XPLR_SESSION_PATH</a></li>
 </ul>
 <h3 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h3>
+<h4 id="xplr"><a class="header" href="#xplr">XPLR</a></h4>
+<p>The binary path of xplr command.</p>
 <h4 id="xplr_app_version"><a class="header" href="#xplr_app_version">XPLR_APP_VERSION</a></h4>
 <p>Self-explanatory.</p>
 <h4 id="xplr_focus_index"><a class="header" href="#xplr_focus_index">XPLR_FOCUS_INDEX</a></h4>
-<p>Contains the index of the currently focused item, as seen in <a href="column-renderer.html#index">column-renderer/index</a>.</p>
+<p>Contains the index of the currently focused item, as seen in
+<a href="column-renderer.html#index">column-renderer/index</a>.</p>
 <h4 id="xplr_focus_path"><a class="header" href="#xplr_focus_path">XPLR_FOCUS_PATH</a></h4>
 <p>Contains the full path of the currently focused node.</p>
 <h4 id="xplr_input_buffer"><a class="header" href="#xplr_input_buffer">XPLR_INPUT_BUFFER</a></h4>
-<p>The line currently in displaying in the xplr input buffer. For e.g. the search input while searching. See <a href="messages.html#reading-input">Reading Input</a>.</p>
+<p>The line currently in displaying in the xplr input buffer. For e.g. the search
+input while searching. See <a href="messages.html#reading-input">Reading Input</a>.</p>
 <h4 id="xplr_mode"><a class="header" href="#xplr_mode">XPLR_MODE</a></h4>
 <p>Contains the mode xplr is currently in, see <a href="modes.html#modes">modes</a>.</p>
 <h4 id="xplr_pid"><a class="header" href="#xplr_pid">XPLR_PID</a></h4>
 <p>Contains the process ID of the current xplr process.</p>
 <h4 id="xplr_session_path"><a class="header" href="#xplr_session_path">XPLR_SESSION_PATH</a></h4>
-<p>Contains the current session path, like /tmp/runtime-&quot;$USER&quot;/xplr/session/&quot;$XPLR_PID&quot;/, you can find temporary files here, such as pipes.</p>
+<p>Contains the current session path, like /tmp/runtime-&quot;$USER&quot;/xplr/session/&quot;$XPLR_PID&quot;/,
+you can find temporary files here, such as pipes.</p>
 <h3 id="pipes"><a class="header" href="#pipes">Pipes</a></h3>
 <h4 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h4>
 <p>Currently there is only one input pipe.</p>
@@ -3511,7 +3529,9 @@ called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a
 <h4 id="output-pipes"><a class="header" href="#output-pipes">Output pipes</a></h4>
 <p><code>XPLR_PIPE_*_OUT</code> are the output pipes that contain data which cannot be
 exposed directly via environment variables, like multi-line strings.
-These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.</p>
+These pipes can be accessed as plain text files located in $XPLR_SESSION_PATH.</p>
+<p>Depending on the message (e.g. <code>Call</code> or <code>Call0</code>), each line will be separated
+by newline or null character (<code>\n</code> or <code>\0</code>).</p>
 <ul>
 <li><a href="environment-variables-and-pipes.html#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></li>
@@ -3521,35 +3541,41 @@ These pipes can be accessed as plaintext files located in $XPLR_SESSION_PATH.</p
 <li><a href="environment-variables-and-pipes.html#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></li>
 </ul>
 <h4 id="xplr_pipe_msg_in"><a class="header" href="#xplr_pipe_msg_in">XPLR_PIPE_MSG_IN</a></h4>
-<p>Append new-line delimited messages to this pipe in <a href="https://www.yaml.org">YAML</a>
-(or <a href="https://www.json.org">JSON</a>) syntax. These messages will be read and
-handled by xplr after the command execution.</p>
+<p>Append new messages to this pipe in <a href="https://www.yaml.org">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. These
+messages will be read and handled by xplr after the command execution.</p>
+<p>Depending on the message (e.g. <code>Call</code> or <code>Call0</code>) you need to separate each
+message using newline or null character (<code>\n</code> or <code>\0</code>).</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> Since version <code>v0.20.0</code>, it's recommended to avoid writing
+directly to this file, as safely escaping YAML strings is a lot of work. Use
+<code>xplr -m</code> / <code>xplr --pipe-msg-in</code> to pass messages to xplr in a safer way.</p>
+<p>Example: <code>&quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;${HOME:?}&quot;</code></p>
+</blockquote>
 <h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>
-<p>New-line delimited list of selected paths.</p>
+<p>List of selected paths.</p>
 <h4 id="xplr_pipe_global_help_menu_out"><a class="header" href="#xplr_pipe_global_help_menu_out">XPLR_PIPE_GLOBAL_HELP_MENU_OUT</a></h4>
 <p>The full help menu.</p>
 <h4 id="xplr_pipe_logs_out"><a class="header" href="#xplr_pipe_logs_out">XPLR_PIPE_LOGS_OUT</a></h4>
-<p>New-line delimited list of logs.</p>
+<p>List of logs.</p>
 <h4 id="xplr_pipe_result_out"><a class="header" href="#xplr_pipe_result_out">XPLR_PIPE_RESULT_OUT</a></h4>
-<p>New-line delimited result (selected paths if any, else the focused path)</p>
+<p>Result (selected paths if any, else the focused path)</p>
 <h4 id="xplr_pipe_history_out"><a class="header" href="#xplr_pipe_history_out">XPLR_PIPE_HISTORY_OUT</a></h4>
-<p>New-line delimited list of last visited paths (similar to jump list in vim).</p>
+<p>List of last visited paths (similar to jump list in vim).</p>
 <h4 id="xplr_pipe_directory_nodes_out"><a class="header" href="#xplr_pipe_directory_nodes_out">XPLR_PIPE_DIRECTORY_NODES_OUT</a></h4>
-<p>New-line delimited list of paths, filtered and sorted as displayed in the
-<a href="layout.html#table">files table</a>.</p>
+<p>List of paths, filtered and sorted as displayed in the <a href="layout.html#table">files table</a>.</p>
 <h3 id="example-using-environment-variables-and-pipes"><a class="header" href="#example-using-environment-variables-and-pipes">Example: Using Environment Variables and Pipes</a></h3>
 <pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.space = {
   help = &quot;ask name and greet&quot;,
   messages = {
     {
-      BashExec = [===[
-      echo &quot;What's your name?&quot;
+      BashExec0 = [===[
+        echo &quot;What's your name?&quot;
 
-      read name
-      greeting=&quot;Hello $name!&quot;
-      message=&quot;$greeting You are inside $PWD&quot;
+        read name
+        greeting=&quot;Hello $name!&quot;
+        message=&quot;$greeting You are inside $PWD&quot;
 
-      echo LogSuccess: '&quot;'$message'&quot;' &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+        &quot;$XPLR&quot; -m 'LogSuccess: %q' &quot;$message&quot;
       ]===]
     }
   }
@@ -3563,8 +3589,8 @@ handled by xplr after the command execution.</p>
   help = &quot;open&quot;,
   messages = {
     {
-      BashExecSilently = [===[
-      xdg-open &quot;${XPLR_FOCUS_PATH:?}&quot;
+      BashExecSilently0 = [===[
+        xdg-open &quot;${XPLR_FOCUS_PATH:?}&quot;
       ]===],
     },
   },
@@ -3636,12 +3662,13 @@ gracefully cancel &quot;cd on quit&quot;.</p>
   help = &quot;bookmark&quot;,
   messages = {
     {
-      BashExecSilently = [===[
+      BashExecSilently0 = [===[
         PTH=&quot;${XPLR_FOCUS_PATH:?}&quot;
+        PTH_ESC=$(printf %q &quot;$PTH&quot;)
         if echo &quot;${PTH:?}&quot; &gt;&gt; &quot;${XPLR_SESSION_PATH:?}/bookmarks&quot;; then
-          echo &quot;LogSuccess: ${PTH:?} added to bookmarks&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+          &quot;$XPLR&quot; -m 'LogSuccess: %q' &quot;$PTH_ESC added to bookmarks&quot;
         else
-          echo &quot;LogError: Failed to bookmark ${PTH:?}&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+          &quot;$XPLR&quot; -m 'LogError: %q' &quot;Failed to bookmark $PTH_ESC&quot;
         fi
       ]===],
     },
@@ -3652,10 +3679,11 @@ xplr.config.modes.builtin.default.key_bindings.on_key[&quot;`&quot;] = {
   help = &quot;go to bookmark&quot;,
   messages = {
     {
-      BashExec = [===[
+      BashExec0 = [===[
         PTH=$(cat &quot;${XPLR_SESSION_PATH:?}/bookmarks&quot; | fzf --no-sort)
+        PTH_ESC=$(printf %q &quot;$PTH&quot;)
         if [ &quot;$PTH&quot; ]; then
-          echo FocusPath: &quot;'&quot;${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+          &quot;$XPLR&quot; -m 'FocusPath: %q' &quot;$PTH&quot;
         fi
       ]===],
     },
@@ -3682,17 +3710,18 @@ xplr.config.modes.custom.bookmark = {
       m = {
         help = &quot;bookmark dir&quot;,
         messages = {
-          { BashExecSilently = [[
+          { BashExecSilently0 = [[
               PTH=&quot;${XPLR_FOCUS_PATH:?}&quot;
               if [ -d &quot;${PTH}&quot; ]; then
                 PTH=&quot;${PTH}&quot;
               elif [ -f &quot;${PTH}&quot; ]; then
                 PTH=&quot;$(dirname &quot;${PTH}&quot;)&quot;
               fi
+              PTH_ESC=$(printf %q &quot;$PTH&quot;)
               if echo &quot;${PTH:?}&quot; &gt;&gt; &quot;${XPLR_BOOKMARK_FILE:?}&quot;; then
-                echo &quot;LogSuccess: ${PTH:?} added to bookmarks&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+                &quot;$XPLR&quot; -m 'LogSuccess: %q' &quot;$PTH_ESC added to bookmarks&quot;
               else
-                echo &quot;LogError: Failed to bookmark ${PTH:?}&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+                &quot;$XPLR&quot; -m 'LogError: %q' &quot;Failed to bookmark $PTH_ESC&quot;
               fi
             ]]
           },
@@ -3702,10 +3731,10 @@ xplr.config.modes.custom.bookmark = {
         help = &quot;go to bookmark&quot;,
         messages = {
           {
-            BashExec = [===[
+            BashExec0 = [===[
               PTH=$(cat &quot;${XPLR_BOOKMARK_FILE:?}&quot; | fzf --no-sort)
               if [ &quot;$PTH&quot; ]; then
-                echo FocusPath: &quot;'&quot;${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+                &quot;$XPLR&quot; -m 'FocusPath: %q' &quot;$PTH&quot;
               fi
             ]===]
           },
@@ -3714,7 +3743,7 @@ xplr.config.modes.custom.bookmark = {
       d = {
         help = &quot;delete bookmark&quot;,
         messages = {
-          { BashExec = [[
+          { BashExec0 = [[
               PTH=$(cat &quot;${XPLR_BOOKMARK_FILE:?}&quot; | fzf --no-sort)
               sd &quot;$PTH\n&quot; &quot;&quot; &quot;${XPLR_BOOKMARK_FILE:?}&quot;
             ]]
@@ -3745,7 +3774,7 @@ xplr.config.modes.custom.bookmark = {
   help = &quot;bookmark jump&quot;,
   messages = {
     &quot;PopMode&quot;,
-    { BashExec = [===[
+    { BashExec0 = [===[
         field='\(\S\+\s*\)'
         esc=$(printf '\033')
         N=&quot;${esc}[0m&quot;
@@ -3762,7 +3791,7 @@ xplr.config.modes.custom.bookmark = {
             --preview-window=&quot;right:50%&quot; \
         | sed 's#.*-&gt;  ##')
         if [ &quot;$PTH&quot; ]; then
-          echo ChangeDirectory: &quot;'&quot;${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+          &quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;$PTH&quot;
         fi
       ]===]
     },
@@ -3784,10 +3813,10 @@ xplr.config.modes.custom.bookmark = {
   messages = {
     &quot;PopMode&quot;,
     {
-      BashExec = [===[
-        PTH=$(cat &quot;${XPLR_PIPE_HISTORY_OUT:?}&quot; | sort -u | fzf --no-sort)
+      BashExec0 = [===[
+        PTH=$(cat &quot;${XPLR_PIPE_HISTORY_OUT:?}&quot; | sort -z -u | fzf --read0)
         if [ &quot;$PTH&quot; ]; then
-          echo ChangeDirectory: &quot;'&quot;${PTH:?}&quot;'&quot; &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+          &quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;$PTH&quot;
         fi
       ]===],
     },
@@ -3814,7 +3843,7 @@ xplr.config.modes.custom.bookmark = {
        NODES=${SELECTION:-$(cat &quot;${XPLR_PIPE_DIRECTORY_NODES_OUT:?}&quot;)}
        if [ &quot;$NODES&quot; ]; then
          echo -e &quot;$NODES&quot; | renamer
-         echo ExplorePwdAsync &gt;&gt; &quot;${XPLR_PIPE_MSG_IN:?}&quot;
+         &quot;$XPLR&quot; -m ExplorePwdAsync
        fi
      ]===],
     },
@@ -3835,7 +3864,7 @@ xplr.config.modes.custom.bookmark = {
   help = &quot;serve $PWD&quot;,
   messages = {
     {
-      BashExec = [===[
+      BashExec0 = [===[
         IP=$(ip addr | grep -w inet | cut -d/ -f1 | grep -Eo '[0-9]{1,3}\.[0-9]{      1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt 'Select IP &gt; ')
         echo &quot;IP: ${IP:?}&quot;
         read -p &quot;Port (default 5000): &quot; PORT
@@ -3862,16 +3891,16 @@ xplr.config.modes.custom.bookmark = {
   help = &quot;preview&quot;,
   messages = {
     {
-      BashExecSilently = [===[
+      BashExecSilently0 = [===[
         FIFO_PATH=&quot;/tmp/xplr.fifo&quot;
 
         if [ -e &quot;$FIFO_PATH&quot; ]; then
-          echo StopFifo &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;
+          &quot;$XPLR&quot; -m StopFifo
           rm -f -- &quot;$FIFO_PATH&quot;
         else
           mkfifo &quot;$FIFO_PATH&quot;
           &quot;$HOME/.local/bin/imv-open.sh&quot; &quot;$FIFO_PATH&quot; &quot;$XPLR_FOCUS_PATH&quot; &amp;
-          echo &quot;StartFifo: '$FIFO_PATH'&quot; &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;
+          &quot;$XPLR&quot; -m 'StartFifo: %q' &quot;$FIFO_PATH&quot;
         fi
       ]===],
     },
@@ -3917,26 +3946,32 @@ imv-msg &quot;$IMV_PID&quot; quit
   return node.mime_essence
 end
 
-local function read(path, lines)
-  local out = &quot;&quot;
+local function read(path, height)
   local p = io.open(path)
 
   if p == nil then
-    return stat(path)
+    return nil
   end
 
   local i = 0
+  local res = &quot;&quot;
   for line in p:lines() do
-    out = out .. line .. &quot;\n&quot;
-    if i == lines then
+    if line:match(&quot;[^ -~\n\t]&quot;) then
+      p:close()
+      return
+    end
+
+    res = res .. line .. &quot;\n&quot;
+    if i == height then
       break
     end
     i = i + 1
   end
   p:close()
 
-  return out
+  return res
 end
+
 
 xplr.config.layouts.builtin.default = {
   Horizontal = {
@@ -3990,7 +4025,7 @@ end
 <pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.T = {
   help = &quot;tere nav&quot;,
   messages = {
-    { BashExec = [[echo ChangeDirectory: &quot;'&quot;$(tere)&quot;'&quot; &gt;&gt; &quot;$XPLR_PIPE_MSG_IN&quot;]] },
+    { BashExec0 = [[xplr -m 'ChangeDirectory: %q' &quot;$(tere)&quot;]] },
   },
 }
 </code></pre>
@@ -4072,8 +4107,7 @@ integers. They will be plugged using the <code>require()</code> function in Lua.
 ├── README.md
 └── init.lua
 </code></pre>
-<p>You can also use
-<a href="https://github.com/sayanarijit/plugin-template1.xplr">this template</a>.</p>
+<p>You can also use <a href="https://github.com/sayanarijit/plugin-template1.xplr">this template</a>.</p>
 <h3 id="readmemd"><a class="header" href="#readmemd">README.md</a></h3>
 <p>This is where you document what the plugin does, how to use it, etc.</p>
 <h3 id="initlua"><a class="header" href="#initlua">init.lua</a></h3>
@@ -4093,6 +4127,18 @@ to append <code>.xplr</code> to the name to make them distinguishable. Similar t
 <code>*.nvim</code> naming convention for <a href="https://neovim.io">Neovim</a> plugins.</p>
 <p>Finally, after publishing, don't hesitate to
 <a href="https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell">let us know</a>.</p>
+<h2 id="best-practices"><a class="header" href="#best-practices">Best practices</a></h2>
+<ul>
+<li>Try not to execute a lot of commands at startup, it may make xplr slow to
+start.</li>
+<li>When executing commands, prefer <code>Call0</code> over <code>Call</code>, <code>BashExec0</code> over
+<code>BashExec</code> and so on. File names may contain newline characters
+(e.g. <code>foo$'\n'bar</code>).</li>
+<li>File names may also contain quotes. Avoid writing directly to
+<code>$XPLR_PIPE_MSG_IN</code>. Use <code>xplr -m</code> / <code>xplr --pipe-msg-in</code> instead.</li>
+<li>Check for empty variables using the syntax <code>${FOO:?}</code> or use a default value
+<code>${FOO:-defaultvalue}</code>.</li>
+</ul>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for xplr plugin examples.</p>
 <h2 id="also-see-7"><a class="header" href="#also-see-7">Also See</a></h2>
@@ -4298,6 +4344,30 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="v0194---v0200-beta0"><a class="header" href="#v0194---v0200-beta0"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a> -&gt; v0.20.0-beta.0</a></h4>
+<ul>
+<li>BREAKING: xplr shell (<code>:!</code>) will default to null (<code>\0</code>) delimited pipes, as
+opposed to newline (<code>\n</code>) delimited ones (i.e. will use <code>Call0</code> instead of
+<code>Call</code>).</li>
+<li>Use new messages for safer file path handling (<code>\0</code> delimited):
+<ul>
+<li>Call0</li>
+<li>CallSilently0</li>
+<li>BashExec0</li>
+<li>BashExecSilently0</li>
+</ul>
+</li>
+<li>Use new sub-commands for safer message passing:
+<ul>
+<li><code>-m FORMAT [ARGUMENT]...</code> / <code>--pipe-msg-in FORMAT [ARGUMENT]...</code></li>
+<li><code>-M FORMAT [ARGUMENT]...</code> / <code>--print-msg-in FORMAT [ARGUMENT]...</code>
+Where FORMAT is a YAML string that may contain <code>%s</code>, <code>%q</code> and <code>%%</code>
+placeholders and ARGUMENT is the value per placeholder. See <code>init.lua</code>.</li>
+</ul>
+</li>
+<li>Handling and displaying file paths with newline (<code>\n</code>) characters are now
+supported.</li>
+</ul>
 <h4 id="v0180---v0194"><a class="header" href="#v0180---v0194"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a></a></h4>
 <ul>
 <li>BREAKING: The builtin modes cannot be accessed using space separated names

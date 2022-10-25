@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=xplr
-Comment=Terminal file manager
+Comment=Terminal file explorer
 Exec=xplr
 Terminal=true
 Icon=xplr

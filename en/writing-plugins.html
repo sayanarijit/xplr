@@ -163,8 +163,7 @@ integers. They will be plugged using the <code>require()</code> function in Lua.
 ├── README.md
 └── init.lua
 </code></pre>
-<p>You can also use
-<a href="https://github.com/sayanarijit/plugin-template1.xplr">this template</a>.</p>
+<p>You can also use <a href="https://github.com/sayanarijit/plugin-template1.xplr">this template</a>.</p>
 <h3 id="readmemd"><a class="header" href="#readmemd">README.md</a></h3>
 <p>This is where you document what the plugin does, how to use it, etc.</p>
 <h3 id="initlua"><a class="header" href="#initlua">init.lua</a></h3>
@@ -184,6 +183,18 @@ to append <code>.xplr</code> to the name to make them distinguishable. Similar t
 <code>*.nvim</code> naming convention for <a href="https://neovim.io">Neovim</a> plugins.</p>
 <p>Finally, after publishing, don't hesitate to
 <a href="https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell">let us know</a>.</p>
+<h2 id="best-practices"><a class="header" href="#best-practices">Best practices</a></h2>
+<ul>
+<li>Try not to execute a lot of commands at startup, it may make xplr slow to
+start.</li>
+<li>When executing commands, prefer <code>Call0</code> over <code>Call</code>, <code>BashExec0</code> over
+<code>BashExec</code> and so on. File names may contain newline characters
+(e.g. <code>foo$'\n'bar</code>).</li>
+<li>File names may also contain quotes. Avoid writing directly to
+<code>$XPLR_PIPE_MSG_IN</code>. Use <code>xplr -m</code> / <code>xplr --pipe-msg-in</code> instead.</li>
+<li>Check for empty variables using the syntax <code>${FOO:?}</code> or use a default value
+<code>${FOO:-defaultvalue}</code>.</li>
+</ul>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for xplr plugin examples.</p>
 <h2 id="also-see"><a class="header" href="#also-see">Also See</a></h2>

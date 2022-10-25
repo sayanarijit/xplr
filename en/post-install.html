@@ -156,11 +156,9 @@
 <h2 id="create-the-customizable-config-file"><a class="header" href="#create-the-customizable-config-file">Create the customizable config file</a></h2>
 <pre><code class="language-bash">mkdir -p ~/.config/xplr
 
-version=&quot;$(xplr | grep ^version: | cut -d' ' -f 2)&quot;
+version=&quot;$(xplr --version | awk '{print $2}')&quot;
 
-# When the app loads, press `#`
-
-echo version = '&quot;'${version:?}'&quot;' &gt; ~/.config/xplr/init.lua
+echo &quot;version = '${version:?}'&quot; &gt; ~/.config/xplr/init.lua
 </code></pre>
 <p>Then
 <strong><a href="https://github.com/sayanarijit/xplr/blob/main/src/init.lua">copy from here</a></strong>
