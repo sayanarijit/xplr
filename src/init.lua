@@ -1689,14 +1689,16 @@ xplr.config.modes.builtin.rename = {
           {
             BashExecSilently0 = [===[
               SRC="${XPLR_FOCUS_PATH:?}"
+              SRC_ESC=$(printf %q "$SRC")
               TARGET="${XPLR_INPUT_BUFFER:?}"
+              TARGET_ESC=$(printf %q "$TARGET")
               if [ -e "${TARGET:?}" ]; then
-                "$XPLR" -m 'LogError: %q' "$TARGET already exists"
+                "$XPLR" -m 'LogError: %q' "$TARGET_ESC already exists"
               else
                 mv -- "${SRC:?}" "${TARGET:?}" \
                   && "$XPLR" -m ExplorePwd \
                   && "$XPLR" -m 'FocusPath: %q' "$TARGET" \
-                  && "$XPLR" -m 'LogSuccess: %q' "$SRC renamed to $TARGET"
+                  && "$XPLR" -m 'LogSuccess: %q' "$SRC_ESC renamed to $TARGET_ESC"
               fi
             ]===],
           },
@@ -1731,14 +1733,16 @@ xplr.config.modes.builtin.duplicate_as = {
           {
             BashExecSilently0 = [===[
               SRC="${XPLR_FOCUS_PATH:?}"
+              SRC_ESC=$(printf %q "$SRC")
               TARGET="${XPLR_INPUT_BUFFER:?}"
+              TARGET_ESC=$(printf %q "$TARGET")
               if [ -e "${TARGET:?}" ]; then
-                "$XPLR" -m 'LogError: %q' "$TARGET already exists"
+                "$XPLR" -m 'LogError: %q' "$TARGET_ESC already exists"
               else
                 cp -r -- "${SRC:?}" "${TARGET:?}" \
                   && "$XPLR" -m ExplorePwd \
-                  && "$XPLR" -m 'FocusPath: %q' "$TARGET" \
-                  && "$XPLR" -m 'LogSuccess: %q' "$SRC duplicated as $TARGET"
+                  && "$XPLR" -m 'FocusPath: %q' "$TARGET_ESC" \
+                  && "$XPLR" -m 'LogSuccess: %q' "$SRC_ESC duplicated as $TARGET_ESC"
               fi
             ]===],
           },
