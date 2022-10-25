@@ -1,5 +1,6 @@
 use crate::app;
 use anyhow::{bail, Context, Result};
+use app::ExternalMsg;
 use serde_json as json;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
@@ -181,19 +182,23 @@ pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
         bail!("too many arguments")
     }
 
-    let path = std::env::var("XPLR_PIPE_MSG_IN")
-        .context("passing messages in only works inside xplr shell")?;
+    // Validate
+    let mut msg = json::to_string(&ExternalMsg::try_from(msg.as_str())?)?;
 
-    let delimiter = fs::read(&path)?
-        .first()
-        .cloned()
-        .context("failed to detect delimmiter")?;
+    if let Ok(path) = std::env::var("XPLR_PIPE_MSG_IN") {
+        let delimiter = fs::read(&path)?
+            .first()
+            .cloned()
+            .context("failed to detect delimmiter")?;
 
-    msg.push(delimiter.try_into()?);
-    File::options()
-        .append(true)
-        .open(&path)?
-        .write_all(msg.as_bytes())?;
+        msg.push(delimiter.try_into()?);
+        File::options()
+            .append(true)
+            .open(&path)?
+            .write_all(msg.as_bytes())?;
+    } else {
+        println!("{}", msg);
+    }
 
     Ok(())
 }
