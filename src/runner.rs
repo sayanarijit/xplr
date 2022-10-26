@@ -245,7 +245,7 @@ impl Runner {
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
-        let mut app = app::App::create(
+        let (mut app, hooks) = app::App::create(
             self.bin,
             self.pwd,
             &lua,
@@ -329,7 +329,12 @@ impl Runner {
         event_reader.start();
 
         // Enqueue on_load messages
-        for msg in self.on_load {
+        for msg in hooks
+            .unwrap_or_default()
+            .on_load
+            .into_iter()
+            .chain(self.on_load)
+        {
             tx_msg_in.send(app::Task::new(app::MsgIn::External(msg), None))?;
         }
 
