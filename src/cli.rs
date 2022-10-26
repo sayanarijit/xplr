@@ -1,6 +1,5 @@
-use crate::app;
+use crate::{app, yaml};
 use anyhow::{bail, Context, Result};
-use app::ExternalMsg;
 use serde_json as json;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
@@ -108,7 +107,7 @@ impl Cli {
 
                     "--on-load" => {
                         while let Some(msg) = args.next_if(|msg| !msg.starts_with('-')) {
-                            cli.on_load.push(msg.trim().try_into()?);
+                            cli.on_load.push(yaml::from_str(&msg)?);
                         }
                     }
 
@@ -215,7 +214,8 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
         bail!("too many arguments")
     }
 
-    // Validate
-    let msg = json::to_string(&ExternalMsg::try_from(msg.as_str())?)?;
+    let msg: yaml::Value = yaml::from_str(&msg)?;
+    let msg = json::to_string(&msg)?;
+
     Ok(msg)
 }

@@ -1,4 +1,5 @@
 use crate::app::ExternalMsg;
+use crate::yaml;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -69,7 +70,7 @@ pub fn read_all(pipe: &str, delimiter: char) -> Result<Vec<ExternalMsg>> {
         let mut msgs = vec![];
         for msg in in_str.trim_matches(delimiter).split(delimiter) {
             if !msg.is_empty() {
-                msgs.push(msg.try_into()?);
+                msgs.push(yaml::from_str(msg)?);
             }
         }
         Ok(msgs)

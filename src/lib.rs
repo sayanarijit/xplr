@@ -17,6 +17,7 @@ pub mod pipe;
 pub mod pwd_watcher;
 pub mod runner;
 pub mod ui;
+pub mod yaml;
 
 #[cfg(test)]
 mod tests {

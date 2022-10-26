@@ -9,6 +9,7 @@ use crate::lua;
 use crate::pipe;
 use crate::pwd_watcher;
 use crate::ui;
+use crate::yaml;
 use anyhow::{bail, Error, Result};
 use crossterm::event;
 use crossterm::execute;
@@ -386,13 +387,13 @@ impl Runner {
                             }
 
                             PrintAppStateAndQuit => {
-                                let out = serde_yaml::to_string(&app)?;
+                                let out = yaml::to_string(&app)?;
                                 result = Ok(Some(out));
                                 break 'outer;
                             }
 
                             Debug(path) => {
-                                fs::write(&path, serde_yaml::to_string(&app)?)?;
+                                fs::write(&path, yaml::to_string(&app)?)?;
                             }
 
                             ClearScreen => {
