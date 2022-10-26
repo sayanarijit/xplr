@@ -17,6 +17,6 @@ pub fn from_str<'de, T>(s: &'de str) -> Result<T>
 where
     T: serde::Deserialize<'de>,
 {
-    let deserializer = serde_yaml::Deserializer::from_str(&s);
+    let deserializer = serde_yaml::Deserializer::from_str(s);
     singleton_map_recursive::deserialize(deserializer)
 }
