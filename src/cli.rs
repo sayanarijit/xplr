@@ -1,5 +1,6 @@
 use crate::{app, yaml};
 use anyhow::{bail, Context, Result};
+use app::ExternalMsg;
 use serde_json as json;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
@@ -216,10 +217,10 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
 
     // Since we'll mostly by passing json using `-m`, and json is faster than yaml
     // let's try to validate using json first.
-    let msg = if let Ok(val) = json::from_str::<json::Value>(&msg) {
+    let msg = if let Ok(val) = json::from_str::<ExternalMsg>(&msg) {
         json::to_string(&val)?
     } else {
-        let val: yaml::Value = yaml::from_str(&msg)?;
+        let val: ExternalMsg = yaml::from_str(&msg)?;
         json::to_string(&val)?
     };
 
