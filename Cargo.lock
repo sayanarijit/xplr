@@ -1322,7 +1322,7 @@ checksum = "f40009d85759725a34da6d89a94e63d7bdc50a862acf0dbc7c8e488f1edcb6f5"
 
 [[package]]
 name = "xplr"
-version = "0.20.0-beta.0"
+version = "0.20.0-beta.1"
 dependencies = [
  "ansi-to-tui",
  "anyhow",
