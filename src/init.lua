@@ -2563,3 +2563,29 @@ end
 -- You can also use nested tables such as
 -- `xplr.fn.custom.my_plugin.my_function` to define custom functions.
 xplr.fn.custom = {}
+
+-- ## Hooks -------------------------------------------------------------------
+--
+-- This section of the configuration cannot be overwritten by another config
+-- file, as it is an optional lua return statement specific to each config
+-- file. It can be used to define things that are append only, such as various
+-- hooks and callbacks.
+--
+-- Example:
+--
+-- ```lua
+-- return {
+--   -- Add messages to send when the xplr loads.
+--   -- This is similar to the `--on-load` command-line option.
+--   --
+--   -- Type: list of [Message](https://xplr.dev/en/message#message)s
+--   on_load = {
+--     { LogInfo = "Hello xplr user," },
+--     { LogSuccess = "Configuration successfully loaded!" },
+--   }
+-- }
+-- ```
+
+return {
+  on_load = {},
+}

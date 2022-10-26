@@ -4,7 +4,6 @@ import os
 from dataclasses import dataclass
 from typing import List
 
-
 # Messages --------------------------------------------------------------------
 
 MESSAGES_DOC_TEMPLATE = """
@@ -157,6 +156,7 @@ def gen_configuration():
             line.startswith("-- # Configuration ")
             or line.startswith("-- ## Config ")
             or line.startswith("-- ## Function ")
+            or line.startswith("-- ## On Load ")
         ):
             reading = configuration
 

@@ -1,5 +1,6 @@
 use crate::app::VERSION;
 use crate::config::Config;
+use crate::config::Hooks;
 use anyhow::bail;
 use anyhow::Error;
 use anyhow::Result;
@@ -57,7 +58,7 @@ pub fn check_version(version: &str, path: &str) -> Result<()> {
 }
 
 /// Used to initialize Lua globals
-pub fn init(lua: &Lua) -> Result<Config> {
+pub fn init(lua: &Lua) -> Result<(Config, Option<Hooks>)> {
     let config = Config::default();
     let globals = lua.globals();
 
@@ -73,20 +74,28 @@ pub fn init(lua: &Lua) -> Result<Config> {
     lua_xplr.set("fn", lua_xplr_fn)?;
     globals.set("xplr", lua_xplr)?;
 
-    lua.load(DEFAULT_LUA_SCRIPT).set_name("init")?.exec()?;
+    let hooks: Option<Hooks> = lua
+        .load(DEFAULT_LUA_SCRIPT)
+        .set_name("xplr init")?
+        .call(())
+        .and_then(|v| lua.from_value(v))?;
 
     let lua_xplr: mlua::Table = globals.get("xplr")?;
     let config: Config = lua.from_value(lua_xplr.get("config")?)?;
-    Ok(config)
+    Ok((config, hooks))
 }
 
 /// Used to extend Lua globals
-pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
+pub fn extend(lua: &Lua, path: &str) -> Result<(Config, Option<Hooks>)> {
     let globals = lua.globals();
 
     let script = fs::read_to_string(path)?;
 
-    lua.load(&script).set_name("init")?.exec()?;
+    let hooks: Option<Hooks> = lua
+        .load(&script)
+        .set_name(path)?
+        .call(())
+        .and_then(|v| lua.from_value(v))?;
 
     let version: String = match globals.get("version").and_then(|v| lua.from_value(v)) {
         Ok(v) => v,
@@ -98,7 +107,7 @@ pub fn extend(lua: &Lua, path: &str) -> Result<Config> {
     let lua_xplr: mlua::Table = globals.get("xplr")?;
 
     let config: Config = lua.from_value(lua_xplr.get("config")?)?;
-    Ok(config)
+    Ok((config, hooks))
 }
 
 fn resolve_fn_recursive<'lua, 'a>(

@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::config::Hooks;
 use crate::config::Mode;
 pub use crate::directory_buffer::DirectoryBuffer;
 use crate::explorer;
@@ -190,8 +191,8 @@ impl App {
         lua: &mlua::Lua,
         config_file: Option<PathBuf>,
         extra_config_files: Vec<PathBuf>,
-    ) -> Result<Self> {
-        let mut config = lua::init(lua)?;
+    ) -> Result<(Self, Option<Hooks>)> {
+        let (mut config, mut hooks) = lua::init(lua)?;
 
         let config_file = if let Some(path) = config_file {
             Some(path)
@@ -218,8 +219,13 @@ impl App {
         let mut load_errs = vec![];
         for config_file in config_files {
             match lua::extend(lua, &config_file.to_string_lossy()) {
-                Ok(c) => {
+                Ok((c, maybe_hooks)) => {
                     config = c;
+                    match (hooks.as_mut(), maybe_hooks) {
+                        (Some(h1), Some(h2)) => h1.on_load.extend(h2.on_load),
+                        (None, Some(h2)) => hooks = Some(h2),
+                        (_, _) => {}
+                    }
                 }
                 Err(e) => {
                     load_errs.push(e.to_string());
@@ -328,7 +334,7 @@ impl App {
             app = app.switch_mode_builtin("debug_error")?;
         }
 
-        Ok(app)
+        Ok((app, hooks))
     }
 
     pub fn focused_node(&self) -> Option<&Node> {

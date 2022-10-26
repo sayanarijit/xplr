@@ -612,3 +612,10 @@ pub struct Config {
     #[serde(default)]
     pub modes: ModesConfig,
 }
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Hooks {
+    #[serde(default)]
+    pub on_load: Vec<ExternalMsg>,
+}
