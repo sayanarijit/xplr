@@ -214,8 +214,14 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
         bail!("too many arguments")
     }
 
-    let msg: yaml::Value = yaml::from_str(&msg)?;
-    let msg = json::to_string(&msg)?;
+    // Since we'll mostly by passing json using `-m`, and json is faster than yaml
+    // let's try to validate using json first.
+    let msg = if let Ok(val) = json::from_str::<json::Value>(&msg) {
+        json::to_string(&val)?
+    } else {
+        let val: yaml::Value = yaml::from_str(&msg)?;
+        json::to_string(&val)?
+    };
 
     Ok(msg)
 }
