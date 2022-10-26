@@ -178,7 +178,7 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
     let mut msg = "".to_string();
     let mut last_char = None;
 
-    for ch in format.chars() {
+    for (col, ch) in format.chars().enumerate() {
         match (ch, last_char) {
             ('%', Some('%')) => {
                 msg.push(ch);
@@ -188,17 +188,26 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
                 last_char = Some(ch);
             }
             ('q', Some('%')) => {
-                let arg = args.next().context("not enough arguments")?;
+                let arg = args.next().context(format!(
+                    "argument missing for the placeholder at col {}",
+                    col
+                ))?;
                 msg.push_str(&json::to_string(&arg)?);
                 last_char = None;
             }
             ('s', Some('%')) => {
-                let arg = args.next().context("not enough arguments")?;
+                let arg = args.next().context(format!(
+                    "argument missing for the placeholder at col {}",
+                    col
+                ))?;
                 msg.push_str(&arg);
                 last_char = None;
             }
             (ch, Some('%')) => {
-                bail!(format!("invalid placeholder: %{}, use %s, %q or %%", ch));
+                bail!(format!(
+                    "invalid placeholder (%{}) at col {}, use one of %s %q %%",
+                    ch, col
+                ));
             }
             (ch, _) => {
                 msg.push(ch);
@@ -212,7 +221,7 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
     }
 
     if args.count() != 0 {
-        bail!("too many arguments")
+        bail!("too many arguments, not enough placeholders")
     }
 
     // Since we'll mostly by passing json using `-m`, and json is faster than yaml
