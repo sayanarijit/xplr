@@ -189,7 +189,7 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
             }
             ('q', Some('%')) => {
                 let arg = args.next().context(format!(
-                    "argument missing for the placeholder at col {}",
+                    "argument missing for the placeholder at column {}",
                     col
                 ))?;
                 msg.push_str(&json::to_string(&arg)?);
@@ -197,7 +197,7 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
             }
             ('s', Some('%')) => {
                 let arg = args.next().context(format!(
-                    "argument missing for the placeholder at col {}",
+                    "argument missing for the placeholder at column {}",
                     col
                 ))?;
                 msg.push_str(&arg);
@@ -205,7 +205,7 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
             }
             (ch, Some('%')) => {
                 bail!(format!(
-                    "invalid placeholder (%{}) at col {}, use one of %s %q %%",
+                    "invalid placeholder '%{}' at column {}, use one of '%s' or '%q', or escape it using '%%'",
                     ch, col
                 ));
             }
