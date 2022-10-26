@@ -122,10 +122,16 @@ impl Cli {
 
                     "-m" | "--pipe-msg-in" => {
                         cli.pipe_msg_in.extend(args.by_ref());
+                        if cli.pipe_msg_in.is_empty() {
+                            bail!("usage: {} {} FORMAT [ARGUMENT]...", cli.bin, arg)
+                        }
                     }
 
                     "-M" | "--print-msg-in" => {
                         cli.print_msg_in.extend(args.by_ref());
+                        if cli.print_msg_in.is_empty() {
+                            bail!("usage: {} {} FORMAT [ARGUMENT]...", cli.bin, arg)
+                        }
                     }
 
                     // path
@@ -168,7 +174,7 @@ pub fn print_msg_in(args: Vec<String>) -> Result<()> {
 
 fn fmt_msg_in(args: Vec<String>) -> Result<String> {
     let mut args = args.into_iter();
-    let format = args.next().context("usage: FORMAT [ARGUMENT]...")?;
+    let format = args.next().context("FORMAT is missing")?;
     let mut msg = "".to_string();
     let mut last_char = None;
 
