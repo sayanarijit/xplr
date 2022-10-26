@@ -1366,9 +1366,9 @@ xplr.config.modes.builtin.go_to_path = {
               PTH=${XPLR_INPUT_BUFFER}
               PTH_ESC=$(printf %q "$PTH")
               if [ -d "$PTH" ]; then
-                "$XPLR" -m 'ChangeDirectory: %q' "$PTH_ESC"
+                "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
               elif [ -e "$PTH" ]; then
-                "$XPLR" -m 'FocusPath: %q' "$PTH_ESC"
+                "$XPLR" -m 'FocusPath: %q' "$PTH"
               else
                 "$XPLR" -m 'LogError: %q' "could not find $PTH_ESC"
               fi
