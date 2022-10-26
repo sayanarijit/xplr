@@ -470,6 +470,23 @@ that can be overwritten.</p>
 in <code>xplr.fn.custom</code>.</p>
 <p>You can also use nested tables such as
 <code>xplr.fn.custom.my_plugin.my_function</code> to define custom functions.</p>
+<h2 id="hooks"><a class="header" href="#hooks">Hooks</a></h2>
+<p>This section of the configuration cannot be overwritten by another config
+file, as it is an optional lua return statement specific to each config
+file. It can be used to define things that are append only, such as various
+hooks and callbacks.</p>
+<p>Example:</p>
+<pre><code class="language-lua">return {
+  -- Messages to send when the config file loads.
+  -- This is similar to the `--on-load` command-line option.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_load = {
+    { LogInfo = &quot;Hello xplr user,&quot; },
+    { LogSuccess = &quot;Configuration successfully loaded!&quot; },
+  }
+}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="general-configuration"><a class="header" href="#general-configuration">General Configuration</a></h3>
 <p>The general configuration properties are grouped together in
 <code>xplr.config.general</code>.</p>
@@ -4344,7 +4361,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="v0194---v0200-beta0"><a class="header" href="#v0194---v0200-beta0"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a> -&gt; v0.20.0-beta.0</a></h4>
+<h4 id="v0194---v0200-beta1"><a class="header" href="#v0194---v0200-beta1"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.0-beta.1">v0.20.0-beta.1</a></a></h4>
 <ul>
 <li>BREAKING: xplr shell (<code>:!</code>) will default to null (<code>\0</code>) delimited pipes, as
 opposed to newline (<code>\n</code>) delimited ones (i.e. will use <code>Call0</code> instead of
@@ -4367,6 +4384,8 @@ placeholders and ARGUMENT is the value per placeholder. See <code>init.lua</code
 </li>
 <li>Handling and displaying file paths with newline (<code>\n</code>) characters are now
 supported.</li>
+<li><code>on_load</code> hooks can be defined in the config files using
+<code>return { on_load = { list, of, messages } }</code> statement at the end.</li>
 </ul>
 <h4 id="v0180---v0194"><a class="header" href="#v0180---v0194"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a></a></h4>
 <ul>
