@@ -262,8 +262,8 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// Lua: `"FollowSymlink"`
-    /// YAML: `FollowSymlink`
+    /// - Lua: `"FollowSymlink"`
+    /// - YAML: `FollowSymlink`
     FollowSymlink,
 
     /// ### Virtual Root ------------------------------------------------------
@@ -276,8 +276,8 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// Lua: `{ SetVroot = "/tmp" }`
-    /// YAML: `SetVroot: /tmp`
+    /// - Lua: `{ SetVroot = "/tmp" }`
+    /// - YAML: `SetVroot: /tmp`
     SetVroot(String),
 
     /// Unset the virtual root temporarily (can be reset back to the initial

@@ -308,8 +308,8 @@ Follow the symlink under focus to its actual location.
 
 Example:
 
-Lua: `"FollowSymlink"`
-YAML: `FollowSymlink`
+- Lua: `"FollowSymlink"`
+- YAML: `FollowSymlink`
 
 ### Virtual Root
 
@@ -323,8 +323,8 @@ Type: { SetVroot = "string" }
 
 Example:
 
-Lua: `{ SetVroot = "/tmp" }`
-YAML: `SetVroot: /tmp`
+- Lua: `{ SetVroot = "/tmp" }`
+- YAML: `SetVroot: /tmp`
 
 #### UnsetVroot
 
