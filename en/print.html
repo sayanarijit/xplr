@@ -1834,6 +1834,7 @@ reasons.</p>
 <ul>
 <li><a href="lua-function-calls.html#version">version</a></li>
 <li><a href="lua-function-calls.html#pwd">pwd</a></li>
+<li><a href="layout.html#vroot">vroot</a></li>
 <li><a href="lua-function-calls.html#focused_node">focused_node</a></li>
 <li><a href="lua-function-calls.html#selection">selection</a></li>
 <li><a href="lua-function-calls.html#mode">mode</a></li>
@@ -2156,6 +2157,20 @@ read from the input buffer.</p>
 <p>Example:</p>
 <p>Lua: <code>&quot;FollowSymlink&quot;</code>
 YAML: <code>FollowSymlink</code></p>
+<h4 id="setvroot"><a class="header" href="#setvroot">SetVroot</a></h4>
+<p>Sets the virtual root for isolating xplr navigation, similar to <code>--vroot</code>.
+If the $PWD is outside the vroot, xplr will automatically enter vroot.</p>
+<p>Type: { SetVroot = &quot;string&quot; }</p>
+<p>Example:</p>
+<p>Lua: <code>{ SetVroot = &quot;/tmp&quot; }</code>
+YAML: <code>SetVroot: /tmp</code></p>
+<h4 id="resetvroot"><a class="header" href="#resetvroot">ResetVroot</a></h4>
+<p>Resets the virtual root bach to the value passed by <code>--vroot</code> or <code>/</code>.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;ResetVroot&quot;</code></li>
+<li>YAML: <code>ResetVroot</code></li>
+</ul>
 <h3 id="reading-input"><a class="header" href="#reading-input">Reading Input</a></h3>
 <h4 id="setinputprompt"><a class="header" href="#setinputprompt">SetInputPrompt</a></h4>
 <p>Set the input prompt temporarily, until the input buffer is reset.</p>
@@ -3299,6 +3314,7 @@ messages which will be handled by xplr.</p>
 <ul>
 <li><a href="lua-function-calls.html#version">version</a></li>
 <li><a href="lua-function-calls.html#pwd">pwd</a></li>
+<li><a href="lua-function-calls.html#vroot">vroot</a></li>
 <li><a href="lua-function-calls.html#focused_node">focused_node</a></li>
 <li><a href="lua-function-calls.html#directory_buffer">directory_buffer</a></li>
 <li><a href="lua-function-calls.html#selection">selection</a></li>
@@ -3316,7 +3332,10 @@ messages which will be handled by xplr.</p>
 <p>xplr version. Can be used to test compatibility.</p>
 <h3 id="pwd"><a class="header" href="#pwd">pwd</a></h3>
 <p>Type: string</p>
-<p>The present working directory/</p>
+<p>The present working directory.</p>
+<h3 id="vroot"><a class="header" href="#vroot">vroot</a></h3>
+<p>Type: nullable string</p>
+<p>The current virtual root.</p>
 <h3 id="focused_node"><a class="header" href="#focused_node">focused_node</a></h3>
 <p>Type: nullable <a href="lua-function-calls.html#node">Node</a></p>
 <p>The node under focus.</p>
@@ -3534,6 +3553,7 @@ called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a
 <li><a href="environment-variables-and-pipes.html#xplr_mode">XPLR_MODE</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_pid">XPLR_PID</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_session_path">XPLR_SESSION_PATH</a></li>
+<li><a href="environment-variables-and-pipes.html#xplr_vroot">XPLR_VROOT</a></li>
 </ul>
 <h3 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h3>
 <h4 id="xplr"><a class="header" href="#xplr">XPLR</a></h4>
@@ -3555,6 +3575,8 @@ input while searching. See <a href="messages.html#reading-input">Reading Input</
 <h4 id="xplr_session_path"><a class="header" href="#xplr_session_path">XPLR_SESSION_PATH</a></h4>
 <p>Contains the current session path, like /tmp/runtime-&quot;$USER&quot;/xplr/session/&quot;$XPLR_PID&quot;/,
 you can find temporary files here, such as pipes.</p>
+<h4 id="xplr_vroot"><a class="header" href="#xplr_vroot">XPLR_VROOT</a></h4>
+<p>Contains the path of current virtual root, is set.</p>
 <h3 id="pipes"><a class="header" href="#pipes">Pipes</a></h3>
 <h4 id="input-pipe"><a class="header" href="#input-pipe">Input pipe</a></h4>
 <p>Currently there is only one input pipe.</p>
@@ -4408,6 +4430,9 @@ placeholders and ARGUMENT is the value per placeholder. See <code>init.lua</code
 <li>on_directory_change</li>
 </ul>
 </li>
+<li>Use <code>--vroot</code> to isolate navigation of an xplr session inside a specific
+directory. Interaction still requires passing full path, and shell,
+lua functions etc still can access paths outside vroot.</li>
 </ul>
 <h4 id="v0180---v0194"><a class="header" href="#v0180---v0194"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.18.0">v0.18.0</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a></a></h4>
 <ul>
