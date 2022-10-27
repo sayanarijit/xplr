@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.19.4][47] -> [v0.20.0-beta.1][48]
+#### [v0.19.4][47] -> [v0.20.0-beta.2][48]
 
 - BREAKING: xplr shell (`:!`) will default to null (`\0`) delimited pipes, as
   opposed to newline (`\n`) delimited ones (i.e. will use `Call0` instead of
@@ -60,10 +60,11 @@ compatibility.
   - `-M FORMAT [ARGUMENT]...` / `--print-msg-in FORMAT [ARGUMENT]...`
     Where FORMAT is a YAML string that may contain `%s`, `%q` and `%%`
     placeholders and ARGUMENT is the value per placeholder. See `init.lua`.
-- Handling and displaying file paths with newline (`\n`) characters are now
-  supported.
-- `on_load` hooks can be defined in the config files using
-  `return { on_load = { list, of, messages } }` statement at the end.
+- Following hooks can be defined in the config files using an optional
+  `return { on_* = { list, of, messages }, ... }` statement at the end.
+  - on_load
+  - on_focus_change
+  - on_directory_change
 
 #### [v0.18.0][46] -> [v0.19.4][47]
 
@@ -422,4 +423,4 @@ Else do the following:
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
-[48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.0-beta.1
+[48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.0-beta.2
