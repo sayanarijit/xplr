@@ -1876,6 +1876,13 @@ xplr.config.modes.builtin.action = {
           "ToggleMouse",
         },
       },
+      ["v"] = {
+        help = "vroot",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "vroot" },
+        },
+      },
       ["q"] = {
         help = "quit options",
         messages = {
@@ -2305,6 +2312,53 @@ xplr.config.modes.builtin.switch_layout = {
         messages = {
           { SwitchLayoutBuiltin = "no_help_no_selection" },
           "PopMode",
+        },
+      },
+    },
+  },
+}
+
+-- The builtin vroot mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.vroot = {
+  name = "vroot",
+  key_bindings = {
+    on_key = {
+      ["."] = {
+        help = "vroot $PWD",
+        messages = {
+          "PopMode",
+          {
+            BashExecSilently0 = [===[
+              "$XPLR" -m 'SetVroot: %q' "${PWD:?}"
+            ]===],
+          },
+        },
+      },
+      ["/"] = {
+        help = "vroot /",
+        messages = {
+          "PopMode",
+          { SetVroot = "/" },
+        },
+      },
+      ["~"] = {
+        help = "vroot ~",
+        messages = {
+          "PopMode",
+          {
+            BashExecSilently0 = [===[
+              "$XPLR" -m 'SetVroot: %q' "${HOME:?}"
+            ]===],
+          },
+        },
+      },
+      ["ctrl-r"] = {
+        help = "reset vroot",
+        messages = {
+          "PopMode",
+          "ResetVroot",
         },
       },
     },

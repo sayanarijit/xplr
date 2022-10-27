@@ -783,10 +783,11 @@ impl App {
         }
     }
 
-    fn reset_vroot(self) -> Result<Self> {
+    fn reset_vroot(mut self) -> Result<Self> {
         if let Some(vroot) = self.initial_vroot.clone() {
             self.set_vroot(&vroot)
         } else {
+            self.vroot = None;
             Ok(self)
         }
     }
