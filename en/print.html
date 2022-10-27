@@ -1032,6 +1032,9 @@ to see what each mode does.</p>
 <h4 id="xplrconfigmodesbuiltinswitch_layout"><a class="header" href="#xplrconfigmodesbuiltinswitch_layout">xplr.config.modes.builtin.switch_layout</a></h4>
 <p>The builtin switch layout mode.</p>
 <p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
+<h4 id="xplrconfigmodesbuiltinvroot"><a class="header" href="#xplrconfigmodesbuiltinvroot">xplr.config.modes.builtin.vroot</a></h4>
+<p>The builtin vroot mode.</p>
+<p>Type: <a href="https://xplr.dev/en/mode">Mode</a></p>
 <h4 id="xplrconfigmodescustom"><a class="header" href="#xplrconfigmodescustom">xplr.config.modes.custom</a></h4>
 <p>This is where you define custom modes.</p>
 <p>Type: mapping of the following key-value pairs:</p>
@@ -1284,8 +1287,10 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>.</td><td></td><td>vroot $PWD</td></tr>
 <tr><td>/</td><td></td><td>vroot /</td></tr>
-<tr><td>ctrl-r</td><td></td><td>reset vroot</td></tr>
 <tr><td>~</td><td></td><td>vroot $HOME</td></tr>
+<tr><td>v</td><td></td><td>toggle vroot</td></tr>
+<tr><td>ctrl-r</td><td></td><td>reset vroot</td></tr>
+<tr><td>ctrl-u</td><td></td><td>unset vroot</td></tr>
 </tbody></table>
 <h3 id="create_file"><a class="header" href="#create_file">create_file</a></h3>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
@@ -1933,6 +1938,7 @@ represented using
 <li><a href="messages.html#exploring">Exploring</a></li>
 <li><a href="messages.html#screen">Screen</a></li>
 <li><a href="messages.html#navigation">Navigation</a></li>
+<li><a href="messages.html#virtual-root">Virtual Root</a></li>
 <li><a href="messages.html#reading-input">Reading Input</a></li>
 <li><a href="messages.html#switching-mode">Switching Mode</a></li>
 <li><a href="messages.html#switching-layout">Switching Layout</a></li>
@@ -2169,15 +2175,32 @@ read from the input buffer.</p>
 <p>Example:</p>
 <p>Lua: <code>&quot;FollowSymlink&quot;</code>
 YAML: <code>FollowSymlink</code></p>
+<h3 id="virtual-root"><a class="header" href="#virtual-root">Virtual Root</a></h3>
 <h4 id="setvroot"><a class="header" href="#setvroot">SetVroot</a></h4>
-<p>Sets the virtual root for isolating xplr navigation, similar to <code>--vroot</code>.
+<p>Sets the virtual root for isolating xplr navigation, similar to
+<code>--vroot</code>, but temporary (can be reset back to initial value).
 If the $PWD is outside the vroot, xplr will automatically enter vroot.</p>
 <p>Type: { SetVroot = &quot;string&quot; }</p>
 <p>Example:</p>
 <p>Lua: <code>{ SetVroot = &quot;/tmp&quot; }</code>
 YAML: <code>SetVroot: /tmp</code></p>
+<h4 id="unsetvroot"><a class="header" href="#unsetvroot">UnsetVroot</a></h4>
+<p>Unset the virtual root temporarily (can be reset back to the initial
+value).</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;UnsetVroot&quot;</code></li>
+<li>YAML: <code>UnsetVroot</code></li>
+</ul>
+<h4 id="togglevroot"><a class="header" href="#togglevroot">ToggleVroot</a></h4>
+<p>Toggle virtual root between unset, initial value and $PWD.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;ToggleVroot&quot;</code></li>
+<li>YAML: <code>ToggleVroot</code></li>
+</ul>
 <h4 id="resetvroot"><a class="header" href="#resetvroot">ResetVroot</a></h4>
-<p>Resets the virtual root bach to the value passed by <code>--vroot</code> or <code>/</code>.</p>
+<p>Reset the virtual root back to the initial value.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetVroot&quot;</code></li>
