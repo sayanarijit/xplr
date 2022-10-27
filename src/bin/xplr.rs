@@ -1,7 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 
 use std::env;
-
 use xplr::cli::{self, Cli};
 use xplr::runner;
 
@@ -36,7 +35,9 @@ fn main() {
     -c, --config <PATH>             Specifies a custom config file (default is
                                       "$HOME/.config/xplr/init.lua")
     -C, --extra-config <PATH>...    Specifies extra config files to load
-        --on-load <MESSAGE>...      Sends messages when xplr loads"###;
+        --on-load <MESSAGE>...      Sends messages when xplr loads
+        --vroot <PATH>              Treats the specified path as the virtual root for
+                                      navigation, but uses full path for interaction"###;
 
         let args = r###"
     <PATH>            Path to focus on, or enter if directory, (default is `.`)

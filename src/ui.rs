@@ -669,6 +669,14 @@ fn draw_table<B: Backend>(
         .map(|c| c.to_tui(screen_size, layout_size))
         .collect();
 
+    let pwd = app
+        .pwd
+        .strip_prefix(&app.vroot)
+        .unwrap_or(&app.pwd)
+        .trim_matches('/')
+        .replace('\\', "\\\\")
+        .replace('\n', "\\n");
+
     let table = Table::new(rows)
         .widths(&table_constraints)
         .style(app_config.general.table.style.to_owned().into())
@@ -677,8 +685,8 @@ fn draw_table<B: Backend>(
         .block(block(
             config,
             format!(
-                " {} ({}) ",
-                app.pwd.replace('\\', "\\\\").replace('\n', "\\n"),
+                " /{} ({}) ",
+                pwd,
                 app.directory_buffer
                     .as_ref()
                     .map(|d| d.total)

@@ -102,6 +102,7 @@ pub(crate) fn explore_async(
 
 pub(crate) fn explore_recursive_async(
     config: ExplorerConfig,
+    root: PathBuf,
     parent: PathBuf,
     focused_path: Option<PathBuf>,
     fallback_focus: usize,
@@ -115,13 +116,16 @@ pub(crate) fn explore_recursive_async(
         tx_msg_in.clone(),
     );
     if let Some(grand_parent) = parent.parent() {
-        explore_recursive_async(
-            config,
-            grand_parent.into(),
-            parent.file_name().map(|p| p.into()),
-            0,
-            tx_msg_in,
-        );
+        if grand_parent.starts_with(&root) {
+            explore_recursive_async(
+                config,
+                root,
+                grand_parent.into(),
+                parent.file_name().map(|p| p.into()),
+                0,
+                tx_msg_in,
+            );
+        }
     }
 }
 
