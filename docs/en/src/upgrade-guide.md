@@ -65,6 +65,9 @@ compatibility.
   - on_load
   - on_focus_change
   - on_directory_change
+- Use `--vroot` to isolate navigation of an xplr session inside a specific
+  directory. Interaction still requires passing full path, and shell,
+  lua functions etc still can access paths outside vroot.
 
 #### [v0.18.0][46] -> [v0.19.4][47]
 

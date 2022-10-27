@@ -191,6 +191,7 @@ fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
 
 pub struct Runner {
     bin: String,
+    vroot: PathBuf,
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
     config_file: Option<PathBuf>,
@@ -210,25 +211,24 @@ impl Runner {
 
     /// Create a new runner object passing the given arguments
     pub fn from_cli(cli: Cli) -> Result<Self> {
-        let basedir = get_current_dir()?;
-        let basedir_clone = basedir.clone();
-        let mut paths = cli.paths.into_iter().map(|p| {
-            if p.is_relative() {
-                basedir_clone.join(p)
-            } else {
-                p
-            }
-        });
-        let mut pwd = paths.next().unwrap_or_else(|| basedir.clone());
+        let currdir = get_current_dir()?;
+        let mut paths = cli.paths.into_iter();
+        let mut pwd = paths
+            .next()
+            .or_else(|| cli.vroot.clone())
+            .unwrap_or_else(|| currdir.clone());
         let mut focused_path = None;
 
         if cli.force_focus || pwd.is_file() {
             focused_path = pwd.file_name().map(|p| p.into());
-            pwd = pwd.parent().map(|p| p.into()).unwrap_or(basedir);
+            pwd = pwd.parent().map(|p| p.into()).unwrap_or(currdir);
         }
+
+        let root = cli.vroot.unwrap_or_else(|| "/".into());
 
         Ok(Self {
             bin: cli.bin,
+            vroot: root,
             pwd,
             focused_path,
             config_file: cli.config,
@@ -247,6 +247,7 @@ impl Runner {
         let lua = unsafe { mlua::Lua::unsafe_new() };
         let mut app = app::App::create(
             self.bin,
+            self.vroot,
             self.pwd,
             &lua,
             self.config_file,
@@ -277,6 +278,7 @@ impl Runner {
 
         explorer::explore_recursive_async(
             app.explorer_config.clone(),
+            app.vroot.clone().into(),
             app.pwd.clone().into(),
             self.focused_path,
             app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
@@ -442,6 +444,7 @@ impl Runner {
                             ExploreParentsAsync => {
                                 explorer::explore_recursive_async(
                                     app.explorer_config.clone(),
+                                    app.vroot.clone().into(),
                                     app.pwd.clone().into(),
                                     app.focused_node()
                                         .map(|n| n.relative_path.clone().into()),

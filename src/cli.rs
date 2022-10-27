@@ -1,6 +1,7 @@
 use crate::{app, yaml};
 use anyhow::{bail, Context, Result};
 use app::ExternalMsg;
+use path_absolutize::*;
 use serde_json as json;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
@@ -18,6 +19,7 @@ pub struct Cli {
     pub print_pwd_as_result: bool,
     pub read0: bool,
     pub write0: bool,
+    pub vroot: Option<PathBuf>,
     pub config: Option<PathBuf>,
     pub extra_config: Vec<PathBuf>,
     pub on_load: Vec<app::ExternalMsg>,
@@ -32,7 +34,7 @@ impl Cli {
             bail!("empty string passed")
         };
 
-        let path = PathBuf::from(arg);
+        let path = PathBuf::from(arg).absolutize()?.to_path_buf();
         if path.exists() {
             self.paths.push(path);
             Ok(())
@@ -94,13 +96,24 @@ impl Cli {
                     }
 
                     // Options
-                    "-c" | "--config" => cli.config = args.next().map(PathBuf::from),
+                    "-c" | "--config" => {
+                        if let Some(p) = args.next().map(PathBuf::from) {
+                            cli.config = Some(p.absolutize()?.to_path_buf());
+                        };
+                    }
+
+                    "--vroot" => {
+                        if let Some(p) = args.next().map(PathBuf::from) {
+                            cli.vroot = Some(p.absolutize()?.to_path_buf());
+                        }
+                    }
 
                     "-C" | "--extra-config" => {
                         while let Some(path) =
                             args.next_if(|path| !path.starts_with('-'))
                         {
-                            cli.extra_config.push(PathBuf::from(path));
+                            cli.extra_config
+                                .push(PathBuf::from(path).absolutize()?.to_path_buf());
                         }
                     }
 

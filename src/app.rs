@@ -24,6 +24,7 @@ use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
 use gethostname::gethostname;
 use indexmap::set::IndexSet;
+use path_absolutize::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -166,6 +167,7 @@ pub struct App {
     pub version: String,
     pub config: Config,
     pub hooks: Hooks,
+    pub vroot: String,
     pub pwd: String,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub last_focus: HashMap<String, Option<String>>,
@@ -188,6 +190,7 @@ pub struct App {
 impl App {
     pub fn create(
         bin: String,
+        vroot: PathBuf,
         pwd: PathBuf,
         lua: &mlua::Lua,
         config_file: Option<PathBuf>,
@@ -199,14 +202,14 @@ impl App {
         let config_file = if let Some(path) = config_file {
             Some(path)
         } else if let Some(dir) = dirs::home_dir() {
-            let path = dir.join(".config").join("xplr").join("init.lua");
+            let path = dir.join(".config/xplr/init.lua");
             if path.exists() {
                 Some(path)
             } else {
                 None
             }
         } else {
-            let path = PathBuf::from("/").join("etc").join("xplr").join("init.lua");
+            let path = PathBuf::from("/etc/xplr/init.lua");
             if path.exists() {
                 Some(path)
             } else {
@@ -294,7 +297,16 @@ impl App {
         };
 
         let hostname = gethostname().to_string_lossy().to_string();
+
+        if !pwd.starts_with(&vroot) {
+            bail!(
+                "{:?} is outside of virtual root {:?}",
+                pwd.to_string_lossy(),
+                vroot.to_string_lossy()
+            )
+        }
         let pwd = pwd.to_string_lossy().to_string();
+        let vroot = vroot.to_string_lossy().to_string();
         env::set_current_dir(&pwd)?;
 
         let input = InputBuffer {
@@ -306,6 +318,7 @@ impl App {
             bin,
             version: VERSION.to_string(),
             config,
+            vroot,
             pwd,
             directory_buffer: Default::default(),
             last_focus: Default::default(),
@@ -743,9 +756,15 @@ impl App {
     }
 
     fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
-        let mut dir = PathBuf::from(dir);
-        if dir.is_relative() {
-            dir = PathBuf::from(self.pwd.clone()).join(dir);
+        let dir = PathBuf::from(dir).absolutize()?.to_path_buf();
+
+        let vroot = &self.vroot.clone();
+        if !dir.starts_with(&self.vroot) {
+            return self.log_error(format!(
+                "{:?} is outside of virtual root {:?}",
+                dir.to_string_lossy(),
+                vroot,
+            ));
         }
 
         match env::set_current_dir(&dir) {
@@ -971,10 +990,7 @@ impl App {
     }
 
     pub fn focus_path(self, path: &str, save_history: bool) -> Result<Self> {
-        let mut pathbuf = PathBuf::from(path);
-        if pathbuf.is_relative() {
-            pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
-        }
+        let pathbuf = PathBuf::from(path).absolutize()?.to_path_buf();
         if let Some(parent) = pathbuf.parent() {
             if let Some(filename) = pathbuf.file_name() {
                 self.change_directory(&parent.to_string_lossy(), false)?
@@ -1216,10 +1232,7 @@ impl App {
     }
 
     pub fn select_path(mut self, path: String) -> Result<Self> {
-        let mut path = PathBuf::from(path);
-        if path.is_relative() {
-            path = PathBuf::from(self.pwd.clone()).join(path);
-        }
+        let path = PathBuf::from(path).absolutize()?.to_path_buf();
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
         if let (Some(p), Some(n)) = (parent, filename) {
@@ -1246,10 +1259,7 @@ impl App {
     }
 
     pub fn un_select_path(mut self, path: String) -> Result<Self> {
-        let mut pathbuf = PathBuf::from(path);
-        if pathbuf.is_relative() {
-            pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
-        }
+        let pathbuf = PathBuf::from(path).absolutize()?.to_path_buf();
         self.selection
             .retain(|n| PathBuf::from(&n.absolute_path) != pathbuf);
         Ok(self)
@@ -1286,10 +1296,7 @@ impl App {
     }
 
     fn toggle_selection_by_path(self, path: String) -> Result<Self> {
-        let mut pathbuf = PathBuf::from(&path);
-        if pathbuf.is_relative() {
-            pathbuf = PathBuf::from(self.pwd.clone()).join(pathbuf);
-        }
+        let pathbuf = PathBuf::from(&path).absolutize()?.to_path_buf();
         if self
             .selection
             .iter()
