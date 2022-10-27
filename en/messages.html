@@ -393,8 +393,10 @@ read from the input buffer.</p>
 <h4 id="followsymlink"><a class="header" href="#followsymlink">FollowSymlink</a></h4>
 <p>Follow the symlink under focus to its actual location.</p>
 <p>Example:</p>
-<p>Lua: <code>&quot;FollowSymlink&quot;</code>
-YAML: <code>FollowSymlink</code></p>
+<ul>
+<li>Lua: <code>&quot;FollowSymlink&quot;</code></li>
+<li>YAML: <code>FollowSymlink</code></li>
+</ul>
 <h3 id="virtual-root"><a class="header" href="#virtual-root">Virtual Root</a></h3>
 <h4 id="setvroot"><a class="header" href="#setvroot">SetVroot</a></h4>
 <p>Sets the virtual root for isolating xplr navigation, similar to
@@ -402,8 +404,10 @@ YAML: <code>FollowSymlink</code></p>
 If the $PWD is outside the vroot, xplr will automatically enter vroot.</p>
 <p>Type: { SetVroot = &quot;string&quot; }</p>
 <p>Example:</p>
-<p>Lua: <code>{ SetVroot = &quot;/tmp&quot; }</code>
-YAML: <code>SetVroot: /tmp</code></p>
+<ul>
+<li>Lua: <code>{ SetVroot = &quot;/tmp&quot; }</code></li>
+<li>YAML: <code>SetVroot: /tmp</code></li>
+</ul>
 <h4 id="unsetvroot"><a class="header" href="#unsetvroot">UnsetVroot</a></h4>
 <p>Unset the virtual root temporarily (can be reset back to the initial
 value).</p>
