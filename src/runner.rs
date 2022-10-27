@@ -277,7 +277,6 @@ impl Runner {
 
         explorer::explore_recursive_async(
             app.explorer_config.clone(),
-            app.vroot.as_ref().map(PathBuf::from),
             app.pwd.clone().into(),
             self.focused_path,
             app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
@@ -443,7 +442,6 @@ impl Runner {
                             ExploreParentsAsync => {
                                 explorer::explore_recursive_async(
                                     app.explorer_config.clone(),
-                                    app.vroot.as_ref().map(PathBuf::from),
                                     app.pwd.clone().into(),
                                     app.focused_node()
                                         .map(|n| n.relative_path.clone().into()),
