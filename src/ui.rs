@@ -678,7 +678,7 @@ fn draw_table<B: Backend>(
     .replace('\\', "\\\\")
     .replace('\n', "\\n");
 
-    let vroot_indicator = if app.vroot.is_some() { "[v] " } else { "" };
+    let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
 
     let table = Table::new(rows)
         .widths(&table_constraints)
