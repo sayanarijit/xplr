@@ -36,8 +36,7 @@ fn main() {
                                       "$HOME/.config/xplr/init.lua")
     -C, --extra-config <PATH>...    Specifies extra config files to load
         --on-load <MESSAGE>...      Sends messages when xplr loads
-        --vroot <PATH>              Treats the specified path as the virtual root for
-                                      navigation, but uses full path for interaction"###;
+        --vroot <PATH>              Treats the specified path as the virtual root"###;
 
         let args = r###"
     <PATH>            Path to focus on, or enter if directory, (default is `.`)

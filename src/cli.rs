@@ -47,7 +47,15 @@ impl Cli {
     pub fn parse(args: env::Args) -> Result<Self> {
         let mut cli = Self::default();
         let mut args = args.peekable();
-        cli.bin = args.next().context("failed to parse xplr binary path")?;
+        cli.bin = args
+            .next()
+            .map(which::which)
+            .context("failed to parse xplr binary path")?
+            .context("failed to find xplr binary path")?
+            .absolutize()?
+            .to_path_buf()
+            .to_string_lossy()
+            .to_string();
 
         let mut flag_ends = false;
 

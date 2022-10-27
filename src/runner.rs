@@ -109,6 +109,7 @@ fn call(
 
     let status = Command::new(cmd.command.clone())
         .env("XPLR", &app.bin)
+        .env("XPLR_VROOT", &app.vroot.clone().unwrap_or_default())
         .env("XPLR_APP_VERSION", &app.version)
         .env("XPLR_PID", &app.pid.to_string())
         .env("XPLR_INPUT_BUFFER", input_buffer)
@@ -191,7 +192,7 @@ fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
 
 pub struct Runner {
     bin: String,
-    vroot: PathBuf,
+    vroot: Option<PathBuf>,
     pwd: PathBuf,
     focused_path: Option<PathBuf>,
     config_file: Option<PathBuf>,
@@ -224,11 +225,9 @@ impl Runner {
             pwd = pwd.parent().map(|p| p.into()).unwrap_or(currdir);
         }
 
-        let root = cli.vroot.unwrap_or_else(|| "/".into());
-
         Ok(Self {
             bin: cli.bin,
-            vroot: root,
+            vroot: cli.vroot,
             pwd,
             focused_path,
             config_file: cli.config,
@@ -278,7 +277,7 @@ impl Runner {
 
         explorer::explore_recursive_async(
             app.explorer_config.clone(),
-            app.vroot.clone().into(),
+            app.vroot.as_ref().map(PathBuf::from),
             app.pwd.clone().into(),
             self.focused_path,
             app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
@@ -444,7 +443,7 @@ impl Runner {
                             ExploreParentsAsync => {
                                 explorer::explore_recursive_async(
                                     app.explorer_config.clone(),
-                                    app.vroot.clone().into(),
+                                    app.vroot.as_ref().map(PathBuf::from),
                                     app.pwd.clone().into(),
                                     app.focused_node()
                                         .map(|n| n.relative_path.clone().into()),

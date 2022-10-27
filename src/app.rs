@@ -128,6 +128,7 @@ impl History {
 pub struct LuaContextHeavy {
     pub version: String,
     pub pwd: String,
+    pub vroot: Option<String>,
     pub focused_node: Option<Node>,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub selection: IndexSet<Node>,
@@ -145,6 +146,7 @@ pub struct LuaContextHeavy {
 pub struct LuaContextLight {
     pub version: String,
     pub pwd: String,
+    pub vroot: Option<String>,
     pub focused_node: Option<Node>,
     pub selection: IndexSet<Node>,
     pub mode: Mode,
@@ -167,7 +169,8 @@ pub struct App {
     pub version: String,
     pub config: Config,
     pub hooks: Hooks,
-    pub vroot: String,
+    pub vroot: Option<String>,
+    pub initial_vroot: Option<String>,
     pub pwd: String,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub last_focus: HashMap<String, Option<String>>,
@@ -190,7 +193,7 @@ pub struct App {
 impl App {
     pub fn create(
         bin: String,
-        vroot: PathBuf,
+        vroot: Option<PathBuf>,
         pwd: PathBuf,
         lua: &mlua::Lua,
         config_file: Option<PathBuf>,
@@ -298,15 +301,19 @@ impl App {
 
         let hostname = gethostname().to_string_lossy().to_string();
 
-        if !pwd.starts_with(&vroot) {
-            bail!(
-                "{:?} is outside of virtual root {:?}",
-                pwd.to_string_lossy(),
-                vroot.to_string_lossy()
-            )
+        if let Some(vroot) = vroot.as_ref() {
+            if !pwd.starts_with(&vroot) {
+                bail!(
+                    "{:?} is outside of virtual root {:?}",
+                    pwd.to_string_lossy(),
+                    vroot.to_string_lossy()
+                )
+            }
         }
+
         let pwd = pwd.to_string_lossy().to_string();
-        let vroot = vroot.to_string_lossy().to_string();
+        let vroot = vroot.map(|v| v.to_string_lossy().to_string());
+        let initial_vroot = vroot.clone();
         env::set_current_dir(&pwd)?;
 
         let input = InputBuffer {
@@ -319,6 +326,7 @@ impl App {
             version: VERSION.to_string(),
             config,
             vroot,
+            initial_vroot,
             pwd,
             directory_buffer: Default::default(),
             last_focus: Default::default(),
@@ -440,6 +448,8 @@ impl App {
                 LastVisitedPath => self.last_visited_path(),
                 NextVisitedPath => self.next_visited_path(),
                 FollowSymlink => self.follow_symlink(),
+                SetVroot(p) => self.set_vroot(&p),
+                ResetVroot => self.reset_vroot(),
                 SetInputPrompt(p) => self.set_input_prompt(p),
                 UpdateInputBuffer(op) => self.update_input_buffer(op),
                 UpdateInputBufferFromKey => self.update_input_buffer_from_key(key),
@@ -755,16 +765,43 @@ impl App {
         }
     }
 
+    fn set_vroot(mut self, path: &String) -> Result<Self> {
+        let vroot = PathBuf::from(path).absolutize()?.to_path_buf();
+
+        if vroot.is_dir() {
+            self.vroot = Some(vroot.to_string_lossy().to_string());
+            if !PathBuf::from(&self.pwd).starts_with(&vroot) {
+                self.change_directory(path, true)
+            } else {
+                Ok(self)
+            }
+        } else {
+            self.log_error(format!(
+                "not a valid directory: {}",
+                vroot.to_string_lossy()
+            ))
+        }
+    }
+
+    fn reset_vroot(self) -> Result<Self> {
+        if let Some(vroot) = self.initial_vroot.clone() {
+            self.set_vroot(&vroot)
+        } else {
+            Ok(self)
+        }
+    }
+
     fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
         let dir = PathBuf::from(dir).absolutize()?.to_path_buf();
 
-        let vroot = &self.vroot.clone();
-        if !dir.starts_with(&self.vroot) {
-            return self.log_error(format!(
-                "{:?} is outside of virtual root {:?}",
-                dir.to_string_lossy(),
-                vroot,
-            ));
+        if let Some(vroot) = &self.vroot.clone() {
+            if !dir.starts_with(&vroot) {
+                return self.log_error(format!(
+                    "{:?} is outside of virtual root {:?}",
+                    dir.to_string_lossy(),
+                    vroot,
+                ));
+            }
         }
 
         match env::set_current_dir(&dir) {
@@ -1722,6 +1759,7 @@ impl App {
         LuaContextHeavy {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
+            vroot: self.vroot.clone(),
             focused_node: self.focused_node().cloned(),
             directory_buffer: self.directory_buffer.clone(),
             selection: self.selection.clone(),
@@ -1740,6 +1778,7 @@ impl App {
         LuaContextLight {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
+            vroot: self.vroot.clone(),
             focused_node: self.focused_node().cloned(),
             selection: self.selection.clone(),
             mode: self.mode.clone(),
