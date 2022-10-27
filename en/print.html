@@ -472,18 +472,36 @@ in <code>xplr.fn.custom</code>.</p>
 <code>xplr.fn.custom.my_plugin.my_function</code> to define custom functions.</p>
 <h2 id="hooks"><a class="header" href="#hooks">Hooks</a></h2>
 <p>This section of the configuration cannot be overwritten by another config
-file, as it is an optional lua return statement specific to each config
-file. It can be used to define things that are append only, such as various
-hooks and callbacks.</p>
+file or plugin, since this is an optional lua return statement specific to
+each config file. It can be used to define things that should be explicit
+for reasons like performance concerns, such as hooks.</p>
+<p>Plugins should expose the hooks, and require users to subscribe to them
+explicitly.</p>
 <p>Example:</p>
 <pre><code class="language-lua">return {
-  -- Messages to send when the config file loads.
+  -- Add messages to send when the xplr loads.
   -- This is similar to the `--on-load` command-line option.
   --
   -- Type: list of [Message](https://xplr.dev/en/message#message)s
   on_load = {
-    { LogInfo = &quot;Hello xplr user,&quot; },
     { LogSuccess = &quot;Configuration successfully loaded!&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_load&quot; },
+  },
+
+  -- Add messages to send when the directory changes.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_directory_change = {
+    { LogSuccess = &quot;Changed directory&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_directory_change&quot; },
+  },
+
+  -- Add messages to send when the focus changes.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_focus_change = {
+    { LogSuccess = &quot;Changed focus&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_focus_change&quot; },
   }
 }
 </code></pre>
