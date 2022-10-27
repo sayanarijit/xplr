@@ -2344,7 +2344,7 @@ xplr.config.modes.builtin.vroot = {
         },
       },
       ["~"] = {
-        help = "vroot ~",
+        help = "vroot $HOME",
         messages = {
           "PopMode",
           {

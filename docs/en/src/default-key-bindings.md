@@ -64,7 +64,7 @@ of [modes][4] and the key mappings for each mode.
 | .      |        | vroot $PWD  |
 | /      |        | vroot /     |
 | ctrl-r |        | reset vroot |
-| ~      |        | vroot ~     |
+| ~      |        | vroot $HOME |
 
 ### create_file
 
