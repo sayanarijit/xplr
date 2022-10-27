@@ -7,6 +7,7 @@ xplr messages categorized based on their purpose.
 - [Exploring](#exploring)
 - [Screen](#screen)
 - [Navigation](#navigation)
+- [Virtual Root](#virtual-root)
 - [Reading Input](#reading-input)
 - [Switching Mode](#switching-mode)
 - [Switching Layout](#switching-layout)
@@ -310,9 +311,12 @@ Example:
 Lua: `"FollowSymlink"`
 YAML: `FollowSymlink`
 
+### Virtual Root
+
 #### SetVroot
 
-Sets the virtual root for isolating xplr navigation, similar to `--vroot`.
+Sets the virtual root for isolating xplr navigation, similar to
+`--vroot`, but temporary (can be reset back to initial value).
 If the $PWD is outside the vroot, xplr will automatically enter vroot.
 
 Type: { SetVroot = "string" }
@@ -322,9 +326,28 @@ Example:
 Lua: `{ SetVroot = "/tmp" }`
 YAML: `SetVroot: /tmp`
 
+#### UnsetVroot
+
+Unset the virtual root temporarily (can be reset back to the initial
+value).
+
+Example:
+
+- Lua: `"UnsetVroot"`
+- YAML: `UnsetVroot`
+
+#### ToggleVroot
+
+Toggle virtual root between unset, initial value and $PWD.
+
+Example:
+
+- Lua: `"ToggleVroot"`
+- YAML: `ToggleVroot`
+
 #### ResetVroot
 
-Resets the virtual root bach to the value passed by `--vroot` or `/`.
+Reset the virtual root back to the initial value.
 
 Example:
 

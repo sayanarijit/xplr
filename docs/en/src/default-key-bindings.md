@@ -59,12 +59,14 @@ of [modes][4] and the key mappings for each mode.
 
 ### vroot
 
-| key    | remaps | action      |
-| ------ | ------ | ----------- |
-| .      |        | vroot $PWD  |
-| /      |        | vroot /     |
-| ctrl-r |        | reset vroot |
-| ~      |        | vroot $HOME |
+| key    | remaps | action       |
+| ------ | ------ | ------------ |
+| .      |        | vroot $PWD   |
+| /      |        | vroot /      |
+| ~      |        | vroot $HOME  |
+| v      |        | toggle vroot |
+| ctrl-r |        | reset vroot  |
+| ctrl-u |        | unset vroot  |
 
 ### create_file
 

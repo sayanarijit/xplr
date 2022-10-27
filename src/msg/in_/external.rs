@@ -266,7 +266,10 @@ pub enum ExternalMsg {
     /// YAML: `FollowSymlink`
     FollowSymlink,
 
-    /// Sets the virtual root for isolating xplr navigation, similar to `--vroot`.
+    /// ### Virtual Root ------------------------------------------------------
+
+    /// Sets the virtual root for isolating xplr navigation, similar to
+    /// `--vroot`, but temporary (can be reset back to initial value).
     /// If the $PWD is outside the vroot, xplr will automatically enter vroot.
     ///
     /// Type: { SetVroot = "string" }
@@ -277,7 +280,24 @@ pub enum ExternalMsg {
     /// YAML: `SetVroot: /tmp`
     SetVroot(String),
 
-    /// Resets the virtual root bach to the value passed by `--vroot` or `/`.
+    /// Unset the virtual root temporarily (can be reset back to the initial
+    /// value).
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"UnsetVroot"`
+    /// - YAML: `UnsetVroot`
+    UnsetVroot,
+
+    /// Toggle virtual root between unset, initial value and $PWD.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ToggleVroot"`
+    /// - YAML: `ToggleVroot`
+    ToggleVroot,
+
+    /// Reset the virtual root back to the initial value.
     ///
     /// Example:
     ///

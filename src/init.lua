@@ -2325,6 +2325,13 @@ xplr.config.modes.builtin.vroot = {
   name = "vroot",
   key_bindings = {
     on_key = {
+      ["v"] = {
+        help = "toggle vroot",
+        messages = {
+          "PopMode",
+          "ToggleVroot",
+        },
+      },
       ["."] = {
         help = "vroot $PWD",
         messages = {
@@ -2359,6 +2366,13 @@ xplr.config.modes.builtin.vroot = {
         messages = {
           "PopMode",
           "ResetVroot",
+        },
+      },
+      ["ctrl-u"] = {
+        help = "unset vroot",
+        messages = {
+          "PopMode",
+          "UnsetVroot",
         },
       },
     },

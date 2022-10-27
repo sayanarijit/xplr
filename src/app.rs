@@ -449,6 +449,8 @@ impl App {
                 NextVisitedPath => self.next_visited_path(),
                 FollowSymlink => self.follow_symlink(),
                 SetVroot(p) => self.set_vroot(&p),
+                UnsetVroot => self.unset_vroot(),
+                ToggleVroot => self.toggle_vroot(),
                 ResetVroot => self.reset_vroot(),
                 SetInputPrompt(p) => self.set_input_prompt(p),
                 UpdateInputBuffer(op) => self.update_input_buffer(op),
@@ -780,6 +782,24 @@ impl App {
                 "not a valid directory: {}",
                 vroot.to_string_lossy()
             ))
+        }
+    }
+
+    fn unset_vroot(mut self) -> Result<Self> {
+        self.vroot = None;
+        Ok(self)
+    }
+
+    fn toggle_vroot(self) -> Result<Self> {
+        if self.vroot.is_some() && self.vroot == self.initial_vroot {
+            self.unset_vroot()
+        } else if self.vroot.is_some() && self.initial_vroot.is_some() {
+            self.reset_vroot()
+        } else if self.vroot.is_some() {
+            self.unset_vroot()
+        } else {
+            let vroot = self.pwd.clone();
+            self.set_vroot(&vroot)
         }
     }
 
