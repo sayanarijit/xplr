@@ -80,21 +80,40 @@ You can also use nested tables such as
 ## Hooks
 
 This section of the configuration cannot be overwritten by another config
-file, as it is an optional lua return statement specific to each config
-file. It can be used to define things that are append only, such as various
-hooks and callbacks.
+file or plugin, since this is an optional lua return statement specific to
+each config file. It can be used to define things that should be explicit
+for reasons like performance concerns, such as hooks.
+
+Plugins should expose the hooks, and require users to subscribe to them
+explicitly.
 
 Example:
 
 ```lua
 return {
-  -- Messages to send when the config file loads.
+  -- Add messages to send when the xplr loads.
   -- This is similar to the `--on-load` command-line option.
   --
   -- Type: list of [Message](https://xplr.dev/en/message#message)s
   on_load = {
-    { LogInfo = "Hello xplr user," },
     { LogSuccess = "Configuration successfully loaded!" },
+    { CallLuaSilently = "custom.some_plugin_with_hooks.on_load" },
+  },
+
+  -- Add messages to send when the directory changes.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_directory_change = {
+    { LogSuccess = "Changed directory" },
+    { CallLuaSilently = "custom.some_plugin_with_hooks.on_directory_change" },
+  },
+
+  -- Add messages to send when the focus changes.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_focus_change = {
+    { LogSuccess = "Changed focus" },
+    { CallLuaSilently = "custom.some_plugin_with_hooks.on_focus_change" },
   }
 }
 ```

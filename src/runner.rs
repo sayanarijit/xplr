@@ -245,7 +245,7 @@ impl Runner {
     pub fn run(self) -> Result<Option<String>> {
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
-        let (mut app, hooks) = app::App::create(
+        let mut app = app::App::create(
             self.bin,
             self.pwd,
             &lua,
@@ -329,13 +329,8 @@ impl Runner {
         event_reader.start();
 
         // Enqueue on_load messages
-        for msg in hooks
-            .unwrap_or_default()
-            .on_load
-            .into_iter()
-            .chain(self.on_load)
-        {
-            tx_msg_in.send(app::Task::new(app::MsgIn::External(msg), None))?;
+        for msg in app.hooks.on_load.iter().chain(self.on_load.iter()) {
+            tx_msg_in.send(app::Task::new(app::MsgIn::External(msg.clone()), None))?;
         }
 
         // Refresh once after loading
@@ -460,16 +455,25 @@ impl Runner {
                             }
 
                             Refresh => {
-                                // Fifo
                                 let focus = app.focused_node();
                                 if focus != last_focus.as_ref() {
+                                    last_focus = focus.cloned();
+
+                                    // Fifo
                                     if let Some(ref mut file) = fifo {
                                         writeln!(file, "{}", app.focused_node_str())?;
                                     };
-                                    last_focus = focus.cloned();
+
+                                    // Hooks
+                                    if !app.hooks.on_focus_change.is_empty() {
+                                        let msgs = app.hooks.on_focus_change.clone();
+                                        app = app.handle_batch_external_msgs(msgs)?
+                                    }
                                 }
 
                                 if app.pwd != last_pwd {
+                                    last_pwd = app.pwd.clone();
+
                                     // $PWD watcher
                                     tx_pwd_watcher.send(app.pwd.clone())?;
 
@@ -483,7 +487,11 @@ impl Runner {
                                         )?;
                                     }
 
-                                    last_pwd = app.pwd.clone();
+                                    // Hooks
+                                    if !app.hooks.on_directory_change.is_empty() {
+                                        let msgs = app.hooks.on_directory_change.clone();
+                                        app = app.handle_batch_external_msgs(msgs)?
+                                    }
                                 }
 
                                 // UI

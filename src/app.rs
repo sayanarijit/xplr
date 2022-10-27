@@ -165,6 +165,7 @@ pub struct App {
     pub bin: String,
     pub version: String,
     pub config: Config,
+    pub hooks: Hooks,
     pub pwd: String,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub last_focus: HashMap<String, Option<String>>,
@@ -191,8 +192,9 @@ impl App {
         lua: &mlua::Lua,
         config_file: Option<PathBuf>,
         extra_config_files: Vec<PathBuf>,
-    ) -> Result<(Self, Option<Hooks>)> {
-        let (mut config, mut hooks) = lua::init(lua)?;
+    ) -> Result<Self> {
+        let (mut config, hooks) = lua::init(lua)?;
+        let mut hooks = hooks.unwrap_or_default();
 
         let config_file = if let Some(path) = config_file {
             Some(path)
@@ -221,10 +223,8 @@ impl App {
             match lua::extend(lua, &config_file.to_string_lossy()) {
                 Ok((c, maybe_hooks)) => {
                     config = c;
-                    match (hooks.as_mut(), maybe_hooks) {
-                        (Some(h1), Some(h2)) => h1.on_load.extend(h2.on_load),
-                        (None, Some(h2)) => hooks = Some(h2),
-                        (_, _) => {}
+                    if let Some(h) = maybe_hooks {
+                        hooks = hooks.extend(h);
                     }
                 }
                 Err(e) => {
@@ -323,6 +323,7 @@ impl App {
             history: Default::default(),
             last_modes: Default::default(),
             hostname,
+            hooks,
         };
 
         let has_errs = !load_errs.is_empty();
@@ -334,7 +335,7 @@ impl App {
             app = app.switch_mode_builtin("debug_error")?;
         }
 
-        Ok((app, hooks))
+        Ok(app)
     }
 
     pub fn focused_node(&self) -> Option<&Node> {

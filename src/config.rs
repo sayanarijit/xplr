@@ -618,4 +618,22 @@ pub struct Config {
 pub struct Hooks {
     #[serde(default)]
     pub on_load: Vec<ExternalMsg>,
+
+    #[serde(default)]
+    pub on_directory_change: Vec<ExternalMsg>,
+
+    #[serde(default)]
+    pub on_focus_change: Vec<ExternalMsg>,
+    // TODO After cleanup or Runner::run
+    // #[serde(default)]
+    // pub before_quit: Vec<ExternalMsg>,
+}
+
+impl Hooks {
+    pub fn extend(mut self, other: Self) -> Self {
+        self.on_load.extend(other.on_load);
+        self.on_directory_change.extend(other.on_directory_change);
+        self.on_focus_change.extend(other.on_focus_change);
+        self
+    }
 }
