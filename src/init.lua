@@ -1827,9 +1827,9 @@ xplr.config.modes.builtin.action = {
       ["!"] = {
         help = "shell",
         messages = {
+          "PopMode",
           { Call0 = { command = "bash", args = { "-i" } } },
           "ExplorePwdAsync",
-          "PopModeKeepingInputBuffer",
         },
       },
       ["c"] = {

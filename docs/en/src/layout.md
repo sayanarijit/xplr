@@ -384,6 +384,7 @@ Hence, only the following fields are avilable.
 
 - [version][40]
 - [pwd][41]
+- [vroot][52]
 - [focused_node][42]
 - [selection][43]
 - [mode][44]
@@ -448,3 +449,4 @@ Hence, only the following fields are avilable.
 [49]: lua-function-calls.md#explorer_config
 [50]: lua-function-calls.md#directory_buffer
 [51]: layouts.md
+[52]: #vroot

@@ -669,13 +669,16 @@ fn draw_table<B: Backend>(
         .map(|c| c.to_tui(screen_size, layout_size))
         .collect();
 
-    let pwd = app
-        .pwd
-        .strip_prefix(&app.vroot)
-        .unwrap_or(&app.pwd)
-        .trim_matches('/')
-        .replace('\\', "\\\\")
-        .replace('\n', "\\n");
+    let pwd = if let Some(vroot) = app.vroot.as_ref() {
+        app.pwd.strip_prefix(vroot).unwrap_or(&app.pwd)
+    } else {
+        &app.pwd
+    }
+    .trim_matches('/')
+    .replace('\\', "\\\\")
+    .replace('\n', "\\n");
+
+    let vroot_indicator = if app.vroot.is_some() { "[v] " } else { "" };
 
     let table = Table::new(rows)
         .widths(&table_constraints)
@@ -685,7 +688,8 @@ fn draw_table<B: Backend>(
         .block(block(
             config,
             format!(
-                " /{} ({}) ",
+                " {}/{} ({}) ",
+                vroot_indicator,
                 pwd,
                 app.directory_buffer
                     .as_ref()

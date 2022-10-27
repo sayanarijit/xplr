@@ -258,7 +258,6 @@ pub enum ExternalMsg {
     /// - YAML: `NextVisitedPath`
     NextVisitedPath,
 
-    ///
     /// Follow the symlink under focus to its actual location.
     ///
     /// Example:
@@ -266,6 +265,25 @@ pub enum ExternalMsg {
     /// Lua: `"FollowSymlink"`
     /// YAML: `FollowSymlink`
     FollowSymlink,
+
+    /// Sets the virtual root for isolating xplr navigation, similar to `--vroot`.
+    /// If the $PWD is outside the vroot, xplr will automatically enter vroot.
+    ///
+    /// Type: { SetVroot = "string" }
+    ///
+    /// Example:
+    ///
+    /// Lua: `{ SetVroot = "/tmp" }`
+    /// YAML: `SetVroot: /tmp`
+    SetVroot(String),
+
+    /// Resets the virtual root bach to the value passed by `--vroot` or `/`.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ResetVroot"`
+    /// - YAML: `ResetVroot`
+    ResetVroot,
 
     /// ### Reading Input -----------------------------------------------------
 

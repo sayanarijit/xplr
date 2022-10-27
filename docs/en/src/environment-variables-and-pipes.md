@@ -52,6 +52,7 @@ The other variables are single-line variables containing simple information:
 - [XPLR_MODE][34]
 - [XPLR_PID][35]
 - [XPLR_SESSION_PATH][36]
+- [XPLR_VROOT][39]
 
 ### Environment variables
 
@@ -89,6 +90,10 @@ Contains the process ID of the current xplr process.
 
 Contains the current session path, like /tmp/runtime-"$USER"/xplr/session/"$XPLR_PID"/,
 you can find temporary files here, such as pipes.
+
+#### XPLR_VROOT
+
+Contains the path of current virtual root, is set.
 
 ### Pipes
 
@@ -214,3 +219,4 @@ xplr.config.modes.builtin.default.key_bindings.on_key.X = {
 [36]: #xplr_session_path
 [37]: messages.md#reading-input
 [38]: #xplr
+[39]: #xplr_vroot
