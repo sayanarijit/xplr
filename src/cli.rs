@@ -29,17 +29,16 @@ pub struct Cli {
 }
 
 impl Cli {
-    fn read_path(&mut self, arg: &str) -> Result<()> {
+    fn read_path(arg: &str) -> Result<PathBuf> {
         if arg.is_empty() {
             bail!("empty string passed")
         };
 
         let path = PathBuf::from(arg).absolutize()?.to_path_buf();
         if path.exists() {
-            self.paths.push(path);
-            Ok(())
+            Ok(path)
         } else {
-            bail!("path doesn't exist: {}", path.to_string_lossy().to_string())
+            bail!("path doesn't exist: {}", path.to_string_lossy())
         }
     }
 
@@ -61,7 +60,7 @@ impl Cli {
 
         while let Some(arg) = args.next() {
             if flag_ends {
-                cli.read_path(&arg)?;
+                cli.paths.push(Cli::read_path(&arg)?);
             } else {
                 match arg.as_str() {
                     // Flags
@@ -69,11 +68,12 @@ impl Cli {
                         let reader = BufReader::new(std::io::stdin());
                         if cli.read0 {
                             for path in reader.split(b'\0') {
-                                cli.read_path(&String::from_utf8(path?)?)?;
+                                cli.paths
+                                    .push(Cli::read_path(&String::from_utf8(path?)?)?);
                             }
                         } else {
                             for path in reader.lines() {
-                                cli.read_path(&path?)?;
+                                cli.paths.push(Cli::read_path(&path?)?);
                             }
                         };
                     }
@@ -105,23 +105,26 @@ impl Cli {
 
                     // Options
                     "-c" | "--config" => {
-                        if let Some(p) = args.next().map(PathBuf::from) {
-                            cli.config = Some(p.absolutize()?.to_path_buf());
-                        };
+                        cli.config = Some(
+                            args.next().map(|a| Cli::read_path(&a)).with_context(
+                                || format!("usage: xplr {} PATH", arg),
+                            )??,
+                        );
                     }
 
                     "--vroot" => {
-                        if let Some(p) = args.next().map(PathBuf::from) {
-                            cli.vroot = Some(p.absolutize()?.to_path_buf());
-                        }
+                        cli.vroot = Some(
+                            args.next().map(|a| Cli::read_path(&a)).with_context(
+                                || format!("usage: xplr {} PATH", arg),
+                            )??,
+                        );
                     }
 
                     "-C" | "--extra-config" => {
                         while let Some(path) =
                             args.next_if(|path| !path.starts_with('-'))
                         {
-                            cli.extra_config
-                                .push(PathBuf::from(path).absolutize()?.to_path_buf());
+                            cli.extra_config.push(Cli::read_path(&path)?);
                         }
                     }
 
@@ -144,20 +147,27 @@ impl Cli {
                     "-m" | "--pipe-msg-in" => {
                         cli.pipe_msg_in.extend(args.by_ref());
                         if cli.pipe_msg_in.is_empty() {
-                            bail!("usage: {} {} FORMAT [ARGUMENT]...", cli.bin, arg)
+                            bail!("usage: xplr {} FORMAT [ARGUMENT]...", arg)
                         }
                     }
 
                     "-M" | "--print-msg-in" => {
                         cli.print_msg_in.extend(args.by_ref());
                         if cli.print_msg_in.is_empty() {
-                            bail!("usage: {} {} FORMAT [ARGUMENT]...", cli.bin, arg)
+                            bail!("usage: xplr {} FORMAT [ARGUMENT]...", arg)
                         }
                     }
 
                     // path
                     path => {
-                        cli.read_path(path)?;
+                        if path.starts_with('-') && !flag_ends {
+                            bail!(
+                                "invalid argument: {0:?}, try `-- {0:?}` or `--help`",
+                                path
+                            )
+                        } else {
+                            cli.paths.push(Cli::read_path(path)?);
+                        }
                     }
                 }
             }
