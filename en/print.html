@@ -1419,6 +1419,7 @@ of <a href="modes.html">modes</a> and the key mappings for each mode.</p>
 <table><thead><tr><th>key</th><th>remaps</th><th>action</th></tr></thead><tbody>
 <tr><td>f</td><td></td><td>follow symlink</td></tr>
 <tr><td>g</td><td></td><td>top</td></tr>
+<tr><td>i</td><td></td><td>initial $PWD</td></tr>
 <tr><td>p</td><td></td><td>path</td></tr>
 <tr><td>x</td><td></td><td>open in gui</td></tr>
 </tbody></table>
@@ -1851,7 +1852,8 @@ reasons.</p>
 <ul>
 <li><a href="lua-function-calls.html#version">version</a></li>
 <li><a href="lua-function-calls.html#pwd">pwd</a></li>
-<li><a href="layout.html#vroot">vroot</a></li>
+<li><a href="lua-function-calls#initial_pwd">initial_pwd</a></li>
+<li><a href="lua-function-calls#vroot">vroot</a></li>
 <li><a href="lua-function-calls.html#focused_node">focused_node</a></li>
 <li><a href="lua-function-calls.html#selection">selection</a></li>
 <li><a href="lua-function-calls.html#mode">mode</a></li>
@@ -3353,6 +3355,7 @@ messages which will be handled by xplr.</p>
 <ul>
 <li><a href="lua-function-calls.html#version">version</a></li>
 <li><a href="lua-function-calls.html#pwd">pwd</a></li>
+<li><a href="lua-function-calls.html#initial_pwd">initial_pwd</a></li>
 <li><a href="lua-function-calls.html#vroot">vroot</a></li>
 <li><a href="lua-function-calls.html#focused_node">focused_node</a></li>
 <li><a href="lua-function-calls.html#directory_buffer">directory_buffer</a></li>
@@ -3372,6 +3375,9 @@ messages which will be handled by xplr.</p>
 <h3 id="pwd"><a class="header" href="#pwd">pwd</a></h3>
 <p>Type: string</p>
 <p>The present working directory.</p>
+<h3 id="initial_pwd"><a class="header" href="#initial_pwd">initial_pwd</a></h3>
+<p>Type: string</p>
+<p>The initial working directory when xplr started.</p>
 <h3 id="vroot-1"><a class="header" href="#vroot-1">vroot</a></h3>
 <p>Type: nullable string</p>
 <p>The current virtual root.</p>
@@ -3589,6 +3595,7 @@ called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a
 <li><a href="environment-variables-and-pipes.html#xplr_focus_index">XPLR_FOCUS_INDEX</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_focus_path">XPLR_FOCUS_PATH</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_input_buffer">XPLR_INPUT_BUFFER</a></li>
+<li><a href="environment-variables-and-pipes.html#xplr_initial_pwd">XPLR_INITIAL_PWD</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_mode">XPLR_MODE</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_pid">XPLR_PID</a></li>
 <li><a href="environment-variables-and-pipes.html#xplr_session_path">XPLR_SESSION_PATH</a></li>
@@ -3604,6 +3611,8 @@ called <a href="environment-variables-and-pipes.html#pipes">&quot;pipe&quot;s</a
 <a href="column-renderer.html#index">column-renderer/index</a>.</p>
 <h4 id="xplr_focus_path"><a class="header" href="#xplr_focus_path">XPLR_FOCUS_PATH</a></h4>
 <p>Contains the full path of the currently focused node.</p>
+<h4 id="xplr_initial_pwd"><a class="header" href="#xplr_initial_pwd">XPLR_INITIAL_PWD</a></h4>
+<p>The $PWD then xplr started.</p>
 <h4 id="xplr_input_buffer"><a class="header" href="#xplr_input_buffer">XPLR_INPUT_BUFFER</a></h4>
 <p>The line currently in displaying in the xplr input buffer. For e.g. the search
 input while searching. See <a href="messages.html#reading-input">Reading Input</a>.</p>
