@@ -11,7 +11,9 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::fs;
 
-const DEFAULT_LUA_SCRIPT: &str = include_str!("init.lua");
+pub mod util;
+
+const DEFAULT_LUA_SCRIPT: &str = include_str!("../init.lua");
 const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
 
 pub fn serialize<'lua, T: Serialize + Sized>(
@@ -62,8 +64,11 @@ pub fn init(lua: &Lua) -> Result<(Config, Option<Hooks>)> {
     let config = Config::default();
     let globals = lua.globals();
 
+    let util = util::create_table(lua)?;
+
     let lua_xplr = lua.create_table()?;
     lua_xplr.set("config", serialize(lua, &config)?)?;
+    lua_xplr.set("util", util)?;
 
     let lua_xplr_fn = lua.create_table()?;
     let lua_xplr_fn_builtin = lua.create_table()?;

@@ -4,6 +4,29 @@ A column renderer is a Lua function that receives a [special argument][1] and
 returns a string that will be displayed in each specific field of the
 [files table][2].
 
+## Example: Customizing Table Renderer
+
+```lua
+xplr.fn.custom.fmt_simple_column = function(m)
+  return m.prefix .. m.relative_path .. m.suffix
+end
+
+xplr.config.general.table.header.cols = {
+  { format = "  path" }
+}
+
+xplr.config.general.table.row.cols = {
+  { format = "custom.fmt_simple_column" }
+}
+
+xplr.config.general.table.col_widths = {
+  { Percentage = 100 }
+}
+
+-- With this config, you should only see a single column displaying the
+-- relative paths.
+```
+
 xplr by default provides the following column renderers:
 
 - `xplr.fn.builtin.fmt_general_table_row_cols_0`
@@ -272,29 +295,6 @@ It contains the following fields.
 - [last_modified][35]
 - [uid][36]
 - [gid][37]
-
-## Example: Customizing Table Renderer
-
-```lua
-xplr.fn.custom.fmt_simple_column = function(m)
-  return m.prefix .. m.relative_path .. m.suffix
-end
-
-xplr.config.general.table.header.cols = {
-  { format = "  path" }
-}
-
-xplr.config.general.table.row.cols = {
-  { format = "custom.fmt_simple_column" }
-}
-
-xplr.config.general.table.col_widths = {
-  { Percentage = 100 }
-}
-
--- With this config, you should only see a single column displaying the
--- relative paths.
-```
 
 [1]: #table-renderer-argument
 [2]: layout.md#table

@@ -36,6 +36,9 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 -- name. Enter your name to receive a nice greeting and to know your location.
 ```
 
+Visit the [xplr.util][85] API docs for some useful utility / helper functions
+that you can use in your Lua function calls.
+
 ## Lua Context
 
 This is a special argument passed to the lua functions when called using the
@@ -133,7 +136,7 @@ The session path.
 
 ### explorer_config
 
-Type: [ExplorerConfig][66]
+Type: [Explorer Config][66]
 
 The configuration for exploring paths.
 
@@ -386,6 +389,10 @@ Where to focus when search is cancelled.
 
 Type: nullable string
 
+## Also Ssee:
+
+- [xplr.util][85]
+
 [7]: https://www.json.org
 [8]: modes.md#mode
 [9]: modes.md#builtin
@@ -453,3 +460,4 @@ Type: nullable string
 [82]: #node-searcher
 [83]: #pattern
 [84]: #recoverable_focus
+[85]: xplr.util.md

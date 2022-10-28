@@ -4,13 +4,51 @@ Alternative to `CallLua`, `CallLuaSilently` messages that call Lua functions,
 there are `Call0`, `CallSilently0`, `BashExec0`, `BashExecSilently0` messages
 that call shell commands.
 
+### Example: Simple file opener using xdg-open and $XPLR_FOCUS_PATH
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key["X"] = {
+  help = "open",
+  messages = {
+    {
+      BashExecSilently0 = [===[
+        xdg-open "${XPLR_FOCUS_PATH:?}"
+      ]===],
+    },
+  },
+}
+```
+
 However, unlike the Lua functions, these shell commands have to read the useful
 information and send messages via environment variables and temporary files
 called "pipe"s. These environment variables and files are only available when
 a command is being executed.
 
-Visit the [**fzf integration tutorial**][19]
-for example.
+### Example: Using Environment Variables and Pipes
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key["space"] = {
+  help = "ask name and greet",
+  messages = {
+    {
+      BashExec0 = [===[
+        echo "What's your name?"
+
+        read name
+        greeting="Hello $name!"
+        message="$greeting You are inside $PWD"
+
+        "$XPLR" -m 'LogSuccess: %q' "$message"
+      ]===]
+    }
+  }
+}
+
+-- Now, when you press "space" in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+```
+
+Visit the [**fzf integration tutorial**][19] for another example.
 
 To see the environment variables and pipes, invoke the shell by typing `:!` in default
 mode and run the following command:
@@ -161,45 +199,6 @@ List of last visited paths (similar to jump list in vim).
 #### XPLR_PIPE_DIRECTORY_NODES_OUT
 
 List of paths, filtered and sorted as displayed in the [files table][28].
-
-### Example: Using Environment Variables and Pipes
-
-```lua
-xplr.config.modes.builtin.default.key_bindings.on_key.space = {
-  help = "ask name and greet",
-  messages = {
-    {
-      BashExec0 = [===[
-        echo "What's your name?"
-
-        read name
-        greeting="Hello $name!"
-        message="$greeting You are inside $PWD"
-
-        "$XPLR" -m 'LogSuccess: %q' "$message"
-      ]===]
-    }
-  }
-}
-
--- Now, when you press "space" in default mode, you will be prompted for your
--- name. Enter your name to receive a nice greeting and to know your location.
-```
-
-### Another example: Simple file opener using xdg-open and $XPLR_FOCUS_PATH
-
-```lua
-xplr.config.modes.builtin.default.key_bindings.on_key.X = {
-  help = "open",
-  messages = {
-    {
-      BashExecSilently0 = [===[
-        xdg-open "${XPLR_FOCUS_PATH:?}"
-      ]===],
-    },
-  },
-}
-```
 
 [7]: https://www.json.org
 [10]: column-renderer.md#index

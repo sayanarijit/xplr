@@ -448,5 +448,5 @@ Hence, only the following fields are avilable.
 [49]: lua-function-calls.md#explorer_config
 [50]: lua-function-calls.md#directory_buffer
 [51]: layouts.md
-[52]: lua-function-calls#vroot
-[53]: lua-function-calls#initial_pwd
+[52]: lua-function-calls.md#vroot
+[53]: lua-function-calls.md#initial_pwd
