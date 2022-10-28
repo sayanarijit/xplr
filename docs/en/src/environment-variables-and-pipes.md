@@ -49,6 +49,7 @@ The other variables are single-line variables containing simple information:
 - [XPLR_FOCUS_INDEX][31]
 - [XPLR_FOCUS_PATH][32]
 - [XPLR_INPUT_BUFFER][33]
+- [XPLR_INITIAL_PWD][40]
 - [XPLR_MODE][34]
 - [XPLR_PID][35]
 - [XPLR_SESSION_PATH][36]
@@ -72,6 +73,10 @@ Contains the index of the currently focused item, as seen in
 #### XPLR_FOCUS_PATH
 
 Contains the full path of the currently focused node.
+
+#### XPLR_INITIAL_PWD
+
+The $PWD then xplr started.
 
 #### XPLR_INPUT_BUFFER
 
@@ -220,3 +225,4 @@ xplr.config.modes.builtin.default.key_bindings.on_key.X = {
 [37]: messages.md#reading-input
 [38]: #xplr
 [39]: #xplr_vroot
+[40]: #xplr_initial_pwd

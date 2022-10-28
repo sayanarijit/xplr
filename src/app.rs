@@ -128,6 +128,7 @@ impl History {
 pub struct LuaContextHeavy {
     pub version: String,
     pub pwd: String,
+    pub initial_pwd: String,
     pub vroot: Option<String>,
     pub focused_node: Option<Node>,
     pub directory_buffer: Option<DirectoryBuffer>,
@@ -146,6 +147,7 @@ pub struct LuaContextHeavy {
 pub struct LuaContextLight {
     pub version: String,
     pub pwd: String,
+    pub initial_pwd: String,
     pub vroot: Option<String>,
     pub focused_node: Option<Node>,
     pub selection: IndexSet<Node>,
@@ -172,6 +174,7 @@ pub struct App {
     pub vroot: Option<String>,
     pub initial_vroot: Option<String>,
     pub pwd: String,
+    pub initial_pwd: String,
     pub directory_buffer: Option<DirectoryBuffer>,
     pub last_focus: HashMap<String, Option<String>>,
     pub selection: IndexSet<Node>,
@@ -316,6 +319,8 @@ impl App {
         let initial_vroot = vroot.clone();
         env::set_current_dir(&pwd)?;
 
+        let initial_pwd = pwd.clone();
+
         let input = InputBuffer {
             buffer: Default::default(),
             prompt: config.general.prompt.format.clone().unwrap_or_default(),
@@ -328,6 +333,7 @@ impl App {
             vroot,
             initial_vroot,
             pwd,
+            initial_pwd,
             directory_buffer: Default::default(),
             last_focus: Default::default(),
             selection: Default::default(),
@@ -1780,6 +1786,7 @@ impl App {
         LuaContextHeavy {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
+            initial_pwd: self.initial_pwd.clone(),
             vroot: self.vroot.clone(),
             focused_node: self.focused_node().cloned(),
             directory_buffer: self.directory_buffer.clone(),
@@ -1799,6 +1806,7 @@ impl App {
         LuaContextLight {
             version: self.version.clone(),
             pwd: self.pwd.clone(),
+            initial_pwd: self.initial_pwd.clone(),
             vroot: self.vroot.clone(),
             focused_node: self.focused_node().cloned(),
             selection: self.selection.clone(),

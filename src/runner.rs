@@ -113,6 +113,7 @@ fn call(
         .env("XPLR_APP_VERSION", &app.version)
         .env("XPLR_PID", &app.pid.to_string())
         .env("XPLR_INPUT_BUFFER", input_buffer)
+        .env("XPLR_INITIAL_PWD", &app.initial_pwd)
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
         .env("XPLR_FOCUS_INDEX", focus_index)
         .env("XPLR_SESSION_PATH", &app.session_path)

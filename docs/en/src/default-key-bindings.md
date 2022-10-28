@@ -233,5 +233,6 @@ of [modes][4] and the key mappings for each mode.
 | --- | ------ | -------------- |
 | f   |        | follow symlink |
 | g   |        | top            |
+| i   |        | initial $PWD   |
 | p   |        | path           |
 | x   |        | open in gui    |

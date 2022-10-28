@@ -1641,7 +1641,17 @@ xplr.config.modes.builtin.go_to = {
           { SetInputBuffer = "" },
         },
       },
-
+      ["i"] = {
+        help = "initial $PWD",
+        messages = {
+          "PopMode",
+          {
+            BashExecSilently0 = [===[
+              "$XPLR" -m 'ChangeDirectory: %q' "${XPLR_INITIAL_PWD:?}"
+            ]===],
+          },
+        },
+      },
       ["x"] = {
         help = "open in gui",
         messages = {

@@ -17,6 +17,7 @@ It contains the following information:
 
 - [version][29]
 - [pwd][31]
+- [initial_pwd][76]
 - [vroot][75]
 - [focused_node][32]
 - [directory_buffer][33]
@@ -41,6 +42,12 @@ xplr version. Can be used to test compatibility.
 Type: string
 
 The present working directory.
+
+### initial_pwd
+
+Type: string
+
+The initial working directory when xplr started.
 
 ### vroot
 
@@ -392,3 +399,4 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [73]: #uid
 [74]: #gid
 [75]: #vroot
+[76]: #initial_pwd
