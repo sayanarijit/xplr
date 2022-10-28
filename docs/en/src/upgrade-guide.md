@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.19.4][47] -> [v0.20.0-beta.3][48]
+#### [v0.19.4][47] -> [v0.20.0][48]
 
 - BREAKING: xplr shell (`:!`) will default to null (`\0`) delimited pipes, as
   opposed to newline (`\n`) delimited ones (i.e. will use `Call0` instead of
@@ -74,6 +74,9 @@ compatibility.
   - UnsetVroot
   - ToggleVroot
   - ResetVroot
+- Use `$XPLR_INITIAL_PWD` and Lua equivalent to implement workspace like
+  features without using virtual root. Use keys `gi` to go to the initial
+  working directory from anywhere.
 
 #### [v0.18.0][46] -> [v0.19.4][47]
 
@@ -432,4 +435,4 @@ Else do the following:
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
-[48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.0-beta.3
+[48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.0

@@ -53,14 +53,17 @@ to lose some kb if it makes sense.
 Some of the coolest features xplr provide beside the basic stuff:
 
 - [Embedded LuaJIT][5] for portability and extensibility.
-- [A simple system based on message passing][10] to control xplr session using:
+- [A simple modal system based on message passing][10] to control xplr session
+  using:
   - [Keyboard inputs][11]
   - [Shell Commands][12]
   - [Lua Functions][13]
-- [Readline-like input buffer][9] with customizable behaviour to read user
+  - [Hooks][22]
+- Easy, typesafe message passing with `-m MSG` or `-M MSG` subcommands.
+- [Readline-like input buffer][9] with customizable behavior to read user
   inputs.
-- [Switchable recover mode][7] that saves you from doing unwanted things when in a
-  hurry.
+- [Switchable recover mode][7] that saves you from doing unwanted things when
+  in a hurry.
 - [Customizable layouts][1] with built-in panels. For e.g.
   - **Selection list** to show you the selected paths in real-time.
   - **Help menu** to show you the available keys bindings in each mode.
@@ -69,6 +72,7 @@ Some of the coolest features xplr provide beside the basic stuff:
 - [Custom file properties][17] with custom colors can be displayed in the table.
 - [FIFO manager][19] to manage a FIFO file that can be used to
   [integrate with previewers][6].
+- [Virtual root][21] with `--vroot` and `:v` key bindings.
 - **Different quit options:**
   - Quit with success without any output (`q`).
   - Quit with success and the result printed on stdout (`enter`).
@@ -88,10 +92,10 @@ Some of the coolest features xplr provide beside the basic stuff:
 [4]: https://github.com/sayanarijit/xplr/tree/main/benches
 [5]: https://github.com/sayanarijit/xplr/discussions/183
 [6]: https://github.com/sayanarijit/xplr/pull/229
-[7]: general-config.md#enable_recover_mode
+[7]: modes.md#xplrconfigmodesbuiltinrecover
 [8]: default-key-bindings.md
 [9]: https://github.com/sayanarijit/xplr/pull/397
-[10]: message.md
+[10]: messages.md
 [11]: configure-key-bindings.md
 [12]: mode.md#input-pipe
 [13]: lua-function-calls.md
@@ -100,5 +104,7 @@ Some of the coolest features xplr provide beside the basic stuff:
 [16]: awesome-hacks.md
 [17]: node_types.md
 [18]: https://github.com/sayanarijit/xplr/blob/main/src/init.lua
-[19]: message.md#startfifo
+[19]: messages.md#startfifo
 [20]: community.md
+[21]: messages.md#virtual-root
+[22]: configuration.md#hooks

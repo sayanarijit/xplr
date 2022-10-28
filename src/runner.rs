@@ -349,8 +349,6 @@ impl Runner {
                         match msg {
                             // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
                             // Try handling them immediately.
-                            //
-                            // TODO: Remove boilerplate code.
                             Enque(task) => {
                                 tx_msg_in.send(task)?;
                             }

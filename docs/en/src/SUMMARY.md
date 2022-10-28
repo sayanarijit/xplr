@@ -34,7 +34,6 @@
   - [Awesome Plugins][18]
 - [Integration][19]
   - [Awesome Integrations][20]
-- [TODO][21]
 - [Alternatives][22]
 - [Upgrade Guide][23]
 - [Community][24]
@@ -60,7 +59,6 @@
 [18]: awesome-plugins.md
 [19]: integration.md
 [20]: awesome-integrations.md
-[21]: todo.md
 [22]: alternatives.md
 [23]: upgrade-guide.md
 [24]: community.md

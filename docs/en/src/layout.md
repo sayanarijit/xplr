@@ -160,8 +160,6 @@ A constraint can be one of the following:
 - { MinLessThanLayoutHeight = int }
 - { MinLessThanLayoutWidth = int }
 
-TODO: document each constraint.
-
 ## splits
 
 Type: list of [Layout][3]

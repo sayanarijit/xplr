@@ -8,6 +8,34 @@ When called the function receives a [special argument][14] that
 contains some useful information. The function can optionally return a list of
 messages which will be handled by xplr.
 
+## Example: Using Lua Function Calls
+
+```lua
+-- Define the function
+xplr.fn.custom.ask_name_and_greet = function(app)
+  print("What's your name?")
+
+  local name = io.read()
+  local greeting = "Hello " .. name .. "!"
+  local message = greeting .. " You are inside " .. app.pwd
+
+  return {
+    { LogSuccess = message },
+  }
+end
+
+-- Map the function to a key (space)
+xplr.config.modes.builtin.default.key_bindings.on_key.space = {
+  help = "ask name and greet",
+  messages = {
+    { CallLua = "custom.ask_name_and_greet" }
+  }
+}
+
+-- Now, when you press "space" in default mode, you will be prompted for your
+-- name. Enter your name to receive a nice greeting and to know your location.
+```
+
 ## Lua Context
 
 This is a special argument passed to the lua functions when called using the
@@ -105,7 +133,9 @@ The session path.
 
 ### explorer_config
 
-[TODO][66]
+Type: [ExplorerConfig][66]
+
+The configuration for exploring paths.
 
 ### history
 
@@ -313,33 +343,48 @@ Type: list of string
 
 Visited paths.
 
-## Example: Using Lua Function Calls
+## Explorer Config
 
-```lua
--- Define the function
-xplr.fn.custom.ask_name_and_greet = function(app)
-  print("What's your name?")
+Explorer config contains the following fields:
 
-  local name = io.read()
-  local greeting = "Hello " .. name .. "!"
-  local message = greeting .. " You are inside " .. app.pwd
+- [filters][77]
+- [sorters][78]
+- [searchers][79]
 
-  return {
-    { LogSuccess = message },
-  }
-end
+### filters
 
--- Map the function to a key (space)
-xplr.config.modes.builtin.default.key_bindings.on_key.space = {
-  help = "ask name and greet",
-  messages = {
-    { CallLua = "custom.ask_name_and_greet" }
-  }
-}
+List of filters to apply.
 
--- Now, when you press "space" in default mode, you will be prompted for your
--- name. Enter your name to receive a nice greeting and to know your location.
-```
+Type: list of [Node Filter Applicable][80]
+
+### sorters
+
+Add list or sorters to the pipeline.
+
+Type: list of [Node Sorter Applicable][81]
+
+### searchers
+
+Type: nullable [Node Searcher][82]
+
+## Node Searcher
+
+Node Searcher contains the following fields:
+
+- [pattern][83]
+- [recoverable_focus][84]
+
+### pattern
+
+The patters used to search.
+
+Type: string
+
+### recoverable_focus
+
+Where to focus when search is cancelled.
+
+Type: nullable string
 
 [7]: https://www.json.org
 [8]: modes.md#mode
@@ -389,7 +434,7 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [63]: #nodes
 [64]: #total
 [65]: #focus
-[66]: https://docs.rs/xplr/latest/xplr/app/struct.ExplorerConfig.html
+[66]: #explorer-config
 [67]: #history
 [68]: #loc
 [69]: #paths
@@ -400,3 +445,11 @@ xplr.config.modes.builtin.default.key_bindings.on_key.space = {
 [74]: #gid
 [75]: #vroot
 [76]: #initial_pwd
+[77]: #filters
+[78]: #sorters
+[79]: #searchers
+[80]: filtering.md#node-filter-applicable
+[81]: sorting.md#node-sorter-applicable
+[82]: #node-searcher
+[83]: #pattern
+[84]: #recoverable_focus

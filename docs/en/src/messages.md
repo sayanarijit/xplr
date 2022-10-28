@@ -1,6 +1,6 @@
 # Full List of Messages
 
-xplr messages categorized based on their purpose.
+xplr [messages][1] categorized based on their purpose.
 
 ## Categories
 
@@ -1251,4 +1251,6 @@ Example:
 
 ## Also See:
 
-- [Message](message.md)
+- [Message][1]
+
+[1]: message.md
