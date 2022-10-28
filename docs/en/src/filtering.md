@@ -68,8 +68,6 @@ A filter can be one of the following:
 - "IAbsolutePathDoesMatchRegex"
 - "IAbsolutePathDoesNotMatchRegex"
 
-TODO: document each
-
 ### input
 
 Type: string

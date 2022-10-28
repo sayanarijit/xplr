@@ -9,7 +9,7 @@ from typing import List
 MESSAGES_DOC_TEMPLATE = """
 # Full List of Messages
 
-xplr messages categorized based on their purpose.
+xplr [messages][1] categorized based on their purpose.
 
 ## Categories
 
@@ -19,7 +19,9 @@ xplr messages categorized based on their purpose.
 
 ## Also See:
 
-- [Message](message.md)
+- [Message][1]
+
+[1]: message.md
 """.strip()
 
 CONFIGURATION_DOC_TEMPLATE = """

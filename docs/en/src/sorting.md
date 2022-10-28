@@ -62,8 +62,6 @@ A sorter can be one of the following:
 - "BySymlinkCreated"
 - "BySymlinkLastModified"
 
-TODO: document each
-
 ### reverse
 
 Type: boolean
