@@ -26,6 +26,7 @@
   - [Filtering][13]
   - [Column Renderer][26]
   - [Lua Function Calls][36]
+    - [xplr.util][40]
   - [Environment Variables and Pipes][37]
 - [Awesome Hacks][30]
 - [Plugin][15]
@@ -77,3 +78,4 @@
 [37]: environment-variables-and-pipes.md
 [38]: messages.md
 [39]: input-operation.md
+[40]: xplr.util.md

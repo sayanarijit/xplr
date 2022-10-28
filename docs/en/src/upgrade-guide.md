@@ -77,6 +77,8 @@ compatibility.
 - Use `$XPLR_INITIAL_PWD` and Lua equivalent to implement workspace like
   features without using virtual root. Use keys `gi` to go to the initial
   working directory from anywhere.
+- Use the convenient `xplr.util` utility functions in your Lua function calls.
+  See xplr.util API docs.
 
 #### [v0.18.0][46] -> [v0.19.4][47]
 

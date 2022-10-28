@@ -135,6 +135,7 @@ def gen_configuration():
     - node_types.md
     - layouts.md
     - modes.md
+    - modes.md
     """
 
     path = "./src/init.lua"
@@ -218,6 +219,48 @@ def gen_configuration():
         print(doc, file=f)
 
 
+# xplr.util -------------------------------------------------------------------
+
+
+@dataclass
+class Function:
+    doc: List[str]
+    name: str
+
+
+def gen_xplr_util():
+
+    path = "./src/lua/util.rs"
+
+    functions: List[Function] = []
+
+    with open(path) as f:
+        lines = iter(f.read().splitlines())
+
+    reading = None
+
+    for line in lines:
+        if line.startswith("///"):
+            if reading:
+                reading.doc.append(line[4:])
+            else:
+                reading = Function(doc=[line[4:]], name="")
+
+        if line.startswith("pub fn") and reading:
+            reading.name = "\n### xplr.util." + line.split("<")[0].split()[-1] + "\n"
+            functions.append(reading)
+            reading = None
+            continue
+
+    with open("./docs/en/src/xplr.util.md", "w") as f:
+        for function in functions:
+            print(function.name)
+            print(function.name, file=f)
+
+            print("\n".join(function.doc))
+            print("\n".join(function.doc), file=f)
+
+
 def format_docs():
     os.system("prettier --write docs/en/src")
 
@@ -225,6 +268,7 @@ def format_docs():
 def main():
     gen_messages()
     gen_configuration()
+    gen_xplr_util()
     format_docs()
 
 

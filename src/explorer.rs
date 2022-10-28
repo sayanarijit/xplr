@@ -14,12 +14,7 @@ lazy_static! {
     static ref FUZZY_MATCHER: SkimMatcherV2 = SkimMatcherV2::default();
 }
 
-pub(crate) fn explore_sync(
-    config: ExplorerConfig,
-    parent: PathBuf,
-    focused_path: Option<PathBuf>,
-    fallback_focus: usize,
-) -> Result<DirectoryBuffer> {
+pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
     let dirs = fs::read_dir(&parent)?;
     let mut nodes = dirs
         .filter_map(|d| {
@@ -51,6 +46,16 @@ pub(crate) fn explore_sync(
         nodes
     };
 
+    Ok(nodes)
+}
+
+pub(crate) fn explore_sync(
+    config: ExplorerConfig,
+    parent: PathBuf,
+    focused_path: Option<PathBuf>,
+    fallback_focus: usize,
+) -> Result<DirectoryBuffer> {
+    let nodes = explore(&parent, &config)?;
     let focus_index = if config.searcher.is_some() {
         0
     } else if let Some(focus) = focused_path {
