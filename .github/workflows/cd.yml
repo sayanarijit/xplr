@@ -118,7 +118,7 @@ jobs:
       - name: Signing archive with GPG
         run: |
           VERSION=${GITHUB_REF##*v}
-          git archive -o xplr-${VERSION:?}.tar.gz --format tar.gz --prefix "xplr-${VERSION:?}/" "v${VERSION}"
+          git archive -c tar.tar.gz.command='gzip -cn' -o xplr-${VERSION:?}.tar.gz --format tar.gz --prefix "xplr-${VERSION:?}/" "v${VERSION}"
           cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "xplr-${VERSION:?}.tar.gz"
           mv "xplr-${VERSION:?}.tar.gz.asc" "source.tar.gz.asc"
 
