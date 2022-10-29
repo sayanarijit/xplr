@@ -50,7 +50,7 @@ Example:
 ```lua
 
 xplr.util.explore("/tmp")
-xplr.util.explore("/tmp", app.extra_config)
+xplr.util.explore("/tmp", app.explorer_config)
 -- { { absolute_path = "/tmp/a", ... }, ... }
 ```
 
