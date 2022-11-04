@@ -25,6 +25,9 @@ Change directory using xplr.
 - Author: [@sayanarijit][8]
 - Tested on: Linux
 
+NOTE: This is a shell hack, rather than Lua config hack. Add this in
+`.bashrc` or `.profile` file in your home directory.
+
 With this alias set, you can navigate directories using xplr by entering
 xcd command, and when you quit by pressing enter, you will enter the
 directory.
