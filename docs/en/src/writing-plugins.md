@@ -78,6 +78,7 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 - [Example: Defining Custom Layout][9]
 - [Example: Customizing Table Renderer][10]
 - [Example: Render a custom dynamic table][11]
+- [Example: Implementing a directory visit counter][16]
 
 [1]: https://www.lua.org
 [2]: https://github.com/sayanarijit/plugin-template1.xplr
@@ -94,3 +95,4 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 [13]: https://github.com/sayanarijit/xplr/discussions/273
 [14]: https://github.com/sayanarijit/xplr/discussions/250
 [15]: https://github.com/sayanarijit/xplr/wiki/Hacks
+[16]: https://github.com/sayanarijit/xplr/discussions/529#discussioncomment-4073734
