@@ -1638,6 +1638,8 @@ impl NodeFilterApplicable {
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct NodeSearcher {
     pub pattern: String,
+
+    #[serde(default)]
     pub recoverable_focus: Option<String>,
 }
 
@@ -1652,8 +1654,13 @@ impl NodeSearcher {
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ExplorerConfig {
+    #[serde(default)]
     pub filters: IndexSet<NodeFilterApplicable>,
+
+    #[serde(default)]
     pub sorters: IndexSet<NodeSorterApplicable>,
+
+    #[serde(default)]
     pub searcher: Option<NodeSearcher>,
 }
 
