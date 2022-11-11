@@ -831,9 +831,22 @@ fn draw_input_buffer<B: Backend>(
             1
         };
 
+        let mut cursor = 0;
+
+        if input.cursor() != 0 {
+            // Safe, because end index will be always within bounds
+            cursor = unicode_width::UnicodeWidthStr::width(unsafe {
+                input.value().get_unchecked(
+                    0..
+                    input.value().char_indices()
+                    .nth(input.cursor())
+                    .map_or(input.value().len(), |(index, _)| index))
+            }) as u16;
+        }
+
         let offset_width = cursor_offset_left + cursor_offset_right;
         let width = layout_size.width.max(offset_width) - offset_width;
-        let scroll = (input.cursor() as u16).max(width) - width;
+        let scroll = cursor.max(width) - width;
 
         let input_buf = Paragraph::new(Spans::from(vec![
             Span::styled(
@@ -851,7 +864,7 @@ fn draw_input_buffer<B: Backend>(
         f.render_widget(input_buf, layout_size);
         f.set_cursor(
             // Put cursor past the end of the input text
-            layout_size.x + (input.cursor() as u16).min(width) + cursor_offset_left,
+            layout_size.x + cursor.min(width) + cursor_offset_left,
             // Move one line down, from the border to the input line
             layout_size.y + 1,
         );

@@ -1376,5 +1376,6 @@ dependencies = [
  "serde_yaml",
  "tui",
  "tui-input",
+ "unicode-width",
  "which",
 ]
