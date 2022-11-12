@@ -352,7 +352,7 @@ Explorer config contains the following fields:
 
 - [filters][77]
 - [sorters][78]
-- [searchers][79]
+- [searcher][79]
 
 ### filters
 
@@ -366,7 +366,7 @@ Add list or sorters to the pipeline.
 
 Type: list of [Node Sorter Applicable][81]
 
-### searchers
+### searcher
 
 Type: nullable [Node Searcher][82]
 
@@ -454,7 +454,7 @@ Type: nullable string
 [76]: #initial_pwd
 [77]: #filters
 [78]: #sorters
-[79]: #searchers
+[79]: #searcher
 [80]: filtering.md#node-filter-applicable
 [81]: sorting.md#node-sorter-applicable
 [82]: #node-searcher
