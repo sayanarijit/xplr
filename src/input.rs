@@ -197,7 +197,7 @@ impl std::fmt::Display for Key {
                 _ => c.to_string(),
             })
             .unwrap_or_else(|| {
-                serde_yaml::to_value(&self)
+                serde_yaml::to_value(self)
                     .ok()
                     .and_then(|v| v.as_str().map(|v| v.to_string()))
                     .unwrap_or_default()

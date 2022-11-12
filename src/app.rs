@@ -305,7 +305,7 @@ impl App {
         let hostname = gethostname().to_string_lossy().to_string();
 
         if let Some(vroot) = vroot.as_ref() {
-            if !pwd.starts_with(&vroot) {
+            if !pwd.starts_with(vroot) {
                 bail!(
                     "{:?} is outside of virtual root {:?}",
                     pwd.to_string_lossy(),
@@ -822,7 +822,7 @@ impl App {
         let dir = PathBuf::from(dir).absolutize()?.to_path_buf();
 
         if let Some(vroot) = &self.vroot.clone() {
-            if !dir.starts_with(&vroot) {
+            if !dir.starts_with(vroot) {
                 return self.log_error(format!(
                     "{:?} is outside of virtual root {:?}",
                     dir.to_string_lossy(),
@@ -1742,7 +1742,7 @@ impl App {
 
     pub fn write_pipes(&self, delimiter: char) -> Result<()> {
         fs::create_dir_all(self.pipe.path.clone())?;
-        fs::write(&self.pipe.msg_in, &[delimiter as u8])?;
+        fs::write(&self.pipe.msg_in, [delimiter as u8])?;
 
         let selection_str = self.selection_str(delimiter);
         fs::write(&self.pipe.selection_out, selection_str)?;

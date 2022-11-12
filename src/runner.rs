@@ -28,7 +28,7 @@ use tui_input::Input;
 
 pub fn get_tty() -> Result<fs::File> {
     let tty = "/dev/tty";
-    match fs::OpenOptions::new().read(true).write(true).open(&tty) {
+    match fs::OpenOptions::new().read(true).write(true).open(tty) {
         Ok(f) => Ok(f),
         Err(e) => {
             bail!(format!("Failed to open {}. {}", tty, e))
@@ -323,6 +323,7 @@ impl Runner {
         let backend = CrosstermBackend::new(stdout);
         let mut terminal = Terminal::new(backend)?;
         terminal.hide_cursor()?;
+        terminal.clear()?;
 
         // Threads
         pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
@@ -334,7 +335,7 @@ impl Runner {
             tx_msg_in.send(app::Task::new(app::MsgIn::External(msg.clone()), None))?;
         }
 
-        // Refresh once after loading
+        // Refresh screen once after loading
         tx_msg_in.send(app::Task::new(
             app::MsgIn::External(app::ExternalMsg::Refresh),
             None,

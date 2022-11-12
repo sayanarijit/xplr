@@ -15,7 +15,7 @@ lazy_static! {
 }
 
 pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
-    let dirs = fs::read_dir(&parent)?;
+    let dirs = fs::read_dir(parent)?;
     let mut nodes = dirs
         .filter_map(|d| {
             d.ok().map(|e| {

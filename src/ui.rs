@@ -809,27 +809,19 @@ fn draw_input_buffer<B: Backend>(
             .to_owned()
             .extend(&panel_config.input_and_logs);
 
-        let cursor_offset_left = if config
+        let cursor_offset_left = config
             .borders
             .as_ref()
             .map(|b| b.contains(&Border::Left))
-            .unwrap_or(false)
-        {
-            1
-        } else {
-            0
-        } + app.input.prompt.chars().count() as u16;
+            .unwrap_or(false) as u16
+            + app.input.prompt.chars().count() as u16;
 
-        let cursor_offset_right = if config
+        let cursor_offset_right = config
             .borders
             .as_ref()
             .map(|b| b.contains(&Border::Right))
-            .unwrap_or(false)
-        {
-            2
-        } else {
-            1
-        };
+            .unwrap_or(false) as u16
+            + 1;
 
         let offset_width = cursor_offset_left + cursor_offset_right;
         let width = layout_size.width.max(offset_width) - offset_width;
