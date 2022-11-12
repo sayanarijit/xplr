@@ -4,7 +4,10 @@ on:
   push:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: nixbuild/nix-quick-install-action@v19
@@ -13,6 +16,8 @@ jobs:
       - uses: cachix/cachix-action@v11
         with:
           name: xplr
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - run: nix-build
-      - run: nix-shell --run "xplr --version"
+          authtoken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - run: nix profile install .
+      - name: Run tests
+        run: |
+          xplr --version
