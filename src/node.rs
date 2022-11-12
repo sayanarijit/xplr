@@ -14,7 +14,7 @@ fn mime_essence(path: &Path, is_dir: bool) -> String {
     if is_dir {
         String::from("inode/directory")
     } else {
-        mime_guess::from_path(&path)
+        mime_guess::from_path(path)
             .first()
             .map(|m| m.essence_str().to_string())
             .unwrap_or_default()

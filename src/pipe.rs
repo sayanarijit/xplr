@@ -60,7 +60,7 @@ pub fn read_all(pipe: &str, delimiter: char) -> Result<Vec<ExternalMsg>> {
         .read(true)
         .write(true)
         .create(false)
-        .open(&pipe)?;
+        .open(pipe)?;
 
     let mut in_str = String::new();
     file.read_to_string(&mut in_str)?;
