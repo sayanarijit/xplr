@@ -62,6 +62,8 @@ integration][15], enabling you to achieve insane terminal productivity.
 
 ## Packaging
 
+Package maintainers please refer to the [RELEASE.md](./RELEASE.md).
+
 <a href="https://repology.org/project/xplr/versions"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" /></a>
 
 ## Backers
