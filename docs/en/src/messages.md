@@ -462,8 +462,7 @@ Example:
 - YAML: SwitchMode: default
 
 > **NOTE:** To be specific about which mode to switch to, use
-> `SwitchModeBuiltinKeepingInputBuffer` or
-> `SwitchModeCustomKeepingInputBuffer` instead.
+> `SwitchModeBuiltin` or `SwitchModeCustom` instead.
 
 #### SwitchModeKeepingInputBuffer
 

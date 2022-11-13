@@ -402,8 +402,7 @@ pub enum ExternalMsg {
     /// - YAML: SwitchMode: default
     ///
     /// > **NOTE:** To be specific about which mode to switch to, use
-    /// > `SwitchModeBuiltinKeepingInputBuffer` or
-    /// > `SwitchModeCustomKeepingInputBuffer` instead.
+    /// > `SwitchModeBuiltin` or `SwitchModeCustom` instead.
     SwitchMode(String),
 
     /// Switch input [mode](https://xplr.dev/en/modes).

@@ -100,7 +100,7 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```lua
 ///
 /// xplr.util.explore("/tmp")
-/// xplr.util.explore("/tmp", app.extra_config)
+/// xplr.util.explore("/tmp", app.explorer_config)
 /// -- { { absolute_path = "/tmp/a", ... }, ... }
 /// ```
 ///
