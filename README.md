@@ -58,6 +58,8 @@ integration][15], enabling you to achieve insane terminal productivity.
 
 - [[VIDEO] XPLR: Insanely Hackable Lua File Manager ~ Brodie Robertson](https://youtu.be/MaVRtYh1IRU)
 
+- [[Article] What is a TUI file explorer & why would you need one? ~ xplr.stck.me](https://xplr.stck.me/post/25252/What-is-a-TUI-file-explorer-why-would-you-need-one)
+
 ## Packaging
 
 <a href="https://repology.org/project/xplr/versions"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" /></a>
