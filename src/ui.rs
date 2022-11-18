@@ -825,7 +825,7 @@ fn draw_input_buffer<B: Backend>(
 
         let offset_width = cursor_offset_left + cursor_offset_right;
         let width = layout_size.width.max(offset_width) - offset_width;
-        let scroll = (input.cursor() as u16).max(width) - width;
+        let scroll = input.visual_scroll(width.into()) as u16;
 
         let input_buf = Paragraph::new(Spans::from(vec![
             Span::styled(
@@ -843,7 +843,9 @@ fn draw_input_buffer<B: Backend>(
         f.render_widget(input_buf, layout_size);
         f.set_cursor(
             // Put cursor past the end of the input text
-            layout_size.x + (input.cursor() as u16).min(width) + cursor_offset_left,
+            layout_size.x
+                + (input.visual_cursor() as u16).min(width)
+                + cursor_offset_left,
             // Move one line down, from the border to the input line
             layout_size.y + 1,
         );
