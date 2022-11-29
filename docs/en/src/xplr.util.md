@@ -84,3 +84,60 @@ Example:
 xplr.util.shell_quote("a'b\"c")
 -- 'a'"'"'b"c'
 ```
+
+### xplr.util.from_json
+
+Load JSON string into Lua value.
+
+Type: function( string ) -> value
+
+Example:
+
+```lua
+xplr.util.from_json([[{"foo": "bar"}]])
+-- { foo = "bar" }
+```
+
+### xplr.util.to_json
+
+Dump Lua value into JSON (i.e. also YAML) string.
+
+Type: function( string ) -> value
+
+Example:
+
+```lua
+xplr.util.to_json({ foo = "bar" })
+-- [[{ "foos": "bar" }]]
+
+xplr.util.to_json({ foo = "bar" }, { pretty = true })
+-- [[{
+--   "foos": "bar"
+-- }]]
+```
+
+### xplr.util.from_yaml
+
+Load YAML (i.e. also JSON) string into Lua value.
+
+Type: function( string ) -> value
+
+Example:
+
+```lua
+xplr.util.from_yaml([[{foo: bar}]])
+-- { foo = "bar" }
+```
+
+### xplr.util.to_yaml
+
+Dump Lua value into YAML string.
+
+Type: function( string ) -> value
+
+Example:
+
+```lua
+xplr.util.to_yaml({ foo = "bar" })
+-- "foo: bar"
+```
