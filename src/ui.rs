@@ -680,6 +680,13 @@ fn draw_table<B: Backend>(
 
     let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
 
+    let node_count = app.directory_buffer.as_ref().map(|d| d.total).unwrap_or(0);
+    let node_count = if node_count == 0 {
+        String::new()
+    } else {
+        format!("({node_count}) ")
+    };
+
     let table = Table::new(rows)
         .widths(&table_constraints)
         .style(app_config.general.table.style.to_owned().into())
@@ -687,15 +694,7 @@ fn draw_table<B: Backend>(
         .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
         .block(block(
             config,
-            format!(
-                " {}/{} ({}) ",
-                vroot_indicator,
-                pwd,
-                app.directory_buffer
-                    .as_ref()
-                    .map(|d| d.total)
-                    .unwrap_or_default()
-            ),
+            format!(" {vroot_indicator}/{pwd} {node_count}"),
         ));
 
     let table = table.to_owned().header(
@@ -744,8 +743,14 @@ fn draw_selection<B: Backend>(
         .collect();
 
     // Selected items
+    let selection_count = if selection_count == 0 {
+        String::new()
+    } else {
+        format!("({selection_count}) ")
+    };
+
     let selection_list = List::new(selection)
-        .block(block(config, format!(" Selection ({}) ", selection_count)));
+        .block(block(config, format!(" Selection {selection_count}")));
 
     f.render_widget(selection_list, layout_size);
 }
@@ -947,10 +952,15 @@ fn draw_sort_n_filter<B: Backend>(
 
     spans.pop();
 
-    let p = Paragraph::new(Spans::from(spans)).block(block(
-        config,
-        format!(" Sort & filter ({}) ", filter_by.len() + sort_by.len()),
-    ));
+    let item_count = filter_by.len() + sort_by.len();
+    let item_count = if item_count == 0 {
+        String::new()
+    } else {
+        format!("({item_count}) ")
+    };
+
+    let p = Paragraph::new(Spans::from(spans))
+        .block(block(config, format!(" Sort & filter {item_count}")));
 
     f.render_widget(p, layout_size);
 }
@@ -1009,11 +1019,18 @@ fn draw_logs<B: Backend>(
             .collect::<Vec<ListItem>>()
     };
 
+    let logs_count = logs.len();
+    let logs_count = if logs_count == 0 {
+        String::new()
+    } else {
+        format!("({logs_count}) ")
+    };
+
     let logs_list = List::new(logs).block(block(
         config,
         format!(
-            " Logs ({}) [{}{}] ",
-            app.logs.len(),
+            " Logs {}[{}{}] ",
+            logs_count,
             app.mode.name,
             read_only_indicator(app),
         ),
