@@ -1019,7 +1019,7 @@ fn draw_logs<B: Backend>(
             .collect::<Vec<ListItem>>()
     };
 
-    let logs_count = logs.len();
+    let logs_count = app.logs.len();
     let logs_count = if logs_count == 0 {
         String::new()
     } else {
