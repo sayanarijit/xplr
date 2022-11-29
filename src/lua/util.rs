@@ -1,3 +1,4 @@
+use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
@@ -18,6 +19,7 @@ use std::process::Command;
 pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
 
+    util = version(util, lua)?;
     util = dirname(util, lua)?;
     util = basename(util, lua)?;
     util = absolute(util, lua)?;
@@ -29,6 +31,42 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = from_yaml(util, lua)?;
     util = to_yaml(util, lua)?;
 
+    Ok(util)
+}
+
+/// Get the xplr version details.
+///
+/// Type: function() -> { major: number, minor: number, patch: number }
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.version()
+/// -- { major = 0, minor = 0, patch = 0 }
+/// ```
+pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    struct Version {
+        major: u16,
+        minor: u16,
+        patch: u16,
+    }
+
+    let func = lua.create_function(|lua, ()| {
+        let (major, minor, patch, _) =
+            lua::parse_version(VERSION).map_err(LuaError::custom)?;
+
+        let version = Version {
+            major,
+            minor,
+            patch,
+        };
+
+        let res = lua::serialize(lua, &version).map_err(LuaError::custom)?;
+        Ok(res)
+    })?;
+
+    util.set("version", func)?;
     Ok(util)
 }
 
@@ -215,8 +253,8 @@ pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// -- }]]
 /// ```
 pub fn to_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
-    pub struct Options {
+    #[derive(Debug, Default, Serialize, Deserialize)]
+    struct Options {
         pretty: bool,
     }
 

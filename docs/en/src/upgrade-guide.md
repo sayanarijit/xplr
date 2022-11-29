@@ -32,13 +32,13 @@ Knowing that we use the `{major}.{minor}.{patch}` versioning format,
 
 e.g.
 
-- `1.0.0` -> `1.0.x`: Bug fix (fully compatible).
+- `1.0.0` -> `1.0.x`: Patch (fully compatible).
 - `1.0.0` -> `1.x.x`: Only backwards compatible. You can't generally use for
   e.g. `app-1.0.0` with `config-1.1.0`. But vice versa is fine.
 - `1.0.0` -> `x.x.x`: Not compatible at all.
 
 Note that until we're `v1`, we'll be using the `{minor}` version number as
-`{major}`, and the `{patch}` fix number as `{minor}` to determine
+`{major}`, and the `{patch}` number as `{minor}` to determine
 compatibility.
 
 </details>

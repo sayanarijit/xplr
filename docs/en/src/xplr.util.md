@@ -1,3 +1,16 @@
+### xplr.util.version
+
+Get the current xplr version details.
+
+Type: function() -> { major: number, minor: number, patch: number }
+
+Example:
+
+```lua
+xplr.util.version()
+-- { major = 0, minor = 0, patch = 0 }
+```
+
 ### xplr.util.dirname
 
 Get the directory name of a given path.

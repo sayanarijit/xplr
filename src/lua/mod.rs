@@ -29,15 +29,15 @@ fn parse_version(version: &str) -> Result<(u16, u16, u16, Option<u16>)> {
 
     let major = configv.next().unwrap_or_default().parse::<u16>()?;
     let minor = configv.next().unwrap_or_default().parse::<u16>()?;
-    let bugfix = configv
+    let patch = configv
         .next()
         .and_then(|s| s.split('-').next())
         .unwrap_or_default()
         .parse::<u16>()?;
 
-    let beta = configv.next().unwrap_or_default().parse::<u16>().ok();
+    let pre = configv.next().unwrap_or_default().parse::<u16>().ok();
 
-    Ok((major, minor, bugfix, beta))
+    Ok((major, minor, patch, pre))
 }
 
 /// Check the config version and notify users.
