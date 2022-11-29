@@ -199,6 +199,39 @@ xplr.util.shell_execute(&quot;bash&quot;, {&quot;-c&quot;, &quot;xplr --help&quo
 <pre><code class="language-lua">xplr.util.shell_quote(&quot;a'b\&quot;c&quot;)
 -- 'a'&quot;'&quot;'b&quot;c'
 </code></pre>
+<h3 id="xplrutilfrom_json"><a class="header" href="#xplrutilfrom_json">xplr.util.from_json</a></h3>
+<p>Load JSON string into Lua value.</p>
+<p>Type: function( string ) -&gt; value</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.util.from_json([[{&quot;foo&quot;: &quot;bar&quot;}]])
+-- { foo = &quot;bar&quot; }
+</code></pre>
+<h3 id="xplrutilto_json"><a class="header" href="#xplrutilto_json">xplr.util.to_json</a></h3>
+<p>Dump Lua value into JSON (i.e. also YAML) string.</p>
+<p>Type: function( string ) -&gt; value</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.util.to_json({ foo = &quot;bar&quot; })
+-- [[{ &quot;foos&quot;: &quot;bar&quot; }]]
+
+xplr.util.to_json({ foo = &quot;bar&quot; }, { pretty = true })
+-- [[{
+--   &quot;foos&quot;: &quot;bar&quot;
+-- }]]
+</code></pre>
+<h3 id="xplrutilfrom_yaml"><a class="header" href="#xplrutilfrom_yaml">xplr.util.from_yaml</a></h3>
+<p>Load YAML (i.e. also JSON) string into Lua value.</p>
+<p>Type: function( string ) -&gt; value</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.util.from_yaml([[{foo: bar}]])
+-- { foo = &quot;bar&quot; }
+</code></pre>
+<h3 id="xplrutilto_yaml"><a class="header" href="#xplrutilto_yaml">xplr.util.to_yaml</a></h3>
+<p>Dump Lua value into YAML string.</p>
+<p>Type: function( string ) -&gt; value</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.util.to_yaml({ foo = &quot;bar&quot; })
+-- &quot;foo: bar&quot;
+</code></pre>
 
                     </main>
 
