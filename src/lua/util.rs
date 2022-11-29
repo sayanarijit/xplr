@@ -9,6 +9,9 @@ use mlua::Table;
 use mlua::Value;
 use path_absolutize::*;
 use serde::de::Error;
+use serde::{Deserialize, Serialize};
+use serde_json as json;
+use serde_yaml as yaml;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -21,6 +24,10 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = explore(util, lua)?;
     util = shell_execute(util, lua)?;
     util = shell_quote(util, lua)?;
+    util = from_json(util, lua)?;
+    util = to_json(util, lua)?;
+    util = from_yaml(util, lua)?;
+    util = to_yaml(util, lua)?;
 
     Ok(util)
 }
@@ -170,5 +177,105 @@ pub fn shell_quote<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         Ok(format!("'{}'", string.replace('\'', r#"'"'"'"#)))
     })?;
     util.set("shell_quote", func)?;
+    Ok(util)
+}
+
+/// Load JSON string into Lua value.
+///
+/// Type: function( string ) -> value
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.from_json([[{"foo": "bar"}]])
+/// -- { foo = "bar" }
+/// ```
+pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, string: String| {
+        let val = json::from_str::<yaml::Value>(&string).map_err(LuaError::custom)?;
+        lua::serialize(lua, &val).map_err(Error::custom)
+    })?;
+    util.set("from_json", func)?;
+    Ok(util)
+}
+
+/// Dump Lua value into JSON (i.e. also YAML) string.
+///
+/// Type: function( string ) -> value
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.to_json({ foo = "bar" })
+/// -- [[{ "foos": "bar" }]]
+///
+/// xplr.util.to_json({ foo = "bar" }, { pretty = true })
+/// -- [[{
+/// --   "foos": "bar"
+/// -- }]]
+/// ```
+pub fn to_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
+    pub struct Options {
+        pretty: bool,
+    }
+
+    let func =
+        lua.create_function(|lua, (value, options): (Value, Option<Table>)| {
+            let options: Options = if let Some(o) = options {
+                lua.from_value(Value::Table(o))?
+            } else {
+                Default::default()
+            };
+
+            if options.pretty {
+                json::to_string_pretty(&value).map_err(Error::custom)
+            } else {
+                json::to_string(&value).map_err(Error::custom)
+            }
+        })?;
+    util.set("to_json", func)?;
+    Ok(util)
+}
+
+/// Load YAML (i.e. also JSON) string into Lua value.
+///
+/// Type: function( string ) -> value
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.from_yaml([[{foo: bar}]])
+/// -- { foo = "bar" }
+/// ```
+pub fn from_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, string: String| {
+        let val = yaml::from_str::<yaml::Value>(&string).map_err(LuaError::custom)?;
+        lua::serialize(lua, &val).map_err(Error::custom)
+    })?;
+    util.set("from_yaml", func)?;
+    Ok(util)
+}
+
+/// Dump Lua value into YAML string.
+///
+/// Type: function( string ) -> value
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.to_yaml({ foo = "bar" })
+/// -- "foo: bar"
+/// ```
+pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
+    pub struct Options {
+        pretty: bool,
+    }
+
+    let func = lua.create_function(|_, value: Value| {
+        yaml::to_string(&value).map_err(Error::custom)
+    })?;
+    util.set("to_yaml", func)?;
     Ok(util)
 }
