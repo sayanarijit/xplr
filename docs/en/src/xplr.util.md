@@ -1,6 +1,6 @@
 ### xplr.util.version
 
-Get the current xplr version details.
+Get the xplr version details.
 
 Type: function() -> { major: number, minor: number, patch: number }
 
@@ -115,7 +115,7 @@ xplr.util.from_json([[{"foo": "bar"}]])
 
 Dump Lua value into JSON (i.e. also YAML) string.
 
-Type: function( string ) -> value
+Type: function( value ) -> string
 
 Example:
 
@@ -146,7 +146,7 @@ xplr.util.from_yaml([[{foo: bar}]])
 
 Dump Lua value into YAML string.
 
-Type: function( string ) -> value
+Type: function( value ) -> string
 
 Example:
 

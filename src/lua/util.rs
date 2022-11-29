@@ -239,7 +239,7 @@ pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Dump Lua value into JSON (i.e. also YAML) string.
 ///
-/// Type: function( string ) -> value
+/// Type: function( value ) -> string
 ///
 /// Example:
 ///
@@ -297,7 +297,7 @@ pub fn from_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Dump Lua value into YAML string.
 ///
-/// Type: function( string ) -> value
+/// Type: function( value ) -> string
 ///
 /// Example:
 ///
