@@ -3589,7 +3589,14 @@ focus on.</p>
 <ul>
 <li><a href="xplr.util.html">xplr.util</a></li>
 </ul>
-<div style="break-before: page; page-break-before: always;"></div><h3 id="xplrutildirname"><a class="header" href="#xplrutildirname">xplr.util.dirname</a></h3>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="xplrutilversion"><a class="header" href="#xplrutilversion">xplr.util.version</a></h3>
+<p>Get the xplr version details.</p>
+<p>Type: function() -&gt; { major: number, minor: number, patch: number }</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.util.version()
+-- { major = 0, minor = 0, patch = 0 }
+</code></pre>
+<h3 id="xplrutildirname"><a class="header" href="#xplrutildirname">xplr.util.dirname</a></h3>
 <p>Get the directory name of a given path.</p>
 <p>Type: function( path:string ) -&gt; path:string|nil</p>
 <p>Example:</p>
@@ -3646,7 +3653,7 @@ xplr.util.shell_execute(&quot;bash&quot;, {&quot;-c&quot;, &quot;xplr --help&quo
 </code></pre>
 <h3 id="xplrutilto_json"><a class="header" href="#xplrutilto_json">xplr.util.to_json</a></h3>
 <p>Dump Lua value into JSON (i.e. also YAML) string.</p>
-<p>Type: function( string ) -&gt; value</p>
+<p>Type: function( value ) -&gt; string</p>
 <p>Example:</p>
 <pre><code class="language-lua">xplr.util.to_json({ foo = &quot;bar&quot; })
 -- [[{ &quot;foos&quot;: &quot;bar&quot; }]]
@@ -3665,7 +3672,7 @@ xplr.util.to_json({ foo = &quot;bar&quot; }, { pretty = true })
 </code></pre>
 <h3 id="xplrutilto_yaml"><a class="header" href="#xplrutilto_yaml">xplr.util.to_yaml</a></h3>
 <p>Dump Lua value into YAML string.</p>
-<p>Type: function( string ) -&gt; value</p>
+<p>Type: function( value ) -&gt; string</p>
 <p>Example:</p>
 <pre><code class="language-lua">xplr.util.to_yaml({ foo = &quot;bar&quot; })
 -- &quot;foo: bar&quot;
@@ -4511,13 +4518,13 @@ app version.</li>
 </ul>
 <p>e.g.</p>
 <ul>
-<li><code>1.0.0</code> -&gt; <code>1.0.x</code>: Bug fix (fully compatible).</li>
+<li><code>1.0.0</code> -&gt; <code>1.0.x</code>: Patch (fully compatible).</li>
 <li><code>1.0.0</code> -&gt; <code>1.x.x</code>: Only backwards compatible. You can't generally use for
 e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fine.</li>
 <li><code>1.0.0</code> -&gt; <code>x.x.x</code>: Not compatible at all.</li>
 </ul>
 <p>Note that until we're <code>v1</code>, we'll be using the <code>{minor}</code> version number as
-<code>{major}</code>, and the <code>{patch}</code> fix number as <code>{minor}</code> to determine
+<code>{major}</code>, and the <code>{patch}</code> number as <code>{minor}</code> to determine
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
