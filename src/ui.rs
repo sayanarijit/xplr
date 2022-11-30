@@ -763,10 +763,12 @@ fn draw_help_menu<B: Backend>(
     _: &Lua,
 ) {
     let panel_config = &app.config.general.panel_ui;
+
     let config = panel_config
         .default
         .to_owned()
         .extend(&panel_config.help_menu);
+
     let help_menu_rows = app
         .mode
         .help_menu()

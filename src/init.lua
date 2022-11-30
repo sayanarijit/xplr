@@ -1405,6 +1405,7 @@ xplr.config.modes.builtin.go_to_path = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.selection_ops = {
   name = "selection ops",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["c"] = {
@@ -1464,6 +1465,7 @@ xplr.config.modes.builtin.selection_ops = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.create = {
   name = "create",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["d"] = {
@@ -1627,6 +1629,7 @@ xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.go_to = {
   name = "go to",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["f"] = {
@@ -1783,6 +1786,7 @@ xplr.config.modes.builtin.duplicate_as = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.delete = {
   name = "delete",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["D"] = {
@@ -1842,6 +1846,7 @@ xplr.config.modes.builtin.delete = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.action = {
   name = "action to",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["!"] = {
@@ -1927,6 +1932,7 @@ xplr.config.modes.builtin.action = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.quit = {
   name = "quit",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["enter"] = {
@@ -2306,6 +2312,7 @@ xplr.config.modes.builtin.sort = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.switch_layout = {
   name = "switch layout",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["1"] = {
@@ -2345,6 +2352,7 @@ xplr.config.modes.builtin.switch_layout = {
 -- Type: [Mode](https://xplr.dev/en/mode)
 xplr.config.modes.builtin.vroot = {
   name = "vroot",
+  layout = "HelpMenu",
   key_bindings = {
     on_key = {
       ["v"] = {
@@ -2446,17 +2454,9 @@ xplr.fn.builtin.try_complete_path = function(m)
     return
   end
 
-  local function splitlines(str)
-    local res = {}
-    for s in str:gmatch("[^\r\n]+") do
-      table.insert(res, s)
-    end
-    return res
-  end
-
-  local function matches_all(str, files)
-    for _, p in ipairs(files) do
-      if string.sub(p, 1, #str) ~= str then
+  local function matches_all(str, paths)
+    for _, path in ipairs(paths) do
+      if string.sub(path, 1, #str) ~= str then
         return false
       end
     end
@@ -2464,12 +2464,23 @@ xplr.fn.builtin.try_complete_path = function(m)
   end
 
   local path = m.input_buffer
+  local explorer_config = {
+    filters = {
+      { filter = "RelativePathDoesStartWith", input = xplr.util.basename(path) },
+    },
+  }
+  local parent = xplr.util.dirname(path)
+  if not parent or parent == "" then
+    parent = "./"
+  elseif parent ~= "/" then
+    parent = parent .. "/"
+  end
 
-  local p = assert(io.popen(string.format("ls -d %q* 2>/dev/null", path)))
-  local out = p:read("*all")
-  p:close()
-
-  local found = splitlines(out)
+  local nodes = xplr.util.explore(parent, explorer_config)
+  local found = {}
+  for _, node in ipairs(nodes) do
+    table.insert(found, parent .. node.relative_path)
+  end
   local count = #found
 
   if count == 0 then
@@ -2481,7 +2492,7 @@ xplr.fn.builtin.try_complete_path = function(m)
   else
     local first = found[1]
     while #first > #path and matches_all(path, found) do
-      path = string.sub(found[1], 1, #path + 1)
+      path = string.sub(first, 1, #path + 1)
     end
 
     if matches_all(path, found) then
