@@ -80,7 +80,7 @@ Type: function( program:string, args:{ arg:string... }|nil )
 Example:
 
 ```lua
-xplr.util.shell_execute("pwd"})
+xplr.util.shell_execute("pwd")
 xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 -- { stdout = "xplr...", stderr = "", returncode = 0 }
 ```
