@@ -176,7 +176,7 @@ pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.shell_execute("pwd"})
+/// xplr.util.shell_execute("pwd")
 /// xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 /// -- { stdout = "xplr...", stderr = "", returncode = 0 }
 /// ```
