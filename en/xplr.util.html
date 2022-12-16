@@ -195,7 +195,7 @@ xplr.util.explore(&quot;/tmp&quot;, app.explorer_config)
 <p>Type: function( program:string, args:{ arg:string... }|nil )
 -&gt; { stdout = string, stderr = string, returncode = number|nil }</p>
 <p>Example:</p>
-<pre><code class="language-lua">xplr.util.shell_execute(&quot;pwd&quot;})
+<pre><code class="language-lua">xplr.util.shell_execute(&quot;pwd&quot;)
 xplr.util.shell_execute(&quot;bash&quot;, {&quot;-c&quot;, &quot;xplr --help&quot;})
 -- { stdout = &quot;xplr...&quot;, stderr = &quot;&quot;, returncode = 0 }
 </code></pre>
