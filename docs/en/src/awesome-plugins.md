@@ -16,7 +16,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/tri-pane.xplr**][56] xplr plugin that implements ranger-like three pane layout.
 - [**sayanarijit/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
-- [**igorepst/term.xplr**][39] Terminal integration for xplr
+- [**dtomvan/term.xplr**][39] Terminal integration for xplr
 - [**sayanarijit/wl-clipboard.xplr**][52] Copy and paste with system clipboard using wl-clipboard
 - [**dtomvan/xpm.xplr**][47] The XPLR Plugin Manager
 
@@ -95,7 +95,7 @@ of the following plugins work for you, it's very easy to
 [36]: https://github.com/chmln/nvim-ctrl
 [37]: https://github.com/sayanarijit/command-mode.xplr
 [38]: https://github.com/sayanarijit/map.xplr
-[39]: https://github.com/igorepst/term.xplr
+[39]: https://github.com/dtomvan/term.xplr
 [40]: https://github.com/dtomvan/ouch.xplr
 [41]: https://github.com/ouch-org/ouch
 [42]: https://github.com/igorepst/context-switch.xplr
