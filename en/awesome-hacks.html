@@ -259,7 +259,14 @@ bookmark can be added, deleted, or jumped to.</p>
 <li>Requires: fzf, sd</li>
 <li>Tested on: MacOS</li>
 </ul>
-<pre><code class="language-lua">-- Bookmark: mode binding
+<pre><code class="language-lua">-- With `export XPLR_BOOKMARK_FILE=&quot;$HOME/bookmarks&quot;`
+-- Bookmark: mode binding
+xplr.config.modes.builtin.default.key_bindings.on_key[&quot;b&quot;] = {
+  help = &quot;bookmark mode&quot;,
+  messages = {
+    { SwitchModeCustom = &quot;bookmark&quot; },
+  },
+}
 xplr.config.modes.custom.bookmark = {
   name = &quot;bookmark&quot;,
   key_bindings = {
@@ -267,12 +274,13 @@ xplr.config.modes.custom.bookmark = {
       m = {
         help = &quot;bookmark dir&quot;,
         messages = {
-          { BashExecSilently0 = [[
+          {
+            BashExecSilently0 = [[
               PTH=&quot;${XPLR_FOCUS_PATH:?}&quot;
               if [ -d &quot;${PTH}&quot; ]; then
                 PTH=&quot;${PTH}&quot;
               elif [ -f &quot;${PTH}&quot; ]; then
-                PTH=&quot;$(dirname &quot;${PTH}&quot;)&quot;
+                PTH=$(dirname &quot;${PTH}&quot;)
               fi
               PTH_ESC=$(printf %q &quot;$PTH&quot;)
               if echo &quot;${PTH:?}&quot; &gt;&gt; &quot;${XPLR_BOOKMARK_FILE:?}&quot;; then
@@ -280,8 +288,9 @@ xplr.config.modes.custom.bookmark = {
               else
                 &quot;$XPLR&quot; -m 'LogError: %q' &quot;Failed to bookmark $PTH_ESC&quot;
               fi
-            ]]
+            ]],
           },
+          &quot;PopMode&quot;,
         },
       },
       g = {
@@ -293,18 +302,21 @@ xplr.config.modes.custom.bookmark = {
               if [ &quot;$PTH&quot; ]; then
                 &quot;$XPLR&quot; -m 'FocusPath: %q' &quot;$PTH&quot;
               fi
-            ]===]
+            ]===],
           },
+          &quot;PopMode&quot;,
         },
       },
       d = {
         help = &quot;delete bookmark&quot;,
         messages = {
-          { BashExec0 = [[
+          {
+            BashExec0 = [[
               PTH=$(cat &quot;${XPLR_BOOKMARK_FILE:?}&quot; | fzf --no-sort)
               sd &quot;$PTH\n&quot; &quot;&quot; &quot;${XPLR_BOOKMARK_FILE:?}&quot;
-            ]]
+            ]],
           },
+          &quot;PopMode&quot;,
         },
       },
       esc = {
@@ -316,6 +328,7 @@ xplr.config.modes.custom.bookmark = {
     },
   },
 }
+
 </code></pre>
 </details>
 <h3 id="another-bookmark-manager-type-thing-taken-from-wfxrs-zsh-plugin"><a class="header" href="#another-bookmark-manager-type-thing-taken-from-wfxrs-zsh-plugin">Another bookmark manager type thing, taken from <a href="https://github.com/wfxr/formarks">wfxr's zsh plugin</a>.</a></h3>
