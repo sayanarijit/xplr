@@ -1673,7 +1673,7 @@ xplr.config.modes.builtin.go_to = {
               if [ -z "$OPENER" ]; then
                 if command -v xdg-open; then
                   OPENER=xdg-open
-                  elif command -v open; then
+                elif command -v open; then
                   OPENER=open
                 else
                   "$XPLR" -m 'LogError: "$OPENER not found"'

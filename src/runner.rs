@@ -393,7 +393,7 @@ impl Runner {
                             }
 
                             Debug(path) => {
-                                fs::write(&path, yaml::to_string(&app)?)?;
+                                fs::write(path, yaml::to_string(&app)?)?;
                             }
 
                             ClearScreen => {

@@ -135,7 +135,14 @@ bookmark can be added, deleted, or jumped to.
 - Tested on: MacOS
 
 ```lua
+-- With `export XPLR_BOOKMARK_FILE="$HOME/bookmarks"`
 -- Bookmark: mode binding
+xplr.config.modes.builtin.default.key_bindings.on_key["b"] = {
+  help = "bookmark mode",
+  messages = {
+    { SwitchModeCustom = "bookmark" },
+  },
+}
 xplr.config.modes.custom.bookmark = {
   name = "bookmark",
   key_bindings = {
@@ -143,12 +150,13 @@ xplr.config.modes.custom.bookmark = {
       m = {
         help = "bookmark dir",
         messages = {
-          { BashExecSilently0 = [[
+          {
+            BashExecSilently0 = [[
               PTH="${XPLR_FOCUS_PATH:?}"
               if [ -d "${PTH}" ]; then
                 PTH="${PTH}"
               elif [ -f "${PTH}" ]; then
-                PTH="$(dirname "${PTH}")"
+                PTH=$(dirname "${PTH}")
               fi
               PTH_ESC=$(printf %q "$PTH")
               if echo "${PTH:?}" >> "${XPLR_BOOKMARK_FILE:?}"; then
@@ -156,8 +164,9 @@ xplr.config.modes.custom.bookmark = {
               else
                 "$XPLR" -m 'LogError: %q' "Failed to bookmark $PTH_ESC"
               fi
-            ]]
+            ]],
           },
+          "PopMode",
         },
       },
       g = {
@@ -169,18 +178,21 @@ xplr.config.modes.custom.bookmark = {
               if [ "$PTH" ]; then
                 "$XPLR" -m 'FocusPath: %q' "$PTH"
               fi
-            ]===]
+            ]===],
           },
+          "PopMode",
         },
       },
       d = {
         help = "delete bookmark",
         messages = {
-          { BashExec0 = [[
+          {
+            BashExec0 = [[
               PTH=$(cat "${XPLR_BOOKMARK_FILE:?}" | fzf --no-sort)
               sd "$PTH\n" "" "${XPLR_BOOKMARK_FILE:?}"
-            ]]
+            ]],
           },
+          "PopMode",
         },
       },
       esc = {
@@ -192,6 +204,7 @@ xplr.config.modes.custom.bookmark = {
     },
   },
 }
+
 ```
 
 </details>

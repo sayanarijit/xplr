@@ -276,7 +276,7 @@ impl App {
             .unwrap_or_else(env::temp_dir)
             .join("xplr")
             .join("session")
-            .join(&pid.to_string())
+            .join(pid.to_string())
             .to_string_lossy()
             .to_string();
 
@@ -284,7 +284,7 @@ impl App {
             session_path = env::temp_dir()
                 .join("xplr")
                 .join("session")
-                .join(&pid.to_string())
+                .join(pid.to_string())
                 .to_string_lossy()
                 .to_string();
             fs::create_dir_all(&session_path)?;
