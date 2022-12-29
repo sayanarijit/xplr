@@ -14,6 +14,7 @@ These are the alternative TUI/CLI file managers/explorers you might want to chec
 - [noice][10]
 - [clifm][11]
 - [clifm][12] (non curses)
+- [felix][14]
 
 [add more][13]
 
@@ -30,3 +31,4 @@ These are the alternative TUI/CLI file managers/explorers you might want to chec
 [11]: https://github.com/pasqu4le/clifm
 [12]: https://github.com/leo-arch/clifm
 [13]: community.md
+[14]: https://github.com/kyoheiu/felix
