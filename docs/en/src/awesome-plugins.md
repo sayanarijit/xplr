@@ -19,6 +19,7 @@ of the following plugins work for you, it's very easy to
 - [**dtomvan/term.xplr**][39] Terminal integration for xplr
 - [**sayanarijit/wl-clipboard.xplr**][52] Copy and paste with system clipboard using wl-clipboard
 - [**dtomvan/xpm.xplr**][47] The XPLR Plugin Manager
+- [**emsquid/style.xplr**][57] Helper plugin that allows you to integrate xplr's [Style][58] anywhere 
 
 ### Integration
 
@@ -113,3 +114,5 @@ of the following plugins work for you, it's very easy to
 [54]: https://github.com/sayanarijit/scp.xplr
 [55]: https://github.com/sayanarijit/regex-search.xplr
 [56]: https://github.com/sayanarijit/tri-pane.xplr
+[57]: https://github.com/emsquid/style.xplr
+[58]: style.md
