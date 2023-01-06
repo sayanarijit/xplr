@@ -53,8 +53,6 @@ Renders the first column in the table
 
 #### xplr.fn.builtin.fmt_general_table_row_cols_1
 
-Renders the second column in the table
-
 #### xplr.fn.builtin.fmt_general_table_row_cols_2
 
 Renders the third column in the table
@@ -114,6 +112,22 @@ return {
   on_focus_change = {
     { LogSuccess = "Changed focus" },
     { CallLuaSilently = "custom.some_plugin_with_hooks.on_focus_change" },
+  }
+
+  -- Add messages to send when the mode is switched.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_mode_switch = {
+    { LogSuccess = "Switched mode" },
+    { CallLuaSilently = "custom.some_plugin_with_hooks.on_mode_switch" },
+  }
+
+  -- Add messages to send when the layout is switched
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_layout_switch = {
+    { LogSuccess = "Switched layout" },
+    { CallLuaSilently = "custom.some_plugin_with_hooks.on_layout_switch" },
   }
 }
 ```

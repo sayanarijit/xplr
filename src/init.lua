@@ -2704,8 +2704,21 @@ xplr.fn.custom = {}
 --     { CallLuaSilently = "custom.some_plugin_with_hooks.on_focus_change" },
 --   }
 --
---   ...
--- }
+--   -- Add messages to send when the mode is switched.
+--   --
+--   -- Type: list of [Message](https://xplr.dev/en/message#message)s
+--   on_mode_switch = {
+--     { LogSuccess = "Switched mode" },
+--     { CallLuaSilently = "custom.some_plugin_with_hooks.on_mode_switch" },
+--   }
+--
+--   -- Add messages to send when the layout is switched
+--   --
+--   -- Type: list of [Message](https://xplr.dev/en/message#message)s
+--   on_layout_switch = {
+--     { LogSuccess = "Switched layout" },
+--     { CallLuaSilently = "custom.some_plugin_with_hooks.on_layout_switch" },
+--   }
 -- ```
 
 return {
