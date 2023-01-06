@@ -381,7 +381,7 @@ impl App {
         self.msg_out.push_back(MsgOut::Enque(task));
         self
     }
-    
+
     pub fn handle_batch_external_msgs(mut self, msgs: Vec<ExternalMsg>) -> Result<Self> {
         for task in msgs
             .into_iter()
@@ -1112,7 +1112,7 @@ impl App {
                 self.config.general.read_only,
                 self.config.general.global_key_bindings.to_owned(),
             );
-             
+
             // Hooks
             if !self.hooks.on_mode_switch.is_empty() {
                 let msgs = self.hooks.on_mode_switch.clone();
@@ -1137,7 +1137,7 @@ impl App {
                 self.config.general.read_only,
                 self.config.general.global_key_bindings.to_owned(),
             );
-            
+
             // Hooks
             if !self.hooks.on_mode_switch.is_empty() {
                 let msgs = self.hooks.on_mode_switch.clone();
@@ -1178,7 +1178,7 @@ impl App {
     fn switch_layout(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.get(layout) {
             self.layout = l.to_owned();
-            
+
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
                 let msgs = self.hooks.on_layout_switch.clone();
@@ -1194,7 +1194,7 @@ impl App {
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.builtin.get(layout) {
             self.layout = l.to_owned();
-            
+
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
                 let msgs = self.hooks.on_layout_switch.clone();
@@ -1210,7 +1210,7 @@ impl App {
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.get_custom(layout) {
             self.layout = l.to_owned();
-            
+
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
                 let msgs = self.hooks.on_layout_switch.clone();
