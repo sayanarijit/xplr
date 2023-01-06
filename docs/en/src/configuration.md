@@ -53,6 +53,8 @@ Renders the first column in the table
 
 #### xplr.fn.builtin.fmt_general_table_row_cols_1
 
+Renders the second column in the table
+
 #### xplr.fn.builtin.fmt_general_table_row_cols_2
 
 Renders the third column in the table
