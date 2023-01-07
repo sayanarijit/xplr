@@ -1,6 +1,6 @@
 # Try in Docker
 
-If youx prefer to try it before installing, here's the snippet for your
+If you prefer to try it before installing, here's the snippet for your
 convenience.
 
 ```bash
