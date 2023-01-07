@@ -1,6 +1,6 @@
 # Try in Docker
 
-If you prefer to try it before installing, here's the snippet for your
+If youx prefer to try it before installing, here's the snippet for your
 convenience.
 
 ```bash
@@ -236,7 +236,7 @@ sudo cp target/release/xplr /usr/local/bin/
   ```
 
 [1]: #direct-download
-[2]: #from-a-hrefhttpscratesiocratesxplrcratesioa
+[2]: #from-cratesio
 [3]: #build-from-source
 [4]: https://github.com/sayanarijit/xplr/watchers
 [5]: https://repology.org/badge/vertical-allrepos/xplr.svg
