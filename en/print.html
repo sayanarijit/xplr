@@ -507,6 +507,22 @@ explicitly.</p>
     { LogSuccess = &quot;Changed focus&quot; },
     { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_focus_change&quot; },
   }
+
+  -- Add messages to send when the mode is switched.
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_mode_switch = {
+    { LogSuccess = &quot;Switched mode&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_mode_switch&quot; },
+  }
+
+  -- Add messages to send when the layout is switched
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_layout_switch = {
+    { LogSuccess = &quot;Switched layout&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_layout_switch&quot; },
+  }
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="general-configuration"><a class="header" href="#general-configuration">General Configuration</a></h3>
