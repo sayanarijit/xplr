@@ -1107,9 +1107,9 @@ impl App {
 
     fn switch_mode_keeping_input_buffer(self, mode: &str) -> Result<Self> {
         if self.config.modes.builtin.contains_key(mode) {
-            self.switch_mode_builtin(mode)
+            self.switch_mode_builtin_keeping_input_buffer(mode)
         } else if self.config.modes.custom.contains_key(mode) {
-            self.switch_mode_custom(mode)
+            self.switch_mode_custom_keeping_input_buffer(mode)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
         }
