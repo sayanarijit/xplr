@@ -1553,7 +1553,7 @@ xplr.config.modes.builtin.create_file = {
               PTH="$XPLR_INPUT_BUFFER"
               PTH_ESC=$(printf %q "$PTH")
               if [ "$PTH" ]; then
-                mkdir -p -- "$(dirname $(realpath $PTH))" \
+                mkdir -p -- "$(dirname $(realpath -m $PTH))" \
                 && touch -- "$PTH" \
                 && "$XPLR" -m 'SetInputBuffer: ""' \
                 && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
