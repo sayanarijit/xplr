@@ -1106,20 +1106,10 @@ impl App {
     }
 
     fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
-        if let Some(mode) = self.config.modes.get(mode).cloned() {
-            self = self.push_mode();
-            self.mode = mode.sanitized(
-                self.config.general.read_only,
-                self.config.general.global_key_bindings.to_owned(),
-            );
-
-            // Hooks
-            if !self.hooks.on_mode_switch.is_empty() {
-                let msgs = self.hooks.on_mode_switch.clone();
-                self = self.handle_batch_external_msgs(msgs)?
-            }
-
-            Ok(self)
+        if self.config.modes.builtin.contains_key(mode) {
+            self.switch_mode_builtin(mode)
+        } else if self.config.modes.custom.contains_key(mode) {
+            self.switch_mode_custom(mode)
         } else {
             self.log_error(format!("Mode not found: {}", mode))
         }
@@ -1176,16 +1166,10 @@ impl App {
     }
 
     fn switch_layout(mut self, layout: &str) -> Result<Self> {
-        if let Some(l) = self.config.layouts.get(layout) {
-            self.layout = l.to_owned();
-
-            // Hooks
-            if !self.hooks.on_layout_switch.is_empty() {
-                let msgs = self.hooks.on_layout_switch.clone();
-                self = self.handle_batch_external_msgs(msgs)?
-            }
-
-            Ok(self)
+        if self.config.layouts.builtin.contains_key(layout) {
+            self.switch_layout_builtin(layout)
+        } else if self.config.layouts.custom.contains_key(layout) {
+            self.switch_layout_custom(layout)
         } else {
             self.log_error(format!("Layout not found: {}", layout))
         }

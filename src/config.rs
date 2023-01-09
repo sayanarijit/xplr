@@ -537,12 +537,6 @@ pub struct ModesConfig {
     pub custom: HashMap<String, Mode>,
 }
 
-impl ModesConfig {
-    pub fn get(&self, name: &str) -> Option<&Mode> {
-        self.builtin.get(name).or_else(|| self.custom.get(name))
-    }
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct PanelUiConfig {
