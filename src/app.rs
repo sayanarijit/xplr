@@ -1105,7 +1105,7 @@ impl App {
             .and_then(App::reset_input_buffer)
     }
 
-    fn switch_mode_keeping_input_buffer(mut self, mode: &str) -> Result<Self> {
+    fn switch_mode_keeping_input_buffer(self, mode: &str) -> Result<Self> {
         if self.config.modes.builtin.contains_key(mode) {
             self.switch_mode_builtin(mode)
         } else if self.config.modes.custom.contains_key(mode) {
@@ -1165,7 +1165,7 @@ impl App {
         }
     }
 
-    fn switch_layout(mut self, layout: &str) -> Result<Self> {
+    fn switch_layout(self, layout: &str) -> Result<Self> {
         if self.config.layouts.builtin.contains_key(layout) {
             self.switch_layout_builtin(layout)
         } else if self.config.layouts.custom.contains_key(layout) {
