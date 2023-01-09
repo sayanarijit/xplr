@@ -2719,6 +2719,7 @@ xplr.fn.custom = {}
 --     { LogSuccess = "Switched layout" },
 --     { CallLuaSilently = "custom.some_plugin_with_hooks.on_layout_switch" },
 --   }
+-- }
 -- ```
 
 return {
