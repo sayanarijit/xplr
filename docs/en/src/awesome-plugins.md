@@ -16,10 +16,10 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/tri-pane.xplr**][56] xplr plugin that implements ranger-like three pane layout.
 - [**sayanarijit/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
-- [**dtomvan/term.xplr**][39] Terminal integration for xplr
+- [**dtomvan/term.xplr**][39] Terminal integration for xplr.
 - [**sayanarijit/wl-clipboard.xplr**][52] Copy and paste with system clipboard using wl-clipboard
-- [**dtomvan/xpm.xplr**][47] The XPLR Plugin Manager
-- [**emsquid/style.xplr**][57] Helper plugin that allows you to integrate xplr's [Style][58] anywhere
+- [**dtomvan/xpm.xplr**][47] The XPLR Plugin Manager.
+- [**emsquid/style.xplr**][57] Helper plugin that allows you to integrate xplr's [Style][58] anywhere.
 
 ### Integration
 
@@ -27,9 +27,9 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/dragon.xplr**][4] Drag and drop files using [dragon][5].
 - [**sayanarijit/dua-cli.xplr**][6] Get the disk usage using [dua-cli][7] with selection
   support.
-- [**sayanarijit/fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter
+- [**sayanarijit/fzf.xplr**][8] Fuzzy search using [fzf][9] to focus on a file or enter.
 - [**sayanarijit/find.xplr**][44] An interactive finder plugin to complement [map.xplr][38].
-- [**Junker/nuke.xplr**][53] Open files in apps by file type or mime
+- [**Junker/nuke.xplr**][53] Open files in apps by file type or mime.
 - [**sayanarijit/nvim-ctrl.xplr**][35] Send files to running Neovim sessions using
   [nvim-ctrl][36].
 - [**dtomvan/ouch.xplr**][40] This plugin uses [ouch][41] to compress and decompress files.
@@ -40,8 +40,6 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
 - [**sayanarijit/scp.xplr**][54] Integrate xplr with scp.
 - [**sayanarijit/trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
-- [**sayanarijit/xargs.xplr**][22] Batch execute commands on the focused or selected files
-  using `xargs`.
 - [**sayanarijit/xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
 - [**sayanarijit/zoxide.xplr**][17] Change directory using the [zoxide][18] database.
 
