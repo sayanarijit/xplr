@@ -80,6 +80,8 @@ apk add xplr bash less
 
 ### macOS
 
+Make sure you have the latest version of [GNU core utilities][29] installed.
+
 #### [MacPorts][11]
 
 ```
@@ -263,3 +265,4 @@ sudo cp target/release/xplr /usr/local/bin/
 [26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
 [27]: https://pkgs.alpinelinux.org/packages?name=xplr
 [28]: https://gpo.zugaina.org/Overlays/guru/app-misc/xplr
+[29]: https://formulae.brew.sh/formula/coreutils
