@@ -35,15 +35,15 @@ jobs:
           - os: macos-latest
             artifact_prefix: macos
             target: x86_64-apple-darwin
-            binary_postfix: ''
+            binary_postfix: ""
           - os: ubuntu-latest
             artifact_prefix: linux
             target: x86_64-unknown-linux-gnu
-            binary_postfix: ''
+            binary_postfix: ""
           - os: ubuntu-20.04
             artifact_prefix: linux-musl
             target: x86_64-unknown-linux-musl
-            binary_postfix: ''
+            binary_postfix: ""
 
     env:
       RUST_BACKTRACE: full
@@ -64,7 +64,7 @@ jobs:
       - name: Installing needed Ubuntu dependencies
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
         run: |
-          sudo apt-get update
+          sudo apt-get update --fix-missing
           sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
 
       - name: Build
