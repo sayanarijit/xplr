@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.19.4][47] -> [v0.20.1][48]
+#### [v0.19.4][47] -> [v0.20.2][48]
 
 - BREAKING: xplr shell (`:!`) will default to null (`\0`) delimited pipes, as
   opposed to newline (`\n`) delimited ones (i.e. will use `Call0` instead of
@@ -65,6 +65,8 @@ compatibility.
   - on_load
   - on_focus_change
   - on_directory_change
+  - on_mode_switch (since v0.20.2)
+  - on_layout_switch (since v0.20.2)
 - Use `--vroot` to isolate navigation of an xplr session inside a specific
   directory. Interaction still requires passing full path, and shell,
   lua functions etc still can access paths outside vroot.
@@ -437,4 +439,4 @@ Else do the following:
 [45]: https://github.com/sayanarijit/xplr/releases/tag/v0.17.6
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
-[48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.1
+[48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
