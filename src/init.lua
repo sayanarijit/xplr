@@ -249,7 +249,7 @@ xplr.config.general.table.col_widths = {
 -- The content that is placed before the item name for each row by default.
 --
 -- Type: nullable string
-xplr.config.general.default_ui.prefix = "─ "
+xplr.config.general.default_ui.prefix = "  "
 
 -- The content which is appended to each item name for each row by default.
 --
@@ -278,7 +278,7 @@ xplr.config.general.focus_ui.style = { add_modifiers = { "Bold" } }
 -- The string placed before the item name for a selected row.
 --
 -- Type: nullable string
-xplr.config.general.selection_ui.prefix = "─{"
+xplr.config.general.selection_ui.prefix = " {"
 
 -- The string placed after the item name for a selected row.
 --
@@ -289,8 +289,8 @@ xplr.config.general.selection_ui.suffix = "}"
 --
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.selection_ui.style = {
-  fg = "LightGreen",
-  add_modifiers = { "Bold" },
+  fg = "DarkGray",
+  add_modifiers = { "CrossedOut" },
 }
 
 -- The string placed before item name for a selected row that gets the focus.
@@ -307,8 +307,7 @@ xplr.config.general.focus_selection_ui.suffix = "]"
 --
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.focus_selection_ui.style = {
-  fg = "LightGreen",
-  add_modifiers = { "Bold" },
+  add_modifiers = { "Bold", "CrossedOut" },
 }
 
 -- The shape of the separator for the Sort & filter panel.
@@ -703,7 +702,6 @@ xplr.config.general.global_key_bindings = {
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.node_types.directory.style = {
   fg = "Cyan",
-  add_modifiers = { "Bold" },
 }
 
 -- Metadata for the directory nodes.
