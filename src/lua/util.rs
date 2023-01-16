@@ -3,8 +3,8 @@ use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
 use crate::ui::Style;
-use lscolors::LsColors;
 use anyhow::Result;
+use lscolors::LsColors;
 use mlua::Error as LuaError;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
@@ -335,11 +335,10 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
-        let style = lscolors.style_for_path(path).map_or(Style::default(), |s| Style::from(s) );
-        lua::serialize(
-                lua, 
-                &style
-            ).map_err(LuaError::custom)
+        let style = lscolors
+            .style_for_path(path)
+            .map_or(Style::default(), |s| Style::from(s));
+        lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
     util.set("lscolor", func)?;
     Ok(util)
@@ -356,15 +355,16 @@ pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// -- "\u001b[31mDesktop\u001b[0m"
 /// ```
 pub fn style<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let func = lua.create_function(|lua, (string, style): (String, Option<Table>)| {
-        let style: Style = if let Some(s) = style {
-            lua.from_value(Value::Table(s))?
-        } else {
-            Style::default()
-        };
-        let ansi_style: nu_ansi_term::Style = style.into();
-        Ok::<String, LuaError>(ansi_style.paint(string).to_string())
-    })?;
+    let func =
+        lua.create_function(|lua, (string, style): (String, Option<Table>)| {
+            let style: Style = if let Some(s) = style {
+                lua.from_value(Value::Table(s))?
+            } else {
+                Style::default()
+            };
+            let ansi_style: nu_ansi_term::Style = style.into();
+            Ok::<String, LuaError>(ansi_style.paint(string).to_string())
+        })?;
     util.set("style", func)?;
     Ok(util)
 }

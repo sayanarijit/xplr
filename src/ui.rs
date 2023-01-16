@@ -4,10 +4,10 @@ use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
-use lscolors::{Style as LsColorsStyle, Color as LsColorsColor};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
+use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -321,11 +321,9 @@ impl From<&LsColorsStyle> for Style {
             fg: style.foreground.as_ref().map(|color| convert_color(&color)),
             bg: style.background.as_ref().map(|color| convert_color(&color)),
             add_modifiers: None,
-            sub_modifiers: None
+            sub_modifiers: None,
         }
     }
-
-    
 }
 
 impl Into<nu_ansi_term::Style> for Style {
@@ -353,21 +351,28 @@ impl Into<nu_ansi_term::Style> for Style {
                 _ => None,
             }
         }
-        fn match_modifiers<F>(style: &Style, f: F) -> bool where F: Fn(&IndexSet<Modifier>) -> bool {
+        fn match_modifiers<F>(style: &Style, f: F) -> bool
+        where
+            F: Fn(&IndexSet<Modifier>) -> bool,
+        {
             style.add_modifiers.as_ref().map_or(false, f)
         }
 
-        nu_ansi_term::Style { 
-            foreground: self.fg.and_then(convert_color), 
+        nu_ansi_term::Style {
+            foreground: self.fg.and_then(convert_color),
             background: self.bg.and_then(convert_color),
             is_bold: match_modifiers(&self, |m| m.contains(&Modifier::Bold)),
-            is_dimmed: match_modifiers(&self, |m| m.contains(&Modifier::Dim)), 
-            is_italic: match_modifiers(&self, |m| m.contains(&Modifier::Italic)), 
-            is_underline: match_modifiers(&self, |m| m.contains(&Modifier::Underlined)), 
-            is_blink: match_modifiers(&self, |m| m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)),
-            is_reverse: match_modifiers(&self, |m| m.contains(&Modifier::Reversed)), 
-            is_hidden: match_modifiers(&self, |m| m.contains(&Modifier::Hidden)), 
-            is_strikethrough: match_modifiers(&self, |m| m.contains(&Modifier::CrossedOut)) 
+            is_dimmed: match_modifiers(&self, |m| m.contains(&Modifier::Dim)),
+            is_italic: match_modifiers(&self, |m| m.contains(&Modifier::Italic)),
+            is_underline: match_modifiers(&self, |m| m.contains(&Modifier::Underlined)),
+            is_blink: match_modifiers(&self, |m| {
+                m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
+            }),
+            is_reverse: match_modifiers(&self, |m| m.contains(&Modifier::Reversed)),
+            is_hidden: match_modifiers(&self, |m| m.contains(&Modifier::Hidden)),
+            is_strikethrough: match_modifiers(&self, |m| {
+                m.contains(&Modifier::CrossedOut)
+            }),
         }
     }
 }
