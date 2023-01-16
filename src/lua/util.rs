@@ -2,6 +2,8 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::ui::Style;
+use lscolors::LsColors;
 use anyhow::Result;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -30,6 +32,8 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_json(util, lua)?;
     util = from_yaml(util, lua)?;
     util = to_yaml(util, lua)?;
+    util = lscolor(util, lua)?;
+    util = style(util, lua)?;
 
     Ok(util)
 }
@@ -315,5 +319,52 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         yaml::to_string(&value).map_err(Error::custom)
     })?;
     util.set("to_yaml", func)?;
+    Ok(util)
+}
+
+/// Get a style object for the given path
+///
+/// Type: function( path ) -> style
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.lscolor("Desktop")
+/// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
+/// ```
+pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let lscolors = LsColors::from_env().unwrap_or_default();
+    let func = lua.create_function(move |lua, path: String| {
+        let style = lscolors.style_for_path(path).map_or(Style::default(), |s| Style::from(s) );
+        lua::serialize(
+                lua, 
+                &style
+            ).map_err(LuaError::custom)
+    })?;
+    util.set("lscolor", func)?;
+    Ok(util)
+}
+
+/// Format a string using a style object
+///
+/// Type: function( string, style ) -> string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.style("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
+/// -- "\u001b[31mDesktop\u001b[0m"
+/// ```
+pub fn style<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, (string, style): (String, Option<Table>)| {
+        let style: Style = if let Some(s) = style {
+            lua.from_value(Value::Table(s))?
+        } else {
+            Style::default()
+        };
+        let ansi_style: nu_ansi_term::Style = style.into();
+        Ok::<String, LuaError>(ansi_style.paint(string).to_string())
+    })?;
+    util.set("style", func)?;
     Ok(util)
 }
