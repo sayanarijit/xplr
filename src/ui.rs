@@ -318,8 +318,8 @@ impl From<&LsColorsStyle> for Style {
             }
         }
         Self {
-            fg: style.foreground.as_ref().map(|color| convert_color(&color)),
-            bg: style.background.as_ref().map(|color| convert_color(&color)),
+            fg: style.foreground.as_ref().map(|color| convert_color(color)),
+            bg: style.background.as_ref().map(|color| convert_color(color)),
             add_modifiers: None,
             sub_modifiers: None,
         }

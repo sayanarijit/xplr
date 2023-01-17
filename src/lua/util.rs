@@ -337,7 +337,7 @@ pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(move |lua, path: String| {
         let style = lscolors
             .style_for_path(path)
-            .map_or(Style::default(), |s| Style::from(s));
+            .map_or(Style::default(), Style::from);
         lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
     util.set("lscolor", func)?;
