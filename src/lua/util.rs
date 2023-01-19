@@ -2,6 +2,7 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::ui;
 use crate::ui::Style;
 use anyhow::Result;
 use lscolors::LsColors;
@@ -33,7 +34,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = from_yaml(util, lua)?;
     util = to_yaml(util, lua)?;
     util = lscolor(util, lua)?;
-    util = style(util, lua)?;
+    util = paint(util, lua)?;
 
     Ok(util)
 }
@@ -324,7 +325,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Get a style object for the given path
 ///
-/// Type: function( path ) -> style
+/// Type: function( path ) -> style|nil
 ///
 /// Example:
 ///
@@ -335,9 +336,11 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
-        let style = lscolors
-            .style_for_path(path)
-            .map_or(Style::default(), Style::from);
+        if *ui::NO_COLOR {
+            return Ok(mlua::Nil);
+        }
+
+        let style = lscolors.style_for_path(path).map(Style::from);
         lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
     util.set("lscolor", func)?;
@@ -346,25 +349,29 @@ pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Format a string using a style object
 ///
-/// Type: function( string, style ) -> string
+/// Type: function( string, style|nil ) -> string
 ///
 /// Example:
 ///
 /// ```lua
-/// xplr.util.style("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
+/// xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
 /// -- "\u001b[31mDesktop\u001b[0m"
 /// ```
-pub fn style<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
         lua.create_function(|lua, (string, style): (String, Option<Table>)| {
-            let style: Style = if let Some(s) = style {
-                lua.from_value(Value::Table(s))?
-            } else {
-                Style::default()
+            if *ui::NO_COLOR {
+                return Ok(string);
+            }
+
+            let Some(style) = style else {
+                return Ok(string);
             };
+
+            let style: Style = lua.from_value(Value::Table(style))?;
             let ansi_style: nu_ansi_term::Style = style.into();
             Ok::<String, LuaError>(ansi_style.paint(string).to_string())
         })?;
-    util.set("style", func)?;
+    util.set("paint", func)?;
     Ok(util)
 }
