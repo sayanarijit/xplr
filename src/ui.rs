@@ -295,18 +295,10 @@ impl Into<TuiStyle> for Style {
 #[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct WrapOptions {
- /// The width in columns at which the text will be wrapped.
- pub width: usize,
- /// Indentation used for the first line of output. See the
- /// [`Options::initial_indent`] method.
- pub initial_indent: Option<String>,
- /// Indentation used for subsequent lines of output. See the
- /// [`Options::subsequent_indent`] method.
- pub subsequent_indent: Option<String>,
- /// Allow long words to be broken if they cannot fit on a line.
- /// When set to `false`, some lines may be longer than
- /// `self.width`. See the [`Options::break_words`] method.
- pub break_words: Option<bool>,
+    pub width: usize,
+    pub initial_indent: Option<String>,
+    pub subsequent_indent: Option<String>,
+    pub break_words: Option<bool>,
 }
 
 impl WrapOptions {

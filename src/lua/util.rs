@@ -336,7 +336,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|lua, (text, options): (String, Value)| {
         if let Ok(width) = lua.from_value::<usize>(options.clone()) {
-            return Ok(textwrap::wrap(&text, width).join("\n"))
+            return Ok(textwrap::wrap(&text, width).join("\n"));
         }
 
         let options = lua.from_value::<WrapOptions>(options)?;
