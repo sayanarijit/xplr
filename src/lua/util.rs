@@ -2,6 +2,7 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::ui::WrapOptions;
 use anyhow::Result;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -30,6 +31,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_json(util, lua)?;
     util = from_yaml(util, lua)?;
     util = to_yaml(util, lua)?;
+    util = wrap(util, lua)?;
 
     Ok(util)
 }
@@ -315,5 +317,31 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         yaml::to_string(&value).map_err(Error::custom)
     })?;
     util.set("to_yaml", func)?;
+    Ok(util)
+}
+
+/// Wrap the given text to fit the specified width
+/// It will try to not split words when possible
+///
+/// Type: function( text:string, widthOrOptions: number|WrapOptions ) -> path:string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.wrap("this will be cut off", 11)
+/// -- "this will\nbe cut off"
+/// xplr.util.wrap("this will be cut off", { width = 12, initial_indent = "", subsequent_indent = "    " })
+/// -- "this will be\n    cut off"
+/// ```
+pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, (text, options): (String, Value)| {
+        if let Ok(width) = lua.from_value::<usize>(options.clone()) {
+            return Ok(textwrap::wrap(&text, width).join("\n"))
+        }
+
+        let options = lua.from_value::<WrapOptions>(options)?;
+        Ok(textwrap::wrap(&text, options.get_options()).join("\n"))
+    })?;
+    util.set("wrap", func)?;
     Ok(util)
 }

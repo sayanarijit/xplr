@@ -292,6 +292,39 @@ impl Into<TuiStyle> for Style {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WrapOptions {
+ /// The width in columns at which the text will be wrapped.
+ pub width: usize,
+ /// Indentation used for the first line of output. See the
+ /// [`Options::initial_indent`] method.
+ pub initial_indent: Option<String>,
+ /// Indentation used for subsequent lines of output. See the
+ /// [`Options::subsequent_indent`] method.
+ pub subsequent_indent: Option<String>,
+ /// Allow long words to be broken if they cannot fit on a line.
+ /// When set to `false`, some lines may be longer than
+ /// `self.width`. See the [`Options::break_words`] method.
+ pub break_words: Option<bool>,
+}
+
+impl WrapOptions {
+    pub fn get_options(&self) -> textwrap::Options<'_> {
+        let mut options = textwrap::Options::new(self.width);
+        if let Some(initial_indent) = &self.initial_indent {
+            options = options.initial_indent(initial_indent);
+        }
+        if let Some(subsequent_indent) = &self.subsequent_indent {
+            options = options.subsequent_indent(subsequent_indent);
+        }
+        if let Some(break_words) = self.break_words {
+            options = options.break_words(break_words);
+        }
+        options
+    }
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum Constraint {
