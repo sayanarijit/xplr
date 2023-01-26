@@ -330,7 +330,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```lua
 /// xplr.util.wrap("this will be cut off", 11)
 /// -- "this will\nbe cut off"
-/// xplr.util.wrap("this will be cut off", { width = 12, initial_indent = "", subsequent_indent = "    " })
+/// xplr.util.wrap("this will be cut off", { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false })
 /// -- "this will be\n    cut off"
 /// ```
 pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
