@@ -7,6 +7,7 @@ use crate::permissions::Permissions;
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
+use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -288,6 +289,90 @@ impl Into<TuiStyle> for Style {
                 add_modifier: TuiModifier::from_bits_truncate(xor(self.add_modifiers)),
                 sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
             }
+        }
+    }
+}
+
+impl From<&LsColorsStyle> for Style {
+    fn from(style: &LsColorsStyle) -> Self {
+        fn convert_color(color: &LsColorsColor) -> Color {
+            match color {
+                LsColorsColor::Black => Color::Black,
+                LsColorsColor::Red => Color::Red,
+                LsColorsColor::Green => Color::Green,
+                LsColorsColor::Yellow => Color::Yellow,
+                LsColorsColor::Blue => Color::Blue,
+                LsColorsColor::Magenta => Color::Magenta,
+                LsColorsColor::Cyan => Color::Cyan,
+                LsColorsColor::White => Color::Gray,
+                LsColorsColor::BrightBlack => Color::DarkGray,
+                LsColorsColor::BrightRed => Color::LightRed,
+                LsColorsColor::BrightGreen => Color::LightGreen,
+                LsColorsColor::BrightYellow => Color::LightYellow,
+                LsColorsColor::BrightBlue => Color::LightBlue,
+                LsColorsColor::BrightMagenta => Color::LightMagenta,
+                LsColorsColor::BrightCyan => Color::LightCyan,
+                LsColorsColor::BrightWhite => Color::White,
+                LsColorsColor::Fixed(index) => Color::Indexed(*index),
+                LsColorsColor::RGB(r, g, b) => Color::Rgb(*r, *g, *b),
+            }
+        }
+        Self {
+            fg: style.foreground.as_ref().map(convert_color),
+            bg: style.background.as_ref().map(convert_color),
+            add_modifiers: None,
+            sub_modifiers: None,
+        }
+    }
+}
+
+impl Into<nu_ansi_term::Style> for Style {
+    fn into(self) -> nu_ansi_term::Style {
+        fn convert_color(color: Color) -> Option<nu_ansi_term::Color> {
+            match color {
+                Color::Black => Some(nu_ansi_term::Color::Black),
+                Color::Red => Some(nu_ansi_term::Color::Red),
+                Color::Green => Some(nu_ansi_term::Color::Green),
+                Color::Yellow => Some(nu_ansi_term::Color::Yellow),
+                Color::Blue => Some(nu_ansi_term::Color::Blue),
+                Color::Magenta => Some(nu_ansi_term::Color::Purple),
+                Color::Cyan => Some(nu_ansi_term::Color::Cyan),
+                Color::Gray => Some(nu_ansi_term::Color::LightGray),
+                Color::DarkGray => Some(nu_ansi_term::Color::DarkGray),
+                Color::LightRed => Some(nu_ansi_term::Color::LightRed),
+                Color::LightGreen => Some(nu_ansi_term::Color::LightGreen),
+                Color::LightYellow => Some(nu_ansi_term::Color::LightYellow),
+                Color::LightBlue => Some(nu_ansi_term::Color::LightBlue),
+                Color::LightMagenta => Some(nu_ansi_term::Color::LightMagenta),
+                Color::LightCyan => Some(nu_ansi_term::Color::LightCyan),
+                Color::White => Some(nu_ansi_term::Color::White),
+                Color::Rgb(r, g, b) => Some(nu_ansi_term::Color::Rgb(r, g, b)),
+                Color::Indexed(index) => Some(nu_ansi_term::Color::Fixed(index)),
+                _ => None,
+            }
+        }
+        fn match_modifiers<F>(style: &Style, f: F) -> bool
+        where
+            F: Fn(&IndexSet<Modifier>) -> bool,
+        {
+            style.add_modifiers.as_ref().map_or(false, f)
+        }
+
+        nu_ansi_term::Style {
+            foreground: self.fg.and_then(convert_color),
+            background: self.bg.and_then(convert_color),
+            is_bold: match_modifiers(&self, |m| m.contains(&Modifier::Bold)),
+            is_dimmed: match_modifiers(&self, |m| m.contains(&Modifier::Dim)),
+            is_italic: match_modifiers(&self, |m| m.contains(&Modifier::Italic)),
+            is_underline: match_modifiers(&self, |m| m.contains(&Modifier::Underlined)),
+            is_blink: match_modifiers(&self, |m| {
+                m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
+            }),
+            is_reverse: match_modifiers(&self, |m| m.contains(&Modifier::Reversed)),
+            is_hidden: match_modifiers(&self, |m| m.contains(&Modifier::Hidden)),
+            is_strikethrough: match_modifiers(&self, |m| {
+                m.contains(&Modifier::CrossedOut)
+            }),
         }
     }
 }

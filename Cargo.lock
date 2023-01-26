@@ -581,6 +581,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lscolors"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2dedc85d67baf5327114fad78ab9418f8893b1121c17d5538dd11005ad1ddf2"
+dependencies = [
+ "nu-ansi-term",
+]
+
+[[package]]
 name = "lua-src"
 version = "544.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -682,6 +691,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "nu-ansi-term"
+version = "0.46.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77a8165726e8236064dbb45459242600304b42a5ea24ee2948e18e023bf7ba84"
+dependencies = [
+ "overload",
+ "winapi",
+]
+
+[[package]]
 name = "num-integer"
 version = "0.1.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -727,6 +746,12 @@ name = "os_str_bytes"
 version = "6.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
+
+[[package]]
+name = "overload"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "parking_lot"
@@ -1399,9 +1424,11 @@ dependencies = [
  "indexmap",
  "lazy_static",
  "libc",
+ "lscolors",
  "mime_guess",
  "mlua",
  "natord",
+ "nu-ansi-term",
  "path-absolutize",
  "regex",
  "serde",
