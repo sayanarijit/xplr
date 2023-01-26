@@ -700,9 +700,7 @@ xplr.config.general.global_key_bindings = {
 -- The style for the directory nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.directory.style = {
-  fg = "Cyan",
-}
+xplr.config.node_types.directory.style = {}
 
 -- Metadata for the directory nodes.
 -- You can set as many metadata as you want.
@@ -2554,43 +2552,21 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
       end
     end
   end
-
-  return r
+  local style = xplr.util.lscolor(m.absolute_path)
+  return xplr.util.paint(r, style)
 end
 
 -- Renders the third column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
-  local no_color = os.getenv("NO_COLOR")
-
-  local function green(x)
-    if no_color == nil then
-      return "\x1b[32m" .. x .. "\x1b[0m"
-    else
-      return x
-    end
-  end
-
-  local function yellow(x)
-    if no_color == nil then
-      return "\x1b[33m" .. x .. "\x1b[0m"
-    else
-      return x
-    end
-  end
-
-  local function red(x)
-    if no_color == nil then
-      return "\x1b[31m" .. x .. "\x1b[0m"
-    else
-      return x
-    end
-  end
+  local green = { fg = "Green" }
+  local yellow = { fg = "Yellow" }
+  local red = { fg = "Red" }
 
   local function bit(x, color, cond)
     if cond then
-      return color(x)
+      return xplr.util.paint(x, color)
     else
-      return color("-")
+      return xplr.util.paint("-", color)
     end
   end
 
