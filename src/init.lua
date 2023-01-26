@@ -2547,7 +2547,11 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      r = r .. path_escape(m.symlink.absolute_path)
+      local symlink_path = xplr.util.path_shorthand(m.symlink.absolute_path, m.parent)
+      if m.symlink.is_dir then
+        symlink_path = symlink_path .. '/'
+      end
+      r = r .. path_escape(symlink_path)
 
       if m.symlink.is_dir then
         r = r .. "/"

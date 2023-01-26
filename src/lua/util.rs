@@ -30,6 +30,8 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_json(util, lua)?;
     util = from_yaml(util, lua)?;
     util = to_yaml(util, lua)?;
+    util = relative_to(util, lua)?;
+    util = path_shorthand(util, lua)?;
 
     Ok(util)
 }
@@ -315,5 +317,94 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         yaml::to_string(&value).map_err(Error::custom)
     })?;
     util.set("to_yaml", func)?;
+    Ok(util)
+}
+
+fn relative_path_as_string(path: String, base: String) -> Option<String> {
+    pathdiff::diff_paths(path, base)
+        .map(|path| path.to_string_lossy().to_string())
+        .map(|path| {
+            if path.is_empty() {
+                ".".to_string()
+            } else {
+                path
+            }
+        })
+}
+
+/// Get a relative path from a path and base path.
+///
+/// Type: function( path:string, base:string ) -> path:string|nil
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.relative_to("/foo/bar", "/foo/baz")
+/// -- "../bar"
+/// ```
+pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|_, (path, base): (String, String)| {
+        Ok(relative_path_as_string(path, base))
+    })?;
+    util.set("relative_to", func)?;
+    Ok(util)
+}
+
+/// Display the given path in shorthand form:
+/// - either relative to your home dir if it makes sense
+/// - or relative to the optional base path
+/// - or absolute if it makes the most sense
+///
+/// Type: function( path:string, base:string|nil ) -> path:string|nil
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.path_shorthand("/foo/bar", "/foo/baz")
+/// -- "../bar"
+/// ```
+///
+/// ```lua
+/// os.getenv('HOME')
+/// -- "/home/me"
+/// xplr.util.path_shorthand("/home/me/.config")
+/// -- "~/.config"
+/// ```
+///
+/// ```lua
+/// os.getenv('HOME')
+/// -- "/home/me"
+/// xplr.util.path_shorthand("/home/someone/projects", "/home/me/.config")
+/// -- "/home/someone/projects"
+/// ```
+pub fn path_shorthand<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let home = dirs::home_dir().map(|buf| buf.to_string_lossy().to_string());
+    let func =
+        lua.create_function(move |_, (path, base): (String, Option<String>)| {
+            let relative =
+                base.and_then(|base| relative_path_as_string(path.clone(), base));
+
+            let shortest = if let Some(home) = &home {
+                if path.starts_with(home) {
+                    path.replace(home, "~")
+                } else {
+                    path
+                }
+            } else {
+                path
+            };
+
+            Ok(match relative {
+                Some(relative) => {
+                    if relative.len() < shortest.len() {
+                        relative
+                    } else {
+                        shortest
+                    }
+                }
+                None => shortest,
+            })
+        })?;
+    util.set("path_shorthand", func)?;
     Ok(util)
 }
