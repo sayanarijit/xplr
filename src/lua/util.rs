@@ -17,6 +17,7 @@ use serde::de::Error;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 use serde_yaml as yaml;
+use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -393,12 +394,15 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|lua, (text, options): (String, Value)| {
-        if let Ok(width) = lua.from_value::<usize>(options.clone()) {
-            return Ok(textwrap::wrap(&text, width).join("\n"));
-        }
+        let lines = match lua.from_value::<usize>(options.clone()) {
+            Ok(width) => textwrap::wrap(&text, width),
+            Err(_) => {
+                let options = lua.from_value::<WrapOptions>(options)?;
+                textwrap::wrap(&text, options.get_options())
+            }
+        };
 
-        let options = lua.from_value::<WrapOptions>(options)?;
-        Ok(textwrap::wrap(&text, options.get_options()).join("\n"))
+        Ok(lines.iter().map(Cow::to_string).collect::<Vec<String>>())
     })?;
     util.set("wrap", func)?;
     Ok(util)
