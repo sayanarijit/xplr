@@ -2,6 +2,7 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::path::relative_path_as_string;
 use anyhow::Result;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -320,21 +321,10 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-fn relative_path_as_string(path: String, base: String) -> Option<String> {
-    pathdiff::diff_paths(path, base)
-        .map(|path| path.to_string_lossy().to_string())
-        .map(|path| {
-            if path.is_empty() {
-                ".".to_string()
-            } else {
-                path
-            }
-        })
-}
-
 /// Get a relative path from a path and base path.
+/// Will error if it fails to determine a relative path
 ///
-/// Type: function( path:string, base:string ) -> path:string|nil
+/// Type: function( path:string, base:string ) -> path:string
 ///
 /// Example:
 ///
@@ -343,8 +333,9 @@ fn relative_path_as_string(path: String, base: String) -> Option<String> {
 /// -- "../bar"
 /// ```
 pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let func = lua.create_function(|_, (path, base): (String, String)| {
-        Ok(relative_path_as_string(path, base))
+    let func = lua.create_function(|_, (path, base): (String, Option<String>)| {
+        relative_path_as_string(path, base)
+            .ok_or_else(|| LuaError::custom("Could not determine relative path"))
     })?;
     util.set("relative_to", func)?;
     Ok(util)
@@ -381,8 +372,7 @@ pub fn path_shorthand<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let home = dirs::home_dir().map(|buf| buf.to_string_lossy().to_string());
     let func =
         lua.create_function(move |_, (path, base): (String, Option<String>)| {
-            let relative =
-                base.and_then(|base| relative_path_as_string(path.clone(), base));
+            let relative = relative_path_as_string(path.clone(), base);
 
             let shortest = if let Some(home) = &home {
                 if path.starts_with(home) {
