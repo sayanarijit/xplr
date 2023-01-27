@@ -4,6 +4,7 @@ use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
 use crate::ui;
 use crate::ui::Style;
+use crate::ui::WrapOptions;
 use anyhow::Result;
 use lscolors::LsColors;
 use mlua::Error as LuaError;
@@ -16,6 +17,7 @@ use serde::de::Error;
 use serde::{Deserialize, Serialize};
 use serde_json as json;
 use serde_yaml as yaml;
+use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -35,6 +37,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_yaml(util, lua)?;
     util = lscolor(util, lua)?;
     util = paint(util, lua)?;
+    util = textwrap(util, lua)?;
 
     Ok(util)
 }
@@ -373,5 +376,40 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             Ok::<String, LuaError>(ansi_style.paint(string).to_string())
         })?;
     util.set("paint", func)?;
+    Ok(util)
+}
+
+/// Wrap the given text to fit the specified width.
+/// It will try to not split words when possible.
+///
+/// Type: function( string, options:number|table ) -> { string, ...}
+///
+/// Options type: { width = number, initial_indent = string|nil, subsequent_indent = string|nil, break_words = boolean|nil }
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.textwrap("this will be cut off", 11)
+/// -- { "this will', 'be cut off" }
+///
+/// xplr.util.textwrap(
+///   "this will be cut off",
+///   { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false }
+/// )
+/// -- { "this will be", "    cut off" }
+/// ```
+pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, (text, options): (String, Value)| {
+        let lines = match lua.from_value::<usize>(options.clone()) {
+            Ok(width) => textwrap::wrap(&text, width),
+            Err(_) => {
+                let options = lua.from_value::<WrapOptions>(options)?;
+                textwrap::wrap(&text, options.get_options())
+            }
+        };
+
+        Ok(lines.iter().map(Cow::to_string).collect::<Vec<String>>())
+    })?;
+    util.set("textwrap", func)?;
     Ok(util)
 }
