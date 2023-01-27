@@ -110,9 +110,13 @@ where
     let res = HOME
         .as_ref()
         .and_then(|h| {
-            path.strip_prefix(h)
-                .ok()
-                .map(|p| PathBuf::from("~").join(p).to_string_lossy().to_string())
+            path.strip_prefix(h).ok().map(|p| {
+                if p.to_str() == Some("") {
+                    "~".into()
+                } else {
+                    PathBuf::from("~").join(p).to_string_lossy().to_string()
+                }
+            })
         })
         .unwrap_or(pathstring);
 
@@ -176,7 +180,7 @@ mod tests {
         let path = HOME.as_ref().unwrap();
 
         let res = shortened(path, Option::<String>::None).unwrap();
-        assert_eq!(res, "~/");
+        assert_eq!(res, "~");
 
         let res = shortened(path.join("foo"), Option::<String>::None).unwrap();
         assert_eq!(res, "~/foo");
