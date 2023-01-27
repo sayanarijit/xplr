@@ -3,7 +3,7 @@ use lazy_static::lazy_static;
 use std::path::{Component, Path, PathBuf};
 
 lazy_static! {
-    pub static ref HOME: Option<String> = std::env::var("HOME").ok();
+    pub static ref HOME: Option<PathBuf> = dirs::home_dir();
 }
 
 // Stolen from https://github.com/Manishearth/pathdiff/blob/master/src/lib.rs
@@ -83,36 +83,37 @@ where
 {
     let path = path.as_ref();
     let pathstring = path.to_string_lossy().to_string();
-    let pathstr = pathstring.as_str();
     let relative = relative_to(path, base)?;
 
     let relative = if relative.to_str() == Some(".") {
         match (path.parent(), path.file_name()) {
-            (Some(_), Some(name)) => {
-                let name = name.to_string_lossy();
-                format!("../{name}")
-            }
-            (_, _) => relative.to_string_lossy().to_string(),
+            (Some(_), Some(name)) => PathBuf::from("..").join(name),
+            (_, _) => relative,
         }
     } else if relative.to_str() == Some("..") {
         match (path.parent(), path.file_name()) {
             (Some(parent), Some(name)) => {
-                let name = name.to_string_lossy();
                 if parent.parent().is_some() {
-                    format!("../../{name}")
+                    PathBuf::from("../..").join(name)
                 } else {
-                    relative.to_string_lossy().to_string()
+                    relative
                 }
             }
-            (_, _) => relative.to_string_lossy().to_string(),
+            (_, _) => relative,
         }
     } else {
-        relative.to_string_lossy().to_string()
+        relative
     };
+
+    let relative = relative.to_string_lossy().to_string();
 
     let res = HOME
         .as_ref()
-        .and_then(|h| pathstr.strip_prefix(h).map(|p| format!("~{p}")))
+        .and_then(|h| {
+            path.strip_prefix(h)
+                .ok()
+                .map(|p| PathBuf::from("~").join(p).to_string_lossy().to_string())
+        })
         .unwrap_or(pathstring);
 
     if relative.len() < res.len() {
@@ -124,6 +125,7 @@ where
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
@@ -174,7 +176,18 @@ mod tests {
         let path = HOME.as_ref().unwrap();
 
         let res = shortened(path, Option::<String>::None).unwrap();
-        assert_eq!(res, "~");
+        assert_eq!(res, "~/");
+
+        let res = shortened(path.join("foo"), Option::<String>::None).unwrap();
+        assert_eq!(res, "~/foo");
+
+        let res = shortened(
+            format!("{}foo", path.to_string_lossy()),
+            Option::<String>::None,
+        )
+        .unwrap();
+        assert_ne!(res, "~/foo");
+        assert_eq!(res, format!("{}foo", path.to_string_lossy()));
     }
 
     #[test]
