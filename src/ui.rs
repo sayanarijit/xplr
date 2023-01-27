@@ -377,6 +377,31 @@ impl Into<nu_ansi_term::Style> for Style {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WrapOptions {
+    pub width: usize,
+    pub initial_indent: Option<String>,
+    pub subsequent_indent: Option<String>,
+    pub break_words: Option<bool>,
+}
+
+impl WrapOptions {
+    pub fn get_options(&self) -> textwrap::Options<'_> {
+        let mut options = textwrap::Options::new(self.width);
+        if let Some(initial_indent) = &self.initial_indent {
+            options = options.initial_indent(initial_indent);
+        }
+        if let Some(subsequent_indent) = &self.subsequent_indent {
+            options = options.subsequent_indent(subsequent_indent);
+        }
+        if let Some(break_words) = self.break_words {
+            options = options.break_words(break_words);
+        }
+        options
+    }
+}
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum Constraint {
