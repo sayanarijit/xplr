@@ -379,18 +379,21 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Wrap the given text to fit the specified width
-/// It will try to not split words when possible
+/// Wrap the given text to fit the specified width.
+/// It will try to not split words when possible.
 ///
-/// Type: function( text:string, widthOrOptions: number|WrapOptions ) -> path:string
+/// Type: function( string, options:number|table ) -> { string, ...}
+///
+/// Options type: { width = number, initial_indent = string|nil, subsequent_indent = string|nil, break_words = boolean|nil }
 ///
 /// Example:
 ///
 /// ```lua
 /// xplr.util.wrap("this will be cut off", 11)
-/// -- "this will\nbe cut off"
+/// -- { "this will', 'be cut off" }
+///
 /// xplr.util.wrap("this will be cut off", { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false })
-/// -- "this will be\n    cut off"
+/// -- { "this will be", "    cut off" }
 /// ```
 pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|lua, (text, options): (String, Value)| {
