@@ -849,7 +849,7 @@ fn draw_selection<B: Backend>(
         .take((layout_size.height.max(2) - 2).into())
         .rev()
         .map(|n| {
-            let p = path::shorthand(&n.absolute_path, Some(&app.pwd))
+            let p = path::shortened(&n.absolute_path, Some(&app.pwd))
                 .unwrap_or_default()
                 .replace('\\', "\\\\")
                 .replace('\n', "\\n");

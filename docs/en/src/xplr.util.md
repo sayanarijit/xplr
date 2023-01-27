@@ -162,7 +162,7 @@ xplr.util.to_yaml({ foo = "bar" })
 Get a [Style][3] object for the given path based on the LS_COLORS
 environment variable.
 
-Type: function( path:string ) -> [Style][3]|nil
+Type: function( path:string ) -> Style[3]|nil
 
 Example:
 
@@ -206,9 +206,9 @@ xplr.util.relative_to("/present/working/directory", "/present/foo/bar")
 -- "../../working/directory"
 ```
 
-### xplr.util.path_shorthand
+### xplr.util.shortened
 
-Display the given path in shorthand form using the following rules:
+Shorten the given absolute path using the following rules:
 
 - either relative to your home dir if it makes sense
 - or relative to the optional base path / current working directory
@@ -219,13 +219,13 @@ Type: function( path:string, base:string|nil ) -> path:string|nil
 Example:
 
 ```lua
-xplr.util.path_shorthand("/home/username/.config")
+xplr.util.shortened("/home/username/.config")
 -- "~/.config"
 
-xplr.util.path_shorthand("/present/working/directory")
+xplr.util.shortened("/present/working/directory")
 -- "../directory"
 
-xplr.util.path_shorthand("/present/working/directory", "/present/foo/bar")
+xplr.util.shortened("/present/working/directory", "/present/foo/bar")
 -- "../../working/directory"
 ```
 

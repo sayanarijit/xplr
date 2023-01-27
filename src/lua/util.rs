@@ -39,7 +39,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = lscolor(util, lua)?;
     util = paint(util, lua)?;
     util = relative_to(util, lua)?;
-    util = path_shorthand(util, lua)?;
+    util = shortened(util, lua)?;
     util = textwrap(util, lua)?;
 
     Ok(util)
@@ -414,7 +414,7 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Display the given path in shorthand form using the following rules:
+/// Shorten the given absolute path using the following rules:
 /// - either relative to your home dir if it makes sense
 /// - or relative to the optional base path / current working directory
 /// - or absolute path if it makes the most sense
@@ -424,21 +424,21 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.path_shorthand("/home/username/.config")
+/// xplr.util.shortened("/home/username/.config")
 /// -- "~/.config"
 ///
-/// xplr.util.path_shorthand("/present/working/directory")
+/// xplr.util.shortened("/present/working/directory")
 /// -- "../directory"
 ///
-/// xplr.util.path_shorthand("/present/working/directory", "/present/foo/bar")
+/// xplr.util.shortened("/present/working/directory", "/present/foo/bar")
 /// -- "../../working/directory"
 /// ```
-pub fn path_shorthand<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn shortened<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
         lua.create_function(move |_, (path, base): (String, Option<String>)| {
-            path::shorthand(path, base).map_err(LuaError::custom)
+            path::shortened(path, base).map_err(LuaError::custom)
         })?;
-    util.set("path_shorthand", func)?;
+    util.set("shortened", func)?;
     Ok(util)
 }
 

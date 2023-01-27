@@ -76,7 +76,7 @@ where
     }
 }
 
-pub fn shorthand<P, B>(path: P, base: Option<B>) -> Result<String>
+pub fn shortened<P, B>(path: P, base: Option<B>) -> Result<String>
 where
     P: AsRef<Path>,
     B: AsRef<Path>,
@@ -110,15 +110,15 @@ where
         relative.to_string_lossy().to_string()
     };
 
-    let shortened = HOME
+    let res = HOME
         .as_ref()
         .and_then(|h| pathstr.strip_prefix(h).map(|p| format!("~{p}")))
         .unwrap_or(pathstring);
 
-    if relative.len() < shortened.len() {
+    if relative.len() < res.len() {
         Ok(relative)
     } else {
-        Ok(shortened)
+        Ok(res)
     }
 }
 
@@ -173,8 +173,8 @@ mod tests {
     fn test_shorthand_to_home() {
         let path = HOME.as_ref().unwrap();
 
-        let shorthand = shorthand(path, Option::<String>::None).unwrap();
-        assert_eq!(shorthand, "~");
+        let res = shortened(path, Option::<String>::None).unwrap();
+        assert_eq!(res, "~");
     }
 
     #[test]
@@ -182,16 +182,16 @@ mod tests {
         let path = "/present/working/directory";
         let base = "/present/foo/bar";
 
-        let shorthand = shorthand(path, Some(base)).unwrap();
-        assert_eq!(shorthand, "../../working/directory");
+        let res = shortened(path, Some(base)).unwrap();
+        assert_eq!(res, "../../working/directory");
     }
 
     #[test]
     fn test_shorthand_to_pwd() {
         let path = "/present/working/directory";
 
-        let shorthand = shorthand(&path, Some(&path)).unwrap();
-        assert_eq!(shorthand, "../directory");
+        let res = shortened(&path, Some(&path)).unwrap();
+        assert_eq!(res, "../directory");
     }
 
     #[test]
@@ -199,19 +199,19 @@ mod tests {
         let path = "/present/working";
         let base = "/present/working/directory";
 
-        let shorthand = shorthand(&path, Some(&base)).unwrap();
-        assert_eq!(shorthand, "../../working");
+        let res = shortened(&path, Some(&base)).unwrap();
+        assert_eq!(res, "../../working");
     }
 
     #[test]
     fn test_shorthand_to_root() {
-        let sh = shorthand("/", Some("/")).unwrap();
-        assert_eq!(sh, "/");
+        let res = shortened("/", Some("/")).unwrap();
+        assert_eq!(res, "/");
 
-        let sh = shorthand("/foo", Some("/")).unwrap();
-        assert_eq!(sh, "foo");
+        let res = shortened("/foo", Some("/")).unwrap();
+        assert_eq!(res, "foo");
 
-        let sh = shorthand("/", Some("/foo")).unwrap();
-        assert_eq!(sh, "/");
+        let res = shortened("/", Some("/foo")).unwrap();
+        assert_eq!(res, "/");
     }
 }
