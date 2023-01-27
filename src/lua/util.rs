@@ -2,7 +2,7 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
-use crate::path::relative_path_as_string;
+use crate::path;
 use crate::ui;
 use crate::ui::Style;
 use anyhow::Result;
@@ -145,7 +145,7 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Explore directories with the given explorer config.
 ///
-/// Type: function( path:string, config:[Explorer Config][1]|nil )
+/// Type: function( path:string, config:[ExplorerConfig][1]|nil )
 ///         -> { node:[Node][2]... }
 ///
 /// Example:
@@ -153,6 +153,8 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```lua
 ///
 /// xplr.util.explore("/tmp")
+/// -- { { absolute_path = "/tmp/a", ... }, ... }
+///
 /// xplr.util.explore("/tmp", app.explorer_config)
 /// -- { { absolute_path = "/tmp/a", ... }, ... }
 /// ```
@@ -178,13 +180,15 @@ pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Execute shell commands safely.
 ///
-/// Type: function( program:string, args:{ arg:string... }|nil )
+/// Type: function( program:string, args:{ arg:string, ... }|nil )
 ///         -> { stdout = string, stderr = string, returncode = number|nil }
 ///
 /// Example:
 ///
 /// ```lua
 /// xplr.util.shell_execute("pwd")
+/// -- "/present/working/directory"
+///
 /// xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 /// -- { stdout = "xplr...", stderr = "", returncode = 0 }
 /// ```
@@ -253,11 +257,11 @@ pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///
 /// ```lua
 /// xplr.util.to_json({ foo = "bar" })
-/// -- [[{ "foos": "bar" }]]
+/// -- [[{ "foo": "bar" }]]
 ///
 /// xplr.util.to_json({ foo = "bar" }, { pretty = true })
 /// -- [[{
-/// --   "foos": "bar"
+/// --   "foo": "bar"
 /// -- }]]
 /// ```
 pub fn to_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
@@ -326,9 +330,10 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Get a style object for the given path
+/// Get a [Style][3] object for the given path based on the LS_COLORS
+/// environment variable.
 ///
-/// Type: function( path ) -> style|nil
+/// Type: function( path:string ) -> Style[3]|nil
 ///
 /// Example:
 ///
@@ -336,6 +341,8 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.lscolor("Desktop")
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
+///
+/// [3]: https://xplr.dev/en/style
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
@@ -350,9 +357,9 @@ pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Format a string using a style object
+/// Apply style (escape sequence) to string using a given [Style][3] object.
 ///
-/// Type: function( string, style|nil ) -> string
+/// Type: function( string, [Style][3]|nil ) -> string
 ///
 /// Example:
 ///
@@ -379,8 +386,8 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Get a relative path from a path and base path.
-/// Will error if it fails to determine a relative path
+/// Get the relative path based on the given base path or current working dir.
+/// Will error if it fails to determine a relative path.
 ///
 /// Type: function( path:string, base:string ) -> path:string
 ///
@@ -392,66 +399,37 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|_, (path, base): (String, Option<String>)| {
-        relative_path_as_string(path, base)
+        path::relative_path_as_string(path, base)
             .ok_or_else(|| LuaError::custom("Could not determine relative path"))
     })?;
     util.set("relative_to", func)?;
     Ok(util)
 }
 
-/// Display the given path in shorthand form:
+/// Display the given path in shorthand form using the following rules:
 /// - either relative to your home dir if it makes sense
-/// - or relative to the optional base path
-/// - or absolute if it makes the most sense
+/// - or relative to the optional base path / current working directory
+/// - or absolute path if it makes the most sense
 ///
 /// Type: function( path:string, base:string|nil ) -> path:string|nil
 ///
 /// Example:
 ///
 /// ```lua
+/// xplr.util.path_shorthand("/foo/bar")
+/// -- "../bar"
+///
 /// xplr.util.path_shorthand("/foo/bar", "/foo/baz")
 /// -- "../bar"
 /// ```
 ///
-/// ```lua
-/// os.getenv('HOME')
-/// -- "/home/me"
 /// xplr.util.path_shorthand("/home/me/.config")
 /// -- "~/.config"
 /// ```
-///
-/// ```lua
-/// os.getenv('HOME')
-/// -- "/home/me"
-/// xplr.util.path_shorthand("/home/someone/projects", "/home/me/.config")
-/// -- "/home/someone/projects"
-/// ```
 pub fn path_shorthand<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let home = dirs::home_dir().map(|buf| buf.to_string_lossy().to_string());
     let func =
         lua.create_function(move |_, (path, base): (String, Option<String>)| {
-            let relative = relative_path_as_string(path.clone(), base);
-
-            let shortest = if let Some(home) = &home {
-                if path.starts_with(home) {
-                    path.replace(home, "~")
-                } else {
-                    path
-                }
-            } else {
-                path
-            };
-
-            Ok(match relative {
-                Some(relative) => {
-                    if relative.len() < shortest.len() {
-                        relative
-                    } else {
-                        shortest
-                    }
-                }
-                None => shortest,
-            })
+            Ok(path::path_shorthand(path, base))
         })?;
     util.set("path_shorthand", func)?;
     Ok(util)

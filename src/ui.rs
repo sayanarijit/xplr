@@ -1,9 +1,9 @@
-use crate::app;
 use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
+use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
@@ -824,6 +824,7 @@ fn draw_selection<B: Backend>(
         .take((layout_size.height.max(2) - 2).into())
         .rev()
         .map(|n| n.absolute_path.replace('\\', "\\\\").replace('\n', "\\n"))
+        .map(|p| path::path_shorthand(p, Some(&app.pwd)))
         .map(ListItem::new)
         .collect();
 
