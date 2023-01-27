@@ -392,13 +392,20 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.relative_to("/foo/bar", "/foo/baz")
-/// -- "../bar"
+/// xplr.util.relative_to("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.relative_to("/present/working")
+/// -- ".."
+///
+/// xplr.util.relative_to("/present/working/directory", "/present/foo/bar")
+/// -- "../../working/directory"
 /// ```
 pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|_, (path, base): (String, Option<String>)| {
-        path::relative_path_as_string(path, base)
-            .ok_or_else(|| LuaError::custom("Could not determine relative path"))
+        path::relative_to(path, base)
+            .map(|p| p.to_string_lossy().to_string())
+            .map_err(LuaError::custom)
     })?;
     util.set("relative_to", func)?;
     Ok(util)
@@ -414,20 +421,19 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.path_shorthand("/foo/bar")
-/// -- "../bar"
-///
-/// xplr.util.path_shorthand("/foo/bar", "/foo/baz")
-/// -- "../bar"
-/// ```
-///
-/// xplr.util.path_shorthand("/home/me/.config")
+/// xplr.util.path_shorthand("/home/username/.config")
 /// -- "~/.config"
+///
+/// xplr.util.path_shorthand("/present/working/directory")
+/// -- "../directory"
+///
+/// xplr.util.path_shorthand("/present/working/directory", "/present/foo/bar")
+/// -- "../../working/directory"
 /// ```
 pub fn path_shorthand<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
         lua.create_function(move |_, (path, base): (String, Option<String>)| {
-            Ok(path::path_shorthand(path, base))
+            path::shorthand(path, base).map_err(LuaError::custom)
         })?;
     util.set("path_shorthand", func)?;
     Ok(util)
