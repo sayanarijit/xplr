@@ -145,8 +145,7 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Explore directories with the given explorer config.
 ///
-/// Type: function( path:string, config:[ExplorerConfig][1]|nil )
-///         -> { node:[Node][2]... }
+/// Type: function( path:string, [ExplorerConfig][1]|nil ) -> { [Node][2], ... }
 ///
 /// Example:
 ///
@@ -180,8 +179,7 @@ pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Execute shell commands safely.
 ///
-/// Type: function( program:string, args:{ arg:string, ... }|nil )
-///         -> { stdout = string, stderr = string, returncode = number|nil }
+/// Type: function( program:string, args:{ string, ... }|nil ) -> { stdout = string, stderr = string, returncode = number|nil }
 ///
 /// Example:
 ///
@@ -232,7 +230,7 @@ pub fn shell_quote<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Load JSON string into Lua value.
 ///
-/// Type: function( string ) -> value
+/// Type: function( string ) -> any
 ///
 /// Example:
 ///

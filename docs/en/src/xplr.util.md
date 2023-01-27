@@ -55,8 +55,7 @@ xplr.util.absolute("foo/bar")
 
 Explore directories with the given explorer config.
 
-Type: function( path:string, config:[ExplorerConfig][1]|nil )
--> { node:[Node][2]... }
+Type: function( path:string, [ExplorerConfig][1]|nil ) -> { [Node][2], ... }
 
 Example:
 
@@ -76,8 +75,7 @@ xplr.util.explore("/tmp", app.explorer_config)
 
 Execute shell commands safely.
 
-Type: function( program:string, args:{ arg:string, ... }|nil )
--> { stdout = string, stderr = string, returncode = number|nil }
+Type: function( program:string, args:{ string, ... }|nil ) -> { stdout = string, stderr = string, returncode = number|nil }
 
 Example:
 
@@ -106,7 +104,7 @@ xplr.util.shell_quote("a'b\"c")
 
 Load JSON string into Lua value.
 
-Type: function( string ) -> value
+Type: function( string ) -> any
 
 Example:
 
