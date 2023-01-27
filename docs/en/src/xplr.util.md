@@ -196,8 +196,14 @@ Type: function( path:string, base:string ) -> path:string
 Example:
 
 ```lua
-xplr.util.relative_to("/foo/bar", "/foo/baz")
--- "../bar"
+xplr.util.relative_to("/present/working/directory")
+-- "."
+
+xplr.util.relative_to("/present/working")
+-- ".."
+
+xplr.util.relative_to("/present/working/directory", "/present/foo/bar")
+-- "../../working/directory"
 ```
 
 ### xplr.util.path_shorthand
@@ -213,16 +219,34 @@ Type: function( path:string, base:string|nil ) -> path:string|nil
 Example:
 
 ```lua
-xplr.util.path_shorthand("/foo/bar")
--- "../bar"
-
-xplr.util.path_shorthand("/foo/bar", "/foo/baz")
--- "../bar"
-```
-
-xplr.util.path_shorthand("/home/me/.config")
+xplr.util.path_shorthand("/home/username/.config")
 -- "~/.config"
 
+xplr.util.path_shorthand("/present/working/directory")
+-- "../directory"
+
+xplr.util.path_shorthand("/present/working/directory", "/present/foo/bar")
+-- "../../working/directory"
 ```
 
+### xplr.util.textwrap
+
+Wrap the given text to fit the specified width.
+It will try to not split words when possible.
+
+Type: function( string, options:number|table ) -> { string, ...}
+
+Options type: { width = number, initial_indent = string|nil, subsequent_indent = string|nil, break_words = boolean|nil }
+
+Example:
+
+```lua
+xplr.util.textwrap("this will be cut off", 11)
+-- { "this will', 'be cut off" }
+
+xplr.util.textwrap(
+  "this will be cut off",
+  { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false }
+)
+-- { "this will be", "    cut off" }
 ```
