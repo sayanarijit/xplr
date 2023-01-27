@@ -37,7 +37,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_yaml(util, lua)?;
     util = lscolor(util, lua)?;
     util = paint(util, lua)?;
-    util = wrap(util, lua)?;
+    util = textwrap(util, lua)?;
 
     Ok(util)
 }
@@ -389,13 +389,16 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.wrap("this will be cut off", 11)
+/// xplr.util.textwrap("this will be cut off", 11)
 /// -- { "this will', 'be cut off" }
 ///
-/// xplr.util.wrap("this will be cut off", { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false })
+/// xplr.util.textwrap(
+///   "this will be cut off",
+///   { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false }
+/// )
 /// -- { "this will be", "    cut off" }
 /// ```
-pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|lua, (text, options): (String, Value)| {
         let lines = match lua.from_value::<usize>(options.clone()) {
             Ok(width) => textwrap::wrap(&text, width),
@@ -407,6 +410,6 @@ pub fn wrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
         Ok(lines.iter().map(Cow::to_string).collect::<Vec<String>>())
     })?;
-    util.set("wrap", func)?;
+    util.set("textwrap", func)?;
     Ok(util)
 }
