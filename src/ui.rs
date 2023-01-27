@@ -823,8 +823,17 @@ fn draw_selection<B: Backend>(
         .rev()
         .take((layout_size.height.max(2) - 2).into())
         .rev()
-        .map(|n| n.absolute_path.replace('\\', "\\\\").replace('\n', "\\n"))
-        .map(|p| path::path_shorthand(p, Some(&app.pwd)))
+        .map(|n| {
+            let p = path::path_shorthand(&n.absolute_path, Some(&app.pwd))
+                .replace('\\', "\\\\")
+                .replace('\n', "\\n");
+
+            if n.is_dir {
+                format!("{p}/")
+            } else {
+                p
+            }
+        })
         .map(ListItem::new)
         .collect();
 
