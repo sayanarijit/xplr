@@ -1,10 +1,9 @@
+use crate::app;
 use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
-use crate::path::RelativityConfig;
 use crate::permissions::Permissions;
-use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
@@ -798,6 +797,9 @@ fn draw_table<B: Backend>(
         format!("({node_count}) ")
     };
 
+    // let pwd_title =
+    //     path::shortened(&pwd, Some(&pwd), false).unwrap_or_else(|_| pwd.clone());
+
     let table = Table::new(rows)
         .widths(&table_constraints)
         .style(app_config.general.table.style.to_owned().into())
@@ -833,7 +835,7 @@ fn draw_selection<B: Backend>(
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
-    _: &Lua,
+    lua: &Lua,
 ) {
     let panel_config = &app.config.general.panel_ui;
     let config = panel_config
@@ -843,10 +845,6 @@ fn draw_selection<B: Backend>(
 
     let selection_count = app.selection.len();
 
-    let relconfig = RelativityConfig::default()
-        .with_base(app.pwd.clone())
-        .with_name();
-
     let selection: Vec<ListItem> = app
         .selection
         .iter()
@@ -854,16 +852,15 @@ fn draw_selection<B: Backend>(
         .take((layout_size.height.max(2) - 2).into())
         .rev()
         .map(|n| {
-            let p = path::shortened(&n.absolute_path, Some(&relconfig))
-                .unwrap_or_default()
+            let out = lua::serialize::<Node>(lua, n)
+                .map(|n| {
+                    lua::call(lua, "builtin.fmt_general_selection", n)
+                        .unwrap_or_else(|e| e.to_string())
+                })
+                .unwrap_or_else(|e| e.to_string())
                 .replace('\\', "\\\\")
                 .replace('\n', "\\n");
-
-            if n.is_dir {
-                format!("{p}/")
-            } else {
-                p
-            }
+            string_to_text(out)
         })
         .map(ListItem::new)
         .collect();

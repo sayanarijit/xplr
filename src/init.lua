@@ -2503,6 +2503,11 @@ xplr.fn.builtin.try_complete_path = function(m)
   end
 end
 
+xplr.fn.builtin.fmt_general_selection = function (n)
+  local shortened = xplr.util.shortened(n.absolute_path, { name = true })
+  return xplr.util.paint(shortened, xplr.util.lscolor(n.absolute_path))
+end
+
 -- Renders the first column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   local r = ""
