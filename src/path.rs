@@ -85,7 +85,7 @@ where
     B: AsRef<Path>,
 {
     let path = path.as_ref();
-    let base = match config.map(|c| c.base.as_ref()).flatten() {
+    let base = match config.and_then(|c| c.base.as_ref()) {
         Some(base) => PathBuf::from(base.as_ref()),
         None => std::env::current_dir()?,
     };
@@ -98,7 +98,7 @@ where
         diff
     };
 
-    let relative = if !config.map(|c| c.name).flatten().unwrap_or(false) {
+    let relative = if !config.and_then(|c| c.name).unwrap_or(false) {
         relative
     } else if relative.to_str() == Some(".") {
         match (path.parent(), path.file_name()) {
