@@ -259,6 +259,9 @@ pub struct GeneralConfig {
     pub selection_ui: UiConfig,
 
     #[serde(default)]
+    pub selection_item: UiElement,
+
+    #[serde(default)]
     pub focus_selection_ui: UiConfig,
 
     #[serde(default)]

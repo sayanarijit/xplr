@@ -275,6 +275,17 @@ xplr.config.general.focus_ui.suffix = "]"
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.focus_ui.style = { add_modifiers = { "Bold" } }
 
+-- Renderer for each item in the selection list.
+--
+-- Type: table with the following fields:
+--
+-- * format: nullable string
+-- * style: [Style](https://xplr.dev/en/style)
+xplr.config.general.selection_item = {
+  format = "builtin.fmt_general_selection",
+  style = {}
+}
+
 -- The string placed before the item name for a selected row.
 --
 -- Type: nullable string

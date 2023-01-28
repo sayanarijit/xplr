@@ -797,9 +797,6 @@ fn draw_table<B: Backend>(
         format!("({node_count}) ")
     };
 
-    // let pwd_title =
-    //     path::shortened(&pwd, Some(&pwd), false).unwrap_or_else(|_| pwd.clone());
-
     let table = Table::new(rows)
         .widths(&table_constraints)
         .style(app_config.general.table.style.to_owned().into())
@@ -852,14 +849,20 @@ fn draw_selection<B: Backend>(
         .take((layout_size.height.max(2) - 2).into())
         .rev()
         .map(|n| {
-            let out = lua::serialize::<Node>(lua, n)
-                .map(|n| {
-                    lua::call(lua, "builtin.fmt_general_selection", n)
+            let out = app
+                .config
+                .general
+                .selection_item
+                .format
+                .as_ref()
+                .map(|f| {
+                    lua::serialize::<Node>(lua, n)
+                        .map(|n| lua::call(lua, f, n).unwrap_or_else(|e| e.to_string()))
                         .unwrap_or_else(|e| e.to_string())
+                        .replace('\\', "\\\\")
+                        .replace('\n', "\\n")
                 })
-                .unwrap_or_else(|e| e.to_string())
-                .replace('\\', "\\\\")
-                .replace('\n', "\\n");
+                .unwrap_or_else(|| n.absolute_path.clone());
             string_to_text(out)
         })
         .map(ListItem::new)
