@@ -168,6 +168,32 @@ impl Layout {
             (_, other) => other.to_owned(),
         }
     }
+
+    pub fn replace(self, target: &Self, replacement: &Self) -> Self {
+        match self {
+            Self::Horizontal { splits, config } => Self::Horizontal {
+                splits: splits
+                    .into_iter()
+                    .map(|s| s.replace(target, replacement))
+                    .collect(),
+                config,
+            },
+            Self::Vertical { splits, config } => Self::Vertical {
+                splits: splits
+                    .into_iter()
+                    .map(|s| s.replace(target, replacement))
+                    .collect(),
+                config,
+            },
+            other => {
+                if other == *target {
+                    replacement.to_owned()
+                } else {
+                    other
+                }
+            }
+        }
+    }
 }
 
 #[derive(
@@ -1539,5 +1565,43 @@ mod tests {
                 sub_modifiers: modifier(Modifier::Italic),
             }
         );
+    }
+
+    #[test]
+    fn test_layout_replace() {
+        let layout = Layout::Horizontal {
+            config: LayoutOptions {
+                margin: Some(2),
+                horizontal_margin: Some(3),
+                vertical_margin: Some(4),
+                constraints: Some(vec![
+                    Constraint::Percentage(80),
+                    Constraint::Percentage(20),
+                ]),
+            },
+            splits: vec![Layout::Table, Layout::HelpMenu],
+        };
+
+        let res = layout.clone().replace(&Layout::Table, &Layout::Selection);
+
+        match (res, layout) {
+            (
+                Layout::Horizontal {
+                    config: res_config,
+                    splits: res_splits,
+                },
+                Layout::Horizontal {
+                    config: layout_config,
+                    splits: layout_splits,
+                },
+            ) => {
+                assert_eq!(res_config, layout_config);
+                assert_eq!(res_splits.len(), layout_splits.len());
+                assert_eq!(res_splits[0], Layout::Selection);
+                assert_ne!(res_splits[0], layout_splits[0]);
+                assert_eq!(res_splits[1], layout_splits[1]);
+            }
+            _ => panic!("Unexpected layout"),
+        }
     }
 }
