@@ -5,6 +5,7 @@ use crate::msg::in_::external::ExplorerConfig;
 use crate::path;
 use crate::path::RelativityConfig;
 use crate::ui;
+use crate::ui::Layout;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
 use anyhow::Result;
@@ -42,6 +43,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = relative_to(util, lua)?;
     util = shortened(util, lua)?;
     util = textwrap(util, lua)?;
+    util = layout_replaced(util, lua)?;
 
     Ok(util)
 }
@@ -509,5 +511,51 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         Ok(lines.iter().map(Cow::to_string).collect::<Vec<String>>())
     })?;
     util.set("textwrap", func)?;
+    Ok(util)
+}
+
+/// Find the target layout in the given layout and replace it with the replacement layout,
+/// returning a new layout.
+///
+/// Type: function( layout:[Layout][4], target:[Layout][4], replacement:[Layout][4] ) -> layout:[Layout][4]
+///
+/// Example:
+///
+/// ```lua
+/// local layout = {
+///   Horizontal = {
+///     splits = {
+///       "Table",  -- Target
+///       "HelpMenu",
+///     },
+///     config = ...,
+///   }
+/// }
+///
+/// xplr.util.layout_replaced(layout, "Table", "Selection")
+/// -- {
+/// --   Horizontal = {
+/// --     splits = {
+/// --       "Selection",  -- Replaced
+/// --       "HelpMenu",
+/// --     },
+/// --     config = ...
+/// --   }
+/// -- }
+/// ```
+pub fn layout_replaced<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(
+        move |lua, (layout, target, replacement): (Table, Table, Table)| {
+            let layout: Layout = lua.from_value(Value::Table(layout))?;
+            let target: Layout = lua.from_value(Value::Table(target))?;
+            let replacement: Layout = lua.from_value(Value::Table(replacement))?;
+
+            let res = layout.replace(&target, &replacement);
+            let res = lua.to_value(&res)?;
+
+            Ok(res)
+        },
+    )?;
+    util.set("layout_replaced", func)?;
     Ok(util)
 }
