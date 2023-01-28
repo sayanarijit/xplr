@@ -393,7 +393,7 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///
 /// Type: function( path:string, config:Config|nil ) -> path:string
 ///
-/// Config type: { base:string|nil, with_prefix_dots: bookean|nil, without_suffix_dots:boolean|nil }
+/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
 ///
 /// - If `base` path is given, the path will be relative to it.
 /// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
@@ -462,10 +462,10 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///
 /// xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
 /// -- "../../working/directory"
-/// ```
 ///
 /// xplr.util.shortened("/tmp")
 /// -- "/tmp"
+/// ```
 pub fn shortened<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
         lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
