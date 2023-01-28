@@ -280,3 +280,35 @@ xplr.util.textwrap(
 )
 -- { "this will be", "    cut off" }
 ```
+
+### xplr.util.layout_replace
+
+Find the target layout in the given layout and replace it with the replacement layout,
+returning a new layout.
+
+Type: function( layout:[Layout][4], target:[Layout][4], replacement:[Layout][4] ) -> layout:[Layout][4]
+
+Example:
+
+```lua
+local layout = {
+  Horizontal = {
+    splits = {
+      "Table",  -- Target
+      "HelpMenu",
+    },
+    config = ...,
+  }
+}
+
+xplr.util.layout_replace(layout, "Table", "Selection")
+-- {
+--   Horizontal = {
+--     splits = {
+--       "Selection",  -- Replaced
+--       "HelpMenu",
+--     },
+--     config = ...
+--   }
+-- }
+```

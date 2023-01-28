@@ -43,7 +43,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = relative_to(util, lua)?;
     util = shortened(util, lua)?;
     util = textwrap(util, lua)?;
-    util = layout_replaced(util, lua)?;
+    util = layout_replace(util, lua)?;
 
     Ok(util)
 }
@@ -532,7 +532,7 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///   }
 /// }
 ///
-/// xplr.util.layout_replaced(layout, "Table", "Selection")
+/// xplr.util.layout_replace(layout, "Table", "Selection")
 /// -- {
 /// --   Horizontal = {
 /// --     splits = {
@@ -543,7 +543,7 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   }
 /// -- }
 /// ```
-pub fn layout_replaced<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(
         move |lua, (layout, target, replacement): (Table, Table, Table)| {
             let layout: Layout = lua.from_value(Value::Table(layout))?;
