@@ -1411,6 +1411,21 @@ xplr.config.modes.builtin.selection_ops = {
   layout = "HelpMenu",
   key_bindings = {
     on_key = {
+      ["l"] = {
+        help = "list selection",
+        messages = {
+          {
+            BashExec0 = [===[
+              [ -z "$PAGER" ] && PAGER="less -+F"
+
+              while IFS= read -r -d '' PTH; do
+                  echo $(printf %q "$PTH")
+              done < "${XPLR_PIPE_SELECTION_OUT:?}" | ${PAGER:?}
+            ]===],
+          },
+          "PopMode",
+        },
+      },
       ["c"] = {
         help = "copy here",
         messages = {
@@ -1418,14 +1433,20 @@ xplr.config.modes.builtin.selection_ops = {
             BashExec0 = [===[
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
-                if cp -vr -- "${PTH:?}" ./; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ."
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                while [ -e "$BASENAME" ]; do
+                  BASENAME="$BASENAME (copied)"
+                  BASENAME_ESC=$(printf %q "$BASENAME")
+                done
+                if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ./$BASENAME_ESC"
+                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to copy $PTH_ESC to ."
+                  "$XPLR" -m 'LogError: %q' "Failed to copy $PTH_ESC to ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               "$XPLR" -m ExplorePwdAsync
-              "$XPLR" -m ClearSelection
               read -p "[enter to continue]"
             ]===],
           },
@@ -1439,10 +1460,71 @@ xplr.config.modes.builtin.selection_ops = {
             BashExec0 = [===[
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
-                if mv -v -- "${PTH:?}" ./; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ."
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                while [ -e "$BASENAME" ]; do
+                  BASENAME="$BASENAME (moved)"
+                  BASENAME_ESC=$(printf %q "$BASENAME")
+                done
+                if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ./$BASENAME_ESC"
+                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to move $PTH_ESC to ."
+                  "$XPLR" -m 'LogError: %q' "Failed to move $PTH_ESC to ./$BASENAME_ESC"
+                fi
+              done < "${XPLR_PIPE_SELECTION_OUT:?}")
+              "$XPLR" -m ExplorePwdAsync
+              read -p "[enter to continue]"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      ["s"] = {
+        help = "softlink here",
+        messages = {
+          {
+            BashExec0 = [===[
+              (while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                while [ -e "$BASENAME" ]; do
+                  BASENAME="$BASENAME (softlinked)"
+                  BASENAME_ESC=$(printf %q "$BASENAME")
+                done
+                if ln -sv -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as ./$BASENAME_ESC"
+                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
+                else
+                  "$XPLR" -m 'LogError: %q' "Failed to softlink $PTH_ESC as ./$BASENAME_ESC"
+                fi
+              done < "${XPLR_PIPE_SELECTION_OUT:?}")
+              "$XPLR" -m ExplorePwdAsync
+              read -p "[enter to continue]"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      ["h"] = {
+        help = "hardlink here",
+        messages = {
+          {
+            BashExec0 = [===[
+              (while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                while [ -e "$BASENAME" ]; do
+                  BASENAME="$BASENAME (hardlinked)"
+                  BASENAME_ESC=$(printf %q "$BASENAME")
+                done
+                if ln -v -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as ./$BASENAME_ESC"
+                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
+                else
+                  "$XPLR" -m 'LogError: %q' "Failed to hardlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               "$XPLR" -m ExplorePwdAsync
@@ -1679,7 +1761,7 @@ xplr.config.modes.builtin.go_to = {
                 elif command -v open; then
                   OPENER=open
                 else
-                  "$XPLR" -m 'LogError: "$OPENER not found"'
+                  "$XPLR" -m 'LogError: %q' "$OPENER not found"
                   exit 1
                 fi
               fi
