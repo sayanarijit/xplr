@@ -746,10 +746,7 @@ xplr.config.node_types.file.meta.icon = "ƒ"
 -- The style for the symlink nodes.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.symlink.style = {
-  fg = "Magenta",
-  add_modifiers = { "Italic" },
-}
+xplr.config.node_types.symlink.style = {}
 
 -- Metadata for the symlink nodes.
 -- You can set as many metadata as you want.
