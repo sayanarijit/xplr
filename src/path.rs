@@ -1,5 +1,6 @@
 use anyhow::{bail, Result};
 use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 use std::path::{Component, Path, PathBuf};
 
 lazy_static! {
@@ -57,35 +58,49 @@ where
     }
 }
 
-pub fn relative_to<P, B>(path: P, base: Option<B>) -> Result<PathBuf>
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct RelativityConfig<B: AsRef<Path>> {
+    base: Option<B>,
+    name: Option<bool>,
+}
+
+impl<B: AsRef<Path>> RelativityConfig<B> {
+    pub fn with_base(mut self, base: B) -> Self {
+        self.base = Some(base);
+        self
+    }
+
+    pub fn with_name(mut self) -> Self {
+        self.name = Some(true);
+        self
+    }
+}
+
+pub fn relative_to<P, B>(
+    path: P,
+    config: Option<&RelativityConfig<B>>,
+) -> Result<PathBuf>
 where
     P: AsRef<Path>,
     B: AsRef<Path>,
 {
-    let base = match base {
+    let path = path.as_ref();
+    let base = match config.map(|c| c.base.as_ref()).flatten() {
         Some(base) => PathBuf::from(base.as_ref()),
         None => std::env::current_dir()?,
     };
 
     let diff = diff(path, base)?;
 
-    if diff.to_str() == Some("") {
-        Ok(".".into())
+    let relative = if diff.to_str() == Some("") {
+        ".".into()
     } else {
-        Ok(diff)
-    }
-}
+        diff
+    };
 
-pub fn shortened<P, B>(path: P, base: Option<B>) -> Result<String>
-where
-    P: AsRef<Path>,
-    B: AsRef<Path>,
-{
-    let path = path.as_ref();
-    let pathstring = path.to_string_lossy().to_string();
-    let relative = relative_to(path, base)?;
-
-    let relative = if relative.to_str() == Some(".") {
+    let relative = if !config.map(|c| c.name).flatten().unwrap_or(false) {
+        relative
+    } else if relative.to_str() == Some(".") {
         match (path.parent(), path.file_name()) {
             (Some(_), Some(name)) => PathBuf::from("..").join(name),
             (_, _) => relative,
@@ -105,9 +120,21 @@ where
         relative
     };
 
+    Ok(relative)
+}
+
+pub fn shortened<P, B>(path: P, config: Option<&RelativityConfig<B>>) -> Result<String>
+where
+    P: AsRef<Path>,
+    B: AsRef<Path>,
+{
+    let path = path.as_ref();
+    let pathstring = path.to_string_lossy().to_string();
+    let relative = relative_to(path, config)?;
+
     let relative = relative.to_string_lossy().to_string();
 
-    let res = HOME
+    let fromhome = HOME
         .as_ref()
         .and_then(|h| {
             path.strip_prefix(h).ok().map(|p| {
@@ -120,10 +147,10 @@ where
         })
         .unwrap_or(pathstring);
 
-    if relative.len() < res.len() {
+    if relative.len() < fromhome.len() {
         Ok(relative)
     } else {
-        Ok(res)
+        Ok(fromhome)
     }
 }
 
@@ -132,38 +159,67 @@ mod tests {
 
     use super::*;
 
+    type Config<'a> = Option<&'a RelativityConfig<String>>;
+
+    const NONE: Config = Config::None;
+
+    fn default<'a>() -> RelativityConfig<&'a str> {
+        Default::default()
+    }
+
     #[test]
     fn test_relative_to_pwd() {
         let path = std::env::current_dir().unwrap();
-        let relative = relative_to(path, Option::<String>::None).unwrap();
+        let relative = relative_to(path, NONE).unwrap();
         assert_eq!(relative, PathBuf::from("."));
+
+        let path = std::env::current_dir().unwrap();
+        let relative = relative_to(&path, Some(&default().with_name())).unwrap();
+        assert_eq!(
+            relative,
+            PathBuf::from("..").join(path.file_name().unwrap())
+        );
     }
 
     #[test]
     fn test_relative_to_parent() {
         let path = std::env::current_dir().unwrap();
-        let path = path.parent().unwrap();
+        let parent = path.parent().unwrap();
 
-        let relative = relative_to(path, Option::<String>::None).unwrap();
+        let relative = relative_to(parent, NONE).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
+
+        let relative = relative_to(&parent, Some(&default().with_name())).unwrap();
+        assert_eq!(
+            relative,
+            PathBuf::from("../..").join(parent.file_name().unwrap())
+        );
     }
 
     #[test]
     fn test_relative_to_file() {
         let path = std::env::current_dir().unwrap().join("foo").join("bar");
-        let relative = relative_to(path, Option::<String>::None).unwrap();
+        let relative = relative_to(path, NONE).unwrap();
         assert_eq!(relative, PathBuf::from("foo/bar"));
     }
 
     #[test]
     fn test_relative_to_root() {
-        let relative = relative_to("/foo", Some("/")).unwrap();
+        let relative = relative_to("/foo", Some(&default().with_base("/"))).unwrap();
         assert_eq!(relative, PathBuf::from("foo"));
 
-        let relative = relative_to("/", Some("/")).unwrap();
+        let relative = relative_to("/", Some(&default().with_base("/"))).unwrap();
         assert_eq!(relative, PathBuf::from("."));
 
-        let relative = relative_to("/", Some("/foo")).unwrap();
+        let relative =
+            relative_to("/", Some(&default().with_base("/").with_name())).unwrap();
+        assert_eq!(relative, PathBuf::from("."));
+
+        let relative = relative_to("/", Some(&default().with_base("/foo"))).unwrap();
+        assert_eq!(relative, PathBuf::from(".."));
+
+        let relative =
+            relative_to("/", Some(&default().with_base("/foo").with_name())).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
     }
 
@@ -171,64 +227,69 @@ mod tests {
     fn test_relative_to_base() {
         let path = "/some/directory";
         let base = "/another/foo/bar";
-        let relative = relative_to(path, Some(base)).unwrap();
+        let relative = relative_to(path, Some(&default().with_base(base))).unwrap();
         assert_eq!(relative, PathBuf::from("../../../some/directory"));
     }
 
     #[test]
-    fn test_shorthand_to_home() {
+    fn test_shortened_home() {
         let path = HOME.as_ref().unwrap();
 
-        let res = shortened(path, Option::<String>::None).unwrap();
+        let res = shortened(path, NONE).unwrap();
         assert_eq!(res, "~");
 
-        let res = shortened(path.join("foo"), Option::<String>::None).unwrap();
+        let res = shortened(path, Some(&default().with_name())).unwrap();
+        assert_eq!(res, "~");
+
+        let res = shortened(path.join("foo"), NONE).unwrap();
         assert_eq!(res, "~/foo");
 
-        let res = shortened(
-            format!("{}foo", path.to_string_lossy()),
-            Option::<String>::None,
-        )
-        .unwrap();
+        let res = shortened(format!("{}foo", path.to_string_lossy()), NONE).unwrap();
         assert_ne!(res, "~/foo");
         assert_eq!(res, format!("{}foo", path.to_string_lossy()));
     }
 
     #[test]
-    fn test_shorthand_to_base() {
+    fn test_shortened_base() {
         let path = "/present/working/directory";
         let base = "/present/foo/bar";
 
-        let res = shortened(path, Some(base)).unwrap();
+        let res = shortened(path, Some(&default().with_base(base))).unwrap();
         assert_eq!(res, "../../working/directory");
     }
 
     #[test]
-    fn test_shorthand_to_pwd() {
+    fn test_shortened_pwd() {
         let path = "/present/working/directory";
 
-        let res = shortened(&path, Some(&path)).unwrap();
+        let res = shortened(path, Some(&default().with_base(path))).unwrap();
+        assert_eq!(res, ".");
+
+        let res = shortened(path, Some(&default().with_base(path).with_name())).unwrap();
         assert_eq!(res, "../directory");
     }
 
     #[test]
-    fn test_shorthand_to_parent() {
+    fn test_shortened_parent() {
         let path = "/present/working";
         let base = "/present/working/directory";
 
-        let res = shortened(&path, Some(&base)).unwrap();
+        let res = shortened(&path, Some(&default().with_base(base))).unwrap();
+        assert_eq!(res, "..");
+
+        let res = shortened(path, Some(&default().with_base(base).with_name())).unwrap();
         assert_eq!(res, "../../working");
     }
 
     #[test]
-    fn test_shorthand_to_root() {
-        let res = shortened("/", Some("/")).unwrap();
+    fn test_shortened_root() {
+        let res = shortened("/", Some(&default().with_base("/"))).unwrap();
         assert_eq!(res, "/");
 
-        let res = shortened("/foo", Some("/")).unwrap();
+        let res = shortened("/foo", Some(&default().with_base("/"))).unwrap();
         assert_eq!(res, "foo");
 
-        let res = shortened("/", Some("/foo")).unwrap();
+        let res = shortened("/", Some(&default().with_base("/foo"))).unwrap();
         assert_eq!(res, "/");
     }
 }

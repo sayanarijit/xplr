@@ -2,6 +2,7 @@ use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
+use crate::path::RelativityConfig;
 use crate::permissions::Permissions;
 use crate::{app, path};
 use ansi_to_tui::IntoText;
@@ -842,6 +843,10 @@ fn draw_selection<B: Backend>(
 
     let selection_count = app.selection.len();
 
+    let relconfig = RelativityConfig::default()
+        .with_base(app.pwd.clone())
+        .with_name();
+
     let selection: Vec<ListItem> = app
         .selection
         .iter()
@@ -849,7 +854,7 @@ fn draw_selection<B: Backend>(
         .take((layout_size.height.max(2) - 2).into())
         .rev()
         .map(|n| {
-            let p = path::shortened(&n.absolute_path, Some(&app.pwd))
+            let p = path::shortened(&n.absolute_path, Some(&relconfig))
                 .unwrap_or_default()
                 .replace('\\', "\\\\")
                 .replace('\n', "\\n");
