@@ -105,17 +105,24 @@ where
             (Some(_), Some(name)) => PathBuf::from("..").join(name),
             (_, _) => relative,
         }
-    } else if relative.to_str() == Some("..") {
+    } else if relative.ends_with("..") {
         match (path.parent(), path.file_name()) {
             (Some(parent), Some(name)) => {
                 if parent.parent().is_some() {
-                    PathBuf::from("../..").join(name)
+                    relative.join("..").join(name)
                 } else {
-                    relative
+                    // always prefer absolute path if it's a child of the root directory
+                    // to guarantee that the basename is included
+                    path.into()
                 }
             }
             (_, _) => relative,
         }
+    } else if !relative.starts_with(".")
+        && !relative.starts_with("/")
+        && !relative.starts_with("..")
+    {
+        PathBuf::from(".").join(relative)
     } else {
         relative
     };
