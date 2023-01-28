@@ -181,6 +181,18 @@ Constraint for the column widths.
 
 Type: nullable list of [Constraint](https://xplr.dev/en/layouts#constraint)
 
+#### xplr.config.general.selection.item.format
+
+Renderer for each item in the selection list.
+
+Type: nullable string
+
+#### xplr.config.general.selection.item.style
+
+Style for each item in the selection list.
+
+Type: [Style](https://xplr.dev/en/style)
+
 #### xplr.config.general.default_ui.prefix
 
 The content that is placed before the item name for each row by default.

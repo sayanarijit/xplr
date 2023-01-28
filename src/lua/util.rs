@@ -2,6 +2,8 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::path;
+use crate::path::RelativityConfig;
 use crate::ui;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
@@ -37,6 +39,8 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_yaml(util, lua)?;
     util = lscolor(util, lua)?;
     util = paint(util, lua)?;
+    util = relative_to(util, lua)?;
+    util = shortened(util, lua)?;
     util = textwrap(util, lua)?;
 
     Ok(util)
@@ -145,14 +149,15 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Explore directories with the given explorer config.
 ///
-/// Type: function( path:string, config:[Explorer Config][1]|nil )
-///         -> { node:[Node][2]... }
+/// Type: function( path:string, [ExplorerConfig][1]|nil ) -> { [Node][2], ... }
 ///
 /// Example:
 ///
 /// ```lua
 ///
 /// xplr.util.explore("/tmp")
+/// -- { { absolute_path = "/tmp/a", ... }, ... }
+///
 /// xplr.util.explore("/tmp", app.explorer_config)
 /// -- { { absolute_path = "/tmp/a", ... }, ... }
 /// ```
@@ -178,13 +183,14 @@ pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Execute shell commands safely.
 ///
-/// Type: function( program:string, args:{ arg:string... }|nil )
-///         -> { stdout = string, stderr = string, returncode = number|nil }
+/// Type: function( program:string, args:{ string, ... }|nil ) -> { stdout = string, stderr = string, returncode = number|nil }
 ///
 /// Example:
 ///
 /// ```lua
 /// xplr.util.shell_execute("pwd")
+/// -- "/present/working/directory"
+///
 /// xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 /// -- { stdout = "xplr...", stderr = "", returncode = 0 }
 /// ```
@@ -228,7 +234,7 @@ pub fn shell_quote<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Load JSON string into Lua value.
 ///
-/// Type: function( string ) -> value
+/// Type: function( string ) -> any
 ///
 /// Example:
 ///
@@ -253,11 +259,11 @@ pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///
 /// ```lua
 /// xplr.util.to_json({ foo = "bar" })
-/// -- [[{ "foos": "bar" }]]
+/// -- [[{ "foo": "bar" }]]
 ///
 /// xplr.util.to_json({ foo = "bar" }, { pretty = true })
 /// -- [[{
-/// --   "foos": "bar"
+/// --   "foo": "bar"
 /// -- }]]
 /// ```
 pub fn to_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
@@ -326,9 +332,10 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Get a style object for the given path
+/// Get a [Style][3] object for the given path based on the LS_COLORS
+/// environment variable.
 ///
-/// Type: function( path ) -> style|nil
+/// Type: function( path:string ) -> Style[3]|nil
 ///
 /// Example:
 ///
@@ -336,6 +343,8 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.lscolor("Desktop")
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
+///
+/// [3]: https://xplr.dev/en/style
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
@@ -350,9 +359,9 @@ pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Format a string using a style object
+/// Apply style (escape sequence) to string using a given [Style][3] object.
 ///
-/// Type: function( string, style|nil ) -> string
+/// Type: function( string, [Style][3]|nil ) -> string
 ///
 /// Example:
 ///
@@ -376,6 +385,95 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             Ok::<String, LuaError>(ansi_style.paint(string).to_string())
         })?;
     util.set("paint", func)?;
+    Ok(util)
+}
+
+/// Get the relative path based on the given base path or current working dir.
+/// Will error if it fails to determine a relative path.
+///
+/// Type: function( path:string, config:Config|nil ) -> path:string
+///
+/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+///
+/// - If `base` path is given, the path will be relative to it.
+/// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+/// - If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.relative_to("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.relative_to("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
+/// -- "../directory"
+///
+/// xplr.util.relative_to("/present/working")
+/// -- ".."
+///
+/// xplr.util.relative_to("/present/working", { without_suffix_dots = true })
+/// -- "../../working"
+///
+/// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
+/// -- "../../working/directory"
+/// ```
+pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
+        let config: Option<RelativityConfig<String>> =
+            lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
+        path::relative_to(path, config.as_ref())
+            .map(|p| p.to_string_lossy().to_string())
+            .map_err(LuaError::custom)
+    })?;
+    util.set("relative_to", func)?;
+    Ok(util)
+}
+
+/// Shorten the given absolute path using the following rules:
+/// - either relative to your home dir if it makes sense
+/// - or relative to the current working directory
+/// - or absolute path if it makes the most sense
+///
+/// Type: Similar to `xplr.util.relative_to`
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.shortened("/home/username/.config")
+/// -- "~/.config"
+///
+/// xplr.util.shortened("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.shortened("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
+/// -- "../directory"
+///
+/// xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
+/// -- "../../working/directory"
+///
+/// xplr.util.shortened("/tmp")
+/// -- "/tmp"
+/// ```
+pub fn shortened<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
+            let config: Option<RelativityConfig<String>> =
+                lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
+            path::shortened(path, config.as_ref()).map_err(LuaError::custom)
+        })?;
+    util.set("shortened", func)?;
     Ok(util)
 }
 

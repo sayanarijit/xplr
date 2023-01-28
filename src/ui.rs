@@ -832,7 +832,7 @@ fn draw_selection<B: Backend>(
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
-    _: &Lua,
+    lua: &Lua,
 ) {
     let panel_config = &app.config.general.panel_ui;
     let config = panel_config
@@ -848,7 +848,24 @@ fn draw_selection<B: Backend>(
         .rev()
         .take((layout_size.height.max(2) - 2).into())
         .rev()
-        .map(|n| n.absolute_path.replace('\\', "\\\\").replace('\n', "\\n"))
+        .map(|n| {
+            let out = app
+                .config
+                .general
+                .selection
+                .item
+                .format
+                .as_ref()
+                .map(|f| {
+                    lua::serialize::<Node>(lua, n)
+                        .map(|n| lua::call(lua, f, n).unwrap_or_else(|e| e.to_string()))
+                        .unwrap_or_else(|e| e.to_string())
+                        .replace('\\', "\\\\")
+                        .replace('\n', "\\n")
+                })
+                .unwrap_or_else(|| n.absolute_path.clone());
+            string_to_text(out)
+        })
         .map(ListItem::new)
         .collect();
 

@@ -148,6 +148,13 @@ pub struct TableConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct SelectionConfig {
+    #[serde(default)]
+    pub item: UiElement,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LogsConfig {
     #[serde(default)]
     pub info: UiElement,
@@ -248,6 +255,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub table: TableConfig,
+
+    #[serde(default)]
+    pub selection: SelectionConfig,
 
     #[serde(default)]
     pub default_ui: UiConfig,

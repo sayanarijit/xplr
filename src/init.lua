@@ -246,6 +246,16 @@ xplr.config.general.table.col_widths = {
   { Percentage = 20 },
 }
 
+-- Renderer for each item in the selection list.
+--
+-- Type: nullable string
+xplr.config.general.selection.item.format = "builtin.fmt_general_selection_item"
+
+-- Style for each item in the selection list.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.selection.item.style = {}
+
 -- The content that is placed before the item name for each row by default.
 --
 -- Type: nullable string
@@ -736,10 +746,7 @@ xplr.config.node_types.file.meta.icon = "ƒ"
 -- The style for the symlink nodes.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.symlink.style = {
-  fg = "Magenta",
-  add_modifiers = { "Italic" },
-}
+xplr.config.node_types.symlink.style = {}
 
 -- Metadata for the symlink nodes.
 -- You can set as many metadata as you want.
@@ -1243,21 +1250,21 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
+xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"]
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 
 -- The builtin debug error mode.
 --
@@ -1616,9 +1623,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2032,9 +2039,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -2503,6 +2510,12 @@ xplr.fn.builtin.try_complete_path = function(m)
   end
 end
 
+xplr.fn.builtin.fmt_general_selection_item = function(n)
+  local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
+  local shortened = xplr.util.shortened(n.absolute_path, sh_config)
+  return xplr.util.paint(shortened, xplr.util.lscolor(n.absolute_path))
+end
+
 -- Renders the first column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)
   local r = ""
@@ -2545,7 +2558,8 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      r = r .. path_escape(m.symlink.absolute_path)
+      local symlink_path = xplr.util.shortened(m.symlink.absolute_path)
+      r = r .. path_escape(symlink_path)
 
       if m.symlink.is_dir then
         r = r .. "/"

@@ -55,14 +55,15 @@ xplr.util.absolute("foo/bar")
 
 Explore directories with the given explorer config.
 
-Type: function( path:string, config:[Explorer Config][1]|nil )
--> { node:[Node][2]... }
+Type: function( path:string, [ExplorerConfig][1]|nil ) -> { [Node][2], ... }
 
 Example:
 
 ```lua
 
 xplr.util.explore("/tmp")
+-- { { absolute_path = "/tmp/a", ... }, ... }
+
 xplr.util.explore("/tmp", app.explorer_config)
 -- { { absolute_path = "/tmp/a", ... }, ... }
 ```
@@ -74,13 +75,14 @@ xplr.util.explore("/tmp", app.explorer_config)
 
 Execute shell commands safely.
 
-Type: function( program:string, args:{ arg:string... }|nil )
--> { stdout = string, stderr = string, returncode = number|nil }
+Type: function( program:string, args:{ string, ... }|nil ) -> { stdout = string, stderr = string, returncode = number|nil }
 
 Example:
 
 ```lua
 xplr.util.shell_execute("pwd")
+-- "/present/working/directory"
+
 xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 -- { stdout = "xplr...", stderr = "", returncode = 0 }
 ```
@@ -102,7 +104,7 @@ xplr.util.shell_quote("a'b\"c")
 
 Load JSON string into Lua value.
 
-Type: function( string ) -> value
+Type: function( string ) -> any
 
 Example:
 
@@ -121,11 +123,11 @@ Example:
 
 ```lua
 xplr.util.to_json({ foo = "bar" })
--- [[{ "foos": "bar" }]]
+-- [[{ "foo": "bar" }]]
 
 xplr.util.to_json({ foo = "bar" }, { pretty = true })
 -- [[{
---   "foos": "bar"
+--   "foo": "bar"
 -- }]]
 ```
 
@@ -153,4 +155,128 @@ Example:
 ```lua
 xplr.util.to_yaml({ foo = "bar" })
 -- "foo: bar"
+```
+
+### xplr.util.lscolor
+
+Get a [Style][3] object for the given path based on the LS_COLORS
+environment variable.
+
+Type: function( path:string ) -> Style[3]|nil
+
+Example:
+
+```lua
+xplr.util.lscolor("Desktop")
+-- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
+```
+
+[3]: https://xplr.dev/en/style
+
+### xplr.util.paint
+
+Apply style (escape sequence) to string using a given [Style][3] object.
+
+Type: function( string, [Style][3]|nil ) -> string
+
+Example:
+
+```lua
+xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
+-- "\u001b[31mDesktop\u001b[0m"
+```
+
+### xplr.util.relative_to
+
+Get the relative path based on the given base path or current working dir.
+Will error if it fails to determine a relative path.
+
+Type: function( path:string, config:Config|nil ) -> path:string
+
+Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+
+- If `base` path is given, the path will be relative to it.
+- If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+- If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
+
+Example:
+
+```lua
+xplr.util.relative_to("/present/working/directory")
+-- "."
+
+xplr.util.relative_to("/present/working/directory/foo")
+-- "foo"
+
+xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+-- "./foo"
+
+xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
+-- "../directory"
+
+xplr.util.relative_to("/present/working")
+-- ".."
+
+xplr.util.relative_to("/present/working", { without_suffix_dots = true })
+-- "../../working"
+
+xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
+-- "../../working/directory"
+```
+
+### xplr.util.shortened
+
+Shorten the given absolute path using the following rules:
+
+- either relative to your home dir if it makes sense
+- or relative to the current working directory
+- or absolute path if it makes the most sense
+
+Type: Similar to `xplr.util.relative_to`
+
+Example:
+
+```lua
+xplr.util.shortened("/home/username/.config")
+-- "~/.config"
+
+xplr.util.shortened("/present/working/directory")
+-- "."
+
+xplr.util.shortened("/present/working/directory/foo")
+-- "foo"
+
+xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
+-- "./foo"
+
+xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
+-- "../directory"
+
+xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
+-- "../../working/directory"
+
+xplr.util.shortened("/tmp")
+-- "/tmp"
+```
+
+### xplr.util.textwrap
+
+Wrap the given text to fit the specified width.
+It will try to not split words when possible.
+
+Type: function( string, options:number|table ) -> { string, ...}
+
+Options type: { width = number, initial_indent = string|nil, subsequent_indent = string|nil, break_words = boolean|nil }
+
+Example:
+
+```lua
+xplr.util.textwrap("this will be cut off", 11)
+-- { "this will', 'be cut off" }
+
+xplr.util.textwrap(
+  "this will be cut off",
+  { width = 12, initial_indent = "", subsequent_indent = "    ", break_words = false }
+)
+-- { "this will be", "    cut off" }
 ```

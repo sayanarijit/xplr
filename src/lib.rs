@@ -12,6 +12,7 @@ pub mod input;
 pub mod lua;
 pub mod msg;
 pub mod node;
+pub mod path;
 pub mod permissions;
 pub mod pipe;
 pub mod pwd_watcher;
