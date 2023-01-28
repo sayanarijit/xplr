@@ -391,11 +391,13 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Get the relative path based on the given base path or current working dir.
 /// Will error if it fails to determine a relative path.
 ///
-/// Type: function( path:string, config:{ base:string|nil, name:boolean|nil }|nil ) -> path:string
+/// Type: function( path:string, config:Config|nil ) -> path:string
 ///
-/// If `base` is given, the path will be relative to it.
-/// If `name` is true, the name will be visible instead of dots `..` / `.`,
-/// except for the home directory `~`.
+/// Config type: { base:string|nil, with_prefix_dots: bookean|nil, without_suffix_dots:boolean|nil }
+///
+/// - If `base` path is given, the path will be relative to it.
+/// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+/// - If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
 ///
 /// Example:
 ///
@@ -403,13 +405,19 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.relative_to("/present/working/directory")
 /// -- "."
 ///
-/// xplr.util.relative_to("/present/working/directory", { name = true })
+/// xplr.util.relative_to("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
 /// -- "../directory"
 ///
 /// xplr.util.relative_to("/present/working")
 /// -- ".."
 ///
-/// xplr.util.relative_to("/present/working", { name = true })
+/// xplr.util.relative_to("/present/working", { without_suffix_dots = true })
 /// -- "../../working"
 ///
 /// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
@@ -432,11 +440,7 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// - or relative to the current working directory
 /// - or absolute path if it makes the most sense
 ///
-/// Type: function( path:string, config:{ base:string|nil, name:boolean|nil }|nil ) -> path:string
-///
-/// If `base` is given, the path will be relative to it.
-/// If `name` is true, the name will be visible instead of dots `..` / `.`,
-/// except for the home directory `~`.
+/// Type: Similar to `xplr.util.relative_to`
 ///
 /// Example:
 ///
@@ -447,12 +451,21 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.shortened("/present/working/directory")
 /// -- "."
 ///
-/// xplr.util.shortened("/present/working/directory", { name = true })
+/// xplr.util.shortened("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
 /// -- "../directory"
 ///
 /// xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
 /// -- "../../working/directory"
 /// ```
+///
+/// xplr.util.shortened("/tmp")
+/// -- "/tmp"
 pub fn shortened<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
         lua.create_function(move |lua, (path, config): (String, Option<Table>)| {

@@ -852,7 +852,8 @@ fn draw_selection<B: Backend>(
             let out = app
                 .config
                 .general
-                .selection_item
+                .selection
+                .item
                 .format
                 .as_ref()
                 .map(|f| {

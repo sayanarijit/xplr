@@ -246,6 +246,16 @@ xplr.config.general.table.col_widths = {
   { Percentage = 20 },
 }
 
+-- Renderer for each item in the selection list.
+--
+-- Type: nullable string
+xplr.config.general.selection.item.format = "builtin.fmt_general_selection_item"
+
+-- Style for each item in the selection list.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.selection.item.style = {}
+
 -- The content that is placed before the item name for each row by default.
 --
 -- Type: nullable string
@@ -274,17 +284,6 @@ xplr.config.general.focus_ui.suffix = "]"
 -- Style for focused item.
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.focus_ui.style = { add_modifiers = { "Bold" } }
-
--- Renderer for each item in the selection list.
---
--- Type: table with the following fields:
---
--- * format: nullable string
--- * style: [Style](https://xplr.dev/en/style)
-xplr.config.general.selection_item = {
-  format = "builtin.fmt_general_selection",
-  style = {}
-}
 
 -- The string placed before the item name for a selected row.
 --
@@ -2514,8 +2513,9 @@ xplr.fn.builtin.try_complete_path = function(m)
   end
 end
 
-xplr.fn.builtin.fmt_general_selection = function (n)
-  local shortened = xplr.util.shortened(n.absolute_path, { name = true })
+xplr.fn.builtin.fmt_general_selection_item = function(n)
+  local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
+  local shortened = xplr.util.shortened(n.absolute_path, sh_config)
   return xplr.util.paint(shortened, xplr.util.lscolor(n.absolute_path))
 end
 

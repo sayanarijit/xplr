@@ -61,7 +61,8 @@ where
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct RelativityConfig<B: AsRef<Path>> {
     base: Option<B>,
-    name: Option<bool>,
+    with_prefix_dots: Option<bool>,
+    without_suffix_dots: Option<bool>,
 }
 
 impl<B: AsRef<Path>> RelativityConfig<B> {
@@ -70,8 +71,13 @@ impl<B: AsRef<Path>> RelativityConfig<B> {
         self
     }
 
-    pub fn with_name(mut self) -> Self {
-        self.name = Some(true);
+    pub fn with_prefix_dots(mut self) -> Self {
+        self.with_prefix_dots = Some(true);
+        self
+    }
+
+    pub fn without_suffix_dots(mut self) -> Self {
+        self.without_suffix_dots = Some(true);
         self
     }
 }
@@ -98,9 +104,18 @@ where
         diff
     };
 
-    let relative = if !config.and_then(|c| c.name).unwrap_or(false) {
+    let relative = if config.and_then(|c| c.with_prefix_dots).unwrap_or(false)
+        && !relative.starts_with(".")
+        && !relative.starts_with("..")
+    {
+        PathBuf::from(".").join(relative)
+    } else {
         relative
-    } else if relative.to_str() == Some(".") {
+    };
+
+    let relative = if !config.and_then(|c| c.without_suffix_dots).unwrap_or(false) {
+        relative
+    } else if relative.ends_with(".") {
         match (path.parent(), path.file_name()) {
             (Some(_), Some(name)) => PathBuf::from("..").join(name),
             (_, _) => relative,
@@ -118,11 +133,6 @@ where
             }
             (_, _) => relative,
         }
-    } else if !relative.starts_with(".")
-        && !relative.starts_with("/")
-        && !relative.starts_with("..")
-    {
-        PathBuf::from(".").join(relative)
     } else {
         relative
     };
@@ -177,11 +187,25 @@ mod tests {
     #[test]
     fn test_relative_to_pwd() {
         let path = std::env::current_dir().unwrap();
-        let relative = relative_to(path, NONE).unwrap();
+
+        let relative = relative_to(&path, NONE).unwrap();
         assert_eq!(relative, PathBuf::from("."));
 
-        let path = std::env::current_dir().unwrap();
-        let relative = relative_to(&path, Some(&default().with_name())).unwrap();
+        let relative = relative_to(&path, Some(&default().with_prefix_dots())).unwrap();
+        assert_eq!(relative, PathBuf::from("."));
+
+        let relative =
+            relative_to(&path, Some(&default().without_suffix_dots())).unwrap();
+        assert_eq!(
+            relative,
+            PathBuf::from("..").join(path.file_name().unwrap())
+        );
+
+        let relative = relative_to(
+            &path,
+            Some(&default().with_prefix_dots().without_suffix_dots()),
+        )
+        .unwrap();
         assert_eq!(
             relative,
             PathBuf::from("..").join(path.file_name().unwrap())
@@ -196,7 +220,22 @@ mod tests {
         let relative = relative_to(parent, NONE).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
 
-        let relative = relative_to(&parent, Some(&default().with_name())).unwrap();
+        let relative =
+            relative_to(&parent, Some(&default().with_prefix_dots())).unwrap();
+        assert_eq!(relative, PathBuf::from(".."));
+
+        let relative =
+            relative_to(&parent, Some(&default().without_suffix_dots())).unwrap();
+        assert_eq!(
+            relative,
+            PathBuf::from("../..").join(parent.file_name().unwrap())
+        );
+
+        let relative = relative_to(
+            &parent,
+            Some(&default().with_prefix_dots().without_suffix_dots()),
+        )
+        .unwrap();
         assert_eq!(
             relative,
             PathBuf::from("../..").join(parent.file_name().unwrap())
@@ -206,8 +245,19 @@ mod tests {
     #[test]
     fn test_relative_to_file() {
         let path = std::env::current_dir().unwrap().join("foo").join("bar");
-        let relative = relative_to(path, NONE).unwrap();
+
+        let relative = relative_to(&path, NONE).unwrap();
         assert_eq!(relative, PathBuf::from("foo/bar"));
+
+        let relative = relative_to(&path, Some(&default().with_prefix_dots())).unwrap();
+        assert_eq!(relative, PathBuf::from("./foo/bar"));
+
+        let relative = relative_to(
+            &path,
+            Some(&default().with_prefix_dots().without_suffix_dots()),
+        )
+        .unwrap();
+        assert_eq!(relative, PathBuf::from("./foo/bar"));
     }
 
     #[test]
@@ -215,18 +265,46 @@ mod tests {
         let relative = relative_to("/foo", Some(&default().with_base("/"))).unwrap();
         assert_eq!(relative, PathBuf::from("foo"));
 
+        let relative = relative_to(
+            "/foo",
+            Some(
+                &default()
+                    .with_base("/")
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
+        assert_eq!(relative, PathBuf::from("./foo"));
+
         let relative = relative_to("/", Some(&default().with_base("/"))).unwrap();
         assert_eq!(relative, PathBuf::from("."));
 
-        let relative =
-            relative_to("/", Some(&default().with_base("/").with_name())).unwrap();
+        let relative = relative_to(
+            "/",
+            Some(
+                &default()
+                    .with_base("/")
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
         assert_eq!(relative, PathBuf::from("."));
 
         let relative = relative_to("/", Some(&default().with_base("/foo"))).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
 
-        let relative =
-            relative_to("/", Some(&default().with_base("/foo").with_name())).unwrap();
+        let relative = relative_to(
+            "/",
+            Some(
+                &default()
+                    .with_base("/foo")
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
         assert_eq!(relative, PathBuf::from(".."));
     }
 
@@ -234,7 +312,20 @@ mod tests {
     fn test_relative_to_base() {
         let path = "/some/directory";
         let base = "/another/foo/bar";
+
         let relative = relative_to(path, Some(&default().with_base(base))).unwrap();
+        assert_eq!(relative, PathBuf::from("../../../some/directory"));
+
+        let relative = relative_to(
+            path,
+            Some(
+                &default()
+                    .with_base(base)
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
         assert_eq!(relative, PathBuf::from("../../../some/directory"));
     }
 
@@ -245,10 +336,28 @@ mod tests {
         let res = shortened(path, NONE).unwrap();
         assert_eq!(res, "~");
 
-        let res = shortened(path, Some(&default().with_name())).unwrap();
+        let res = shortened(
+            path,
+            Some(&default().with_prefix_dots().without_suffix_dots()),
+        )
+        .unwrap();
+        assert_eq!(res, "~");
+
+        let res = shortened(
+            path,
+            Some(&default().with_prefix_dots().without_suffix_dots()),
+        )
+        .unwrap();
         assert_eq!(res, "~");
 
         let res = shortened(path.join("foo"), NONE).unwrap();
+        assert_eq!(res, "~/foo");
+
+        let res = shortened(
+            path.join("foo"),
+            Some(&default().with_prefix_dots().without_suffix_dots()),
+        )
+        .unwrap();
         assert_eq!(res, "~/foo");
 
         let res = shortened(format!("{}foo", path.to_string_lossy()), NONE).unwrap();
@@ -263,6 +372,18 @@ mod tests {
 
         let res = shortened(path, Some(&default().with_base(base))).unwrap();
         assert_eq!(res, "../../working/directory");
+
+        let res = shortened(
+            path,
+            Some(
+                &default()
+                    .with_base(base)
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
+        assert_eq!(res, "../../working/directory");
     }
 
     #[test]
@@ -272,7 +393,16 @@ mod tests {
         let res = shortened(path, Some(&default().with_base(path))).unwrap();
         assert_eq!(res, ".");
 
-        let res = shortened(path, Some(&default().with_base(path).with_name())).unwrap();
+        let res = shortened(
+            path,
+            Some(
+                &default()
+                    .with_base(path)
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
         assert_eq!(res, "../directory");
     }
 
@@ -284,7 +414,16 @@ mod tests {
         let res = shortened(&path, Some(&default().with_base(base))).unwrap();
         assert_eq!(res, "..");
 
-        let res = shortened(path, Some(&default().with_base(base).with_name())).unwrap();
+        let res = shortened(
+            path,
+            Some(
+                &default()
+                    .with_base(base)
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
         assert_eq!(res, "../../working");
     }
 
@@ -293,10 +432,43 @@ mod tests {
         let res = shortened("/", Some(&default().with_base("/"))).unwrap();
         assert_eq!(res, "/");
 
+        let res = shortened(
+            "/",
+            Some(
+                &default()
+                    .with_base("/")
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
+        assert_eq!(res, "/");
+
         let res = shortened("/foo", Some(&default().with_base("/"))).unwrap();
         assert_eq!(res, "foo");
 
-        let res = shortened("/", Some(&default().with_base("/foo"))).unwrap();
+        let res = shortened(
+            "/foo",
+            Some(
+                &default()
+                    .with_base("/")
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
+        assert_eq!(res, "/foo");
+
+        let res = shortened(
+            "/",
+            Some(
+                &default()
+                    .with_base("/foo")
+                    .with_prefix_dots()
+                    .without_suffix_dots(),
+            ),
+        )
+        .unwrap();
         assert_eq!(res, "/");
     }
 }
