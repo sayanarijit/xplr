@@ -31,7 +31,7 @@ pub fn get_tty() -> Result<fs::File> {
     match fs::OpenOptions::new().read(true).write(true).open(tty) {
         Ok(f) => Ok(f),
         Err(e) => {
-            bail!(format!("Failed to open {}. {}", tty, e))
+            bail!(format!("Failed to open {tty}. {e}"))
         }
     }
 }
@@ -140,7 +140,7 @@ fn call(
             if s.success() {
                 Ok(())
             } else {
-                Err(format!("process exited with code {}", &s))
+                Err(format!("process exited with code {s}"))
             }
         })
         .unwrap_or_else(|e| Err(e.to_string()));
