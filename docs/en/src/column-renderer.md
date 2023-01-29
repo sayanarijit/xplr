@@ -257,7 +257,7 @@ The total number of the nodes.
 
 ### style
 
-Type: mapping of string and string
+Type: [Style][39]
 
 The applicable [style object][39] for the node.
 
