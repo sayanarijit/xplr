@@ -38,6 +38,7 @@ path-absolutize = "3.0.14"
 which = "4.3.0"
 nu-ansi-term = "0.46.0" 
 textwrap = "0.16"
+snailquote = "0.3.1"
 
 [dependencies.lscolors]
 version = "0.13.0"

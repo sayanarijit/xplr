@@ -710,7 +710,9 @@ xplr.config.general.global_key_bindings = {
 -- The style for the directory nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.directory.style = {}
+xplr.config.node_types.directory.style = {
+  fg = "Blue",
+}
 
 -- Metadata for the directory nodes.
 -- You can set as many metadata as you want.
@@ -746,7 +748,10 @@ xplr.config.node_types.file.meta.icon = "ƒ"
 -- The style for the symlink nodes.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.symlink.style = {}
+xplr.config.node_types.symlink.style = {
+  fg = "Magenta",
+  add_modifiers = { "Italic" },
+}
 
 -- Metadata for the symlink nodes.
 -- You can set as many metadata as you want.
@@ -2615,9 +2620,16 @@ xplr.fn.builtin.try_complete_path = function(m)
 end
 
 xplr.fn.builtin.fmt_general_selection_item = function(n)
+  local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
   local shortened = xplr.util.shorten(n.absolute_path, sh_config)
-  return xplr.util.paint(shortened, xplr.util.lscolor(n.absolute_path))
+  if n.is_dir then
+    shortened = shortened .. "/"
+  end
+  local ls_style = xplr.util.lscolor(n.absolute_path)
+  local meta_style = xplr.util.node_type(n).style
+  local style = xplr.util.style_mix({ meta_style, ls_style })
+  return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
 
 -- Renders the first column in the table
@@ -2636,11 +2648,10 @@ end
 
 -- Renders the second column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
+  local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local r = m.tree .. m.prefix
-
-  local function path_escape(path)
-    return string.gsub(string.gsub(path, "\\", "\\\\"), "\n", "\\n")
-  end
+  local style = xplr.util.lscolor(m.absolute_path)
+  style = xplr.util.style_mix({ m.style, style })
 
   if m.meta.icon == nil then
     r = r .. ""
@@ -2648,11 +2659,11 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     r = r .. m.meta.icon .. " "
   end
 
-  r = r .. path_escape(m.relative_path)
-
+  local rel = m.relative_path
   if m.is_dir then
-    r = r .. "/"
+    rel = rel .. "/"
   end
+  r = r .. xplr.util.paint(xplr.util.shell_escape(rel), style)
 
   r = r .. m.suffix .. " "
 
@@ -2663,15 +2674,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
       r = r .. "×"
     else
       local symlink_path = xplr.util.shorten(m.symlink.absolute_path)
-      r = r .. path_escape(symlink_path)
-
       if m.symlink.is_dir then
-        r = r .. "/"
+        symlink_path = symlink_path .. "/"
       end
+      r = r .. symlink_path:gsub("\n", nl)
     end
   end
-  local style = xplr.util.lscolor(m.absolute_path)
-  return xplr.util.paint(r, style)
+
+  return r
 end
 
 -- Renders the third column in the table

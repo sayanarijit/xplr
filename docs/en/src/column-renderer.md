@@ -73,6 +73,7 @@ The special argument contains the following fields
 - [is_selected][25]
 - [is_focused][26]
 - [total][27]
+- [style][38]
 - [meta][28]
 
 ### parent
@@ -254,6 +255,12 @@ Type: integer
 
 The total number of the nodes.
 
+### style
+
+Type: [Style][39]
+
+The applicable [style object][39] for the node.
+
 ### meta
 
 Type: mapping of string and string
@@ -333,3 +340,5 @@ It contains the following fields.
 [35]: #last_modified
 [36]: #uid
 [37]: #gid
+[38]: #style
+[39]: style.md#style
