@@ -127,7 +127,24 @@ xplr.util.node("/")
 -- nil
 ```
 
-[5]: https://xplr.dev/en/lua-function-calls#node
+### xplr.util.node_type
+
+Get the configured [Node Type][6] of a given [Node][5].
+
+Type: function( [Node][5], [NodeTypesConfig][7]|nil ) -> [NodeType][5]
+
+If the second argument is missing, global config `xplr.config.node_types`
+will be used.
+
+Example:
+
+```lua
+xplr.util.node_type(app.focused_node)
+-- { style = { fg = ..., ... }, meta = { icon = ..., ... } ... }
+
+xplr.util.node_type(xplr.util.node("/foo/bar"), xplr.config.node_types)
+-- { style = { fg = ..., ... }, meta = { icon = ..., ... } ... }
+```
 
 ### xplr.util.dirname
 
@@ -259,9 +276,6 @@ xplr.util.explore("/tmp", app.explorer_config)
 -- { { absolute_path = "/tmp/a", ... }, ... }
 ```
 
-[1]: https://xplr.dev/en/lua-function-calls#explorer-config
-[2]: https://xplr.dev/en/lua-function-calls#node
-
 ### xplr.util.shell_execute
 
 Execute shell commands safely.
@@ -289,6 +303,19 @@ Example:
 ```lua
 xplr.util.shell_quote("a'b\"c")
 -- 'a'"'"'b"c'
+```
+
+### xplr.util.shell_escape
+
+Escape commands and paths safely.
+
+Type: function( string ) -> string
+
+Example:
+
+```lua
+xplr.util.shell_escape("a'b\"c")
+-- "\"a'b\\\"c\""
 ```
 
 ### xplr.util.from_json
@@ -353,7 +380,7 @@ xplr.util.to_yaml({ foo = "bar" })
 Get a [Style][3] object for the given path based on the LS_COLORS
 environment variable.
 
-Type: function( path:string ) -> Style[3]|nil
+Type: function( path:string ) -> [Style][3]|nil
 
 Example:
 
@@ -361,8 +388,6 @@ Example:
 xplr.util.lscolor("Desktop")
 -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 ```
-
-[3]: https://xplr.dev/en/style
 
 ### xplr.util.paint
 
@@ -375,6 +400,19 @@ Example:
 ```lua
 xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
 -- "\u001b[31mDesktop\u001b[0m"
+```
+
+### xplr.util.style_mix
+
+Mix multiple [Style][3] objects into one.
+
+Type: function( [Style][3], [Style][3], ... ) -> Style[3]
+
+Example:
+
+```lua
+xplr.util.style_mix({ fg = "Red" }, { bg = "Blue" }, { add_modifiers = {"Bold"} })
+-- { fg = "Red", bg = "Blue", add_modifiers = { "Bold" }, sub_modifiers = {} }
 ```
 
 ### xplr.util.textwrap
@@ -431,4 +469,10 @@ xplr.util.layout_replace(layout, "Table", "Selection")
 -- }
 ```
 
+[1]: https://xplr.dev/en/lua-function-calls#explorer-config
+[2]: https://xplr.dev/en/lua-function-calls#node
+[3]: https://xplr.dev/en/style
 [4]: https://xplr.dev/en/layout
+[5]: https://xplr.dev/en/lua-function-calls#node
+[6]: https://xplr.dev/en/node-type
+[7]: https://xplr.dev/en/node-types

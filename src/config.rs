@@ -3,6 +3,7 @@ use crate::app::HelpMenuLine;
 use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
+use crate::node::Node;
 use crate::ui::Border;
 use crate::ui::BorderType;
 use crate::ui::Constraint;
@@ -78,6 +79,40 @@ pub struct NodeTypesConfig {
 
     #[serde(default)]
     pub special: HashMap<String, NodeTypeConfig>,
+}
+
+impl NodeTypesConfig {
+    pub fn get(&self, node: &Node) -> NodeTypeConfig {
+        let mut node_type = if node.is_symlink {
+            self.symlink.to_owned()
+        } else if node.is_dir {
+            self.directory.to_owned()
+        } else {
+            self.file.to_owned()
+        };
+
+        let mut me = node.mime_essence.splitn(2, '/');
+        let mimetype: String = me.next().map(|s| s.into()).unwrap_or_default();
+        let mimesub: String = me.next().map(|s| s.into()).unwrap_or_default();
+
+        if let Some(conf) = self
+            .mime_essence
+            .get(&mimetype)
+            .and_then(|t| t.get(&mimesub).or_else(|| t.get("*")))
+        {
+            node_type = node_type.extend(conf);
+        }
+
+        if let Some(conf) = self.extension.get(&node.extension) {
+            node_type = node_type.extend(conf);
+        }
+
+        if let Some(conf) = self.special.get(&node.relative_path) {
+            node_type = node_type.extend(conf);
+        }
+
+        node_type
+    }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]

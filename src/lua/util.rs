@@ -1,4 +1,5 @@
 use crate::app::VERSION;
+use crate::config::NodeTypesConfig;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
@@ -24,38 +25,6 @@ use serde_yaml as yaml;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
-
-pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
-    let mut util = lua.create_table()?;
-
-    util = version(util, lua)?;
-    util = clone(util, lua)?;
-    util = exists(util, lua)?;
-    util = is_dir(util, lua)?;
-    util = is_file(util, lua)?;
-    util = is_symlink(util, lua)?;
-    util = is_absolute(util, lua)?;
-    util = path_split(util, lua)?;
-    util = node(util, lua)?;
-    util = dirname(util, lua)?;
-    util = basename(util, lua)?;
-    util = absolute(util, lua)?;
-    util = relative_to(util, lua)?;
-    util = shorten(util, lua)?;
-    util = explore(util, lua)?;
-    util = shell_execute(util, lua)?;
-    util = shell_quote(util, lua)?;
-    util = from_json(util, lua)?;
-    util = to_json(util, lua)?;
-    util = from_yaml(util, lua)?;
-    util = to_yaml(util, lua)?;
-    util = lscolor(util, lua)?;
-    util = paint(util, lua)?;
-    util = textwrap(util, lua)?;
-    util = layout_replace(util, lua)?;
-
-    Ok(util)
-}
 
 /// Get the xplr version details.
 ///
@@ -241,8 +210,6 @@ pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.node("/")
 /// -- nil
 /// ```
-///
-/// [5]: https://xplr.dev/en/lua-function-calls#node
 pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(move |lua, path: String| {
         let path = PathBuf::from(path);
@@ -259,6 +226,43 @@ pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         }
     })?;
     util.set("node", func)?;
+    Ok(util)
+}
+
+/// Get the configured [Node Type][6] of a given [Node][5].
+///
+/// Type: function( [Node][5], [NodeTypesConfig][7]|nil ) -> [NodeType][5]
+///
+/// If the second argument is missing, global config `xplr.config.node_types`
+/// will be used.
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.node_type(app.focused_node)
+/// -- { style = { fg = ..., ... }, meta = { icon = ..., ... } ... }
+///
+/// xplr.util.node_type(xplr.util.node("/foo/bar"), xplr.config.node_types)
+/// -- { style = { fg = ..., ... }, meta = { icon = ..., ... } ... }
+/// ```
+pub fn node_type<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |lua, (node, config): (Table, Option<Table>)| {
+            let node: Node = lua.from_value(Value::Table(node))?;
+            let config: Table = if let Some(config) = config {
+                config
+            } else {
+                lua.globals()
+                    .get::<_, Table>("xplr")?
+                    .get::<_, Table>("config")?
+                    .get::<_, Table>("node_types")?
+            };
+            let config: NodeTypesConfig = lua.from_value(Value::Table(config))?;
+            let node_type = config.get(&node);
+            let node_type = lua::serialize(lua, &node_type).map_err(LuaError::custom)?;
+            Ok(node_type)
+        })?;
+    util.set("node_type", func)?;
     Ok(util)
 }
 
@@ -430,9 +434,6 @@ pub fn shorten<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.explore("/tmp", app.explorer_config)
 /// -- { { absolute_path = "/tmp/a", ... }, ... }
 /// ```
-///
-/// [1]: https://xplr.dev/en/lua-function-calls#explorer-config
-/// [2]: https://xplr.dev/en/lua-function-calls#node
 pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
         let config: ExplorerConfig = if let Some(cfg) = config {
@@ -498,6 +499,25 @@ pub fn shell_quote<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         Ok(format!("'{}'", string.replace('\'', r#"'"'"'"#)))
     })?;
     util.set("shell_quote", func)?;
+    Ok(util)
+}
+
+/// Escape commands and paths safely.
+///
+/// Type: function( string ) -> string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.shell_escape("a'b\"c")
+/// -- "\"a'b\\\"c\""
+/// ```
+pub fn shell_escape<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |_, string: String| {
+        let val = path::escape(&string).to_string();
+        Ok(val)
+    })?;
+    util.set("shell_escape", func)?;
     Ok(util)
 }
 
@@ -604,7 +624,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Get a [Style][3] object for the given path based on the LS_COLORS
 /// environment variable.
 ///
-/// Type: function( path:string ) -> Style[3]|nil
+/// Type: function( path:string ) -> [Style][3]|nil
 ///
 /// Example:
 ///
@@ -612,15 +632,9 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.lscolor("Desktop")
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
-///
-/// [3]: https://xplr.dev/en/style
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
-        if *ui::NO_COLOR {
-            return Ok(mlua::Nil);
-        }
-
         let style = lscolors.style_for_path(path).map(Style::from);
         lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
@@ -654,6 +668,30 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             Ok::<String, LuaError>(ansi_style.paint(string).to_string())
         })?;
     util.set("paint", func)?;
+    Ok(util)
+}
+
+/// Mix multiple [Style][3] objects into one.
+///
+/// Type: function( [Style][3], [Style][3], ... ) -> Style[3]
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.style_mix({ fg = "Red" }, { bg = "Blue" }, { add_modifiers = {"Bold"} })
+/// -- { fg = "Red", bg = "Blue", add_modifiers = { "Bold" }, sub_modifiers = {} }
+/// ```
+pub fn style_mix<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, styles: Vec<Table>| {
+        let mut style = Style::default();
+        for other in styles {
+            let other: Style = lua.from_value(Value::Table(other))?;
+            style = style.extend(&other);
+        }
+
+        lua::serialize(lua, &style).map_err(LuaError::custom)
+    })?;
+    util.set("style_mix", func)?;
     Ok(util)
 }
 
@@ -721,8 +759,6 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   }
 /// -- }
 /// ```
-///
-/// [4]: https://xplr.dev/en/layout
 pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(
         move |lua, (layout, target, replacement): (Table, Table, Table)| {
@@ -737,5 +773,49 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
         },
     )?;
     util.set("layout_replaced", func)?;
+    Ok(util)
+}
+
+///
+/// [1]: https://xplr.dev/en/lua-function-calls#explorer-config
+/// [2]: https://xplr.dev/en/lua-function-calls#node
+/// [3]: https://xplr.dev/en/style
+/// [4]: https://xplr.dev/en/layout
+/// [5]: https://xplr.dev/en/lua-function-calls#node
+/// [6]: https://xplr.dev/en/node-type
+/// [7]: https://xplr.dev/en/node-types
+
+pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
+    let mut util = lua.create_table()?;
+
+    util = version(util, lua)?;
+    util = clone(util, lua)?;
+    util = exists(util, lua)?;
+    util = is_dir(util, lua)?;
+    util = is_file(util, lua)?;
+    util = is_symlink(util, lua)?;
+    util = is_absolute(util, lua)?;
+    util = path_split(util, lua)?;
+    util = node(util, lua)?;
+    util = node_type(util, lua)?;
+    util = dirname(util, lua)?;
+    util = basename(util, lua)?;
+    util = absolute(util, lua)?;
+    util = relative_to(util, lua)?;
+    util = shorten(util, lua)?;
+    util = explore(util, lua)?;
+    util = shell_execute(util, lua)?;
+    util = shell_quote(util, lua)?;
+    util = shell_escape(util, lua)?;
+    util = from_json(util, lua)?;
+    util = to_json(util, lua)?;
+    util = from_yaml(util, lua)?;
+    util = to_yaml(util, lua)?;
+    util = lscolor(util, lua)?;
+    util = paint(util, lua)?;
+    util = style_mix(util, lua)?;
+    util = textwrap(util, lua)?;
+    util = layout_replace(util, lua)?;
+
     Ok(util)
 }

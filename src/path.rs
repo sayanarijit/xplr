@@ -1,6 +1,7 @@
 use anyhow::{bail, Result};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+pub use snailquote::escape;
 use std::path::{Component, Path, PathBuf};
 
 lazy_static! {
@@ -469,5 +470,26 @@ mod tests {
         )
         .unwrap();
         assert_eq!(res, "/");
+    }
+
+    #[test]
+    fn test_path_escape() {
+        let text = "foo".to_string();
+        assert_eq!(escape(&text), "foo");
+
+        let text = "foo bar".to_string();
+        assert_eq!(escape(&text), "'foo bar'");
+
+        let text = "foo\nbar".to_string();
+        assert_eq!(escape(&text), "\"foo\\nbar\"");
+
+        let text = "foo$bar".to_string();
+        assert_eq!(escape(&text), "'foo$bar'");
+
+        let text = "foo'$\n'bar".to_string();
+        assert_eq!(escape(&text), "\"foo'\\$\\n'bar\"");
+
+        let text = "a'b\"c".to_string();
+        assert_eq!(escape(&text), "\"a'b\\\"c\"");
     }
 }

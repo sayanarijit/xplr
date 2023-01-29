@@ -1,9 +1,9 @@
-use crate::app;
 use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
+use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
@@ -278,6 +278,21 @@ impl Modifier {
     }
 }
 
+fn extend_optional_modifiers(
+    a: Option<IndexSet<Modifier>>,
+    b: Option<IndexSet<Modifier>>,
+) -> Option<IndexSet<Modifier>> {
+    match (a, b) {
+        (Some(mut a), Some(b)) => {
+            a.extend(b);
+            Some(a)
+        }
+        (Some(a), None) => Some(a),
+        (None, Some(b)) => Some(b),
+        (None, None) => None,
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
@@ -291,8 +306,14 @@ impl Style {
     pub fn extend(mut self, other: &Self) -> Self {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.add_modifiers = other.add_modifiers.to_owned().or(self.add_modifiers);
-        self.sub_modifiers = other.sub_modifiers.to_owned().or(self.sub_modifiers);
+        self.add_modifiers = extend_optional_modifiers(
+            self.add_modifiers,
+            other.add_modifiers.to_owned(),
+        );
+        self.sub_modifiers = extend_optional_modifiers(
+            self.sub_modifiers,
+            other.sub_modifiers.to_owned(),
+        );
         self
     }
 }
@@ -564,6 +585,7 @@ pub struct NodeUiMetadata {
     pub is_focused: bool,
     pub total: usize,
     pub meta: HashMap<String, String>,
+    pub style: Style,
 }
 
 impl NodeUiMetadata {
@@ -580,6 +602,7 @@ impl NodeUiMetadata {
         is_focused: bool,
         total: usize,
         meta: HashMap<String, String>,
+        style: Style,
     ) -> Self {
         Self {
             parent: node.parent.to_owned(),
@@ -612,6 +635,7 @@ impl NodeUiMetadata {
             is_focused,
             total,
             meta,
+            style,
         }
     }
 }
@@ -686,40 +710,7 @@ fn draw_table<B: Backend>(
                         })
                         .unwrap_or_default();
 
-                    let mut me = node.mime_essence.splitn(2, '/');
-                    let mimetype: String =
-                        me.next().map(|s| s.into()).unwrap_or_default();
-                    let mimesub: String =
-                        me.next().map(|s| s.into()).unwrap_or_default();
-
-                    let mut node_type = if node.is_symlink {
-                        app_config.node_types.symlink.to_owned()
-                    } else if node.is_dir {
-                        app_config.node_types.directory.to_owned()
-                    } else {
-                        app_config.node_types.file.to_owned()
-                    };
-
-                    if let Some(conf) = app_config
-                        .node_types
-                        .mime_essence
-                        .get(&mimetype)
-                        .and_then(|t| t.get(&mimesub).or_else(|| t.get("*")))
-                    {
-                        node_type = node_type.extend(conf);
-                    }
-
-                    if let Some(conf) =
-                        app_config.node_types.extension.get(&node.extension)
-                    {
-                        node_type = node_type.extend(conf);
-                    }
-
-                    if let Some(conf) =
-                        app_config.node_types.special.get(&node.relative_path)
-                    {
-                        node_type = node_type.extend(conf);
-                    }
+                    let node_type = app_config.node_types.get(node);
 
                     let (relative_index, is_before_focus, is_after_focus) =
                         match dir.focus.cmp(&index) {
@@ -763,6 +754,7 @@ fn draw_table<B: Backend>(
                         is_focused,
                         dir.total,
                         node_type.meta,
+                        style,
                     );
 
                     let cols = lua::serialize::<NodeUiMetadata>(lua, &meta)
@@ -789,7 +781,7 @@ fn draw_table<B: Backend>(
                         .map(|x| Cell::from(x.to_owned()))
                         .collect::<Vec<Cell>>();
 
-                    Row::new(cols).style(style.into())
+                    Row::new(cols)
                 })
                 .collect::<Vec<Row>>()
         })
@@ -810,9 +802,9 @@ fn draw_table<B: Backend>(
     } else {
         &app.pwd
     }
-    .trim_matches('/')
-    .replace('\\', "\\\\")
-    .replace('\n', "\\n");
+    .trim_matches('/');
+
+    let pwd = path::escape(&pwd);
 
     let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
 
@@ -886,8 +878,6 @@ fn draw_selection<B: Backend>(
                     lua::serialize::<Node>(lua, n)
                         .map(|n| lua::call(lua, f, n).unwrap_or_else(|e| e.to_string()))
                         .unwrap_or_else(|e| e.to_string())
-                        .replace('\\', "\\\\")
-                        .replace('\n', "\\n")
                 })
                 .unwrap_or_else(|| n.absolute_path.clone());
             string_to_text(out)
