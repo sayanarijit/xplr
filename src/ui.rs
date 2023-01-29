@@ -804,7 +804,7 @@ fn draw_table<B: Backend>(
     }
     .trim_matches('/');
 
-    let pwd = path::escape(&pwd);
+    let pwd = path::escape(pwd);
 
     let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
 
@@ -1541,7 +1541,11 @@ mod tests {
             Style {
                 fg: Some(Color::Cyan),
                 bg: Some(Color::Magenta),
-                add_modifiers: modifier(Modifier::CrossedOut),
+                add_modifiers: Some(
+                    vec![Modifier::Bold, Modifier::CrossedOut]
+                        .into_iter()
+                        .collect()
+                ),
                 sub_modifiers: modifier(Modifier::Italic),
             }
         );
@@ -1551,7 +1555,11 @@ mod tests {
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Magenta),
-                add_modifiers: modifier(Modifier::Bold),
+                add_modifiers: Some(
+                    vec![Modifier::Bold, Modifier::CrossedOut]
+                        .into_iter()
+                        .collect()
+                ),
                 sub_modifiers: modifier(Modifier::Italic),
             }
         );
