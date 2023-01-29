@@ -1754,8 +1754,7 @@ impl App {
                 .join("");
 
             format!(
-                "### {name}{d}{d} key             | remaps                    | action\n --------------- | ------------------------- | ------{d}{help}{d}",
-                d = delimiter
+                "### {name}{delimiter}{delimiter} key             | remaps                    | action\n --------------- | ------------------------- | ------{delimiter}{help}{delimiter}"
             )
         })
         .collect::<Vec<String>>()

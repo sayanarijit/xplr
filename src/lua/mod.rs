@@ -143,7 +143,7 @@ pub fn call<'lua, R: Deserialize<'lua>>(
     func: &str,
     arg: mlua::Value<'lua>,
 ) -> Result<R> {
-    let func = format!("xplr.fn.{}", func);
+    let func = format!("xplr.fn.{func}");
     let func = resolve_fn(&lua.globals(), &func)?;
     let res: mlua::Value = func.call(arg)?;
     let res: R = lua.from_value(res)?;

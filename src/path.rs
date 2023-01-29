@@ -220,19 +220,18 @@ mod tests {
         let relative = relative_to(parent, NONE).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
 
-        let relative =
-            relative_to(&parent, Some(&default().with_prefix_dots())).unwrap();
+        let relative = relative_to(parent, Some(&default().with_prefix_dots())).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
 
         let relative =
-            relative_to(&parent, Some(&default().without_suffix_dots())).unwrap();
+            relative_to(parent, Some(&default().without_suffix_dots())).unwrap();
         assert_eq!(
             relative,
             PathBuf::from("../..").join(parent.file_name().unwrap())
         );
 
         let relative = relative_to(
-            &parent,
+            parent,
             Some(&default().with_prefix_dots().without_suffix_dots()),
         )
         .unwrap();
@@ -411,7 +410,7 @@ mod tests {
         let path = "/present/working";
         let base = "/present/working/directory";
 
-        let res = shorten(&path, Some(&default().with_base(base))).unwrap();
+        let res = shorten(path, Some(&default().with_base(base))).unwrap();
         assert_eq!(res, "..");
 
         let res = shorten(
