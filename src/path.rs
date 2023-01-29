@@ -140,7 +140,7 @@ where
     Ok(relative)
 }
 
-pub fn shortened<P, B>(path: P, config: Option<&RelativityConfig<B>>) -> Result<String>
+pub fn shorten<P, B>(path: P, config: Option<&RelativityConfig<B>>) -> Result<String>
 where
     P: AsRef<Path>,
     B: AsRef<Path>,
@@ -330,50 +330,50 @@ mod tests {
     }
 
     #[test]
-    fn test_shortened_home() {
+    fn test_shorten_home() {
         let path = HOME.as_ref().unwrap();
 
-        let res = shortened(path, NONE).unwrap();
+        let res = shorten(path, NONE).unwrap();
         assert_eq!(res, "~");
 
-        let res = shortened(
+        let res = shorten(
             path,
             Some(&default().with_prefix_dots().without_suffix_dots()),
         )
         .unwrap();
         assert_eq!(res, "~");
 
-        let res = shortened(
+        let res = shorten(
             path,
             Some(&default().with_prefix_dots().without_suffix_dots()),
         )
         .unwrap();
         assert_eq!(res, "~");
 
-        let res = shortened(path.join("foo"), NONE).unwrap();
+        let res = shorten(path.join("foo"), NONE).unwrap();
         assert_eq!(res, "~/foo");
 
-        let res = shortened(
+        let res = shorten(
             path.join("foo"),
             Some(&default().with_prefix_dots().without_suffix_dots()),
         )
         .unwrap();
         assert_eq!(res, "~/foo");
 
-        let res = shortened(format!("{}foo", path.to_string_lossy()), NONE).unwrap();
+        let res = shorten(format!("{}foo", path.to_string_lossy()), NONE).unwrap();
         assert_ne!(res, "~/foo");
         assert_eq!(res, format!("{}foo", path.to_string_lossy()));
     }
 
     #[test]
-    fn test_shortened_base() {
+    fn test_shorten_base() {
         let path = "/present/working/directory";
         let base = "/present/foo/bar";
 
-        let res = shortened(path, Some(&default().with_base(base))).unwrap();
+        let res = shorten(path, Some(&default().with_base(base))).unwrap();
         assert_eq!(res, "../../working/directory");
 
-        let res = shortened(
+        let res = shorten(
             path,
             Some(
                 &default()
@@ -387,13 +387,13 @@ mod tests {
     }
 
     #[test]
-    fn test_shortened_pwd() {
+    fn test_shorten_pwd() {
         let path = "/present/working/directory";
 
-        let res = shortened(path, Some(&default().with_base(path))).unwrap();
+        let res = shorten(path, Some(&default().with_base(path))).unwrap();
         assert_eq!(res, ".");
 
-        let res = shortened(
+        let res = shorten(
             path,
             Some(
                 &default()
@@ -407,14 +407,14 @@ mod tests {
     }
 
     #[test]
-    fn test_shortened_parent() {
+    fn test_shorten_parent() {
         let path = "/present/working";
         let base = "/present/working/directory";
 
-        let res = shortened(&path, Some(&default().with_base(base))).unwrap();
+        let res = shorten(&path, Some(&default().with_base(base))).unwrap();
         assert_eq!(res, "..");
 
-        let res = shortened(
+        let res = shorten(
             path,
             Some(
                 &default()
@@ -428,11 +428,11 @@ mod tests {
     }
 
     #[test]
-    fn test_shortened_root() {
-        let res = shortened("/", Some(&default().with_base("/"))).unwrap();
+    fn test_shorten_root() {
+        let res = shorten("/", Some(&default().with_base("/"))).unwrap();
         assert_eq!(res, "/");
 
-        let res = shortened(
+        let res = shorten(
             "/",
             Some(
                 &default()
@@ -444,10 +444,10 @@ mod tests {
         .unwrap();
         assert_eq!(res, "/");
 
-        let res = shortened("/foo", Some(&default().with_base("/"))).unwrap();
+        let res = shorten("/foo", Some(&default().with_base("/"))).unwrap();
         assert_eq!(res, "foo");
 
-        let res = shortened(
+        let res = shorten(
             "/foo",
             Some(
                 &default()
@@ -459,7 +459,7 @@ mod tests {
         .unwrap();
         assert_eq!(res, "/foo");
 
-        let res = shortened(
+        let res = shorten(
             "/",
             Some(
                 &default()

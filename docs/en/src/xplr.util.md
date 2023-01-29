@@ -169,6 +169,79 @@ xplr.util.absolute("foo/bar")
 -- "/tmp/foo/bar"
 ```
 
+### xplr.util.relative_to
+
+Get the relative path based on the given base path or current working dir.
+Will error if it fails to determine a relative path.
+
+Type: function( path:string, config:Config|nil ) -> path:string
+
+Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+
+- If `base` path is given, the path will be relative to it.
+- If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+- If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
+
+Example:
+
+```lua
+xplr.util.relative_to("/present/working/directory")
+-- "."
+
+xplr.util.relative_to("/present/working/directory/foo")
+-- "foo"
+
+xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+-- "./foo"
+
+xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
+-- "../directory"
+
+xplr.util.relative_to("/present/working")
+-- ".."
+
+xplr.util.relative_to("/present/working", { without_suffix_dots = true })
+-- "../../working"
+
+xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
+-- "../../working/directory"
+```
+
+### xplr.util.shorten
+
+Shorten the given absolute path using the following rules:
+
+- either relative to your home dir if it makes sense
+- or relative to the current working directory
+- or absolute path if it makes the most sense
+
+Type: Similar to `xplr.util.relative_to`
+
+Example:
+
+```lua
+xplr.util.shorten("/home/username/.config")
+-- "~/.config"
+
+xplr.util.shorten("/present/working/directory")
+-- "."
+
+xplr.util.shorten("/present/working/directory/foo")
+-- "foo"
+
+xplr.util.shorten("/present/working/directory/foo", { with_prefix_dots = true })
+-- "./foo"
+
+xplr.util.shorten("/present/working/directory", { without_suffix_dots = true })
+-- "../directory"
+
+xplr.util.shorten("/present/working/directory", { base = "/present/foo/bar" })
+-- "../../working/directory"
+
+xplr.util.shorten("/tmp")
+-- "/tmp"
+```
+
 ### xplr.util.explore
 
 Explore directories with the given explorer config.
@@ -302,79 +375,6 @@ Example:
 ```lua
 xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
 -- "\u001b[31mDesktop\u001b[0m"
-```
-
-### xplr.util.relative_to
-
-Get the relative path based on the given base path or current working dir.
-Will error if it fails to determine a relative path.
-
-Type: function( path:string, config:Config|nil ) -> path:string
-
-Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
-
-- If `base` path is given, the path will be relative to it.
-- If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
-- If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
-
-Example:
-
-```lua
-xplr.util.relative_to("/present/working/directory")
--- "."
-
-xplr.util.relative_to("/present/working/directory/foo")
--- "foo"
-
-xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
--- "./foo"
-
-xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
--- "../directory"
-
-xplr.util.relative_to("/present/working")
--- ".."
-
-xplr.util.relative_to("/present/working", { without_suffix_dots = true })
--- "../../working"
-
-xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
--- "../../working/directory"
-```
-
-### xplr.util.shortened
-
-Shorten the given absolute path using the following rules:
-
-- either relative to your home dir if it makes sense
-- or relative to the current working directory
-- or absolute path if it makes the most sense
-
-Type: Similar to `xplr.util.relative_to`
-
-Example:
-
-```lua
-xplr.util.shortened("/home/username/.config")
--- "~/.config"
-
-xplr.util.shortened("/present/working/directory")
--- "."
-
-xplr.util.shortened("/present/working/directory/foo")
--- "foo"
-
-xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
--- "./foo"
-
-xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
--- "../directory"
-
-xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
--- "../../working/directory"
-
-xplr.util.shortened("/tmp")
--- "/tmp"
 ```
 
 ### xplr.util.textwrap

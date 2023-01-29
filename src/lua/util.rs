@@ -40,6 +40,8 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = dirname(util, lua)?;
     util = basename(util, lua)?;
     util = absolute(util, lua)?;
+    util = relative_to(util, lua)?;
+    util = shorten(util, lua)?;
     util = explore(util, lua)?;
     util = shell_execute(util, lua)?;
     util = shell_quote(util, lua)?;
@@ -49,8 +51,6 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_yaml(util, lua)?;
     util = lscolor(util, lua)?;
     util = paint(util, lua)?;
-    util = relative_to(util, lua)?;
-    util = shortened(util, lua)?;
     util = textwrap(util, lua)?;
     util = layout_replace(util, lua)?;
 
@@ -327,6 +327,95 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
+/// Get the relative path based on the given base path or current working dir.
+/// Will error if it fails to determine a relative path.
+///
+/// Type: function( path:string, config:Config|nil ) -> path:string
+///
+/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+///
+/// - If `base` path is given, the path will be relative to it.
+/// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+/// - If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.relative_to("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.relative_to("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
+/// -- "../directory"
+///
+/// xplr.util.relative_to("/present/working")
+/// -- ".."
+///
+/// xplr.util.relative_to("/present/working", { without_suffix_dots = true })
+/// -- "../../working"
+///
+/// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
+/// -- "../../working/directory"
+/// ```
+pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
+        let config: Option<RelativityConfig<String>> =
+            lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
+        path::relative_to(path, config.as_ref())
+            .map(|p| p.to_string_lossy().to_string())
+            .map_err(LuaError::custom)
+    })?;
+    util.set("relative_to", func)?;
+    Ok(util)
+}
+
+/// Shorten the given absolute path using the following rules:
+/// - either relative to your home dir if it makes sense
+/// - or relative to the current working directory
+/// - or absolute path if it makes the most sense
+///
+/// Type: Similar to `xplr.util.relative_to`
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.shorten("/home/username/.config")
+/// -- "~/.config"
+///
+/// xplr.util.shorten("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.shorten("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.shorten("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.shorten("/present/working/directory", { without_suffix_dots = true })
+/// -- "../directory"
+///
+/// xplr.util.shorten("/present/working/directory", { base = "/present/foo/bar" })
+/// -- "../../working/directory"
+///
+/// xplr.util.shorten("/tmp")
+/// -- "/tmp"
+/// ```
+pub fn shorten<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
+            let config: Option<RelativityConfig<String>> =
+                lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
+            path::shorten(path, config.as_ref()).map_err(LuaError::custom)
+        })?;
+    util.set("shortened", func)?;
+    Ok(util)
+}
+
 /// Explore directories with the given explorer config.
 ///
 /// Type: function( path:string, [ExplorerConfig][1]|nil ) -> { [Node][2], ... }
@@ -565,95 +654,6 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             Ok::<String, LuaError>(ansi_style.paint(string).to_string())
         })?;
     util.set("paint", func)?;
-    Ok(util)
-}
-
-/// Get the relative path based on the given base path or current working dir.
-/// Will error if it fails to determine a relative path.
-///
-/// Type: function( path:string, config:Config|nil ) -> path:string
-///
-/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
-///
-/// - If `base` path is given, the path will be relative to it.
-/// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
-/// - If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
-///
-/// Example:
-///
-/// ```lua
-/// xplr.util.relative_to("/present/working/directory")
-/// -- "."
-///
-/// xplr.util.relative_to("/present/working/directory/foo")
-/// -- "foo"
-///
-/// xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
-/// -- "./foo"
-///
-/// xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
-/// -- "../directory"
-///
-/// xplr.util.relative_to("/present/working")
-/// -- ".."
-///
-/// xplr.util.relative_to("/present/working", { without_suffix_dots = true })
-/// -- "../../working"
-///
-/// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
-/// -- "../../working/directory"
-/// ```
-pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
-        let config: Option<RelativityConfig<String>> =
-            lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
-        path::relative_to(path, config.as_ref())
-            .map(|p| p.to_string_lossy().to_string())
-            .map_err(LuaError::custom)
-    })?;
-    util.set("relative_to", func)?;
-    Ok(util)
-}
-
-/// Shorten the given absolute path using the following rules:
-/// - either relative to your home dir if it makes sense
-/// - or relative to the current working directory
-/// - or absolute path if it makes the most sense
-///
-/// Type: Similar to `xplr.util.relative_to`
-///
-/// Example:
-///
-/// ```lua
-/// xplr.util.shortened("/home/username/.config")
-/// -- "~/.config"
-///
-/// xplr.util.shortened("/present/working/directory")
-/// -- "."
-///
-/// xplr.util.shortened("/present/working/directory/foo")
-/// -- "foo"
-///
-/// xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
-/// -- "./foo"
-///
-/// xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
-/// -- "../directory"
-///
-/// xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
-/// -- "../../working/directory"
-///
-/// xplr.util.shortened("/tmp")
-/// -- "/tmp"
-/// ```
-pub fn shortened<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let func =
-        lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
-            let config: Option<RelativityConfig<String>> =
-                lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
-            path::shortened(path, config.as_ref()).map_err(LuaError::custom)
-        })?;
-    util.set("shortened", func)?;
     Ok(util)
 }
 
