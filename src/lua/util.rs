@@ -231,7 +231,7 @@ pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Get the configured [Node Type][6] of a given [Node][5].
 ///
-/// Type: function( [Node][5], [NodeTypesConfig][7]|nil ) -> [NodeType][5]
+/// Type: function( [Node][5], [xplr.config.node_types][7]|nil ) -> [NodeType][5]
 ///
 /// If the second argument is missing, global config `xplr.config.node_types`
 /// will be used.
@@ -240,10 +240,10 @@ pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///
 /// ```lua
 /// xplr.util.node_type(app.focused_node)
-/// -- { style = { fg = ..., ... }, meta = { icon = ..., ... } ... }
+/// -- { style = { fg = "Red", ... }, meta = { icon = "", ... } ... }
 ///
 /// xplr.util.node_type(xplr.util.node("/foo/bar"), xplr.config.node_types)
-/// -- { style = { fg = ..., ... }, meta = { icon = ..., ... } ... }
+/// -- { style = { fg = "Red", ... }, meta = { icon = "", ... } ... }
 /// ```
 pub fn node_type<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
@@ -334,9 +334,9 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Get the relative path based on the given base path or current working dir.
 /// Will error if it fails to determine a relative path.
 ///
-/// Type: function( path:string, config:Config|nil ) -> path:string
+/// Type: function( path:string, options:table|nil ) -> path:string
 ///
-/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+/// Options type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
 ///
 /// - If `base` path is given, the path will be relative to it.
 /// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
@@ -673,12 +673,12 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Mix multiple [Style][3] objects into one.
 ///
-/// Type: function( [Style][3], [Style][3], ... ) -> Style[3]
+/// Type: function( { [Style][3], [Style][3], ... } ) -> Style[3]
 ///
 /// Example:
 ///
 /// ```lua
-/// xplr.util.style_mix({ fg = "Red" }, { bg = "Blue" }, { add_modifiers = {"Bold"} })
+/// xplr.util.style_mix({{ fg = "Red" }, { bg = "Blue" }, { add_modifiers = {"Bold"} }})
 /// -- { fg = "Red", bg = "Blue", add_modifiers = { "Bold" }, sub_modifiers = {} }
 /// ```
 pub fn style_mix<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
@@ -752,7 +752,7 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// -- {
 /// --   Horizontal = {
 /// --     splits = {
-/// --       "Selection",  -- Replaced
+/// --       "Selection",  -- Replacement
 /// --       "HelpMenu",
 /// --     },
 /// --     config = ...
@@ -772,7 +772,7 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             Ok(res)
         },
     )?;
-    util.set("layout_replaced", func)?;
+    util.set("layout_replace", func)?;
     Ok(util)
 }
 
