@@ -6,7 +6,7 @@ use xplr::runner;
 
 fn main() {
     let cli = Cli::parse(env::args()).unwrap_or_else(|e| {
-        eprintln!("error: {}", e);
+        eprintln!("error: {e}");
         std::process::exit(1);
     });
 
@@ -54,28 +54,28 @@ fn main() {
         );
         let help = help.trim();
 
-        println!("{}", help);
+        println!("{help}");
     } else if cli.version {
         println!("xplr {}", xplr::app::VERSION);
     } else if !cli.pipe_msg_in.is_empty() {
         if let Err(err) = cli::pipe_msg_in(cli.pipe_msg_in) {
-            eprintln!("error: {}", err);
+            eprintln!("error: {err}");
             std::process::exit(1);
         }
     } else if !cli.print_msg_in.is_empty() {
         if let Err(err) = cli::print_msg_in(cli.print_msg_in) {
-            eprintln!("error: {}", err);
+            eprintln!("error: {err}");
             std::process::exit(1);
         }
     } else {
         match runner::from_cli(cli).and_then(|a| a.run()) {
             Ok(Some(out)) => {
-                print!("{}", out);
+                print!("{out}");
             }
             Ok(None) => {}
             Err(err) => {
                 if !err.to_string().is_empty() {
-                    eprintln!("error: {}", err);
+                    eprintln!("error: {err}");
                 };
 
                 std::process::exit(1);

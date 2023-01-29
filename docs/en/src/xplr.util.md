@@ -11,6 +11,124 @@ xplr.util.version()
 -- { major = 0, minor = 0, patch = 0 }
 ```
 
+### xplr.util.clone
+
+Clone/deepcopy a Lua value. Doesn't work with functions.
+
+Type: function( value ) -> value
+
+Example:
+
+```lua
+local val = { foo = "bar" }
+local val_clone = xplr.util.clone(val)
+val.foo = "baz"
+print(val_clone.foo)
+-- "bar"
+```
+
+### xplr.util.exists
+
+Check if the given path exists.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.exists("/foo/bar")
+-- true
+```
+
+### xplr.util.is_dir
+
+Check if the given path is a directory.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_dir("/foo/bar")
+-- true
+```
+
+### xplr.util.is_file
+
+Check if the given path is a file.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_file("/foo/bar")
+-- true
+```
+
+### xplr.util.is_symlink
+
+Check if the given path is a symlink.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_file("/foo/bar")
+-- true
+```
+
+### xplr.util.is_absolute
+
+Check if the given path is an absolute path.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_absolute("/foo/bar")
+-- true
+```
+
+### xplr.util.path_split
+
+Split a path into its components.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.path_split("/foo/bar")
+-- { "/", "foo", "bar" }
+
+xplr.util.path_split(".././foo")
+-- { "..", "foo" }
+```
+
+### xplr.util.node
+
+Get [Node][5] information of a given path.
+Doesn't check if the path exists.
+Returns nil if the path is "/".
+Errors out if absolute path can't be obtained.
+
+Type: function( path:string ) -> [Node][5]|nil
+
+Example:
+
+```lua
+xplr.util.node("./bar")
+-- { parent = "/pwd", relative_path = "bar", absolute_path = "/pwd/bar", ... }
+
+xplr.util.node("/")
+-- nil
+```
+
+[5]: https://xplr.dev/en/lua-function-calls#node
+
 ### xplr.util.dirname
 
 Get the directory name of a given path.
@@ -49,6 +167,79 @@ Example:
 ```lua
 xplr.util.absolute("foo/bar")
 -- "/tmp/foo/bar"
+```
+
+### xplr.util.relative_to
+
+Get the relative path based on the given base path or current working dir.
+Will error if it fails to determine a relative path.
+
+Type: function( path:string, config:Config|nil ) -> path:string
+
+Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+
+- If `base` path is given, the path will be relative to it.
+- If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+- If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
+
+Example:
+
+```lua
+xplr.util.relative_to("/present/working/directory")
+-- "."
+
+xplr.util.relative_to("/present/working/directory/foo")
+-- "foo"
+
+xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+-- "./foo"
+
+xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
+-- "../directory"
+
+xplr.util.relative_to("/present/working")
+-- ".."
+
+xplr.util.relative_to("/present/working", { without_suffix_dots = true })
+-- "../../working"
+
+xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
+-- "../../working/directory"
+```
+
+### xplr.util.shorten
+
+Shorten the given absolute path using the following rules:
+
+- either relative to your home dir if it makes sense
+- or relative to the current working directory
+- or absolute path if it makes the most sense
+
+Type: Similar to `xplr.util.relative_to`
+
+Example:
+
+```lua
+xplr.util.shorten("/home/username/.config")
+-- "~/.config"
+
+xplr.util.shorten("/present/working/directory")
+-- "."
+
+xplr.util.shorten("/present/working/directory/foo")
+-- "foo"
+
+xplr.util.shorten("/present/working/directory/foo", { with_prefix_dots = true })
+-- "./foo"
+
+xplr.util.shorten("/present/working/directory", { without_suffix_dots = true })
+-- "../directory"
+
+xplr.util.shorten("/present/working/directory", { base = "/present/foo/bar" })
+-- "../../working/directory"
+
+xplr.util.shorten("/tmp")
+-- "/tmp"
 ```
 
 ### xplr.util.explore
@@ -186,79 +377,6 @@ xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modif
 -- "\u001b[31mDesktop\u001b[0m"
 ```
 
-### xplr.util.relative_to
-
-Get the relative path based on the given base path or current working dir.
-Will error if it fails to determine a relative path.
-
-Type: function( path:string, config:Config|nil ) -> path:string
-
-Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
-
-- If `base` path is given, the path will be relative to it.
-- If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
-- If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
-
-Example:
-
-```lua
-xplr.util.relative_to("/present/working/directory")
--- "."
-
-xplr.util.relative_to("/present/working/directory/foo")
--- "foo"
-
-xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
--- "./foo"
-
-xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
--- "../directory"
-
-xplr.util.relative_to("/present/working")
--- ".."
-
-xplr.util.relative_to("/present/working", { without_suffix_dots = true })
--- "../../working"
-
-xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
--- "../../working/directory"
-```
-
-### xplr.util.shortened
-
-Shorten the given absolute path using the following rules:
-
-- either relative to your home dir if it makes sense
-- or relative to the current working directory
-- or absolute path if it makes the most sense
-
-Type: Similar to `xplr.util.relative_to`
-
-Example:
-
-```lua
-xplr.util.shortened("/home/username/.config")
--- "~/.config"
-
-xplr.util.shortened("/present/working/directory")
--- "."
-
-xplr.util.shortened("/present/working/directory/foo")
--- "foo"
-
-xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
--- "./foo"
-
-xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
--- "../directory"
-
-xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
--- "../../working/directory"
-
-xplr.util.shortened("/tmp")
--- "/tmp"
-```
-
 ### xplr.util.textwrap
 
 Wrap the given text to fit the specified width.
@@ -312,3 +430,5 @@ xplr.util.layout_replace(layout, "Table", "Selection")
 --   }
 -- }
 ```
+
+[4]: https://xplr.dev/en/layout

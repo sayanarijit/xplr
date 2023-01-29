@@ -2,6 +2,7 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::node::Node;
 use crate::path;
 use crate::path::RelativityConfig;
 use crate::ui;
@@ -28,9 +29,19 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
 
     util = version(util, lua)?;
+    util = clone(util, lua)?;
+    util = exists(util, lua)?;
+    util = is_dir(util, lua)?;
+    util = is_file(util, lua)?;
+    util = is_symlink(util, lua)?;
+    util = is_absolute(util, lua)?;
+    util = path_split(util, lua)?;
+    util = node(util, lua)?;
     util = dirname(util, lua)?;
     util = basename(util, lua)?;
     util = absolute(util, lua)?;
+    util = relative_to(util, lua)?;
+    util = shorten(util, lua)?;
     util = explore(util, lua)?;
     util = shell_execute(util, lua)?;
     util = shell_quote(util, lua)?;
@@ -40,8 +51,6 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = to_yaml(util, lua)?;
     util = lscolor(util, lua)?;
     util = paint(util, lua)?;
-    util = relative_to(util, lua)?;
-    util = shortened(util, lua)?;
     util = textwrap(util, lua)?;
     util = layout_replace(util, lua)?;
 
@@ -81,6 +90,175 @@ pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     })?;
 
     util.set("version", func)?;
+    Ok(util)
+}
+
+/// Clone/deepcopy a Lua value. Doesn't work with functions.
+///
+/// Type: function( value ) -> value
+///
+/// Example:
+///
+/// ```lua
+/// local val = { foo = "bar" }
+/// local val_clone = xplr.util.clone(val)
+/// val.foo = "baz"
+/// print(val_clone.foo)
+/// -- "bar"
+/// ```
+pub fn clone<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |lua, value: Value| {
+        lua::serialize(lua, &value).map_err(LuaError::custom)
+    })?;
+    util.set("clone", func)?;
+    Ok(util)
+}
+
+/// Check if the given path exists.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.exists("/foo/bar")
+/// -- true
+/// ```
+pub fn exists<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).exists()))?;
+    util.set("exists", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is a directory.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.is_dir("/foo/bar")
+/// -- true
+/// ```
+pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
+    util.set("is_dir", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is a file.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.is_file("/foo/bar")
+/// -- true
+/// ```
+pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
+    util.set("is_file", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is a symlink.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.is_file("/foo/bar")
+/// -- true
+/// ```
+pub fn is_symlink<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua
+        .create_function(move |_, path: String| Ok(PathBuf::from(path).is_symlink()))?;
+    util.set("is_symlink", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is an absolute path.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.is_absolute("/foo/bar")
+/// -- true
+/// ```
+pub fn is_absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua
+        .create_function(move |_, path: String| Ok(PathBuf::from(path).is_absolute()))?;
+    util.set("is_absolute", func)?;
+    Ok(util)
+}
+
+/// Split a path into its components.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.path_split("/foo/bar")
+/// -- { "/", "foo", "bar" }
+///
+/// xplr.util.path_split(".././foo")
+/// -- { "..", "foo" }
+/// ```
+pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |_, path: String| {
+        let components: Vec<String> = PathBuf::from(path)
+            .components()
+            .into_iter()
+            .map(|c| c.as_os_str().to_string_lossy().to_string())
+            .collect();
+        Ok(components)
+    })?;
+    util.set("path_split", func)?;
+    Ok(util)
+}
+
+/// Get [Node][5] information of a given path.
+/// Doesn't check if the path exists.
+/// Returns nil if the path is "/".
+/// Errors out if absolute path can't be obtained.
+///
+/// Type: function( path:string ) -> [Node][5]|nil
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.node("./bar")
+/// -- { parent = "/pwd", relative_path = "bar", absolute_path = "/pwd/bar", ... }
+///
+/// xplr.util.node("/")
+/// -- nil
+/// ```
+///
+/// [5]: https://xplr.dev/en/lua-function-calls#node
+pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |lua, path: String| {
+        let path = PathBuf::from(path);
+        let abs = path.absolutize()?;
+        match (abs.parent(), abs.file_name()) {
+            (Some(parent), Some(name)) => {
+                let node = Node::new(
+                    parent.to_string_lossy().to_string(),
+                    name.to_string_lossy().to_string(),
+                );
+                Ok(lua::serialize(lua, &node).map_err(LuaError::custom)?)
+            }
+            (_, _) => Ok(Value::Nil),
+        }
+    })?;
+    util.set("node", func)?;
     Ok(util)
 }
 
@@ -139,13 +317,102 @@ pub fn basename<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|_, path: String| {
-        let parent = PathBuf::from(path)
+        let abs = PathBuf::from(path)
             .absolutize()?
             .to_string_lossy()
             .to_string();
-        Ok(parent)
+        Ok(abs)
     })?;
     util.set("absolute", func)?;
+    Ok(util)
+}
+
+/// Get the relative path based on the given base path or current working dir.
+/// Will error if it fails to determine a relative path.
+///
+/// Type: function( path:string, config:Config|nil ) -> path:string
+///
+/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
+///
+/// - If `base` path is given, the path will be relative to it.
+/// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
+/// - If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.relative_to("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.relative_to("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
+/// -- "../directory"
+///
+/// xplr.util.relative_to("/present/working")
+/// -- ".."
+///
+/// xplr.util.relative_to("/present/working", { without_suffix_dots = true })
+/// -- "../../working"
+///
+/// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
+/// -- "../../working/directory"
+/// ```
+pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
+        let config: Option<RelativityConfig<String>> =
+            lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
+        path::relative_to(path, config.as_ref())
+            .map(|p| p.to_string_lossy().to_string())
+            .map_err(LuaError::custom)
+    })?;
+    util.set("relative_to", func)?;
+    Ok(util)
+}
+
+/// Shorten the given absolute path using the following rules:
+/// - either relative to your home dir if it makes sense
+/// - or relative to the current working directory
+/// - or absolute path if it makes the most sense
+///
+/// Type: Similar to `xplr.util.relative_to`
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.shorten("/home/username/.config")
+/// -- "~/.config"
+///
+/// xplr.util.shorten("/present/working/directory")
+/// -- "."
+///
+/// xplr.util.shorten("/present/working/directory/foo")
+/// -- "foo"
+///
+/// xplr.util.shorten("/present/working/directory/foo", { with_prefix_dots = true })
+/// -- "./foo"
+///
+/// xplr.util.shorten("/present/working/directory", { without_suffix_dots = true })
+/// -- "../directory"
+///
+/// xplr.util.shorten("/present/working/directory", { base = "/present/foo/bar" })
+/// -- "../../working/directory"
+///
+/// xplr.util.shorten("/tmp")
+/// -- "/tmp"
+/// ```
+pub fn shorten<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
+            let config: Option<RelativityConfig<String>> =
+                lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
+            path::shorten(path, config.as_ref()).map_err(LuaError::custom)
+        })?;
+    util.set("shorten", func)?;
     Ok(util)
 }
 
@@ -390,95 +657,6 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Get the relative path based on the given base path or current working dir.
-/// Will error if it fails to determine a relative path.
-///
-/// Type: function( path:string, config:Config|nil ) -> path:string
-///
-/// Config type: { base:string|nil, with_prefix_dots:bookean|nil, without_suffix_dots:boolean|nil }
-///
-/// - If `base` path is given, the path will be relative to it.
-/// - If `with_prefix_dots` is true, the path will always start with dots `..` / `.`
-/// - If `without_suffix_dots` is true, the name will be visible instead of dots `..` / `.`
-///
-/// Example:
-///
-/// ```lua
-/// xplr.util.relative_to("/present/working/directory")
-/// -- "."
-///
-/// xplr.util.relative_to("/present/working/directory/foo")
-/// -- "foo"
-///
-/// xplr.util.relative_to("/present/working/directory/foo", { with_prefix_dots = true })
-/// -- "./foo"
-///
-/// xplr.util.relative_to("/present/working/directory", { without_suffix_dots = true })
-/// -- "../directory"
-///
-/// xplr.util.relative_to("/present/working")
-/// -- ".."
-///
-/// xplr.util.relative_to("/present/working", { without_suffix_dots = true })
-/// -- "../../working"
-///
-/// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
-/// -- "../../working/directory"
-/// ```
-pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
-        let config: Option<RelativityConfig<String>> =
-            lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
-        path::relative_to(path, config.as_ref())
-            .map(|p| p.to_string_lossy().to_string())
-            .map_err(LuaError::custom)
-    })?;
-    util.set("relative_to", func)?;
-    Ok(util)
-}
-
-/// Shorten the given absolute path using the following rules:
-/// - either relative to your home dir if it makes sense
-/// - or relative to the current working directory
-/// - or absolute path if it makes the most sense
-///
-/// Type: Similar to `xplr.util.relative_to`
-///
-/// Example:
-///
-/// ```lua
-/// xplr.util.shortened("/home/username/.config")
-/// -- "~/.config"
-///
-/// xplr.util.shortened("/present/working/directory")
-/// -- "."
-///
-/// xplr.util.shortened("/present/working/directory/foo")
-/// -- "foo"
-///
-/// xplr.util.shortened("/present/working/directory/foo", { with_prefix_dots = true })
-/// -- "./foo"
-///
-/// xplr.util.shortened("/present/working/directory", { without_suffix_dots = true })
-/// -- "../directory"
-///
-/// xplr.util.shortened("/present/working/directory", { base = "/present/foo/bar" })
-/// -- "../../working/directory"
-///
-/// xplr.util.shortened("/tmp")
-/// -- "/tmp"
-/// ```
-pub fn shortened<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let func =
-        lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
-            let config: Option<RelativityConfig<String>> =
-                lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
-            path::shortened(path, config.as_ref()).map_err(LuaError::custom)
-        })?;
-    util.set("shortened", func)?;
-    Ok(util)
-}
-
 /// Wrap the given text to fit the specified width.
 /// It will try to not split words when possible.
 ///
@@ -543,6 +721,8 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   }
 /// -- }
 /// ```
+///
+/// [4]: https://xplr.dev/en/layout
 pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(
         move |lua, (layout, target, replacement): (Table, Table, Table)| {
@@ -551,7 +731,7 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             let replacement: Layout = lua.from_value(Value::Table(replacement))?;
 
             let res = layout.replace(&target, &replacement);
-            let res = lua.to_value(&res)?;
+            let res = lua::serialize(lua, &res).map_err(LuaError::custom)?;
 
             Ok(res)
         },

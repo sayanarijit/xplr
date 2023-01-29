@@ -1411,6 +1411,28 @@ xplr.config.modes.builtin.selection_ops = {
   layout = "HelpMenu",
   key_bindings = {
     on_key = {
+      ["e"] = {
+        help = "edit selection",
+        messages = {
+          {
+            BashExec0 = [===[
+              TMPFILE="$(mktemp)"
+              (while IFS= read -r -d '' PTH; do
+                echo $(printf %q "${PTH:?}") >> "${TMPFILE:?}"
+              done < "${XPLR_PIPE_SELECTION_OUT:?}")
+              ${EDITOR:-vi} "${TMPFILE:?}"
+              [ ! -e "$TMPFILE" ] && exit
+              "$XPLR" -m UnSelectAll
+              (while IFS= read -r PTH_ESC; do
+                "$XPLR" -m 'SelectPath: %q' "$(eval printf %s ${PTH_ESC:?})"
+              done < "${TMPFILE:?}")
+              read -p "[enter to continue]"
+              rm -- "${TMPFILE:?}"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
       ["l"] = {
         help = "list selection",
         messages = {
@@ -1419,7 +1441,7 @@ xplr.config.modes.builtin.selection_ops = {
               [ -z "$PAGER" ] && PAGER="less -+F"
 
               while IFS= read -r -d '' PTH; do
-                  echo $(printf %q "$PTH")
+                echo $(printf %q "$PTH")
               done < "${XPLR_PIPE_SELECTION_OUT:?}" | ${PAGER:?}
             ]===],
           },
@@ -2594,7 +2616,7 @@ end
 
 xplr.fn.builtin.fmt_general_selection_item = function(n)
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
-  local shortened = xplr.util.shortened(n.absolute_path, sh_config)
+  local shortened = xplr.util.shorten(n.absolute_path, sh_config)
   return xplr.util.paint(shortened, xplr.util.lscolor(n.absolute_path))
 end
 
@@ -2640,7 +2662,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      local symlink_path = xplr.util.shortened(m.symlink.absolute_path)
+      local symlink_path = xplr.util.shorten(m.symlink.absolute_path)
       r = r .. path_escape(symlink_path)
 
       if m.symlink.is_dir then

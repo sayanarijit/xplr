@@ -45,7 +45,7 @@ fn string_to_text<'a>(string: String) -> Text<'a> {
         string
             .as_bytes()
             .into_text()
-            .unwrap_or_else(|e| Text::raw(format!("{:?}", e)))
+            .unwrap_or_else(|e| Text::raw(format!("{e:?}")))
     }
 }
 
@@ -1150,7 +1150,7 @@ fn draw_logs<B: Backend>(
                 };
 
                 let prefix =
-                    format!("{}|{}", time, cfg.format.to_owned().unwrap_or_default());
+                    format!("{time}|{0}", cfg.format.to_owned().unwrap_or_default());
 
                 let padding = " ".repeat(prefix.chars().count());
 
@@ -1160,9 +1160,9 @@ fn draw_logs<B: Backend>(
                     .enumerate()
                     .map(|(i, line)| {
                         if i == 0 {
-                            format!("{}: {}", &prefix, line)
+                            format!("{prefix}: {line}")
                         } else {
-                            format!("{}  {}", &padding, line)
+                            format!("{padding}  {line}")
                         }
                     })
                     .take(layout_size.height as usize)
@@ -1223,7 +1223,7 @@ pub fn draw_custom_content<B: Backend>(
             let render = string_to_text(render);
             let content = Paragraph::new(render).block(block(
                 config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                title.map(|t| format!(" {t} ")).unwrap_or_default(),
             ));
             f.render_widget(content, layout_size);
         }
@@ -1237,7 +1237,7 @@ pub fn draw_custom_content<B: Backend>(
 
             let render = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{:?}", e))
+                    lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{e:?}"))
                 })
                 .unwrap_or_else(|e| e.to_string());
 
@@ -1245,7 +1245,7 @@ pub fn draw_custom_content<B: Backend>(
 
             let content = Paragraph::new(render).block(block(
                 config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                title.map(|t| format!(" {t} ")).unwrap_or_default(),
             ));
             f.render_widget(content, layout_size);
         }
@@ -1259,7 +1259,7 @@ pub fn draw_custom_content<B: Backend>(
 
             let content = List::new(items).block(block(
                 config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                title.map(|t| format!(" {t} ")).unwrap_or_default(),
             ));
             f.render_widget(content, layout_size);
         }
@@ -1274,7 +1274,7 @@ pub fn draw_custom_content<B: Backend>(
             let items = lua::serialize(lua, &ctx)
                 .map(|arg| {
                     lua::call(lua, &render, arg)
-                        .unwrap_or_else(|e| vec![format!("{:?}", e)])
+                        .unwrap_or_else(|e| vec![format!("{e:?}")])
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
                 .into_iter()
@@ -1284,7 +1284,7 @@ pub fn draw_custom_content<B: Backend>(
 
             let content = List::new(items).block(block(
                 config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                title.map(|t| format!(" {t} ")).unwrap_or_default(),
             ));
             f.render_widget(content, layout_size);
         }
@@ -1316,7 +1316,7 @@ pub fn draw_custom_content<B: Backend>(
                 .column_spacing(col_spacing.unwrap_or(1))
                 .block(block(
                     config,
-                    title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                    title.map(|t| format!(" {t} ")).unwrap_or_default(),
                 ));
 
             f.render_widget(content, layout_size);
@@ -1336,7 +1336,7 @@ pub fn draw_custom_content<B: Backend>(
             let rows = lua::serialize(lua, &ctx)
                 .map(|arg| {
                     lua::call(lua, &render, arg)
-                        .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
+                        .unwrap_or_else(|e| vec![vec![format!("{e:?}")]])
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])
                 .into_iter()
@@ -1357,7 +1357,7 @@ pub fn draw_custom_content<B: Backend>(
 
             let mut content = Table::new(rows).widths(&widths).block(block(
                 config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
+                title.map(|t| format!(" {t} ")).unwrap_or_default(),
             ));
 
             if let Some(col_spacing) = col_spacing {
@@ -1537,7 +1537,7 @@ mod tests {
         );
 
         assert_eq!(
-            b.to_owned().extend(&a),
+            b.extend(&a),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
@@ -1557,7 +1557,7 @@ mod tests {
         );
 
         assert_eq!(
-            c.to_owned().extend(&a),
+            c.extend(&a),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Magenta),

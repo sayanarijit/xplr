@@ -83,7 +83,7 @@ impl std::fmt::Display for Log {
             LogLevel::Success => "SUCCESS",
             LogLevel::Error => "ERROR  ",
         };
-        write!(f, "[{}] {} {}", &self.created_at, level_str, &self.message)
+        write!(f, "[{0}] {level_str} {1}", &self.created_at, &self.message)
     }
 }
 
@@ -839,7 +839,12 @@ impl App {
                 self.pwd = dir.to_string_lossy().to_string();
                 self.explorer_config.searcher = None;
                 if save_history {
-                    self.history = self.history.push(format!("{}/", self.pwd));
+                    let hist = if &self.pwd == "/" {
+                        self.pwd.clone()
+                    } else {
+                        format!("{0}/", &self.pwd)
+                    };
+                    self.history = self.history.push(hist);
                 }
                 self.explore_pwd()
             }
@@ -1026,7 +1031,7 @@ impl App {
                 }
                 Ok(self)
             } else {
-                self.log_error(format!("{} not found in $PWD", name))
+                self.log_error(format!("{name} not found in $PWD"))
             }
         } else {
             Ok(self)
@@ -1060,10 +1065,10 @@ impl App {
                 self.change_directory(&parent.to_string_lossy(), false)?
                     .focus_by_file_name(&filename.to_string_lossy(), save_history)
             } else {
-                self.log_error(format!("{} not found", path))
+                self.log_error(format!("{path} not found"))
             }
         } else {
-            self.log_error(format!("Cannot focus on {}", path))
+            self.log_error(format!("Cannot focus on {path}"))
         }
     }
 
@@ -1111,7 +1116,7 @@ impl App {
         } else if self.config.modes.custom.contains_key(mode) {
             self.switch_mode_custom_keeping_input_buffer(mode)
         } else {
-            self.log_error(format!("Mode not found: {}", mode))
+            self.log_error(format!("Mode not found: {mode}"))
         }
     }
 
@@ -1136,7 +1141,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin mode not found: {}", mode))
+            self.log_error(format!("Builtin mode not found: {mode}"))
         }
     }
 
@@ -1161,7 +1166,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom mode not found: {}", mode))
+            self.log_error(format!("Custom mode not found: {mode}"))
         }
     }
 
@@ -1171,7 +1176,7 @@ impl App {
         } else if self.config.layouts.custom.contains_key(layout) {
             self.switch_layout_custom(layout)
         } else {
-            self.log_error(format!("Layout not found: {}", layout))
+            self.log_error(format!("Layout not found: {layout}"))
         }
     }
 
@@ -1187,7 +1192,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin layout not found: {}", layout))
+            self.log_error(format!("Builtin layout not found: {layout}"))
         }
     }
 
@@ -1203,7 +1208,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom layout not found: {}", layout))
+            self.log_error(format!("Custom layout not found: {layout}"))
         }
     }
 
@@ -1664,7 +1669,7 @@ impl App {
     }
 
     pub fn mode_str(&self) -> String {
-        format!("{}\n", &self.mode.name)
+        format!("{0}\n", &self.mode.name)
     }
 
     fn refresh_selection(mut self) -> Result<Self> {
@@ -1688,7 +1693,7 @@ impl App {
             .map(|d| {
                 d.nodes
                     .iter()
-                    .map(|n| format!("{}{}", n.absolute_path, delimiter))
+                    .map(|n| format!("{0}{delimiter}", n.absolute_path))
                     .collect::<Vec<String>>()
                     .join("")
             })
@@ -1696,13 +1701,13 @@ impl App {
     }
 
     pub fn pwd_str(&self, delimiter: char) -> String {
-        format!("{}{}", &self.pwd, delimiter)
+        format!("{0}{delimiter}", &self.pwd)
     }
 
     pub fn selection_str(&self, delimiter: char) -> String {
         self.selection
             .iter()
-            .map(|n| format!("{}{}", n.absolute_path, delimiter))
+            .map(|n| format!("{0}{delimiter}", n.absolute_path))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1710,7 +1715,7 @@ impl App {
     pub fn result_str(&self, delimiter: char) -> String {
         self.result()
             .into_iter()
-            .map(|n| format!("{}{}", n.absolute_path, delimiter))
+            .map(|n| format!("{0}{delimiter}", n.absolute_path))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1718,7 +1723,7 @@ impl App {
     pub fn logs_str(&self, delimiter: char) -> String {
         self.logs
             .iter()
-            .map(|l| format!("{}{}", l, delimiter))
+            .map(|l| format!("{l}{delimiter}"))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1739,18 +1744,17 @@ impl App {
                 .help_menu()
                 .iter()
                 .map(|l| match l {
-                    HelpMenuLine::Paragraph(p) => format!("\t{}{}", p, delimiter),
+                    HelpMenuLine::Paragraph(p) => format!("\t{p}{delimiter}"),
                     HelpMenuLine::KeyMap(k, remaps, h) => {
                         let remaps = remaps.join(", ");
-                        format!(" {:15} | {:25} | {}{}", k, remaps, h , delimiter)
+                        format!(" {k:15} | {remaps:25} | {h}{delimiter}")
                     }
                 })
                 .collect::<Vec<String>>()
                 .join("");
 
             format!(
-                "### {}{d}{d} key             | remaps                    | action\n --------------- | ------------------------- | ------{d}{}{d}",
-                name, help, d = delimiter
+                "### {name}{delimiter}{delimiter} key             | remaps                    | action\n --------------- | ------------------------- | ------{delimiter}{help}{delimiter}"
             )
         })
         .collect::<Vec<String>>()
@@ -1761,7 +1765,7 @@ impl App {
         self.history
             .paths
             .iter()
-            .map(|p| format!("{}{}", &p, delimiter))
+            .map(|p| format!("{p}{delimiter}"))
             .collect::<Vec<String>>()
             .join("")
     }

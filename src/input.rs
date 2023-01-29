@@ -203,7 +203,7 @@ impl std::fmt::Display for Key {
                     .unwrap_or_default()
             });
 
-        write!(f, "{}", key_str)
+        write!(f, "{key_str}")
     }
 }
 

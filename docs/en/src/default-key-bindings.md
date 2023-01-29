@@ -47,37 +47,23 @@ of [modes][4] and the key mappings for each mode.
 | ~         |        | go home             |
 | [0-9]     |        | input               |
 
-### recover
-
-| key | remaps | action |
-| --- | ------ | ------ |
-
-### rename
-
-| key   | remaps | action       |
-| ----- | ------ | ------------ |
-| enter |        | submit       |
-| tab   |        | try complete |
-
-### create_directory
-
-| key   | remaps | action       |
-| ----- | ------ | ------------ |
-| enter |        | submit       |
-| tab   |        | try complete |
-
-### relative_path_does_not_match_regex
-
-| key   | remaps | action |
-| ----- | ------ | ------ |
-| enter |        | submit |
-
 ### duplicate_as
 
 | key   | remaps | action       |
 | ----- | ------ | ------------ |
 | enter |        | submit       |
 | tab   |        | try complete |
+
+### vroot
+
+| key    | remaps | action       |
+| ------ | ------ | ------------ |
+| .      |        | vroot $PWD   |
+| /      |        | vroot /      |
+| ctrl-r |        | reset vroot  |
+| ctrl-u |        | unset vroot  |
+| v      |        | toggle vroot |
+| ~      |        | vroot $HOME  |
 
 ### quit
 
@@ -88,45 +74,6 @@ of [modes][4] and the key mappings for each mode.
 | p     |        | quit printing pwd       |
 | r     |        | quit printing result    |
 | s     |        | quit printing selection |
-
-### debug_error
-
-| key   | remaps | action              |
-| ----- | ------ | ------------------- |
-| enter |        | open logs in editor |
-| q     |        | quit                |
-
-### switch_layout
-
-| key | remaps | action               |
-| --- | ------ | -------------------- |
-| 1   |        | default              |
-| 2   |        | no help menu         |
-| 3   |        | no selection panel   |
-| 4   |        | no help or selection |
-
-### go_to_path
-
-| key   | remaps | action       |
-| ----- | ------ | ------------ |
-| enter |        | submit       |
-| tab   |        | try complete |
-
-### create
-
-| key | remaps | action           |
-| --- | ------ | ---------------- |
-| d   |        | create directory |
-| f   |        | create file      |
-
-### number
-
-| key   | remaps | action   |
-| ----- | ------ | -------- |
-| down  | j      | to down  |
-| enter |        | to index |
-| k     | up     | to up    |
-| [0-9] |        | input    |
 
 ### action
 
@@ -142,6 +89,57 @@ of [modes][4] and the key mappings for each mode.
 | v     |        | vroot                |
 | [0-9] |        | go to index          |
 
+### go_to
+
+| key | remaps | action         |
+| --- | ------ | -------------- |
+| f   |        | follow symlink |
+| g   |        | top            |
+| i   |        | initial $PWD   |
+| p   |        | path           |
+| x   |        | open in gui    |
+
+### debug_error
+
+| key   | remaps | action              |
+| ----- | ------ | ------------------- |
+| enter |        | open logs in editor |
+| q     |        | quit                |
+
+### recover
+
+| key | remaps | action |
+| --- | ------ | ------ |
+
+### relative_path_does_not_match_regex
+
+| key   | remaps | action |
+| ----- | ------ | ------ |
+| enter |        | submit |
+
+### rename
+
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
+
+### switch_layout
+
+| key | remaps | action               |
+| --- | ------ | -------------------- |
+| 1   |        | default              |
+| 2   |        | no help menu         |
+| 3   |        | no selection panel   |
+| 4   |        | no help or selection |
+
+### create_file
+
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
+
 ### filter
 
 | key       | remaps | action                             |
@@ -152,50 +150,72 @@ of [modes][4] and the key mappings for each mode.
 | ctrl-u    |        | clear filters                      |
 | r         |        | relative path does match regex     |
 
-### relative_path_does_match_regex
-
-| key   | remaps | action |
-| ----- | ------ | ------ |
-| enter |        | submit |
-
-### vroot
-
-| key    | remaps | action       |
-| ------ | ------ | ------------ |
-| .      |        | vroot $PWD   |
-| /      |        | vroot /      |
-| ctrl-r |        | reset vroot  |
-| ctrl-u |        | unset vroot  |
-| v      |        | toggle vroot |
-| ~      |        | vroot $HOME  |
-
-### selection_ops
-
-| key | remaps | action          |
-| --- | ------ | --------------- |
-| c   |        | copy here       |
-| h   |        | hardlink here   |
-| l   |        | list selection  |
-| m   |        | move here       |
-| s   |        | softlink here   |
-| u   |        | clear selection |
-
-### create_file
+### create_directory
 
 | key   | remaps | action       |
 | ----- | ------ | ------------ |
 | enter |        | submit       |
 | tab   |        | try complete |
 
-### go_to
+### selection_ops
 
-| key | remaps | action         |
-| --- | ------ | -------------- |
-| f   |        | follow symlink |
-| g   |        | top            |
-| i   |        | initial $PWD   |
-| p   |        | path           |
-| x   |        | open in gui    |
+| key | remaps | action          |
+| --- | ------ | --------------- |
+| c   |        | copy here       |
+| e   |        | edit selection  |
+| h   |        | hardlink here   |
+| l   |        | list selection  |
+| m   |        | move here       |
+| s   |        | softlink here   |
+| u   |        | clear selection |
+
+### search
+
+| key    | remaps | action           |
+| ------ | ------ | ---------------- |
+| ctrl-n | down   | down             |
+| ctrl-p | up     | up               |
+| enter  |        | submit           |
+| esc    |        | cancel           |
+| left   |        | back             |
+| right  |        | enter            |
+| tab    |        | toggle selection |
+
+### number
+
+| key   | remaps | action   |
+| ----- | ------ | -------- |
+| down  | j      | to down  |
+| enter |        | to index |
+| k     | up     | to up    |
+| [0-9] |        | input    |
+
+### delete
+
+| key | remaps | action       |
+| --- | ------ | ------------ |
+| D   |        | force delete |
+| d   |        | delete       |
+
+### go_to_path
+
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
+
+### relative_path_does_match_regex
+
+| key   | remaps | action |
+| ----- | ------ | ------ |
+| enter |        | submit |
+
+### create
+
+| key | remaps | action           |
+| --- | ------ | ---------------- |
+| d   |        | create directory |
+| f   |        | create file      |
 
 ### sort
 
@@ -220,22 +240,3 @@ of [modes][4] and the key mappings for each mode.
 | n         |        | by node type                      |
 | r         |        | by relative path                  |
 | s         |        | by size                           |
-
-### delete
-
-| key | remaps | action       |
-| --- | ------ | ------------ |
-| D   |        | force delete |
-| d   |        | delete       |
-
-### search
-
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-n | down   | down             |
-| ctrl-p | up     | up               |
-| enter  |        | submit           |
-| esc    |        | cancel           |
-| left   |        | back             |
-| right  |        | enter            |
-| tab    |        | toggle selection |
