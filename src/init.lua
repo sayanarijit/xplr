@@ -2616,7 +2616,7 @@ end
 
 xplr.fn.builtin.fmt_general_selection_item = function(n)
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
-  local shortened = xplr.util.shortened(n.absolute_path, sh_config)
+  local shortened = xplr.util.shorten(n.absolute_path, sh_config)
   return xplr.util.paint(shortened, xplr.util.lscolor(n.absolute_path))
 end
 
@@ -2662,7 +2662,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      local symlink_path = xplr.util.shortened(m.symlink.absolute_path)
+      local symlink_path = xplr.util.shorten(m.symlink.absolute_path)
       r = r .. path_escape(symlink_path)
 
       if m.symlink.is_dir then

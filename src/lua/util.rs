@@ -412,7 +412,7 @@ pub fn shorten<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
                 lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
             path::shorten(path, config.as_ref()).map_err(LuaError::custom)
         })?;
-    util.set("shortened", func)?;
+    util.set("shorten", func)?;
     Ok(util)
 }
 
