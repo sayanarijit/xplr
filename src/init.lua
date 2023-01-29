@@ -1431,7 +1431,6 @@ xplr.config.modes.builtin.selection_ops = {
               (while IFS= read -r PTH_ESC; do
                 "$XPLR" -m 'SelectPath: %q' "$(eval printf %s ${PTH_ESC:?})"
               done < "${TMPFILE:?}")
-              read -p "[enter to continue]"
               rm -- "${TMPFILE:?}"
             ]===],
           },
