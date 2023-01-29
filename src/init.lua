@@ -2620,6 +2620,7 @@ xplr.fn.builtin.try_complete_path = function(m)
 end
 
 xplr.fn.builtin.fmt_general_selection_item = function(n)
+  local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
   local shortened = xplr.util.shorten(n.absolute_path, sh_config)
   if n.is_dir then
@@ -2628,7 +2629,7 @@ xplr.fn.builtin.fmt_general_selection_item = function(n)
   local ls_style = xplr.util.lscolor(n.absolute_path)
   local meta_style = xplr.util.node_type(n).style
   local style = xplr.util.style_mix({ meta_style, ls_style })
-  return xplr.util.paint(xplr.util.shell_escape(shortened), style)
+  return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
 
 -- Renders the first column in the table
@@ -2647,8 +2648,8 @@ end
 
 -- Renders the second column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
+  local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local r = m.tree .. m.prefix
-
   local style = xplr.util.lscolor(m.absolute_path)
   style = xplr.util.style_mix({ m.style, style })
 
@@ -2676,7 +2677,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
       if m.symlink.is_dir then
         symlink_path = symlink_path .. "/"
       end
-      r = r .. xplr.util.shell_escape(symlink_path)
+      r = r .. symlink_path:gsub("\n", nl)
     end
   end
 
