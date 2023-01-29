@@ -721,6 +721,8 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   }
 /// -- }
 /// ```
+///
+/// [4]: https://xplr.dev/en/layout
 pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(
         move |lua, (layout, target, replacement): (Table, Table, Table)| {

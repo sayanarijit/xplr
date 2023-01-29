@@ -430,3 +430,5 @@ xplr.util.layout_replace(layout, "Table", "Selection")
 --   }
 -- }
 ```
+
+[4]: https://xplr.dev/en/layout
