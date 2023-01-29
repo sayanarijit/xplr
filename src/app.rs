@@ -1338,18 +1338,9 @@ impl App {
 
     pub fn select_all(mut self) -> Result<Self> {
         if let Some(d) = self.directory_buffer.as_ref() {
-            d.nodes.clone().into_iter().for_each(|n| {
-                self.selection.insert(n);
-            });
+            self.selection = d.nodes.clone().into_iter().collect();
         };
 
-        Ok(self)
-    }
-
-    pub fn un_select(mut self) -> Result<Self> {
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
-            self.selection.retain(|s| s != &n);
-        }
         Ok(self)
     }
 
@@ -1360,10 +1351,19 @@ impl App {
         Ok(self)
     }
 
+    pub fn un_select(mut self) -> Result<Self> {
+        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+            self.selection
+                .retain(|s| s.absolute_path != n.absolute_path);
+        }
+        Ok(self)
+    }
+
     pub fn un_select_all(mut self) -> Result<Self> {
         if let Some(d) = self.directory_buffer.as_ref() {
             d.nodes.clone().into_iter().for_each(|n| {
-                self.selection.retain(|s| s != &n);
+                self.selection
+                    .retain(|s| s.absolute_path != n.absolute_path);
             });
         };
 

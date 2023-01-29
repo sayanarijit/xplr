@@ -1427,7 +1427,7 @@ xplr.config.modes.builtin.selection_ops = {
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               ${EDITOR:-vi} "${TMPFILE:?}"
               [ ! -e "$TMPFILE" ] && exit
-              "$XPLR" -m UnSelectAll
+              "$XPLR" -m ClearSelection
               (while IFS= read -r PTH_ESC; do
                 "$XPLR" -m 'SelectPath: %q' "$(eval printf %s ${PTH_ESC:?})"
               done < "${TMPFILE:?}")
