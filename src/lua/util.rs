@@ -2,6 +2,7 @@ use crate::app::VERSION;
 use crate::explorer;
 use crate::lua;
 use crate::msg::in_::external::ExplorerConfig;
+use crate::node::Node;
 use crate::path;
 use crate::path::RelativityConfig;
 use crate::ui;
@@ -28,6 +29,14 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
 
     util = version(util, lua)?;
+    util = clone(util, lua)?;
+    util = exists(util, lua)?;
+    util = is_dir(util, lua)?;
+    util = is_file(util, lua)?;
+    util = is_symlink(util, lua)?;
+    util = is_absolute(util, lua)?;
+    util = path_split(util, lua)?;
+    util = node(util, lua)?;
     util = dirname(util, lua)?;
     util = basename(util, lua)?;
     util = absolute(util, lua)?;
@@ -81,6 +90,169 @@ pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     })?;
 
     util.set("version", func)?;
+    Ok(util)
+}
+
+/// Clone/deepcopy a Lua value. Doesn't work with functions.
+///
+/// Type: function( value ) -> value
+///
+/// Example:
+///
+/// ```lua
+/// local val = { foo = "bar" }
+/// local val_clone = xplr.util.clone(val)
+/// val.foo = "baz"
+/// print(val_clone.foo)
+/// -- "bar"
+/// ```
+pub fn clone<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |lua, value: Value| {
+        lua::serialize(lua, &value).map_err(LuaError::custom)
+    })?;
+    util.set("clone", func)?;
+    Ok(util)
+}
+
+/// Check if the given path exists.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+/// ```lua
+/// xplr.util.exists("/foo/bar")
+/// -- true
+/// ```
+pub fn exists<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).exists()))?;
+    util.set("exists", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is a directory.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+/// ```lua
+/// xplr.util.is_dir("/foo/bar")
+/// -- true
+/// ```
+pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
+    util.set("is_dir", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is a file.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+/// ```lua
+/// xplr.util.is_file("/foo/bar")
+/// -- true
+/// ```
+pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func =
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
+    util.set("is_file", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is a symlink.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+/// ```lua
+/// xplr.util.is_file("/foo/bar")
+/// -- true
+/// ```
+pub fn is_symlink<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua
+        .create_function(move |_, path: String| Ok(PathBuf::from(path).is_symlink()))?;
+    util.set("is_symlink", func)?;
+    Ok(util)
+}
+
+/// Check if the given path is an absolute path.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+/// ```lua
+/// xplr.util.is_absolute("/foo/bar")
+/// -- true
+/// ```
+pub fn is_absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua
+        .create_function(move |_, path: String| Ok(PathBuf::from(path).is_absolute()))?;
+    util.set("is_absolute", func)?;
+    Ok(util)
+}
+
+/// Split a path into its components.
+///
+/// Type: function( path:string ) -> boolean
+///
+/// Example:
+/// ```lua
+/// xplr.util.path_split("/foo/bar")
+/// -- { "/", "foo", "bar" }
+///
+/// xplr.util.path_split(".././foo")
+/// -- { "..", "foo" }
+/// ```
+pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |_, path: String| {
+        let components: Vec<String> = PathBuf::from(path)
+            .components()
+            .into_iter()
+            .map(|c| c.as_os_str().to_string_lossy().to_string())
+            .collect();
+        Ok(components)
+    })?;
+    util.set("path_split", func)?;
+    Ok(util)
+}
+
+/// Get [Node][5] information of a given path.
+/// Doesn't check if the path exists.
+/// Returns nil if the path is "/".
+/// Errors out if absolute path can't be obtained.
+///
+/// Type: function( path:string ) -> [Node][5]|nil
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.node("./bar")
+/// -- { parent = "/pwd", relative_path = "bar", absolute_path = "/foo/bar", ... }
+///
+/// xplr.util.node("/")
+/// -- nil
+/// ```
+///
+/// [5]: https://xplr.dev/en/lua-function-calls#node
+pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(move |lua, path: String| {
+        let path = PathBuf::from(path);
+        let abs = path.absolutize()?;
+        match (abs.parent(), abs.file_name()) {
+            (Some(parent), Some(name)) => {
+                let node = Node::new(
+                    parent.to_string_lossy().to_string(),
+                    name.to_string_lossy().to_string(),
+                );
+                Ok(lua::serialize(lua, &node).map_err(LuaError::custom)?)
+            }
+            (_, _) => Ok(Value::Nil),
+        }
+    })?;
+    util.set("node", func)?;
     Ok(util)
 }
 
@@ -139,11 +311,11 @@ pub fn basename<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(|_, path: String| {
-        let parent = PathBuf::from(path)
+        let abs = PathBuf::from(path)
             .absolutize()?
             .to_string_lossy()
             .to_string();
-        Ok(parent)
+        Ok(abs)
     })?;
     util.set("absolute", func)?;
     Ok(util)
@@ -551,7 +723,7 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             let replacement: Layout = lua.from_value(Value::Table(replacement))?;
 
             let res = layout.replace(&target, &replacement);
-            let res = lua.to_value(&res)?;
+            let res = lua::serialize(lua, &res).map_err(LuaError::custom)?;
 
             Ok(res)
         },

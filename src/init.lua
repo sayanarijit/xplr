@@ -1411,6 +1411,28 @@ xplr.config.modes.builtin.selection_ops = {
   layout = "HelpMenu",
   key_bindings = {
     on_key = {
+      ["e"] = {
+        help = "edit selection",
+        messages = {
+          {
+            BashExec0 = [===[
+              TMPFILE=$(mktemp)
+              (while IFS= read -r -d '' PTH; do
+                echo $(printf %q "$PTH") >> "${TMPFILE:?}"
+              done < "${XPLR_PIPE_SELECTION_OUT:?}")
+              "${EDITOR:-vi}" "${TMPFILE:?}"
+              [ ! -e "$TMPFILE" ] && exit
+              "$XPLR" -m UnSelectAll
+              (while IFS= read -r PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                "$XPLR" -m 'SelectPath: %q' "$PTH"
+              done < "${TMPFILE:?}")
+              rm -- "${TMPFILE:?}"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
       ["l"] = {
         help = "list selection",
         messages = {
@@ -1419,7 +1441,7 @@ xplr.config.modes.builtin.selection_ops = {
               [ -z "$PAGER" ] && PAGER="less -+F"
 
               while IFS= read -r -d '' PTH; do
-                  echo $(printf %q "$PTH")
+                echo $(printf %q "$PTH")
               done < "${XPLR_PIPE_SELECTION_OUT:?}" | ${PAGER:?}
             ]===],
           },
