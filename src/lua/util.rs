@@ -119,6 +119,7 @@ pub fn clone<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Type: function( path:string ) -> boolean
 ///
 /// Example:
+///
 /// ```lua
 /// xplr.util.exists("/foo/bar")
 /// -- true
@@ -135,6 +136,7 @@ pub fn exists<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Type: function( path:string ) -> boolean
 ///
 /// Example:
+///
 /// ```lua
 /// xplr.util.is_dir("/foo/bar")
 /// -- true
@@ -151,6 +153,7 @@ pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Type: function( path:string ) -> boolean
 ///
 /// Example:
+///
 /// ```lua
 /// xplr.util.is_file("/foo/bar")
 /// -- true
@@ -167,6 +170,7 @@ pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Type: function( path:string ) -> boolean
 ///
 /// Example:
+///
 /// ```lua
 /// xplr.util.is_file("/foo/bar")
 /// -- true
@@ -183,6 +187,7 @@ pub fn is_symlink<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Type: function( path:string ) -> boolean
 ///
 /// Example:
+///
 /// ```lua
 /// xplr.util.is_absolute("/foo/bar")
 /// -- true
@@ -199,6 +204,7 @@ pub fn is_absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Type: function( path:string ) -> boolean
 ///
 /// Example:
+///
 /// ```lua
 /// xplr.util.path_split("/foo/bar")
 /// -- { "/", "foo", "bar" }
@@ -230,7 +236,7 @@ pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 ///
 /// ```lua
 /// xplr.util.node("./bar")
-/// -- { parent = "/pwd", relative_path = "bar", absolute_path = "/foo/bar", ... }
+/// -- { parent = "/pwd", relative_path = "bar", absolute_path = "/pwd/bar", ... }
 ///
 /// xplr.util.node("/")
 /// -- nil

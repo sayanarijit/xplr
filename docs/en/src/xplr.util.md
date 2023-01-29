@@ -11,6 +11,124 @@ xplr.util.version()
 -- { major = 0, minor = 0, patch = 0 }
 ```
 
+### xplr.util.clone
+
+Clone/deepcopy a Lua value. Doesn't work with functions.
+
+Type: function( value ) -> value
+
+Example:
+
+```lua
+local val = { foo = "bar" }
+local val_clone = xplr.util.clone(val)
+val.foo = "baz"
+print(val_clone.foo)
+-- "bar"
+```
+
+### xplr.util.exists
+
+Check if the given path exists.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.exists("/foo/bar")
+-- true
+```
+
+### xplr.util.is_dir
+
+Check if the given path is a directory.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_dir("/foo/bar")
+-- true
+```
+
+### xplr.util.is_file
+
+Check if the given path is a file.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_file("/foo/bar")
+-- true
+```
+
+### xplr.util.is_symlink
+
+Check if the given path is a symlink.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_file("/foo/bar")
+-- true
+```
+
+### xplr.util.is_absolute
+
+Check if the given path is an absolute path.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.is_absolute("/foo/bar")
+-- true
+```
+
+### xplr.util.path_split
+
+Split a path into its components.
+
+Type: function( path:string ) -> boolean
+
+Example:
+
+```lua
+xplr.util.path_split("/foo/bar")
+-- { "/", "foo", "bar" }
+
+xplr.util.path_split(".././foo")
+-- { "..", "foo" }
+```
+
+### xplr.util.node
+
+Get [Node][5] information of a given path.
+Doesn't check if the path exists.
+Returns nil if the path is "/".
+Errors out if absolute path can't be obtained.
+
+Type: function( path:string ) -> [Node][5]|nil
+
+Example:
+
+```lua
+xplr.util.node("./bar")
+-- { parent = "/pwd", relative_path = "bar", absolute_path = "/pwd/bar", ... }
+
+xplr.util.node("/")
+-- nil
+```
+
+[5]: https://xplr.dev/en/lua-function-calls#node
+
 ### xplr.util.dirname
 
 Get the directory name of a given path.
