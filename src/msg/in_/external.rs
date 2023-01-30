@@ -110,7 +110,7 @@ pub enum ExternalMsg {
     /// - YAML: `FocusPrevious`
     FocusPrevious,
 
-    /// Focus on the previous item.
+    /// Focus on the previous selection item.
     ///
     /// Example:
     ///

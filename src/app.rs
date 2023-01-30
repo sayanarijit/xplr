@@ -608,14 +608,20 @@ impl App {
     pub fn explore_pwd(mut self) -> Result<Self> {
         let focus = &self.last_focus.get(&self.pwd).cloned().unwrap_or(None);
         let pwd = self.pwd.clone();
-        self = self.add_last_focus(pwd, focus.clone())?;
-        let dir = explorer::explore_sync(
+        self = self.add_last_focus(pwd.clone(), focus.clone())?;
+
+        match explorer::explore_sync(
             self.explorer_config.clone(),
             self.pwd.clone().into(),
             focus.as_ref().map(PathBuf::from),
             self.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
-        )?;
-        self.set_directory(dir)
+        ) {
+            Ok(dir) => self.set_directory(dir),
+            Err(e) => {
+                self.directory_buffer = None;
+                self.log_error(format!("Failed to explore {pwd:?}: {e}"))
+            }
+        }
     }
 
     fn explore_pwd_async(mut self) -> Result<Self> {
@@ -867,7 +873,7 @@ impl App {
             }
         } else {
             self.log_error(format!(
-                "not a valid directory: {}",
+                "not a valid directory: {:?}",
                 vroot.to_string_lossy()
             ))
         }
@@ -930,7 +936,7 @@ impl App {
                 }
                 self.explore_pwd()
             }
-            Err(e) => self.log_error(e.to_string()),
+            Err(e) => self.log_error(format!("failed to enter {dir:?}: {e}")),
         }
     }
 
@@ -1113,7 +1119,7 @@ impl App {
                 }
                 Ok(self)
             } else {
-                self.log_error(format!("{name} not found in $PWD"))
+                self.log_error(format!("{name:?} not found in $PWD"))
             }
         } else {
             Ok(self)
@@ -1147,10 +1153,10 @@ impl App {
                 self.change_directory(&parent.to_string_lossy(), false)?
                     .focus_by_file_name(&filename.to_string_lossy(), save_history)
             } else {
-                self.log_error(format!("{path} not found"))
+                self.log_error(format!("{path:?} not found"))
             }
         } else {
-            self.log_error(format!("Cannot focus on {path}"))
+            self.log_error(format!("Cannot focus on {path:?}"))
         }
     }
 
@@ -1198,7 +1204,7 @@ impl App {
         } else if self.config.modes.custom.contains_key(mode) {
             self.switch_mode_custom_keeping_input_buffer(mode)
         } else {
-            self.log_error(format!("Mode not found: {mode}"))
+            self.log_error(format!("Mode not found: {mode:?}"))
         }
     }
 
@@ -1223,7 +1229,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin mode not found: {mode}"))
+            self.log_error(format!("Builtin mode not found: {mode:?}"))
         }
     }
 
@@ -1248,7 +1254,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom mode not found: {mode}"))
+            self.log_error(format!("Custom mode not found: {mode:?}"))
         }
     }
 
@@ -1258,7 +1264,7 @@ impl App {
         } else if self.config.layouts.custom.contains_key(layout) {
             self.switch_layout_custom(layout)
         } else {
-            self.log_error(format!("Layout not found: {layout}"))
+            self.log_error(format!("Layout not found: {layout:?}"))
         }
     }
 
@@ -1274,7 +1280,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin layout not found: {layout}"))
+            self.log_error(format!("Builtin layout not found: {layout:?}"))
         }
     }
 
@@ -1290,7 +1296,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom layout not found: {layout}"))
+            self.log_error(format!("Custom layout not found: {layout:?}"))
         }
     }
 

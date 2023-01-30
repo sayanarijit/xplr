@@ -297,12 +297,13 @@ impl Runner {
         execute!(stdout, term::EnterAlternateScreen)?;
 
         let mut fifo: Option<fs::File> =
-            if let Some(path) = app.config.general.start_fifo.as_ref() {
+            if let Some(path) = app.config.general.start_fifo.clone() {
                 // TODO remove duplicate segment
-                match start_fifo(path, &app.focused_node_str()) {
+                match start_fifo(&path, &app.focused_node_str()) {
                     Ok(file) => Some(file),
                     Err(e) => {
-                        app = app.log_error(e.to_string())?;
+                        app = app
+                            .log_error(format!("could not start fifo {path:?}: {e}"))?;
                         None
                     }
                 }
@@ -316,7 +317,7 @@ impl Runner {
         let mut mouse_enabled = app.config.general.enable_mouse;
         if mouse_enabled {
             if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
-                app = app.log_error(e.to_string())?;
+                app = app.log_error(format!("could not enable mouse: {e}"))?;
             }
         }
 
@@ -508,7 +509,9 @@ impl Runner {
                                             mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app = app.log_error(format!(
+                                                "could not enable mouse: {e}"
+                                            ))?;
                                         }
                                     }
                                 }
@@ -536,7 +539,9 @@ impl Runner {
                                             mouse_enabled = false;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            app = app.log_error(format!(
+                                                "could not disable mouse: {e}"
+                                            ))?;
                                         }
                                     }
                                 }
@@ -546,7 +551,9 @@ impl Runner {
                                 fifo = match start_fifo(&path, &app.focused_node_str()) {
                                     Ok(file) => Some(file),
                                     Err(e) => {
-                                        app = app.log_error(e.to_string())?;
+                                        app = app.log_error(format!(
+                                            "could not start fifo {path:?}: {e}"
+                                        ))?;
                                         None
                                     }
                                 }
@@ -569,7 +576,9 @@ impl Runner {
                                         {
                                             Ok(file) => Some(file),
                                             Err(e) => {
-                                                app = app.log_error(e.to_string())?;
+                                                app = app.log_error(format!(
+                                                    "could not toggle fifo {path:?}: {e}"
+                                                ))?;
                                                 None
                                             }
                                         }

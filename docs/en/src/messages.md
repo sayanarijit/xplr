@@ -139,7 +139,7 @@ Example:
 
 #### FocusPreviousSelection
 
-Focus on the previous item.
+Focus on the previous selection item.
 
 Example:
 
