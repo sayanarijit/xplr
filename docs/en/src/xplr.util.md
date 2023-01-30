@@ -131,7 +131,7 @@ xplr.util.node("/")
 
 Get the configured [Node Type][6] of a given [Node][5].
 
-Type: function( [Node][5], [xplr.config.node_types][7]|nil ) -> [NodeType][5]
+Type: function( [Node][5], [xplr.config.node_types][7]|nil ) -> [Node Type][6]
 
 If the second argument is missing, global config `xplr.config.node_types`
 will be used.
