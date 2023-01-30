@@ -31,7 +31,7 @@ pub fn get_tty() -> Result<fs::File> {
     match fs::OpenOptions::new().read(true).write(true).open(tty) {
         Ok(f) => Ok(f),
         Err(e) => {
-            bail!(format!("Failed to open {tty}. {e}"))
+            bail!(format!("could not open {tty}. {e}"))
         }
     }
 }

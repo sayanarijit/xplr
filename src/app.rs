@@ -415,7 +415,7 @@ impl App {
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
         if self.config.general.read_only && !msg.is_read_only() {
-            self.log_error("Cannot execute code in read-only mode.".into())
+            self.log_error("could not execute code in read-only mode.".into())
         } else {
             use ExternalMsg::*;
             match msg {
@@ -594,7 +594,7 @@ impl App {
                 if self.config.general.enable_recover_mode {
                     vec![ExternalMsg::SwitchModeBuiltin("recover".into())]
                 } else {
-                    vec![ExternalMsg::LogWarning("Key map not found.".into())]
+                    vec![ExternalMsg::LogWarning("key map not found.".into())]
                 }
             });
 
@@ -619,7 +619,7 @@ impl App {
             Ok(dir) => self.set_directory(dir),
             Err(e) => {
                 self.directory_buffer = None;
-                self.log_error(format!("Failed to explore {pwd:?}: {e}"))
+                self.log_error(format!("could not explore {pwd:?}: {e}"))
             }
         }
     }
@@ -936,7 +936,7 @@ impl App {
                 }
                 self.explore_pwd()
             }
-            Err(e) => self.log_error(format!("failed to enter {dir:?}: {e}")),
+            Err(e) => self.log_error(format!("could not enter {dir:?}: {e}")),
         }
     }
 
@@ -1156,7 +1156,7 @@ impl App {
                 self.log_error(format!("{path:?} not found"))
             }
         } else {
-            self.log_error(format!("Cannot focus on {path:?}"))
+            self.log_error(format!("could not focus on {path:?}"))
         }
     }
 
@@ -1204,7 +1204,7 @@ impl App {
         } else if self.config.modes.custom.contains_key(mode) {
             self.switch_mode_custom_keeping_input_buffer(mode)
         } else {
-            self.log_error(format!("Mode not found: {mode:?}"))
+            self.log_error(format!("mode not found: {mode:?}"))
         }
     }
 
@@ -1229,7 +1229,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin mode not found: {mode:?}"))
+            self.log_error(format!("builtin mode not found: {mode:?}"))
         }
     }
 
@@ -1254,7 +1254,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom mode not found: {mode:?}"))
+            self.log_error(format!("custom mode not found: {mode:?}"))
         }
     }
 
@@ -1264,7 +1264,7 @@ impl App {
         } else if self.config.layouts.custom.contains_key(layout) {
             self.switch_layout_custom(layout)
         } else {
-            self.log_error(format!("Layout not found: {layout:?}"))
+            self.log_error(format!("layout not found: {layout:?}"))
         }
     }
 
@@ -1280,7 +1280,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin layout not found: {layout:?}"))
+            self.log_error(format!("builtin layout not found: {layout:?}"))
         }
     }
 
@@ -1296,7 +1296,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom layout not found: {layout:?}"))
+            self.log_error(format!("custom layout not found: {layout:?}"))
         }
     }
 

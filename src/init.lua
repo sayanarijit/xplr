@@ -1481,7 +1481,7 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to copy $PTH_ESC to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               read -p "[enter to continue]"
@@ -1508,7 +1508,7 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ./$BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to move $PTH_ESC to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               read -p "[enter to continue]"
@@ -1536,7 +1536,7 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to softlink $PTH_ESC as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               read -p "[enter to continue]"
@@ -1564,7 +1564,7 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to hardlink $PTH_ESC as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
               read -p "[enter to continue]"
@@ -1924,7 +1924,7 @@ xplr.config.modes.builtin.delete = {
                 if rm -rfv -- "${PTH:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                 else
-                  "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not delete $PTH_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$PTH"
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
@@ -1946,14 +1946,14 @@ xplr.config.modes.builtin.delete = {
                   if rmdir -v -- "${PTH:?}"; then
                     "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                   else
-                    "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
+                    "$XPLR" -m 'LogError: %q' "could not delete $PTH_ESC"
                     "$XPLR" -m 'FocusPath: %q' "$PTH"
                   fi
                 else
                   if rm -v -- "${PTH:?}"; then
                     "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                   else
-                    "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
+                    "$XPLR" -m 'LogError: %q' "could not delete $PTH_ESC"
                     "$XPLR" -m 'FocusPath: %q' "$PTH"
                   fi
                 fi
