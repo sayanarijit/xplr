@@ -1467,6 +1467,7 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec0 = [===[
+              "$XPLR" -m ExplorePwd
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
@@ -1483,7 +1484,6 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'LogError: %q' "Failed to copy $PTH_ESC to ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              "$XPLR" -m ExplorePwdAsync
               read -p "[enter to continue]"
             ]===],
           },
@@ -1495,6 +1495,7 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec0 = [===[
+              "$XPLR" -m ExplorePwd
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
@@ -1510,7 +1511,6 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'LogError: %q' "Failed to move $PTH_ESC to ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              "$XPLR" -m ExplorePwdAsync
               read -p "[enter to continue]"
             ]===],
           },
@@ -1522,6 +1522,7 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec0 = [===[
+              "$XPLR" -m ExplorePwd
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
@@ -1538,7 +1539,6 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'LogError: %q' "Failed to softlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              "$XPLR" -m ExplorePwdAsync
               read -p "[enter to continue]"
             ]===],
           },
@@ -1550,6 +1550,7 @@ xplr.config.modes.builtin.selection_ops = {
         messages = {
           {
             BashExec0 = [===[
+              "$XPLR" -m ExplorePwd
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
@@ -1566,7 +1567,6 @@ xplr.config.modes.builtin.selection_ops = {
                   "$XPLR" -m 'LogError: %q' "Failed to hardlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              "$XPLR" -m ExplorePwdAsync
               read -p "[enter to continue]"
             ]===],
           },
@@ -1918,15 +1918,16 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
+              "$XPLR" -m ExplorePwd
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 if rm -rfv -- "${PTH:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                 else
                   "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
+                  "$XPLR" -m 'FocusPath: %q' "$PTH"
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
-              "$XPLR" -m ExplorePwdAsync
               read -p "[enter to continue]"
             ]===],
           },
@@ -1938,6 +1939,7 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
+              "$XPLR" -m ExplorePwd
               (while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 if [ -d "$PTH" ] && [ ! -L "$PTH" ]; then
@@ -1945,16 +1947,17 @@ xplr.config.modes.builtin.delete = {
                     "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                   else
                     "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
+                    "$XPLR" -m 'FocusPath: %q' "$PTH"
                   fi
                 else
                   if rm -v -- "${PTH:?}"; then
                     "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
                   else
                     "$XPLR" -m 'LogError: %q' "Failed to delete $PTH_ESC"
+                    "$XPLR" -m 'FocusPath: %q' "$PTH"
                   fi
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}")
-              "$XPLR" -m ExplorePwdAsync
               read -p "[enter to continue]"
             ]===],
           },
