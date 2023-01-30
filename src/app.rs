@@ -427,6 +427,7 @@ impl App {
                 FocusFirst => self.focus_first(true),
                 FocusLast => self.focus_last(),
                 FocusPrevious => self.focus_previous(),
+                FocusPreviousSelection => self.focus_previous_selection(),
                 FocusPreviousByRelativeIndex(i) => {
                     self.focus_previous_by_relative_index(i)
                 }
@@ -435,6 +436,7 @@ impl App {
                     self.focus_previous_by_relative_index_from_input()
                 }
                 FocusNext => self.focus_next(),
+                FocusNextSelection => self.focus_next_selection(),
                 FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
                 FocusNextByRelativeIndexFromInput => {
                     self.focus_next_by_relative_index_from_input()
@@ -689,6 +691,46 @@ impl App {
         Ok(self)
     }
 
+    fn focus_previous_selection(mut self) -> Result<Self> {
+        let total = self.selection.len();
+        if total == 0 {
+            return Ok(self);
+        }
+
+        let bounded = self.config.general.enforce_bounded_index_navigation;
+
+        if let Some(n) = self
+            .directory_buffer
+            .as_ref()
+            .and_then(|d| d.focused_node())
+        {
+            if let Some(idx) = self.selection.get_index_of(n) {
+                let idx = if idx == 0 {
+                    if bounded {
+                        idx
+                    } else {
+                        total.max(1) - 1
+                    }
+                } else {
+                    idx.max(1) - 1
+                };
+                if let Some(p) = self
+                    .selection
+                    .get_index(idx)
+                    .map(|n| n.absolute_path.clone())
+                {
+                    self = self.focus_path(&p, true)?;
+                }
+            } else if let Some(p) =
+                self.selection.last().map(|n| n.absolute_path.clone())
+            {
+                self = self.focus_path(&p, true)?;
+            }
+        }
+
+        Ok(self)
+    }
+
     pub fn focus_previous_by_relative_index(mut self, index: usize) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
@@ -731,6 +773,46 @@ impl App {
                 dir.focus + 1
             }
         };
+        Ok(self)
+    }
+
+    fn focus_next_selection(mut self) -> Result<Self> {
+        let total = self.selection.len();
+        if total == 0 {
+            return Ok(self);
+        }
+
+        let bounded = self.config.general.enforce_bounded_index_navigation;
+
+        if let Some(n) = self
+            .directory_buffer
+            .as_ref()
+            .and_then(|d| d.focused_node())
+        {
+            if let Some(idx) = self.selection.get_index_of(n) {
+                let idx = if idx + 1 == total {
+                    if bounded {
+                        idx
+                    } else {
+                        0
+                    }
+                } else {
+                    idx + 1
+                };
+                if let Some(p) = self
+                    .selection
+                    .get_index(idx)
+                    .map(|n| n.absolute_path.clone())
+                {
+                    self = self.focus_path(&p, true)?;
+                }
+            } else if let Some(p) =
+                self.selection.first().map(|n| n.absolute_path.clone())
+            {
+                self = self.focus_path(&p, true)?;
+            }
+        }
+
         Ok(self)
     }
 
