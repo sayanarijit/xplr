@@ -659,13 +659,13 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
                 return Ok(string);
             }
 
-            let Some(style) = style else {
-                return Ok(string);
-            };
-
-            let style: Style = lua.from_value(Value::Table(style))?;
-            let ansi_style: nu_ansi_term::Style = style.into();
-            Ok::<String, LuaError>(ansi_style.paint(string).to_string())
+            if let Some(style) = style {
+                let style: Style = lua.from_value(Value::Table(style))?;
+                let ansi_style: nu_ansi_term::Style = style.into();
+                Ok::<String, LuaError>(ansi_style.paint(string).to_string())
+            } else {
+                Ok(string)
+            }
         })?;
     util.set("paint", func)?;
     Ok(util)
