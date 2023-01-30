@@ -74,6 +74,14 @@ pub enum ExternalMsg {
     /// - YAML: `FocusNext`
     FocusNext,
 
+    /// Focus on the next selected node.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"FocusNextSelection"`
+    /// - YAML: `FocusNextSelection`
+    FocusNextSelection,
+
     /// Focus on the `n`th node relative to the current focus where `n` is a
     /// given value.
     ///
@@ -101,6 +109,14 @@ pub enum ExternalMsg {
     /// - Lua: `"FocusPrevious"`
     /// - YAML: `FocusPrevious`
     FocusPrevious,
+
+    /// Focus on the previous item.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"FocusPreviousSelection"`
+    /// - YAML: `FocusPreviousSelection`
+    FocusPreviousSelection,
 
     /// Focus on the `-n`th node relative to the current focus where `n` is a
     /// given value.

@@ -1242,6 +1242,18 @@ xplr.config.modes.builtin.default = {
           "ScrollDownHalf",
         },
       },
+      ["ctrl-n"] = {
+        help = "next selection",
+        messages = {
+          "FocusNextSelection",
+        },
+      },
+      ["ctrl-p"] = {
+        help = "prev selection",
+        messages = {
+          "FocusPreviousSelection",
+        },
+      },
     },
     on_number = {
       help = "input",
@@ -1468,6 +1480,7 @@ xplr.config.modes.builtin.selection_ops = {
                 if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ./$BASENAME_ESC"
                   "$XPLR" -m 'UnSelectPath: %q' "$PTH"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "Failed to copy $PTH_ESC to ./$BASENAME_ESC"
                 fi
@@ -1494,7 +1507,7 @@ xplr.config.modes.builtin.selection_ops = {
                 done
                 if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ./$BASENAME_ESC"
-                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "Failed to move $PTH_ESC to ./$BASENAME_ESC"
                 fi
@@ -1522,6 +1535,7 @@ xplr.config.modes.builtin.selection_ops = {
                 if ln -sv -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as ./$BASENAME_ESC"
                   "$XPLR" -m 'UnSelectPath: %q' "$PTH"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "Failed to softlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
@@ -1549,6 +1563,7 @@ xplr.config.modes.builtin.selection_ops = {
                 if ln -v -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as ./$BASENAME_ESC"
                   "$XPLR" -m 'UnSelectPath: %q' "$PTH"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "Failed to hardlink $PTH_ESC as ./$BASENAME_ESC"
                 fi

@@ -97,6 +97,15 @@ Example:
 - Lua: `"FocusNext"`
 - YAML: `FocusNext`
 
+#### FocusNextSelection
+
+Focus on the next selected node.
+
+Example:
+
+- Lua: `"FocusNextSelection"`
+- YAML: `FocusNextSelection`
+
 #### FocusNextByRelativeIndex
 
 Focus on the `n`th node relative to the current focus where `n` is a
@@ -127,6 +136,15 @@ Example:
 
 - Lua: `"FocusPrevious"`
 - YAML: `FocusPrevious`
+
+#### FocusPreviousSelection
+
+Focus on the previous item.
+
+Example:
+
+- Lua: `"FocusPreviousSelection"`
+- YAML: `FocusPreviousSelection`
 
 #### FocusPreviousByRelativeIndex
 
