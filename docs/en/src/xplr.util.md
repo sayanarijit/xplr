@@ -406,7 +406,7 @@ xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modif
 
 Mix multiple [Style][3] objects into one.
 
-Type: function( { [Style][3], [Style][3], ... } ) -> Style[3]
+Type: function( { [Style][3], [Style][3], ... } ) -> [Style][3]
 
 Example:
 
@@ -475,4 +475,4 @@ xplr.util.layout_replace(layout, "Table", "Selection")
 [4]: https://xplr.dev/en/layout
 [5]: https://xplr.dev/en/lua-function-calls#node
 [6]: https://xplr.dev/en/node-type
-[7]: https://xplr.dev/en/node-types
+[7]: https://xplr.dev/en/node_types

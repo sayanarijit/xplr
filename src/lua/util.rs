@@ -673,7 +673,7 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
 /// Mix multiple [Style][3] objects into one.
 ///
-/// Type: function( { [Style][3], [Style][3], ... } ) -> Style[3]
+/// Type: function( { [Style][3], [Style][3], ... } ) -> [Style][3]
 ///
 /// Example:
 ///
@@ -783,7 +783,7 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// [4]: https://xplr.dev/en/layout
 /// [5]: https://xplr.dev/en/lua-function-calls#node
 /// [6]: https://xplr.dev/en/node-type
-/// [7]: https://xplr.dev/en/node-types
+/// [7]: https://xplr.dev/en/node_types
 
 pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
