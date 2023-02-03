@@ -2127,7 +2127,6 @@ xplr.config.modes.builtin.search = {
         help = "sort (disables ranking)",
         messages = {
           "DisableRankedSearch",
-          -- "PopMode",
           "ExplorePwdAsync",
           { SwitchModeBuiltinKeepingInputBuffer = "sort" },
         },
