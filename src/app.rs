@@ -528,6 +528,9 @@ impl App {
                 ClearNodeSorters => self.clear_node_sorters(),
                 SearchFuzzy(p) => self.search_fuzzy(p),
                 SearchFuzzyFromInput => self.search_fuzzy_from_input(),
+                ToggleRankedSearch => self.toggle_ranked_search(),
+                EnableRankedSearch => self.set_ranked_search(true),
+                DisableRankedSearch => self.set_ranked_search(false),
                 AcceptSearch => self.accept_search(),
                 CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),
@@ -1612,14 +1615,16 @@ impl App {
     }
 
     pub fn search_fuzzy(mut self, pattern: String) -> Result<Self> {
-        let rf = self
+        let (rf, ranked) = self
             .explorer_config
             .searcher
             .as_ref()
-            .map(|s| s.recoverable_focus.clone())
-            .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
+            .map(|s| (s.recoverable_focus.clone(), s.ranked))
+            .unwrap_or_else(|| {
+                (self.focused_node().map(|n| n.absolute_path.clone()), true)
+            });
 
-        self.explorer_config.searcher = Some(NodeSearcher::new(pattern, rf));
+        self.explorer_config.searcher = Some(NodeSearcher::new(pattern, rf, ranked));
         Ok(self)
     }
 
@@ -1629,6 +1634,22 @@ impl App {
         } else {
             Ok(self)
         }
+    }
+
+    fn toggle_ranked_search(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|searcher| searcher.toggle_ranked());
+        Ok(self)
+    }
+
+    fn set_ranked_search(mut self, ranking: bool) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|searcher| searcher.with_ranked(ranking));
+        Ok(self)
     }
 
     fn accept_search(mut self) -> Result<Self> {

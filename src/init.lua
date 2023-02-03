@@ -2116,6 +2116,22 @@ xplr.config.modes.builtin.search = {
           "FocusNext",
         },
       },
+      ["ctrl-z"] = {
+        help = "toggle search ranking",
+        messages = {
+          "ToggleRankedSearch",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-s"] = {
+        help = "sort (disables ranking)",
+        messages = {
+          "DisableRankedSearch",
+          -- "PopMode",
+          "ExplorePwdAsync",
+          { SwitchModeBuiltinKeepingInputBuffer = "sort" },
+        },
+      },
       ["right"] = {
         help = "enter",
         messages = {
@@ -2365,7 +2381,12 @@ xplr.config.modes.builtin.sort = {
       ["enter"] = {
         help = "submit",
         messages = {
-          "PopMode",
+          "PopModeKeepingInputBuffer",
+        },
+      },
+      ["esc"] = {
+        messages = {
+          "PopModeKeepingInputBuffer",
         },
       },
       ["m"] = {

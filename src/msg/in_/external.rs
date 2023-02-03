@@ -943,6 +943,33 @@ pub enum ExternalMsg {
     /// - YAML: `SearchFuzzyFromInput`
     SearchFuzzyFromInput,
 
+    /// Toggles sorting based on search match ranking or xplr default.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ToggleRankedSearch"`
+    /// - YAML: `ToggleRankedSearch`
+    ToggleRankedSearch,
+
+    /// Enables sorting based on search match ranking instead of xplr default.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"EnableRankedSearch"`
+    /// - YAML: `EnableRankedSearch`
+    EnableRankedSearch,
+
+    /// Disables sorting based on search match ranking and uses xplr default.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"DisableRankedSearch"`
+    /// - YAML: `DisableRankedSearch`
+    DisableRankedSearch,
+
     /// Accepts the search by keeping the latest focus while in search mode.
     /// Automatically calls `ExplorePwd`.
     ///
@@ -1656,13 +1683,36 @@ pub struct NodeSearcher {
 
     #[serde(default)]
     pub recoverable_focus: Option<String>,
+
+    pub ranked: bool,
 }
 
 impl NodeSearcher {
-    pub fn new(pattern: String, recoverable_focus: Option<String>) -> Self {
+    pub fn new(
+        pattern: String,
+        recoverable_focus: Option<String>,
+        ranked: bool,
+    ) -> Self {
         Self {
             pattern,
             recoverable_focus,
+            ranked,
+        }
+    }
+
+    pub fn with_ranked(self, ranked: bool) -> Self {
+        Self {
+            pattern: self.pattern,
+            recoverable_focus: self.recoverable_focus,
+            ranked,
+        }
+    }
+
+    pub fn toggle_ranked(self) -> Self {
+        Self {
+            pattern: self.pattern,
+            recoverable_focus: self.recoverable_focus,
+            ranked: !self.ranked,
         }
     }
 }

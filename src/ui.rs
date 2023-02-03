@@ -1017,11 +1017,7 @@ fn draw_sort_n_filter<B: Backend>(
     let ui = app.config.general.sort_and_filter_ui.to_owned();
     let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
     let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
-    let search = app
-        .explorer_config
-        .searcher
-        .as_ref()
-        .map(|s| s.pattern.clone());
+    let search = app.explorer_config.searcher.as_ref();
 
     let defaultui = &ui.default_identifier;
     let forwardui = defaultui
@@ -1071,7 +1067,11 @@ fn draw_sort_n_filter<B: Backend>(
                         })
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
-                .take(if search.is_some() { 0 } else { sort_by.len() }),
+                .take(if let Some(true) = search.map(|s| s.ranked) {
+                    0
+                } else {
+                    sort_by.len()
+                }),
         )
         .chain(search.iter().map(|s| {
             ui.search_identifier
@@ -1083,10 +1083,10 @@ fn draw_sort_n_filter<B: Backend>(
                             ui.format.to_owned().unwrap_or_default(),
                             ui.style.to_owned().into(),
                         ),
-                        Span::styled(s, ui.style.into()),
+                        Span::styled(&s.pattern, ui.style.into()),
                     )
                 })
-                .unwrap_or((Span::raw("/"), Span::raw(s)))
+                .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
         }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
