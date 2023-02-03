@@ -761,10 +761,10 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(
-        move |lua, (layout, target, replacement): (Table, Table, Table)| {
+        move |lua, (layout, target, replacement): (Table, Value, Value)| {
             let layout: Layout = lua.from_value(Value::Table(layout))?;
-            let target: Layout = lua.from_value(Value::Table(target))?;
-            let replacement: Layout = lua.from_value(Value::Table(replacement))?;
+            let target: Layout = lua.from_value(target)?;
+            let replacement: Layout = lua.from_value(replacement)?;
 
             let res = layout.replace(&target, &replacement);
             let res = lua::serialize(lua, &res).map_err(LuaError::custom)?;
