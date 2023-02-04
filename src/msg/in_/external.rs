@@ -1,4 +1,9 @@
-use crate::{app::Node, input::InputOperation};
+use crate::{
+    app::Node,
+    config::SearchConfig,
+    input::InputOperation,
+    search::{SearchAlgorithm, SearchOrder},
+};
 use indexmap::IndexSet;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -943,32 +948,32 @@ pub enum ExternalMsg {
     /// - YAML: `SearchFuzzyFromInput`
     SearchFuzzyFromInput,
 
-    /// Toggles sorting based on search match ranking or xplr default.
+    /// Cycles through different search order modes.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
-    /// - Lua: `"ToggleRankedSearch"`
-    /// - YAML: `ToggleRankedSearch`
-    ToggleRankedSearch,
+    /// - Lua: `"CycleSearchOrder"`
+    /// - YAML: `CycleSearchOrder`
+    CycleSearchOrder,
 
-    /// Enables sorting based on search match ranking instead of xplr default.
+    /// Sets how search results should be ordered.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
-    /// - Lua: `"EnableRankedSearch"`
-    /// - YAML: `EnableRankedSearch`
-    EnableRankedSearch,
+    /// - Lua: `{ SetSearchOrder = "Ranked" }`
+    /// - YAML: `SetSearchOrder: Sorted`
+    SetSearchOrder(SearchOrder),
 
-    /// Disables sorting based on search match ranking and uses xplr default.
+    /// Sets the search algorithm.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
-    /// - Lua: `"DisableRankedSearch"`
-    /// - YAML: `DisableRankedSearch`
-    DisableRankedSearch,
+    /// - Lua: `{ SetSearchAlgorithm = { Skim = "Fuzzy" } }`
+    /// - YAML: `SetSearchAlgorithm: {Skim: Regex}`
+    SetSearchAlgorithm(SearchAlgorithm),
 
     /// Accepts the search by keeping the latest focus while in search mode.
     /// Automatically calls `ExplorePwd`.
@@ -1684,35 +1689,20 @@ pub struct NodeSearcher {
     #[serde(default)]
     pub recoverable_focus: Option<String>,
 
-    pub ranked: bool,
+    #[serde(default)]
+    pub config: SearchConfig,
 }
 
 impl NodeSearcher {
     pub fn new(
         pattern: String,
         recoverable_focus: Option<String>,
-        ranked: bool,
+        config: SearchConfig,
     ) -> Self {
         Self {
             pattern,
             recoverable_focus,
-            ranked,
-        }
-    }
-
-    pub fn with_ranked(self, ranked: bool) -> Self {
-        Self {
-            pattern: self.pattern,
-            recoverable_focus: self.recoverable_focus,
-            ranked,
-        }
-    }
-
-    pub fn toggle_ranked(self) -> Self {
-        Self {
-            pattern: self.pattern,
-            recoverable_focus: self.recoverable_focus,
-            ranked: !self.ranked,
+            config,
         }
     }
 }

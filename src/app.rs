@@ -19,6 +19,8 @@ pub use crate::msg::out::MsgOut;
 pub use crate::node::Node;
 pub use crate::node::ResolvedNode;
 pub use crate::pipe::Pipe;
+use crate::search::SearchAlgorithm;
+use crate::search::SearchOrder;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
@@ -528,9 +530,9 @@ impl App {
                 ClearNodeSorters => self.clear_node_sorters(),
                 SearchFuzzy(p) => self.search_fuzzy(p),
                 SearchFuzzyFromInput => self.search_fuzzy_from_input(),
-                ToggleRankedSearch => self.toggle_ranked_search(),
-                EnableRankedSearch => self.set_ranked_search(true),
-                DisableRankedSearch => self.set_ranked_search(false),
+                CycleSearchOrder => self.cycle_search_order(),
+                SetSearchOrder(r) => self.set_search_order(r),
+                SetSearchAlgorithm(a) => self.set_search_algorithm(a),
                 AcceptSearch => self.accept_search(),
                 CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),
@@ -1615,16 +1617,18 @@ impl App {
     }
 
     pub fn search_fuzzy(mut self, pattern: String) -> Result<Self> {
-        let (rf, ranked) = self
+        let rf = self
             .explorer_config
             .searcher
             .as_ref()
-            .map(|s| (s.recoverable_focus.clone(), s.ranked))
-            .unwrap_or_else(|| {
-                (self.focused_node().map(|n| n.absolute_path.clone()), true)
-            });
+            .map(|s| s.recoverable_focus.clone())
+            .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
 
-        self.explorer_config.searcher = Some(NodeSearcher::new(pattern, rf, ranked));
+        self.explorer_config.searcher = Some(NodeSearcher::new(
+            pattern,
+            rf,
+            self.config.general.search.clone(),
+        ));
         Ok(self)
     }
 
@@ -1636,19 +1640,30 @@ impl App {
         }
     }
 
-    fn toggle_ranked_search(mut self) -> Result<Self> {
-        self.explorer_config.searcher = self
-            .explorer_config
-            .searcher
-            .map(|searcher| searcher.toggle_ranked());
+    fn cycle_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher.as_mut().map(|s| {
+            s.config.order = match s.config.order {
+                SearchOrder::Ranked => SearchOrder::Sorted,
+                SearchOrder::Sorted => SearchOrder::Ranked,
+            };
+            s
+        });
         Ok(self)
     }
 
-    fn set_ranked_search(mut self, ranking: bool) -> Result<Self> {
-        self.explorer_config.searcher = self
-            .explorer_config
-            .searcher
-            .map(|searcher| searcher.with_ranked(ranking));
+    fn set_search_order(mut self, order: SearchOrder) -> Result<Self> {
+        self.explorer_config.searcher.as_mut().map(|s| {
+            s.config.order = order;
+            s
+        });
+        Ok(self)
+    }
+
+    fn set_search_algorithm(mut self, algorithm: SearchAlgorithm) -> Result<Self> {
+        self.explorer_config.searcher.as_mut().map(|s| {
+            s.config.algorithm = algorithm;
+            s
+        });
         Ok(self)
     }
 

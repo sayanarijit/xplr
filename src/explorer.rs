@@ -1,36 +1,12 @@
 use crate::app::{
     DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task,
 };
+use crate::search::SearchOrder;
 use anyhow::{Error, Result};
-use lazy_static::lazy_static;
-use skim::prelude::ExactOrFuzzyEngineFactory;
-use skim::{MatchEngineFactory, SkimItem};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
-use std::sync::Arc;
 use std::thread;
-
-lazy_static! {
-    static ref ENGINE_FACTORY: ExactOrFuzzyEngineFactory =
-        ExactOrFuzzyEngineFactory::builder().build();
-}
-
-struct PathItem {
-    path: String,
-}
-
-impl From<String> for PathItem {
-    fn from(value: String) -> Self {
-        Self { path: value }
-    }
-}
-
-impl SkimItem for PathItem {
-    fn text(&self) -> std::borrow::Cow<str> {
-        std::borrow::Cow::from(&self.path)
-    }
-}
 
 pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
     let dirs = fs::read_dir(parent)?;
@@ -47,23 +23,16 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
         .filter(|n| config.filter(n))
         .collect::<Vec<Node>>();
 
-    nodes = if let Some((pattern, ranked)) =
-        config.searcher.as_ref().map(|s| (&s.pattern, &s.ranked))
-    {
-        let engine = ENGINE_FACTORY.create_engine(pattern);
-        let mut ranked_nodes = nodes
-            .into_iter()
-            .filter_map(|n| {
-                let item = Arc::new(PathItem::from(n.relative_path.clone()));
-                engine.match_item(item).map(|res| (n, res.rank))
-            })
-            .collect::<Vec<(_, _)>>();
+    nodes = if let Some(searcher) = config.searcher.as_ref() {
+        let mut ranked_nodes =
+            searcher.config.algorithm.search(&searcher.pattern, nodes);
 
-        if *ranked {
-            ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1))
-        } else {
-            ranked_nodes.sort_by(|(a, _), (b, _)| config.sort(a, b))
-        }
+        match searcher.config.order {
+            SearchOrder::Ranked => ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1)),
+            SearchOrder::Sorted => {
+                ranked_nodes.sort_by(|(a, _), (b, _)| config.sort(a, b))
+            }
+        };
 
         ranked_nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>()
     } else {

@@ -3,6 +3,7 @@ use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
+use crate::search::SearchOrder;
 use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
@@ -1067,11 +1068,15 @@ fn draw_sort_n_filter<B: Backend>(
                         })
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
-                .take(if let Some(true) = search.map(|s| s.ranked) {
-                    0
-                } else {
-                    sort_by.len()
-                }),
+                .take(
+                    if let Some(SearchOrder::Sorted) =
+                        search.map(|s| s.config.order.to_owned())
+                    {
+                        sort_by.len()
+                    } else {
+                        0
+                    },
+                ),
         )
         .chain(search.iter().map(|s| {
             ui.search_identifier

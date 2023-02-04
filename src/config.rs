@@ -4,6 +4,8 @@ use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
 use crate::node::Node;
+use crate::search::SearchAlgorithm;
+use crate::search::SearchOrder;
 use crate::ui::Border;
 use crate::ui::BorderType;
 use crate::ui::Constraint;
@@ -236,6 +238,16 @@ pub struct SortAndFilterUi {
     pub search_identifier: Option<UiElement>,
 }
 
+#[derive(Debug, Clone, Default, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SearchConfig {
+    #[serde(default)]
+    pub order: SearchOrder,
+
+    #[serde(default)]
+    pub algorithm: SearchAlgorithm,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PanelUi {
@@ -308,6 +320,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub sort_and_filter_ui: SortAndFilterUi,
+
+    #[serde(default)]
+    pub search: SearchConfig,
 
     #[serde(default)]
     pub panel_ui: PanelUi,

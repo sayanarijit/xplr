@@ -467,6 +467,14 @@ xplr.config.general.sort_and_filter_ui.search_identifier = {
   style = {},
 }
 
+-- -- The configuration
+-- --
+-- -- Type: { algorithm = [SearchAlgorithm], order = [SearchOrder] }
+xplr.config.general.search = {
+  algorithm = { Skim = "Fuzzy" },
+  order = "Ranked"
+}
+
 -- The content for panel title by default.
 --
 -- Type: nullable string
@@ -2119,14 +2127,28 @@ xplr.config.modes.builtin.search = {
       ["ctrl-z"] = {
         help = "toggle search ranking",
         messages = {
-          "ToggleRankedSearch",
+          "CycleSearchOrder",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-r"] = {
+        help = "regex search",
+        messages = {
+          { SetSearchAlgorithm = { Skim = "Regex" } },
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-f"] = {
+        help = "fuzzy search",
+        messages = {
+          { SetSearchAlgorithm = { Skim = "Fuzzy" } },
           "ExplorePwdAsync",
         },
       },
       ["ctrl-s"] = {
         help = "sort (disables ranking)",
         messages = {
-          "DisableRankedSearch",
+          { SetSearchOrder = "Sorted" },
           "ExplorePwdAsync",
           { SwitchModeBuiltinKeepingInputBuffer = "sort" },
         },
