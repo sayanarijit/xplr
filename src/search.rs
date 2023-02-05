@@ -48,10 +48,10 @@ impl SearchAlgorithm {
 
     pub fn cycle(self) -> Self {
         match self {
-            Self::Fuzzy => Self::FuzzyUnranked,
-            Self::FuzzyUnranked => Self::Regex,
-            Self::Regex => Self::RegexUnranked,
-            Self::RegexUnranked => Self::Fuzzy,
+            Self::Fuzzy => Self::Regex,
+            Self::FuzzyUnranked => Self::RegexUnranked,
+            Self::Regex => Self::Fuzzy,
+            Self::RegexUnranked => Self::FuzzyUnranked,
         }
     }
 

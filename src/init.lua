@@ -2124,6 +2124,13 @@ xplr.config.modes.builtin.search = {
         },
       },
       ["ctrl-z"] = {
+        help = "toggle ranking",
+        messages = {
+          "ToggleRankedSearch",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-a"] = {
         help = "cycle search algorithm",
         messages = {
           "CycleSearchAlgorithm",
