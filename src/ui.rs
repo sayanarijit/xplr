@@ -3,7 +3,6 @@ use crate::app::{Node, ResolvedNode};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
-use crate::search::SearchOrder;
 use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
@@ -1045,6 +1044,21 @@ fn draw_sort_n_filter<B: Backend>(
                 })
                 .unwrap_or((Span::raw("f"), Span::raw("")))
         })
+        .chain(search.iter().map(|s| {
+            ui.search_identifiers
+                .get(&s.algorithm)
+                .map(|u| {
+                    let ui = defaultui.to_owned().extend(u);
+                    (
+                        Span::styled(
+                            ui.format.to_owned().unwrap_or_default(),
+                            ui.style.to_owned().into(),
+                        ),
+                        Span::styled(&s.pattern, ui.style.into()),
+                    )
+                })
+                .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
+        }))
         .chain(
             sort_by
                 .iter()
@@ -1069,30 +1083,13 @@ fn draw_sort_n_filter<B: Backend>(
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
                 .take(
-                    if let Some(SearchOrder::Sorted) =
-                        search.map(|s| s.config.order.to_owned())
-                    {
-                        sort_by.len()
-                    } else {
+                    if search.map(|s| s.algorithm.is_ranked()).unwrap_or(false) {
                         0
+                    } else {
+                        sort_by.len()
                     },
                 ),
         )
-        .chain(search.iter().map(|s| {
-            ui.search_identifier
-                .as_ref()
-                .map(|u| {
-                    let ui = defaultui.to_owned().extend(u);
-                    (
-                        Span::styled(
-                            ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned().into(),
-                        ),
-                        Span::styled(&s.pattern, ui.style.into()),
-                    )
-                })
-                .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
-        }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
             ui.separator.style.to_owned().into(),

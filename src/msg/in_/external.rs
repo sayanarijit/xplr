@@ -1,9 +1,6 @@
-use crate::{
-    app::Node,
-    config::SearchConfig,
-    input::InputOperation,
-    search::{SearchAlgorithm, SearchOrder},
-};
+use crate::app::Node;
+use crate::input::InputOperation;
+use crate::search::SearchAlgorithm;
 use indexmap::IndexSet;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -926,6 +923,26 @@ pub enum ExternalMsg {
 
     /// ### Search Operations --------------------------------------------------
 
+    /// Search files using the current or default (fuzzy) search algorithm.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Type: { Search = "string" }
+    ///
+    /// Example:
+    ///
+    /// - Lua: `{ Search = "pattern" }`
+    /// - YAML: `Search: pattern`
+    Search(String),
+
+    /// Calls `Search` with the input taken from the input buffer.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"SearchFromInput"`
+    /// - YAML: `SearchFromInput`
+    SearchFromInput,
+
     /// Search files using fuzzy match algorithm.
     /// It keeps the filters, but overrides the sorters.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
@@ -941,6 +958,7 @@ pub enum ExternalMsg {
 
     /// Calls `SearchFuzzy` with the input taken from the input buffer.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
     ///
     /// Example:
     ///
@@ -948,32 +966,108 @@ pub enum ExternalMsg {
     /// - YAML: `SearchFuzzyFromInput`
     SearchFuzzyFromInput,
 
-    /// Cycles through different search order modes.
+    /// Like `SearchFuzzy`, but doesn't not perform rank based sorting.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Type: { SearchFuzzyUnranked = "string" }
     ///
     /// Example:
     ///
-    /// - Lua: `"CycleSearchOrder"`
-    /// - YAML: `CycleSearchOrder`
-    CycleSearchOrder,
+    /// - Lua: `{ SearchFuzzyUnranked = "pattern" }`
+    /// - YAML: `SearchFuzzyUnranked: pattern`
+    SearchFuzzyUnranked(String),
 
-    /// Sets how search results should be ordered.
+    /// Calls `SearchFuzzyUnranked` with the input taken from the input buffer.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
     ///
     /// Example:
     ///
-    /// - Lua: `{ SetSearchOrder = "Ranked" }`
-    /// - YAML: `SetSearchOrder: Sorted`
-    SetSearchOrder(SearchOrder),
+    /// - Lua: `"SearchFuzzyUnrankedFromInput"`
+    /// - YAML: `SearchFuzzyUnrankedFromInput`
+    SearchFuzzyUnrankedFromInput,
 
-    /// Sets the search algorithm.
+    /// Search files using regex match algorithm.
+    /// It keeps the filters, but overrides the sorters.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Type: { SearchRegex = "string" }
+    ///
+    /// Example:
+    ///
+    /// - Lua: `{ SearchRegex = "pattern" }`
+    /// - YAML: `SearchRegex: pattern`
+    SearchRegex(String),
+
+    /// Calls `SearchRegex` with the input taken from the input buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"SearchRegexFromInput"`
+    /// - YAML: `SearchRegexFromInput`
+    SearchRegexFromInput,
+
+    /// Like `SearchRegex`, but doesn't not perform rank based sorting.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Type: { SearchRegexUnranked = "string" }
+    ///
+    /// Example:
+    ///
+    /// - Lua: `{ SearchRegexUnranked = "pattern" }`
+    /// - YAML: `SearchRegexUnranked: pattern`
+    SearchRegexUnranked(String),
+
+    /// Calls `SearchRegexUnranked` with the input taken from the input buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// It gets reset automatically when changing directory.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"SearchRegexUnrankedFromInput"`
+    /// - YAML: `SearchRegexUnrankedFromInput`
+    SearchRegexUnrankedFromInput,
+
+    /// Cycles through different search algorithms, without changing the input
+    /// buffer
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
-    /// - Lua: `{ SetSearchAlgorithm = { Skim = "Fuzzy" } }`
-    /// - YAML: `SetSearchAlgorithm: {Skim: Regex}`
-    SetSearchAlgorithm(SearchAlgorithm),
+    /// - Lua: `"CycleSearchAlgorithm"`
+    /// - YAML: `CycleSearchAlgorithm`
+    CycleSearchAlgorithm,
+
+    /// Enables ranked search without changing the input buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"EnableRankedSearch"`
+    /// - YAML: `EnableRankedSearch`
+    EnableRankedSearch,
+
+    /// Disabled ranked search without changing the input buffer.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"DisableRankedSearch"`
+    /// - YAML: `DisableRankedSearch`
+    DisableRankedSearch,
+
+    /// Toggles ranked search without changing the input buffer.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"ToggleRankedSearch"`
+    /// - YAML: `ToggleRankedSearch`
+    ToggleRankedSearch,
 
     /// Accepts the search by keeping the latest focus while in search mode.
     /// Automatically calls `ExplorePwd`.
@@ -1683,26 +1777,58 @@ impl NodeFilterApplicable {
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, Serialize, Deserialize)]
-pub struct NodeSearcher {
+pub struct NodeSearcherApplicable {
     pub pattern: String,
 
     #[serde(default)]
     pub recoverable_focus: Option<String>,
 
     #[serde(default)]
-    pub config: SearchConfig,
+    pub algorithm: SearchAlgorithm,
 }
 
-impl NodeSearcher {
+impl NodeSearcherApplicable {
     pub fn new(
         pattern: String,
         recoverable_focus: Option<String>,
-        config: SearchConfig,
+        algorithm: SearchAlgorithm,
     ) -> Self {
         Self {
             pattern,
             recoverable_focus,
-            config,
+            algorithm,
+        }
+    }
+
+    pub fn search(&self, nodes: Vec<Node>) -> Vec<(Node, [i32; 4])> {
+        self.algorithm.search(&self.pattern, nodes)
+    }
+
+    pub fn enable_ranking(self) -> Self {
+        Self {
+            algorithm: self.algorithm.enable_ranking(),
+            ..self
+        }
+    }
+
+    pub fn disable_ranking(self) -> Self {
+        Self {
+            algorithm: self.algorithm.disable_ranking(),
+            ..self
+        }
+    }
+
+    pub fn toggle_ranking(self) -> Self {
+        Self {
+            algorithm: self.algorithm.toggle_ranking(),
+            ..self
+        }
+    }
+
+    pub fn cycle_algorithm(self) -> Self {
+        Self {
+            algorithm: self.algorithm.cycle(),
+            ..self
         }
     }
 }
@@ -1716,7 +1842,7 @@ pub struct ExplorerConfig {
     pub sorters: IndexSet<NodeSorterApplicable>,
 
     #[serde(default)]
-    pub searcher: Option<NodeSearcher>,
+    pub searcher: Option<NodeSearcherApplicable>,
 }
 
 impl ExplorerConfig {

@@ -193,6 +193,12 @@ Style for each item in the selection list.
 
 Type: [Style](https://xplr.dev/en/style)
 
+#### xplr.config.general.search.algorithm
+
+The default search algorithm
+
+Type: nullable [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
+
 #### xplr.config.general.default_ui.prefix
 
 The content that is placed before the item name for each row by default.
@@ -334,7 +340,7 @@ Type: nullable mapping of the following key-value pairs:
   - format: nullable string
   - style: [Style](https://xplr.dev/en/style)
 
-#### xplr.config.general.sort_and_filter_ui.search_identifier
+#### xplr.config.general.sort_and_filter_ui.search_identifiers
 
 The identifiers used to denote applied search input.
 

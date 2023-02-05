@@ -22,6 +22,7 @@
     - [Input Operation][39]
   - [Borders][31]
   - [Style][11]
+  - [Searching][41]
   - [Sorting][12]
   - [Filtering][13]
   - [Column Renderer][26]
@@ -79,3 +80,4 @@
 [38]: messages.md
 [39]: input-operation.md
 [40]: xplr.util.md
+[41]: searching.md

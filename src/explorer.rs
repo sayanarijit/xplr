@@ -1,7 +1,6 @@
 use crate::app::{
     DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task,
 };
-use crate::search::SearchOrder;
 use anyhow::{Error, Result};
 use std::fs;
 use std::path::PathBuf;
@@ -24,14 +23,12 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
         .collect::<Vec<Node>>();
 
     nodes = if let Some(searcher) = config.searcher.as_ref() {
-        let mut ranked_nodes =
-            searcher.config.algorithm.search(&searcher.pattern, nodes);
+        let mut ranked_nodes = searcher.search(nodes);
 
-        match searcher.config.order {
-            SearchOrder::Ranked => ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1)),
-            SearchOrder::Sorted => {
-                ranked_nodes.sort_by(|(a, _), (b, _)| config.sort(a, b))
-            }
+        if searcher.algorithm.is_ranked() {
+            ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
+        } else {
+            ranked_nodes.sort_by(|(a, _), (b, _)| config.sort(a, b));
         };
 
         ranked_nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>()
