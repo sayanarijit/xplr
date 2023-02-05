@@ -1800,8 +1800,11 @@ impl NodeSearcherApplicable {
         }
     }
 
-    pub fn search(&self, nodes: Vec<Node>) -> Vec<(Node, [i32; 4])> {
-        self.algorithm.search(&self.pattern, nodes)
+    pub fn search<F>(&self, nodes: Vec<Node>, sort: F) -> Vec<Node>
+    where
+        F: FnMut(&Node, &Node) -> Ordering,
+    {
+        self.algorithm.search(&self.pattern, nodes, sort)
     }
 
     pub fn enable_ranking(self) -> Self {

@@ -3,6 +3,7 @@ use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use skim::prelude::{ExactOrFuzzyEngineFactory, RegexEngineFactory};
 use skim::{MatchEngine, MatchEngineFactory, SkimItem};
+use std::cmp::Ordering;
 use std::sync::Arc;
 
 lazy_static! {
@@ -86,14 +87,27 @@ impl SearchAlgorithm {
         }
     }
 
-    pub fn search(&self, pattern: &str, nodes: Vec<Node>) -> Vec<(Node, [i32; 4])> {
+    pub fn search<F>(&self, pattern: &str, nodes: Vec<Node>, sort: F) -> Vec<Node>
+    where
+        F: FnMut(&Node, &Node) -> Ordering,
+    {
         let engine = self.engine(pattern);
-        nodes
+        let mut ranked_nodes = nodes
             .into_iter()
             .filter_map(|n| {
                 let item = Arc::new(PathItem::from(n.relative_path.clone()));
                 engine.match_item(item).map(|res| (n, res.rank))
             })
-            .collect::<Vec<(_, _)>>()
+            .collect::<Vec<(_, _)>>();
+
+        if self.is_ranked() {
+            ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
+            ranked_nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>()
+        } else {
+            let mut filtered_nodes =
+                ranked_nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>();
+            filtered_nodes.sort_by(sort);
+            filtered_nodes
+        }
     }
 }

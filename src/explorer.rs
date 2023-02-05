@@ -23,15 +23,7 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
         .collect::<Vec<Node>>();
 
     nodes = if let Some(searcher) = config.searcher.as_ref() {
-        let mut ranked_nodes = searcher.search(nodes);
-
-        if searcher.algorithm.is_ranked() {
-            ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
-        } else {
-            ranked_nodes.sort_by(|(a, _), (b, _)| config.sort(a, b));
-        };
-
-        ranked_nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>()
+        searcher.search(nodes, |a, b| config.sort(a, b))
     } else {
         nodes.sort_by(|a, b| config.sort(a, b));
         nodes
