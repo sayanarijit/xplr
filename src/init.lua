@@ -258,8 +258,13 @@ xplr.config.general.selection.item.style = {}
 
 -- The default search algorithm
 --
--- Type: nullable [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
+-- Type: [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
 xplr.config.general.search.algorithm = "Fuzzy"
+
+-- The default search ordering
+--
+-- Type: boolean
+xplr.config.general.search.unordered = false
 
 -- The content that is placed before the item name for each row by default.
 --
@@ -468,11 +473,20 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
 --
 -- Type: { format = nullable string, style = [Style](https://xplr.dev/en/style) }
 xplr.config.general.sort_and_filter_ui.search_identifiers = {
-  Fuzzy = { format = "/fzy↓", style = {} },
-  FuzzyUnranked = { format = "/fzy:", style = {} },
-  Regex = { format = "/reg↓", style = {} },
-  RegexUnranked = { format = "/reg:", style = {} },
+  Fuzzy = { format = "fzy:/", style = {} },
+  Regex = { format = "reg:/", style = {} },
 }
+
+-- The shape of ordered indicator for search ordering identifiers in Sort & filter panel.
+--
+-- Type: nullable string
+xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
+"↓"
+
+-- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
+--
+-- Type: nullable string
+xplr.config.general.sort_and_filter_ui.search_direction_identifiers.unordered.format = ""
 
 -- The content for panel title by default.
 --

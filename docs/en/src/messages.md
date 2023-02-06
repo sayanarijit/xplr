@@ -1077,29 +1077,29 @@ Example:
 - Lua: `"SearchFuzzyFromInput"`
 - YAML: `SearchFuzzyFromInput`
 
-#### SearchFuzzyUnranked
+#### SearchFuzzyUnordered
 
 Like `SearchFuzzy`, but doesn't not perform rank based sorting.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 It gets reset automatically when changing directory.
 
-Type: { SearchFuzzyUnranked = "string" }
+Type: { SearchFuzzyUnordered = "string" }
 
 Example:
 
-- Lua: `{ SearchFuzzyUnranked = "pattern" }`
-- YAML: `SearchFuzzyUnranked: pattern`
+- Lua: `{ SearchFuzzyUnordered = "pattern" }`
+- YAML: `SearchFuzzyUnordered: pattern`
 
-#### SearchFuzzyUnrankedFromInput
+#### SearchFuzzyUnorderedFromInput
 
-Calls `SearchFuzzyUnranked` with the input taken from the input buffer.
+Calls `SearchFuzzyUnordered` with the input taken from the input buffer.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 It gets reset automatically when changing directory.
 
 Example:
 
-- Lua: `"SearchFuzzyUnrankedFromInput"`
-- YAML: `SearchFuzzyUnrankedFromInput`
+- Lua: `"SearchFuzzyUnorderedFromInput"`
+- YAML: `SearchFuzzyUnorderedFromInput`
 
 #### SearchRegex
 
@@ -1126,29 +1126,29 @@ Example:
 - Lua: `"SearchRegexFromInput"`
 - YAML: `SearchRegexFromInput`
 
-#### SearchRegexUnranked
+#### SearchRegexUnordered
 
 Like `SearchRegex`, but doesn't not perform rank based sorting.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 It gets reset automatically when changing directory.
 
-Type: { SearchRegexUnranked = "string" }
+Type: { SearchRegexUnordered = "string" }
 
 Example:
 
-- Lua: `{ SearchRegexUnranked = "pattern" }`
-- YAML: `SearchRegexUnranked: pattern`
+- Lua: `{ SearchRegexUnordered = "pattern" }`
+- YAML: `SearchRegexUnordered: pattern`
 
-#### SearchRegexUnrankedFromInput
+#### SearchRegexUnorderedFromInput
 
-Calls `SearchRegexUnranked` with the input taken from the input buffer.
+Calls `SearchRegexUnordered` with the input taken from the input buffer.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 It gets reset automatically when changing directory.
 
 Example:
 
-- Lua: `"SearchRegexUnrankedFromInput"`
-- YAML: `SearchRegexUnrankedFromInput`
+- Lua: `"SearchRegexUnorderedFromInput"`
+- YAML: `SearchRegexUnorderedFromInput`
 
 #### CycleSearchAlgorithm
 

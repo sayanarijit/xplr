@@ -194,6 +194,9 @@ pub struct SelectionConfig {
 pub struct SearchConfig {
     #[serde(default)]
     pub algorithm: SearchAlgorithm,
+
+    #[serde(default)]
+    pub unordered: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -224,6 +227,16 @@ pub struct SortDirectionIdentifiersUi {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct SearchDirectionIdentifiersUi {
+    #[serde(default)]
+    pub ordered: UiElement,
+
+    #[serde(default)]
+    pub unordered: UiElement,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SortAndFilterUi {
     #[serde(default)]
     pub separator: UiElement,
@@ -239,6 +252,9 @@ pub struct SortAndFilterUi {
 
     #[serde(default)]
     pub filter_identifiers: HashMap<NodeFilter, UiElement>,
+
+    #[serde(default)]
+    pub search_direction_identifiers: SearchDirectionIdentifiersUi,
 
     #[serde(default)]
     pub search_identifiers: HashMap<SearchAlgorithm, UiElement>,

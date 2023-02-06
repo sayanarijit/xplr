@@ -197,7 +197,13 @@ Type: [Style](https://xplr.dev/en/style)
 
 The default search algorithm
 
-Type: nullable [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
+Type: [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
+
+#### xplr.config.general.search.unordered
+
+The default search ordering
+
+Type: boolean
 
 #### xplr.config.general.default_ui.prefix
 
@@ -345,6 +351,18 @@ Type: nullable mapping of the following key-value pairs:
 The identifiers used to denote applied search input.
 
 Type: { format = nullable string, style = [Style](https://xplr.dev/en/style) }
+
+#### xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format
+
+The shape of ordered indicator for search ordering identifiers in Sort & filter panel.
+
+Type: nullable string
+
+#### xplr.config.general.sort_and_filter_ui.search_direction_identifiers.unordered.format
+
+The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
+
+Type: nullable string
 
 #### xplr.config.general.panel_ui.default.title.format
 

@@ -1,10 +1,11 @@
 use crate::app::Node;
 use crate::input::InputOperation;
+use crate::search::PathItem;
 use crate::search::SearchAlgorithm;
 use indexmap::IndexSet;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::cmp::Ordering;
+use std::{cmp::Ordering, sync::Arc};
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
@@ -970,23 +971,23 @@ pub enum ExternalMsg {
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     /// It gets reset automatically when changing directory.
     ///
-    /// Type: { SearchFuzzyUnranked = "string" }
+    /// Type: { SearchFuzzyUnordered = "string" }
     ///
     /// Example:
     ///
-    /// - Lua: `{ SearchFuzzyUnranked = "pattern" }`
-    /// - YAML: `SearchFuzzyUnranked: pattern`
-    SearchFuzzyUnranked(String),
+    /// - Lua: `{ SearchFuzzyUnordered = "pattern" }`
+    /// - YAML: `SearchFuzzyUnordered: pattern`
+    SearchFuzzyUnordered(String),
 
-    /// Calls `SearchFuzzyUnranked` with the input taken from the input buffer.
+    /// Calls `SearchFuzzyUnordered` with the input taken from the input buffer.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     /// It gets reset automatically when changing directory.
     ///
     /// Example:
     ///
-    /// - Lua: `"SearchFuzzyUnrankedFromInput"`
-    /// - YAML: `SearchFuzzyUnrankedFromInput`
-    SearchFuzzyUnrankedFromInput,
+    /// - Lua: `"SearchFuzzyUnorderedFromInput"`
+    /// - YAML: `SearchFuzzyUnorderedFromInput`
+    SearchFuzzyUnorderedFromInput,
 
     /// Search files using regex match algorithm.
     /// It keeps the filters, but overrides the sorters.
@@ -1015,23 +1016,23 @@ pub enum ExternalMsg {
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     /// It gets reset automatically when changing directory.
     ///
-    /// Type: { SearchRegexUnranked = "string" }
+    /// Type: { SearchRegexUnordered = "string" }
     ///
     /// Example:
     ///
-    /// - Lua: `{ SearchRegexUnranked = "pattern" }`
-    /// - YAML: `SearchRegexUnranked: pattern`
-    SearchRegexUnranked(String),
+    /// - Lua: `{ SearchRegexUnordered = "pattern" }`
+    /// - YAML: `SearchRegexUnordered: pattern`
+    SearchRegexUnordered(String),
 
-    /// Calls `SearchRegexUnranked` with the input taken from the input buffer.
+    /// Calls `SearchRegexUnordered` with the input taken from the input buffer.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     /// It gets reset automatically when changing directory.
     ///
     /// Example:
     ///
-    /// - Lua: `"SearchRegexUnrankedFromInput"`
-    /// - YAML: `SearchRegexUnrankedFromInput`
-    SearchRegexUnrankedFromInput,
+    /// - Lua: `"SearchRegexUnorderedFromInput"`
+    /// - YAML: `SearchRegexUnorderedFromInput`
+    SearchRegexUnorderedFromInput,
 
     /// Cycles through different search algorithms, without changing the input
     /// buffer
@@ -1785,6 +1786,9 @@ pub struct NodeSearcherApplicable {
 
     #[serde(default)]
     pub algorithm: SearchAlgorithm,
+
+    #[serde(default)]
+    pub unordered: bool,
 }
 
 impl NodeSearcherApplicable {
@@ -1792,45 +1796,59 @@ impl NodeSearcherApplicable {
         pattern: String,
         recoverable_focus: Option<String>,
         algorithm: SearchAlgorithm,
+        unordered: bool,
     ) -> Self {
         Self {
             pattern,
             recoverable_focus,
             algorithm,
+            unordered,
         }
     }
 
-    pub fn search<F>(&self, nodes: Vec<Node>, sort: F) -> Vec<Node>
+    pub fn search<I>(&self, nodes: I) -> Vec<Node>
     where
-        F: FnMut(&Node, &Node) -> Ordering,
+        I: IntoIterator<Item = Node>,
     {
-        self.algorithm.search(&self.pattern, nodes, sort)
+        let engine = self.algorithm.engine(&self.pattern);
+        let ranked_nodes = nodes.into_iter().filter_map(|n| {
+            let item = Arc::new(PathItem::from(n.relative_path.clone()));
+            engine.match_item(item).map(|res| (n, res.rank))
+        });
+
+        if self.unordered {
+            ranked_nodes.map(|(n, _)| n).collect()
+        } else {
+            let mut ranked_nodes = ranked_nodes.collect::<Vec<_>>();
+            ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
+            ranked_nodes.into_iter().map(|(n, _)| n).collect()
+        }
     }
 
-    pub fn enable_ranking(self) -> Self {
+    pub fn enable_search_order(self) -> Self {
         Self {
-            algorithm: self.algorithm.enable_ranking(),
+            unordered: false,
             ..self
         }
     }
 
-    pub fn disable_ranking(self) -> Self {
+    pub fn disable_search_order(self) -> Self {
         Self {
-            algorithm: self.algorithm.disable_ranking(),
+            unordered: true,
             ..self
         }
     }
 
-    pub fn toggle_ranking(self) -> Self {
+    pub fn toggle_search_order(self) -> Self {
         Self {
-            algorithm: self.algorithm.toggle_ranking(),
+            unordered: !self.unordered,
             ..self
         }
     }
 
-    pub fn cycle_algorithm(self) -> Self {
+    pub fn toggle_algorithm(self) -> Self {
         Self {
-            algorithm: self.algorithm.cycle(),
+            algorithm: self.algorithm.toggle(),
             ..self
         }
     }

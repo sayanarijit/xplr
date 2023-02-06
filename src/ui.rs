@@ -1027,6 +1027,13 @@ fn draw_sort_n_filter<B: Backend>(
         .to_owned()
         .extend(&ui.sort_direction_identifiers.reverse);
 
+    let orderedui = defaultui
+        .to_owned()
+        .extend(&ui.search_direction_identifiers.ordered);
+    let unorderedui = defaultui
+        .to_owned()
+        .extend(&ui.search_direction_identifiers.unordered);
+
     let mut spans = filter_by
         .iter()
         .map(|f| {
@@ -1048,13 +1055,23 @@ fn draw_sort_n_filter<B: Backend>(
             ui.search_identifiers
                 .get(&s.algorithm)
                 .map(|u| {
+                    let direction = if s.unordered {
+                        &unorderedui
+                    } else {
+                        &orderedui
+                    };
                     let ui = defaultui.to_owned().extend(u);
+                    let f = ui
+                        .format
+                        .as_ref()
+                        .map(|f| format!("{f}{p}", p = &s.pattern))
+                        .unwrap_or_else(|| s.pattern.clone());
                     (
+                        Span::styled(f, ui.style.into()),
                         Span::styled(
-                            ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned().into(),
+                            direction.format.to_owned().unwrap_or_default(),
+                            direction.style.to_owned().into(),
                         ),
-                        Span::styled(&s.pattern, ui.style.into()),
                     )
                 })
                 .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
@@ -1064,7 +1081,6 @@ fn draw_sort_n_filter<B: Backend>(
                 .iter()
                 .map(|s| {
                     let direction = if s.reverse { &reverseui } else { &forwardui };
-
                     ui.sorter_identifiers
                         .get(&s.sorter)
                         .map(|u| {
@@ -1082,13 +1098,11 @@ fn draw_sort_n_filter<B: Backend>(
                         })
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
-                .take(
-                    if search.map(|s| s.algorithm.is_ranked()).unwrap_or(false) {
-                        0
-                    } else {
-                        sort_by.len()
-                    },
-                ),
+                .take(if search.map(|s| s.unordered).unwrap_or(false) {
+                    sort_by.len()
+                } else {
+                    0
+                }),
         )
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),

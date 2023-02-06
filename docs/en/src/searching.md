@@ -20,6 +20,7 @@ Node Searcher contains the following fields:
 - [pattern][3]
 - [recoverable_focus][4]
 - [algorithm][5]
+- [unordered][7]
 
 ### pattern
 
@@ -40,9 +41,14 @@ Search algorithm to use. Defaults to `Fuzzy`.
 It can be one of the following:
 
 - Fuzzy
-- FuzzyUnranked
 - Regex
-- RegexUnranked
+
+### unordered
+
+Whether to skip ordering the search result by algorithm based ranking. Defaults
+to `false`.
+
+Type: boolean
 
 ## Example:
 
@@ -64,3 +70,4 @@ See [xplr.util.explore][6]
 [4]: #recoverable_focus
 [5]: #algorithm
 [6]: xplr.util.md#explore
+[7]: #unordered

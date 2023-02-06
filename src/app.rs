@@ -529,30 +529,30 @@ impl App {
                 ClearNodeSorters => self.clear_node_sorters(),
                 Search(p) => self.search(p),
                 SearchFromInput => self.search_from_input(),
-                SearchFuzzy(p) => self.search_with(p, SearchAlgorithm::Fuzzy),
+                SearchFuzzy(p) => self.search_with(p, SearchAlgorithm::Fuzzy, false),
                 SearchFuzzyFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::Fuzzy)
+                    self.search_from_input_with(SearchAlgorithm::Fuzzy, false)
                 }
-                SearchRegex(p) => self.search_with(p, SearchAlgorithm::Regex),
+                SearchRegex(p) => self.search_with(p, SearchAlgorithm::Regex, false),
                 SearchRegexFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::Regex)
+                    self.search_from_input_with(SearchAlgorithm::Regex, false)
                 }
-                SearchFuzzyUnranked(p) => {
-                    self.search_with(p, SearchAlgorithm::FuzzyUnranked)
+                SearchFuzzyUnordered(p) => {
+                    self.search_with(p, SearchAlgorithm::Fuzzy, true)
                 }
-                SearchFuzzyUnrankedFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::FuzzyUnranked)
+                SearchFuzzyUnorderedFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Fuzzy, true)
                 }
-                SearchRegexUnranked(p) => {
-                    self.search_with(p, SearchAlgorithm::RegexUnranked)
+                SearchRegexUnordered(p) => {
+                    self.search_with(p, SearchAlgorithm::Regex, true)
                 }
-                SearchRegexUnrankedFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::RegexUnranked)
+                SearchRegexUnorderedFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Regex, true)
                 }
-                EnableRankedSearch => self.enable_ranked_search(),
-                DisableRankedSearch => self.disable_ranked_search(),
-                ToggleRankedSearch => self.toggle_ranked_search(),
-                CycleSearchAlgorithm => self.cycle_search_algorithm(),
+                EnableRankedSearch => self.enable_search_order(),
+                DisableRankedSearch => self.disable_search_order(),
+                ToggleRankedSearch => self.toggle_search_order(),
+                CycleSearchAlgorithm => self.toggle_search_algorithm(),
                 AcceptSearch => self.accept_search(),
                 CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),
@@ -1637,13 +1637,17 @@ impl App {
     }
 
     pub fn search(self, pattern: String) -> Result<Self> {
-        let algorithm = self
+        let (algorithm, unordered) = self
             .explorer_config
             .searcher
             .as_ref()
-            .map(|s| s.algorithm)
-            .unwrap_or(self.config.general.search.algorithm);
-        self.search_with(pattern, algorithm)
+            .map(|s| (s.algorithm, s.unordered))
+            .unwrap_or((
+                self.config.general.search.algorithm,
+                self.config.general.search.unordered,
+            ));
+
+        self.search_with(pattern, algorithm, unordered)
     }
 
     fn search_from_input(self) -> Result<Self> {
@@ -1658,6 +1662,7 @@ impl App {
         mut self,
         pattern: String,
         algorithm: SearchAlgorithm,
+        unordered: bool,
     ) -> Result<Self> {
         let rf = self
             .explorer_config
@@ -1666,40 +1671,51 @@ impl App {
             .map(|s| s.recoverable_focus.clone())
             .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
 
-        self.explorer_config.searcher =
-            Some(NodeSearcherApplicable::new(pattern, rf, algorithm));
+        self.explorer_config.searcher = Some(NodeSearcherApplicable::new(
+            pattern, rf, algorithm, unordered,
+        ));
         Ok(self)
     }
 
-    fn search_from_input_with(self, algorithm: SearchAlgorithm) -> Result<Self> {
+    fn search_from_input_with(
+        self,
+        algorithm: SearchAlgorithm,
+        unordered: bool,
+    ) -> Result<Self> {
         if let Some(pattern) = self.input.buffer.as_ref().map(Input::to_string) {
-            self.search_with(pattern, algorithm)
+            self.search_with(pattern, algorithm, unordered)
         } else {
             Ok(self)
         }
     }
 
-    fn enable_ranked_search(mut self) -> Result<Self> {
-        self.explorer_config.searcher =
-            self.explorer_config.searcher.map(|s| s.enable_ranking());
+    fn enable_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.enable_search_order());
         Ok(self)
     }
 
-    fn disable_ranked_search(mut self) -> Result<Self> {
-        self.explorer_config.searcher =
-            self.explorer_config.searcher.map(|s| s.disable_ranking());
+    fn disable_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.disable_search_order());
         Ok(self)
     }
 
-    fn toggle_ranked_search(mut self) -> Result<Self> {
-        self.explorer_config.searcher =
-            self.explorer_config.searcher.map(|s| s.toggle_ranking());
+    fn toggle_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.toggle_search_order());
         Ok(self)
     }
 
-    fn cycle_search_algorithm(mut self) -> Result<Self> {
+    fn toggle_search_algorithm(mut self) -> Result<Self> {
         self.explorer_config.searcher =
-            self.explorer_config.searcher.map(|s| s.cycle_algorithm());
+            self.explorer_config.searcher.map(|s| s.toggle_algorithm());
         Ok(self)
     }
 
