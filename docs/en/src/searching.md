@@ -36,7 +36,8 @@ Type: nullable string
 
 ### algorithm
 
-Search algorithm to use. Defaults to [xplr.config.general.search.algorithm][8]
+Search algorithm to use. Defaults to the value set in
+[xplr.config.general.search.algorithm][8].
 
 It can be one of the following:
 
@@ -46,7 +47,7 @@ It can be one of the following:
 ### unordered
 
 Whether to skip ordering the search result by algorithm based ranking. Defaults
-to [xplr.config.general.search.unordered][9]
+to the value set in [xplr.config.general.search.unordered][9].
 
 Type: boolean
 
@@ -63,14 +64,14 @@ local searcher = {
 xplr.util.explore({ searcher = searcher })
 ```
 
-See [xplr.util.explore][6]
+See [xplr.util.explore][6].
 
 [1]: https://en.wikipedia.org/wiki/Approximate_string_matching
 [2]: sorting.md
 [3]: #pattern
 [4]: #recoverable_focus
 [5]: #algorithm
-[6]: xplr.util.md#explore
+[6]: xplr.util.md#xplrutilexplore
 [7]: #unordered
 [8]: general-config.md#xplrconfiggeneralsearchalgorithm
 [9]: general-config.md#xplrconfiggeneralsearchunordered
