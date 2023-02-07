@@ -1017,11 +1017,7 @@ fn draw_sort_n_filter<B: Backend>(
     let ui = app.config.general.sort_and_filter_ui.to_owned();
     let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
     let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
-    let search = app
-        .explorer_config
-        .searcher
-        .as_ref()
-        .map(|s| s.pattern.clone());
+    let search = app.explorer_config.searcher.as_ref();
 
     let defaultui = &ui.default_identifier;
     let forwardui = defaultui
@@ -1030,6 +1026,15 @@ fn draw_sort_n_filter<B: Backend>(
     let reverseui = defaultui
         .to_owned()
         .extend(&ui.sort_direction_identifiers.reverse);
+
+    let orderedui = defaultui
+        .to_owned()
+        .extend(&ui.search_direction_identifiers.ordered);
+    let unorderedui = defaultui
+        .to_owned()
+        .extend(&ui.search_direction_identifiers.unordered);
+
+    let is_ordered_search = search.as_ref().map(|s| !s.unordered).unwrap_or(false);
 
     let mut spans = filter_by
         .iter()
@@ -1048,12 +1053,36 @@ fn draw_sort_n_filter<B: Backend>(
                 })
                 .unwrap_or((Span::raw("f"), Span::raw("")))
         })
+        .chain(search.iter().map(|s| {
+            ui.search_identifiers
+                .get(&s.algorithm)
+                .map(|u| {
+                    let direction = if s.unordered {
+                        &unorderedui
+                    } else {
+                        &orderedui
+                    };
+                    let ui = defaultui.to_owned().extend(u);
+                    let f = ui
+                        .format
+                        .as_ref()
+                        .map(|f| format!("{f}{p}", p = &s.pattern))
+                        .unwrap_or_else(|| s.pattern.clone());
+                    (
+                        Span::styled(f, ui.style.into()),
+                        Span::styled(
+                            direction.format.to_owned().unwrap_or_default(),
+                            direction.style.to_owned().into(),
+                        ),
+                    )
+                })
+                .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
+        }))
         .chain(
             sort_by
                 .iter()
                 .map(|s| {
                     let direction = if s.reverse { &reverseui } else { &forwardui };
-
                     ui.sorter_identifiers
                         .get(&s.sorter)
                         .map(|u| {
@@ -1071,23 +1100,8 @@ fn draw_sort_n_filter<B: Backend>(
                         })
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
-                .take(if search.is_some() { 0 } else { sort_by.len() }),
+                .take(if !is_ordered_search { sort_by.len() } else { 0 }),
         )
-        .chain(search.iter().map(|s| {
-            ui.search_identifier
-                .as_ref()
-                .map(|u| {
-                    let ui = defaultui.to_owned().extend(u);
-                    (
-                        Span::styled(
-                            ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned().into(),
-                        ),
-                        Span::styled(s, ui.style.into()),
-                    )
-                })
-                .unwrap_or((Span::raw("/"), Span::raw(s)))
-        }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
             ui.separator.style.to_owned().into(),

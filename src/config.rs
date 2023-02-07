@@ -4,6 +4,7 @@ use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
 use crate::node::Node;
+use crate::search::SearchAlgorithm;
 use crate::ui::Border;
 use crate::ui::BorderType;
 use crate::ui::Constraint;
@@ -190,6 +191,16 @@ pub struct SelectionConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct SearchConfig {
+    #[serde(default)]
+    pub algorithm: SearchAlgorithm,
+
+    #[serde(default)]
+    pub unordered: bool,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LogsConfig {
     #[serde(default)]
     pub info: UiElement,
@@ -216,6 +227,16 @@ pub struct SortDirectionIdentifiersUi {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct SearchDirectionIdentifiersUi {
+    #[serde(default)]
+    pub ordered: UiElement,
+
+    #[serde(default)]
+    pub unordered: UiElement,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SortAndFilterUi {
     #[serde(default)]
     pub separator: UiElement,
@@ -233,7 +254,10 @@ pub struct SortAndFilterUi {
     pub filter_identifiers: HashMap<NodeFilter, UiElement>,
 
     #[serde(default)]
-    pub search_identifier: Option<UiElement>,
+    pub search_direction_identifiers: SearchDirectionIdentifiersUi,
+
+    #[serde(default)]
+    pub search_identifiers: HashMap<SearchAlgorithm, UiElement>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -293,6 +317,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub selection: SelectionConfig,
+
+    #[serde(default)]
+    pub search: SearchConfig,
 
     #[serde(default)]
     pub default_ui: UiConfig,

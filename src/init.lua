@@ -256,6 +256,16 @@ xplr.config.general.selection.item.format = "builtin.fmt_general_selection_item"
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.selection.item.style = {}
 
+-- The default search algorithm
+--
+-- Type: [Search Algorithm](https://xplr.dev/en/searching#algorithm)
+xplr.config.general.search.algorithm = "Fuzzy"
+
+-- The default search ordering
+--
+-- Type: boolean
+xplr.config.general.search.unordered = false
+
 -- The content that is placed before the item name for each row by default.
 --
 -- Type: nullable string
@@ -462,10 +472,21 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
 -- The identifiers used to denote applied search input.
 --
 -- Type: { format = nullable string, style = [Style](https://xplr.dev/en/style) }
-xplr.config.general.sort_and_filter_ui.search_identifier = {
-  format = "search:",
-  style = {},
+xplr.config.general.sort_and_filter_ui.search_identifiers = {
+  Fuzzy = { format = "fzy:", style = {} },
+  Regex = { format = "reg:", style = {} },
 }
+
+-- The shape of ordered indicator for search ordering identifiers in Sort & filter panel.
+--
+-- Type: nullable string
+xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
+"↓"
+
+-- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
+--
+-- Type: nullable string
+xplr.config.general.sort_and_filter_ui.search_direction_identifiers.unordered.format = ""
 
 -- The content for panel title by default.
 --
@@ -2116,6 +2137,42 @@ xplr.config.modes.builtin.search = {
           "FocusNext",
         },
       },
+      ["ctrl-z"] = {
+        help = "toggle ordering",
+        messages = {
+          "ToggleSearchOrder",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-a"] = {
+        help = "toggle search algorithm",
+        messages = {
+          "ToggleSearchAlgorithm",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-r"] = {
+        help = "regex search",
+        messages = {
+          "SearchRegexFromInput",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-f"] = {
+        help = "fuzzy search",
+        messages = {
+          "SearchFuzzyFromInput",
+          "ExplorePwdAsync",
+        },
+      },
+      ["ctrl-s"] = {
+        help = "sort (no search order)",
+        messages = {
+          "DisableSearchOrder",
+          "ExplorePwdAsync",
+          { SwitchModeBuiltinKeepingInputBuffer = "sort" },
+        },
+      },
       ["right"] = {
         help = "enter",
         messages = {
@@ -2155,7 +2212,7 @@ xplr.config.modes.builtin.search = {
     default = {
       messages = {
         "UpdateInputBufferFromKey",
-        "SearchFuzzyFromInput",
+        "SearchFromInput",
         "ExplorePwdAsync",
       },
     },
@@ -2365,7 +2422,12 @@ xplr.config.modes.builtin.sort = {
       ["enter"] = {
         help = "submit",
         messages = {
-          "PopMode",
+          "PopModeKeepingInputBuffer",
+        },
+      },
+      ["esc"] = {
+        messages = {
+          "PopModeKeepingInputBuffer",
         },
       },
       ["m"] = {

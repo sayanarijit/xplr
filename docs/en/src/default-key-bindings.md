@@ -23,7 +23,7 @@ of [modes][4] and the key mappings for each mode.
 | G         |        | go to bottom        |
 | V         | ctrl-a | select/unselect all |
 | ctrl-d    |        | duplicate as        |
-| ctrl-i    | tab    | next visited path   |
+| ctrl-i    |        | next visited path   |
 | ctrl-n    |        | next selection      |
 | ctrl-o    |        | last visited path   |
 | ctrl-p    |        | prev selection      |
@@ -49,41 +49,12 @@ of [modes][4] and the key mappings for each mode.
 | ~         |        | go home             |
 | [0-9]     |        | input               |
 
-### search
+### debug_error
 
-| key    | remaps | action           |
-| ------ | ------ | ---------------- |
-| ctrl-n | down   | down             |
-| ctrl-p | up     | up               |
-| enter  |        | submit           |
-| esc    |        | cancel           |
-| left   |        | back             |
-| right  |        | enter            |
-| tab    |        | toggle selection |
-
-### go_to
-
-| key | remaps | action         |
-| --- | ------ | -------------- |
-| f   |        | follow symlink |
-| g   |        | top            |
-| i   |        | initial $PWD   |
-| p   |        | path           |
-| x   |        | open in gui    |
-
-### go_to_path
-
-| key   | remaps | action       |
-| ----- | ------ | ------------ |
-| enter |        | submit       |
-| tab   |        | try complete |
-
-### duplicate_as
-
-| key   | remaps | action       |
-| ----- | ------ | ------------ |
-| enter |        | submit       |
-| tab   |        | try complete |
+| key   | remaps | action              |
+| ----- | ------ | ------------------- |
+| enter |        | open logs in editor |
+| q     |        | quit                |
 
 ### sort
 
@@ -109,33 +80,25 @@ of [modes][4] and the key mappings for each mode.
 | r         |        | by relative path                  |
 | s         |        | by size                           |
 
-### debug_error
+### relative_path_does_not_match_regex
 
-| key   | remaps | action              |
-| ----- | ------ | ------------------- |
-| enter |        | open logs in editor |
-| q     |        | quit                |
+| key   | remaps | action |
+| ----- | ------ | ------ |
+| enter |        | submit |
 
-### delete
+### switch_layout
 
-| key | remaps | action       |
-| --- | ------ | ------------ |
-| D   |        | force delete |
-| d   |        | delete       |
+| key | remaps | action               |
+| --- | ------ | -------------------- |
+| 1   |        | default              |
+| 2   |        | no help menu         |
+| 3   |        | no selection panel   |
+| 4   |        | no help or selection |
 
-### create
+### recover
 
-| key | remaps | action           |
-| --- | ------ | ---------------- |
-| d   |        | create directory |
-| f   |        | create file      |
-
-### create_directory
-
-| key   | remaps | action       |
-| ----- | ------ | ------------ |
-| enter |        | submit       |
-| tab   |        | try complete |
+| key | remaps | action |
+| --- | ------ | ------ |
 
 ### vroot
 
@@ -148,33 +111,14 @@ of [modes][4] and the key mappings for each mode.
 | v      |        | toggle vroot |
 | ~      |        | vroot $HOME  |
 
-### relative_path_does_match_regex
+### go_to_path
 
-| key   | remaps | action |
-| ----- | ------ | ------ |
-| enter |        | submit |
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
 
-### quit
-
-| key   | remaps | action                  |
-| ----- | ------ | ----------------------- |
-| enter |        | just quit               |
-| f     |        | quit printing focus     |
-| p     |        | quit printing pwd       |
-| r     |        | quit printing result    |
-| s     |        | quit printing selection |
-
-### filter
-
-| key       | remaps | action                             |
-| --------- | ------ | ---------------------------------- |
-| R         |        | relative path does not match regex |
-| backspace |        | remove last filter                 |
-| ctrl-r    |        | reset filters                      |
-| ctrl-u    |        | clear filters                      |
-| r         |        | relative path does match regex     |
-
-### create_file
+### rename
 
 | key   | remaps | action       |
 | ----- | ------ | ------------ |
@@ -193,41 +137,33 @@ of [modes][4] and the key mappings for each mode.
 | s   |        | softlink here   |
 | u   |        | clear selection |
 
-### switch_layout
-
-| key | remaps | action               |
-| --- | ------ | -------------------- |
-| 1   |        | default              |
-| 2   |        | no help menu         |
-| 3   |        | no selection panel   |
-| 4   |        | no help or selection |
-
-### rename
+### create_file
 
 | key   | remaps | action       |
 | ----- | ------ | ------------ |
 | enter |        | submit       |
 | tab   |        | try complete |
 
-### relative_path_does_not_match_regex
+### delete
 
-| key   | remaps | action |
-| ----- | ------ | ------ |
-| enter |        | submit |
+| key | remaps | action       |
+| --- | ------ | ------------ |
+| D   |        | force delete |
+| d   |        | delete       |
 
-### number
+### create_directory
 
-| key   | remaps | action   |
-| ----- | ------ | -------- |
-| down  | j      | to down  |
-| enter |        | to index |
-| k     | up     | to up    |
-| [0-9] |        | input    |
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
 
-### recover
+### create
 
-| key | remaps | action |
-| --- | ------ | ------ |
+| key | remaps | action           |
+| --- | ------ | ---------------- |
+| d   |        | create directory |
+| f   |        | create file      |
 
 ### action
 
@@ -242,3 +178,72 @@ of [modes][4] and the key mappings for each mode.
 | s     |        | selection operations |
 | v     |        | vroot                |
 | [0-9] |        | go to index          |
+
+### filter
+
+| key       | remaps | action                             |
+| --------- | ------ | ---------------------------------- |
+| R         |        | relative path does not match regex |
+| backspace |        | remove last filter                 |
+| ctrl-r    |        | reset filters                      |
+| ctrl-u    |        | clear filters                      |
+| r         |        | relative path does match regex     |
+
+### search
+
+| key    | remaps | action                  |
+| ------ | ------ | ----------------------- |
+| ctrl-a |        | toggle search algorithm |
+| ctrl-f |        | fuzzy search            |
+| ctrl-n | down   | down                    |
+| ctrl-p | up     | up                      |
+| ctrl-r |        | regex search            |
+| ctrl-s |        | sort (no search order)  |
+| ctrl-z |        | toggle ordering         |
+| enter  |        | submit                  |
+| esc    |        | cancel                  |
+| left   |        | back                    |
+| right  |        | enter                   |
+| tab    |        | toggle selection        |
+
+### duplicate_as
+
+| key   | remaps | action       |
+| ----- | ------ | ------------ |
+| enter |        | submit       |
+| tab   |        | try complete |
+
+### go_to
+
+| key | remaps | action         |
+| --- | ------ | -------------- |
+| f   |        | follow symlink |
+| g   |        | top            |
+| i   |        | initial $PWD   |
+| p   |        | path           |
+| x   |        | open in gui    |
+
+### relative_path_does_match_regex
+
+| key   | remaps | action |
+| ----- | ------ | ------ |
+| enter |        | submit |
+
+### quit
+
+| key   | remaps | action                  |
+| ----- | ------ | ----------------------- |
+| enter |        | just quit               |
+| f     |        | quit printing focus     |
+| p     |        | quit printing pwd       |
+| r     |        | quit printing result    |
+| s     |        | quit printing selection |
+
+### number
+
+| key   | remaps | action   |
+| ----- | ------ | -------- |
+| down  | j      | to down  |
+| enter |        | to index |
+| k     | up     | to up    |
+| [0-9] |        | input    |

@@ -9,7 +9,7 @@ pub use crate::msg::in_::external::Command;
 pub use crate::msg::in_::external::ExplorerConfig;
 pub use crate::msg::in_::external::NodeFilter;
 pub use crate::msg::in_::external::NodeFilterApplicable;
-use crate::msg::in_::external::NodeSearcher;
+use crate::msg::in_::external::NodeSearcherApplicable;
 pub use crate::msg::in_::external::NodeSorter;
 pub use crate::msg::in_::external::NodeSorterApplicable;
 pub use crate::msg::in_::ExternalMsg;
@@ -19,6 +19,7 @@ pub use crate::msg::out::MsgOut;
 pub use crate::node::Node;
 pub use crate::node::ResolvedNode;
 pub use crate::pipe::Pipe;
+use crate::search::SearchAlgorithm;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local};
@@ -526,8 +527,32 @@ impl App {
                 ReverseNodeSorters => self.reverse_node_sorters(),
                 ResetNodeSorters => self.reset_node_sorters(),
                 ClearNodeSorters => self.clear_node_sorters(),
-                SearchFuzzy(p) => self.search_fuzzy(p),
-                SearchFuzzyFromInput => self.search_fuzzy_from_input(),
+                Search(p) => self.search(p),
+                SearchFromInput => self.search_from_input(),
+                SearchFuzzy(p) => self.search_with(p, SearchAlgorithm::Fuzzy, false),
+                SearchFuzzyFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Fuzzy, false)
+                }
+                SearchRegex(p) => self.search_with(p, SearchAlgorithm::Regex, false),
+                SearchRegexFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Regex, false)
+                }
+                SearchFuzzyUnordered(p) => {
+                    self.search_with(p, SearchAlgorithm::Fuzzy, true)
+                }
+                SearchFuzzyUnorderedFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Fuzzy, true)
+                }
+                SearchRegexUnordered(p) => {
+                    self.search_with(p, SearchAlgorithm::Regex, true)
+                }
+                SearchRegexUnorderedFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Regex, true)
+                }
+                EnableSearchOrder => self.enable_search_order(),
+                DisableSearchOrder => self.disable_search_order(),
+                ToggleSearchOrder => self.toggle_search_order(),
+                ToggleSearchAlgorithm => self.toggle_search_algorithm(),
                 AcceptSearch => self.accept_search(),
                 CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),
@@ -1611,7 +1636,34 @@ impl App {
         Ok(self)
     }
 
-    pub fn search_fuzzy(mut self, pattern: String) -> Result<Self> {
+    pub fn search(self, pattern: String) -> Result<Self> {
+        let (algorithm, unordered) = self
+            .explorer_config
+            .searcher
+            .as_ref()
+            .map(|s| (s.algorithm, s.unordered))
+            .unwrap_or((
+                self.config.general.search.algorithm,
+                self.config.general.search.unordered,
+            ));
+
+        self.search_with(pattern, algorithm, unordered)
+    }
+
+    fn search_from_input(self) -> Result<Self> {
+        if let Some(pattern) = self.input.buffer.as_ref().map(Input::to_string) {
+            self.search(pattern)
+        } else {
+            Ok(self)
+        }
+    }
+
+    pub fn search_with(
+        mut self,
+        pattern: String,
+        algorithm: SearchAlgorithm,
+        unordered: bool,
+    ) -> Result<Self> {
         let rf = self
             .explorer_config
             .searcher
@@ -1619,16 +1671,52 @@ impl App {
             .map(|s| s.recoverable_focus.clone())
             .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
 
-        self.explorer_config.searcher = Some(NodeSearcher::new(pattern, rf));
+        self.explorer_config.searcher = Some(NodeSearcherApplicable::new(
+            pattern, rf, algorithm, unordered,
+        ));
         Ok(self)
     }
 
-    fn search_fuzzy_from_input(self) -> Result<Self> {
+    fn search_from_input_with(
+        self,
+        algorithm: SearchAlgorithm,
+        unordered: bool,
+    ) -> Result<Self> {
         if let Some(pattern) = self.input.buffer.as_ref().map(Input::to_string) {
-            self.search_fuzzy(pattern)
+            self.search_with(pattern, algorithm, unordered)
         } else {
             Ok(self)
         }
+    }
+
+    fn enable_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.enable_search_order());
+        Ok(self)
+    }
+
+    fn disable_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.disable_search_order());
+        Ok(self)
+    }
+
+    fn toggle_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.toggle_search_order());
+        Ok(self)
+    }
+
+    fn toggle_search_algorithm(mut self) -> Result<Self> {
+        self.explorer_config.searcher =
+            self.explorer_config.searcher.map(|s| s.toggle_algorithm());
+        Ok(self)
     }
 
     fn accept_search(mut self) -> Result<Self> {
