@@ -1152,14 +1152,14 @@ Example:
 
 #### ToggleSearchAlgorithm
 
-Cycles through different search algorithms, without changing the input
+Toggles between different search algorithms, without changing the input
 buffer
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
-- Lua: `"CycleSearchAlgorithm"`
-- YAML: `CycleSearchAlgorithm`
+- Lua: `"ToggleSearchAlgorithm"`
+- YAML: `ToggleSearchAlgorithm`
 
 #### EnableSearchOrder
 
