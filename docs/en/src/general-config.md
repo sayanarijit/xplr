@@ -197,7 +197,7 @@ Type: [Style](https://xplr.dev/en/style)
 
 The default search algorithm
 
-Type: [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
+Type: [Search Algorithm](https://xplr.dev/en/searching#algorithm)
 
 #### xplr.config.general.search.unordered
 

@@ -258,7 +258,7 @@ xplr.config.general.selection.item.style = {}
 
 -- The default search algorithm
 --
--- Type: [Search Algorithm](https://xplr.dev/en/searching#search-algorithm)
+-- Type: [Search Algorithm](https://xplr.dev/en/searching#algorithm)
 xplr.config.general.search.algorithm = "Fuzzy"
 
 -- The default search ordering
@@ -473,8 +473,8 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
 --
 -- Type: { format = nullable string, style = [Style](https://xplr.dev/en/style) }
 xplr.config.general.sort_and_filter_ui.search_identifiers = {
-  Fuzzy = { format = "fzy:/", style = {} },
-  Regex = { format = "reg:/", style = {} },
+  Fuzzy = { format = "fzy:", style = {} },
+  Regex = { format = "reg:", style = {} },
 }
 
 -- The shape of ordered indicator for search ordering identifiers in Sort & filter panel.

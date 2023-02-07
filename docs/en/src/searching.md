@@ -6,12 +6,12 @@ generally appears between filters and sorters in the `Sort & filter` panel.
 Example:
 
 ```
-/fzy↓abc
+fzy:foo↓
 ```
 
 This line means that the nodes visible on the table are being filtered using the
-[fuzzy matching][1] algorithm. The arrow means that ranking based ordering is
-being applied, i.e. [sorters][2] are being ignored.
+[fuzzy matching][1] algorithm on the input `foo`. The arrow means that ranking based
+ordering is being applied, i.e. [sorters][2] are being ignored.
 
 ## Node Searcher Applicable
 
@@ -36,7 +36,7 @@ Type: nullable string
 
 ### algorithm
 
-Search algorithm to use. Defaults to `Fuzzy`.
+Search algorithm to use. Defaults to [xplr.config.general.search.algorithm][8]
 
 It can be one of the following:
 
@@ -46,7 +46,7 @@ It can be one of the following:
 ### unordered
 
 Whether to skip ordering the search result by algorithm based ranking. Defaults
-to `false`.
+to [xplr.config.general.search.unordered][9]
 
 Type: boolean
 
@@ -57,6 +57,7 @@ local searcher = {
   pattern = "pattern to search",
   recoverable_focus = "/path/to/focus/on/cancel",
   algorithm = "Fuzzy",
+  unordered = false,
 }
 
 xplr.util.explore({ searcher = searcher })
@@ -71,3 +72,5 @@ See [xplr.util.explore][6]
 [5]: #algorithm
 [6]: xplr.util.md#explore
 [7]: #unordered
+[8]: general-config.md#xplrconfiggeneralsearchalgorithm
+[9]: general-config.md#xplrconfiggeneralsearchunordered
