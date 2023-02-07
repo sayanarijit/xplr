@@ -1034,6 +1034,8 @@ fn draw_sort_n_filter<B: Backend>(
         .to_owned()
         .extend(&ui.search_direction_identifiers.unordered);
 
+    let is_ordered_search = search.as_ref().map(|s| !s.unordered).unwrap_or(false);
+
     let mut spans = filter_by
         .iter()
         .map(|f| {
@@ -1098,11 +1100,7 @@ fn draw_sort_n_filter<B: Backend>(
                         })
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
-                .take(if search.map(|s| s.unordered).unwrap_or(false) {
-                    sort_by.len()
-                } else {
-                    0
-                }),
+                .take(if !is_ordered_search { sort_by.len() } else { 0 }),
         )
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),

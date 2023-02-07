@@ -1042,33 +1042,33 @@ pub enum ExternalMsg {
     ///
     /// - Lua: `"CycleSearchAlgorithm"`
     /// - YAML: `CycleSearchAlgorithm`
-    CycleSearchAlgorithm,
+    ToggleSearchAlgorithm,
 
     /// Enables ranked search without changing the input buffer.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
-    /// - Lua: `"EnableRankedSearch"`
-    /// - YAML: `EnableRankedSearch`
-    EnableRankedSearch,
+    /// - Lua: `"EnableOrderedSearch"`
+    /// - YAML: `EnableSearchOrder`
+    EnableSearchOrder,
 
     /// Disabled ranked search without changing the input buffer.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
     ///
     /// Example:
     ///
-    /// - Lua: `"DisableRankedSearch"`
-    /// - YAML: `DisableRankedSearch`
-    DisableRankedSearch,
+    /// - Lua: `"DisableSearchOrder"`
+    /// - YAML: `DisableSearchOrder`
+    DisableSearchOrder,
 
     /// Toggles ranked search without changing the input buffer.
     ///
     /// Example:
     ///
-    /// - Lua: `"ToggleRankedSearch"`
-    /// - YAML: `ToggleRankedSearch`
-    ToggleRankedSearch,
+    /// - Lua: `"ToggleSearchOrder"`
+    /// - YAML: `ToggleSearchOrder`
+    ToggleSearchOrder,
 
     /// Accepts the search by keeping the latest focus while in search mode.
     /// Automatically calls `ExplorePwd`.

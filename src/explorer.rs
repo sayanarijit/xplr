@@ -27,12 +27,13 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
         nodes.collect()
     };
 
-    let ignore_sort = config
+    let is_ordered_search = config
         .searcher
         .as_ref()
-        .map(|s| s.unordered)
+        .map(|s| !s.unordered)
         .unwrap_or(false);
-    if !ignore_sort {
+
+    if !is_ordered_search {
         nodes.sort_by(|a, b| config.sort(a, b));
     }
 

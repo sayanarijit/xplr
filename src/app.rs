@@ -549,10 +549,10 @@ impl App {
                 SearchRegexUnorderedFromInput => {
                     self.search_from_input_with(SearchAlgorithm::Regex, true)
                 }
-                EnableRankedSearch => self.enable_search_order(),
-                DisableRankedSearch => self.disable_search_order(),
-                ToggleRankedSearch => self.toggle_search_order(),
-                CycleSearchAlgorithm => self.toggle_search_algorithm(),
+                EnableSearchOrder => self.enable_search_order(),
+                DisableSearchOrder => self.disable_search_order(),
+                ToggleSearchOrder => self.toggle_search_order(),
+                ToggleSearchAlgorithm => self.toggle_search_algorithm(),
                 AcceptSearch => self.accept_search(),
                 CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),

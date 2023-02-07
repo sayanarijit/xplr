@@ -2138,16 +2138,16 @@ xplr.config.modes.builtin.search = {
         },
       },
       ["ctrl-z"] = {
-        help = "toggle ranking",
+        help = "toggle ordering",
         messages = {
-          "ToggleRankedSearch",
+          "ToggleSearchOrder",
           "ExplorePwdAsync",
         },
       },
       ["ctrl-a"] = {
-        help = "cycle search algorithm",
+        help = "toggle search algorithm",
         messages = {
-          "CycleSearchAlgorithm",
+          "ToggleSearchAlgorithm",
           "ExplorePwdAsync",
         },
       },
@@ -2166,9 +2166,9 @@ xplr.config.modes.builtin.search = {
         },
       },
       ["ctrl-s"] = {
-        help = "sort (disables ranking)",
+        help = "sort (no search order)",
         messages = {
-          "DisableRankedSearch",
+          "DisableSearchOrder",
           "ExplorePwdAsync",
           { SwitchModeBuiltinKeepingInputBuffer = "sort" },
         },

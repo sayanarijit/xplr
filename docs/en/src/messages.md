@@ -1150,7 +1150,7 @@ Example:
 - Lua: `"SearchRegexUnorderedFromInput"`
 - YAML: `SearchRegexUnorderedFromInput`
 
-#### CycleSearchAlgorithm
+#### ToggleSearchAlgorithm
 
 Cycles through different search algorithms, without changing the input
 buffer
@@ -1161,34 +1161,34 @@ Example:
 - Lua: `"CycleSearchAlgorithm"`
 - YAML: `CycleSearchAlgorithm`
 
-#### EnableRankedSearch
+#### EnableSearchOrder
 
 Enables ranked search without changing the input buffer.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
-- Lua: `"EnableRankedSearch"`
-- YAML: `EnableRankedSearch`
+- Lua: `"EnableOrderedSearch"`
+- YAML: `EnableSearchOrder`
 
-#### DisableRankedSearch
+#### DisableSearchOrder
 
 Disabled ranked search without changing the input buffer.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
 
 Example:
 
-- Lua: `"DisableRankedSearch"`
-- YAML: `DisableRankedSearch`
+- Lua: `"DisableSearchOrder"`
+- YAML: `DisableSearchOrder`
 
-#### ToggleRankedSearch
+#### ToggleSearchOrder
 
 Toggles ranked search without changing the input buffer.
 
 Example:
 
-- Lua: `"ToggleRankedSearch"`
-- YAML: `ToggleRankedSearch`
+- Lua: `"ToggleSearchOrder"`
+- YAML: `ToggleSearchOrder`
 
 #### AcceptSearch
 
