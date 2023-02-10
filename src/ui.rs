@@ -1615,5 +1615,11 @@ mod tests {
             }
             _ => panic!("Unexpected layout"),
         }
+
+        let res = Layout::Table.replace(&Layout::Table, &Layout::Selection);
+        assert_eq!(res, Layout::Selection);
+
+        let res = Layout::Table.replace(&Layout::Nothing, &Layout::Selection);
+        assert_eq!(res, Layout::Table);
     }
 }
