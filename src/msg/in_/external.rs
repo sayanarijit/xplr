@@ -1820,7 +1820,7 @@ impl NodeSearcherApplicable {
             ranked_nodes.map(|(n, _)| n).collect()
         } else {
             let mut ranked_nodes = ranked_nodes.collect::<Vec<_>>();
-            ranked_nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
+            ranked_nodes.sort_by(|(_, s1), (_, s2)| s1.cmp(s2));
             ranked_nodes.into_iter().map(|(n, _)| n).collect()
         }
     }
