@@ -1,5 +1,6 @@
 use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
+use crate::compat::{draw_custom_content, CustomContent};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
@@ -38,7 +39,7 @@ fn read_only_indicator(app: &app::App) -> &str {
     }
 }
 
-fn string_to_text<'a>(string: String) -> Text<'a> {
+pub fn string_to_text<'a>(string: String) -> Text<'a> {
     if *NO_COLOR {
         Text::raw(string)
     } else {
@@ -77,31 +78,23 @@ impl LayoutOptions {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-pub enum ContentBody {
-    /// A paragraph to render
-    StaticParagraph { render: String },
-
-    /// A Lua function that returns a paragraph to render
-    DynamicParagraph { render: String },
-
-    /// List to render
-    StaticList { render: Vec<String> },
-
-    /// A Lua function that returns lines to render
-    DynamicList { render: String },
-
-    /// A table to render
-    StaticTable {
-        widths: Vec<Constraint>,
-        col_spacing: Option<u16>,
-        render: Vec<Vec<String>>,
+pub enum CustomPanel {
+    Paragraph {
+        #[serde(default)]
+        ui: PanelUiConfig,
+        body: String,
     },
-
-    /// A Lua function that returns a table to render
-    DynamicTable {
+    List {
+        #[serde(default)]
+        ui: PanelUiConfig,
+        body: Vec<String>,
+    },
+    Table {
+        #[serde(default)]
+        ui: PanelUiConfig,
         widths: Vec<Constraint>,
         col_spacing: Option<u16>,
-        render: String,
+        body: Vec<Vec<String>>,
     },
 }
 
@@ -114,10 +107,8 @@ pub enum Layout {
     Selection,
     HelpMenu,
     SortAndFilter,
-    CustomContent {
-        title: Option<String>,
-        body: ContentBody,
-    },
+    Static(CustomPanel),
+    Dynamic(String),
     Horizontal {
         config: LayoutOptions,
         splits: Vec<Layout>,
@@ -126,6 +117,9 @@ pub enum Layout {
         config: LayoutOptions,
         splits: Vec<Layout>,
     },
+
+    /// For compatibility only. A better choice is Static or Dymanic layout.
+    CustomContent(CustomContent),
 }
 
 impl Default for Layout {
@@ -640,7 +634,7 @@ impl NodeUiMetadata {
     }
 }
 
-fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
+pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
     Block::default()
         .borders(TuiBorders::from_bits_truncate(
             config
@@ -770,7 +764,7 @@ fn draw_table<B: Backend>(
                                 .filter_map(|c| {
                                     c.format.as_ref().map(|f| {
                                         let out = lua::call(lua, f, v.clone())
-                                            .unwrap_or_else(|e| e.to_string());
+                                            .unwrap_or_else(|e| format!("{e:?}"));
                                         string_to_text(out)
                                     })
                                 })
@@ -876,8 +870,8 @@ fn draw_selection<B: Backend>(
                 .as_ref()
                 .map(|f| {
                     lua::serialize::<Node>(lua, n)
-                        .map(|n| lua::call(lua, f, n).unwrap_or_else(|e| e.to_string()))
-                        .unwrap_or_else(|e| e.to_string())
+                        .and_then(|n| lua::call(lua, f, n))
+                        .unwrap_or_else(|e| format!("{e:?}"))
                 })
                 .unwrap_or_else(|| n.absolute_path.clone());
             string_to_text(out)
@@ -1211,94 +1205,68 @@ pub fn draw_nothing<B: Backend>(
     f.render_widget(nothing, layout_size);
 }
 
-pub fn draw_custom_content<B: Backend>(
+pub fn draw_dynamic<B: Backend>(
     f: &mut Frame<B>,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
-    title: Option<String>,
-    body: ContentBody,
+    func: &str,
     lua: &Lua,
 ) {
-    let config = app.config.general.panel_ui.default.clone();
+    let ctx = ContentRendererArg {
+        app: app.to_lua_ctx_light(),
+        layout_size: layout_size.into(),
+        screen_size: screen_size.into(),
+    };
 
-    match body {
-        ContentBody::StaticParagraph { render } => {
-            let render = string_to_text(render);
-            let content = Paragraph::new(render).block(block(
-                config,
-                title.map(|t| format!(" {t} ")).unwrap_or_default(),
-            ));
+    let panel: CustomPanel = lua::serialize(lua, &ctx)
+        .and_then(|arg| lua::call(lua, func, arg))
+        .unwrap_or_else(|e| CustomPanel::Paragraph {
+            ui: app.config.general.panel_ui.default.clone(),
+            body: format!("{e:?}"),
+        });
+
+    draw_static(f, screen_size, layout_size, app, panel, lua);
+}
+
+pub fn draw_static<B: Backend>(
+    f: &mut Frame<B>,
+    screen_size: TuiRect,
+    layout_size: TuiRect,
+    app: &app::App,
+    panel: CustomPanel,
+    _lua: &Lua,
+) {
+    let defaultui = app.config.general.panel_ui.default.clone();
+    match panel {
+        CustomPanel::Paragraph { ui, body } => {
+            let config = defaultui.extend(&ui);
+            let body = string_to_text(body);
+            let content = Paragraph::new(body).block(block(config, "".into()));
             f.render_widget(content, layout_size);
         }
 
-        ContentBody::DynamicParagraph { render } => {
-            let ctx = ContentRendererArg {
-                app: app.to_lua_ctx_light(),
-                layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
-            };
+        CustomPanel::List { ui, body } => {
+            let config = defaultui.extend(&ui);
 
-            let render = lua::serialize(lua, &ctx)
-                .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{e:?}"))
-                })
-                .unwrap_or_else(|e| e.to_string());
-
-            let render = string_to_text(render);
-
-            let content = Paragraph::new(render).block(block(
-                config,
-                title.map(|t| format!(" {t} ")).unwrap_or_default(),
-            ));
-            f.render_widget(content, layout_size);
-        }
-
-        ContentBody::StaticList { render } => {
-            let items = render
+            let items = body
                 .into_iter()
                 .map(string_to_text)
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
-            let content = List::new(items).block(block(
-                config,
-                title.map(|t| format!(" {t} ")).unwrap_or_default(),
-            ));
+            let content = List::new(items).block(block(config, "".into()));
             f.render_widget(content, layout_size);
         }
 
-        ContentBody::DynamicList { render } => {
-            let ctx = ContentRendererArg {
-                app: app.to_lua_ctx_light(),
-                layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
-            };
-
-            let items = lua::serialize(lua, &ctx)
-                .map(|arg| {
-                    lua::call(lua, &render, arg)
-                        .unwrap_or_else(|e| vec![format!("{e:?}")])
-                })
-                .unwrap_or_else(|e| vec![e.to_string()])
-                .into_iter()
-                .map(string_to_text)
-                .map(ListItem::new)
-                .collect::<Vec<ListItem>>();
-
-            let content = List::new(items).block(block(
-                config,
-                title.map(|t| format!(" {t} ")).unwrap_or_default(),
-            ));
-            f.render_widget(content, layout_size);
-        }
-
-        ContentBody::StaticTable {
+        CustomPanel::Table {
+            ui,
             widths,
             col_spacing,
-            render,
+            body,
         } => {
-            let rows = render
+            let config = defaultui.extend(&ui);
+            let rows = body
                 .into_iter()
                 .map(|cols| {
                     Row::new(
@@ -1318,55 +1286,7 @@ pub fn draw_custom_content<B: Backend>(
             let content = Table::new(rows)
                 .widths(&widths)
                 .column_spacing(col_spacing.unwrap_or(1))
-                .block(block(
-                    config,
-                    title.map(|t| format!(" {t} ")).unwrap_or_default(),
-                ));
-
-            f.render_widget(content, layout_size);
-        }
-
-        ContentBody::DynamicTable {
-            widths,
-            col_spacing,
-            render,
-        } => {
-            let ctx = ContentRendererArg {
-                app: app.to_lua_ctx_light(),
-                layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
-            };
-
-            let rows = lua::serialize(lua, &ctx)
-                .map(|arg| {
-                    lua::call(lua, &render, arg)
-                        .unwrap_or_else(|e| vec![vec![format!("{e:?}")]])
-                })
-                .unwrap_or_else(|e| vec![vec![e.to_string()]])
-                .into_iter()
-                .map(|cols| {
-                    Row::new(
-                        cols.into_iter()
-                            .map(string_to_text)
-                            .map(Cell::from)
-                            .collect::<Vec<Cell>>(),
-                    )
-                })
-                .collect::<Vec<Row>>();
-
-            let widths = widths
-                .into_iter()
-                .map(|w| w.to_tui(screen_size, layout_size))
-                .collect::<Vec<TuiConstraint>>();
-
-            let mut content = Table::new(rows).widths(&widths).block(block(
-                config,
-                title.map(|t| format!(" {t} ")).unwrap_or_default(),
-            ));
-
-            if let Some(col_spacing) = col_spacing {
-                content = content.column_spacing(col_spacing);
-            };
+                .block(block(config, "".into()));
 
             f.render_widget(content, layout_size);
         }
@@ -1394,9 +1314,9 @@ impl From<TuiRect> for Rect {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ContentRendererArg {
-    app: app::LuaContextLight,
-    screen_size: Rect,
-    layout_size: Rect,
+    pub app: app::LuaContextLight,
+    pub screen_size: Rect,
+    pub layout_size: Rect,
 }
 
 pub fn draw_layout<B: Backend>(
@@ -1422,8 +1342,14 @@ pub fn draw_layout<B: Backend>(
                 draw_logs(f, screen_size, layout_size, app, lua);
             };
         }
-        Layout::CustomContent { title, body } => {
-            draw_custom_content(f, screen_size, layout_size, app, title, body, lua)
+        Layout::Static(panel) => {
+            draw_static(f, screen_size, layout_size, app, panel, lua)
+        }
+        Layout::Dynamic(ref func) => {
+            draw_dynamic(f, screen_size, layout_size, app, func, lua)
+        }
+        Layout::CustomContent(content) => {
+            draw_custom_content(f, screen_size, layout_size, app, content, lua)
         }
         Layout::Horizontal { config, splits } => {
             let chunks = TuiLayout::default()

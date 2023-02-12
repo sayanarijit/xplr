@@ -4,6 +4,7 @@
 
 pub mod app;
 pub mod cli;
+pub mod compat;
 pub mod config;
 pub mod directory_buffer;
 pub mod event_reader;

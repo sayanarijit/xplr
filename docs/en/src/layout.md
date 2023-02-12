@@ -32,56 +32,61 @@ A layout can be one of the following:
 - [Selection][11]
 - [HelpMenu][12]
 - [SortAndFilter][13]
-- [CustomContent][25]
+- [Static][25]
+- [Dynamic][26]
 - [Horizontal][14]
 - [Vertical][16]
+- CustomContent (deprecated, use `Static` or `Dynamic`)
 
 ### Nothing
 
 This layout contains a blank panel.
 
-Example: "Nothing"
+Type: "Nothing"
 
 ### Table
 
-This layout contains the table displaying the files and directories in the
-current directory.
+This layout contains the table displaying the files and directories in the current
+directory.
 
 ### InputAndLogs
 
 This layout contains the panel displaying the input prompt and logs.
 
-Example: "InputAndLogs"
+Type: "InputAndLogs"
 
 ### Selection
 
 This layout contains the panel displaying the selected paths.
 
-Example: "Selection"
+Type: "Selection"
 
 ### HelpMenu
 
 This layout contains the panel displaying the help menu for the current mode in
 real-time.
 
-Example: "HelpMenu"
+Type: "HelpMenu"
 
 ### SortAndFilter
 
-This layout contains the panel displaying the pipeline of sorters and filters
-applied of the list of paths being displayed.
+This layout contains the panel displaying the pipeline of sorters and filters applied of
+the list of paths being displayed.
 
-Example: "SortAndFilter"
+Type: "SortAndFilter"
 
-### Custom Content
+### Static
 
-Custom content is a special layout to render something custom.
-It contains the following information:
+This is a custom layout to render static content.
 
-- [title][33]
-- [body][34]
+Type: { Static = [Custom Panel][27] }
 
-Example: { CustomContent = { title = [title][33], body = [body][34] }
+### Dynamic
+
+This is a custom layout to render dynamic content using a function defined in
+[xplr.fn][28] that returns [Custom Panel][27].
+
+Type: { Dynamic = [Content Renderer][35] }
 
 ### Horizontal
 
@@ -92,7 +97,7 @@ It contains the following information:
 - [config][15]
 - [splits][17]
 
-Example: { Horizontal = { config = [config][15], splits = [splits][17] }
+Type: { Horizontal = { config = [config][15], splits = [splits][17] }
 
 ### Vertical
 
@@ -103,7 +108,7 @@ It contains the following information:
 - [config][15]
 - [splits][17]
 
-Example: { Vertical = { config = [config][15], splits = [splits][17] }
+Type: { Vertical = { config = [config][15], splits = [splits][17] }
 
 ## Layout Config
 
@@ -166,186 +171,152 @@ Type: list of [Layout][3]
 
 The list of child layouts to fit into the parent layout.
 
-## title
+## Custom Panel
 
-Type: nullable string
+Custom panel can be one of the following:
 
-The title of the panel.
+- [Paragraph][29]
+- [List][30]
+- [Table][31]
 
-## body
-
-Type: [Content Body][26]
-
-The body of the panel.
-
-## Content Body
-
-Content body can be one of the following:
-
-- [StaticParagraph][27]
-- [DynamicParagraph][28]
-- [StaticList][29]
-- [DynamicList][30]
-- [StaticTable][31]
-- [DynamicTable][32]
-
-## Static Paragraph
+### Paragraph
 
 A paragraph to render. It contains the following fields:
 
-- **render** (string): The string to render.
+- **ui** (nullable [Panel UI Config][32]): Optional UI config for the panel.
+- **body** (string): The string to render.
 
 #### Example: Render a custom static paragraph
 
 ```lua
 xplr.config.layouts.builtin.default = {
-  CustomContent = {
-    title = "custom title",
-    body = {
-      StaticParagraph = { render = "custom body" },
+  Static = {
+    Paragraph = {
+      ui = { title = { format = " custom title " } },
+      body = "custom body",
     },
   },
 }
 ```
 
-## Dynamic Paragraph
-
-A [Lua function][35] to render a custom paragraph.
-It contains the following fields:
-
-- **render** (string): The [lua function][35] that returns the paragraph to
-  render.
-
 #### Example: Render a custom dynamic paragraph
 
 ```lua
-xplr.config.layouts.builtin.default = {
-  CustomContent = {
-    title = "custom title",
-    body = { DynamicParagraph = { render = "custom.render_layout" } },
-  },
-}
+xplr.config.layouts.builtin.default = { Dynamic = "custom.render_layout" }
 
 xplr.fn.custom.render_layout = function(ctx)
-  return ctx.app.pwd
+  return {
+    Paragraph = {
+      ui = { title = { format = ctx.app.pwd } },
+      body = xplr.util.to_yaml(ctx.app.focused_node),
+    },
+  }
 end
 ```
 
-## Static List
+### List
 
 A list to render. It contains the following fields:
 
-- **render** (list of string): The list to render.
+- **ui** (nullable [Panel UI Config][32]): Optional UI config for the panel.
+- **body** (list of string): The list of strings to display.
 
 #### Example: Render a custom static list
 
 ```lua
 xplr.config.layouts.builtin.default = {
-  CustomContent = {
-    title = "custom title",
-    body = {
-      StaticList = { render = { "1", "2", "3" } },
+  Static = {
+    List = {
+      ui = { title = { format = " custom title " } },
+      body = { "1", "2", "3" },
     },
   },
 }
 ```
 
-## Dynamic List
-
-A [Lua function][35] to render a custom list.
-It contains the following fields:
-
-- **render** (string): The [lua function][35] that returns the list to render.
-
 #### Example: Render a custom dynamic list
 
 ```lua
-xplr.config.layouts.builtin.default = {
-  CustomContent = {
-    title = "custom title",
-    body = { DynamicList = { render = "custom.render_layout" } },
-  },
-}
+xplr.config.layouts.builtin.default = { Dynamic = "custom.render_layout" }
 
 xplr.fn.custom.render_layout = function(ctx)
   return {
-    ctx.app.pwd,
-    ctx.app.version,
-    tostring(ctx.app.pid),
+    List = {
+      ui = { title = { format = ctx.app.pwd } },
+      body = {
+        (ctx.app.focused_node or {}).relative_path or "",
+        ctx.app.version,
+        tostring(ctx.app.pid),
+      },
+    },
   }
 end
 ```
 
-## Static Table
+## Table
 
-A table to render. It contains the following fields:
+A custom table to render. It contains the following fields:
 
+- **ui** (nullable [Panel UI Config][32]): Optional UI config for the panel.
 - **widths** (list of [Constraint][22]): Width of the columns.
 - **col_spacing** (nullable int): Spacing between columns. Defaults to 1.
-- **render** (list of list of string): The rows and columns to render.
+- **body** (list of list of string): The rows and columns to render.
 
 #### Example: Render a custom static table
 
 ```lua
 xplr.config.layouts.builtin.default = {
-  CustomContent = {
-    title = "custom title",
-    body = {
-      StaticTable = {
-        widths = {
-          { Percentage = 50 },
-          { Percentage = 50 },
-        },
-        col_spacing = 1,
-        render = {
-          { "a", "b" },
-          { "c", "d" },
-        },
+  Static = {
+    Table = {
+      ui = { title = { format = " custom title " } },
+      widths = {
+        { Percentage = 50 },
+        { Percentage = 50 },
+      },
+      body = {
+        { "a", "b" },
+        { "c", "d" },
       },
     },
   },
 }
 ```
-
-## Dynamic Table
-
-A [Lua function][35] to render a custom table.
-It contains the following fields:
-
-- **widths** (list of [Constraint][22]): Width of the columns.
-- **col_spacing** (nullable int): Spacing between columns. Defaults to 1.
-- **render** (string): The [lua function][35] that returns the table to render.
 
 #### Example: Render a custom dynamic table
 
 ```lua
-xplr.config.layouts.builtin.default = {
-  CustomContent = {
-    title = "custom title",
-    body = {
-      DynamicTable = {
-        widths = {
-          { Percentage = 50 },
-          { Percentage = 50 },
-        },
-        col_spacing = 1,
-        render = "custom.render_layout",
-      },
-    },
-  },
-}
+xplr.config.layouts.builtin.default = {Dynamic = "custom.render_layout" }
 
 xplr.fn.custom.render_layout = function(ctx)
   return {
-    { "", "" },
-    { "Layout height", tostring(ctx.layout_size.height) },
-    { "Layout width", tostring(ctx.layout_size.width) },
-    { "", "" },
-    { "Screen height", tostring(ctx.screen_size.height) },
-    { "Screen width", tostring(ctx.screen_size.width) },
+    Table = {
+      ui = { title = { format = ctx.app.pwd } },
+      widths = {
+        { Percentage = 50 },
+        { Percentage = 50 },
+      },
+      body = {
+        { "", "" },
+        { "Layout height", tostring(ctx.layout_size.height) },
+        { "Layout width", tostring(ctx.layout_size.width) },
+        { "", "" },
+        { "Screen height", tostring(ctx.screen_size.height) },
+        { "Screen width", tostring(ctx.screen_size.width) },
+      },
+    },
   }
 end
 ```
+
+## Panel UI Config
+
+It contains the following optional fields:
+
+- **title** ({ format = "string", style = [Style][33] }): the title of the panel.
+- **style** ([Style][33]): The style of the panel body.
+- **borders** (nullable list of [Border][34]): The shape of the borders.
+- **border_type** ([Border Type][54]): The type of the borders.
+- **border_style** ([Style][33]): The style of the borders.
 
 ## Content Renderer
 
@@ -421,16 +392,16 @@ Hence, only the following fields are avilable.
 [22]: #constraint
 [23]: https://s6.gifyu.com/images/layout.png
 [24]: https://gifyu.com/image/1X38
-[25]: #custom-content
-[26]: #content-body
-[27]: #static-paragraph
-[28]: #dynamic-paragraph
-[29]: #static-list
-[30]: #dynamic-list
-[31]: #static-table
-[32]: #dynamic-table
-[33]: #title
-[34]: #body
+[25]: #static
+[26]: #dynamic
+[27]: #custom-panel
+[28]: configuration.md#function
+[29]: #paragraph
+[30]: #list
+[31]: #table
+[32]: #panel-ui-config
+[33]: style.md#style
+[34]: borders.md#border
 [35]: #content-renderer
 [36]: #content-renderer-argument
 [37]: #size
@@ -450,3 +421,4 @@ Hence, only the following fields are avilable.
 [51]: layouts.md
 [52]: lua-function-calls.md#vroot
 [53]: lua-function-calls.md#initial_pwd
+[54]: borders.md#border-type
