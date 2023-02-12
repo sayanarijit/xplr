@@ -175,11 +175,11 @@ The list of child layouts to fit into the parent layout.
 
 Custom panel can be one of the following:
 
-- [Paragraph][29]
-- [List][30]
-- [Table][31]
+- [CustomParagraph][29]
+- [CustomList][30]
+- [CustomTable][31]
 
-### Paragraph
+### CustomParagraph
 
 A paragraph to render. It contains the following fields:
 
@@ -191,7 +191,7 @@ A paragraph to render. It contains the following fields:
 ```lua
 xplr.config.layouts.builtin.default = {
   Static = {
-    Paragraph = {
+    CustomParagraph = {
       ui = { title = { format = " custom title " } },
       body = "custom body",
     },
@@ -206,7 +206,7 @@ xplr.config.layouts.builtin.default = { Dynamic = "custom.render_layout" }
 
 xplr.fn.custom.render_layout = function(ctx)
   return {
-    Paragraph = {
+    CustomParagraph = {
       ui = { title = { format = ctx.app.pwd } },
       body = xplr.util.to_yaml(ctx.app.focused_node),
     },
@@ -214,7 +214,7 @@ xplr.fn.custom.render_layout = function(ctx)
 end
 ```
 
-### List
+### CustomList
 
 A list to render. It contains the following fields:
 
@@ -226,7 +226,7 @@ A list to render. It contains the following fields:
 ```lua
 xplr.config.layouts.builtin.default = {
   Static = {
-    List = {
+    CustomList = {
       ui = { title = { format = " custom title " } },
       body = { "1", "2", "3" },
     },
@@ -241,7 +241,7 @@ xplr.config.layouts.builtin.default = { Dynamic = "custom.render_layout" }
 
 xplr.fn.custom.render_layout = function(ctx)
   return {
-    List = {
+    CustomList = {
       ui = { title = { format = ctx.app.pwd } },
       body = {
         (ctx.app.focused_node or {}).relative_path or "",
@@ -253,7 +253,7 @@ xplr.fn.custom.render_layout = function(ctx)
 end
 ```
 
-## Table
+## CustomTable
 
 A custom table to render. It contains the following fields:
 
@@ -267,7 +267,7 @@ A custom table to render. It contains the following fields:
 ```lua
 xplr.config.layouts.builtin.default = {
   Static = {
-    Table = {
+    CustomTable = {
       ui = { title = { format = " custom title " } },
       widths = {
         { Percentage = 50 },
@@ -289,7 +289,7 @@ xplr.config.layouts.builtin.default = {Dynamic = "custom.render_layout" }
 
 xplr.fn.custom.render_layout = function(ctx)
   return {
-    Table = {
+    CustomTable = {
       ui = { title = { format = ctx.app.pwd } },
       widths = {
         { Percentage = 50 },
@@ -396,9 +396,9 @@ Hence, only the following fields are avilable.
 [26]: #dynamic
 [27]: #custom-panel
 [28]: configuration.md#function
-[29]: #paragraph
-[30]: #list
-[31]: #table
+[29]: #custom-paragraph
+[30]: #custom-list
+[31]: #custom-table
 [32]: #panel-ui-config
 [33]: style.md#style
 [34]: borders.md#border

@@ -79,17 +79,17 @@ impl LayoutOptions {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum CustomPanel {
-    Paragraph {
+    CustomParagraph {
         #[serde(default)]
         ui: PanelUiConfig,
         body: String,
     },
-    List {
+    CustomList {
         #[serde(default)]
         ui: PanelUiConfig,
         body: Vec<String>,
     },
-    Table {
+    CustomTable {
         #[serde(default)]
         ui: PanelUiConfig,
         widths: Vec<Constraint>,
@@ -1221,7 +1221,7 @@ pub fn draw_dynamic<B: Backend>(
 
     let panel: CustomPanel = lua::serialize(lua, &ctx)
         .and_then(|arg| lua::call(lua, func, arg))
-        .unwrap_or_else(|e| CustomPanel::Paragraph {
+        .unwrap_or_else(|e| CustomPanel::CustomParagraph {
             ui: app.config.general.panel_ui.default.clone(),
             body: format!("{e:?}"),
         });
@@ -1239,14 +1239,14 @@ pub fn draw_static<B: Backend>(
 ) {
     let defaultui = app.config.general.panel_ui.default.clone();
     match panel {
-        CustomPanel::Paragraph { ui, body } => {
+        CustomPanel::CustomParagraph { ui, body } => {
             let config = defaultui.extend(&ui);
             let body = string_to_text(body);
             let content = Paragraph::new(body).block(block(config, "".into()));
             f.render_widget(content, layout_size);
         }
 
-        CustomPanel::List { ui, body } => {
+        CustomPanel::CustomList { ui, body } => {
             let config = defaultui.extend(&ui);
 
             let items = body
@@ -1259,7 +1259,7 @@ pub fn draw_static<B: Backend>(
             f.render_widget(content, layout_size);
         }
 
-        CustomPanel::Table {
+        CustomPanel::CustomTable {
             ui,
             widths,
             col_spacing,
