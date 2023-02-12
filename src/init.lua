@@ -1317,11 +1317,10 @@ xplr.config.modes.builtin.debug_error = {
       },
       splits = {
         {
-          CustomContent = {
-            title = "debug error",
-            body = {
-              StaticParagraph = {
-                render = [[
+          Static = {
+            CustomParagraph = {
+              ui = { title = { format = "debug error" } },
+              body = [[
 
   Some errors occurred during startup.
   If you think this is a bug, please report it at:
@@ -1333,8 +1332,7 @@ xplr.config.modes.builtin.debug_error = {
 
   To disable this mode, set `xplr.config.general.disable_debug_error_mode`
   to `true` in your config file.
-                ]],
-              },
+              ]],
             },
           },
         },
@@ -1373,11 +1371,10 @@ xplr.config.modes.builtin.debug_error = {
 xplr.config.modes.builtin.recover = {
   name = "recover",
   layout = {
-    CustomContent = {
-      title = " recover ",
-      body = {
-        StaticParagraph = {
-          render = [[
+    Static = {
+      CustomParagraph = {
+        ui = { title = { format = "recover" } },
+        body = [[
 
   You pressed an invalid key and went into "recover" mode.
   This mode saves you from performing unwanted actions.
@@ -1386,8 +1383,7 @@ xplr.config.modes.builtin.recover = {
 
   To disable this mode, set `xplr.config.general.enable_recover_mode`
   to `false` in your config file.
-          ]],
-        },
+        ]],
       },
     },
   },

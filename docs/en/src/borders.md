@@ -20,6 +20,10 @@ A border can be one of the following:
 - Double
 - Thick
 
+### Border Style
+
+The [style][1] of the borders.
+
 ## Example
 
 ```lua
@@ -28,3 +32,5 @@ xplr.config.general.panel_ui.default.border_type = "Thick"
 xplr.config.general.panel_ui.default.border_style.fg = "Black"
 xplr.config.general.panel_ui.default.border_style.bg = "Gray"
 ```
+
+[1]: style.md#style
