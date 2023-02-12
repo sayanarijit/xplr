@@ -70,7 +70,7 @@ Type: "HelpMenu"
 
 ### SortAndFilter
 
-This layout contains the panel displaying the pipeline of sorters and filters applied of
+This layout contains the panel displaying the pipeline of sorters and filters applied on
 the list of paths being displayed.
 
 Type: "SortAndFilter"
