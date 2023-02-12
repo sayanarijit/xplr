@@ -107,7 +107,7 @@ pub enum Layout {
     Selection,
     HelpMenu,
     SortAndFilter,
-    Static(CustomPanel),
+    Static(Box<CustomPanel>),
     Dynamic(String),
     Horizontal {
         config: LayoutOptions,
@@ -119,7 +119,7 @@ pub enum Layout {
     },
 
     /// For compatibility only. A better choice is Static or Dymanic layout.
-    CustomContent(CustomContent),
+    CustomContent(Box<CustomContent>),
 }
 
 impl Default for Layout {
@@ -1343,13 +1343,13 @@ pub fn draw_layout<B: Backend>(
             };
         }
         Layout::Static(panel) => {
-            draw_static(f, screen_size, layout_size, app, panel, lua)
+            draw_static(f, screen_size, layout_size, app, *panel, lua)
         }
         Layout::Dynamic(ref func) => {
             draw_dynamic(f, screen_size, layout_size, app, func, lua)
         }
         Layout::CustomContent(content) => {
-            draw_custom_content(f, screen_size, layout_size, app, content, lua)
+            draw_custom_content(f, screen_size, layout_size, app, *content, lua)
         }
         Layout::Horizontal { config, splits } => {
             let chunks = TuiLayout::default()
