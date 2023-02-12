@@ -396,9 +396,9 @@ Hence, only the following fields are avilable.
 [26]: #dynamic
 [27]: #custom-panel
 [28]: configuration.md#function
-[29]: #custom-paragraph
-[30]: #custom-list
-[31]: #custom-table
+[29]: #customparagraph
+[30]: #customlist
+[31]: #customtable
 [32]: #panel-ui-config
 [33]: style.md#style
 [34]: borders.md#border
