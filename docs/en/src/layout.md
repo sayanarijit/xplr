@@ -84,7 +84,7 @@ Type: { Static = [Custom Panel][27] }
 ### Dynamic
 
 This is a custom layout to render dynamic content using a function defined in
-[xplr.fn][28] that returns [Custom Panel][27].
+[xplr.fn][28] that takes [Content Renderer Argument][36] and returns [Custom Panel][27].
 
 Type: { Dynamic = [Content Renderer][35] }
 
