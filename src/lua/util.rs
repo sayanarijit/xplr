@@ -6,6 +6,8 @@ use crate::msg::in_::external::ExplorerConfig;
 use crate::node::Node;
 use crate::path;
 use crate::path::RelativityConfig;
+use crate::permissions::Octal;
+use crate::permissions::Permissions;
 use crate::ui;
 use crate::ui::Layout;
 use crate::ui::Style;
@@ -776,6 +778,53 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
+/// Convert [Permission][8] to rwxrwxrwx representation with special bits.
+///
+/// Type: function( [Permission][8] ) -> string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.permissions_rwx({ user_read = true }))
+/// -- "r--------"
+///
+/// xplr.util.permissions_rwx(app.focused_node.permission))
+/// -- "rwxrwsrwT"
+/// ```
+pub fn permissions_rwx<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, permission: Table| {
+        let permissions: Permissions = lua.from_value(Value::Table(permission))?;
+        let permissions = permissions.to_string();
+        Ok(permissions)
+    })?;
+    util.set("permissions_rwx", func)?;
+    Ok(util)
+}
+
+/// Convert [Permission][8] to octal representation.
+///
+/// Type: function( [Permission][8] ) -> { number, number, number, number }
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.permissions_octal({ user_read = true }))
+/// -- { 0, 4, 0, 0 }
+///
+/// xplr.util.permissions_octal(app.focused_node.permission))
+/// -- { 0, 7, 5, 4 }
+/// ```
+pub fn permissions_octal<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|lua, permission: Table| {
+        let permissions: Permissions = lua.from_value(Value::Table(permission))?;
+        let permissions: Octal = permissions.into();
+        let permissions = lua::serialize(lua, &permissions).map_err(LuaError::custom)?;
+        Ok(permissions)
+    })?;
+    util.set("permissions_octal", func)?;
+    Ok(util)
+}
+
 ///
 /// [1]: https://xplr.dev/en/lua-function-calls#explorer-config
 /// [2]: https://xplr.dev/en/lua-function-calls#node
@@ -784,6 +833,7 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// [5]: https://xplr.dev/en/lua-function-calls#node
 /// [6]: https://xplr.dev/en/node-type
 /// [7]: https://xplr.dev/en/node_types
+/// [8]: https://xplr.dev/en/column-renderer#permission
 
 pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
@@ -816,6 +866,8 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = style_mix(util, lua)?;
     util = textwrap(util, lua)?;
     util = layout_replace(util, lua)?;
+    util = permissions_rwx(util, lua)?;
+    util = permissions_octal(util, lua)?;
 
     Ok(util)
 }

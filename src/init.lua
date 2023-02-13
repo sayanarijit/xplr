@@ -159,7 +159,7 @@ xplr.config.general.logs.error.style = { fg = "Red" }
 xplr.config.general.table.header.cols = {
   { format = " index", style = {} },
   { format = "╭─── path", style = {} },
-  { format = "permissions", style = {} },
+  { format = "perm", style = {} },
   { format = "size", style = {} },
   { format = "modified", style = {} },
 }
@@ -1406,7 +1406,7 @@ xplr.config.modes.builtin.go_to_path = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PTH=${XPLR_INPUT_BUFFER}
+              PTH="$XPLR_INPUT_BUFFER"
               PTH_ESC=$(printf %q "$PTH")
               if [ -d "$PTH" ]; then
                 "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
@@ -2045,6 +2045,19 @@ xplr.config.modes.builtin.action = {
           "ToggleMouse",
         },
       },
+      ["p"] = {
+        help = "edit permissions",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "edit_permissions" },
+          {
+            BashExecSilently0 = [===[
+              PERM=$(stat -c '%a' -- "${XPLR_FOCUS_PATH:?}")
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
       ["v"] = {
         help = "vroot",
         messages = {
@@ -2594,6 +2607,100 @@ xplr.config.modes.builtin.vroot = {
   },
 }
 
+-- The builtin edit permissions mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.edit_permissions = {
+  name = "edit permissions",
+  key_bindings = {
+    on_key = {
+      ["u"] = {
+        help = "+user",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"+100))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["U"] = {
+        help = "-user",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"-100))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["g"] = {
+        help = "+group",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"+10))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["G"] = {
+        help = "-group",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"-10))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["o"] = {
+        help = "+other",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"+1))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["O"] = {
+        help = "-other",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"-1))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["enter"] = {
+        help = "submit",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              chmod "${XPLR_INPUT_BUFFER:?}" -- "${XPLR_FOCUS_PATH:?}"
+            ]===],
+          },
+          "PopMode",
+          "ExplorePwdAsync",
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
 -- This is where you define custom modes.
 --
 -- Type: mapping of the following key-value pairs:
@@ -2759,62 +2866,23 @@ end
 
 -- Renders the third column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
-  local green = { fg = "Green" }
-  local yellow = { fg = "Yellow" }
-  local red = { fg = "Red" }
+  local r = xplr.util.paint("r", { fg = "Green" })
+  local w = xplr.util.paint("w", { fg = "Yellow" })
+  local x = xplr.util.paint("x", { fg = "Red" })
+  local s = xplr.util.paint("s", { fg = "Red" })
+  local S = xplr.util.paint("S", { fg = "Red" })
+  local t = xplr.util.paint("t", { fg = "Red" })
+  local T = xplr.util.paint("T", { fg = "Red" })
 
-  local function bit(x, color, cond)
-    if cond then
-      return xplr.util.paint(x, color)
-    else
-      return xplr.util.paint("-", color)
-    end
-  end
-
-  local p = m.permissions
-
-  local r = ""
-
-  r = r .. bit("r", green, p.user_read)
-  r = r .. bit("w", yellow, p.user_write)
-
-  if p.user_execute == false and p.setuid == false then
-    r = r .. bit("-", red, p.user_execute)
-  elseif p.user_execute == true and p.setuid == false then
-    r = r .. bit("x", red, p.user_execute)
-  elseif p.user_execute == false and p.setuid == true then
-    r = r .. bit("S", red, p.user_execute)
-  else
-    r = r .. bit("s", red, p.user_execute)
-  end
-
-  r = r .. bit("r", green, p.group_read)
-  r = r .. bit("w", yellow, p.group_write)
-
-  if p.group_execute == false and p.setuid == false then
-    r = r .. bit("-", red, p.group_execute)
-  elseif p.group_execute == true and p.setuid == false then
-    r = r .. bit("x", red, p.group_execute)
-  elseif p.group_execute == false and p.setuid == true then
-    r = r .. bit("S", red, p.group_execute)
-  else
-    r = r .. bit("s", red, p.group_execute)
-  end
-
-  r = r .. bit("r", green, p.other_read)
-  r = r .. bit("w", yellow, p.other_write)
-
-  if p.other_execute == false and p.setuid == false then
-    r = r .. bit("-", red, p.other_execute)
-  elseif p.other_execute == true and p.setuid == false then
-    r = r .. bit("x", red, p.other_execute)
-  elseif p.other_execute == false and p.setuid == true then
-    r = r .. bit("T", red, p.other_execute)
-  else
-    r = r .. bit("t", red, p.other_execute)
-  end
-
-  return r
+  return xplr.util
+      .permissions_rwx(m.permissions)
+      :gsub("r", r)
+      :gsub("w", w)
+      :gsub("x", x)
+      :gsub("s", s)
+      :gsub("S", S)
+      :gsub("t", t)
+      :gsub("T", T)
 end
 
 -- Renders the fourth column in the table
