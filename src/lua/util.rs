@@ -785,10 +785,10 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.permissions_rwx({ user_read = true }))
+/// xplr.util.permissions_rwx({ user_read = true })
 /// -- "r--------"
 ///
-/// xplr.util.permissions_rwx(app.focused_node.permission))
+/// xplr.util.permissions_rwx(app.focused_node.permission)
 /// -- "rwxrwsrwT"
 /// ```
 pub fn permissions_rwx<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
@@ -808,10 +808,10 @@ pub fn permissions_rwx<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Example:
 ///
 /// ```lua
-/// xplr.util.permissions_octal({ user_read = true }))
+/// xplr.util.permissions_octal({ user_read = true })
 /// -- { 0, 4, 0, 0 }
 ///
-/// xplr.util.permissions_octal(app.focused_node.permission))
+/// xplr.util.permissions_octal(app.focused_node.permission)
 /// -- { 0, 7, 5, 4 }
 /// ```
 pub fn permissions_octal<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
