@@ -469,6 +469,38 @@ xplr.util.layout_replace(layout, "Table", "Selection")
 -- }
 ```
 
+### xplr.util.permissions_rwx
+
+Convert [Permission][8] to rwxrwxrwx representation with special bits.
+
+Type: function( [Permission][8] ) -> string
+
+Example:
+
+```lua
+xplr.util.permissions_rwx({ user_read = true }))
+-- "r--------"
+
+xplr.util.permissions_rwx(app.focused_node.permission))
+-- "rwxrwsrwT"
+```
+
+### xplr.util.permissions_octal
+
+Convert [Permission][8] to octal representation.
+
+Type: function( [Permission][8] ) -> { number, number, number, number }
+
+Example:
+
+```lua
+xplr.util.permissions_octal({ user_read = true }))
+-- { 0, 4, 0, 0 }
+
+xplr.util.permissions_octal(app.focused_node.permission))
+-- { 0, 7, 5, 4 }
+```
+
 [1]: https://xplr.dev/en/lua-function-calls#explorer-config
 [2]: https://xplr.dev/en/lua-function-calls#node
 [3]: https://xplr.dev/en/style
@@ -476,3 +508,4 @@ xplr.util.layout_replace(layout, "Table", "Selection")
 [5]: https://xplr.dev/en/lua-function-calls#node
 [6]: https://xplr.dev/en/node-type
 [7]: https://xplr.dev/en/node_types
+[8]: https://xplr.dev/en/column-renderer#permission

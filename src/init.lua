@@ -159,7 +159,7 @@ xplr.config.general.logs.error.style = { fg = "Red" }
 xplr.config.general.table.header.cols = {
   { format = " index", style = {} },
   { format = "╭─── path", style = {} },
-  { format = "permissions", style = {} },
+  { format = "perm", style = {} },
   { format = "size", style = {} },
   { format = "modified", style = {} },
 }
@@ -481,7 +481,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-"↓"
+  "↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -1288,19 +1288,19 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 
 -- The builtin debug error mode.
 --
@@ -1761,9 +1761,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2216,9 +2216,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -2759,62 +2759,23 @@ end
 
 -- Renders the third column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
-  local green = { fg = "Green" }
-  local yellow = { fg = "Yellow" }
-  local red = { fg = "Red" }
+  local r = xplr.util.paint("r", { fg = "Green" })
+  local w = xplr.util.paint("w", { fg = "Yellow" })
+  local x = xplr.util.paint("x", { fg = "Red" })
+  local s = xplr.util.paint("s", { fg = "Red" })
+  local S = xplr.util.paint("S", { fg = "Red" })
+  local t = xplr.util.paint("t", { fg = "Red" })
+  local T = xplr.util.paint("T", { fg = "Red" })
 
-  local function bit(x, color, cond)
-    if cond then
-      return xplr.util.paint(x, color)
-    else
-      return xplr.util.paint("-", color)
-    end
-  end
-
-  local p = m.permissions
-
-  local r = ""
-
-  r = r .. bit("r", green, p.user_read)
-  r = r .. bit("w", yellow, p.user_write)
-
-  if p.user_execute == false and p.setuid == false then
-    r = r .. bit("-", red, p.user_execute)
-  elseif p.user_execute == true and p.setuid == false then
-    r = r .. bit("x", red, p.user_execute)
-  elseif p.user_execute == false and p.setuid == true then
-    r = r .. bit("S", red, p.user_execute)
-  else
-    r = r .. bit("s", red, p.user_execute)
-  end
-
-  r = r .. bit("r", green, p.group_read)
-  r = r .. bit("w", yellow, p.group_write)
-
-  if p.group_execute == false and p.setuid == false then
-    r = r .. bit("-", red, p.group_execute)
-  elseif p.group_execute == true and p.setuid == false then
-    r = r .. bit("x", red, p.group_execute)
-  elseif p.group_execute == false and p.setuid == true then
-    r = r .. bit("S", red, p.group_execute)
-  else
-    r = r .. bit("s", red, p.group_execute)
-  end
-
-  r = r .. bit("r", green, p.other_read)
-  r = r .. bit("w", yellow, p.other_write)
-
-  if p.other_execute == false and p.setuid == false then
-    r = r .. bit("-", red, p.other_execute)
-  elseif p.other_execute == true and p.setuid == false then
-    r = r .. bit("x", red, p.other_execute)
-  elseif p.other_execute == false and p.setuid == true then
-    r = r .. bit("T", red, p.other_execute)
-  else
-    r = r .. bit("t", red, p.other_execute)
-  end
-
-  return r
+  return xplr.util
+    .permissions_rwx(m.permissions)
+    :gsub("r", r)
+    :gsub("w", w)
+    :gsub("x", x)
+    :gsub("s", s)
+    :gsub("S", S)
+    :gsub("t", t)
+    :gsub("T", T)
 end
 
 -- Renders the fourth column in the table
