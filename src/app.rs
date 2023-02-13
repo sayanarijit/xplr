@@ -166,7 +166,7 @@ pub struct InputBuffer {
     pub prompt: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct App {
     pub bin: String,
     pub version: String,
