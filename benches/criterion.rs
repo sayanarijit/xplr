@@ -18,8 +18,9 @@ fn navigation_benchmark(c: &mut Criterion) {
     });
 
     let lua = mlua::Lua::new();
-    let mut app = app::App::create(PWD.into(), &lua, None, [].into())
-        .expect("failed to create app");
+    let mut app =
+        app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into())
+            .expect("failed to create app");
 
     app = app
         .clone()
@@ -97,8 +98,9 @@ fn draw_benchmark(c: &mut Criterion) {
     });
 
     let lua = mlua::Lua::new();
-    let mut app = app::App::create(PWD.into(), &lua, None, [].into())
-        .expect("failed to create app");
+    let mut app =
+        app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into())
+            .expect("failed to create app");
 
     app = app
         .clone()

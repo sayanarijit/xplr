@@ -297,6 +297,7 @@ It contains the following fields.
 - [is_readonly][11]
 - [mime_essence][12]
 - [size][13]
+- [permissions][15]
 - [human_size][14]
 - [created][34]
 - [last_modified][35]
