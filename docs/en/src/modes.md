@@ -143,6 +143,12 @@ The builtin vroot mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
+#### xplr.config.modes.builtin.edit_permissions
+
+The builtin edit permissions mode.
+
+Type: [Mode](https://xplr.dev/en/mode)
+
 #### xplr.config.modes.custom
 
 This is where you define custom modes.

@@ -481,7 +481,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-  "↓"
+"↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -1288,19 +1288,19 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 
 -- The builtin debug error mode.
 --
@@ -1406,7 +1406,7 @@ xplr.config.modes.builtin.go_to_path = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PTH=${XPLR_INPUT_BUFFER}
+              PTH="$XPLR_INPUT_BUFFER"
               PTH_ESC=$(printf %q "$PTH")
               if [ -d "$PTH" ]; then
                 "$XPLR" -m 'ChangeDirectory: %q' "$PTH"
@@ -1761,9 +1761,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2045,6 +2045,19 @@ xplr.config.modes.builtin.action = {
           "ToggleMouse",
         },
       },
+      ["p"] = {
+        help = "edit permissions",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "edit_permissions" },
+          {
+            BashExecSilently0 = [===[
+              PERM=$(stat -c '%a' -- "${XPLR_FOCUS_PATH:?}")
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
       ["v"] = {
         help = "vroot",
         messages = {
@@ -2216,9 +2229,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -2594,6 +2607,100 @@ xplr.config.modes.builtin.vroot = {
   },
 }
 
+-- The builtin edit permissions mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.edit_permissions = {
+  name = "edit permissions",
+  key_bindings = {
+    on_key = {
+      ["u"] = {
+        help = "+user",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"+100))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["U"] = {
+        help = "-user",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"-100))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["g"] = {
+        help = "+group",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"+10))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["G"] = {
+        help = "-group",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"-10))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["o"] = {
+        help = "+other",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"+1))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["O"] = {
+        help = "-other",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(("${XPLR_INPUT_BUFFER:?}"-1))
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
+      ["enter"] = {
+        help = "submit",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              chmod "${XPLR_INPUT_BUFFER:?}" -- "${XPLR_FOCUS_PATH:?}"
+            ]===],
+          },
+          "PopMode",
+          "ExplorePwdAsync",
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
 -- This is where you define custom modes.
 --
 -- Type: mapping of the following key-value pairs:
@@ -2768,14 +2875,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local T = xplr.util.paint("T", { fg = "Red" })
 
   return xplr.util
-    .permissions_rwx(m.permissions)
-    :gsub("r", r)
-    :gsub("w", w)
-    :gsub("x", x)
-    :gsub("s", s)
-    :gsub("S", S)
-    :gsub("t", t)
-    :gsub("T", T)
+      .permissions_rwx(m.permissions)
+      :gsub("r", r)
+      :gsub("w", w)
+      :gsub("x", x)
+      :gsub("s", s)
+      :gsub("S", S)
+      :gsub("t", t)
+      :gsub("T", T)
 end
 
 -- Renders the fourth column in the table
