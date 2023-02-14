@@ -2619,8 +2619,13 @@ xplr.config.modes.builtin.edit_permissions = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PERM=$(("${XPLR_INPUT_BUFFER:?}"+100))
-              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+              PERM="${XPLR_INPUT_BUFFER:-000}"
+              U="${PERM: -3:-2}"
+              G="${PERM: -2:-1}"
+              O="${PERM: -1}"
+
+              U="$(( (${U:-0} + 1) % 8 ))"
+              "$XPLR" -m 'SetInputBuffer: %q' "${U:-0}${G:-0}${O:-0}"
             ]===],
           },
         },
@@ -2630,8 +2635,13 @@ xplr.config.modes.builtin.edit_permissions = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PERM=$(("${XPLR_INPUT_BUFFER:?}"-100))
-              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+              PERM="${XPLR_INPUT_BUFFER:-000}"
+              U="${PERM: -3:-2}"
+              G="${PERM: -2:-1}"
+              O="${PERM: -1}"
+
+              U="$(( ${U:-0}-1 < 0 ? 7 : ${U:-0}-1 ))"
+              "$XPLR" -m 'SetInputBuffer: %q' "${U:-0}${G:-0}${O:-0}"
             ]===],
           },
         },
@@ -2641,8 +2651,13 @@ xplr.config.modes.builtin.edit_permissions = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PERM=$(("${XPLR_INPUT_BUFFER:?}"+10))
-              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+              PERM="${XPLR_INPUT_BUFFER:-000}"
+              U="${PERM: -3:-2}"
+              G="${PERM: -2:-1}"
+              O="${PERM: -1}"
+
+              G="$(( (${G:-0} + 1) % 8 ))"
+              "$XPLR" -m 'SetInputBuffer: %q' "${U:-0}${G:-0}${O:-0}"
             ]===],
           },
         },
@@ -2652,8 +2667,13 @@ xplr.config.modes.builtin.edit_permissions = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PERM=$(("${XPLR_INPUT_BUFFER:?}"-10))
-              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+              PERM="${XPLR_INPUT_BUFFER:-000}"
+              U="${PERM: -3:-2}"
+              G="${PERM: -2:-1}"
+              O="${PERM: -1}"
+
+              G="$(( ${G:-0}-1 < 0 ? 7 : ${G:-0}-1 ))"
+              "$XPLR" -m 'SetInputBuffer: %q' "${U:-0}${G:-0}${O:-0}"
             ]===],
           },
         },
@@ -2663,8 +2683,13 @@ xplr.config.modes.builtin.edit_permissions = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PERM=$(("${XPLR_INPUT_BUFFER:?}"+1))
-              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+              PERM="${XPLR_INPUT_BUFFER:-000}"
+              U="${PERM: -3:-2}"
+              G="${PERM: -2:-1}"
+              O="${PERM: -1}"
+
+              O="$(( (${O:-0} + 1) % 8 ))"
+              "$XPLR" -m 'SetInputBuffer: %q' "${U:-0}${G:-0}${O:-0}"
             ]===],
           },
         },
@@ -2674,8 +2699,13 @@ xplr.config.modes.builtin.edit_permissions = {
         messages = {
           {
             BashExecSilently0 = [===[
-              PERM=$(("${XPLR_INPUT_BUFFER:?}"-1))
-              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+              PERM="${XPLR_INPUT_BUFFER:-000}"
+              U="${PERM: -3:-2}"
+              G="${PERM: -2:-1}"
+              O="${PERM: -1}"
+
+              O="$(( ${O:-0}-1 < 0 ? 7 : ${O:-0}-1 ))"
+              "$XPLR" -m 'SetInputBuffer: %q' "${U:-0}${G:-0}${O:-0}"
             ]===],
           },
         },
