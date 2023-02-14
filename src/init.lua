@@ -2710,6 +2710,37 @@ xplr.config.modes.builtin.edit_permissions = {
           },
         },
       },
+      ["m"] = {
+        help = "max",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              "$XPLR" -m 'SetInputBuffer: %q' "777"
+            ]===],
+          },
+        },
+      },
+      ["M"] = {
+        help = "min",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              "$XPLR" -m 'SetInputBuffer: %q' "000"
+            ]===],
+          },
+        },
+      },
+      ["ctrl-r"] = {
+        help = "reset",
+        messages = {
+          {
+            BashExecSilently0 = [===[
+              PERM=$(stat -c '%a' -- "${XPLR_FOCUS_PATH:?}")
+              "$XPLR" -m 'SetInputBuffer: %q' "${PERM:?}"
+            ]===],
+          },
+        },
+      },
       ["enter"] = {
         help = "submit",
         messages = {
