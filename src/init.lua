@@ -481,7 +481,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-"↓"
+  "↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -1288,19 +1288,19 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 
 -- The builtin debug error mode.
 --
@@ -1694,8 +1694,8 @@ xplr.config.modes.builtin.create_file = {
               PTH="$XPLR_INPUT_BUFFER"
               PTH_ESC=$(printf %q "$PTH")
               if [ "$PTH" ]; then
-                mkdir -p -- "$(dirname $(realpath -m $PTH))" \
-                && touch -- "$PTH" \
+                mkdir -p -- "$(dirname $(realpath -m $PTH))"  # This may fail.
+                touch -- "$PTH" \
                 && "$XPLR" -m 'SetInputBuffer: ""' \
                 && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
                 && "$XPLR" -m 'ExplorePwd' \
@@ -1761,9 +1761,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2229,9 +2229,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -2935,15 +2935,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local t = xplr.util.paint("t", { fg = "Red" })
   local T = xplr.util.paint("T", { fg = "Red" })
 
-  return xplr.util
-      .permissions_rwx(m.permissions)
-      :gsub("r", r)
-      :gsub("w", w)
-      :gsub("x", x)
-      :gsub("s", s)
-      :gsub("S", S)
-      :gsub("t", t)
-      :gsub("T", T)
+  return xplr.util.permissions_rwx(m.permissions)
+    :gsub("r", r)
+    :gsub("w", w)
+    :gsub("x", x)
+    :gsub("s", s)
+    :gsub("S", S)
+    :gsub("t", t)
+    :gsub("T", T)
 end
 
 -- Renders the fourth column in the table
