@@ -1139,7 +1139,7 @@ fn draw_logs<B: Backend>(
             .rev()
             .take(layout_size.height as usize)
             .map(|log| {
-                let time = log.created_at.format("%r");
+                let time = log.created_at.format("%H:%M:%S");
                 let cfg = match log.level {
                     app::LogLevel::Info => &logs_config.info,
                     app::LogLevel::Warning => &logs_config.warning,
@@ -1158,7 +1158,7 @@ fn draw_logs<B: Backend>(
                     .enumerate()
                     .map(|(i, line)| {
                         if i == 0 {
-                            format!("{prefix}: {line}")
+                            format!("{prefix}) {line}")
                         } else {
                             format!("{padding}  {line}")
                         }
