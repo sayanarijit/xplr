@@ -434,7 +434,6 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
   RelativePathIsNot = { format = "rel!=", style = {} },
   RelativePathDoesMatchRegex = { format = "rel=/", style = {} },
   RelativePathDoesNotMatchRegex = { format = "rel!/", style = {} },
-
   IRelativePathDoesContain = { format = "[i]rel=~", style = {} },
   IRelativePathDoesEndWith = { format = "[i]rel=$", style = {} },
   IRelativePathDoesNotContain = { format = "[i]rel!~", style = {} },
@@ -445,7 +444,6 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
   IRelativePathIsNot = { format = "[i]rel!=", style = {} },
   IRelativePathDoesMatchRegex = { format = "[i]rel=/", style = {} },
   IRelativePathDoesNotMatchRegex = { format = "[i]rel!/", style = {} },
-
   AbsolutePathDoesContain = { format = "abs=~", style = {} },
   AbsolutePathDoesEndWith = { format = "abs=$", style = {} },
   AbsolutePathDoesNotContain = { format = "abs!~", style = {} },
@@ -456,7 +454,6 @@ xplr.config.general.sort_and_filter_ui.filter_identifiers = {
   AbsolutePathIsNot = { format = "abs!=", style = {} },
   AbsolutePathDoesMatchRegex = { format = "abs=/", style = {} },
   AbsolutePathDoesNotMatchRegex = { format = "abs!/", style = {} },
-
   IAbsolutePathDoesContain = { format = "[i]abs=~", style = {} },
   IAbsolutePathDoesEndWith = { format = "[i]abs=$", style = {} },
   IAbsolutePathDoesNotContain = { format = "[i]abs!~", style = {} },
@@ -1495,7 +1492,6 @@ xplr.config.modes.builtin.selection_ops = {
                 done
                 if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ./$BASENAME_ESC"
-                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to ./$BASENAME_ESC"
@@ -1550,7 +1546,6 @@ xplr.config.modes.builtin.selection_ops = {
                 done
                 if ln -sv -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as ./$BASENAME_ESC"
-                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as ./$BASENAME_ESC"
@@ -1578,7 +1573,6 @@ xplr.config.modes.builtin.selection_ops = {
                 done
                 if ln -v -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as ./$BASENAME_ESC"
-                  "$XPLR" -m 'UnSelectPath: %q' "$PTH"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as ./$BASENAME_ESC"
@@ -2935,7 +2929,8 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local t = xplr.util.paint("t", { fg = "Red" })
   local T = xplr.util.paint("T", { fg = "Red" })
 
-  return xplr.util.permissions_rwx(m.permissions)
+  return xplr.util
+    .permissions_rwx(m.permissions)
     :gsub("r", r)
     :gsub("w", w)
     :gsub("x", x)
