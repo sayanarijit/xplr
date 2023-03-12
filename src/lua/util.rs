@@ -187,7 +187,6 @@ pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(move |_, path: String| {
         let components: Vec<String> = PathBuf::from(path)
             .components()
-            .into_iter()
             .map(|c| c.as_os_str().to_string_lossy().to_string())
             .collect();
         Ok(components)
