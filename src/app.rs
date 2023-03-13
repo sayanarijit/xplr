@@ -101,23 +101,67 @@ pub struct History {
 }
 
 impl History {
+    fn loc_exists(&self) -> bool {
+        self.peek()
+            .map(|p| PathBuf::from(p).exists())
+            .unwrap_or(false)
+    }
+
+    fn cleanup(mut self) -> Self {
+        while self.loc > 0
+            && self
+                .paths
+                .get(self.loc.saturating_sub(1))
+                .and_then(|p1| self.peek().map(|p2| p1 == p2))
+                .unwrap_or(false)
+        {
+            self.paths.remove(self.loc);
+            self.loc = self.loc.saturating_sub(1);
+        }
+
+        while self.loc < self.paths.len().saturating_sub(1)
+            && self
+                .paths
+                .get(self.loc.saturating_add(1))
+                .and_then(|p1| self.peek().map(|p2| p1 == p2))
+                .unwrap_or(false)
+        {
+            self.paths.remove(self.loc.saturating_add(1));
+        }
+
+        self
+    }
+
     fn push(mut self, path: String) -> Self {
         if self.peek() != Some(&path) {
             self.paths = self.paths.into_iter().take(self.loc + 1).collect();
             self.paths.push(path);
-            self.loc = self.paths.len().max(1) - 1;
+            self.loc = self.paths.len().saturating_sub(1);
         }
         self
     }
 
     fn visit_last(mut self) -> Self {
-        self.loc = self.loc.max(1) - 1;
-        self
+        self.loc = self.loc.saturating_sub(1);
+
+        while self.loc > 0 && !self.loc_exists() {
+            self.paths.remove(self.loc);
+            self.loc = self.loc.saturating_sub(1);
+        }
+        self.cleanup()
     }
 
     fn visit_next(mut self) -> Self {
-        self.loc = (self.loc + 1).min(self.paths.len().max(1) - 1);
-        self
+        self.loc = self
+            .loc
+            .saturating_add(1)
+            .min(self.paths.len().saturating_sub(1));
+
+        while self.loc < self.paths.len().saturating_sub(1) && !self.loc_exists() {
+            self.paths.remove(self.loc);
+        }
+
+        self.cleanup()
     }
 
     fn peek(&self) -> Option<&String> {
@@ -696,7 +740,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir.total.max(1) - 1;
+            dir.focus = dir.total.saturating_sub(1);
 
             if let Some(n) = dir.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
@@ -713,10 +757,10 @@ impl App {
                 if bounded {
                     dir.focus
                 } else {
-                    dir.total.max(1) - 1
+                    dir.total.saturating_sub(1)
                 }
             } else {
-                dir.focus.max(1) - 1
+                dir.focus.saturating_sub(1)
             };
         };
         Ok(self)
@@ -740,10 +784,10 @@ impl App {
                     if bounded {
                         idx
                     } else {
-                        total.max(1) - 1
+                        total.saturating_sub(1)
                     }
                 } else {
-                    idx.max(1) - 1
+                    idx.saturating_sub(1)
                 };
                 if let Some(p) = self
                     .selection
@@ -769,7 +813,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir.focus.max(index) - index;
+            dir.focus = dir.focus.saturating_sub(index);
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -854,7 +898,11 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
+            dir.focus = dir
+                .focus
+                .saturating_add(index)
+                .min(dir.total.saturating_sub(1));
+
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -946,9 +994,9 @@ impl App {
 
         match env::set_current_dir(&dir) {
             Ok(()) => {
-                let pwd = self.pwd.clone();
+                let lwd = self.pwd.clone();
                 let focus = self.focused_node().map(|n| n.relative_path.clone());
-                self = self.add_last_focus(pwd, focus)?;
+                self = self.add_last_focus(lwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
                 self.explorer_config.searcher = None;
                 if save_history {
@@ -1099,7 +1147,7 @@ impl App {
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
         let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = index.min(dir.total.max(1) - 1);
+            dir.focus = index.min(dir.total.saturating_sub(1));
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }

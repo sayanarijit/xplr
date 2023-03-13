@@ -56,7 +56,7 @@ pub(crate) fn explore_sync(
             .enumerate()
             .find(|(_, n)| n.relative_path == focus_str)
             .map(|(i, _)| i)
-            .unwrap_or_else(|| fallback_focus.min(nodes.len().max(1) - 1))
+            .unwrap_or_else(|| fallback_focus.min(nodes.len().saturating_sub(1)))
     } else {
         0
     };
