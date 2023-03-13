@@ -108,7 +108,7 @@ impl History {
     }
 
     fn cleanup(mut self) -> Self {
-        while self.loc != 0
+        while self.loc > 0
             && self
                 .paths
                 .get(self.loc.saturating_sub(1))
@@ -119,7 +119,7 @@ impl History {
             self.loc = self.loc.saturating_sub(1);
         }
 
-        while self.loc != self.paths.len().saturating_sub(1)
+        while self.loc < self.paths.len().saturating_sub(1)
             && self
                 .paths
                 .get(self.loc.saturating_add(1))
@@ -144,7 +144,7 @@ impl History {
     fn visit_last(mut self) -> Self {
         self.loc = self.loc.saturating_sub(1);
 
-        while self.loc != 0 && !self.loc_exists() {
+        while self.loc > 0 && !self.loc_exists() {
             self.paths.remove(self.loc);
             self.loc = self.loc.saturating_sub(1);
         }
@@ -157,7 +157,7 @@ impl History {
             .saturating_add(1)
             .min(self.paths.len().saturating_sub(1));
 
-        while self.loc != self.paths.len().saturating_sub(1) && !self.loc_exists() {
+        while self.loc < self.paths.len().saturating_sub(1) && !self.loc_exists() {
             self.paths.remove(self.loc);
         }
 
