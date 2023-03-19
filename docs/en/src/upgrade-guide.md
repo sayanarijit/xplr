@@ -45,6 +45,81 @@ compatibility.
 
 ### Instructions
 
+#### [v0.20.2][48] -> [v0.21.0][49]
+
+- Some plugins might stop rendering colors. Wait for them to update.
+- Rename `xplr.config.general.sort_and_filter_ui.search_identifier` to
+  `xplr.config.general.sort_and_filter_ui.search_identifiers`.
+- Resolved Node API will not contain the `permissions` field anymore.
+  Use the utility function `xplr.util.node` to get its permissions.
+- Layout `CustomContent` has been undocumented. It will stay for compatibility,
+  but you should prefer using the following new layouts, because they support
+  custom title:
+  - Static
+  - Dynamic
+- Use the new messages for improved search operations:
+  - Search
+  - SearchFromInput
+  - SearchFuzzyUnordered
+  - SearchFuzzyUnorderedFromInput
+  - SearchRegex
+  - SearchRegexFromInput
+  - SearchRegexUnordered
+  - SearchRegexUnorderedFromInput
+  - ToggleSearchAlgorithm
+  - EnableSearchOrder
+  - DisableSearchOrder
+  - ToggleSearchOrder
+- Use skim's [search syntax][50] to customize the search.
+- Set your preferred search algorithm:
+  `xplr.config.general.search.algorithm = "Fuzzy" -- or "Regex"`.
+- You need to clear the selection list manually after performing batch
+  operation like copy, softlink creation etc.
+- Use the following new key bindings:
+  - `:sl` to list selection in a $PAGER.
+  - `:ss` to create softlink of the selected items.
+  - `:sh` to create hardlink of the selected items.
+  - `:se` to edit selection list in your $EDITOR.
+  - Better conflict handling: add suffix rather than overriding/skipping.
+- Navigate between the selected paths using the following messages:
+  - FocusPreviousSelection (`ctrl-p`)
+  - FocusNextSelection (`ctrl-n`)
+- Use `LS_COLORS` environment variable, along with the following utility
+- functions for applying better styling/theaming.
+  - xplr.util.lscolor
+  - xplr.util.paint
+  - xplr.util.textwrap
+  - xplr.util.style_mix
+- Use new the fields in Column Renderer Argument:
+  - style
+  - permissions
+- Use the following config to specify how the paths in selection list should be
+  rendered:
+  - xplr.config.general.selection.item.format
+  - xplr.config.general.selection.item.style
+- Use the following utility functions to work with teh file permissions:
+  - xplr.util.permissions_rwx
+  - xplr.util.permissions_octal
+- Type `:p` to edit file permissions interactively.
+- Also check out the following utility functions:
+  - xplr.util.layout_replace
+  - xplr.util.relative_to
+  - xplr.util.shorthand
+  - xplr.util.clone
+  - xplr.util.exists
+  - xplr.util.is_dir
+  - xplr.util.is_file
+  - xplr.util.is_symlink
+  - xplr.util.is_absolute
+  - xplr.util.path_split
+  - xplr.util.node
+  - xplr.util.node_type
+  - xplr.util.shell_escape
+- Executables will me marked with the mime type: `application/x-executable`.
+- macOS legacy coreutils will be generally supported, but please update it.
+
+Thanks to @noahmayr for contributing to a major part of this release.
+
 #### [v0.19.4][47] -> [v0.20.2][48]
 
 - BREAKING: xplr shell (`:!`) will default to null (`\0`) delimited pipes, as
@@ -440,3 +515,5 @@ Else do the following:
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
+[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.0
+[50]: https://github.com/lotabout/skim#search-syntax
