@@ -10,9 +10,16 @@ fn to_human_size(size: u64) -> String {
     format_size(size, DECIMAL)
 }
 
-fn mime_essence(path: &Path, is_dir: bool) -> String {
+fn mime_essence(
+    path: &Path,
+    is_dir: bool,
+    extension: &str,
+    is_executable: bool,
+) -> String {
     if is_dir {
         String::from("inode/directory")
+    } else if extension.is_empty() && is_executable {
+        String::from("application/x-executable")
     } else {
         mime_guess::from_path(path)
             .first()
@@ -44,29 +51,43 @@ impl ResolvedNode {
             .map(|e| e.to_string_lossy().to_string())
             .unwrap_or_default();
 
-        let (is_dir, is_file, is_readonly, size, created, last_modified, uid, gid) =
-            path.metadata()
-                .map(|m| {
-                    (
-                        m.is_dir(),
-                        m.is_file(),
-                        m.permissions().readonly(),
-                        m.len(),
-                        m.created()
-                            .ok()
-                            .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                            .map(|d| d.as_nanos()),
-                        m.modified()
-                            .ok()
-                            .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                            .map(|d| d.as_nanos()),
-                        m.uid(),
-                        m.gid(),
-                    )
-                })
-                .unwrap_or((false, false, false, 0, None, None, 0, 0));
+        let (
+            is_dir,
+            is_file,
+            is_readonly,
+            size,
+            permissions,
+            created,
+            last_modified,
+            uid,
+            gid,
+        ) = path
+            .metadata()
+            .map(|m| {
+                (
+                    m.is_dir(),
+                    m.is_file(),
+                    m.permissions().readonly(),
+                    m.len(),
+                    Permissions::from(&m),
+                    m.created()
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| d.as_nanos()),
+                    m.modified()
+                        .ok()
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .map(|d| d.as_nanos()),
+                    m.uid(),
+                    m.gid(),
+                )
+            })
+            .unwrap_or((false, false, false, 0, Default::default(), None, None, 0, 0));
 
-        let mime_essence = mime_essence(&path, is_dir);
+        let is_executable = permissions.user_execute
+            || permissions.group_execute
+            || permissions.other_execute;
+        let mime_essence = mime_essence(&path, is_dir, &extension, is_executable);
         let human_size = to_human_size(size);
 
         Self {
@@ -177,7 +198,11 @@ impl Node {
                 )
             });
 
-        let mime_essence = mime_essence(&path, is_dir);
+        let is_executable = permissions.user_execute
+            || permissions.group_execute
+            || permissions.other_execute;
+
+        let mime_essence = mime_essence(&path, is_dir, &extension, is_executable);
         let human_size = to_human_size(size);
 
         Self {

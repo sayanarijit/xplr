@@ -368,26 +368,9 @@ Type: list of [Node Sorter Applicable][81]
 
 ### searcher
 
-Type: nullable [Node Searcher][82]
+The searcher to use (if any).
 
-## Node Searcher
-
-Node Searcher contains the following fields:
-
-- [pattern][83]
-- [recoverable_focus][84]
-
-### pattern
-
-The patters used to search.
-
-Type: string
-
-### recoverable_focus
-
-Where to focus when search is cancelled.
-
-Type: nullable string
+Type: nullable [Node Searcher Applicable][82]
 
 ## Also Ssee:
 
@@ -457,7 +440,5 @@ Type: nullable string
 [79]: #searcher
 [80]: filtering.md#node-filter-applicable
 [81]: sorting.md#node-sorter-applicable
-[82]: #node-searcher
-[83]: #pattern
-[84]: #recoverable_focus
+[82]: searching.md#node-searcher-applicable
 [85]: xplr.util.md

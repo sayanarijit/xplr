@@ -260,6 +260,9 @@ def gen_xplr_util():
             print("\n".join(function.doc))
             print("\n".join(function.doc), file=f)
 
+        if reading:
+            print("\n".join(reading.doc), file=f)
+
 
 def format_docs():
     os.system("prettier --write docs/en/src")

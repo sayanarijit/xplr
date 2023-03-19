@@ -9,7 +9,7 @@ pub use crate::msg::in_::external::Command;
 pub use crate::msg::in_::external::ExplorerConfig;
 pub use crate::msg::in_::external::NodeFilter;
 pub use crate::msg::in_::external::NodeFilterApplicable;
-use crate::msg::in_::external::NodeSearcher;
+use crate::msg::in_::external::NodeSearcherApplicable;
 pub use crate::msg::in_::external::NodeSorter;
 pub use crate::msg::in_::external::NodeSorterApplicable;
 pub use crate::msg::in_::ExternalMsg;
@@ -19,9 +19,9 @@ pub use crate::msg::out::MsgOut;
 pub use crate::node::Node;
 pub use crate::node::ResolvedNode;
 pub use crate::pipe::Pipe;
+use crate::search::SearchAlgorithm;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
-use chrono::{DateTime, Local};
 use gethostname::gethostname;
 use indexmap::set::IndexSet;
 use path_absolutize::*;
@@ -31,6 +31,7 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
+use time::OffsetDateTime;
 use tui_input::{Input, InputRequest};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -62,7 +63,7 @@ pub enum LogLevel {
 pub struct Log {
     pub level: LogLevel,
     pub message: String,
-    pub created_at: DateTime<Local>,
+    pub created_at: OffsetDateTime,
 }
 
 impl Log {
@@ -70,7 +71,9 @@ impl Log {
         Self {
             level,
             message,
-            created_at: Local::now(),
+            created_at: OffsetDateTime::now_local()
+                .ok()
+                .unwrap_or_else(OffsetDateTime::now_utc),
         }
     }
 }
@@ -83,7 +86,7 @@ impl std::fmt::Display for Log {
             LogLevel::Success => "SUCCESS",
             LogLevel::Error => "ERROR  ",
         };
-        write!(f, "[{}] {} {}", &self.created_at, level_str, &self.message)
+        write!(f, "[{0}] {level_str} {1}", &self.created_at, &self.message)
     }
 }
 
@@ -100,23 +103,67 @@ pub struct History {
 }
 
 impl History {
+    fn loc_exists(&self) -> bool {
+        self.peek()
+            .map(|p| PathBuf::from(p).exists())
+            .unwrap_or(false)
+    }
+
+    fn cleanup(mut self) -> Self {
+        while self.loc > 0
+            && self
+                .paths
+                .get(self.loc.saturating_sub(1))
+                .and_then(|p1| self.peek().map(|p2| p1 == p2))
+                .unwrap_or(false)
+        {
+            self.paths.remove(self.loc);
+            self.loc = self.loc.saturating_sub(1);
+        }
+
+        while self.loc < self.paths.len().saturating_sub(1)
+            && self
+                .paths
+                .get(self.loc.saturating_add(1))
+                .and_then(|p1| self.peek().map(|p2| p1 == p2))
+                .unwrap_or(false)
+        {
+            self.paths.remove(self.loc.saturating_add(1));
+        }
+
+        self
+    }
+
     fn push(mut self, path: String) -> Self {
         if self.peek() != Some(&path) {
             self.paths = self.paths.into_iter().take(self.loc + 1).collect();
             self.paths.push(path);
-            self.loc = self.paths.len().max(1) - 1;
+            self.loc = self.paths.len().saturating_sub(1);
         }
         self
     }
 
     fn visit_last(mut self) -> Self {
-        self.loc = self.loc.max(1) - 1;
-        self
+        self.loc = self.loc.saturating_sub(1);
+
+        while self.loc > 0 && !self.loc_exists() {
+            self.paths.remove(self.loc);
+            self.loc = self.loc.saturating_sub(1);
+        }
+        self.cleanup()
     }
 
     fn visit_next(mut self) -> Self {
-        self.loc = (self.loc + 1).min(self.paths.len().max(1) - 1);
-        self
+        self.loc = self
+            .loc
+            .saturating_add(1)
+            .min(self.paths.len().saturating_sub(1));
+
+        while self.loc < self.paths.len().saturating_sub(1) && !self.loc_exists() {
+            self.paths.remove(self.loc);
+        }
+
+        self.cleanup()
     }
 
     fn peek(&self) -> Option<&String> {
@@ -165,7 +212,7 @@ pub struct InputBuffer {
     pub prompt: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct App {
     pub bin: String,
     pub version: String,
@@ -415,7 +462,7 @@ impl App {
 
     fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
         if self.config.general.read_only && !msg.is_read_only() {
-            self.log_error("Cannot execute code in read-only mode.".into())
+            self.log_error("could not execute code in read-only mode.".into())
         } else {
             use ExternalMsg::*;
             match msg {
@@ -427,6 +474,7 @@ impl App {
                 FocusFirst => self.focus_first(true),
                 FocusLast => self.focus_last(),
                 FocusPrevious => self.focus_previous(),
+                FocusPreviousSelection => self.focus_previous_selection(),
                 FocusPreviousByRelativeIndex(i) => {
                     self.focus_previous_by_relative_index(i)
                 }
@@ -435,6 +483,7 @@ impl App {
                     self.focus_previous_by_relative_index_from_input()
                 }
                 FocusNext => self.focus_next(),
+                FocusNextSelection => self.focus_next_selection(),
                 FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
                 FocusNextByRelativeIndexFromInput => {
                     self.focus_next_by_relative_index_from_input()
@@ -524,8 +573,32 @@ impl App {
                 ReverseNodeSorters => self.reverse_node_sorters(),
                 ResetNodeSorters => self.reset_node_sorters(),
                 ClearNodeSorters => self.clear_node_sorters(),
-                SearchFuzzy(p) => self.search_fuzzy(p),
-                SearchFuzzyFromInput => self.search_fuzzy_from_input(),
+                Search(p) => self.search(p),
+                SearchFromInput => self.search_from_input(),
+                SearchFuzzy(p) => self.search_with(p, SearchAlgorithm::Fuzzy, false),
+                SearchFuzzyFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Fuzzy, false)
+                }
+                SearchRegex(p) => self.search_with(p, SearchAlgorithm::Regex, false),
+                SearchRegexFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Regex, false)
+                }
+                SearchFuzzyUnordered(p) => {
+                    self.search_with(p, SearchAlgorithm::Fuzzy, true)
+                }
+                SearchFuzzyUnorderedFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Fuzzy, true)
+                }
+                SearchRegexUnordered(p) => {
+                    self.search_with(p, SearchAlgorithm::Regex, true)
+                }
+                SearchRegexUnorderedFromInput => {
+                    self.search_from_input_with(SearchAlgorithm::Regex, true)
+                }
+                EnableSearchOrder => self.enable_search_order(),
+                DisableSearchOrder => self.disable_search_order(),
+                ToggleSearchOrder => self.toggle_search_order(),
+                ToggleSearchAlgorithm => self.toggle_search_algorithm(),
                 AcceptSearch => self.accept_search(),
                 CancelSearch => self.cancel_search(),
                 EnableMouse => self.enable_mouse(),
@@ -592,7 +665,7 @@ impl App {
                 if self.config.general.enable_recover_mode {
                     vec![ExternalMsg::SwitchModeBuiltin("recover".into())]
                 } else {
-                    vec![ExternalMsg::LogWarning("Key map not found.".into())]
+                    vec![ExternalMsg::LogWarning("key map not found.".into())]
                 }
             });
 
@@ -606,14 +679,20 @@ impl App {
     pub fn explore_pwd(mut self) -> Result<Self> {
         let focus = &self.last_focus.get(&self.pwd).cloned().unwrap_or(None);
         let pwd = self.pwd.clone();
-        self = self.add_last_focus(pwd, focus.clone())?;
-        let dir = explorer::explore_sync(
+        self = self.add_last_focus(pwd.clone(), focus.clone())?;
+
+        match explorer::explore_sync(
             self.explorer_config.clone(),
             self.pwd.clone().into(),
             focus.as_ref().map(PathBuf::from),
             self.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
-        )?;
-        self.set_directory(dir)
+        ) {
+            Ok(dir) => self.set_directory(dir),
+            Err(e) => {
+                self.directory_buffer = None;
+                self.log_error(format!("could not explore {pwd:?}: {e}"))
+            }
+        }
     }
 
     fn explore_pwd_async(mut self) -> Result<Self> {
@@ -663,7 +742,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir.total.max(1) - 1;
+            dir.focus = dir.total.saturating_sub(1);
 
             if let Some(n) = dir.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
@@ -680,12 +759,52 @@ impl App {
                 if bounded {
                     dir.focus
                 } else {
-                    dir.total.max(1) - 1
+                    dir.total.saturating_sub(1)
                 }
             } else {
-                dir.focus.max(1) - 1
+                dir.focus.saturating_sub(1)
             };
         };
+        Ok(self)
+    }
+
+    fn focus_previous_selection(mut self) -> Result<Self> {
+        let total = self.selection.len();
+        if total == 0 {
+            return Ok(self);
+        }
+
+        let bounded = self.config.general.enforce_bounded_index_navigation;
+
+        if let Some(n) = self
+            .directory_buffer
+            .as_ref()
+            .and_then(|d| d.focused_node())
+        {
+            if let Some(idx) = self.selection.get_index_of(n) {
+                let idx = if idx == 0 {
+                    if bounded {
+                        idx
+                    } else {
+                        total.saturating_sub(1)
+                    }
+                } else {
+                    idx.saturating_sub(1)
+                };
+                if let Some(p) = self
+                    .selection
+                    .get_index(idx)
+                    .map(|n| n.absolute_path.clone())
+                {
+                    self = self.focus_path(&p, true)?;
+                }
+            } else if let Some(p) =
+                self.selection.last().map(|n| n.absolute_path.clone())
+            {
+                self = self.focus_path(&p, true)?;
+            }
+        }
+
         Ok(self)
     }
 
@@ -696,7 +815,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir.focus.max(index) - index;
+            dir.focus = dir.focus.saturating_sub(index);
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -734,6 +853,46 @@ impl App {
         Ok(self)
     }
 
+    fn focus_next_selection(mut self) -> Result<Self> {
+        let total = self.selection.len();
+        if total == 0 {
+            return Ok(self);
+        }
+
+        let bounded = self.config.general.enforce_bounded_index_navigation;
+
+        if let Some(n) = self
+            .directory_buffer
+            .as_ref()
+            .and_then(|d| d.focused_node())
+        {
+            if let Some(idx) = self.selection.get_index_of(n) {
+                let idx = if idx + 1 == total {
+                    if bounded {
+                        idx
+                    } else {
+                        0
+                    }
+                } else {
+                    idx + 1
+                };
+                if let Some(p) = self
+                    .selection
+                    .get_index(idx)
+                    .map(|n| n.absolute_path.clone())
+                {
+                    self = self.focus_path(&p, true)?;
+                }
+            } else if let Some(p) =
+                self.selection.first().map(|n| n.absolute_path.clone())
+            {
+                self = self.focus_path(&p, true)?;
+            }
+        }
+
+        Ok(self)
+    }
+
     pub fn focus_next_by_relative_index(mut self, index: usize) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
@@ -741,7 +900,11 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = (dir.focus + index).min(dir.total.max(1) - 1);
+            dir.focus = dir
+                .focus
+                .saturating_add(index)
+                .min(dir.total.saturating_sub(1));
+
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -785,7 +948,7 @@ impl App {
             }
         } else {
             self.log_error(format!(
-                "not a valid directory: {}",
+                "not a valid directory: {:?}",
                 vroot.to_string_lossy()
             ))
         }
@@ -833,17 +996,22 @@ impl App {
 
         match env::set_current_dir(&dir) {
             Ok(()) => {
-                let pwd = self.pwd.clone();
+                let lwd = self.pwd.clone();
                 let focus = self.focused_node().map(|n| n.relative_path.clone());
-                self = self.add_last_focus(pwd, focus)?;
+                self = self.add_last_focus(lwd, focus)?;
                 self.pwd = dir.to_string_lossy().to_string();
                 self.explorer_config.searcher = None;
                 if save_history {
-                    self.history = self.history.push(format!("{}/", self.pwd));
+                    let hist = if &self.pwd == "/" {
+                        self.pwd.clone()
+                    } else {
+                        format!("{0}/", &self.pwd)
+                    };
+                    self.history = self.history.push(hist);
                 }
                 self.explore_pwd()
             }
-            Err(e) => self.log_error(e.to_string()),
+            Err(e) => self.log_error(format!("could not enter {dir:?}: {e}")),
         }
     }
 
@@ -981,7 +1149,7 @@ impl App {
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
         let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = index.min(dir.total.max(1) - 1);
+            dir.focus = index.min(dir.total.saturating_sub(1));
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -1026,7 +1194,7 @@ impl App {
                 }
                 Ok(self)
             } else {
-                self.log_error(format!("{} not found in $PWD", name))
+                self.log_error(format!("{name:?} not found in $PWD"))
             }
         } else {
             Ok(self)
@@ -1060,10 +1228,10 @@ impl App {
                 self.change_directory(&parent.to_string_lossy(), false)?
                     .focus_by_file_name(&filename.to_string_lossy(), save_history)
             } else {
-                self.log_error(format!("{} not found", path))
+                self.log_error(format!("{path:?} not found"))
             }
         } else {
-            self.log_error(format!("Cannot focus on {}", path))
+            self.log_error(format!("could not focus on {path:?}"))
         }
     }
 
@@ -1111,7 +1279,7 @@ impl App {
         } else if self.config.modes.custom.contains_key(mode) {
             self.switch_mode_custom_keeping_input_buffer(mode)
         } else {
-            self.log_error(format!("Mode not found: {}", mode))
+            self.log_error(format!("mode not found: {mode:?}"))
         }
     }
 
@@ -1136,7 +1304,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin mode not found: {}", mode))
+            self.log_error(format!("builtin mode not found: {mode:?}"))
         }
     }
 
@@ -1161,7 +1329,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom mode not found: {}", mode))
+            self.log_error(format!("custom mode not found: {mode:?}"))
         }
     }
 
@@ -1171,7 +1339,7 @@ impl App {
         } else if self.config.layouts.custom.contains_key(layout) {
             self.switch_layout_custom(layout)
         } else {
-            self.log_error(format!("Layout not found: {}", layout))
+            self.log_error(format!("layout not found: {layout:?}"))
         }
     }
 
@@ -1187,7 +1355,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Builtin layout not found: {}", layout))
+            self.log_error(format!("builtin layout not found: {layout:?}"))
         }
     }
 
@@ -1203,7 +1371,7 @@ impl App {
 
             Ok(self)
         } else {
-            self.log_error(format!("Custom layout not found: {}", layout))
+            self.log_error(format!("custom layout not found: {layout:?}"))
         }
     }
 
@@ -1333,18 +1501,9 @@ impl App {
 
     pub fn select_all(mut self) -> Result<Self> {
         if let Some(d) = self.directory_buffer.as_ref() {
-            d.nodes.clone().into_iter().for_each(|n| {
-                self.selection.insert(n);
-            });
+            self.selection = d.nodes.clone().into_iter().collect();
         };
 
-        Ok(self)
-    }
-
-    pub fn un_select(mut self) -> Result<Self> {
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
-            self.selection.retain(|s| s != &n);
-        }
         Ok(self)
     }
 
@@ -1355,10 +1514,19 @@ impl App {
         Ok(self)
     }
 
+    pub fn un_select(mut self) -> Result<Self> {
+        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+            self.selection
+                .retain(|s| s.absolute_path != n.absolute_path);
+        }
+        Ok(self)
+    }
+
     pub fn un_select_all(mut self) -> Result<Self> {
         if let Some(d) = self.directory_buffer.as_ref() {
             d.nodes.clone().into_iter().for_each(|n| {
-                self.selection.retain(|s| s != &n);
+                self.selection
+                    .retain(|s| s.absolute_path != n.absolute_path);
             });
         };
 
@@ -1518,7 +1686,34 @@ impl App {
         Ok(self)
     }
 
-    pub fn search_fuzzy(mut self, pattern: String) -> Result<Self> {
+    pub fn search(self, pattern: String) -> Result<Self> {
+        let (algorithm, unordered) = self
+            .explorer_config
+            .searcher
+            .as_ref()
+            .map(|s| (s.algorithm, s.unordered))
+            .unwrap_or((
+                self.config.general.search.algorithm,
+                self.config.general.search.unordered,
+            ));
+
+        self.search_with(pattern, algorithm, unordered)
+    }
+
+    fn search_from_input(self) -> Result<Self> {
+        if let Some(pattern) = self.input.buffer.as_ref().map(Input::to_string) {
+            self.search(pattern)
+        } else {
+            Ok(self)
+        }
+    }
+
+    pub fn search_with(
+        mut self,
+        pattern: String,
+        algorithm: SearchAlgorithm,
+        unordered: bool,
+    ) -> Result<Self> {
         let rf = self
             .explorer_config
             .searcher
@@ -1526,16 +1721,52 @@ impl App {
             .map(|s| s.recoverable_focus.clone())
             .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
 
-        self.explorer_config.searcher = Some(NodeSearcher::new(pattern, rf));
+        self.explorer_config.searcher = Some(NodeSearcherApplicable::new(
+            pattern, rf, algorithm, unordered,
+        ));
         Ok(self)
     }
 
-    fn search_fuzzy_from_input(self) -> Result<Self> {
+    fn search_from_input_with(
+        self,
+        algorithm: SearchAlgorithm,
+        unordered: bool,
+    ) -> Result<Self> {
         if let Some(pattern) = self.input.buffer.as_ref().map(Input::to_string) {
-            self.search_fuzzy(pattern)
+            self.search_with(pattern, algorithm, unordered)
         } else {
             Ok(self)
         }
+    }
+
+    fn enable_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.enable_search_order());
+        Ok(self)
+    }
+
+    fn disable_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.disable_search_order());
+        Ok(self)
+    }
+
+    fn toggle_search_order(mut self) -> Result<Self> {
+        self.explorer_config.searcher = self
+            .explorer_config
+            .searcher
+            .map(|s| s.toggle_search_order());
+        Ok(self)
+    }
+
+    fn toggle_search_algorithm(mut self) -> Result<Self> {
+        self.explorer_config.searcher =
+            self.explorer_config.searcher.map(|s| s.toggle_algorithm());
+        Ok(self)
     }
 
     fn accept_search(mut self) -> Result<Self> {
@@ -1664,13 +1895,15 @@ impl App {
     }
 
     pub fn mode_str(&self) -> String {
-        format!("{}\n", &self.mode.name)
+        format!("{0}\n", &self.mode.name)
     }
 
     fn refresh_selection(mut self) -> Result<Self> {
-        // Should be able to select broken symlink
-        self.selection
-            .retain(|n| PathBuf::from(&n.absolute_path).symlink_metadata().is_ok());
+        self.selection.retain(|n| {
+            let p = PathBuf::from(&n.absolute_path);
+            // Should be able to retain broken symlink
+            p.exists() || p.symlink_metadata().is_ok()
+        });
         Ok(self)
     }
 
@@ -1688,7 +1921,7 @@ impl App {
             .map(|d| {
                 d.nodes
                     .iter()
-                    .map(|n| format!("{}{}", n.absolute_path, delimiter))
+                    .map(|n| format!("{0}{delimiter}", n.absolute_path))
                     .collect::<Vec<String>>()
                     .join("")
             })
@@ -1696,13 +1929,13 @@ impl App {
     }
 
     pub fn pwd_str(&self, delimiter: char) -> String {
-        format!("{}{}", &self.pwd, delimiter)
+        format!("{0}{delimiter}", &self.pwd)
     }
 
     pub fn selection_str(&self, delimiter: char) -> String {
         self.selection
             .iter()
-            .map(|n| format!("{}{}", n.absolute_path, delimiter))
+            .map(|n| format!("{0}{delimiter}", n.absolute_path))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1710,7 +1943,7 @@ impl App {
     pub fn result_str(&self, delimiter: char) -> String {
         self.result()
             .into_iter()
-            .map(|n| format!("{}{}", n.absolute_path, delimiter))
+            .map(|n| format!("{0}{delimiter}", n.absolute_path))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1718,7 +1951,7 @@ impl App {
     pub fn logs_str(&self, delimiter: char) -> String {
         self.logs
             .iter()
-            .map(|l| format!("{}{}", l, delimiter))
+            .map(|l| format!("{l}{delimiter}"))
             .collect::<Vec<String>>()
             .join("")
     }
@@ -1739,18 +1972,17 @@ impl App {
                 .help_menu()
                 .iter()
                 .map(|l| match l {
-                    HelpMenuLine::Paragraph(p) => format!("\t{}{}", p, delimiter),
+                    HelpMenuLine::Paragraph(p) => format!("\t{p}{delimiter}"),
                     HelpMenuLine::KeyMap(k, remaps, h) => {
                         let remaps = remaps.join(", ");
-                        format!(" {:15} | {:25} | {}{}", k, remaps, h , delimiter)
+                        format!(" {k:15} | {remaps:25} | {h}{delimiter}")
                     }
                 })
                 .collect::<Vec<String>>()
                 .join("");
 
             format!(
-                "### {}{d}{d} key             | remaps                    | action\n --------------- | ------------------------- | ------{d}{}{d}",
-                name, help, d = delimiter
+                "### {name}{delimiter}{delimiter} key             | remaps                    | action\n --------------- | ------------------------- | ------{delimiter}{help}{delimiter}"
             )
         })
         .collect::<Vec<String>>()
@@ -1761,7 +1993,7 @@ impl App {
         self.history
             .paths
             .iter()
-            .map(|p| format!("{}{}", &p, delimiter))
+            .map(|p| format!("{p}{delimiter}"))
             .collect::<Vec<String>>()
             .join("")
     }

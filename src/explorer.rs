@@ -2,21 +2,14 @@ use crate::app::{
     DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task,
 };
 use anyhow::{Error, Result};
-use fuzzy_matcher::skim::SkimMatcherV2;
-use fuzzy_matcher::FuzzyMatcher;
-use lazy_static::lazy_static;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
 use std::thread;
 
-lazy_static! {
-    static ref FUZZY_MATCHER: SkimMatcherV2 = SkimMatcherV2::default();
-}
-
 pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
     let dirs = fs::read_dir(parent)?;
-    let mut nodes = dirs
+    let nodes = dirs
         .filter_map(|d| {
             d.ok().map(|e| {
                 e.path()
@@ -26,25 +19,23 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
             })
         })
         .map(|name| Node::new(parent.to_string_lossy().to_string(), name))
-        .filter(|n| config.filter(n))
-        .collect::<Vec<Node>>();
+        .filter(|n| config.filter(n));
 
-    nodes = if let Some(pattern) = config.searcher.as_ref().map(|s| &s.pattern) {
-        let mut nodes = nodes
-            .into_iter()
-            .filter_map(|n| {
-                FUZZY_MATCHER
-                    .fuzzy_match(&n.relative_path, pattern)
-                    .map(|score| (n, score))
-            })
-            .collect::<Vec<(_, _)>>();
-
-        nodes.sort_by(|(_, s1), (_, s2)| s2.cmp(s1));
-        nodes.into_iter().map(|(n, _)| n).collect::<Vec<_>>()
+    let mut nodes = if let Some(searcher) = config.searcher.as_ref() {
+        searcher.search(nodes)
     } else {
-        nodes.sort_by(|a, b| config.sort(a, b));
-        nodes
+        nodes.collect()
     };
+
+    let is_ordered_search = config
+        .searcher
+        .as_ref()
+        .map(|s| !s.unordered)
+        .unwrap_or(false);
+
+    if !is_ordered_search {
+        nodes.sort_by(|a, b| config.sort(a, b));
+    }
 
     Ok(nodes)
 }
@@ -65,7 +56,7 @@ pub(crate) fn explore_sync(
             .enumerate()
             .find(|(_, n)| n.relative_path == focus_str)
             .map(|(i, _)| i)
-            .unwrap_or_else(|| fallback_focus.min(nodes.len().max(1) - 1))
+            .unwrap_or_else(|| fallback_focus.min(nodes.len().saturating_sub(1)))
     } else {
         0
     };

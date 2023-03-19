@@ -1,18 +1,21 @@
-use crate::app;
 use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
+use crate::compat::{draw_custom_content, CustomContent};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
-use ansi_to_tui::IntoText;
+use crate::{app, path};
+use ansi_to_tui_forked::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
+use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::env;
 use std::ops::BitXor;
+use time::macros::format_description;
 use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
@@ -37,14 +40,14 @@ fn read_only_indicator(app: &app::App) -> &str {
     }
 }
 
-fn string_to_text<'a>(string: String) -> Text<'a> {
+pub fn string_to_text<'a>(string: String) -> Text<'a> {
     if *NO_COLOR {
         Text::raw(string)
     } else {
         string
             .as_bytes()
             .into_text()
-            .unwrap_or_else(|e| Text::raw(format!("{:?}", e)))
+            .unwrap_or_else(|e| Text::raw(format!("{e:?}")))
     }
 }
 
@@ -76,31 +79,23 @@ impl LayoutOptions {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
-pub enum ContentBody {
-    /// A paragraph to render
-    StaticParagraph { render: String },
-
-    /// A Lua function that returns a paragraph to render
-    DynamicParagraph { render: String },
-
-    /// List to render
-    StaticList { render: Vec<String> },
-
-    /// A Lua function that returns lines to render
-    DynamicList { render: String },
-
-    /// A table to render
-    StaticTable {
-        widths: Vec<Constraint>,
-        col_spacing: Option<u16>,
-        render: Vec<Vec<String>>,
+pub enum CustomPanel {
+    CustomParagraph {
+        #[serde(default)]
+        ui: PanelUiConfig,
+        body: String,
     },
-
-    /// A Lua function that returns a table to render
-    DynamicTable {
+    CustomList {
+        #[serde(default)]
+        ui: PanelUiConfig,
+        body: Vec<String>,
+    },
+    CustomTable {
+        #[serde(default)]
+        ui: PanelUiConfig,
         widths: Vec<Constraint>,
         col_spacing: Option<u16>,
-        render: String,
+        body: Vec<Vec<String>>,
     },
 }
 
@@ -113,10 +108,8 @@ pub enum Layout {
     Selection,
     HelpMenu,
     SortAndFilter,
-    CustomContent {
-        title: Option<String>,
-        body: ContentBody,
-    },
+    Static(Box<CustomPanel>),
+    Dynamic(String),
     Horizontal {
         config: LayoutOptions,
         splits: Vec<Layout>,
@@ -125,6 +118,9 @@ pub enum Layout {
         config: LayoutOptions,
         splits: Vec<Layout>,
     },
+
+    /// For compatibility only. A better choice is Static or Dymanic layout.
+    CustomContent(Box<CustomContent>),
 }
 
 impl Default for Layout {
@@ -167,6 +163,32 @@ impl Layout {
             (_, other) => other.to_owned(),
         }
     }
+
+    pub fn replace(self, target: &Self, replacement: &Self) -> Self {
+        match self {
+            Self::Horizontal { splits, config } => Self::Horizontal {
+                splits: splits
+                    .into_iter()
+                    .map(|s| s.replace(target, replacement))
+                    .collect(),
+                config,
+            },
+            Self::Vertical { splits, config } => Self::Vertical {
+                splits: splits
+                    .into_iter()
+                    .map(|s| s.replace(target, replacement))
+                    .collect(),
+                config,
+            },
+            other => {
+                if other == *target {
+                    replacement.to_owned()
+                } else {
+                    other
+                }
+            }
+        }
+    }
 }
 
 #[derive(
@@ -181,7 +203,7 @@ pub enum Border {
 }
 
 impl Border {
-    pub fn bits(self) -> u32 {
+    pub fn bits(self) -> u8 {
         match self {
             Self::Top => TuiBorders::TOP.bits(),
             Self::Right => TuiBorders::RIGHT.bits(),
@@ -236,7 +258,7 @@ pub enum Modifier {
 }
 
 impl Modifier {
-    pub fn bits(self) -> u16 {
+    pub fn bits(self) -> u8 {
         match self {
             Self::Bold => TuiModifier::BOLD.bits(),
             Self::Dim => TuiModifier::DIM.bits(),
@@ -248,6 +270,21 @@ impl Modifier {
             Self::Hidden => TuiModifier::HIDDEN.bits(),
             Self::CrossedOut => TuiModifier::CROSSED_OUT.bits(),
         }
+    }
+}
+
+fn extend_optional_modifiers(
+    a: Option<IndexSet<Modifier>>,
+    b: Option<IndexSet<Modifier>>,
+) -> Option<IndexSet<Modifier>> {
+    match (a, b) {
+        (Some(mut a), Some(b)) => {
+            a.extend(b);
+            Some(a)
+        }
+        (Some(a), None) => Some(a),
+        (None, Some(b)) => Some(b),
+        (None, None) => None,
     }
 }
 
@@ -264,15 +301,21 @@ impl Style {
     pub fn extend(mut self, other: &Self) -> Self {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.add_modifiers = other.add_modifiers.to_owned().or(self.add_modifiers);
-        self.sub_modifiers = other.sub_modifiers.to_owned().or(self.sub_modifiers);
+        self.add_modifiers = extend_optional_modifiers(
+            self.add_modifiers,
+            other.add_modifiers.to_owned(),
+        );
+        self.sub_modifiers = extend_optional_modifiers(
+            self.sub_modifiers,
+            other.sub_modifiers.to_owned(),
+        );
         self
     }
 }
 
 impl Into<TuiStyle> for Style {
     fn into(self) -> TuiStyle {
-        fn xor(modifiers: Option<IndexSet<Modifier>>) -> u16 {
+        fn xor(modifiers: Option<IndexSet<Modifier>>) -> u8 {
             modifiers
                 .unwrap_or_default()
                 .into_iter()
@@ -289,6 +332,115 @@ impl Into<TuiStyle> for Style {
                 sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
             }
         }
+    }
+}
+
+impl From<&LsColorsStyle> for Style {
+    fn from(style: &LsColorsStyle) -> Self {
+        fn convert_color(color: &LsColorsColor) -> Color {
+            match color {
+                LsColorsColor::Black => Color::Black,
+                LsColorsColor::Red => Color::Red,
+                LsColorsColor::Green => Color::Green,
+                LsColorsColor::Yellow => Color::Yellow,
+                LsColorsColor::Blue => Color::Blue,
+                LsColorsColor::Magenta => Color::Magenta,
+                LsColorsColor::Cyan => Color::Cyan,
+                LsColorsColor::White => Color::Gray,
+                LsColorsColor::BrightBlack => Color::DarkGray,
+                LsColorsColor::BrightRed => Color::LightRed,
+                LsColorsColor::BrightGreen => Color::LightGreen,
+                LsColorsColor::BrightYellow => Color::LightYellow,
+                LsColorsColor::BrightBlue => Color::LightBlue,
+                LsColorsColor::BrightMagenta => Color::LightMagenta,
+                LsColorsColor::BrightCyan => Color::LightCyan,
+                LsColorsColor::BrightWhite => Color::White,
+                LsColorsColor::Fixed(index) => Color::Indexed(*index),
+                LsColorsColor::RGB(r, g, b) => Color::Rgb(*r, *g, *b),
+            }
+        }
+        Self {
+            fg: style.foreground.as_ref().map(convert_color),
+            bg: style.background.as_ref().map(convert_color),
+            add_modifiers: None,
+            sub_modifiers: None,
+        }
+    }
+}
+
+impl Into<nu_ansi_term::Style> for Style {
+    fn into(self) -> nu_ansi_term::Style {
+        fn convert_color(color: Color) -> Option<nu_ansi_term::Color> {
+            match color {
+                Color::Black => Some(nu_ansi_term::Color::Black),
+                Color::Red => Some(nu_ansi_term::Color::Red),
+                Color::Green => Some(nu_ansi_term::Color::Green),
+                Color::Yellow => Some(nu_ansi_term::Color::Yellow),
+                Color::Blue => Some(nu_ansi_term::Color::Blue),
+                Color::Magenta => Some(nu_ansi_term::Color::Purple),
+                Color::Cyan => Some(nu_ansi_term::Color::Cyan),
+                Color::Gray => Some(nu_ansi_term::Color::LightGray),
+                Color::DarkGray => Some(nu_ansi_term::Color::DarkGray),
+                Color::LightRed => Some(nu_ansi_term::Color::LightRed),
+                Color::LightGreen => Some(nu_ansi_term::Color::LightGreen),
+                Color::LightYellow => Some(nu_ansi_term::Color::LightYellow),
+                Color::LightBlue => Some(nu_ansi_term::Color::LightBlue),
+                Color::LightMagenta => Some(nu_ansi_term::Color::LightMagenta),
+                Color::LightCyan => Some(nu_ansi_term::Color::LightCyan),
+                Color::White => Some(nu_ansi_term::Color::White),
+                Color::Rgb(r, g, b) => Some(nu_ansi_term::Color::Rgb(r, g, b)),
+                Color::Indexed(index) => Some(nu_ansi_term::Color::Fixed(index)),
+                _ => None,
+            }
+        }
+        fn match_modifiers<F>(style: &Style, f: F) -> bool
+        where
+            F: Fn(&IndexSet<Modifier>) -> bool,
+        {
+            style.add_modifiers.as_ref().map_or(false, f)
+        }
+
+        nu_ansi_term::Style {
+            foreground: self.fg.and_then(convert_color),
+            background: self.bg.and_then(convert_color),
+            is_bold: match_modifiers(&self, |m| m.contains(&Modifier::Bold)),
+            is_dimmed: match_modifiers(&self, |m| m.contains(&Modifier::Dim)),
+            is_italic: match_modifiers(&self, |m| m.contains(&Modifier::Italic)),
+            is_underline: match_modifiers(&self, |m| m.contains(&Modifier::Underlined)),
+            is_blink: match_modifiers(&self, |m| {
+                m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
+            }),
+            is_reverse: match_modifiers(&self, |m| m.contains(&Modifier::Reversed)),
+            is_hidden: match_modifiers(&self, |m| m.contains(&Modifier::Hidden)),
+            is_strikethrough: match_modifiers(&self, |m| {
+                m.contains(&Modifier::CrossedOut)
+            }),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WrapOptions {
+    pub width: usize,
+    pub initial_indent: Option<String>,
+    pub subsequent_indent: Option<String>,
+    pub break_words: Option<bool>,
+}
+
+impl WrapOptions {
+    pub fn get_options(&self) -> textwrap::Options<'_> {
+        let mut options = textwrap::Options::new(self.width);
+        if let Some(initial_indent) = &self.initial_indent {
+            options = options.initial_indent(initial_indent);
+        }
+        if let Some(subsequent_indent) = &self.subsequent_indent {
+            options = options.subsequent_indent(subsequent_indent);
+        }
+        if let Some(break_words) = self.break_words {
+            options = options.break_words(break_words);
+        }
+        options
     }
 }
 
@@ -428,6 +580,7 @@ pub struct NodeUiMetadata {
     pub is_focused: bool,
     pub total: usize,
     pub meta: HashMap<String, String>,
+    pub style: Style,
 }
 
 impl NodeUiMetadata {
@@ -444,6 +597,7 @@ impl NodeUiMetadata {
         is_focused: bool,
         total: usize,
         meta: HashMap<String, String>,
+        style: Style,
     ) -> Self {
         Self {
             parent: node.parent.to_owned(),
@@ -476,11 +630,12 @@ impl NodeUiMetadata {
             is_focused,
             total,
             meta,
+            style,
         }
     }
 }
 
-fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
+pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
     Block::default()
         .borders(TuiBorders::from_bits_truncate(
             config
@@ -550,40 +705,7 @@ fn draw_table<B: Backend>(
                         })
                         .unwrap_or_default();
 
-                    let mut me = node.mime_essence.splitn(2, '/');
-                    let mimetype: String =
-                        me.next().map(|s| s.into()).unwrap_or_default();
-                    let mimesub: String =
-                        me.next().map(|s| s.into()).unwrap_or_default();
-
-                    let mut node_type = if node.is_symlink {
-                        app_config.node_types.symlink.to_owned()
-                    } else if node.is_dir {
-                        app_config.node_types.directory.to_owned()
-                    } else {
-                        app_config.node_types.file.to_owned()
-                    };
-
-                    if let Some(conf) = app_config
-                        .node_types
-                        .mime_essence
-                        .get(&mimetype)
-                        .and_then(|t| t.get(&mimesub).or_else(|| t.get("*")))
-                    {
-                        node_type = node_type.extend(conf);
-                    }
-
-                    if let Some(conf) =
-                        app_config.node_types.extension.get(&node.extension)
-                    {
-                        node_type = node_type.extend(conf);
-                    }
-
-                    if let Some(conf) =
-                        app_config.node_types.special.get(&node.relative_path)
-                    {
-                        node_type = node_type.extend(conf);
-                    }
+                    let node_type = app_config.node_types.get(node);
 
                     let (relative_index, is_before_focus, is_after_focus) =
                         match dir.focus.cmp(&index) {
@@ -627,6 +749,7 @@ fn draw_table<B: Backend>(
                         is_focused,
                         dir.total,
                         node_type.meta,
+                        style,
                     );
 
                     let cols = lua::serialize::<NodeUiMetadata>(lua, &meta)
@@ -642,7 +765,7 @@ fn draw_table<B: Backend>(
                                 .filter_map(|c| {
                                     c.format.as_ref().map(|f| {
                                         let out = lua::call(lua, f, v.clone())
-                                            .unwrap_or_else(|e| e.to_string());
+                                            .unwrap_or_else(|e| format!("{e:?}"));
                                         string_to_text(out)
                                     })
                                 })
@@ -653,7 +776,7 @@ fn draw_table<B: Backend>(
                         .map(|x| Cell::from(x.to_owned()))
                         .collect::<Vec<Cell>>();
 
-                    Row::new(cols).style(style.into())
+                    Row::new(cols)
                 })
                 .collect::<Vec<Row>>()
         })
@@ -674,9 +797,9 @@ fn draw_table<B: Backend>(
     } else {
         &app.pwd
     }
-    .trim_matches('/')
-    .replace('\\', "\\\\")
-    .replace('\n', "\\n");
+    .trim_matches('/');
+
+    let pwd = path::escape(pwd);
 
     let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
 
@@ -722,7 +845,7 @@ fn draw_selection<B: Backend>(
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
-    _: &Lua,
+    lua: &Lua,
 ) {
     let panel_config = &app.config.general.panel_ui;
     let config = panel_config
@@ -738,7 +861,22 @@ fn draw_selection<B: Backend>(
         .rev()
         .take((layout_size.height.max(2) - 2).into())
         .rev()
-        .map(|n| n.absolute_path.replace('\\', "\\\\").replace('\n', "\\n"))
+        .map(|n| {
+            let out = app
+                .config
+                .general
+                .selection
+                .item
+                .format
+                .as_ref()
+                .map(|f| {
+                    lua::serialize::<Node>(lua, n)
+                        .and_then(|n| lua::call(lua, f, n))
+                        .unwrap_or_else(|e| format!("{e:?}"))
+                })
+                .unwrap_or_else(|| n.absolute_path.clone());
+            string_to_text(out)
+        })
         .map(ListItem::new)
         .collect();
 
@@ -874,11 +1012,7 @@ fn draw_sort_n_filter<B: Backend>(
     let ui = app.config.general.sort_and_filter_ui.to_owned();
     let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
     let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
-    let search = app
-        .explorer_config
-        .searcher
-        .as_ref()
-        .map(|s| s.pattern.clone());
+    let search = app.explorer_config.searcher.as_ref();
 
     let defaultui = &ui.default_identifier;
     let forwardui = defaultui
@@ -887,6 +1021,15 @@ fn draw_sort_n_filter<B: Backend>(
     let reverseui = defaultui
         .to_owned()
         .extend(&ui.sort_direction_identifiers.reverse);
+
+    let orderedui = defaultui
+        .to_owned()
+        .extend(&ui.search_direction_identifiers.ordered);
+    let unorderedui = defaultui
+        .to_owned()
+        .extend(&ui.search_direction_identifiers.unordered);
+
+    let is_ordered_search = search.as_ref().map(|s| !s.unordered).unwrap_or(false);
 
     let mut spans = filter_by
         .iter()
@@ -905,12 +1048,36 @@ fn draw_sort_n_filter<B: Backend>(
                 })
                 .unwrap_or((Span::raw("f"), Span::raw("")))
         })
+        .chain(search.iter().map(|s| {
+            ui.search_identifiers
+                .get(&s.algorithm)
+                .map(|u| {
+                    let direction = if s.unordered {
+                        &unorderedui
+                    } else {
+                        &orderedui
+                    };
+                    let ui = defaultui.to_owned().extend(u);
+                    let f = ui
+                        .format
+                        .as_ref()
+                        .map(|f| format!("{f}{p}", p = &s.pattern))
+                        .unwrap_or_else(|| s.pattern.clone());
+                    (
+                        Span::styled(f, ui.style.into()),
+                        Span::styled(
+                            direction.format.to_owned().unwrap_or_default(),
+                            direction.style.to_owned().into(),
+                        ),
+                    )
+                })
+                .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
+        }))
         .chain(
             sort_by
                 .iter()
                 .map(|s| {
                     let direction = if s.reverse { &reverseui } else { &forwardui };
-
                     ui.sorter_identifiers
                         .get(&s.sorter)
                         .map(|u| {
@@ -928,23 +1095,8 @@ fn draw_sort_n_filter<B: Backend>(
                         })
                         .unwrap_or((Span::raw("s"), Span::raw("")))
                 })
-                .take(if search.is_some() { 0 } else { sort_by.len() }),
+                .take(if !is_ordered_search { sort_by.len() } else { 0 }),
         )
-        .chain(search.iter().map(|s| {
-            ui.search_identifier
-                .as_ref()
-                .map(|u| {
-                    let ui = defaultui.to_owned().extend(u);
-                    (
-                        Span::styled(
-                            ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned().into(),
-                        ),
-                        Span::styled(s, ui.style.into()),
-                    )
-                })
-                .unwrap_or((Span::raw("/"), Span::raw(s)))
-        }))
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
             ui.separator.style.to_owned().into(),
@@ -988,7 +1140,8 @@ fn draw_logs<B: Backend>(
             .rev()
             .take(layout_size.height as usize)
             .map(|log| {
-                let time = log.created_at.format("%r");
+                let fd = format_description!("[hour]:[minute]:[second]");
+                let time = log.created_at.format(fd).unwrap_or_else(|_| "when?".into());
                 let cfg = match log.level {
                     app::LogLevel::Info => &logs_config.info,
                     app::LogLevel::Warning => &logs_config.warning,
@@ -997,7 +1150,7 @@ fn draw_logs<B: Backend>(
                 };
 
                 let prefix =
-                    format!("{}|{}", time, cfg.format.to_owned().unwrap_or_default());
+                    format!("{time}|{0}", cfg.format.to_owned().unwrap_or_default());
 
                 let padding = " ".repeat(prefix.chars().count());
 
@@ -1007,9 +1160,9 @@ fn draw_logs<B: Backend>(
                     .enumerate()
                     .map(|(i, line)| {
                         if i == 0 {
-                            format!("{}: {}", &prefix, line)
+                            format!("{prefix}) {line}")
                         } else {
-                            format!("{}  {}", &padding, line)
+                            format!("{padding}  {line}")
                         }
                     })
                     .take(layout_size.height as usize)
@@ -1054,94 +1207,68 @@ pub fn draw_nothing<B: Backend>(
     f.render_widget(nothing, layout_size);
 }
 
-pub fn draw_custom_content<B: Backend>(
+pub fn draw_dynamic<B: Backend>(
     f: &mut Frame<B>,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
-    title: Option<String>,
-    body: ContentBody,
+    func: &str,
     lua: &Lua,
 ) {
-    let config = app.config.general.panel_ui.default.clone();
+    let ctx = ContentRendererArg {
+        app: app.to_lua_ctx_light(),
+        layout_size: layout_size.into(),
+        screen_size: screen_size.into(),
+    };
 
-    match body {
-        ContentBody::StaticParagraph { render } => {
-            let render = string_to_text(render);
-            let content = Paragraph::new(render).block(block(
-                config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
-            ));
+    let panel: CustomPanel = lua::serialize(lua, &ctx)
+        .and_then(|arg| lua::call(lua, func, arg))
+        .unwrap_or_else(|e| CustomPanel::CustomParagraph {
+            ui: app.config.general.panel_ui.default.clone(),
+            body: format!("{e:?}"),
+        });
+
+    draw_static(f, screen_size, layout_size, app, panel, lua);
+}
+
+pub fn draw_static<B: Backend>(
+    f: &mut Frame<B>,
+    screen_size: TuiRect,
+    layout_size: TuiRect,
+    app: &app::App,
+    panel: CustomPanel,
+    _lua: &Lua,
+) {
+    let defaultui = app.config.general.panel_ui.default.clone();
+    match panel {
+        CustomPanel::CustomParagraph { ui, body } => {
+            let config = defaultui.extend(&ui);
+            let body = string_to_text(body);
+            let content = Paragraph::new(body).block(block(config, "".into()));
             f.render_widget(content, layout_size);
         }
 
-        ContentBody::DynamicParagraph { render } => {
-            let ctx = ContentRendererArg {
-                app: app.to_lua_ctx_light(),
-                layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
-            };
+        CustomPanel::CustomList { ui, body } => {
+            let config = defaultui.extend(&ui);
 
-            let render = lua::serialize(lua, &ctx)
-                .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{:?}", e))
-                })
-                .unwrap_or_else(|e| e.to_string());
-
-            let render = string_to_text(render);
-
-            let content = Paragraph::new(render).block(block(
-                config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
-            ));
-            f.render_widget(content, layout_size);
-        }
-
-        ContentBody::StaticList { render } => {
-            let items = render
+            let items = body
                 .into_iter()
                 .map(string_to_text)
                 .map(ListItem::new)
                 .collect::<Vec<ListItem>>();
 
-            let content = List::new(items).block(block(
-                config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
-            ));
+            let content = List::new(items).block(block(config, "".into()));
             f.render_widget(content, layout_size);
         }
 
-        ContentBody::DynamicList { render } => {
-            let ctx = ContentRendererArg {
-                app: app.to_lua_ctx_light(),
-                layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
-            };
-
-            let items = lua::serialize(lua, &ctx)
-                .map(|arg| {
-                    lua::call(lua, &render, arg)
-                        .unwrap_or_else(|e| vec![format!("{:?}", e)])
-                })
-                .unwrap_or_else(|e| vec![e.to_string()])
-                .into_iter()
-                .map(string_to_text)
-                .map(ListItem::new)
-                .collect::<Vec<ListItem>>();
-
-            let content = List::new(items).block(block(
-                config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
-            ));
-            f.render_widget(content, layout_size);
-        }
-
-        ContentBody::StaticTable {
+        CustomPanel::CustomTable {
+            ui,
             widths,
             col_spacing,
-            render,
+            body,
         } => {
-            let rows = render
+            let config = defaultui.extend(&ui);
+            let rows = body
                 .into_iter()
                 .map(|cols| {
                     Row::new(
@@ -1161,55 +1288,7 @@ pub fn draw_custom_content<B: Backend>(
             let content = Table::new(rows)
                 .widths(&widths)
                 .column_spacing(col_spacing.unwrap_or(1))
-                .block(block(
-                    config,
-                    title.map(|t| format!(" {} ", t)).unwrap_or_default(),
-                ));
-
-            f.render_widget(content, layout_size);
-        }
-
-        ContentBody::DynamicTable {
-            widths,
-            col_spacing,
-            render,
-        } => {
-            let ctx = ContentRendererArg {
-                app: app.to_lua_ctx_light(),
-                layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
-            };
-
-            let rows = lua::serialize(lua, &ctx)
-                .map(|arg| {
-                    lua::call(lua, &render, arg)
-                        .unwrap_or_else(|e| vec![vec![format!("{:?}", e)]])
-                })
-                .unwrap_or_else(|e| vec![vec![e.to_string()]])
-                .into_iter()
-                .map(|cols| {
-                    Row::new(
-                        cols.into_iter()
-                            .map(string_to_text)
-                            .map(Cell::from)
-                            .collect::<Vec<Cell>>(),
-                    )
-                })
-                .collect::<Vec<Row>>();
-
-            let widths = widths
-                .into_iter()
-                .map(|w| w.to_tui(screen_size, layout_size))
-                .collect::<Vec<TuiConstraint>>();
-
-            let mut content = Table::new(rows).widths(&widths).block(block(
-                config,
-                title.map(|t| format!(" {} ", t)).unwrap_or_default(),
-            ));
-
-            if let Some(col_spacing) = col_spacing {
-                content = content.column_spacing(col_spacing);
-            };
+                .block(block(config, "".into()));
 
             f.render_widget(content, layout_size);
         }
@@ -1237,9 +1316,9 @@ impl From<TuiRect> for Rect {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ContentRendererArg {
-    app: app::LuaContextLight,
-    screen_size: Rect,
-    layout_size: Rect,
+    pub app: app::LuaContextLight,
+    pub screen_size: Rect,
+    pub layout_size: Rect,
 }
 
 pub fn draw_layout<B: Backend>(
@@ -1265,8 +1344,14 @@ pub fn draw_layout<B: Backend>(
                 draw_logs(f, screen_size, layout_size, app, lua);
             };
         }
-        Layout::CustomContent { title, body } => {
-            draw_custom_content(f, screen_size, layout_size, app, title, body, lua)
+        Layout::Static(panel) => {
+            draw_static(f, screen_size, layout_size, app, *panel, lua)
+        }
+        Layout::Dynamic(ref func) => {
+            draw_dynamic(f, screen_size, layout_size, app, func, lua)
+        }
+        Layout::CustomContent(content) => {
+            draw_custom_content(f, screen_size, layout_size, app, *content, lua)
         }
         Layout::Horizontal { config, splits } => {
             let chunks = TuiLayout::default()
@@ -1293,9 +1378,9 @@ pub fn draw_layout<B: Backend>(
 
             splits
                 .into_iter()
-                .zip(chunks.into_iter())
+                .zip(chunks.iter())
                 .for_each(|(split, chunk)| {
-                    draw_layout(split, f, screen_size, chunk, app, lua)
+                    draw_layout(split, f, screen_size, *chunk, app, lua)
                 });
         }
 
@@ -1324,9 +1409,9 @@ pub fn draw_layout<B: Backend>(
 
             splits
                 .into_iter()
-                .zip(chunks.into_iter())
+                .zip(chunks.iter())
                 .for_each(|(split, chunk)| {
-                    draw_layout(split, f, screen_size, chunk, app, lua)
+                    draw_layout(split, f, screen_size, *chunk, app, lua)
                 });
         }
     }
@@ -1384,7 +1469,7 @@ mod tests {
         );
 
         assert_eq!(
-            b.to_owned().extend(&a),
+            b.extend(&a),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
@@ -1398,19 +1483,71 @@ mod tests {
             Style {
                 fg: Some(Color::Cyan),
                 bg: Some(Color::Magenta),
-                add_modifiers: modifier(Modifier::CrossedOut),
+                add_modifiers: Some(
+                    vec![Modifier::Bold, Modifier::CrossedOut]
+                        .into_iter()
+                        .collect()
+                ),
                 sub_modifiers: modifier(Modifier::Italic),
             }
         );
 
         assert_eq!(
-            c.to_owned().extend(&a),
+            c.extend(&a),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Magenta),
-                add_modifiers: modifier(Modifier::Bold),
+                add_modifiers: Some(
+                    vec![Modifier::Bold, Modifier::CrossedOut]
+                        .into_iter()
+                        .collect()
+                ),
                 sub_modifiers: modifier(Modifier::Italic),
             }
         );
+    }
+
+    #[test]
+    fn test_layout_replace() {
+        let layout = Layout::Horizontal {
+            config: LayoutOptions {
+                margin: Some(2),
+                horizontal_margin: Some(3),
+                vertical_margin: Some(4),
+                constraints: Some(vec![
+                    Constraint::Percentage(80),
+                    Constraint::Percentage(20),
+                ]),
+            },
+            splits: vec![Layout::Table, Layout::HelpMenu],
+        };
+
+        let res = layout.clone().replace(&Layout::Table, &Layout::Selection);
+
+        match (res, layout) {
+            (
+                Layout::Horizontal {
+                    config: res_config,
+                    splits: res_splits,
+                },
+                Layout::Horizontal {
+                    config: layout_config,
+                    splits: layout_splits,
+                },
+            ) => {
+                assert_eq!(res_config, layout_config);
+                assert_eq!(res_splits.len(), layout_splits.len());
+                assert_eq!(res_splits[0], Layout::Selection);
+                assert_ne!(res_splits[0], layout_splits[0]);
+                assert_eq!(res_splits[1], layout_splits[1]);
+            }
+            _ => panic!("Unexpected layout"),
+        }
+
+        let res = Layout::Table.replace(&Layout::Table, &Layout::Selection);
+        assert_eq!(res, Layout::Selection);
+
+        let res = Layout::Table.replace(&Layout::Nothing, &Layout::Selection);
+        assert_eq!(res, Layout::Table);
     }
 }

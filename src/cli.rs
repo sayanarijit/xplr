@@ -106,17 +106,17 @@ impl Cli {
                     // Options
                     "-c" | "--config" => {
                         cli.config = Some(
-                            args.next().map(|a| Cli::read_path(&a)).with_context(
-                                || format!("usage: xplr {} PATH", arg),
-                            )??,
+                            args.next()
+                                .map(|a| Cli::read_path(&a))
+                                .with_context(|| format!("usage: xplr {arg} PATH"))??,
                         );
                     }
 
                     "--vroot" => {
                         cli.vroot = Some(
-                            args.next().map(|a| Cli::read_path(&a)).with_context(
-                                || format!("usage: xplr {} PATH", arg),
-                            )??,
+                            args.next()
+                                .map(|a| Cli::read_path(&a))
+                                .with_context(|| format!("usage: xplr {arg} PATH"))??,
                         );
                     }
 
@@ -191,7 +191,7 @@ pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
             .open(&path)?
             .write_all(msg.as_bytes())?;
     } else {
-        println!("{}", msg);
+        println!("{msg}");
     };
 
     Ok(())
@@ -199,7 +199,7 @@ pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
 
 pub fn print_msg_in(args: Vec<String>) -> Result<()> {
     let msg = fmt_msg_in(args)?;
-    print!("{}", msg);
+    print!("{msg}");
     Ok(())
 }
 
@@ -220,24 +220,21 @@ fn fmt_msg_in(args: Vec<String>) -> Result<String> {
             }
             ('q', Some('%')) => {
                 let arg = args.next().context(format!(
-                    "argument missing for the placeholder at column {}",
-                    col
+                    "argument missing for the placeholder at column {col}"
                 ))?;
                 msg.push_str(&json::to_string(&arg)?);
                 last_char = None;
             }
             ('s', Some('%')) => {
                 let arg = args.next().context(format!(
-                    "argument missing for the placeholder at column {}",
-                    col
+                    "argument missing for the placeholder at column {col}",
                 ))?;
                 msg.push_str(&arg);
                 last_char = None;
             }
             (ch, Some('%')) => {
                 bail!(format!(
-                    "invalid placeholder '%{}' at column {}, use one of '%s' or '%q', or escape it using '%%'",
-                    ch, col
+                    "invalid placeholder '%{ch}' at column {col}, use one of '%s' or '%q', or escape it using '%%'",
                 ));
             }
             (ch, _) => {

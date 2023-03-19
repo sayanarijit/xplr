@@ -4,6 +4,7 @@
 
 pub mod app;
 pub mod cli;
+pub mod compat;
 pub mod config;
 pub mod directory_buffer;
 pub mod event_reader;
@@ -12,10 +13,12 @@ pub mod input;
 pub mod lua;
 pub mod msg;
 pub mod node;
+pub mod path;
 pub mod permissions;
 pub mod pipe;
 pub mod pwd_watcher;
 pub mod runner;
+pub mod search;
 pub mod ui;
 pub mod yaml;
 

@@ -1,6 +1,6 @@
 use crate::node::Node;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DirectoryBuffer {
@@ -9,8 +9,8 @@ pub struct DirectoryBuffer {
     pub total: usize,
     pub focus: usize,
 
-    #[serde(skip)]
-    pub explored_at: DateTime<Utc>,
+    #[serde(skip, default = "now")]
+    pub explored_at: OffsetDateTime,
 }
 
 impl DirectoryBuffer {
@@ -21,11 +21,17 @@ impl DirectoryBuffer {
             nodes,
             total,
             focus,
-            explored_at: Utc::now(),
+            explored_at: now(),
         }
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
         self.nodes.get(self.focus)
     }
+}
+
+fn now() -> OffsetDateTime {
+    OffsetDateTime::now_local()
+        .ok()
+        .unwrap_or_else(OffsetDateTime::now_utc)
 }

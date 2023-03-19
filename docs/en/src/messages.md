@@ -97,6 +97,15 @@ Example:
 - Lua: `"FocusNext"`
 - YAML: `FocusNext`
 
+#### FocusNextSelection
+
+Focus on the next selected node.
+
+Example:
+
+- Lua: `"FocusNextSelection"`
+- YAML: `FocusNextSelection`
+
 #### FocusNextByRelativeIndex
 
 Focus on the `n`th node relative to the current focus where `n` is a
@@ -127,6 +136,15 @@ Example:
 
 - Lua: `"FocusPrevious"`
 - YAML: `FocusPrevious`
+
+#### FocusPreviousSelection
+
+Focus on the previous selection item.
+
+Example:
+
+- Lua: `"FocusPreviousSelection"`
+- YAML: `FocusPreviousSelection`
 
 #### FocusPreviousByRelativeIndex
 
@@ -1012,6 +1030,28 @@ Example:
 
 ### Search Operations
 
+#### Search
+
+Search files using the current or default (fuzzy) search algorithm.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Type: { Search = "string" }
+
+Example:
+
+- Lua: `{ Search = "pattern" }`
+- YAML: `Search: pattern`
+
+#### SearchFromInput
+
+Calls `Search` with the input taken from the input buffer.
+
+Example:
+
+- Lua: `"SearchFromInput"`
+- YAML: `SearchFromInput`
+
 #### SearchFuzzy
 
 Search files using fuzzy match algorithm.
@@ -1030,11 +1070,125 @@ Example:
 
 Calls `SearchFuzzy` with the input taken from the input buffer.
 You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
 
 Example:
 
 - Lua: `"SearchFuzzyFromInput"`
 - YAML: `SearchFuzzyFromInput`
+
+#### SearchFuzzyUnordered
+
+Like `SearchFuzzy`, but doesn't not perform rank based sorting.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Type: { SearchFuzzyUnordered = "string" }
+
+Example:
+
+- Lua: `{ SearchFuzzyUnordered = "pattern" }`
+- YAML: `SearchFuzzyUnordered: pattern`
+
+#### SearchFuzzyUnorderedFromInput
+
+Calls `SearchFuzzyUnordered` with the input taken from the input buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Example:
+
+- Lua: `"SearchFuzzyUnorderedFromInput"`
+- YAML: `SearchFuzzyUnorderedFromInput`
+
+#### SearchRegex
+
+Search files using regex match algorithm.
+It keeps the filters, but overrides the sorters.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Type: { SearchRegex = "string" }
+
+Example:
+
+- Lua: `{ SearchRegex = "pattern" }`
+- YAML: `SearchRegex: pattern`
+
+#### SearchRegexFromInput
+
+Calls `SearchRegex` with the input taken from the input buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Example:
+
+- Lua: `"SearchRegexFromInput"`
+- YAML: `SearchRegexFromInput`
+
+#### SearchRegexUnordered
+
+Like `SearchRegex`, but doesn't not perform rank based sorting.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Type: { SearchRegexUnordered = "string" }
+
+Example:
+
+- Lua: `{ SearchRegexUnordered = "pattern" }`
+- YAML: `SearchRegexUnordered: pattern`
+
+#### SearchRegexUnorderedFromInput
+
+Calls `SearchRegexUnordered` with the input taken from the input buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+It gets reset automatically when changing directory.
+
+Example:
+
+- Lua: `"SearchRegexUnorderedFromInput"`
+- YAML: `SearchRegexUnorderedFromInput`
+
+#### ToggleSearchAlgorithm
+
+Toggles between different search algorithms, without changing the input
+buffer
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+
+Example:
+
+- Lua: `"ToggleSearchAlgorithm"`
+- YAML: `ToggleSearchAlgorithm`
+
+#### EnableSearchOrder
+
+Enables ranked search without changing the input buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+
+Example:
+
+- Lua: `"EnableOrderedSearch"`
+- YAML: `EnableSearchOrder`
+
+#### DisableSearchOrder
+
+Disabled ranked search without changing the input buffer.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+
+Example:
+
+- Lua: `"DisableSearchOrder"`
+- YAML: `DisableSearchOrder`
+
+#### ToggleSearchOrder
+
+Toggles ranked search without changing the input buffer.
+
+Example:
+
+- Lua: `"ToggleSearchOrder"`
+- YAML: `ToggleSearchOrder`
 
 #### AcceptSearch
 
