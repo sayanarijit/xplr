@@ -71,8 +71,9 @@ compatibility.
   - DisableSearchOrder
   - ToggleSearchOrder
 - Use skim's [search syntax][50] to customize the search.
-- Set your preferred search algorithm:
+- Set your preferred search algorithm and ordering:
   `xplr.config.general.search.algorithm = "Fuzzy" -- or "Regex"`.
+  `xplr.config.general.search.unordered = false -- or true`
 - You need to clear the selection list manually after performing batch
   operation like copy, softlink creation etc.
 - Use the following new key bindings:
