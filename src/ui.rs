@@ -1378,7 +1378,7 @@ pub fn draw_layout<B: Backend>(
 
             splits
                 .into_iter()
-                .zip(chunks.into_iter())
+                .zip(chunks.iter())
                 .for_each(|(split, chunk)| {
                     draw_layout(split, f, screen_size, *chunk, app, lua)
                 });
@@ -1409,7 +1409,7 @@ pub fn draw_layout<B: Backend>(
 
             splits
                 .into_iter()
-                .zip(chunks.into_iter())
+                .zip(chunks.iter())
                 .for_each(|(split, chunk)| {
                     draw_layout(split, f, screen_size, *chunk, app, lua)
                 });
