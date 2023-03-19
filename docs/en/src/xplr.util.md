@@ -478,10 +478,10 @@ Type: function( [Permission][8] ) -> string
 Example:
 
 ```lua
-xplr.util.permissions_rwx({ user_read = true }))
+xplr.util.permissions_rwx({ user_read = true })
 -- "r--------"
 
-xplr.util.permissions_rwx(app.focused_node.permission))
+xplr.util.permissions_rwx(app.focused_node.permission)
 -- "rwxrwsrwT"
 ```
 
@@ -494,10 +494,10 @@ Type: function( [Permission][8] ) -> { number, number, number, number }
 Example:
 
 ```lua
-xplr.util.permissions_octal({ user_read = true }))
+xplr.util.permissions_octal({ user_read = true })
 -- { 0, 4, 0, 0 }
 
-xplr.util.permissions_octal(app.focused_node.permission))
+xplr.util.permissions_octal(app.focused_node.permission)
 -- { 0, 7, 5, 4 }
 ```
 
