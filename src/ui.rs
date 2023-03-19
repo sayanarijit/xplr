@@ -15,6 +15,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::env;
 use std::ops::BitXor;
+use time::macros::format_description;
 use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
@@ -1139,7 +1140,8 @@ fn draw_logs<B: Backend>(
             .rev()
             .take(layout_size.height as usize)
             .map(|log| {
-                let time = log.created_at.format("%H:%M:%S");
+                let fd = format_description!("[hour]:[minute]:[second]");
+                let time = log.created_at.format(fd).unwrap_or_else(|_| "when?".into());
                 let cfg = match log.level {
                     app::LogLevel::Info => &logs_config.info,
                     app::LogLevel::Warning => &logs_config.warning,

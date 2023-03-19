@@ -22,7 +22,6 @@ pub use crate::pipe::Pipe;
 use crate::search::SearchAlgorithm;
 use crate::ui::Layout;
 use anyhow::{bail, Result};
-use chrono::{DateTime, Local};
 use gethostname::gethostname;
 use indexmap::set::IndexSet;
 use path_absolutize::*;
@@ -32,6 +31,7 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
+use time::OffsetDateTime;
 use tui_input::{Input, InputRequest};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -63,7 +63,7 @@ pub enum LogLevel {
 pub struct Log {
     pub level: LogLevel,
     pub message: String,
-    pub created_at: DateTime<Local>,
+    pub created_at: OffsetDateTime,
 }
 
 impl Log {
@@ -71,7 +71,9 @@ impl Log {
         Self {
             level,
             message,
-            created_at: Local::now(),
+            created_at: OffsetDateTime::now_local()
+                .ok()
+                .unwrap_or_else(OffsetDateTime::now_utc),
         }
     }
 }
