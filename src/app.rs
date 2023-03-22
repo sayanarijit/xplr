@@ -1501,7 +1501,7 @@ impl App {
 
     pub fn select_all(mut self) -> Result<Self> {
         if let Some(d) = self.directory_buffer.as_ref() {
-            self.selection = d.nodes.clone().into_iter().collect();
+            self.selection.extend(d.nodes.clone());
         };
 
         Ok(self)
