@@ -5,7 +5,7 @@ use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
 use crate::{app, path};
-use ansi_to_tui_forked::IntoText;
+use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
@@ -258,7 +258,7 @@ pub enum Modifier {
 }
 
 impl Modifier {
-    pub fn bits(self) -> u8 {
+    pub fn bits(self) -> u16 {
         match self {
             Self::Bold => TuiModifier::BOLD.bits(),
             Self::Dim => TuiModifier::DIM.bits(),
@@ -315,7 +315,7 @@ impl Style {
 
 impl Into<TuiStyle> for Style {
     fn into(self) -> TuiStyle {
-        fn xor(modifiers: Option<IndexSet<Modifier>>) -> u8 {
+        fn xor(modifiers: Option<IndexSet<Modifier>>) -> u16 {
             modifiers
                 .unwrap_or_default()
                 .into_iter()
