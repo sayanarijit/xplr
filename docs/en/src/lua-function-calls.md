@@ -372,7 +372,7 @@ The searcher to use (if any).
 
 Type: nullable [Node Searcher Applicable][82]
 
-## Also Ssee:
+## Also See:
 
 - [xplr.util][85]
 

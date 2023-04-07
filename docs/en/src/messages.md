@@ -389,7 +389,7 @@ Example:
 
 Update the input buffer using cursor based operations.
 
-Type: { UpdateInputBuffer = [Input Opertaion](https://xplr.dev/en/input-operation) }
+Type: { UpdateInputBuffer = [Input Operation](https://xplr.dev/en/input-operation) }
 
 Example:
 
@@ -418,7 +418,7 @@ Example:
 
 #### BufferInputFromKey
 
-Append/buffer the characted read from a keyboard input into the
+Append/buffer the character read from a keyboard input into the
 input buffer.
 
 Example:
@@ -843,7 +843,7 @@ Example:
 
 Add a [filter](https://xplr.dev/en/filtering#filter) to exclude nodes
 while exploring directories.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 Filters get automatically cleared when changing directories.
 
 Type: { AddNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering#filter), input = "string" }
@@ -856,7 +856,7 @@ Example:
 #### RemoveNodeFilter
 
 Remove an existing [filter](https://xplr.dev/en/filtering#filter).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { RemoveNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
 
@@ -869,7 +869,7 @@ Example:
 
 Remove a [filter](https://xplr.dev/en/filtering#filter) if it exists,
 else, add a it.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { ToggleNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
 
@@ -882,7 +882,7 @@ Example:
 
 Add a node [filter](https://xplr.dev/en/filtering#filter) reading the
 input from the buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { AddNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
 
@@ -895,7 +895,7 @@ Example:
 
 Remove a node [filter](https://xplr.dev/en/filtering#filter) reading
 the input from the buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { RemoveNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
 
@@ -907,7 +907,7 @@ Example:
 #### RemoveLastNodeFilter
 
 Remove the last node [filter](https://xplr.dev/en/filtering).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -918,7 +918,7 @@ Example:
 
 Reset the node [filters](https://xplr.dev/en/filtering) back to the
 default configuration.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -928,7 +928,7 @@ Example:
 #### ClearNodeFilters
 
 Clear all the node [filters](https://xplr.dev/en/filtering).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -941,7 +941,7 @@ Example:
 
 Add a [sorter](https://xplr.dev/en/sorting#sorter) to sort nodes while
 exploring directories.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { AddNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
 
@@ -953,7 +953,7 @@ Example:
 #### RemoveNodeSorter
 
 Remove an existing [sorter](https://xplr.dev/en/sorting#sorter).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { RemoveNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
 
@@ -965,7 +965,7 @@ Example:
 #### ReverseNodeSorter
 
 Reverse a node [sorter](https://xplr.dev/en/sorting#sorter).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { ReverseNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
 
@@ -978,7 +978,7 @@ Example:
 
 Remove a [sorter](https://xplr.dev/en/sorting#sorter) if it exists,
 else, add a it.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Type: { ToggleNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
 
@@ -990,7 +990,7 @@ Example:
 #### ReverseNodeSorters
 
 Reverse the node [sorters](https://xplr.dev/en/sorting#sorter).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1000,7 +1000,7 @@ Example:
 #### RemoveLastNodeSorter
 
 Remove the last node [sorter](https://xplr.dev/en/sorting#sorter).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1011,7 +1011,7 @@ Example:
 
 Reset the node [sorters](https://xplr.dev/en/sorting#sorter) back to
 the default configuration.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1021,7 +1021,7 @@ Example:
 #### ClearNodeSorters
 
 Clear all the node [sorters](https://xplr.dev/en/sorting#sorter).
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1033,7 +1033,7 @@ Example:
 #### Search
 
 Search files using the current or default (fuzzy) search algorithm.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Type: { Search = "string" }
@@ -1056,7 +1056,7 @@ Example:
 
 Search files using fuzzy match algorithm.
 It keeps the filters, but overrides the sorters.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Type: { SearchFuzzy = "string" }
@@ -1069,7 +1069,7 @@ Example:
 #### SearchFuzzyFromInput
 
 Calls `SearchFuzzy` with the input taken from the input buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Example:
@@ -1080,7 +1080,7 @@ Example:
 #### SearchFuzzyUnordered
 
 Like `SearchFuzzy`, but doesn't not perform rank based sorting.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Type: { SearchFuzzyUnordered = "string" }
@@ -1093,7 +1093,7 @@ Example:
 #### SearchFuzzyUnorderedFromInput
 
 Calls `SearchFuzzyUnordered` with the input taken from the input buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Example:
@@ -1105,7 +1105,7 @@ Example:
 
 Search files using regex match algorithm.
 It keeps the filters, but overrides the sorters.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Type: { SearchRegex = "string" }
@@ -1118,7 +1118,7 @@ Example:
 #### SearchRegexFromInput
 
 Calls `SearchRegex` with the input taken from the input buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Example:
@@ -1129,7 +1129,7 @@ Example:
 #### SearchRegexUnordered
 
 Like `SearchRegex`, but doesn't not perform rank based sorting.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Type: { SearchRegexUnordered = "string" }
@@ -1142,7 +1142,7 @@ Example:
 #### SearchRegexUnorderedFromInput
 
 Calls `SearchRegexUnordered` with the input taken from the input buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 It gets reset automatically when changing directory.
 
 Example:
@@ -1154,7 +1154,7 @@ Example:
 
 Toggles between different search algorithms, without changing the input
 buffer
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1164,7 +1164,7 @@ Example:
 #### EnableSearchOrder
 
 Enables ranked search without changing the input buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1174,7 +1174,7 @@ Example:
 #### DisableSearchOrder
 
 Disabled ranked search without changing the input buffer.
-You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
 
 Example:
 
@@ -1264,7 +1264,7 @@ Example:
 
 #### ToggleFifo
 
-Toggle betwen {Start|Stop}Fifo
+Toggle between {Start|Stop}Fifo
 
 Type: { ToggleFifo = "string" }
 

@@ -72,7 +72,7 @@ Type: nullable string
 
 #### xplr.config.general.logs.info.style
 
-The style for the informations logs.
+The style for the information logs.
 
 Type: [Style](https://xplr.dev/en/style)
 

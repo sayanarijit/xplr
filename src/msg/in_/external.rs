@@ -338,7 +338,7 @@ pub enum ExternalMsg {
 
     /// Update the input buffer using cursor based operations.
     ///
-    /// Type: { UpdateInputBuffer = [Input Opertaion](https://xplr.dev/en/input-operation) }
+    /// Type: { UpdateInputBuffer = [Input Operation](https://xplr.dev/en/input-operation) }
     ///
     /// Example:
     ///
@@ -364,7 +364,7 @@ pub enum ExternalMsg {
     /// - YAML: `BufferInput: foo`
     BufferInput(String),
 
-    /// Append/buffer the characted read from a keyboard input into the
+    /// Append/buffer the character read from a keyboard input into the
     /// input buffer.
     ///
     /// Example:
@@ -751,7 +751,7 @@ pub enum ExternalMsg {
 
     /// Add a [filter](https://xplr.dev/en/filtering#filter) to exclude nodes
     /// while exploring directories.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// Filters get automatically cleared when changing directories.
     ///
     /// Type: { AddNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering#filter), input = "string" }
@@ -763,7 +763,7 @@ pub enum ExternalMsg {
     AddNodeFilter(NodeFilterApplicable),
 
     /// Remove an existing [filter](https://xplr.dev/en/filtering#filter).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { RemoveNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
     ///
@@ -775,7 +775,7 @@ pub enum ExternalMsg {
 
     /// Remove a [filter](https://xplr.dev/en/filtering#filter) if it exists,
     /// else, add a it.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { ToggleNodeFilter = { filter = [Filter](https://xplr.dev/en/filtering), input = "string" }
     ///
@@ -787,7 +787,7 @@ pub enum ExternalMsg {
 
     /// Add a node [filter](https://xplr.dev/en/filtering#filter) reading the
     /// input from the buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { AddNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
     ///
@@ -799,7 +799,7 @@ pub enum ExternalMsg {
 
     /// Remove a node [filter](https://xplr.dev/en/filtering#filter) reading
     /// the input from the buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { RemoveNodeFilterFromInput = [Filter](https://xplr.dev/en/filtering) }
     ///
@@ -810,7 +810,7 @@ pub enum ExternalMsg {
     RemoveNodeFilterFromInput(NodeFilter),
 
     /// Remove the last node [filter](https://xplr.dev/en/filtering).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -820,7 +820,7 @@ pub enum ExternalMsg {
 
     /// Reset the node [filters](https://xplr.dev/en/filtering) back to the
     /// default configuration.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -829,7 +829,7 @@ pub enum ExternalMsg {
     ResetNodeFilters,
 
     /// Clear all the node [filters](https://xplr.dev/en/filtering).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -841,7 +841,7 @@ pub enum ExternalMsg {
 
     /// Add a [sorter](https://xplr.dev/en/sorting#sorter) to sort nodes while
     /// exploring directories.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { AddNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
     ///
@@ -852,7 +852,7 @@ pub enum ExternalMsg {
     AddNodeSorter(NodeSorterApplicable),
 
     /// Remove an existing [sorter](https://xplr.dev/en/sorting#sorter).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { RemoveNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
     ///
@@ -863,7 +863,7 @@ pub enum ExternalMsg {
     RemoveNodeSorter(NodeSorter),
 
     /// Reverse a node [sorter](https://xplr.dev/en/sorting#sorter).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { ReverseNodeSorter = [Sorter](https://xplr.dev/en/sorting#sorter) }
     ///
@@ -875,7 +875,7 @@ pub enum ExternalMsg {
 
     /// Remove a [sorter](https://xplr.dev/en/sorting#sorter) if it exists,
     /// else, add a it.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Type: { ToggleNodeSorter = { sorter = [Sorter](https://xplr.dev/en/sorting#sorter), reverse = bool } }
     ///
@@ -886,7 +886,7 @@ pub enum ExternalMsg {
     ToggleNodeSorter(NodeSorterApplicable),
 
     /// Reverse the node [sorters](https://xplr.dev/en/sorting#sorter).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -895,7 +895,7 @@ pub enum ExternalMsg {
     ReverseNodeSorters,
 
     /// Remove the last node [sorter](https://xplr.dev/en/sorting#sorter).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -905,7 +905,7 @@ pub enum ExternalMsg {
 
     /// Reset the node [sorters](https://xplr.dev/en/sorting#sorter) back to
     /// the default configuration.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -914,7 +914,7 @@ pub enum ExternalMsg {
     ResetNodeSorters,
 
     /// Clear all the node [sorters](https://xplr.dev/en/sorting#sorter).
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -925,7 +925,7 @@ pub enum ExternalMsg {
     /// ### Search Operations --------------------------------------------------
 
     /// Search files using the current or default (fuzzy) search algorithm.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Type: { Search = "string" }
@@ -946,7 +946,7 @@ pub enum ExternalMsg {
 
     /// Search files using fuzzy match algorithm.
     /// It keeps the filters, but overrides the sorters.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Type: { SearchFuzzy = "string" }
@@ -958,7 +958,7 @@ pub enum ExternalMsg {
     SearchFuzzy(String),
 
     /// Calls `SearchFuzzy` with the input taken from the input buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Example:
@@ -968,7 +968,7 @@ pub enum ExternalMsg {
     SearchFuzzyFromInput,
 
     /// Like `SearchFuzzy`, but doesn't not perform rank based sorting.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Type: { SearchFuzzyUnordered = "string" }
@@ -980,7 +980,7 @@ pub enum ExternalMsg {
     SearchFuzzyUnordered(String),
 
     /// Calls `SearchFuzzyUnordered` with the input taken from the input buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Example:
@@ -991,7 +991,7 @@ pub enum ExternalMsg {
 
     /// Search files using regex match algorithm.
     /// It keeps the filters, but overrides the sorters.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Type: { SearchRegex = "string" }
@@ -1003,7 +1003,7 @@ pub enum ExternalMsg {
     SearchRegex(String),
 
     /// Calls `SearchRegex` with the input taken from the input buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Example:
@@ -1013,7 +1013,7 @@ pub enum ExternalMsg {
     SearchRegexFromInput,
 
     /// Like `SearchRegex`, but doesn't not perform rank based sorting.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Type: { SearchRegexUnordered = "string" }
@@ -1025,7 +1025,7 @@ pub enum ExternalMsg {
     SearchRegexUnordered(String),
 
     /// Calls `SearchRegexUnordered` with the input taken from the input buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
     ///
     /// Example:
@@ -1036,7 +1036,7 @@ pub enum ExternalMsg {
 
     /// Toggles between different search algorithms, without changing the input
     /// buffer
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -1045,7 +1045,7 @@ pub enum ExternalMsg {
     ToggleSearchAlgorithm,
 
     /// Enables ranked search without changing the input buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -1054,7 +1054,7 @@ pub enum ExternalMsg {
     EnableSearchOrder,
 
     /// Disabled ranked search without changing the input buffer.
-    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitely.
+    /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     ///
     /// Example:
     ///
@@ -1135,7 +1135,7 @@ pub enum ExternalMsg {
     /// - YAML: `StopFifo`
     StopFifo,
 
-    /// Toggle betwen {Start|Stop}Fifo
+    /// Toggle between {Start|Stop}Fifo
     ///
     /// Type: { ToggleFifo = "string" }
     ///

@@ -98,7 +98,7 @@ compatibility.
   rendered:
   - xplr.config.general.selection.item.format
   - xplr.config.general.selection.item.style
-- Use the following utility functions to work with teh file permissions:
+- Use the following utility functions to work with the file permissions:
   - xplr.util.permissions_rwx
   - xplr.util.permissions_octal
 - Type `:p` to edit file permissions interactively.
@@ -305,7 +305,7 @@ Thanks to @noahmayr for contributing to a major part of this release.
 - You can disable the recover mode using `config.general.disable_recover_mode = true`.
 - Try running `xplr --help`. Yes, CLI has been implemented.
 - Since version `v0.14.3`, `StartFifo` and `ToggleFifo` will write to the FIFO
-  path when called. So, there's no need to pipe the focus path explicitely.
+  path when called. So, there's no need to pipe the focus path explicitly.
 - Since version `v0.14.3`, general config `xplr.config.start_fifo` is available
   which can be set to a file path to start a fifo when xplr starts.
 - Since version `v0.14.4`, `$XPLR_SESSION_PATH` can be used to dump session
@@ -316,7 +316,7 @@ Thanks to @noahmayr for contributing to a major part of this release.
 #### [v0.12.1][6] -> [v0.13.7][2]
 
 - Lua functions called using [`CallLua`][7] and [`CallLuaSilently`][8] messages will receive [`CallLuaArg`][9] object as the function argument (instead of the [`App`][10] object).
-- Each `node_types` config will inherit defaults from matching less specifig `node_types` config and overwrite them.
+- Each `node_types` config will inherit defaults from matching less specific `node_types` config and overwrite them.
 - Since version `v0.13.2`, you don't need to use/send `Refresh` anymore. It will be auto-handled by xplr.
 
 #### [v0.11.1][11] -> [v0.12.1][6]
