@@ -115,7 +115,7 @@ xplr.config.general.prompt.style = {}
 -- Type: nullable string
 xplr.config.general.logs.info.format = "INFO"
 
--- The style for the informations logs.
+-- The style for the information logs.
 --
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.logs.info.style = { fg = "LightBlue" }

@@ -349,7 +349,7 @@ This is a lightweight version of the [Lua Context][39]. In this context, the
 heavyweight fields like [directory_buffer][50] are omitted for performance
 reasons.
 
-Hence, only the following fields are avilable.
+Hence, only the following fields are available.
 
 - [version][40]
 - [pwd][41]
