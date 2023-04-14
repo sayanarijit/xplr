@@ -88,7 +88,7 @@ Example:
 xplr.config.node_types.mime_essence = {
   application = {
     -- application/*
-    ["*"] = { meta = { icon = "a" } }
+    ["*"] = { meta = { icon = "a" } },
 
     -- application/pdf
     pdf = { meta = { icon = "" }, style = { fg = "Blue" } },
