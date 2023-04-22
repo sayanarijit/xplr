@@ -15,32 +15,32 @@ fn main() {
     xplr [FLAG]... [OPTION]... [PATH] [SELECTION]..."###;
 
         let flags = r###"
-    -                            Reads new-line (\n) separated paths from stdin
-    --                           Denotes the end of command-line flags and options
-        --force-focus            Focuses on the given <PATH>, even if it is a directory
-    -h, --help                   Prints help information
-    -m, --pipe-msg-in            Helps safely passing messages to the active xplr
-                                   session, use %%, %s and %q as the placeholders
-    -M, --print-msg-in           Like --pipe-msg-in, but prints the message instead of
-                                   passing to the active xplr session
-        --print-pwd-as-result    Prints the present working directory when quitting
-                                   with `PrintResultAndQuit`
-        --read-only              Enables read-only mode (config.general.read_only)
-        --read0                  Reads paths separated using the null character (\0)
-        --write0                 Prints paths separated using the null character (\0)
-    -0  --null                   Combines --read0 and --write0
-    -V, --version                Prints version information"###;
+  -                            Reads new-line (\n) separated paths from stdin
+  --                           Denotes the end of command-line flags and options
+      --force-focus            Focuses on the given <PATH>, even if it is a directory
+  -h, --help                   Prints help information
+  -m, --pipe-msg-in            Helps safely passing messages to the active xplr
+                                 session, use %%, %s and %q as the placeholders
+  -M, --print-msg-in           Like --pipe-msg-in, but prints the message instead of
+                                 passing to the active xplr session
+      --print-pwd-as-result    Prints the present working directory when quitting
+                                 with `PrintResultAndQuit`
+      --read-only              Enables read-only mode (config.general.read_only)
+      --read0                  Reads paths separated using the null character (\0)
+      --write0                 Prints paths separated using the null character (\0)
+  -0  --null                   Combines --read0 and --write0
+  -V, --version                Prints version information"###;
 
         let options = r###"
-    -c, --config <PATH>             Specifies a custom config file (default is
-                                      "$HOME/.config/xplr/init.lua")
-    -C, --extra-config <PATH>...    Specifies extra config files to load
-        --on-load <MESSAGE>...      Sends messages when xplr loads
-        --vroot <PATH>              Treats the specified path as the virtual root"###;
+  -c, --config <PATH>             Specifies a custom config file (default is
+                                    "$HOME/.config/xplr/init.lua")
+  -C, --extra-config <PATH>...    Specifies extra config files to load
+      --on-load <MESSAGE>...      Sends messages when xplr loads
+      --vroot <PATH>              Treats the specified path as the virtual root"###;
 
         let args = r###"
-    <PATH>            Path to focus on, or enter if directory, (default is `.`)
-    <SELECTION>...    Paths to select, requires <PATH> to be set explicitly"###;
+  <PATH>            Path to focus on, or enter if directory, (default is `.`)
+  <SELECTION>...    Paths to select, requires <PATH> to be set explicitly"###;
 
         let help = format!(
             "xplr {}\n{}\n{}\n\nUSAGE:{}\n\nFLAGS:{}\n\nOPTIONS:{}\n\nARGS:{}",
