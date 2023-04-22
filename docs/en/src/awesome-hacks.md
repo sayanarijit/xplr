@@ -8,7 +8,7 @@ Do you have something cool to share?
 
 [Edit this file][3] or [share them here][4] or [let us know][5].
 
-You can try these hacks by writing them to a file, say `hack.lua` and passsing
+You can try these hacks by writing them to a file, say `hack.lua` and passing
 it to xplr with `--extra-config` or `-C`.
 
 ```bash

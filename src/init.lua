@@ -115,7 +115,7 @@ xplr.config.general.prompt.style = {}
 -- Type: nullable string
 xplr.config.general.logs.info.format = "INFO"
 
--- The style for the informations logs.
+-- The style for the information logs.
 --
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.logs.info.style = { fg = "LightBlue" }
@@ -801,7 +801,7 @@ xplr.config.node_types.symlink.meta.icon = "§"
 -- xplr.config.node_types.mime_essence = {
 --   application = {
 --     -- application/*
---     ["*"] = { meta = { icon = "a" } }
+--     ["*"] = { meta = { icon = "a" } },
 --
 --     -- application/pdf
 --     pdf = { meta = { icon = "" }, style = { fg = "Blue" } },
@@ -2465,7 +2465,6 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-
       ["c"] = {
         help = "by created",
         messages = {
@@ -2473,7 +2472,6 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-
       ["C"] = {
         help = "by created reverse",
         messages = {
@@ -2481,7 +2479,6 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-
       ["l"] = {
         help = "by last modified",
         messages = {
@@ -2489,7 +2486,6 @@ xplr.config.modes.builtin.sort = {
           "ExplorePwdAsync",
         },
       },
-
       ["L"] = {
         help = "by last modified reverse",
         messages = {

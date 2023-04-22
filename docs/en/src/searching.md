@@ -24,7 +24,7 @@ Node Searcher contains the following fields:
 
 ### pattern
 
-The patters used to search.
+The patterns used to search.
 
 Type: string
 
