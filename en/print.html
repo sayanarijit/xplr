@@ -558,7 +558,7 @@ The default behavior is to rotate from the last/first path.</p>
 <p>The string to indicate an information in logs.</p>
 <p>Type: nullable string</p>
 <h4 id="xplrconfiggenerallogsinfostyle"><a class="header" href="#xplrconfiggenerallogsinfostyle">xplr.config.general.logs.info.style</a></h4>
-<p>The style for the informations logs.</p>
+<p>The style for the information logs.</p>
 <p>Type: <a href="https://xplr.dev/en/style">Style</a></p>
 <h4 id="xplrconfiggenerallogssuccessformat"><a class="header" href="#xplrconfiggenerallogssuccessformat">xplr.config.general.logs.success.format</a></h4>
 <p>The string to indicate an success in logs.</p>
@@ -908,7 +908,7 @@ be overwritten by the more specific sub types that are defined.</p>
 <pre><code class="language-lua">xplr.config.node_types.mime_essence = {
   application = {
     -- application/*
-    [&quot;*&quot;] = { meta = { icon = &quot;a&quot; } }
+    [&quot;*&quot;] = { meta = { icon = &quot;a&quot; } },
 
     -- application/pdf
     pdf = { meta = { icon = &quot;&quot; }, style = { fg = &quot;Blue&quot; } },
@@ -1880,7 +1880,7 @@ content body for the custom dynamic layouts.</p>
 <p>This is a lightweight version of the <a href="lua-function-calls.html#lua-context">Lua Context</a>. In this context, the
 heavyweight fields like <a href="lua-function-calls.html#directory_buffer">directory_buffer</a> are omitted for performance
 reasons.</p>
-<p>Hence, only the following fields are avilable.</p>
+<p>Hence, only the following fields are available.</p>
 <ul>
 <li><a href="lua-function-calls.html#version">version</a></li>
 <li><a href="lua-function-calls.html#pwd">pwd</a></li>
@@ -2269,7 +2269,7 @@ value).</p>
 </ul>
 <h4 id="updateinputbuffer"><a class="header" href="#updateinputbuffer">UpdateInputBuffer</a></h4>
 <p>Update the input buffer using cursor based operations.</p>
-<p>Type: { UpdateInputBuffer = <a href="https://xplr.dev/en/input-operation">Input Opertaion</a> }</p>
+<p>Type: { UpdateInputBuffer = <a href="https://xplr.dev/en/input-operation">Input Operation</a> }</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>{ UpdateInputBuffer = &quot;GoToPreviousWord&quot; }</code></li>
@@ -2291,7 +2291,7 @@ value).</p>
 <li>YAML: <code>BufferInput: foo</code></li>
 </ul>
 <h4 id="bufferinputfromkey"><a class="header" href="#bufferinputfromkey">BufferInputFromKey</a></h4>
-<p>Append/buffer the characted read from a keyboard input into the
+<p>Append/buffer the character read from a keyboard input into the
 input buffer.</p>
 <p>Example:</p>
 <ul>
@@ -2615,7 +2615,7 @@ Example:</p>
 <h4 id="addnodefilter"><a class="header" href="#addnodefilter">AddNodeFilter</a></h4>
 <p>Add a <a href="https://xplr.dev/en/filtering#filter">filter</a> to exclude nodes
 while exploring directories.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 Filters get automatically cleared when changing directories.</p>
 <p>Type: { AddNodeFilter = { filter = <a href="https://xplr.dev/en/filtering#filter">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
@@ -2625,7 +2625,7 @@ Filters get automatically cleared when changing directories.</p>
 </ul>
 <h4 id="removenodefilter"><a class="header" href="#removenodefilter">RemoveNodeFilter</a></h4>
 <p>Remove an existing <a href="https://xplr.dev/en/filtering#filter">filter</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { RemoveNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -2635,7 +2635,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="togglenodefilter"><a class="header" href="#togglenodefilter">ToggleNodeFilter</a></h4>
 <p>Remove a <a href="https://xplr.dev/en/filtering#filter">filter</a> if it exists,
 else, add a it.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { ToggleNodeFilter = { filter = <a href="https://xplr.dev/en/filtering">Filter</a>, input = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -2645,7 +2645,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="addnodefilterfrominput"><a class="header" href="#addnodefilterfrominput">AddNodeFilterFromInput</a></h4>
 <p>Add a node <a href="https://xplr.dev/en/filtering#filter">filter</a> reading the
 input from the buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { AddNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2655,7 +2655,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="removenodefilterfrominput"><a class="header" href="#removenodefilterfrominput">RemoveNodeFilterFromInput</a></h4>
 <p>Remove a node <a href="https://xplr.dev/en/filtering#filter">filter</a> reading
 the input from the buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { RemoveNodeFilterFromInput = <a href="https://xplr.dev/en/filtering">Filter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2664,7 +2664,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="removelastnodefilter"><a class="header" href="#removelastnodefilter">RemoveLastNodeFilter</a></h4>
 <p>Remove the last node <a href="https://xplr.dev/en/filtering">filter</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;RemoveLastNodeFilter&quot;</code></li>
@@ -2673,7 +2673,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="resetnodefilters"><a class="header" href="#resetnodefilters">ResetNodeFilters</a></h4>
 <p>Reset the node <a href="https://xplr.dev/en/filtering">filters</a> back to the
 default configuration.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetNodeFilters&quot;</code></li>
@@ -2681,7 +2681,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="clearnodefilters"><a class="header" href="#clearnodefilters">ClearNodeFilters</a></h4>
 <p>Clear all the node <a href="https://xplr.dev/en/filtering">filters</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ClearNodeFilters&quot;</code></li>
@@ -2691,7 +2691,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="addnodesorter"><a class="header" href="#addnodesorter">AddNodeSorter</a></h4>
 <p>Add a <a href="https://xplr.dev/en/sorting#sorter">sorter</a> to sort nodes while
 exploring directories.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { AddNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
@@ -2700,7 +2700,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="removenodesorter"><a class="header" href="#removenodesorter">RemoveNodeSorter</a></h4>
 <p>Remove an existing <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { RemoveNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2709,7 +2709,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="reversenodesorter"><a class="header" href="#reversenodesorter">ReverseNodeSorter</a></h4>
 <p>Reverse a node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { ReverseNodeSorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a> }</p>
 <p>Example:</p>
 <ul>
@@ -2719,7 +2719,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="togglenodesorter"><a class="header" href="#togglenodesorter">ToggleNodeSorter</a></h4>
 <p>Remove a <a href="https://xplr.dev/en/sorting#sorter">sorter</a> if it exists,
 else, add a it.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Type: { ToggleNodeSorter = { sorter = <a href="https://xplr.dev/en/sorting#sorter">Sorter</a>, reverse = bool } }</p>
 <p>Example:</p>
 <ul>
@@ -2728,7 +2728,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="reversenodesorters"><a class="header" href="#reversenodesorters">ReverseNodeSorters</a></h4>
 <p>Reverse the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ReverseNodeSorters&quot;</code></li>
@@ -2736,7 +2736,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="removelastnodesorter"><a class="header" href="#removelastnodesorter">RemoveLastNodeSorter</a></h4>
 <p>Remove the last node <a href="https://xplr.dev/en/sorting#sorter">sorter</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;RemoveLastNodeSorter&quot;</code></li>
@@ -2745,7 +2745,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h4 id="resetnodesorters"><a class="header" href="#resetnodesorters">ResetNodeSorters</a></h4>
 <p>Reset the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a> back to
 the default configuration.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ResetNodeSorters&quot;</code></li>
@@ -2753,7 +2753,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="clearnodesorters"><a class="header" href="#clearnodesorters">ClearNodeSorters</a></h4>
 <p>Clear all the node <a href="https://xplr.dev/en/sorting#sorter">sorters</a>.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ClearNodeSorters&quot;</code></li>
@@ -2762,7 +2762,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 <h3 id="search-operations"><a class="header" href="#search-operations">Search Operations</a></h3>
 <h4 id="search-1"><a class="header" href="#search-1">Search</a></h4>
 <p>Search files using the current or default (fuzzy) search algorithm.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Type: { Search = &quot;string&quot; }</p>
 <p>Example:</p>
@@ -2780,7 +2780,7 @@ It gets reset automatically when changing directory.</p>
 <h4 id="searchfuzzy"><a class="header" href="#searchfuzzy">SearchFuzzy</a></h4>
 <p>Search files using fuzzy match algorithm.
 It keeps the filters, but overrides the sorters.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Type: { SearchFuzzy = &quot;string&quot; }</p>
 <p>Example:</p>
@@ -2790,7 +2790,7 @@ It gets reset automatically when changing directory.</p>
 </ul>
 <h4 id="searchfuzzyfrominput"><a class="header" href="#searchfuzzyfrominput">SearchFuzzyFromInput</a></h4>
 <p>Calls <code>SearchFuzzy</code> with the input taken from the input buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Example:</p>
 <ul>
@@ -2799,7 +2799,7 @@ It gets reset automatically when changing directory.</p>
 </ul>
 <h4 id="searchfuzzyunordered"><a class="header" href="#searchfuzzyunordered">SearchFuzzyUnordered</a></h4>
 <p>Like <code>SearchFuzzy</code>, but doesn't not perform rank based sorting.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Type: { SearchFuzzyUnordered = &quot;string&quot; }</p>
 <p>Example:</p>
@@ -2809,7 +2809,7 @@ It gets reset automatically when changing directory.</p>
 </ul>
 <h4 id="searchfuzzyunorderedfrominput"><a class="header" href="#searchfuzzyunorderedfrominput">SearchFuzzyUnorderedFromInput</a></h4>
 <p>Calls <code>SearchFuzzyUnordered</code> with the input taken from the input buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Example:</p>
 <ul>
@@ -2819,7 +2819,7 @@ It gets reset automatically when changing directory.</p>
 <h4 id="searchregex"><a class="header" href="#searchregex">SearchRegex</a></h4>
 <p>Search files using regex match algorithm.
 It keeps the filters, but overrides the sorters.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Type: { SearchRegex = &quot;string&quot; }</p>
 <p>Example:</p>
@@ -2829,7 +2829,7 @@ It gets reset automatically when changing directory.</p>
 </ul>
 <h4 id="searchregexfrominput"><a class="header" href="#searchregexfrominput">SearchRegexFromInput</a></h4>
 <p>Calls <code>SearchRegex</code> with the input taken from the input buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Example:</p>
 <ul>
@@ -2838,7 +2838,7 @@ It gets reset automatically when changing directory.</p>
 </ul>
 <h4 id="searchregexunordered"><a class="header" href="#searchregexunordered">SearchRegexUnordered</a></h4>
 <p>Like <code>SearchRegex</code>, but doesn't not perform rank based sorting.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Type: { SearchRegexUnordered = &quot;string&quot; }</p>
 <p>Example:</p>
@@ -2848,7 +2848,7 @@ It gets reset automatically when changing directory.</p>
 </ul>
 <h4 id="searchregexunorderedfrominput"><a class="header" href="#searchregexunorderedfrominput">SearchRegexUnorderedFromInput</a></h4>
 <p>Calls <code>SearchRegexUnordered</code> with the input taken from the input buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.
 It gets reset automatically when changing directory.</p>
 <p>Example:</p>
 <ul>
@@ -2858,7 +2858,7 @@ It gets reset automatically when changing directory.</p>
 <h4 id="togglesearchalgorithm"><a class="header" href="#togglesearchalgorithm">ToggleSearchAlgorithm</a></h4>
 <p>Toggles between different search algorithms, without changing the input
 buffer
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;ToggleSearchAlgorithm&quot;</code></li>
@@ -2866,7 +2866,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="enablesearchorder"><a class="header" href="#enablesearchorder">EnableSearchOrder</a></h4>
 <p>Enables ranked search without changing the input buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;EnableOrderedSearch&quot;</code></li>
@@ -2874,7 +2874,7 @@ You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explici
 </ul>
 <h4 id="disablesearchorder"><a class="header" href="#disablesearchorder">DisableSearchOrder</a></h4>
 <p>Disabled ranked search without changing the input buffer.
-You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitely.</p>
+You need to call <code>ExplorePwd</code> or <code>ExplorePwdAsync</code> explicitly.</p>
 <p>Example:</p>
 <ul>
 <li>Lua: <code>&quot;DisableSearchOrder&quot;</code></li>
@@ -2943,7 +2943,7 @@ Automatically calls <code>ExplorePwd</code>.</p>
 <li>YAML: <code>StopFifo</code></li>
 </ul>
 <h4 id="togglefifo"><a class="header" href="#togglefifo">ToggleFifo</a></h4>
-<p>Toggle betwen {Start|Stop}Fifo</p>
+<p>Toggle between {Start|Stop}Fifo</p>
 <p>Type: { ToggleFifo = &quot;string&quot; }</p>
 <p>Example:</p>
 <ul>
@@ -3180,7 +3180,7 @@ ordering is being applied, i.e. <a href="sorting.html">sorters</a> are being ign
 <li><a href="searching.html#unordered">unordered</a></li>
 </ul>
 <h3 id="pattern"><a class="header" href="#pattern">pattern</a></h3>
-<p>The patters used to search.</p>
+<p>The patterns used to search.</p>
 <p>Type: string</p>
 <h3 id="recoverable_focus"><a class="header" href="#recoverable_focus">recoverable_focus</a></h3>
 <p>Where to focus when search is cancelled.</p>
@@ -3777,7 +3777,7 @@ focus on.</p>
 <h3 id="searcher"><a class="header" href="#searcher">searcher</a></h3>
 <p>The searcher to use (if any).</p>
 <p>Type: nullable <a href="searching.html#node-searcher-applicable">Node Searcher Applicable</a></p>
-<h2 id="also-ssee"><a class="header" href="#also-ssee">Also Ssee:</a></h2>
+<h2 id="also-see-6"><a class="header" href="#also-see-6">Also See:</a></h2>
 <ul>
 <li><a href="xplr.util.html">xplr.util</a></li>
 </ul>
@@ -4254,7 +4254,7 @@ and paste into your <a href="configuration.html">configuration</a> or the approp
 too small or too niche for a full fledge <a href="plugin.html">plugin</a>.</p>
 <p>Do you have something cool to share?</p>
 <p><a href="https://github.com/sayanarijit/xplr/edit/main/docs/en/src/awesome-hacks.md">Edit this file</a> or <a href="https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell">share them here</a> or <a href="community.html">let us know</a>.</p>
-<p>You can try these hacks by writing them to a file, say <code>hack.lua</code> and passsing
+<p>You can try these hacks by writing them to a file, say <code>hack.lua</code> and passing
 it to xplr with <code>--extra-config</code> or <code>-C</code>.</p>
 <pre><code class="language-bash">xplr -C hack.lua
 </code></pre>
@@ -4697,7 +4697,7 @@ end
 }
 </code></pre>
 </details>
-<h2 id="also-see-6"><a class="header" href="#also-see-6">Also See:</a></h2>
+<h2 id="also-see-7"><a class="header" href="#also-see-7">Also See:</a></h2>
 <ul>
 <li><a href="awesome-plugins.html">Awesome Plugins</a></li>
 <li><a href="awesome-integrations.html">Awesome Integrations</a></li>
@@ -4808,7 +4808,7 @@ start.</li>
 </ul>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <p>Visit <a href="awesome-plugins.html">Awesome Plugins</a> for xplr plugin examples.</p>
-<h2 id="also-see-7"><a class="header" href="#also-see-7">Also See</a></h2>
+<h2 id="also-see-8"><a class="header" href="#also-see-8">Also See</a></h2>
 <ul>
 <li><a href="https://github.com/sayanarijit/xplr/wiki/Hacks">Tip: A list of hacks yet to make it as Lua plugins</a></li>
 <li><a href="https://github.com/sayanarijit/xplr/discussions/274">Tip: Some UI and themeing tips</a></li>
@@ -4833,7 +4833,7 @@ of the following plugins work for you, it's very easy to
 <li><a href="https://github.com/sayanarijit/dual-pane.xplr"><strong>sayanarijit/dual-pane.xplr</strong></a> Implements support for dual-pane navigation into xplr.</li>
 <li><a href="https://github.com/sayanarijit/map.xplr"><strong>sayanarijit/map.xplr</strong></a> Visually inspect and interactively execute batch commands using xplr.</li>
 <li><a href="https://github.com/sayanarijit/offline-docs.xplr"><strong>sayanarijit/offline-docs.xplr</strong></a> Fetch the appropriate version of xplr docs and browse offline.</li>
-<li><a href="https://github.com/sayanarijit/regex-search.xplr"><strong>sayanarijit/regex-search.xplr</strong></a> Bring back the regex based seach in xplr.</li>
+<li><a href="https://github.com/sayanarijit/regex-search.xplr"><strong>sayanarijit/regex-search.xplr</strong></a> Bring back the regex based search in xplr.</li>
 <li><a href="https://github.com/sayanarijit/registers.xplr"><strong>sayanarijit/registers.xplr</strong></a> Use multiple registers to store the selected paths.</li>
 <li><a href="https://github.com/sayanarijit/tri-pane.xplr"><strong>sayanarijit/tri-pane.xplr</strong></a> xplr plugin that implements ranger-like three pane layout.</li>
 <li><a href="https://github.com/sayanarijit/type-to-nav.xplr"><strong>sayanarijit/type-to-nav.xplr</strong></a> Inspired by <a href="https://github.com/jarun/nnn/wiki/concepts#type-to-nav">nnn's type-to-nav mode</a> for xplr,
@@ -4874,7 +4874,7 @@ support.</li>
 <li><a href="https://github.com/dtomvan/extra-icons.xplr"><strong>dtomvan/extra-icons.xplr</strong></a> Adds more icons to icons.xplr, compatible
 with zentable.xplr.</li>
 </ul>
-<h2 id="also-see-8"><a class="header" href="#also-see-8">Also See:</a></h2>
+<h2 id="also-see-9"><a class="header" href="#also-see-9">Also See:</a></h2>
 <ul>
 <li><a href="awesome-hacks.html">Awesome Hacks</a></li>
 <li><a href="awesome-integrations.html">Awesome Integrations</a></li>
@@ -4907,7 +4907,7 @@ used as a file picker or a pluggable file manager.</p>
 <ul>
 <li><a href="https://github.com/orhun/gpg-tui#importreceive"><strong>gpg-tui</strong></a> Import GPG certificates using xplr.</li>
 </ul>
-<h2 id="also-see-9"><a class="header" href="#also-see-9">Also See:</a></h2>
+<h2 id="also-see-10"><a class="header" href="#also-see-10">Also See:</a></h2>
 <ul>
 <li><a href="awesome-hacks.html">Awesome Hacks</a></li>
 <li><a href="awesome-plugins.html">Awesome Plugins</a></li>
@@ -5041,7 +5041,7 @@ rendered:
 <li>xplr.config.general.selection.item.style</li>
 </ul>
 </li>
-<li>Use the following utility functions to work with teh file permissions:
+<li>Use the following utility functions to work with the file permissions:
 <ul>
 <li>xplr.util.permissions_rwx</li>
 <li>xplr.util.permissions_octal</li>
@@ -5282,7 +5282,7 @@ for <a href="https://github.com/sayanarijit/xplr/pull/229#issue-662426960">FIFO 
 <li>You can disable the recover mode using <code>config.general.disable_recover_mode = true</code>.</li>
 <li>Try running <code>xplr --help</code>. Yes, CLI has been implemented.</li>
 <li>Since version <code>v0.14.3</code>, <code>StartFifo</code> and <code>ToggleFifo</code> will write to the FIFO
-path when called. So, there's no need to pipe the focus path explicitely.</li>
+path when called. So, there's no need to pipe the focus path explicitly.</li>
 <li>Since version <code>v0.14.3</code>, general config <code>xplr.config.start_fifo</code> is available
 which can be set to a file path to start a fifo when xplr starts.</li>
 <li>Since version <code>v0.14.4</code>, <code>$XPLR_SESSION_PATH</code> can be used to dump session
@@ -5293,7 +5293,7 @@ available.</li>
 <h4 id="v0121---v0137"><a class="header" href="#v0121---v0137"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a></a></h4>
 <ul>
 <li>Lua functions called using <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua"><code>CallLua</code></a> and <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently"><code>CallLuaSilently</code></a> messages will receive <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
-<li>Each <code>node_types</code> config will inherit defaults from matching less specifig <code>node_types</code> config and overwrite them.</li>
+<li>Each <code>node_types</code> config will inherit defaults from matching less specific <code>node_types</code> config and overwrite them.</li>
 <li>Since version <code>v0.13.2</code>, you don't need to use/send <code>Refresh</code> anymore. It will be auto-handled by xplr.</li>
 </ul>
 <h4 id="v0111---v0121"><a class="header" href="#v0111---v0121"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.11.1">v0.11.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a></a></h4>

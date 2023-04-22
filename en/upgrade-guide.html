@@ -262,7 +262,7 @@ rendered:
 <li>xplr.config.general.selection.item.style</li>
 </ul>
 </li>
-<li>Use the following utility functions to work with teh file permissions:
+<li>Use the following utility functions to work with the file permissions:
 <ul>
 <li>xplr.util.permissions_rwx</li>
 <li>xplr.util.permissions_octal</li>
@@ -503,7 +503,7 @@ for <a href="https://github.com/sayanarijit/xplr/pull/229#issue-662426960">FIFO 
 <li>You can disable the recover mode using <code>config.general.disable_recover_mode = true</code>.</li>
 <li>Try running <code>xplr --help</code>. Yes, CLI has been implemented.</li>
 <li>Since version <code>v0.14.3</code>, <code>StartFifo</code> and <code>ToggleFifo</code> will write to the FIFO
-path when called. So, there's no need to pipe the focus path explicitely.</li>
+path when called. So, there's no need to pipe the focus path explicitly.</li>
 <li>Since version <code>v0.14.3</code>, general config <code>xplr.config.start_fifo</code> is available
 which can be set to a file path to start a fifo when xplr starts.</li>
 <li>Since version <code>v0.14.4</code>, <code>$XPLR_SESSION_PATH</code> can be used to dump session
@@ -514,7 +514,7 @@ available.</li>
 <h4 id="v0121---v0137"><a class="header" href="#v0121---v0137"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a></a></h4>
 <ul>
 <li>Lua functions called using <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua"><code>CallLua</code></a> and <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently"><code>CallLuaSilently</code></a> messages will receive <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
-<li>Each <code>node_types</code> config will inherit defaults from matching less specifig <code>node_types</code> config and overwrite them.</li>
+<li>Each <code>node_types</code> config will inherit defaults from matching less specific <code>node_types</code> config and overwrite them.</li>
 <li>Since version <code>v0.13.2</code>, you don't need to use/send <code>Refresh</code> anymore. It will be auto-handled by xplr.</li>
 </ul>
 <h4 id="v0111---v0121"><a class="header" href="#v0111---v0121"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.11.1">v0.11.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a></a></h4>
