@@ -38,7 +38,7 @@ which = "4.4.0"
 nu-ansi-term = "0.47.0" 
 textwrap = "0.16"
 snailquote = "0.3.1"
-skim = "0.10.4"
+skim = { version = "0.10.4", default-features = false }
 time = { version = "0.3.20", features = ["serde", "local-offset", "formatting", "macros"] }
 
 [dependencies.lscolors]
