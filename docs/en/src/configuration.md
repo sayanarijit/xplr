@@ -133,3 +133,16 @@ return {
   }
 }
 ```
+
+---
+
+> Note:
+>
+> It's not recommended to copy the entire configuration, unless you want to
+> freeze it and miss out on useful updates to the defaults.
+>
+> Instead, you can use this as a reference to overwrite only the parts you
+> want to update.
+>
+> If you still want to copy the entire configuration, make sure to put your
+> customization before the return statement.
