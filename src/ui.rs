@@ -97,6 +97,7 @@ pub enum CustomPanel {
         col_spacing: Option<u16>,
         body: Vec<Vec<String>>,
     },
+    CustomLayout(Layout),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -1291,6 +1292,10 @@ pub fn draw_static<B: Backend>(
                 .block(block(config, "".into()));
 
             f.render_widget(content, layout_size);
+        }
+
+        CustomPanel::CustomLayout(layout) => {
+            draw_layout(layout, f, screen_size, layout_size, app, _lua);
         }
     }
 }
