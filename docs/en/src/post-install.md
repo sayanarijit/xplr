@@ -12,9 +12,7 @@ version="$(xplr --version | awk '{print $2}')"
 echo "version = '${version:?}'" > ~/.config/xplr/init.lua
 ```
 
-Then
-**[copy from here][2]**
-and remove / comment out what you don't want to customize.
+Then **[copy from here][2]** and remove / comment out what you don't want to customize.
 
 ## Run
 

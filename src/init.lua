@@ -1818,7 +1818,8 @@ xplr.config.modes.builtin.go_to = {
                 fi
               fi
               (while IFS= read -r -d '' PTH; do
-                $OPENER "${PTH:?}" > /dev/null 2>&1
+                $OPENER "${PTH:?}" > /dev/null 2>&1 &
+                disown
               done < "${XPLR_PIPE_RESULT_OUT:?}")
             ]===],
           },
@@ -2705,21 +2706,13 @@ xplr.config.modes.builtin.edit_permissions = {
       ["m"] = {
         help = "max",
         messages = {
-          {
-            BashExecSilently0 = [===[
-              "$XPLR" -m 'SetInputBuffer: %q' "777"
-            ]===],
-          },
+          { SetInputBuffer = "777" },
         },
       },
       ["M"] = {
         help = "min",
         messages = {
-          {
-            BashExecSilently0 = [===[
-              "$XPLR" -m 'SetInputBuffer: %q' "000"
-            ]===],
-          },
+          { SetInputBuffer = "000" },
         },
       },
       ["ctrl-r"] = {
