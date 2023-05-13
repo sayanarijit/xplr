@@ -178,6 +178,7 @@ Custom panel can be one of the following:
 - [CustomParagraph][29]
 - [CustomList][30]
 - [CustomTable][31]
+- [CustomLayout][55]
 
 ### CustomParagraph
 
@@ -308,6 +309,44 @@ xplr.fn.custom.render_layout = function(ctx)
 end
 ```
 
+### CustomLayout
+
+A whole custom layout to render. It doesn't make sense to use it as a
+[Static][25] layout, but can be very useful to render as a [Dynamic][26] layout
+for use cases where the structure of the layout needs to change without having
+to switch modes.
+
+> WARNING: Rendering the same dynamic custom layout recursively will result in
+> a ugly crash.
+
+#### Example: Render a custom dynamic layout
+
+```lua
+xplr.config.layouts.builtin.default = { Dynamic = "custom.render_layout" }
+
+xplr.fn.custom.render_layout = function(ctx)
+  local inner = {
+    config = {
+      constraints = {
+        { Percentage = 50 },
+        { Percentage = 50 },
+      },
+    },
+    splits = {
+      { Static = { CustomParagraph = { body = "Try your luck..." } } },
+      { Static = { CustomParagraph = { body = "Press ctrl-r" } } },
+    },
+  }
+
+  local layout_type = "Vertical"
+  if math.random(1, 2) == 1 then
+    layout_type = "Horizontal"
+  end
+
+  return { CustomLayout = { [layout_type] = inner } }
+end
+```
+
 ## Panel UI Config
 
 It contains the following optional fields:
@@ -422,3 +461,4 @@ Hence, only the following fields are available.
 [52]: lua-function-calls.md#vroot
 [53]: lua-function-calls.md#initial_pwd
 [54]: borders.md#border-type
+[55]: #customlayout
