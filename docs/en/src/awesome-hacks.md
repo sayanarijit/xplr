@@ -423,7 +423,7 @@ Preview text files in a native xplr pane (should be fast enough).
 
 ```lua
 local function stat(node)
-  return node.mime_essence
+  return xplr.util.to_yaml(xplr.util.node(node.absolute_path))
 end
 
 local function read(path, height)
@@ -452,8 +452,29 @@ local function read(path, height)
   return res
 end
 
+xplr.fn.custom.preview_pane = {}
+xplr.fn.custom.preview_pane.render = function(ctx)
+  local title = nil
+  local body = ""
+  local n = ctx.app.focused_node
+  if n and n.canonical then
+    n = n.canonical
+  end
 
-xplr.config.layouts.builtin.default = {
+  if n then
+    title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
+    if n.is_file then
+      body = read(n.absolute_path, ctx.layout_size.height) or stat(n)
+    else
+      body = stat(n)
+    end
+  end
+
+  return { CustomParagraph = { ui = { title = title }, body = body } }
+end
+
+local preview_pane = { Dynamic = "custom.preview_pane.render" }
+local split_preview = {
   Horizontal = {
     config = {
       constraints = {
@@ -463,36 +484,14 @@ xplr.config.layouts.builtin.default = {
     },
     splits = {
       "Table",
-      {
-        CustomContent = {
-          title = "preview",
-          body = { DynamicParagraph = { render = "custom.preview_pane.render" } },
-        },
-      },
+      preview_pane,
     },
   },
 }
 
-xplr.fn.custom.preview_pane = {}
-xplr.fn.custom.preview_pane.render = function(ctx)
-  local n = ctx.app.focused_node
-
-  if n and n.canonical then
-    n = n.canonical
-  end
-
-  if n then
-    if n.is_file then
-      return read(n.absolute_path, ctx.layout_size.height)
-    else
-      return stat(n)
-    end
-  else
-    return ""
-  end
-end
+xplr.config.layouts.builtin.default =
+    xplr.util.layout_replace(xplr.config.layouts.builtin.default, "Table", split_preview)
 ```
-
 </details>
 
 ### Tere Navigation
@@ -510,7 +509,7 @@ Navigate using the [tere][19] file explorer (defaults to type-to-nav system).
 xplr.config.modes.builtin.default.key_bindings.on_key.T = {
   help = "tere nav",
   messages = {
-    { BashExec0 = [[xplr -m 'ChangeDirectory: %q' "$(tere)"]] },
+    { BashExec0 = [["$XPLR" -m 'ChangeDirectory: %q' "$(tere)"]] },
   },
 }
 ```
