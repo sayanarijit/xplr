@@ -513,7 +513,7 @@ imv-msg &quot;$IMV_PID&quot; quit
 <li>Tested on: Linux, FreeBSD 13.1-RELEASE</li>
 </ul>
 <pre><code class="language-lua">local function stat(node)
-  return node.mime_essence
+  return xplr.util.to_yaml(xplr.util.node(node.absolute_path))
 end
 
 local function read(path, height)
@@ -542,8 +542,29 @@ local function read(path, height)
   return res
 end
 
+xplr.fn.custom.preview_pane = {}
+xplr.fn.custom.preview_pane.render = function(ctx)
+  local title = nil
+  local body = &quot;&quot;
+  local n = ctx.app.focused_node
+  if n and n.canonical then
+    n = n.canonical
+  end
 
-xplr.config.layouts.builtin.default = {
+  if n then
+    title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
+    if n.is_file then
+      body = read(n.absolute_path, ctx.layout_size.height) or stat(n)
+    else
+      body = stat(n)
+    end
+  end
+
+  return { CustomParagraph = { ui = { title = title }, body = body } }
+end
+
+local preview_pane = { Dynamic = &quot;custom.preview_pane.render&quot; }
+local split_preview = {
   Horizontal = {
     config = {
       constraints = {
@@ -553,34 +574,13 @@ xplr.config.layouts.builtin.default = {
     },
     splits = {
       &quot;Table&quot;,
-      {
-        CustomContent = {
-          title = &quot;preview&quot;,
-          body = { DynamicParagraph = { render = &quot;custom.preview_pane.render&quot; } },
-        },
-      },
+      preview_pane,
     },
   },
 }
 
-xplr.fn.custom.preview_pane = {}
-xplr.fn.custom.preview_pane.render = function(ctx)
-  local n = ctx.app.focused_node
-
-  if n and n.canonical then
-    n = n.canonical
-  end
-
-  if n then
-    if n.is_file then
-      return read(n.absolute_path, ctx.layout_size.height)
-    else
-      return stat(n)
-    end
-  else
-    return &quot;&quot;
-  end
-end
+xplr.config.layouts.builtin.default =
+    xplr.util.layout_replace(xplr.config.layouts.builtin.default, &quot;Table&quot;, split_preview)
 </code></pre>
 </details>
 <h3 id="tere-navigation"><a class="header" href="#tere-navigation">Tere Navigation</a></h3>
@@ -595,7 +595,7 @@ end
 <pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key.T = {
   help = &quot;tere nav&quot;,
   messages = {
-    { BashExec0 = [[xplr -m 'ChangeDirectory: %q' &quot;$(tere)&quot;]] },
+    { BashExec0 = [[&quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;$(tere)&quot;]] },
   },
 }
 </code></pre>
