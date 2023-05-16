@@ -492,6 +492,7 @@ local split_preview = {
 xplr.config.layouts.builtin.default =
     xplr.util.layout_replace(xplr.config.layouts.builtin.default, "Table", split_preview)
 ```
+
 </details>
 
 ### Tere Navigation

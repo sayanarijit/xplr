@@ -728,9 +728,7 @@ xplr.config.general.global_key_bindings = {
 -- The style for the directory nodes
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.directory.style = {
-  fg = "Blue",
-}
+xplr.config.node_types.directory.style = {}
 
 -- Metadata for the directory nodes.
 -- You can set as many metadata as you want.
@@ -766,10 +764,7 @@ xplr.config.node_types.file.meta.icon = "ƒ"
 -- The style for the symlink nodes.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.node_types.symlink.style = {
-  fg = "Magenta",
-  add_modifiers = { "Italic" },
-}
+xplr.config.node_types.symlink.style = {}
 
 -- Metadata for the symlink nodes.
 -- You can set as many metadata as you want.
@@ -2861,7 +2856,7 @@ xplr.fn.builtin.fmt_general_selection_item = function(n)
   end
   local ls_style = xplr.util.lscolor(n.absolute_path)
   local meta_style = xplr.util.node_type(n).style
-  local style = xplr.util.style_mix({ meta_style, ls_style })
+  local style = xplr.util.style_mix({ ls_style, meta_style })
   return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
 
@@ -2884,7 +2879,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local r = m.tree .. m.prefix
   local style = xplr.util.lscolor(m.absolute_path)
-  style = xplr.util.style_mix({ m.style, style })
+  style = xplr.util.style_mix({ style, m.style })
 
   if m.meta.icon == nil then
     r = r .. ""
