@@ -745,7 +745,7 @@ xplr.config.node_types.directory.meta.icon = "ð"
 
 -- The style for the file nodes.
 --
--- Type: [](https://xplr.dev/en/style)
+-- Type: [Style](https://xplr.dev/en/style)
 xplr.config.node_types.file.style = {}
 
 -- Metadata for the file nodes.
