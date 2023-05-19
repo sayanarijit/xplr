@@ -204,62 +204,18 @@ pub fn print_msg_in(args: Vec<String>) -> Result<()> {
 }
 
 fn fmt_msg_in(args: Vec<String>) -> Result<String> {
-    let mut args = args.into_iter();
-    let format = args.next().context("FORMAT is missing")?;
-    let mut msg = "".to_string();
-    let mut last_char = None;
-
-    for (col, ch) in format.chars().enumerate() {
-        match (ch, last_char) {
-            ('%', Some('%')) => {
-                msg.push(ch);
-                last_char = None;
-            }
-            ('%', _) => {
-                last_char = Some(ch);
-            }
-            ('q', Some('%')) => {
-                let arg = args.next().context(format!(
-                    "argument missing for the placeholder at column {col}"
-                ))?;
-                msg.push_str(&json::to_string(&arg)?);
-                last_char = None;
-            }
-            ('s', Some('%')) => {
-                let arg = args.next().context(format!(
-                    "argument missing for the placeholder at column {col}",
-                ))?;
-                msg.push_str(&arg);
-                last_char = None;
-            }
-            (ch, Some('%')) => {
-                bail!(format!(
-                    "invalid placeholder '%{ch}' at column {col}, use one of '%s' or '%q', or escape it using '%%'",
-                ));
-            }
-            (ch, _) => {
-                msg.push(ch);
-                last_char = Some(ch);
-            }
+    let msg = match jf::format(args.into_iter().map(Into::into)) {
+        Ok(msg) => msg,
+        Err(jf::Error::Usage) => {
+            bail!("usage: xplr -m TEMPLATE [VALUE]... [NAME=VALUE]...")
         }
-    }
-
-    if last_char == Some('%') {
-        bail!("message ended with incomplete placeholder");
-    }
-
-    if args.count() != 0 {
-        bail!("too many arguments, not enough placeholders")
-    }
-
-    // Since we'll mostly by passing json using `-m`, and json is faster than yaml
-    // let's try to validate using json first.
-    let msg = if let Ok(val) = json::from_str::<ExternalMsg>(&msg) {
-        json::to_string(&val)?
-    } else {
-        let val: ExternalMsg = yaml::from_str(&msg)?;
-        json::to_string(&val)?
+        Err(jf::Error::Jf(e)) => bail!("xplr -m: {e}"),
+        Err(jf::Error::Json(e)) => bail!("xplr -m: json: {e}"),
+        Err(jf::Error::Yaml(e)) => bail!("xplr -m: yaml: {e}"),
     };
+
+    // validate
+    let _: ExternalMsg = json::from_str(&msg)?;
 
     Ok(msg)
 }
