@@ -27,7 +27,7 @@ humansize = "2.1.3"
 natord = "1.0.9"
 anyhow = "1.0.71"
 serde_yaml = "0.9.21"
-crossterm = "0.26.1"
+crossterm = { version = "0.26.1", features = [], default-features = false }
 dirs = "5.0.1"
 ansi-to-tui = "3.0.0"
 regex = "1.8.1"
@@ -53,7 +53,7 @@ default-features = false
 
 [dependencies.mime_guess]
 version = "2.0.4"
-features = ["rev-mappings"]
+default-features = false
 
 [dependencies.tui]
 version = "0.20.1"
@@ -63,7 +63,8 @@ package = 'ratatui'
 
 [dependencies.serde]
 version = "1.0.163"
-features = ['derive']
+features = []
+default-features = false
 
 [dependencies.indexmap]
 version = "1.9.3"
