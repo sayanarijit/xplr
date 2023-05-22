@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.20.2][48] -> [v0.21.1][49]
+#### [v0.20.2][48] -> [v0.21.2][49]
 
 - Some plugins might stop rendering colors. Wait for them to update.
 - Rename `xplr.config.general.sort_and_filter_ui.search_identifier` to
@@ -516,5 +516,5 @@ Else do the following:
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
-[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.1
+[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.2
 [50]: https://github.com/lotabout/skim#search-syntax
