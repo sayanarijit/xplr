@@ -282,6 +282,7 @@ message using newline or null character (<code>\n</code> or <code>\0</code>).</p
 <p><strong><em>NOTE:</em></strong> Since version <code>v0.20.0</code>, it's recommended to avoid writing
 directly to this file, as safely escaping YAML strings is a lot of work. Use
 <code>xplr -m</code> / <code>xplr --pipe-msg-in</code> to pass messages to xplr in a safer way.</p>
+<p>It uses <a href="https://github.com/sayanarijit/jf">jf</a> syntax to safely convert an YAML template into a valid message.</p>
 <p>Example: <code>&quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;${HOME:?}&quot;</code></p>
 </blockquote>
 <h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>

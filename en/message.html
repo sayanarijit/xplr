@@ -163,21 +163,31 @@ requests, xplr listens to <a href="messages.html">messages</a>.</p>
 <li>Via socket (coming soon)</li>
 </ul>
 <h3 id="format"><a class="header" href="#format">Format</a></h3>
-<p>To send messages using the <a href="key-bindings.html">key bindings</a> or
-<a href="lua-function-calls.html">Lua function calls</a>, messages are represented in
-<a href="https://www.lua.org/">Lua</a> syntax. For example:</p>
+<p>To send messages using the <a href="key-bindings.html">key bindings</a> or <a href="lua-function-calls.html">Lua function calls</a>,
+messages are represented in <a href="https://www.lua.org/">Lua</a> syntax.</p>
+<p>For example:</p>
 <ul>
 <li><code>&quot;Quit&quot;</code></li>
 <li><code>{ FocusPath = &quot;/path/to/file&quot; }</code></li>
 <li><code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
 </ul>
 <p>However, to send messages using the <a href="environment-variables-and-pipes.html#input-pipe">input pipe</a>, they need to be
-represented using
-<a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. For example:</p>
+represented using <a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax.</p>
+<p>For example:</p>
 <ul>
 <li><code>Quit</code></li>
 <li><code>FocusPath: &quot;/path/to/file&quot;</code></li>
 <li><code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
+</ul>
+<p>Use <code>&quot;$XPLR&quot; -m TEMPLATE [VALUE]...</code> command-line option to safely format
+<code>TEMPLATE</code> into a valid message. If uses <a href="https://github.com/sayanarijit/jf">jf</a> to parse and render the
+template. And <code>$XPLR</code> (rather than <code>xplr</code>) makes sure that the correct version
+of the binary is being used.</p>
+<p>For example:</p>
+<ul>
+<li><code>&quot;$XPLR&quot; -m Quit</code></li>
+<li><code>&quot;$XPLR&quot; -m 'FocusPath: %q' &quot;/path/to/file&quot;</code></li>
+<li><code>&quot;$XPLR&quot; -m 'Call: { command: %q, args: [%*q] }' bash -c &quot;read -p test&quot;</code></li>
 </ul>
 <h2 id="also-see"><a class="header" href="#also-see">Also See:</a></h2>
 <ul>

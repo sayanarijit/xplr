@@ -263,7 +263,7 @@ available.</p>
 repositories:</p>
 <p><a href="https://repology.org/project/xplr/versions"><img src="https://repology.org/badge/vertical-allrepos/xplr.svg" alt="packaging status" /></a></p>
 <h3 id="cross-platform"><a class="header" href="#cross-platform">Cross-platform</a></h3>
-<h4 id="nixpkgs"><a class="header" href="#nixpkgs"><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr">Nixpkgs</a></a></h4>
+<h4 id="nixpkgs"><a class="header" href="#nixpkgs"><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/file-managers/xplr/default.nix">Nixpkgs</a></a></h4>
 <pre><code>nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
 </code></pre>
 <h3 id="arch-linux"><a class="header" href="#arch-linux">Arch Linux</a></h3>
@@ -1748,6 +1748,7 @@ the list of paths being displayed.</p>
 <li><a href="layout.html#customparagraph">CustomParagraph</a></li>
 <li><a href="layout.html#customlist">CustomList</a></li>
 <li><a href="layout.html#customtable">CustomTable</a></li>
+<li><a href="layout.html#customlayout">CustomLayout</a></li>
 </ul>
 <h3 id="customparagraph"><a class="header" href="#customparagraph">CustomParagraph</a></h3>
 <p>A paragraph to render. It contains the following fields:</p>
@@ -1857,6 +1858,40 @@ xplr.fn.custom.render_layout = function(ctx)
   }
 end
 </code></pre>
+<h3 id="customlayout"><a class="header" href="#customlayout">CustomLayout</a></h3>
+<p>A whole custom layout to render. It doesn't make sense to use it as a
+<a href="layout.html#static">Static</a> layout, but can be very useful to render as a <a href="layout.html#dynamic">Dynamic</a> layout
+for use cases where the structure of the layout needs to change without having
+to switch modes.</p>
+<blockquote>
+<p>WARNING: Rendering the same dynamic custom layout recursively will result in
+a ugly crash.</p>
+</blockquote>
+<h4 id="example-render-a-custom-dynamic-layout"><a class="header" href="#example-render-a-custom-dynamic-layout">Example: Render a custom dynamic layout</a></h4>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = { Dynamic = &quot;custom.render_layout&quot; }
+
+xplr.fn.custom.render_layout = function(ctx)
+  local inner = {
+    config = {
+      constraints = {
+        { Percentage = 50 },
+        { Percentage = 50 },
+      },
+    },
+    splits = {
+      { Static = { CustomParagraph = { body = &quot;Try your luck...&quot; } } },
+      { Static = { CustomParagraph = { body = &quot;Press ctrl-r&quot; } } },
+    },
+  }
+
+  local layout_type = &quot;Vertical&quot;
+  if math.random(1, 2) == 1 then
+    layout_type = &quot;Horizontal&quot;
+  end
+
+  return { CustomLayout = { [layout_type] = inner } }
+end
+</code></pre>
 <h2 id="panel-ui-config"><a class="header" href="#panel-ui-config">Panel UI Config</a></h2>
 <p>It contains the following optional fields:</p>
 <ul>
@@ -1955,21 +1990,31 @@ requests, xplr listens to <a href="messages.html">messages</a>.</p>
 <li>Via socket (coming soon)</li>
 </ul>
 <h3 id="format"><a class="header" href="#format">Format</a></h3>
-<p>To send messages using the <a href="key-bindings.html">key bindings</a> or
-<a href="lua-function-calls.html">Lua function calls</a>, messages are represented in
-<a href="https://www.lua.org/">Lua</a> syntax. For example:</p>
+<p>To send messages using the <a href="key-bindings.html">key bindings</a> or <a href="lua-function-calls.html">Lua function calls</a>,
+messages are represented in <a href="https://www.lua.org/">Lua</a> syntax.</p>
+<p>For example:</p>
 <ul>
 <li><code>&quot;Quit&quot;</code></li>
 <li><code>{ FocusPath = &quot;/path/to/file&quot; }</code></li>
 <li><code>{ Call = { command = &quot;bash&quot;, args = { &quot;-c&quot;, &quot;read -p test&quot; } } }</code></li>
 </ul>
 <p>However, to send messages using the <a href="environment-variables-and-pipes.html#input-pipe">input pipe</a>, they need to be
-represented using
-<a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax. For example:</p>
+represented using <a href="http://yaml.org/">YAML</a> (or <a href="https://www.json.org">JSON</a>) syntax.</p>
+<p>For example:</p>
 <ul>
 <li><code>Quit</code></li>
 <li><code>FocusPath: &quot;/path/to/file&quot;</code></li>
 <li><code>Call: { command: bash, args: [&quot;-c&quot;, &quot;read -p test&quot;] }</code></li>
+</ul>
+<p>Use <code>&quot;$XPLR&quot; -m TEMPLATE [VALUE]...</code> command-line option to safely format
+<code>TEMPLATE</code> into a valid message. If uses <a href="https://github.com/sayanarijit/jf">jf</a> to parse and render the
+template. And <code>$XPLR</code> (rather than <code>xplr</code>) makes sure that the correct version
+of the binary is being used.</p>
+<p>For example:</p>
+<ul>
+<li><code>&quot;$XPLR&quot; -m Quit</code></li>
+<li><code>&quot;$XPLR&quot; -m 'FocusPath: %q' &quot;/path/to/file&quot;</code></li>
+<li><code>&quot;$XPLR&quot; -m 'Call: { command: %q, args: [%*q] }' bash -c &quot;read -p test&quot;</code></li>
 </ul>
 <h2 id="also-see-3"><a class="header" href="#also-see-3">Also See:</a></h2>
 <ul>
@@ -4244,6 +4289,7 @@ message using newline or null character (<code>\n</code> or <code>\0</code>).</p
 <p><strong><em>NOTE:</em></strong> Since version <code>v0.20.0</code>, it's recommended to avoid writing
 directly to this file, as safely escaping YAML strings is a lot of work. Use
 <code>xplr -m</code> / <code>xplr --pipe-msg-in</code> to pass messages to xplr in a safer way.</p>
+<p>It uses <a href="https://github.com/sayanarijit/jf">jf</a> syntax to safely convert an YAML template into a valid message.</p>
 <p>Example: <code>&quot;$XPLR&quot; -m 'ChangeDirectory: %q' &quot;${HOME:?}&quot;</code></p>
 </blockquote>
 <h4 id="xplr_pipe_selection_out"><a class="header" href="#xplr_pipe_selection_out">XPLR_PIPE_SELECTION_OUT</a></h4>
@@ -4977,7 +5023,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="v0202---v0211"><a class="header" href="#v0202---v0211"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.1">v0.21.1</a></a></h4>
+<h4 id="v0202---v0212"><a class="header" href="#v0202---v0212"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.2">v0.21.2</a></a></h4>
 <ul>
 <li>Some plugins might stop rendering colors. Wait for them to update.</li>
 <li>Rename <code>xplr.config.general.sort_and_filter_ui.search_identifier</code> to
