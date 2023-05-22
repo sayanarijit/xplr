@@ -40,7 +40,7 @@ textwrap = "0.16"
 snailquote = "0.3.1"
 skim = { version = "0.10.4", default-features = false }
 time = { version = "0.3.21", features = ["serde", "local-offset", "formatting", "macros"] }
-jf = "0.2.3"
+jf = "0.3.1"
 
 [dependencies.lscolors]
 version = "0.14.0"
