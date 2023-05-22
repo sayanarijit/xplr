@@ -174,6 +174,8 @@ message using newline or null character (`\n` or `\0`).
 > directly to this file, as safely escaping YAML strings is a lot of work. Use
 > `xplr -m` / `xplr --pipe-msg-in` to pass messages to xplr in a safer way.
 >
+> It uses [jf][41] syntax to safely convert an YAML template into a valid message.
+>
 > Example: `"$XPLR" -m 'ChangeDirectory: %q' "${HOME:?}"`
 
 #### XPLR_PIPE_SELECTION_OUT
@@ -225,3 +227,4 @@ List of paths, filtered and sorted as displayed in the [files table][28].
 [38]: #xplr
 [39]: #xplr_vroot
 [40]: #xplr_initial_pwd
+[41]: https://github.com/sayanarijit/jf

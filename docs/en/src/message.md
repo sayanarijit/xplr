@@ -13,21 +13,34 @@ You can send these messages to an xplr session in the following ways:
 
 ### Format
 
-To send messages using the [key bindings][2] or
-[Lua function calls][3], messages are represented in
-[Lua][5] syntax. For example:
+To send messages using the [key bindings][2] or [Lua function calls][3],
+messages are represented in [Lua][5] syntax.
+
+For example:
 
 - `"Quit"`
 - `{ FocusPath = "/path/to/file" }`
 - `{ Call = { command = "bash", args = { "-c", "read -p test" } } }`
 
 However, to send messages using the [input pipe][4], they need to be
-represented using
-[YAML][6] (or [JSON][7]) syntax. For example:
+represented using [YAML][6] (or [JSON][7]) syntax.
+
+For example:
 
 - `Quit`
 - `FocusPath: "/path/to/file"`
 - `Call: { command: bash, args: ["-c", "read -p test"] }`
+
+Use `"$XPLR" -m TEMPLATE [VALUE]...` command-line option to safely format
+`TEMPLATE` into a valid message. If uses [jf][8] to parse and render the
+template. And `$XPLR` (rather than `xplr`) makes sure that the correct version
+of the binary is being used.
+
+For example:
+
+- `"$XPLR" -m Quit`
+- `"$XPLR" -m 'FocusPath: %q' "/path/to/file"`
+- `"$XPLR" -m 'Call: { command: %q, args: [%*q] }' bash -c "read -p test"`
 
 ## Also See:
 
@@ -40,3 +53,4 @@ represented using
 [5]: https://www.lua.org/
 [6]: http://yaml.org/
 [7]: https://www.json.org
+[8]: https://github.com/sayanarijit/jf
