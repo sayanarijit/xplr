@@ -157,11 +157,11 @@ xplr.config.general.logs.error.style = { fg = "Red" }
 -- * format: nullable string
 -- * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.header.cols = {
-  { format = " index", style = {} },
+  { format = " index",            style = {} },
   { format = "╭─── path", style = {} },
-  { format = "perm", style = {} },
-  { format = "size", style = {} },
-  { format = "modified", style = {} },
+  { format = "perm",              style = {} },
+  { format = "size",              style = {} },
+  { format = "modified",          style = {} },
 }
 
 -- Style of the table header.
@@ -478,7 +478,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-  "↓"
+"↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -676,7 +676,7 @@ xplr.config.general.panel_ui.sort_and_filter.border_style = {}
 -- Type: nullable list of [Node Sorter](https://xplr.dev/en/sorting#node-sorter-applicable)
 xplr.config.general.initial_sorting = {
   { sorter = "ByCanonicalIsDir", reverse = true },
-  { sorter = "ByIRelativePath", reverse = false },
+  { sorter = "ByIRelativePath",  reverse = false },
 }
 
 -- The name of one of the modes to use when xplr loads.
@@ -1280,21 +1280,21 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
+    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
 
 -- The builtin debug error mode.
 --
@@ -1443,15 +1443,15 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec0 = [===[
               TMPFILE="$(mktemp)"
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 echo $(printf %q "${PTH:?}") >> "${TMPFILE:?}"
-              done < "${XPLR_PIPE_SELECTION_OUT:?}")
+              done < "${XPLR_PIPE_SELECTION_OUT:?}"
               ${EDITOR:-vi} "${TMPFILE:?}"
               [ ! -e "$TMPFILE" ] && exit
               "$XPLR" -m ClearSelection
-              (while IFS= read -r PTH_ESC; do
+              while IFS= read -r PTH_ESC; do
                 "$XPLR" -m 'SelectPath: %q' "$(eval printf %s ${PTH_ESC:?})"
-              done < "${TMPFILE:?}")
+              done < "${TMPFILE:?}"
               rm -- "${TMPFILE:?}"
             ]===],
           },
@@ -1479,22 +1479,35 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec0 = [===[
               "$XPLR" -m ExplorePwd
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
                 BASENAME_ESC=$(printf %q "$BASENAME")
-                while [ -e "$BASENAME" ]; do
-                  BASENAME="$BASENAME (copied)"
-                  BASENAME_ESC=$(printf %q "$BASENAME")
-                done
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
                 if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ./$BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to ./$BASENAME_ESC"
                 fi
-              done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              read -p "[enter to continue]"
+              done < "${XPLR_PIPE_SELECTION_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
             ]===],
           },
           "PopMode",
@@ -1506,22 +1519,35 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec0 = [===[
               "$XPLR" -m ExplorePwd
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
                 BASENAME_ESC=$(printf %q "$BASENAME")
-                while [ -e "$BASENAME" ]; do
-                  BASENAME="$BASENAME (moved)"
-                  BASENAME_ESC=$(printf %q "$BASENAME")
-                done
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
                 if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ./$BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to ./$BASENAME_ESC"
                 fi
-              done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              read -p "[enter to continue]"
+              done < "${XPLR_PIPE_SELECTION_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
             ]===],
           },
           "PopMode",
@@ -1533,22 +1559,35 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec0 = [===[
               "$XPLR" -m ExplorePwd
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
                 BASENAME_ESC=$(printf %q "$BASENAME")
-                while [ -e "$BASENAME" ]; do
-                  BASENAME="$BASENAME (softlinked)"
-                  BASENAME_ESC=$(printf %q "$BASENAME")
-                done
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
                 if ln -sv -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as ./$BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
-              done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              read -p "[enter to continue]"
+              done < "${XPLR_PIPE_SELECTION_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
             ]===],
           },
           "PopMode",
@@ -1560,22 +1599,35 @@ xplr.config.modes.builtin.selection_ops = {
           {
             BashExec0 = [===[
               "$XPLR" -m ExplorePwd
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
                 BASENAME_ESC=$(printf %q "$BASENAME")
-                while [ -e "$BASENAME" ]; do
-                  BASENAME="$BASENAME (hardlinked)"
-                  BASENAME_ESC=$(printf %q "$BASENAME")
-                done
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
                 if ln -v -- "${PTH:?}" "./${BASENAME:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as ./$BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
                   "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as ./$BASENAME_ESC"
                 fi
-              done < "${XPLR_PIPE_SELECTION_OUT:?}")
-              read -p "[enter to continue]"
+              done < "${XPLR_PIPE_SELECTION_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
             ]===],
           },
           "PopMode",
@@ -1752,9 +1804,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+    xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+    xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -1812,9 +1864,9 @@ xplr.config.modes.builtin.go_to = {
                   exit 1
                 fi
               fi
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 $OPENER "${PTH:?}" > /dev/null 2>&1
-              done < "${XPLR_PIPE_RESULT_OUT:?}")
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
             ]===],
           },
           "ClearScreen",
@@ -1926,8 +1978,14 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
+              cat "${XPLR_PIPE_RESULT_OUT:?}" | xargs -0 printf '%q\n'
+              echo
+              read -p "Permanently delete these files? [Y/n]: " ANS
+              [ "${ANS:-Y}" = "Y" ] || [ "$ANS" = "y" ] || exit 0
+              echo
+
               "$XPLR" -m ExplorePwd
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 if rm -rfv -- "${PTH:?}"; then
                   "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC deleted"
@@ -1935,8 +1993,9 @@ xplr.config.modes.builtin.delete = {
                   "$XPLR" -m 'LogError: %q' "could not delete $PTH_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$PTH"
                 fi
-              done < "${XPLR_PIPE_RESULT_OUT:?}")
-              read -p "[enter to continue]"
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
             ]===],
           },
           "PopMode",
@@ -1947,8 +2006,14 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
+              cat "${XPLR_PIPE_RESULT_OUT:?}" | xargs -0 printf '%q\n'
+              echo
+              read -p "Permanently delete these files? [Y/n]: " ANS
+              [ "${ANS:-Y}" = "Y" ] || [ "$ANS" = "y" ] || exit 0
+              echo
+
               "$XPLR" -m ExplorePwd
-              (while IFS= read -r -d '' PTH; do
+              while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 if [ -d "$PTH" ] && [ ! -L "$PTH" ]; then
                   if rmdir -v -- "${PTH:?}"; then
@@ -1965,8 +2030,9 @@ xplr.config.modes.builtin.delete = {
                     "$XPLR" -m 'FocusPath: %q' "$PTH"
                   fi
                 fi
-              done < "${XPLR_PIPE_RESULT_OUT:?}")
-              read -p "[enter to continue]"
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
             ]===],
           },
           "PopMode",
@@ -2220,9 +2286,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+    xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+    xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -2923,14 +2989,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local T = xplr.util.paint("T", { fg = "Red" })
 
   return xplr.util
-    .permissions_rwx(m.permissions)
-    :gsub("r", r)
-    :gsub("w", w)
-    :gsub("x", x)
-    :gsub("s", s)
-    :gsub("S", S)
-    :gsub("t", t)
-    :gsub("T", T)
+      .permissions_rwx(m.permissions)
+      :gsub("r", r)
+      :gsub("w", w)
+      :gsub("x", x)
+      :gsub("s", s)
+      :gsub("S", S)
+      :gsub("t", t)
+      :gsub("T", T)
 end
 
 -- Renders the fourth column in the table

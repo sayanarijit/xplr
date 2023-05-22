@@ -246,7 +246,7 @@ sudo cp target/release/xplr /usr/local/bin/
 [7]: https://archlinux.org/packages/community/x86_64/xplr
 [8]: https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go
 [9]: https://github.com/shubham-cpp/void-pkg-templates
-[10]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/misc/xplr
+[10]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/file-managers/xplr/default.nix
 [11]: https://ports.macports.org/port/xplr
 [12]: https://formulae.brew.sh/formula/xplr
 [13]: https://cgit.freebsd.org/ports/plain/misc/xplr/
