@@ -254,8 +254,8 @@ impl App {
 
         let config_file = if let Some(path) = config_file {
             Some(path)
-        } else if let Some(dir) = dirs::home_dir() {
-            let path = dir.join(".config/xplr/init.lua");
+        } else if let Some(dir) = dirs::config_dir() {
+            let path = dir.join("xplr/init.lua");
             if path.exists() {
                 Some(path)
             } else {
