@@ -240,6 +240,22 @@ pub struct App {
     pub hostname: String,
 }
 
+#[cfg(not(target_os = "macos"))]
+fn get_config_dir() -> Option<PathBuf> {
+    dirs::config_dir()
+}
+
+#[cfg(target_os = "macos")]
+fn get_config_dir() -> Option<PathBuf> {
+    match env::var_os("XDG_CONFIG_HOME") {
+        Some(val) => Some(PathBuf::from(val)),
+        None => match dirs::home_dir() {
+            Some(val) => Some(val.join(".config")),
+            None => None,
+        },
+    }
+}
+
 impl App {
     pub fn create(
         bin: String,
@@ -254,7 +270,7 @@ impl App {
 
         let config_file = if let Some(path) = config_file {
             Some(path)
-        } else if let Some(dir) = dirs::config_dir() {
+        } else if let Some(dir) = get_config_dir() {
             let path = dir.join("xplr/init.lua");
             if path.exists() {
                 Some(path)
