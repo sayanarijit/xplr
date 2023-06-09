@@ -21,5 +21,5 @@ pub fn runtime_dir() -> PathBuf {
         .and_then(|base| base.get_runtime_directory().ok()) else {
         return env::temp_dir();
     };
-    return dir.to_owned();
+    dir.to_owned()
 }
