@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::config::Hooks;
 use crate::config::Mode;
 pub use crate::directory_buffer::DirectoryBuffer;
+use crate::dirs;
 use crate::explorer;
 use crate::input::{InputOperation, Key};
 use crate::lua;
@@ -320,7 +321,6 @@ impl App {
 
         let pid = std::process::id();
         let mut session_path = dirs::runtime_dir()
-            .unwrap_or_else(env::temp_dir)
             .join("xplr")
             .join("session")
             .join(pid.to_string())

@@ -7,6 +7,7 @@ pub mod cli;
 pub mod compat;
 pub mod config;
 pub mod directory_buffer;
+pub mod dirs;
 pub mod event_reader;
 pub mod explorer;
 pub mod input;
