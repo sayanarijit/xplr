@@ -28,19 +28,20 @@ natord = "1.0.9"
 anyhow = "1.0.71"
 serde_yaml = "0.9.21"
 crossterm = { version = "0.26.1", features = [], default-features = false }
-dirs = "5.0.1"
 ansi-to-tui = "3.0.0"
 regex = "1.8.1"
 gethostname = "0.4.3"
 serde_json = "1.0.96"
 path-absolutize = "3.1.0"
 which = "4.4.0"
-nu-ansi-term = "0.47.0" 
+nu-ansi-term = "0.47.0"
 textwrap = "0.16"
 snailquote = "0.3.1"
 skim = { version = "0.10.4", default-features = false }
 time = { version = "0.3.21", features = ["serde", "local-offset", "formatting", "macros"] }
 jf = "0.3.1"
+xdg = "2.5.0"
+home = "0.5.5"
 
 [dependencies.lscolors]
 version = "0.14.0"
