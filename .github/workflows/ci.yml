@@ -81,6 +81,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           args: --target ${{ matrix.target }}
 
+
   # bench:
   #   name: Benchmarks
   #   runs-on: ubuntu-latest
@@ -128,3 +129,12 @@ jobs:
         with:
           command: clippy
           args: -- -D warnings
+
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: codespell-project/actions-codespell@v1
+        with:
+          ignore_words_file: .codespellignore
