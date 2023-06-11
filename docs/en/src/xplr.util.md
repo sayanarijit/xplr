@@ -286,7 +286,7 @@ Example:
 
 ```lua
 xplr.util.shell_execute("pwd")
--- "/present/working/directory"
+-- { stdout = "/present/working/directory", stderr = "", returncode = 0 }
 
 xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 -- { stdout = "xplr...", stderr = "", returncode = 0 }
