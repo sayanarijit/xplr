@@ -51,6 +51,8 @@ of the following plugins work for you, it's very easy to
 - [**prncss-xyz/icons.xplr**][30] An icon theme for xplr.
 - [**dtomvan/extra-icons.xplr**][50] Adds more icons to icons.xplr, compatible
   with zentable.xplr.
+- [**hartan/web-devicons.xplr**][59] Adds [nvim-web-devicons][60] to xplr with
+  optional coloring
 
 ## Also See:
 
@@ -114,3 +116,5 @@ of the following plugins work for you, it's very easy to
 [56]: https://github.com/sayanarijit/tri-pane.xplr
 [57]: https://github.com/emsquid/style.xplr
 [58]: style.md
+[59]: https://gitlab.com/hartan/web-devicons.xplr
+[60]: https://github.com/nvim-tree/nvim-web-devicons
