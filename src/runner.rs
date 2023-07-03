@@ -349,12 +349,6 @@ impl Runner {
                     while let Some(msg) = app.msg_out.pop_front() {
                         use app::MsgOut::*;
                         match msg {
-                            // NOTE: Do not schedule critical tasks via tx_msg_in in this loop.
-                            // Try handling them immediately.
-                            Enque(task) => {
-                                tx_msg_in.send(task)?;
-                            }
-
                             Quit => {
                                 result = Ok(None);
                                 break 'outer;

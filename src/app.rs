@@ -424,11 +424,6 @@ impl App {
             .unwrap_or_default()
     }
 
-    fn enqueue(mut self, task: Task) -> Self {
-        self.msg_out.push_back(MsgOut::Enque(task));
-        self
-    }
-
     pub fn handle_batch_external_msgs(mut self, msgs: Vec<ExternalMsg>) -> Result<Self> {
         for task in msgs
             .into_iter()
@@ -670,7 +665,7 @@ impl App {
             });
 
         for msg in msgs {
-            self = self.enqueue(Task::new(MsgIn::External(msg), Some(key)));
+            self = self.handle_external(msg, Some(key))?;
         }
 
         Ok(self)

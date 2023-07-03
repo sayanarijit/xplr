@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::app::{Command, Task};
+use crate::app::Command;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
@@ -17,7 +17,6 @@ pub enum MsgOut {
     CallLuaSilently(String),
     LuaEval(String),
     LuaEvalSilently(String),
-    Enque(Task),
     EnableMouse,
     DisableMouse,
     ToggleMouse,
