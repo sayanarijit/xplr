@@ -349,6 +349,10 @@ impl Runner {
                     while let Some(msg) = app.msg_out.pop_front() {
                         use app::MsgOut::*;
                         match msg {
+                            Enqueue(task) => {
+                                tx_msg_in.send(task)?;
+                            }
+
                             Quit => {
                                 result = Ok(None);
                                 break 'outer;

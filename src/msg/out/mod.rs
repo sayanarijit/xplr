@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::app::Command;
+use crate::app::{Command, Task};
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MsgOut {
@@ -33,4 +33,5 @@ pub enum MsgOut {
     PrintSelectionAndQuit,
     PrintResultAndQuit,
     PrintAppStateAndQuit,
+    Enqueue(Task),
 }

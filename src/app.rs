@@ -665,7 +665,11 @@ impl App {
             });
 
         for msg in msgs {
-            self = self.handle_external(msg, Some(key))?;
+            // Rename breaks without enqueue
+            let external = MsgIn::External(msg);
+            let task = Task::new(external, Some(key));
+            let msg_out = MsgOut::Enqueue(task);
+            self.msg_out.push_back(msg_out);
         }
 
         Ok(self)
