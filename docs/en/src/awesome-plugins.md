@@ -13,6 +13,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/offline-docs.xplr**][51] Fetch the appropriate version of xplr docs and browse offline.
 - [**sayanarijit/regex-search.xplr**][55] Bring back the regex based search in xplr.
 - [**sayanarijit/registers.xplr**][49] Use multiple registers to store the selected paths.
+- [**sayanarijit/tree-view.xplr**][61] Hackable tree view for xplr
 - [**sayanarijit/tri-pane.xplr**][56] xplr plugin that implements ranger-like three pane layout.
 - [**sayanarijit/type-to-nav.xplr**][28] Inspired by [nnn's type-to-nav mode][29] for xplr,
   with some tweaks.
@@ -118,3 +119,4 @@ of the following plugins work for you, it's very easy to
 [58]: style.md
 [59]: https://gitlab.com/hartan/web-devicons.xplr
 [60]: https://github.com/nvim-tree/nvim-web-devicons
+[61]: https://github.com/sayanarijit/tree-view.xplr
