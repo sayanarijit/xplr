@@ -4023,7 +4023,7 @@ xplr.util.explore(&quot;/tmp&quot;, app.explorer_config)
 <p>Type: function( program:string, args:{ string, ... }|nil ) -&gt; { stdout = string, stderr = string, returncode = number|nil }</p>
 <p>Example:</p>
 <pre><code class="language-lua">xplr.util.shell_execute(&quot;pwd&quot;)
--- &quot;/present/working/directory&quot;
+-- { stdout = &quot;/present/working/directory&quot;, stderr = &quot;&quot;, returncode = 0 }
 
 xplr.util.shell_execute(&quot;bash&quot;, {&quot;-c&quot;, &quot;xplr --help&quot;})
 -- { stdout = &quot;xplr...&quot;, stderr = &quot;&quot;, returncode = 0 }
@@ -4891,6 +4891,7 @@ of the following plugins work for you, it's very easy to
 <li><a href="https://github.com/sayanarijit/offline-docs.xplr"><strong>sayanarijit/offline-docs.xplr</strong></a> Fetch the appropriate version of xplr docs and browse offline.</li>
 <li><a href="https://github.com/sayanarijit/regex-search.xplr"><strong>sayanarijit/regex-search.xplr</strong></a> Bring back the regex based search in xplr.</li>
 <li><a href="https://github.com/sayanarijit/registers.xplr"><strong>sayanarijit/registers.xplr</strong></a> Use multiple registers to store the selected paths.</li>
+<li><a href="https://github.com/sayanarijit/tree-view.xplr"><strong>sayanarijit/tree-view.xplr</strong></a> Hackable tree view for xplr</li>
 <li><a href="https://github.com/sayanarijit/tri-pane.xplr"><strong>sayanarijit/tri-pane.xplr</strong></a> xplr plugin that implements ranger-like three pane layout.</li>
 <li><a href="https://github.com/sayanarijit/type-to-nav.xplr"><strong>sayanarijit/type-to-nav.xplr</strong></a> Inspired by <a href="https://github.com/jarun/nnn/wiki/concepts#type-to-nav">nnn's type-to-nav mode</a> for xplr,
 with some tweaks.</li>
@@ -4929,6 +4930,8 @@ support.</li>
 <li><a href="https://github.com/prncss-xyz/icons.xplr"><strong>prncss-xyz/icons.xplr</strong></a> An icon theme for xplr.</li>
 <li><a href="https://github.com/dtomvan/extra-icons.xplr"><strong>dtomvan/extra-icons.xplr</strong></a> Adds more icons to icons.xplr, compatible
 with zentable.xplr.</li>
+<li><a href="https://gitlab.com/hartan/web-devicons.xplr"><strong>hartan/web-devicons.xplr</strong></a> Adds <a href="https://github.com/nvim-tree/nvim-web-devicons">nvim-web-devicons</a> to xplr with
+optional coloring</li>
 </ul>
 <h2 id="also-see-9"><a class="header" href="#also-see-9">Also See:</a></h2>
 <ul>
