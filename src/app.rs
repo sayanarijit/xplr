@@ -1486,7 +1486,7 @@ impl App {
 
         if dir.parent == self.pwd {
             self.directory_buffer = Some(dir);
-            // Migh as well refresh the selection
+            // Might as well refresh the selection
             self = self.refresh_selection()?;
         };
 
