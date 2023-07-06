@@ -131,6 +131,14 @@ return {
     { LogSuccess = "Switched layout" },
     { CallLuaSilently = "custom.some_plugin_with_hooks.on_layout_switch" },
   }
+
+  -- Add messages to send when the selection changes
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_selection_change = {
+    { LogSuccess = "Selection changed" },
+    { CallLuaSilently = "custom.some_plugin_with_hooks.on_selection_change" },
+  }
 }
 ```
 
