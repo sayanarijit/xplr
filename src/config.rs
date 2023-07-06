@@ -702,6 +702,9 @@ pub struct Hooks {
 
     #[serde(default)]
     pub on_layout_switch: Vec<ExternalMsg>,
+
+    #[serde(default)]
+    pub on_selection_change: Vec<ExternalMsg>,
     // TODO After cleanup or Runner::run
     // #[serde(default)]
     // pub before_quit: Vec<ExternalMsg>,
@@ -714,6 +717,7 @@ impl Hooks {
         self.on_focus_change.extend(other.on_focus_change);
         self.on_mode_switch.extend(other.on_mode_switch);
         self.on_layout_switch.extend(other.on_layout_switch);
+        self.on_selection_change.extend(other.on_selection_change);
         self
     }
 }
