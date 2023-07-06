@@ -7,4 +7,5 @@ pub enum InternalMsg {
     AddLastFocus(String, Option<String>),
     SetDirectory(DirectoryBuffer),
     HandleKey(Key),
+    RefreshSelection,
 }

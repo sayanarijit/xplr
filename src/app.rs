@@ -452,15 +452,23 @@ impl App {
                 self.add_last_focus(parent, focus_path)
             }
             InternalMsg::HandleKey(key) => self.handle_key(key),
+            InternalMsg::RefreshSelection => self.refresh_selection(),
         }
     }
 
-    fn handle_external(self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
-        if self.config.general.read_only && !msg.is_read_only() {
+    fn handle_external(mut self, msg: ExternalMsg, key: Option<Key>) -> Result<Self> {
+        let is_msg_read_only = msg.is_read_only();
+        if self.config.general.read_only && !is_msg_read_only {
             self.log_error("could not execute code in read-only mode.".into())
         } else {
             use ExternalMsg::*;
-            match msg {
+
+            if !is_msg_read_only {
+                // We don't want to operate on imaginary paths.
+                self = self.refresh_selection()?;
+            }
+
+            self = match msg {
                 ExplorePwd => self.explore_pwd(),
                 ExploreParentsAsync => self.explore_parents_async(),
                 ExplorePwdAsync => self.explore_pwd_async(),
@@ -614,9 +622,20 @@ impl App {
                 PrintAppStateAndQuit => self.print_app_state_and_quit(),
                 Debug(path) => self.debug(path),
                 Terminate => bail!(""),
+            }?;
+
+            if !is_msg_read_only {
+                // We don't want to keep imaginary paths in the selection.
+                // But the write action is probably still in queue.
+                // So we need to refresh selection after the write action.
+                let msg = InternalMsg::RefreshSelection;
+                let msg = MsgIn::Internal(msg);
+                let task = Task::new(msg, None);
+                self.msg_out.push_back(MsgOut::Enqueue(task));
             }
-        }?
-        .refresh_selection()
+
+            Ok(self)
+        }
     }
 
     fn handle_key(mut self, key: Key) -> Result<Self> {
@@ -1467,6 +1486,8 @@ impl App {
 
         if dir.parent == self.pwd {
             self.directory_buffer = Some(dir);
+            // Migh as well refresh the selection
+            self = self.refresh_selection()?;
         };
 
         Ok(self)
@@ -1482,9 +1503,15 @@ impl App {
     }
 
     pub fn select(mut self) -> Result<Self> {
+        let count = self.selection.len();
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection.insert(n);
         }
+
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
+        }
+
         Ok(self)
     }
 
@@ -1492,42 +1519,69 @@ impl App {
         let path = PathBuf::from(path).absolutize()?.to_path_buf();
         let parent = path.parent().map(|p| p.to_string_lossy().to_string());
         let filename = path.file_name().map(|p| p.to_string_lossy().to_string());
+        let count = self.selection.len();
+
         if let (Some(p), Some(n)) = (parent, filename) {
             self.selection.insert(Node::new(p, n));
+        }
+
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
         }
         Ok(self)
     }
 
     pub fn select_all(mut self) -> Result<Self> {
+        let count = self.selection.len();
         if let Some(d) = self.directory_buffer.as_ref() {
             self.selection.extend(d.nodes.clone());
         };
+
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
+        }
 
         Ok(self)
     }
 
     pub fn un_select_path(mut self, path: String) -> Result<Self> {
         let pathbuf = PathBuf::from(path).absolutize()?.to_path_buf();
+        let count = self.selection.len();
         self.selection
             .retain(|n| PathBuf::from(&n.absolute_path) != pathbuf);
+
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
+        }
+
         Ok(self)
     }
 
     pub fn un_select(mut self) -> Result<Self> {
+        let count = self.selection.len();
         if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
             self.selection
                 .retain(|s| s.absolute_path != n.absolute_path);
+        }
+
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
         }
         Ok(self)
     }
 
     pub fn un_select_all(mut self) -> Result<Self> {
+        let count = self.selection.len();
         if let Some(d) = self.directory_buffer.as_ref() {
             d.nodes.clone().into_iter().for_each(|n| {
                 self.selection
                     .retain(|s| s.absolute_path != n.absolute_path);
             });
         };
+
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
+        }
 
         Ok(self)
     }
@@ -1566,7 +1620,11 @@ impl App {
     }
 
     fn clear_selection(mut self) -> Result<Self> {
+        let count = self.selection.len();
         self.selection.clear();
+        if self.selection.len() != count {
+            self = self.on_selection_change()?;
+        }
         Ok(self)
     }
 
@@ -1897,12 +1955,28 @@ impl App {
         format!("{0}\n", &self.mode.name)
     }
 
+    // This is a performance heavy function. Use it only when necessary.
     fn refresh_selection(mut self) -> Result<Self> {
+        let count = self.selection.len();
         self.selection.retain(|n| {
             let p = PathBuf::from(&n.absolute_path);
             // Should be able to retain broken symlink
             p.exists() || p.symlink_metadata().is_ok()
         });
+
+        if count != self.selection.len() {
+            self = self.on_selection_change()?;
+        }
+
+        Ok(self)
+    }
+
+    fn on_selection_change(mut self) -> Result<Self> {
+        if !self.hooks.on_selection_change.is_empty() {
+            let msgs = self.hooks.on_selection_change.clone();
+            self = self.handle_batch_external_msgs(msgs)?
+        }
+
         Ok(self)
     }
 
