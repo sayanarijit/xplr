@@ -669,6 +669,7 @@ fn draw_table<B: Backend>(
     let header_height = app_config.general.table.header.height.unwrap_or(1);
     let height: usize =
         (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
+    let row_style = app_config.general.table.row.style.to_owned();
 
     let rows = app
         .directory_buffer
@@ -767,17 +768,17 @@ fn draw_table<B: Backend>(
                                     c.format.as_ref().map(|f| {
                                         let out = lua::call(lua, f, v.clone())
                                             .unwrap_or_else(|e| format!("{e:?}"));
-                                        string_to_text(out)
+                                        (string_to_text(out), c.style.to_owned())
                                     })
                                 })
-                                .collect::<Vec<Text>>()
+                                .collect::<Vec<(Text, Style)>>()
                         })
                         .unwrap_or_default()
-                        .iter()
-                        .map(|x| Cell::from(x.to_owned()))
+                        .into_iter()
+                        .map(|(text, style)| Cell::from(text).style(style.into()))
                         .collect::<Vec<Cell>>();
 
-                    Row::new(cols)
+                    Row::new(cols).style(row_style.to_owned().into())
                 })
                 .collect::<Vec<Row>>()
         })
@@ -878,7 +879,10 @@ fn draw_selection<B: Backend>(
                 .unwrap_or_else(|| n.absolute_path.clone());
             string_to_text(out)
         })
-        .map(ListItem::new)
+        .map(|i| {
+            ListItem::new(i)
+                .style(app.config.general.selection.item.style.to_owned().into())
+        })
         .collect();
 
     // Selected items
