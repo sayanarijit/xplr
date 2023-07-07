@@ -40,15 +40,14 @@ pub fn get_tty() -> Result<fs::File> {
 // returns physical path. As a workaround, this function tries to use `PWD`
 // environment variable that is configured by shell.
 fn get_current_dir() -> Result<PathBuf, std::io::Error> {
-    let cur = std::env::current_dir();
     if let Ok(pwd) = std::env::var("PWD") {
         if pwd.is_empty() {
-            cur
+            std::env::current_dir()
         } else {
             Ok(PathBuf::from(pwd))
         }
     } else {
-        cur
+        std::env::current_dir()
     }
 }
 
