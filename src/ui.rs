@@ -832,7 +832,10 @@ fn draw_table<B: Backend>(
                 .to_owned()
                 .unwrap_or_default()
                 .iter()
-                .map(|c| Cell::from(c.format.to_owned().unwrap_or_default()))
+                .map(|c| {
+                    Cell::from(c.format.to_owned().unwrap_or_default())
+                        .style(c.style.to_owned().into())
+                })
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
