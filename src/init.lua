@@ -2915,7 +2915,8 @@ end
 
 xplr.fn.builtin.fmt_general_selection_item = function(n)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
-  local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
+  local sh_config =
+  { base = n.parent, with_prefix_dots = true, without_suffix_dots = true }
   local shortened = xplr.util.shorten(n.absolute_path, sh_config)
   if n.is_dir then
     shortened = shortened .. "/"
