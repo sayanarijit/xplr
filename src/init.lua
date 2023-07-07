@@ -1884,6 +1884,12 @@ xplr.config.modes.builtin.rename = {
   name = "rename",
   key_bindings = {
     on_key = {
+      ["esc"] = {
+        help = "cancel",
+        messages = {
+          "PopMode",
+        },
+      },
       ["tab"] = {
         help = "try complete",
         messages = {
@@ -1973,6 +1979,12 @@ xplr.config.modes.builtin.delete = {
   layout = "HelpMenu",
   key_bindings = {
     on_key = {
+      ["esc"] = {
+        help = "cancel",
+        messages = {
+          "PopMode",
+        },
+      },
       ["D"] = {
         help = "force delete",
         messages = {
