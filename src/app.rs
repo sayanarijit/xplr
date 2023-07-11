@@ -1042,11 +1042,10 @@ impl App {
     }
 
     fn back(self) -> Result<Self> {
-        if let Some(p) = PathBuf::from(self.pwd.clone())
-            .parent()
-            .and_then(|p| p.to_str())
-        {
+        let pwd = self.pwd.clone();
+        if let Some(p) = PathBuf::from(&pwd).parent().and_then(|p| p.to_str()) {
             self.change_directory(p, true)
+                .and_then(|a| a.focus_path(&pwd, false))
         } else {
             Ok(self)
         }
