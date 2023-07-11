@@ -1044,8 +1044,8 @@ impl App {
     fn back(self) -> Result<Self> {
         let pwd = self.pwd.clone();
         if let Some(p) = PathBuf::from(&pwd).parent().and_then(|p| p.to_str()) {
-            self.change_directory(p, true)
-                .and_then(|a| a.focus_path(&pwd, false))
+            self.change_directory(p, false)
+                .and_then(|a| a.focus_path(&pwd, true))
         } else {
             Ok(self)
         }
