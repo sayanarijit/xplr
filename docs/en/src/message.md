@@ -1,7 +1,9 @@
 # Message
 
 You can think of xplr as a server. Just like web servers listen to HTTP
-requests, xplr listens to [messages][1].
+requests, xplr listens to messages.
+
+A message is a [sum type][9] that can have [these possible values][1].
 
 You can send these messages to an xplr session in the following ways:
 
@@ -54,3 +56,4 @@ For example:
 [6]: http://yaml.org/
 [7]: https://www.json.org
 [8]: https://github.com/sayanarijit/jf
+[9]: sum-type.md

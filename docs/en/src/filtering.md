@@ -25,7 +25,7 @@ It contains the following information:
 
 ### filter
 
-A filter can be one of the following:
+A filter is a [sum type][5] that can be one of the following:
 
 - "RelativePathIs"
 - "RelativePathIsNot"
@@ -90,3 +90,4 @@ Here, `ToggleNodeFilter` is a [message][4] that adds or removes
 [2]: #filter
 [3]: #input
 [4]: message.md
+[5]: sum-type.md

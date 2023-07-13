@@ -27,7 +27,7 @@ It contains the following information:
 
 ### sorter
 
-A sorter can be one of the following:
+A sorter is a [sum type][4] that can be one of the following:
 
 - "ByRelativePath"
 - "ByIRelativePath"
@@ -82,3 +82,4 @@ This snippet defines the initial sorting logic to be applied when xplr loads.
 [1]: #node-sorter-applicable
 [2]: #sorter
 [3]: #reverse
+[4]: sum-type.md

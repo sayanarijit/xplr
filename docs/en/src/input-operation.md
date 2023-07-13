@@ -1,6 +1,6 @@
 # Input Operation
 
-Cursor based input operation can be one of the following:
+Cursor based input operation is a [sum type][3] can be one of the following:
 
 - { SetCursor = int }
 - { InsertCharacter = str }
@@ -24,3 +24,4 @@ Cursor based input operation can be one of the following:
 
 [1]: message.md
 [2]: messages.md
+[3]: sum-type.md

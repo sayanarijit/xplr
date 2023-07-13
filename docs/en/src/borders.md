@@ -4,21 +4,21 @@ xplr allows customizing the shape and style of the borders.
 
 ### Border
 
-A border can be one of the following:
+A border is a [sum type][2] that can be one of the following:
 
-- Top
-- Right
-- Bottom
-- Left
+- "Top"
+- "Right"
+- "Bottom"
+- "Left"
 
 ### Border Type
 
-A border can be one of the following:
+A border type is a [sum type][2] that can be one of the following:
 
-- Plain
-- Rounded
-- Double
-- Thick
+- "Plain"
+- "Rounded"
+- "Double"
+- "Thick"
 
 ### Border Style
 
@@ -34,3 +34,4 @@ xplr.config.general.panel_ui.default.border_style.bg = "Gray"
 ```
 
 [1]: style.md#style
+[2]: sum-type.md
