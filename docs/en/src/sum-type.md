@@ -8,7 +8,7 @@
 > If you're already familiar with [Sum Type / Tagged Union][1] (e.g. Rust's
 > enum), you can skip ahead.
 
-While reading this doc, you'll come accross some data types like [Layout][2],
+While reading this doc, you'll come across some data types like [Layout][2],
 [Color][4], [Message][3] etc. that says something like "x can be any of the
 following", and then you'll see a list of strings and/or lua tables just below.
 
@@ -61,7 +61,7 @@ We'd document it here as:
 > - { Err = "string" }
 
 Here, `Result` still has only two possibilities, but unlike bool, each
-possibility here has further finite or infinite set of possibile values.
+possibility here has further finite or infinite set of possible values.
 
 And there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.
