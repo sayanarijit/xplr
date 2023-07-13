@@ -10,6 +10,7 @@
   - [Layouts][9]
   - [Modes][7]
 - [Concept][32]
+  - [Sum Type][42]
   - [Key Bindings][27]
     - [Configure Key Bindings][28]
     - [Default Key Bindings][14]
@@ -81,3 +82,4 @@
 [39]: input-operation.md
 [40]: xplr.util.md
 [41]: searching.md
+[42]: sum-type.md

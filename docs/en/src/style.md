@@ -33,7 +33,7 @@ Modifiers to remove.
 
 ## Color
 
-Color can be one of the following:
+Color is a [sum type][7] that can be one of the following:
 
 - "Reset"
 - "Black"
@@ -57,7 +57,7 @@ Color can be one of the following:
 
 ## Modifier
 
-Modifier can be one of the following:
+Modifier is a [sum type][7] that can be one of the following:
 
 - "Bold"
 - "Dim"
@@ -84,3 +84,4 @@ xplr.config.general.prompt.style.sub_modifiers = { "Hidden" }
 [4]: #sub_modifiers
 [5]: #color
 [6]: #modifier
+[7]: sum-type.md

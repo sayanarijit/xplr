@@ -86,7 +86,7 @@ Default action to perform in case if a keyboard input not mapped via any of the
 
 ## Key
 
-A key can be one of the following:
+A key is a [sum type][36] can be one of the following:
 
 - 0, 1, ... 9
 - a, b, ... z
@@ -230,3 +230,4 @@ Visit [Awesome Plugins][27] for more [integration][28] options.
 [33]: #on_character
 [34]: #on_navigation
 [35]: #on_function
+[36]: sum-type.md

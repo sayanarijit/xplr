@@ -24,7 +24,7 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
-A layout can be one of the following:
+A layout is a [sum type][56] can be one of the following:
 
 - [Nothing][8]
 - [Table][9]
@@ -145,7 +145,7 @@ The constraints applied on the layout.
 
 ## Constraint
 
-A constraint can be one of the following:
+A constraint is a [sum type][56] can be one of the following:
 
 - { Percentage = int }
 - { Ratio = { int, int } }
@@ -173,7 +173,7 @@ The list of child layouts to fit into the parent layout.
 
 ## Custom Panel
 
-Custom panel can be one of the following:
+Custom panel is a [sum type][56] can be one of the following:
 
 - [CustomParagraph][29]
 - [CustomList][30]
@@ -462,3 +462,4 @@ Hence, only the following fields are available.
 [53]: lua-function-calls.md#initial_pwd
 [54]: borders.md#border-type
 [55]: #customlayout
+[56]: sum-type.md
