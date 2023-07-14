@@ -35,8 +35,8 @@ enum Result {
 }
 ```
 
-Here, `Result` can be one of two the possible values: "Ok" and "Err" (just like
-`boolean`, but tagged):
+Here, `Result` can be one of two the possible values: `Ok` and `Err` (just like
+`boolean`, but tagged).
 
 We'd document it here as:
 
@@ -62,8 +62,8 @@ We'd document it here as:
 > - { Ok = bool }
 > - { Err = "string" }
 
-Here, `Result` still has only two possibilities, but unlike bool, each
-possibility here is tagged, and has further set of possible value(s).
+Here, `Result` still has only two possibilities, but unlike the first example,
+each possibility here has further set of possible value(s).
 
 And there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.
