@@ -35,23 +35,17 @@ enum Result {
 }
 ```
 
-Here, `Result` can be one of two the possible values: `Ok` and `Err` (just like
-`boolean`, but tagged).
+Here, `Result` can be one of two possible set of values: `Ok` and `Err`, just
+like `boolean`, but unlike `boolean`, being tagged allows `Result` to have more
+than two variants if required, by changing the definition.
 
-We'd document it here as:
-
-> Result is a sum type that can be one of the following:
->
-> - "Ok"
-> - "Err"
-
-But some languages (like Rust, Haskell, Elm etc.) go even further, allowing us
-to associate each branch of the enum with further nested types like:
+e.g.
 
 ```rust
 enum Result {
-    Ok(bool),
-    Err(String),
+    Ok,
+    Err,
+    Pending,
 }
 ```
 
@@ -59,16 +53,46 @@ We'd document it here as:
 
 > Result is a sum type that can be one of the following:
 >
+> - "Ok"
+> - "Err"
+> - "Pending"
+
+But some languages (like Rust, Haskell, Elm etc.) go even further, allowing us
+to associate each branch of the enum with further nested types like:
+
+```rust
+enum Result {
+    Ok(bool),
+    Err(Error),
+    Pending,
+}
+```
+
+Here, as we can see, unlike the first example, some of `Result`'s possible
+variants can have further nested types associated with them. Note that `Error`
+here can be either a sum type (e.g. enum), or a product type (e.g.
+class/struct), but whatever it is, it will only exist when `Result` is `Err`.
+
+We'd document it here as:
+
+> Result is a sum type that can be one of the following:
+>
 > - { Ok = bool }
-> - { Err = "string" }
+> - { Err = Error }
+> - "Pending"
 
-Here, `Result` still has only two possibilities, but unlike the first example,
-each possibility here has further set of possible value(s).
+And then we'd go on documenting whatever `Error` is.
 
-And there you go. This is exactly what sum types are - glorified enums that can
+So, there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.
+
+---
+
+If you're still confused about something, or if you found an error in this
+explaination, feel free to [discuss together][5].
 
 [1]: https://en.wikipedia.org/wiki/Tagged_union
 [2]: layout.md
 [3]: message.md
 [4]: style.md#color
+[5]: community.md
