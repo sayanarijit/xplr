@@ -3,29 +3,30 @@
 > This section isn't specific to xplr. However, since xplr configuration makes
 > heavy use of this particular data type, even though it isn't available in
 > most of the mainstream programming languages (yet), making it a wild or
-> unfamilier concept for many, it's worth doing a quick introduction here.
+> unfamiliar concept for many, it's worth doing a quick introduction here.
 >
 > If you're already familiar with [Sum Type / Tagged Union][1] (e.g. Rust's
 > enum), you can skip ahead.
 
 While reading this doc, you'll come across some data types like [Layout][2],
-[Color][4], [Message][3] etc. that says something like "x can be any of the
-following", and then you'll see a list of strings and/or lua tables just below.
+[Color][4], [Message][3] etc. that says something like "x is a sum type that
+can be any of the following", and then you'll see a list of strings and/or lua
+tables just below.
 
-Yes, they are actually sum types, i.e. they can be any of the finite set of
-values listed there.
+Yes, they are actually sum types, i.e. they can be any of the given set of
+tagged variants listed there.
 
-Note the word "finite". Many conventional programming languages have only two
-kinds of data types with finite set of values:
+Notice the word "be". Unlike classes or structs (aka product types), they don't
+"have" values, they "are" (i.e. "be") the value, or rather, one of the possible
+set of values.
 
-- `null` - aka "unit type", can be only one thing - i.e. `null`.
-- `bool` - can be one of the two possible values - `true` or `false`.
+Also notice the word "tagged". Unlike the single variant `null`, or the dual
+variant `boolean` types, the variants of sum types are tagged (i.e. named), and
+may further have, or be, value or values of any data type.
 
-Other types like `integer`, `float`, `string` etc. can have infinite number of
-possible values (ideally).
-
-Many popular programming languages come with the concept of `enum`, which lets
-us define a type with finite set of possible values like:
+A simple example of a sum type is an enum. Many programming languages have
+them, but only a few modern programming languages allow nesting other types
+into a sum type.
 
 ```rust
 enum Result {
@@ -34,7 +35,8 @@ enum Result {
 }
 ```
 
-Here, `Result` has only two possible values (just like `bool`): `Ok` and `Err`.
+Here, `Result` can be one of two the possible values: "Ok" and "Err" (just like
+`boolean`, but tagged):
 
 We'd document it here as:
 
@@ -61,7 +63,7 @@ We'd document it here as:
 > - { Err = "string" }
 
 Here, `Result` still has only two possibilities, but unlike bool, each
-possibility here has further finite or infinite set of possible values.
+possibility here is tagged, and has further set of possible value(s).
 
 And there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.
