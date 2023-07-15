@@ -16,8 +16,8 @@ tables just below.
 Yes, they are actually sum types, i.e. they can be any of the given set of
 tagged variants listed there.
 
-Notice the word "be". Unlike classes or structs (aka product types), they don't
-"have" values, they "are" (i.e. "be") the value, or rather, one of the possible
+Notice the word "be". Unlike classes or structs (aka product types), they can't
+"have" values, they can only "be" the value, or rather, be one of the possible
 set of values.
 
 Also notice the word "tagged". Unlike the single variant `null`, or the dual
