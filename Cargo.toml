@@ -73,7 +73,8 @@ features = ['serde']
 
 [dependencies.mlua]
 version = "0.8.9"
-features = ['luajit', 'vendored', 'serialize', 'send']
+features = ['lua54', 'vendored', 'serialize', 'send']
+default-features = false
 
 [dependencies.tui-input]
 version = "0.7.1"

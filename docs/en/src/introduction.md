@@ -52,7 +52,7 @@ to lose some kb if it makes sense.
 
 Some of the coolest features xplr provide beside the basic stuff:
 
-- [Embedded LuaJIT][5] for portability and extensibility.
+- [Embedded Lua54][5] for portability and extensibility.
 - [A simple modal system based on message passing][10] to control xplr session
   using:
   - [Keyboard inputs][11]

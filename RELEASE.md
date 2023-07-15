@@ -2,7 +2,7 @@
 
 See [install.md](./docs/en/src/install.md#build-from-source)
 
-Note: xplr ships with vendored luajit. If the platform can't compile this,
+Note: xplr ships with vendored lua54. If the platform can't compile this,
 you need to grep out the feature "vendored" from the "mlua" dependency
 specified in [Cargo.toml](./Cargo.toml), and static link luajit yourself.
 
