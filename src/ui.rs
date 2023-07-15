@@ -20,7 +20,7 @@ use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
-use tui::text::{Span, Spans, Text};
+use tui::text::{Line, Span, Text};
 use tui::widgets::{
     Block, BorderType as TuiBorderType, Borders as TuiBorders, Cell, List, ListItem,
     Paragraph, Row, Table,
@@ -401,22 +401,22 @@ impl Into<nu_ansi_term::Style> for Style {
             style.add_modifiers.as_ref().map_or(false, f)
         }
 
-        nu_ansi_term::Style {
-            foreground: self.fg.and_then(convert_color),
-            background: self.bg.and_then(convert_color),
-            is_bold: match_modifiers(&self, |m| m.contains(&Modifier::Bold)),
-            is_dimmed: match_modifiers(&self, |m| m.contains(&Modifier::Dim)),
-            is_italic: match_modifiers(&self, |m| m.contains(&Modifier::Italic)),
-            is_underline: match_modifiers(&self, |m| m.contains(&Modifier::Underlined)),
-            is_blink: match_modifiers(&self, |m| {
-                m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
-            }),
-            is_reverse: match_modifiers(&self, |m| m.contains(&Modifier::Reversed)),
-            is_hidden: match_modifiers(&self, |m| m.contains(&Modifier::Hidden)),
-            is_strikethrough: match_modifiers(&self, |m| {
-                m.contains(&Modifier::CrossedOut)
-            }),
-        }
+        let mut style = nu_ansi_term::Style::new();
+        style.foreground = self.fg.and_then(convert_color);
+        style.background = self.bg.and_then(convert_color);
+        style.is_bold = match_modifiers(&self, |m| m.contains(&Modifier::Bold));
+        style.is_dimmed = match_modifiers(&self, |m| m.contains(&Modifier::Dim));
+        style.is_italic = match_modifiers(&self, |m| m.contains(&Modifier::Italic));
+        style.is_underline =
+            match_modifiers(&self, |m| m.contains(&Modifier::Underlined));
+        style.is_blink = match_modifiers(&self, |m| {
+            m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
+        });
+        style.is_reverse = match_modifiers(&self, |m| m.contains(&Modifier::Reversed));
+        style.is_hidden = match_modifiers(&self, |m| m.contains(&Modifier::Hidden));
+        style.is_strikethrough =
+            match_modifiers(&self, |m| m.contains(&Modifier::CrossedOut));
+        style
     }
 }
 
@@ -980,7 +980,7 @@ fn draw_input_buffer<B: Backend>(
         let width = layout_size.width.max(offset_width) - offset_width;
         let scroll = input.visual_scroll(width.into()) as u16;
 
-        let input_buf = Paragraph::new(Spans::from(vec![
+        let input_buf = Paragraph::new(Line::from(vec![
             Span::styled(
                 app.input.prompt.to_owned(),
                 app.config.general.prompt.style.to_owned().into(),
@@ -1121,7 +1121,7 @@ fn draw_sort_n_filter<B: Backend>(
         format!("({item_count}) ")
     };
 
-    let p = Paragraph::new(Spans::from(spans))
+    let p = Paragraph::new(Line::from(spans))
         .block(block(config, format!(" Sort & filter {item_count}")));
 
     f.render_widget(p, layout_size);

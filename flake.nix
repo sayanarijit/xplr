@@ -17,6 +17,7 @@
         "i686-linux"
         "x86_64-darwin"
         "aarch64-linux"
+        "aarch64-linux-android"
         "aarch64-darwin"
       ];
       forAllSystems = f: builtins.listToAttrs (map (name: { inherit name; value = f name; }) systems);

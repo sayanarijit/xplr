@@ -206,12 +206,10 @@ pub fn print_msg_in(args: Vec<String>) -> Result<()> {
 fn fmt_msg_in(args: Vec<String>) -> Result<String> {
     let msg = match jf::format(args.into_iter().map(Into::into)) {
         Ok(msg) => msg,
-        Err(jf::Error::Usage) => {
-            bail!("usage: xplr -m TEMPLATE [VALUE]... [NAME=VALUE]...")
-        }
         Err(jf::Error::Jf(e)) => bail!("xplr -m: {e}"),
         Err(jf::Error::Json(e)) => bail!("xplr -m: json: {e}"),
         Err(jf::Error::Yaml(e)) => bail!("xplr -m: yaml: {e}"),
+        Err(jf::Error::Io(e)) => bail!("xplr -m: io: {e}"),
     };
 
     // validate
