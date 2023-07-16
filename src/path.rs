@@ -216,17 +216,20 @@ mod tests {
 
     #[test]
     fn test_relative_to_parent() {
-        let path = std::env::current_dir().unwrap();
+        let path = std::env::current_dir().unwrap().join("docs");
         let parent = path.parent().unwrap();
 
-        let relative = relative_to(parent, NONE).unwrap();
-        assert_eq!(relative, PathBuf::from(".."));
+        let base = default().with_base(path.to_str().unwrap());
 
-        let relative = relative_to(parent, Some(&default().with_prefix_dots())).unwrap();
+        let relative = relative_to(parent, Some(&base)).unwrap();
         assert_eq!(relative, PathBuf::from(".."));
 
         let relative =
-            relative_to(parent, Some(&default().without_suffix_dots())).unwrap();
+            relative_to(parent, Some(&base.clone().with_prefix_dots())).unwrap();
+        assert_eq!(relative, PathBuf::from(".."));
+
+        let relative =
+            relative_to(parent, Some(&base.clone().without_suffix_dots())).unwrap();
         assert_eq!(
             relative,
             PathBuf::from("../..").join(parent.file_name().unwrap())
@@ -234,12 +237,12 @@ mod tests {
 
         let relative = relative_to(
             parent,
-            Some(&default().with_prefix_dots().without_suffix_dots()),
+            Some(&base.clone().with_prefix_dots().without_suffix_dots()),
         )
         .unwrap();
         assert_eq!(
             relative,
-            PathBuf::from("../..").join(parent.file_name().unwrap())
+            PathBuf::from("../..").join(parent.clone().file_name().unwrap())
         );
     }
 

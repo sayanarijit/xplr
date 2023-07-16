@@ -17,3 +17,6 @@ book/
 
 # direnv
 .direnv/
+
+# nix
+result

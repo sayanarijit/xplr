@@ -12,71 +12,86 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - ubuntu-20.04
+        build:
+          - macos
+          - macos-aarch64
+          - linux
+          - linux-musl
+          - aarch64-linux
+          # - aarch64-linux-musl
+          - aarch64-android
+          # - armv7-linux
         rust: [stable]
         include:
           # See the list: https://github.com/cross-rs/cross
 
-          - os: macos-latest
-            artifact_prefix: macos
+          - build: macos
+            os: macos-latest
             target: x86_64-apple-darwin
             binary_postfix: ""
 
-          - os: ubuntu-latest
-            artifact_prefix: linux
+          - build: macos-aarch64
+            os: macos-latest
+            target: aarch64-apple-darwin
+            binary_postfix: ""
+
+          - build: linux
+            os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             binary_postfix: ""
 
-          - os: ubuntu-20.04
-            artifact_prefix: linux-musl
+          - build: linux-musl
+            os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             binary_postfix: ""
 
-          # Will see later
+          - build: aarch64-linux
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            binary_postfix: ""
 
-          # - os: ubuntu-latest
-          #   artifact_prefix: x86_64-android
-          #   target: x86_64-linux-android
-          #   binary_postfix: ''
-          #
-          # - os: ubuntu-latest
-          #   artifact_prefix: aarch64-android
-          #   target: aarch64-linux-android
-          #   binary_postfix: ''
+          # - build: aarch64-linux-musl
+          #   os: ubuntu-latest
+          #   target: aarch64-unknown-linux-musl
+          #   binary_postfix: ""
+
+          - build: aarch64-android
+            os: ubuntu-latest
+            target: aarch64-linux-android
+            binary_postfix: ""
+
+          # - build: armv7-linux
+          #   os: ubuntu-latest
+          #   target: armv7-unknown-linux-gnueabihf
+          #   binary_postfix: ""
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Installing Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
-          override: true
 
       - name: Installing needed macOS dependencies
         if: matrix.os == 'macos-latest'
         run: brew install openssl@1.1
 
       - name: Installing needed Ubuntu dependencies
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update --fix-missing
-          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+          sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev
 
-      - name: Checking out sources
-        uses: actions/checkout@v1
+      - if: matrix.os == 'ubuntu-latest' && contains(matrix.build, 'armv7')
+        run: sudo apt-get install -y --no-install-recommends gcc-arm-linux-gnueabihf libc-dev-armhf-cross
+
+      - if: matrix.os == 'ubuntu-latest' && contains(matrix.build, 'aarch64')
+        run: sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
       - name: Running cargo build
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          toolchain: ${{ matrix.rust }}
-          args: --locked --release --target ${{ matrix.target }}
+        run: cargo build --locked --release --target ${{ matrix.target }}
 
       - name: Install gpg secret key
         run: |
@@ -89,7 +104,7 @@ jobs:
           cd target/${{ matrix.target }}/release
           BINARY_NAME=xplr${{ matrix.binary_postfix }}
           strip $BINARY_NAME
-          RELEASE_NAME=xplr-${{ matrix.artifact_prefix }}
+          RELEASE_NAME=xplr-${{ matrix.build }}
           tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
           shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
           cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor $RELEASE_NAME.tar.gz
@@ -98,9 +113,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/${{ matrix.target }}/release/xplr-${{ matrix.artifact_prefix }}.tar.gz
-            target/${{ matrix.target }}/release/xplr-${{ matrix.artifact_prefix }}.sha256
-            target/${{ matrix.target }}/release/xplr-${{ matrix.artifact_prefix }}.tar.gz.asc
+            target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz
+            target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.sha256
+            target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz.asc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -108,7 +123,7 @@ jobs:
     name: Publishing GPG signature
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install gpg secret key
         run: |
           cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
@@ -133,20 +148,16 @@ jobs:
     name: Publishing to Cargo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
 
       - run: |
           sudo apt-get update --fix-missing
           sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --allow-dirty
+      - run: cargo publish --allow-dirty
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}
