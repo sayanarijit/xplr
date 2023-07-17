@@ -1034,8 +1034,13 @@ impl App {
     }
 
     fn enter(self) -> Result<Self> {
-        if let Some(path) = self.focused_node().map(|n| n.absolute_path.clone()) {
-            self.change_directory(&path, true)
+        if let Some(node) = self.focused_node() {
+            if node.is_dir || node.symlink.as_ref().map(|s| s.is_dir).unwrap_or(false) {
+                let path = node.absolute_path.clone();
+                self.change_directory(&path, true)
+            } else {
+                Ok(self)
+            }
         } else {
             Ok(self)
         }
