@@ -63,10 +63,8 @@ jobs:
           - macos-aarch64
           - linux
           - linux-musl
-          - aarch64-linux
-          # - aarch64-linux-musl
-          # - aarch64-android
-          # - armv7-linux
+          - linux-aarch64
+          - linux-arm
         rust: [stable]
         include:
           # See the list: https://github.com/cross-rs/cross
@@ -87,23 +85,13 @@ jobs:
             os: ubuntu-latest
             target: x86_64-unknown-linux-musl
 
-          # TODO: make these work
-          #
-          # - build: aarch64-linux
-          #   os: ubuntu-latest
-          #   target: aarch64-unknown-linux-gnu
+          - build: linux-aarch64
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
 
-          # - build: aarch64-linux-musl
-          #   os: ubuntu-latest
-          #   target: aarch64-unknown-linux-musl
-
-          # - build: aarch64-android
-          #   os: ubuntu-latest
-          #   target: aarch64-linux-android
-
-          # - build: armv7-linux
-          #   os: ubuntu-latest
-          #   target: armv7-unknown-linux-gnueabihf
+          - build: linux-arm
+            os: ubuntu-latest
+            target: arm-unknown-linux-gnueabihf
 
     env:
       RUST_BACKTRACE: full
@@ -124,16 +112,24 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update --fix-missing
-          sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc musl-tools pkg-config
+          sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc pkg-config curl git make ca-certificates
 
-      # - if: matrix.os == 'ubuntu-latest' && contains(matrix.build, 'armv7')
-      #   run: sudo apt-get install -y --no-install-recommends gcc-arm-linux-gnueabihf libc-dev-armhf-cross
-      #
-      # - if: matrix.os == 'ubuntu-latest' && contains(matrix.build, 'aarch64')
-      #   run: sudo apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+      - if: matrix.build == 'linux-musl'
+        run: sudo apt-get install -y musl-tools
+
+      - if: matrix.build == 'linux-aarch64'
+        run: sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - if: matrix.build == 'linux-arm'
+        run: |
+          sudo apt-get install -y gcc-multilib
+          sudo apt-get install -y gcc-arm-linux-gnueabihf
+          sudo ln -s /usr/include/asm-generic/ /usr/include/asm
 
       - run: cargo build --target ${{ matrix.target }}
-      - run: cargo test --target ${{ matrix.target }}
+
+      - if: matrix.build == 'macos' || matrix.build == 'linux'
+        run: cargo test --target ${{ matrix.target }}
 
   # bench:
   #   name: Benchmarks
