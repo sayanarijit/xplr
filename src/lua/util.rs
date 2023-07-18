@@ -634,7 +634,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let lscolors = LsColors::from_env().unwrap_or_default();
+    let lscolors = LsColors::from_env().unwrap_or(LsColors::empty());
     let func = lua.create_function(move |lua, path: String| {
         let style = lscolors.style_for_path(path).map(Style::from);
         lua::serialize(lua, &style).map_err(LuaError::custom)
