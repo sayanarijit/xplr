@@ -329,6 +329,7 @@ impl Into<TuiStyle> for Style {
             TuiStyle {
                 fg: self.fg,
                 bg: self.bg,
+                underline_color: None,
                 add_modifier: TuiModifier::from_bits_truncate(xor(self.add_modifiers)),
                 sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
             }

@@ -196,47 +196,6 @@ cargo build --locked --release --bin xplr
 sudo cp target/release/xplr /usr/local/bin/
 ```
 
-## Android
-
-### [Termux][23]
-
-[![xplr-termuxfd3c398d3cf4bcbc.md.jpg][24]][25]
-
-> Please note that xplr isn't heavily tested on Termux, hence things might
-> need a little tweaking and fixing for a smooth usage experience.
-
-- Install build dependencies
-
-  ```bash
-  pkg install rustc cargo make
-  ```
-
-- Install `xplr`
-
-  ```bash
-  cargo install --locked --force xplr
-  ```
-
-- Setup storage
-
-  ```bash
-  termux-setup-storage
-  ```
-
-- Setup config and runtime dir
-
-  ```bash
-  export XDG_CONFIG_HOME="$PWD/storage/.config"
-  export XDG_RUNTIME_DIR="$PWD/storage/run"
-
-  mkdir -p "$XDG_CONFIG_HOME" "$XDG_RUNTIME_DIR"
-  ```
-
-- Run
-  ```bash
-  ~/.cargo/bin/xplr
-  ```
-
 [1]: #direct-download
 [2]: #from-cratesio
 [3]: #build-from-source
@@ -259,8 +218,6 @@ sudo cp target/release/xplr /usr/local/bin/
 [20]: https://gcc.gnu.org/
 [21]: https://www.gnu.org/software/make/
 [22]: https://git-scm.com/
-[23]: https://termux.com/
-[24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
 [25]: https://gifyu.com/image/tF2D
 [26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
 [27]: https://pkgs.alpinelinux.org/packages?name=xplr

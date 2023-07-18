@@ -89,7 +89,7 @@ have nested types in each branch.
 ---
 
 If you're still confused about something, or if you found an error in this
-explaination, feel free to [discuss together][5].
+explanation, feel free to [discuss together][5].
 
 [1]: https://en.wikipedia.org/wiki/Tagged_union
 [2]: layout.md
