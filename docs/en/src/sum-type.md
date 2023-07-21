@@ -29,23 +29,23 @@ them, but only a few modern programming languages allow nesting other types
 into a sum type.
 
 ```rust
-enum Result {
-    Ok,
-    Err,
+enum Color {
+    Red,
+    Green,
 }
 ```
 
-Here, `Result` can be one of two possible set of values: `Ok` and `Err`, just
-like `boolean`, but unlike `boolean`, being tagged allows `Result` to have more
+Here, `Color` can be one of two possible set of values: `Red` and `Green`, just
+like `boolean`, but unlike `boolean`, being tagged allows `Color` to have more
 than two variants if required, by changing the definition.
 
 e.g.
 
 ```rust
-enum Result {
-    Ok,
-    Err,
-    Pending,
+enum Color {
+    Red,
+    Green,
+    Blue,
 }
 ```
 
@@ -53,35 +53,39 @@ We'd document it here as:
 
 > Result is a sum type that can be one of the following:
 >
-> - "Ok"
-> - "Err"
-> - "Pending"
+> - "Red"
+> - "Green"
+> - "Blue"
 
 But some languages (like Rust, Haskell, Elm etc.) go even further, allowing us
 to associate each branch of the enum with further nested types like:
 
 ```rust
-enum Result {
-    Ok(bool),
-    Err(Error),
-    Pending,
+enum Layout {
+    Table,
+    HelpMenu,
+    Horizontal {
+        config: LayoutConfig,  // A product type (similar to class/struct)
+        splits: Vec<Layout>  // A list of "Layout"s (i.e. list of sum types)
+    },
 }
 ```
 
-Here, as we can see, unlike the first example, some of `Result`'s possible
-variants can have further nested types associated with them. Note that `Error`
-here can be either a sum type (e.g. enum), or a product type (e.g.
-class/struct), but whatever it is, it will only exist when `Result` is `Err`.
+Here, as we can see, unlike the first example, some of `Layout`'s possible
+variants can have further nested types associated with them. Note that
+`Horizontal` here can have a sum type (e.g. enum), or a product type (e.g.
+class/struct), or both (any number of them actually) nested in it. But the
+nested values will only exist when `Layout` is `Horizontal`.
 
 We'd document it here as:
 
-> Result is a sum type that can be one of the following:
+> Layout is a sum type that can be one of the following:
 >
-> - { Ok = bool }
-> - { Err = Error }
-> - "Pending"
+> - "Table"
+> - "HelpMenu"
+> - { Horizontal = { config = Layout Config, splits = { Layout, ... } }
 
-And then we'd go on documenting whatever `Error` is.
+And then we'd go on documenting whatever `Layout Config` is.
 
 So, there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.
