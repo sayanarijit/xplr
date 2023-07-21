@@ -196,6 +196,23 @@ cargo build --locked --release --bin xplr
 sudo cp target/release/xplr /usr/local/bin/
 ```
 
+## Android
+
+### [Termux][24]
+
+```bash
+pkg install rust make binutils
+cargo install --locked xplr
+
+# Run
+~/.cargo/bin/xplr
+```
+
+> Please note that xplr isn't heavily tested on Termux, hence things might need
+> a little tweaking and fixing for a smooth user experience.
+
+![termux demo][23]
+
 [1]: #direct-download
 [2]: #from-cratesio
 [3]: #build-from-source
@@ -218,6 +235,8 @@ sudo cp target/release/xplr /usr/local/bin/
 [20]: https://gcc.gnu.org/
 [21]: https://www.gnu.org/software/make/
 [22]: https://git-scm.com/
+[23]: https://github.com/sayanarijit/xplr/assets/11632726/3b61e8c8-76f0-48e8-8734-50e9e7e495b7
+[24]: https://termux.dev/
 [25]: https://gifyu.com/image/tF2D
 [26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
 [27]: https://pkgs.alpinelinux.org/packages?name=xplr

@@ -2,15 +2,13 @@
 
 #### Example: Defining Custom Layout
 
-[![layout.png][23]][24]
-
 ```lua
 xplr.config.layouts.builtin.default = {
   Horizontal = {
     config = {
       margin = 1,
-      horizontal_margin = 2,
-      vertical_margin = 3,
+      horizontal_margin = 1,
+      vertical_margin = 1,
       constraints = {
         { Percentage = 50 },
         { Percentage = 50 },
@@ -22,6 +20,21 @@ xplr.config.layouts.builtin.default = {
     }
   }
 }
+```
+
+Result:
+
+```
+ ╭ /home ─────────────╮╭ Help [default] ────╮
+ │   ╭─── path        ││.    show hidden    │
+ │   ├▸[ð Desktop/]   ││/    search         │
+ │   ├  ð Documents/  ││:    action         │
+ │   ├  ð Downloads/  ││?    global help    │
+ │   ├  ð GitHub/     ││G    go to bottom   │
+ │   ├  ð Music/      ││V    select/unselect│
+ │   ├  ð Pictures/   ││ctrl duplicate as   │
+ │   ├  ð Public/     ││ctrl next visit     │
+ ╰────────────────────╯╰────────────────────╯
 ```
 
 A layout is a [sum type][56] can be one of the following:
@@ -86,7 +99,7 @@ Type: { Static = [Custom Panel][27] }
 This is a custom layout to render dynamic content using a function defined in
 [xplr.fn][28] that takes [Content Renderer Argument][36] and returns [Custom Panel][27].
 
-Type: { Dynamic = [Content Renderer][35] }
+Type: { Dynamic = "[Content Renderer][35]" }
 
 ### Horizontal
 
@@ -97,7 +110,7 @@ It contains the following information:
 - [config][15]
 - [splits][17]
 
-Type: { Horizontal = { config = [config][15], splits = [splits][17] }
+Type: { Vertical = { config = [Layout Config][15], splits = { [Layout][17], ... } }
 
 ### Vertical
 
@@ -108,7 +121,7 @@ It contains the following information:
 - [config][15]
 - [splits][17]
 
-Type: { Vertical = { config = [config][15], splits = [splits][17] }
+Type: { Vertical = { config = [Layout Config][15], splits = { [Layout][17], ... } }
 
 ## Layout Config
 
@@ -200,6 +213,16 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
+Result:
+
+```
+╭ custom title ────────╮
+│custom body           │
+│                      │
+│                      │
+╰──────────────────────╯
+```
+
 #### Example: Render a custom dynamic paragraph
 
 ```lua
@@ -213,6 +236,23 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+```
+
+Result:
+
+```
+╭/home/sayanarijit───────────────────────────╮
+│mime_essence: inode/directory               │
+│relative_path: Desktop                      │
+│is_symlink: false                           │
+│is_readonly: false                          │
+│parent: /home/sayanarijit                   │
+│absolute_path: /home/sayanarijit/Desktop    │
+│is_broken: false                            │
+│created: 1668087850396758714                │
+│size: 4096                                  │
+│gid: 100                                    │
+╰────────────────────────────────────────────╯
 ```
 
 ### CustomList
@@ -235,6 +275,17 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
+Result:
+
+```
+╭ custom title ─────────────╮
+│1                          │
+│2                          │
+│3                          │
+│                           │
+╰───────────────────────────╯
+```
+
 #### Example: Render a custom dynamic list
 
 ```lua
@@ -252,6 +303,18 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+```
+
+Result:
+
+```
+╭/home/sayanarijit──────────╮
+│Desktop                    │
+│0.21.2                     │
+│17336                      │
+│                           │
+│                           │
+╰───────────────────────────╯
 ```
 
 ## CustomTable
@@ -283,6 +346,18 @@ xplr.config.layouts.builtin.default = {
 }
 ```
 
+Result:
+
+```
+╭ custom title ────────────────────╮
+│a                 b               │
+│c                 d               │
+│                                  │
+│                                  │
+│                                  │
+╰──────────────────────────────────╯
+```
+
 #### Example: Render a custom dynamic table
 
 ```lua
@@ -307,6 +382,23 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+```
+
+Result:
+
+```
+╭/home/sayanarijit───────────────────────────╮
+│                                            │
+│Layout height          12                   │
+│Layout width           46                   │
+│                                            │
+│Screen height          12                   │
+│Screen width           46                   │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
 ```
 
 ### CustomLayout
@@ -345,6 +437,40 @@ xplr.fn.custom.render_layout = function(ctx)
 
   return { CustomLayout = { [layout_type] = inner } }
 end
+```
+
+Result:
+
+```
+╭─────────────────────╮╭─────────────────────╮
+│Try your luck...     ││Press ctrl-r         │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+╰─────────────────────╯╰─────────────────────╯
+```
+
+Or
+
+```
+╭────────────────────────────────────────────╮
+│Try your luck...                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
+╭────────────────────────────────────────────╮
+│Press ctrl-r                                │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
 ```
 
 ## Panel UI Config
@@ -429,8 +555,6 @@ Hence, only the following fields are available.
 [20]: #vertical_margin
 [21]: #constraints
 [22]: #constraint
-[23]: https://s6.gifyu.com/images/layout.png
-[24]: https://gifyu.com/image/1X38
 [25]: #static
 [26]: #dynamic
 [27]: #custom-panel

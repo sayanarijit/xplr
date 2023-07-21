@@ -680,11 +680,15 @@ xplr.config.general.initial_sorting = {
 }
 
 -- The name of one of the modes to use when xplr loads.
+-- This isn't the default mode. To modify the default mode, overwrite
+-- [xplr.config.modes.builtin.default](https://xplr.dev/en/modes#xplrconfigmodesbuiltindefault).
 --
 -- Type: nullable string
 xplr.config.general.initial_mode = "default"
 
 -- The name of one of the layouts to use when xplr loads.
+-- This isn't the default layout. To modify the default layout, overwrite
+-- [xplr.config.layouts.builtin.default](https://xplr.dev/en/layouts#xplrconfiglayoutsbuiltindefault).
 --
 -- Type: nullable string
 xplr.config.general.initial_layout = "default"
@@ -852,15 +856,13 @@ xplr.config.node_types.special = {}
 --
 -- ##### Example: Defining Custom Layout
 --
--- ![demo](https://s6.gifyu.com/images/layout.png)
---
 -- ```lua
 -- xplr.config.layouts.builtin.default = {
 --   Horizontal = {
 --     config = {
 --       margin = 1,
---       horizontal_margin = 2,
---       vertical_margin = 3,
+--       horizontal_margin = 1,
+--       vertical_margin = 1,
 --       constraints = {
 --         { Percentage = 50 },
 --         { Percentage = 50 },
@@ -872,6 +874,21 @@ xplr.config.node_types.special = {}
 --     }
 --   }
 -- }
+-- ```
+--
+-- Result:
+--
+-- ```
+-- ╭ /home ─────────────╮╭ Help [default] ────╮
+-- │   ╭─── path        ││.    show hidden    │
+-- │   ├▸[ð Desktop/]   ││/    search         │
+-- │   ├  ð Documents/  ││:    action         │
+-- │   ├  ð Downloads/  ││?    global help    │
+-- │   ├  ð GitHub/     ││G    go to bottom   │
+-- │   ├  ð Music/      ││V    select/unselect│
+-- │   ├  ð Pictures/   ││ctrl duplicate as   │
+-- │   ├  ð Public/     ││ctrl next visit     │
+-- ╰────────────────────╯╰────────────────────╯
 -- ```
 
 -- The default layout
@@ -3076,6 +3093,14 @@ xplr.fn.custom = {}
 --   on_layout_switch = {
 --     { LogSuccess = "Switched layout" },
 --     { CallLuaSilently = "custom.some_plugin_with_hooks.on_layout_switch" },
+--   }
+--
+--   -- Add messages to send when the selection changes
+--   --
+--   -- Type: list of [Message](https://xplr.dev/en/message#message)s
+--   on_selection_change = {
+--     { LogSuccess = "Selection changed" },
+--     { CallLuaSilently = "custom.some_plugin_with_hooks.on_selection_change" },
 --   }
 -- }
 -- ```

@@ -587,12 +587,16 @@ Type: nullable list of [Node Sorter](https://xplr.dev/en/sorting#node-sorter-app
 #### xplr.config.general.initial_mode
 
 The name of one of the modes to use when xplr loads.
+This isn't the default mode. To modify the default mode, overwrite
+[xplr.config.modes.builtin.default](https://xplr.dev/en/modes#xplrconfigmodesbuiltindefault).
 
 Type: nullable string
 
 #### xplr.config.general.initial_layout
 
 The name of one of the layouts to use when xplr loads.
+This isn't the default layout. To modify the default layout, overwrite
+[xplr.config.layouts.builtin.default](https://xplr.dev/en/layouts#xplrconfiglayoutsbuiltindefault).
 
 Type: nullable string
 
