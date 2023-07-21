@@ -880,14 +880,14 @@ xplr.config.node_types.special = {}
 --
 -- ```
 -- ╭ /home ─────────────╮╭ Help [default] ────╮
--- │   ╭─── path        ││.         show hidde│
--- │   ├▸[ð Desktop/]   ││/    ctrl search    │
--- │   ├  ð Documents/  ││:         action    │
--- │   ├  ð Downloads/  ││?         global hel│
--- │   ├  ð GitHub/     ││G         go to bott│
--- │   ├  ð Music/      ││V    ctrl select/uns│
--- │   ├  ð Pictures/   ││ctrl      duplicate │
--- │   ├  ð Public/     ││ctrl tab  next visit│
+-- │   ╭─── path        ││.    show hidden    │
+-- │   ├▸[ð Desktop/]   ││/    search         │
+-- │   ├  ð Documents/  ││:    action         │
+-- │   ├  ð Downloads/  ││?    global help    │
+-- │   ├  ð GitHub/     ││G    go to bottom   │
+-- │   ├  ð Music/      ││V    select/unselect│
+-- │   ├  ð Pictures/   ││ctrl duplicate as   │
+-- │   ├  ð Public/     ││ctrl next visit     │
 -- ╰────────────────────╯╰────────────────────╯
 -- ```
 
