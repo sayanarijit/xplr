@@ -200,8 +200,6 @@ sudo cp target/release/xplr /usr/local/bin/
 
 ### [Termux][24]
 
-![termux demo][23]
-
 ```bash
 pkg install rust make binutils
 cargo install --locked xplr
@@ -212,6 +210,8 @@ cargo install --locked xplr
 
 > Please note that xplr isn't heavily tested on Termux, hence things might need
 > a little tweaking and fixing for a smooth user experience.
+
+![termux demo][23]
 
 [1]: #direct-download
 [2]: #from-cratesio
