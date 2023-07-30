@@ -1995,7 +1995,9 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
-              cat "${XPLR_PIPE_RESULT_OUT:?}" | xargs -0 printf '%q\n'
+              while IFS= read -r -d '' PTH; do
+                printf '%q\n' "$PTH"
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
               echo
               read -p "Permanently delete these files? [Y/n]: " ANS
               [ "${ANS:-Y}" = "Y" ] || [ "$ANS" = "y" ] || exit 0
@@ -2023,7 +2025,9 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
-              cat "${XPLR_PIPE_RESULT_OUT:?}" | xargs -0 printf '%q\n'
+              while IFS= read -r -d '' PTH; do
+                printf '%q\n' "$PTH"
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
               echo
               read -p "Permanently delete these files? [Y/n]: " ANS
               [ "${ANS:-Y}" = "Y" ] || [ "$ANS" = "y" ] || exit 0
