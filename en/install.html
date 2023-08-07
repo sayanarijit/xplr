@@ -279,42 +279,18 @@ cargo build --locked --release --bin xplr
 sudo cp target/release/xplr /usr/local/bin/
 </code></pre>
 <h2 id="android"><a class="header" href="#android">Android</a></h2>
-<h3 id="termux"><a class="header" href="#termux"><a href="https://termux.com/">Termux</a></a></h3>
-<p><a href="https://gifyu.com/image/tF2D"><img src="https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg" alt="xplr-termuxfd3c398d3cf4bcbc.md.jpg" /></a></p>
-<blockquote>
-<p>Please note that xplr isn't heavily tested on Termux, hence things might
-need a little tweaking and fixing for a smooth usage experience.</p>
-</blockquote>
-<ul>
-<li>
-<p>Install build dependencies</p>
-<pre><code class="language-bash">pkg install rustc cargo make
-</code></pre>
-</li>
-<li>
-<p>Install <code>xplr</code></p>
-<pre><code class="language-bash">cargo install --locked --force xplr
-</code></pre>
-</li>
-<li>
-<p>Setup storage</p>
-<pre><code class="language-bash">termux-setup-storage
-</code></pre>
-</li>
-<li>
-<p>Setup config and runtime dir</p>
-<pre><code class="language-bash">export XDG_CONFIG_HOME=&quot;$PWD/storage/.config&quot;
-export XDG_RUNTIME_DIR=&quot;$PWD/storage/run&quot;
+<h3 id="termux"><a class="header" href="#termux"><a href="https://termux.dev/">Termux</a></a></h3>
+<pre><code class="language-bash">pkg install rust make binutils
+cargo install --locked xplr
 
-mkdir -p &quot;$XDG_CONFIG_HOME&quot; &quot;$XDG_RUNTIME_DIR&quot;
+# Run
+~/.cargo/bin/xplr
 </code></pre>
-</li>
-<li>
-<p>Run</p>
-<pre><code class="language-bash">~/.cargo/bin/xplr
-</code></pre>
-</li>
-</ul>
+<blockquote>
+<p>Please note that xplr isn't heavily tested on Termux, hence things might need
+a little tweaking and fixing for a smooth user experience.</p>
+</blockquote>
+<p><img src="https://github.com/sayanarijit/xplr/assets/11632726/3b61e8c8-76f0-48e8-8734-50e9e7e495b7" alt="termux demo" /></p>
 
                     </main>
 

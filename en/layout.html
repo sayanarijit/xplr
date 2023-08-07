@@ -153,13 +153,12 @@
                     <main>
                         <h1 id="layout"><a class="header" href="#layout">Layout</a></h1>
 <h4 id="example-defining-custom-layout"><a class="header" href="#example-defining-custom-layout">Example: Defining Custom Layout</a></h4>
-<p><a href="https://gifyu.com/image/1X38"><img src="https://s6.gifyu.com/images/layout.png" alt="layout.png" /></a></p>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {
   Horizontal = {
     config = {
       margin = 1,
-      horizontal_margin = 2,
-      vertical_margin = 3,
+      horizontal_margin = 1,
+      vertical_margin = 1,
       constraints = {
         { Percentage = 50 },
         { Percentage = 50 },
@@ -171,6 +170,18 @@
     }
   }
 }
+</code></pre>
+<p>Result:</p>
+<pre><code> ╭ /home ─────────────╮╭ Help [default] ────╮
+ │   ╭─── path        ││.    show hidden    │
+ │   ├▸[ð Desktop/]   ││/    search         │
+ │   ├  ð Documents/  ││:    action         │
+ │   ├  ð Downloads/  ││?    global help    │
+ │   ├  ð GitHub/     ││G    go to bottom   │
+ │   ├  ð Music/      ││V    select/unselect│
+ │   ├  ð Pictures/   ││ctrl duplicate as   │
+ │   ├  ð Public/     ││ctrl next visit     │
+ ╰────────────────────╯╰────────────────────╯
 </code></pre>
 <p>A layout is a <a href="sum-type.html">sum type</a> can be one of the following:</p>
 <ul>
@@ -212,7 +223,7 @@ the list of paths being displayed.</p>
 <h3 id="dynamic"><a class="header" href="#dynamic">Dynamic</a></h3>
 <p>This is a custom layout to render dynamic content using a function defined in
 <a href="configuration.html#function">xplr.fn</a> that takes <a href="#content-renderer-argument">Content Renderer Argument</a> and returns <a href="#custom-panel">Custom Panel</a>.</p>
-<p>Type: { Dynamic = <a href="#content-renderer">Content Renderer</a> }</p>
+<p>Type: { Dynamic = &quot;<a href="#content-renderer">Content Renderer</a>&quot; }</p>
 <h3 id="horizontal"><a class="header" href="#horizontal">Horizontal</a></h3>
 <p>This is a special layout that splits the panel into two horizontal parts.</p>
 <p>It contains the following information:</p>
@@ -220,7 +231,7 @@ the list of paths being displayed.</p>
 <li><a href="#layout-config">config</a></li>
 <li><a href="#splits">splits</a></li>
 </ul>
-<p>Type: { Horizontal = { config = <a href="#layout-config">config</a>, splits = <a href="#splits">splits</a> }</p>
+<p>Type: { Vertical = { config = <a href="#layout-config">Layout Config</a>, splits = { <a href="#splits">Layout</a>, ... } }</p>
 <h3 id="vertical"><a class="header" href="#vertical">Vertical</a></h3>
 <p>This is a special layout that splits the panel into two vertical parts.</p>
 <p>It contains the following information:</p>
@@ -228,7 +239,7 @@ the list of paths being displayed.</p>
 <li><a href="#layout-config">config</a></li>
 <li><a href="#splits">splits</a></li>
 </ul>
-<p>Type: { Vertical = { config = <a href="#layout-config">config</a>, splits = <a href="#splits">splits</a> }</p>
+<p>Type: { Vertical = { config = <a href="#layout-config">Layout Config</a>, splits = { <a href="#splits">Layout</a>, ... } }</p>
 <h2 id="layout-config"><a class="header" href="#layout-config">Layout Config</a></h2>
 <p>A layout config contains the following information:</p>
 <ul>
@@ -297,6 +308,13 @@ the list of paths being displayed.</p>
   },
 }
 </code></pre>
+<p>Result:</p>
+<pre><code>╭ custom title ────────╮
+│custom body           │
+│                      │
+│                      │
+╰──────────────────────╯
+</code></pre>
 <h4 id="example-render-a-custom-dynamic-paragraph"><a class="header" href="#example-render-a-custom-dynamic-paragraph">Example: Render a custom dynamic paragraph</a></h4>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = { Dynamic = &quot;custom.render_layout&quot; }
 
@@ -308,6 +326,20 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭/home/sayanarijit───────────────────────────╮
+│mime_essence: inode/directory               │
+│relative_path: Desktop                      │
+│is_symlink: false                           │
+│is_readonly: false                          │
+│parent: /home/sayanarijit                   │
+│absolute_path: /home/sayanarijit/Desktop    │
+│is_broken: false                            │
+│created: 1668087850396758714                │
+│size: 4096                                  │
+│gid: 100                                    │
+╰────────────────────────────────────────────╯
 </code></pre>
 <h3 id="customlist"><a class="header" href="#customlist">CustomList</a></h3>
 <p>A list to render. It contains the following fields:</p>
@@ -325,6 +357,14 @@ end
   },
 }
 </code></pre>
+<p>Result:</p>
+<pre><code>╭ custom title ─────────────╮
+│1                          │
+│2                          │
+│3                          │
+│                           │
+╰───────────────────────────╯
+</code></pre>
 <h4 id="example-render-a-custom-dynamic-list"><a class="header" href="#example-render-a-custom-dynamic-list">Example: Render a custom dynamic list</a></h4>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = { Dynamic = &quot;custom.render_layout&quot; }
 
@@ -340,6 +380,15 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭/home/sayanarijit──────────╮
+│Desktop                    │
+│0.21.2                     │
+│17336                      │
+│                           │
+│                           │
+╰───────────────────────────╯
 </code></pre>
 <h2 id="customtable"><a class="header" href="#customtable">CustomTable</a></h2>
 <p>A custom table to render. It contains the following fields:</p>
@@ -366,6 +415,15 @@ end
   },
 }
 </code></pre>
+<p>Result:</p>
+<pre><code>╭ custom title ────────────────────╮
+│a                 b               │
+│c                 d               │
+│                                  │
+│                                  │
+│                                  │
+╰──────────────────────────────────╯
+</code></pre>
 <h4 id="example-render-a-custom-dynamic-table"><a class="header" href="#example-render-a-custom-dynamic-table">Example: Render a custom dynamic table</a></h4>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {Dynamic = &quot;custom.render_layout&quot; }
 
@@ -388,6 +446,20 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭/home/sayanarijit───────────────────────────╮
+│                                            │
+│Layout height          12                   │
+│Layout width           46                   │
+│                                            │
+│Screen height          12                   │
+│Screen width           46                   │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
 </code></pre>
 <h3 id="customlayout"><a class="header" href="#customlayout">CustomLayout</a></h3>
 <p>A whole custom layout to render. It doesn't make sense to use it as a
@@ -422,6 +494,34 @@ xplr.fn.custom.render_layout = function(ctx)
 
   return { CustomLayout = { [layout_type] = inner } }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭─────────────────────╮╭─────────────────────╮
+│Try your luck...     ││Press ctrl-r         │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+╰─────────────────────╯╰─────────────────────╯
+</code></pre>
+<p>Or</p>
+<pre><code>╭────────────────────────────────────────────╮
+│Try your luck...                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
+╭────────────────────────────────────────────╮
+│Press ctrl-r                                │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
 </code></pre>
 <h2 id="panel-ui-config"><a class="header" href="#panel-ui-config">Panel UI Config</a></h2>
 <p>It contains the following optional fields:</p>

@@ -366,42 +366,18 @@ cargo build --locked --release --bin xplr
 sudo cp target/release/xplr /usr/local/bin/
 </code></pre>
 <h2 id="android"><a class="header" href="#android">Android</a></h2>
-<h3 id="termux"><a class="header" href="#termux"><a href="https://termux.com/">Termux</a></a></h3>
-<p><a href="https://gifyu.com/image/tF2D"><img src="https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg" alt="xplr-termuxfd3c398d3cf4bcbc.md.jpg" /></a></p>
-<blockquote>
-<p>Please note that xplr isn't heavily tested on Termux, hence things might
-need a little tweaking and fixing for a smooth usage experience.</p>
-</blockquote>
-<ul>
-<li>
-<p>Install build dependencies</p>
-<pre><code class="language-bash">pkg install rustc cargo make
-</code></pre>
-</li>
-<li>
-<p>Install <code>xplr</code></p>
-<pre><code class="language-bash">cargo install --locked --force xplr
-</code></pre>
-</li>
-<li>
-<p>Setup storage</p>
-<pre><code class="language-bash">termux-setup-storage
-</code></pre>
-</li>
-<li>
-<p>Setup config and runtime dir</p>
-<pre><code class="language-bash">export XDG_CONFIG_HOME=&quot;$PWD/storage/.config&quot;
-export XDG_RUNTIME_DIR=&quot;$PWD/storage/run&quot;
+<h3 id="termux"><a class="header" href="#termux"><a href="https://termux.dev/">Termux</a></a></h3>
+<pre><code class="language-bash">pkg install rust make binutils
+cargo install --locked xplr
 
-mkdir -p &quot;$XDG_CONFIG_HOME&quot; &quot;$XDG_RUNTIME_DIR&quot;
+# Run
+~/.cargo/bin/xplr
 </code></pre>
-</li>
-<li>
-<p>Run</p>
-<pre><code class="language-bash">~/.cargo/bin/xplr
-</code></pre>
-</li>
-</ul>
+<blockquote>
+<p>Please note that xplr isn't heavily tested on Termux, hence things might need
+a little tweaking and fixing for a smooth user experience.</p>
+</blockquote>
+<p><img src="https://github.com/sayanarijit/xplr/assets/11632726/3b61e8c8-76f0-48e8-8734-50e9e7e495b7" alt="termux demo" /></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="post-install"><a class="header" href="#post-install">Post Install</a></h1>
 <p>Once <a href="install.html">installed</a>, use the following steps to setup and run xplr.</p>
 <h2 id="create-the-customizable-config-file"><a class="header" href="#create-the-customizable-config-file">Create the customizable config file</a></h2>
@@ -514,6 +490,14 @@ explicitly.</p>
   on_layout_switch = {
     { LogSuccess = &quot;Switched layout&quot; },
     { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_layout_switch&quot; },
+  }
+
+  -- Add messages to send when the selection changes
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_selection_change = {
+    { LogSuccess = &quot;Selection changed&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_selection_change&quot; },
   }
 }
 </code></pre>
@@ -847,10 +831,14 @@ Defines where to show borders for the selection panel.</p>
 <p>Initial group if sorters applied to the nodes list in the table.</p>
 <p>Type: nullable list of <a href="https://xplr.dev/en/sorting#node-sorter-applicable">Node Sorter</a></p>
 <h4 id="xplrconfiggeneralinitial_mode"><a class="header" href="#xplrconfiggeneralinitial_mode">xplr.config.general.initial_mode</a></h4>
-<p>The name of one of the modes to use when xplr loads.</p>
+<p>The name of one of the modes to use when xplr loads.
+This isn't the default mode. To modify the default mode, overwrite
+<a href="https://xplr.dev/en/modes#xplrconfigmodesbuiltindefault">xplr.config.modes.builtin.default</a>.</p>
 <p>Type: nullable string</p>
 <h4 id="xplrconfiggeneralinitial_layout"><a class="header" href="#xplrconfiggeneralinitial_layout">xplr.config.general.initial_layout</a></h4>
-<p>The name of one of the layouts to use when xplr loads.</p>
+<p>The name of one of the layouts to use when xplr loads.
+This isn't the default layout. To modify the default layout, overwrite
+<a href="https://xplr.dev/en/layouts#xplrconfiglayoutsbuiltindefault">xplr.config.layouts.builtin.default</a>.</p>
 <p>Type: nullable string</p>
 <h4 id="xplrconfiggeneralstart_fifo"><a class="header" href="#xplrconfiggeneralstart_fifo">xplr.config.general.start_fifo</a></h4>
 <p>Set it to a file path to start fifo when xplr loads.
@@ -958,13 +946,12 @@ placement and size of the panels, how they look etc.</p>
 overridden, but you can't add or remove panels in it.</p>
 <p>You can add new panels in <code>xplr.config.layouts.custom</code>.</p>
 <h5 id="example-defining-custom-layout"><a class="header" href="#example-defining-custom-layout">Example: Defining Custom Layout</a></h5>
-<p><img src="https://s6.gifyu.com/images/layout.png" alt="demo" /></p>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {
   Horizontal = {
     config = {
       margin = 1,
-      horizontal_margin = 2,
-      vertical_margin = 3,
+      horizontal_margin = 1,
+      vertical_margin = 1,
       constraints = {
         { Percentage = 50 },
         { Percentage = 50 },
@@ -976,6 +963,18 @@ overridden, but you can't add or remove panels in it.</p>
     }
   }
 }
+</code></pre>
+<p>Result:</p>
+<pre><code>╭ /home ─────────────╮╭ Help [default] ────╮
+│   ╭─── path        ││.    show hidden    │
+│   ├▸[ð Desktop/]   ││/    search         │
+│   ├  ð Documents/  ││:    action         │
+│   ├  ð Downloads/  ││?    global help    │
+│   ├  ð GitHub/     ││G    go to bottom   │
+│   ├  ð Music/      ││V    select/unselect│
+│   ├  ð Pictures/   ││ctrl duplicate as   │
+│   ├  ð Public/     ││ctrl next visit     │
+╰────────────────────╯╰────────────────────╯
 </code></pre>
 <h4 id="xplrconfiglayoutsbuiltindefault"><a class="header" href="#xplrconfiglayoutsbuiltindefault">xplr.config.layouts.builtin.default</a></h4>
 <p>The default layout</p>
@@ -1147,23 +1146,23 @@ into a sum type.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>enum Result {
-    Ok,
-    Err,
+</span>enum Color {
+    Red,
+    Green,
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here, <code>Result</code> can be one of two possible set of values: <code>Ok</code> and <code>Err</code>, just
-like <code>boolean</code>, but unlike <code>boolean</code>, being tagged allows <code>Result</code> to have more
+<p>Here, <code>Color</code> can be one of two possible set of values: <code>Red</code> and <code>Green</code>, just
+like <code>boolean</code>, but unlike <code>boolean</code>, being tagged allows <code>Color</code> to have more
 than two variants if required, by changing the definition.</p>
 <p>e.g.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>enum Result {
-    Ok,
-    Err,
-    Pending,
+</span>enum Color {
+    Red,
+    Green,
+    Blue,
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -1171,9 +1170,9 @@ than two variants if required, by changing the definition.</p>
 <blockquote>
 <p>Result is a sum type that can be one of the following:</p>
 <ul>
-<li>&quot;Ok&quot;</li>
-<li>&quot;Err&quot;</li>
-<li>&quot;Pending&quot;</li>
+<li>&quot;Red&quot;</li>
+<li>&quot;Green&quot;</li>
+<li>&quot;Blue&quot;</li>
 </ul>
 </blockquote>
 <p>But some languages (like Rust, Haskell, Elm etc.) go even further, allowing us
@@ -1181,32 +1180,36 @@ to associate each branch of the enum with further nested types like:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>enum Result {
-    Ok(bool),
-    Err(Error),
-    Pending,
+</span>enum Layout {
+    Table,
+    HelpMenu,
+    Horizontal {
+        config: LayoutConfig,  // A product type (similar to class/struct)
+        splits: Vec&lt;Layout&gt;  // A list of &quot;Layout&quot;s (i.e. list of sum types)
+    },
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here, as we can see, unlike the first example, some of <code>Result</code>'s possible
-variants can have further nested types associated with them. Note that <code>Error</code>
-here can be either a sum type (e.g. enum), or a product type (e.g.
-class/struct), but whatever it is, it will only exist when <code>Result</code> is <code>Err</code>.</p>
+<p>Here, as we can see, unlike the first example, some of <code>Layout</code>'s possible
+variants can have further nested types associated with them. Note that
+<code>Horizontal</code> here can have a sum type (e.g. enum), or a product type (e.g.
+class/struct), or both (any number of them actually) nested in it. But the
+nested values will only exist when <code>Layout</code> is <code>Horizontal</code>.</p>
 <p>We'd document it here as:</p>
 <blockquote>
-<p>Result is a sum type that can be one of the following:</p>
+<p>Layout is a sum type that can be one of the following:</p>
 <ul>
-<li>{ Ok = bool }</li>
-<li>{ Err = Error }</li>
-<li>&quot;Pending&quot;</li>
+<li>&quot;Table&quot;</li>
+<li>&quot;HelpMenu&quot;</li>
+<li>{ Horizontal = { config = Layout Config, splits = { Layout, ... } }</li>
 </ul>
 </blockquote>
-<p>And then we'd go on documenting whatever <code>Error</code> is.</p>
+<p>And then we'd go on documenting whatever <code>Layout Config</code> is.</p>
 <p>So, there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.</p>
 <hr />
 <p>If you're still confused about something, or if you found an error in this
-explaination, feel free to <a href="community.html">discuss together</a>.</p>
+explanation, feel free to <a href="community.html">discuss together</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="key-bindings"><a class="header" href="#key-bindings">Key Bindings</a></h1>
 <p>Key bindings define how each keyboard input will be handled while in a specific
 <a href="modes.html#mode">mode</a>.</p>
@@ -1709,13 +1712,12 @@ metadata is set for the <a href="node_types.html#directory">directory</a>, <a hr
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="layout"><a class="header" href="#layout">Layout</a></h1>
 <h4 id="example-defining-custom-layout-1"><a class="header" href="#example-defining-custom-layout-1">Example: Defining Custom Layout</a></h4>
-<p><a href="https://gifyu.com/image/1X38"><img src="https://s6.gifyu.com/images/layout.png" alt="layout.png" /></a></p>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {
   Horizontal = {
     config = {
       margin = 1,
-      horizontal_margin = 2,
-      vertical_margin = 3,
+      horizontal_margin = 1,
+      vertical_margin = 1,
       constraints = {
         { Percentage = 50 },
         { Percentage = 50 },
@@ -1727,6 +1729,18 @@ metadata is set for the <a href="node_types.html#directory">directory</a>, <a hr
     }
   }
 }
+</code></pre>
+<p>Result:</p>
+<pre><code> ╭ /home ─────────────╮╭ Help [default] ────╮
+ │   ╭─── path        ││.    show hidden    │
+ │   ├▸[ð Desktop/]   ││/    search         │
+ │   ├  ð Documents/  ││:    action         │
+ │   ├  ð Downloads/  ││?    global help    │
+ │   ├  ð GitHub/     ││G    go to bottom   │
+ │   ├  ð Music/      ││V    select/unselect│
+ │   ├  ð Pictures/   ││ctrl duplicate as   │
+ │   ├  ð Public/     ││ctrl next visit     │
+ ╰────────────────────╯╰────────────────────╯
 </code></pre>
 <p>A layout is a <a href="sum-type.html">sum type</a> can be one of the following:</p>
 <ul>
@@ -1768,7 +1782,7 @@ the list of paths being displayed.</p>
 <h3 id="dynamic"><a class="header" href="#dynamic">Dynamic</a></h3>
 <p>This is a custom layout to render dynamic content using a function defined in
 <a href="configuration.html#function">xplr.fn</a> that takes <a href="layout.html#content-renderer-argument">Content Renderer Argument</a> and returns <a href="layout.html#custom-panel">Custom Panel</a>.</p>
-<p>Type: { Dynamic = <a href="layout.html#content-renderer">Content Renderer</a> }</p>
+<p>Type: { Dynamic = &quot;<a href="layout.html#content-renderer">Content Renderer</a>&quot; }</p>
 <h3 id="horizontal"><a class="header" href="#horizontal">Horizontal</a></h3>
 <p>This is a special layout that splits the panel into two horizontal parts.</p>
 <p>It contains the following information:</p>
@@ -1776,7 +1790,7 @@ the list of paths being displayed.</p>
 <li><a href="layout.html#layout-config">config</a></li>
 <li><a href="layout.html#splits">splits</a></li>
 </ul>
-<p>Type: { Horizontal = { config = <a href="layout.html#layout-config">config</a>, splits = <a href="layout.html#splits">splits</a> }</p>
+<p>Type: { Vertical = { config = <a href="layout.html#layout-config">Layout Config</a>, splits = { <a href="layout.html#splits">Layout</a>, ... } }</p>
 <h3 id="vertical"><a class="header" href="#vertical">Vertical</a></h3>
 <p>This is a special layout that splits the panel into two vertical parts.</p>
 <p>It contains the following information:</p>
@@ -1784,7 +1798,7 @@ the list of paths being displayed.</p>
 <li><a href="layout.html#layout-config">config</a></li>
 <li><a href="layout.html#splits">splits</a></li>
 </ul>
-<p>Type: { Vertical = { config = <a href="layout.html#layout-config">config</a>, splits = <a href="layout.html#splits">splits</a> }</p>
+<p>Type: { Vertical = { config = <a href="layout.html#layout-config">Layout Config</a>, splits = { <a href="layout.html#splits">Layout</a>, ... } }</p>
 <h2 id="layout-config"><a class="header" href="#layout-config">Layout Config</a></h2>
 <p>A layout config contains the following information:</p>
 <ul>
@@ -1853,6 +1867,13 @@ the list of paths being displayed.</p>
   },
 }
 </code></pre>
+<p>Result:</p>
+<pre><code>╭ custom title ────────╮
+│custom body           │
+│                      │
+│                      │
+╰──────────────────────╯
+</code></pre>
 <h4 id="example-render-a-custom-dynamic-paragraph"><a class="header" href="#example-render-a-custom-dynamic-paragraph">Example: Render a custom dynamic paragraph</a></h4>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = { Dynamic = &quot;custom.render_layout&quot; }
 
@@ -1864,6 +1885,20 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭/home/sayanarijit───────────────────────────╮
+│mime_essence: inode/directory               │
+│relative_path: Desktop                      │
+│is_symlink: false                           │
+│is_readonly: false                          │
+│parent: /home/sayanarijit                   │
+│absolute_path: /home/sayanarijit/Desktop    │
+│is_broken: false                            │
+│created: 1668087850396758714                │
+│size: 4096                                  │
+│gid: 100                                    │
+╰────────────────────────────────────────────╯
 </code></pre>
 <h3 id="customlist"><a class="header" href="#customlist">CustomList</a></h3>
 <p>A list to render. It contains the following fields:</p>
@@ -1881,6 +1916,14 @@ end
   },
 }
 </code></pre>
+<p>Result:</p>
+<pre><code>╭ custom title ─────────────╮
+│1                          │
+│2                          │
+│3                          │
+│                           │
+╰───────────────────────────╯
+</code></pre>
 <h4 id="example-render-a-custom-dynamic-list"><a class="header" href="#example-render-a-custom-dynamic-list">Example: Render a custom dynamic list</a></h4>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = { Dynamic = &quot;custom.render_layout&quot; }
 
@@ -1896,6 +1939,15 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭/home/sayanarijit──────────╮
+│Desktop                    │
+│0.21.2                     │
+│17336                      │
+│                           │
+│                           │
+╰───────────────────────────╯
 </code></pre>
 <h2 id="customtable"><a class="header" href="#customtable">CustomTable</a></h2>
 <p>A custom table to render. It contains the following fields:</p>
@@ -1922,6 +1974,15 @@ end
   },
 }
 </code></pre>
+<p>Result:</p>
+<pre><code>╭ custom title ────────────────────╮
+│a                 b               │
+│c                 d               │
+│                                  │
+│                                  │
+│                                  │
+╰──────────────────────────────────╯
+</code></pre>
 <h4 id="example-render-a-custom-dynamic-table"><a class="header" href="#example-render-a-custom-dynamic-table">Example: Render a custom dynamic table</a></h4>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {Dynamic = &quot;custom.render_layout&quot; }
 
@@ -1944,6 +2005,20 @@ xplr.fn.custom.render_layout = function(ctx)
     },
   }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭/home/sayanarijit───────────────────────────╮
+│                                            │
+│Layout height          12                   │
+│Layout width           46                   │
+│                                            │
+│Screen height          12                   │
+│Screen width           46                   │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
 </code></pre>
 <h3 id="customlayout"><a class="header" href="#customlayout">CustomLayout</a></h3>
 <p>A whole custom layout to render. It doesn't make sense to use it as a
@@ -1978,6 +2053,34 @@ xplr.fn.custom.render_layout = function(ctx)
 
   return { CustomLayout = { [layout_type] = inner } }
 end
+</code></pre>
+<p>Result:</p>
+<pre><code>╭─────────────────────╮╭─────────────────────╮
+│Try your luck...     ││Press ctrl-r         │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+│                     ││                     │
+╰─────────────────────╯╰─────────────────────╯
+</code></pre>
+<p>Or</p>
+<pre><code>╭────────────────────────────────────────────╮
+│Try your luck...                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
+╭────────────────────────────────────────────╮
+│Press ctrl-r                                │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
 </code></pre>
 <h2 id="panel-ui-config"><a class="header" href="#panel-ui-config">Panel UI Config</a></h2>
 <p>It contains the following optional fields:</p>
@@ -5114,7 +5217,7 @@ e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fi
 compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
-<h4 id="v0202---v0212"><a class="header" href="#v0202---v0212"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.2">v0.21.2</a></a></h4>
+<h4 id="v0202---v0213"><a class="header" href="#v0202---v0213"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.3">v0.21.3</a></a></h4>
 <ul>
 <li>Some plugins might stop rendering colors. Wait for them to update.</li>
 <li>Rename <code>xplr.config.general.sort_and_filter_ui.search_identifier</code> to
@@ -5157,7 +5260,7 @@ operation like copy, softlink creation etc.</li>
 <li><code>:ss</code> to create softlink of the selected items.</li>
 <li><code>:sh</code> to create hardlink of the selected items.</li>
 <li><code>:se</code> to edit selection list in your $EDITOR.</li>
-<li>Better conflict handling: add suffix rather than overriding/skipping.</li>
+<li>Better conflict handling: prompt for action.</li>
 </ul>
 </li>
 <li>Navigate between the selected paths using the following messages:
@@ -5214,6 +5317,7 @@ rendered:
 </li>
 <li>Executables will me marked with the mime type: <code>application/x-executable</code>.</li>
 <li>macOS legacy coreutils will be generally supported, but please update it.</li>
+<li>Since v0.21.2 you can use the on_selection_change hook.</li>
 </ul>
 <p>Thanks to @noahmayr for contributing to a major part of this release.</p>
 <h4 id="v0194---v0202"><a class="header" href="#v0194---v0202"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.19.4">v0.19.4</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a></a></h4>

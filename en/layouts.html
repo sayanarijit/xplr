@@ -159,13 +159,12 @@ placement and size of the panels, how they look etc.</p>
 overridden, but you can't add or remove panels in it.</p>
 <p>You can add new panels in <code>xplr.config.layouts.custom</code>.</p>
 <h5 id="example-defining-custom-layout"><a class="header" href="#example-defining-custom-layout">Example: Defining Custom Layout</a></h5>
-<p><img src="https://s6.gifyu.com/images/layout.png" alt="demo" /></p>
 <pre><code class="language-lua">xplr.config.layouts.builtin.default = {
   Horizontal = {
     config = {
       margin = 1,
-      horizontal_margin = 2,
-      vertical_margin = 3,
+      horizontal_margin = 1,
+      vertical_margin = 1,
       constraints = {
         { Percentage = 50 },
         { Percentage = 50 },
@@ -177,6 +176,18 @@ overridden, but you can't add or remove panels in it.</p>
     }
   }
 }
+</code></pre>
+<p>Result:</p>
+<pre><code>╭ /home ─────────────╮╭ Help [default] ────╮
+│   ╭─── path        ││.    show hidden    │
+│   ├▸[ð Desktop/]   ││/    search         │
+│   ├  ð Documents/  ││:    action         │
+│   ├  ð Downloads/  ││?    global help    │
+│   ├  ð GitHub/     ││G    go to bottom   │
+│   ├  ð Music/      ││V    select/unselect│
+│   ├  ð Pictures/   ││ctrl duplicate as   │
+│   ├  ð Public/     ││ctrl next visit     │
+╰────────────────────╯╰────────────────────╯
 </code></pre>
 <h4 id="xplrconfiglayoutsbuiltindefault"><a class="header" href="#xplrconfiglayoutsbuiltindefault">xplr.config.layouts.builtin.default</a></h4>
 <p>The default layout</p>

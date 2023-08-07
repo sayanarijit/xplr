@@ -249,6 +249,14 @@ explicitly.</p>
     { LogSuccess = &quot;Switched layout&quot; },
     { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_layout_switch&quot; },
   }
+
+  -- Add messages to send when the selection changes
+  --
+  -- Type: list of [Message](https://xplr.dev/en/message#message)s
+  on_selection_change = {
+    { LogSuccess = &quot;Selection changed&quot; },
+    { CallLuaSilently = &quot;custom.some_plugin_with_hooks.on_selection_change&quot; },
+  }
 }
 </code></pre>
 <hr />

@@ -178,23 +178,23 @@ into a sum type.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>enum Result {
-    Ok,
-    Err,
+</span>enum Color {
+    Red,
+    Green,
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here, <code>Result</code> can be one of two possible set of values: <code>Ok</code> and <code>Err</code>, just
-like <code>boolean</code>, but unlike <code>boolean</code>, being tagged allows <code>Result</code> to have more
+<p>Here, <code>Color</code> can be one of two possible set of values: <code>Red</code> and <code>Green</code>, just
+like <code>boolean</code>, but unlike <code>boolean</code>, being tagged allows <code>Color</code> to have more
 than two variants if required, by changing the definition.</p>
 <p>e.g.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>enum Result {
-    Ok,
-    Err,
-    Pending,
+</span>enum Color {
+    Red,
+    Green,
+    Blue,
 }
 <span class="boring">}
 </span></code></pre></pre>
@@ -202,9 +202,9 @@ than two variants if required, by changing the definition.</p>
 <blockquote>
 <p>Result is a sum type that can be one of the following:</p>
 <ul>
-<li>&quot;Ok&quot;</li>
-<li>&quot;Err&quot;</li>
-<li>&quot;Pending&quot;</li>
+<li>&quot;Red&quot;</li>
+<li>&quot;Green&quot;</li>
+<li>&quot;Blue&quot;</li>
 </ul>
 </blockquote>
 <p>But some languages (like Rust, Haskell, Elm etc.) go even further, allowing us
@@ -212,32 +212,36 @@ to associate each branch of the enum with further nested types like:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>enum Result {
-    Ok(bool),
-    Err(Error),
-    Pending,
+</span>enum Layout {
+    Table,
+    HelpMenu,
+    Horizontal {
+        config: LayoutConfig,  // A product type (similar to class/struct)
+        splits: Vec&lt;Layout&gt;  // A list of &quot;Layout&quot;s (i.e. list of sum types)
+    },
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Here, as we can see, unlike the first example, some of <code>Result</code>'s possible
-variants can have further nested types associated with them. Note that <code>Error</code>
-here can be either a sum type (e.g. enum), or a product type (e.g.
-class/struct), but whatever it is, it will only exist when <code>Result</code> is <code>Err</code>.</p>
+<p>Here, as we can see, unlike the first example, some of <code>Layout</code>'s possible
+variants can have further nested types associated with them. Note that
+<code>Horizontal</code> here can have a sum type (e.g. enum), or a product type (e.g.
+class/struct), or both (any number of them actually) nested in it. But the
+nested values will only exist when <code>Layout</code> is <code>Horizontal</code>.</p>
 <p>We'd document it here as:</p>
 <blockquote>
-<p>Result is a sum type that can be one of the following:</p>
+<p>Layout is a sum type that can be one of the following:</p>
 <ul>
-<li>{ Ok = bool }</li>
-<li>{ Err = Error }</li>
-<li>&quot;Pending&quot;</li>
+<li>&quot;Table&quot;</li>
+<li>&quot;HelpMenu&quot;</li>
+<li>{ Horizontal = { config = Layout Config, splits = { Layout, ... } }</li>
 </ul>
 </blockquote>
-<p>And then we'd go on documenting whatever <code>Error</code> is.</p>
+<p>And then we'd go on documenting whatever <code>Layout Config</code> is.</p>
 <p>So, there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.</p>
 <hr />
 <p>If you're still confused about something, or if you found an error in this
-explaination, feel free to <a href="community.html">discuss together</a>.</p>
+explanation, feel free to <a href="community.html">discuss together</a>.</p>
 
                     </main>
 
