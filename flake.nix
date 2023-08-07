@@ -3,30 +3,26 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
-    nix.url = "github:domenkozar/nix/relaxed-flakes";
-    flake-compat = {
-      url = "github:edolstra/flake-compat";
-      flake = false;
-    };
   };
 
-  outputs = { self, nixpkgs, nix, ... }:
+  outputs = inputs@{ self, nixpkgs, ... }:
     let
-      systems = [
-        "x86_64-linux"
-        "i686-linux"
-        "x86_64-darwin"
-        "aarch64-linux"
-        "aarch64-darwin"
-      ];
-      forAllSystems = f: builtins.listToAttrs (map (name: { inherit name; value = f name; }) systems);
+      lib = nixpkgs.lib;
+
+      darwin = [ "x86_64-darwin" "aarch64-darwin" ];
+      linux = [ "x86_64-linux" "x86_64-linux-musl" "aarch64-linux" "aarch64-linux-android" "i86_64-linux" ];
+      allSystems = darwin ++ linux;
+
+      forEachSystem = systems: f: lib.genAttrs systems (system: f system);
+      forAllSystems = forEachSystem allSystems;
     in
     {
       packages = forAllSystems (system:
         let
           pkgs = import nixpkgs { inherit system; };
         in
-        {
+        rec {
+          # e.g. nix build .#xplr
           xplr = pkgs.rustPlatform.buildRustPackage rec {
             name = "xplr";
             src = ./.;
@@ -34,6 +30,14 @@
               lockFile = ./Cargo.lock;
             };
           };
+
+          # e.g. nix build .#cross.x86_64-linux-musl.xplr --impure
+          cross = forEachSystem (lib.filter (sys: sys != system) allSystems) (targetSystem:
+            let
+              crossPkgs = import nixpkgs { localSystem = system; crossSystem = targetSystem; };
+            in
+            { inherit (crossPkgs) xplr; }
+          );
         }
       );
       defaultPackage = forAllSystems (system: self.packages.${system}.xplr);
@@ -53,6 +57,9 @@
         {
           default = pkgs.mkShell {
             RUST_BACKTRACE = 1;
+
+            # For cross compilation
+            NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM = 1;
 
             buildInputs = devRequirements;
             packages = devRequirements;

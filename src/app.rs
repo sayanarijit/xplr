@@ -1034,19 +1034,23 @@ impl App {
     }
 
     fn enter(self) -> Result<Self> {
-        if let Some(path) = self.focused_node().map(|n| n.absolute_path.clone()) {
-            self.change_directory(&path, true)
+        if let Some(node) = self.focused_node() {
+            if node.is_dir || node.symlink.as_ref().map(|s| s.is_dir).unwrap_or(false) {
+                let path = node.absolute_path.clone();
+                self.change_directory(&path, true)
+            } else {
+                Ok(self)
+            }
         } else {
             Ok(self)
         }
     }
 
     fn back(self) -> Result<Self> {
-        if let Some(p) = PathBuf::from(self.pwd.clone())
-            .parent()
-            .and_then(|p| p.to_str())
-        {
-            self.change_directory(p, true)
+        let pwd = self.pwd.clone();
+        if let Some(p) = PathBuf::from(&pwd).parent().and_then(|p| p.to_str()) {
+            self.change_directory(p, false)
+                .and_then(|a| a.focus_path(&pwd, true))
         } else {
             Ok(self)
         }
@@ -1486,7 +1490,7 @@ impl App {
 
         if dir.parent == self.pwd {
             self.directory_buffer = Some(dir);
-            // Migh as well refresh the selection
+            // Might as well refresh the selection
             self = self.refresh_selection()?;
         };
 
@@ -2035,8 +2039,10 @@ impl App {
         let read_only = self.config.general.read_only;
         let global_kb = &self.config.general.global_key_bindings;
 
-        builtin.into_iter()
-        .chain(custom.into_iter())
+        let modes = builtin.into_iter().chain(custom.into_iter());
+
+        std::iter::once((self.mode.name.clone(), self.mode.clone()))
+        .chain(modes)
         .map(|(name, mode)| {
             (name, mode.sanitized(read_only, global_kb.clone()))
         })

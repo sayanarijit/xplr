@@ -680,11 +680,15 @@ xplr.config.general.initial_sorting = {
 }
 
 -- The name of one of the modes to use when xplr loads.
+-- This isn't the default mode. To modify the default mode, overwrite
+-- [xplr.config.modes.builtin.default](https://xplr.dev/en/modes#xplrconfigmodesbuiltindefault).
 --
 -- Type: nullable string
 xplr.config.general.initial_mode = "default"
 
 -- The name of one of the layouts to use when xplr loads.
+-- This isn't the default layout. To modify the default layout, overwrite
+-- [xplr.config.layouts.builtin.default](https://xplr.dev/en/layouts#xplrconfiglayoutsbuiltindefault).
 --
 -- Type: nullable string
 xplr.config.general.initial_layout = "default"
@@ -701,6 +705,17 @@ xplr.config.general.start_fifo = nil
 -- Type: [Key Bindings](https://xplr.dev/en/configure-key-bindings#key-bindings)
 xplr.config.general.global_key_bindings = {
   on_key = {
+    ["f1"] = {
+      help = "global help menu",
+      messages = {
+        {
+          BashExec = [===[
+            [ -z "$PAGER" ] && PAGER="less -+F"
+            cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
+          ]===],
+        },
+      },
+    },
     ["esc"] = {
       messages = {
         "PopMode",
@@ -852,15 +867,13 @@ xplr.config.node_types.special = {}
 --
 -- ##### Example: Defining Custom Layout
 --
--- ![demo](https://s6.gifyu.com/images/layout.png)
---
 -- ```lua
 -- xplr.config.layouts.builtin.default = {
 --   Horizontal = {
 --     config = {
 --       margin = 1,
---       horizontal_margin = 2,
---       vertical_margin = 3,
+--       horizontal_margin = 1,
+--       vertical_margin = 1,
 --       constraints = {
 --         { Percentage = 50 },
 --         { Percentage = 50 },
@@ -872,6 +885,21 @@ xplr.config.node_types.special = {}
 --     }
 --   }
 -- }
+-- ```
+--
+-- Result:
+--
+-- ```
+-- ╭ /home ─────────────╮╭ Help [default] ────╮
+-- │   ╭─── path        ││.    show hidden    │
+-- │   ├▸[ð Desktop/]   ││/    search         │
+-- │   ├  ð Documents/  ││:    action         │
+-- │   ├  ð Downloads/  ││?    global help    │
+-- │   ├  ð GitHub/     ││G    go to bottom   │
+-- │   ├  ð Music/      ││V    select/unselect│
+-- │   ├  ð Pictures/   ││ctrl duplicate as   │
+-- │   ├  ð Public/     ││ctrl next visit     │
+-- ╰────────────────────╯╰────────────────────╯
 -- ```
 
 -- The default layout
@@ -1060,17 +1088,6 @@ xplr.config.modes.builtin.default = {
         messages = {
           "PopMode",
           { SwitchModeBuiltin = "action" },
-        },
-      },
-      ["?"] = {
-        help = "global help menu",
-        messages = {
-          {
-            BashExec = [===[
-              [ -z "$PAGER" ] && PAGER="less -+F"
-              cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
-            ]===],
-          },
         },
       },
       ["G"] = {
@@ -1295,6 +1312,8 @@ xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
     xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
     xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
+xplr.config.modes.builtin.default.key_bindings.on_key["?"] =
+    xplr.config.general.global_key_bindings.on_key["f1"]
 
 -- The builtin debug error mode.
 --
@@ -1978,7 +1997,9 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
-              cat "${XPLR_PIPE_RESULT_OUT:?}" | xargs -0 printf '%q\n'
+              while IFS= read -r -d '' PTH; do
+                printf '%q\n' "$PTH"
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
               echo
               read -p "Permanently delete these files? [Y/n]: " ANS
               [ "${ANS:-Y}" = "Y" ] || [ "$ANS" = "y" ] || exit 0
@@ -2006,7 +2027,9 @@ xplr.config.modes.builtin.delete = {
         messages = {
           {
             BashExec0 = [===[
-              cat "${XPLR_PIPE_RESULT_OUT:?}" | xargs -0 printf '%q\n'
+              while IFS= read -r -d '' PTH; do
+                printf '%q\n' "$PTH"
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
               echo
               read -p "Permanently delete these files? [Y/n]: " ANS
               [ "${ANS:-Y}" = "Y" ] || [ "$ANS" = "y" ] || exit 0
@@ -2967,7 +2990,8 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
     if m.is_broken then
       r = r .. "×"
     else
-      local symlink_path = xplr.util.shorten(m.symlink.absolute_path)
+      local symlink_path =
+          xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
       if m.symlink.is_dir then
         symlink_path = symlink_path .. "/"
       end
@@ -3075,6 +3099,14 @@ xplr.fn.custom = {}
 --   on_layout_switch = {
 --     { LogSuccess = "Switched layout" },
 --     { CallLuaSilently = "custom.some_plugin_with_hooks.on_layout_switch" },
+--   }
+--
+--   -- Add messages to send when the selection changes
+--   --
+--   -- Type: list of [Message](https://xplr.dev/en/message#message)s
+--   on_selection_change = {
+--     { LogSuccess = "Selection changed" },
+--     { CallLuaSilently = "custom.some_plugin_with_hooks.on_selection_change" },
 --   }
 -- }
 -- ```

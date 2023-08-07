@@ -20,7 +20,7 @@ use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
-use tui::text::{Span, Spans, Text};
+use tui::text::{Line, Span, Text};
 use tui::widgets::{
     Block, BorderType as TuiBorderType, Borders as TuiBorders, Cell, List, ListItem,
     Paragraph, Row, Table,
@@ -329,6 +329,7 @@ impl Into<TuiStyle> for Style {
             TuiStyle {
                 fg: self.fg,
                 bg: self.bg,
+                underline_color: None,
                 add_modifier: TuiModifier::from_bits_truncate(xor(self.add_modifiers)),
                 sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
             }
@@ -401,22 +402,22 @@ impl Into<nu_ansi_term::Style> for Style {
             style.add_modifiers.as_ref().map_or(false, f)
         }
 
-        nu_ansi_term::Style {
-            foreground: self.fg.and_then(convert_color),
-            background: self.bg.and_then(convert_color),
-            is_bold: match_modifiers(&self, |m| m.contains(&Modifier::Bold)),
-            is_dimmed: match_modifiers(&self, |m| m.contains(&Modifier::Dim)),
-            is_italic: match_modifiers(&self, |m| m.contains(&Modifier::Italic)),
-            is_underline: match_modifiers(&self, |m| m.contains(&Modifier::Underlined)),
-            is_blink: match_modifiers(&self, |m| {
-                m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
-            }),
-            is_reverse: match_modifiers(&self, |m| m.contains(&Modifier::Reversed)),
-            is_hidden: match_modifiers(&self, |m| m.contains(&Modifier::Hidden)),
-            is_strikethrough: match_modifiers(&self, |m| {
-                m.contains(&Modifier::CrossedOut)
-            }),
-        }
+        let mut style = nu_ansi_term::Style::new();
+        style.foreground = self.fg.and_then(convert_color);
+        style.background = self.bg.and_then(convert_color);
+        style.is_bold = match_modifiers(&self, |m| m.contains(&Modifier::Bold));
+        style.is_dimmed = match_modifiers(&self, |m| m.contains(&Modifier::Dim));
+        style.is_italic = match_modifiers(&self, |m| m.contains(&Modifier::Italic));
+        style.is_underline =
+            match_modifiers(&self, |m| m.contains(&Modifier::Underlined));
+        style.is_blink = match_modifiers(&self, |m| {
+            m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
+        });
+        style.is_reverse = match_modifiers(&self, |m| m.contains(&Modifier::Reversed));
+        style.is_hidden = match_modifiers(&self, |m| m.contains(&Modifier::Hidden));
+        style.is_strikethrough =
+            match_modifiers(&self, |m| m.contains(&Modifier::CrossedOut));
+        style
     }
 }
 
@@ -669,6 +670,7 @@ fn draw_table<B: Backend>(
     let header_height = app_config.general.table.header.height.unwrap_or(1);
     let height: usize =
         (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
+    let row_style = app_config.general.table.row.style.to_owned();
 
     let rows = app
         .directory_buffer
@@ -767,17 +769,17 @@ fn draw_table<B: Backend>(
                                     c.format.as_ref().map(|f| {
                                         let out = lua::call(lua, f, v.clone())
                                             .unwrap_or_else(|e| format!("{e:?}"));
-                                        string_to_text(out)
+                                        (string_to_text(out), c.style.to_owned())
                                     })
                                 })
-                                .collect::<Vec<Text>>()
+                                .collect::<Vec<(Text, Style)>>()
                         })
                         .unwrap_or_default()
-                        .iter()
-                        .map(|x| Cell::from(x.to_owned()))
+                        .into_iter()
+                        .map(|(text, style)| Cell::from(text).style(style.into()))
                         .collect::<Vec<Cell>>();
 
-                    Row::new(cols)
+                    Row::new(cols).style(row_style.to_owned().into())
                 })
                 .collect::<Vec<Row>>()
         })
@@ -831,7 +833,10 @@ fn draw_table<B: Backend>(
                 .to_owned()
                 .unwrap_or_default()
                 .iter()
-                .map(|c| Cell::from(c.format.to_owned().unwrap_or_default()))
+                .map(|c| {
+                    Cell::from(c.format.to_owned().unwrap_or_default())
+                        .style(c.style.to_owned().into())
+                })
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
@@ -878,7 +883,10 @@ fn draw_selection<B: Backend>(
                 .unwrap_or_else(|| n.absolute_path.clone());
             string_to_text(out)
         })
-        .map(ListItem::new)
+        .map(|i| {
+            ListItem::new(i)
+                .style(app.config.general.selection.item.style.to_owned().into())
+        })
         .collect();
 
     // Selected items
@@ -973,7 +981,7 @@ fn draw_input_buffer<B: Backend>(
         let width = layout_size.width.max(offset_width) - offset_width;
         let scroll = input.visual_scroll(width.into()) as u16;
 
-        let input_buf = Paragraph::new(Spans::from(vec![
+        let input_buf = Paragraph::new(Line::from(vec![
             Span::styled(
                 app.input.prompt.to_owned(),
                 app.config.general.prompt.style.to_owned().into(),
@@ -1114,7 +1122,7 @@ fn draw_sort_n_filter<B: Backend>(
         format!("({item_count}) ")
     };
 
-    let p = Paragraph::new(Spans::from(spans))
+    let p = Paragraph::new(Line::from(spans))
         .block(block(config, format!(" Sort & filter {item_count}")));
 
     f.render_widget(p, layout_size);

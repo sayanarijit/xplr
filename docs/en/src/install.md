@@ -198,44 +198,20 @@ sudo cp target/release/xplr /usr/local/bin/
 
 ## Android
 
-### [Termux][23]
+### [Termux][24]
 
-[![xplr-termuxfd3c398d3cf4bcbc.md.jpg][24]][25]
+```bash
+pkg install rust make binutils
+cargo install --locked xplr
 
-> Please note that xplr isn't heavily tested on Termux, hence things might
-> need a little tweaking and fixing for a smooth usage experience.
+# Run
+~/.cargo/bin/xplr
+```
 
-- Install build dependencies
+> Please note that xplr isn't heavily tested on Termux, hence things might need
+> a little tweaking and fixing for a smooth user experience.
 
-  ```bash
-  pkg install rustc cargo make
-  ```
-
-- Install `xplr`
-
-  ```bash
-  cargo install --locked --force xplr
-  ```
-
-- Setup storage
-
-  ```bash
-  termux-setup-storage
-  ```
-
-- Setup config and runtime dir
-
-  ```bash
-  export XDG_CONFIG_HOME="$PWD/storage/.config"
-  export XDG_RUNTIME_DIR="$PWD/storage/run"
-
-  mkdir -p "$XDG_CONFIG_HOME" "$XDG_RUNTIME_DIR"
-  ```
-
-- Run
-  ```bash
-  ~/.cargo/bin/xplr
-  ```
+![termux demo][23]
 
 [1]: #direct-download
 [2]: #from-cratesio
@@ -259,8 +235,8 @@ sudo cp target/release/xplr /usr/local/bin/
 [20]: https://gcc.gnu.org/
 [21]: https://www.gnu.org/software/make/
 [22]: https://git-scm.com/
-[23]: https://termux.com/
-[24]: https://s3.gifyu.com/images/xplr-termuxfd3c398d3cf4bcbc.md.jpg
+[23]: https://github.com/sayanarijit/xplr/assets/11632726/3b61e8c8-76f0-48e8-8734-50e9e7e495b7
+[24]: https://termux.dev/
 [25]: https://gifyu.com/image/tF2D
 [26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
 [27]: https://pkgs.alpinelinux.org/packages?name=xplr

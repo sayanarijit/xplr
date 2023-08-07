@@ -12,15 +12,13 @@ You can add new panels in `xplr.config.layouts.custom`.
 
 ##### Example: Defining Custom Layout
 
-![demo](https://s6.gifyu.com/images/layout.png)
-
 ```lua
 xplr.config.layouts.builtin.default = {
   Horizontal = {
     config = {
       margin = 1,
-      horizontal_margin = 2,
-      vertical_margin = 3,
+      horizontal_margin = 1,
+      vertical_margin = 1,
       constraints = {
         { Percentage = 50 },
         { Percentage = 50 },
@@ -32,6 +30,21 @@ xplr.config.layouts.builtin.default = {
     }
   }
 }
+```
+
+Result:
+
+```
+╭ /home ─────────────╮╭ Help [default] ────╮
+│   ╭─── path        ││.    show hidden    │
+│   ├▸[ð Desktop/]   ││/    search         │
+│   ├  ð Documents/  ││:    action         │
+│   ├  ð Downloads/  ││?    global help    │
+│   ├  ð GitHub/     ││G    go to bottom   │
+│   ├  ð Music/      ││V    select/unselect│
+│   ├  ð Pictures/   ││ctrl duplicate as   │
+│   ├  ð Public/     ││ctrl next visit     │
+╰────────────────────╯╰────────────────────╯
 ```
 
 #### xplr.config.layouts.builtin.default

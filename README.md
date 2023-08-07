@@ -60,6 +60,8 @@ integration][15], enabling you to achieve insane terminal productivity.
 
 - [[Article] What is a TUI file explorer & why would you need one? ~ xplr.stck.me](https://xplr.stck.me/post/25252/What-is-a-TUI-file-explorer-why-would-you-need-one)
 
+- [[Article] FOSSPicks - Linux Magazine](https://www.linux-magazine.com/Issues/2022/258/FOSSPicks/(offset)/6)
+
 ## Packaging
 
 Package maintainers please refer to the [RELEASE.md](./RELEASE.md).

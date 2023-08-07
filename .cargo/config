@@ -1,4 +1,14 @@
 # Why dynamic linking?
 # See https://github.com/sayanarijit/xplr/issues/309
+
 [target.x86_64-unknown-linux-gnu]
 rustflags = ["-C", "link-args=-rdynamic"]
+
+[target.aarch64-unknown-linux-gnu]
+rustflags = ["-C", "linker=aarch64-linux-gnu-gcc", "-C", "link-args=-rdynamic"]
+
+[target.aarch64-linux-android]
+rustflags = ["-C", "linker=aarch64-linux-android-clang", "-C", "link-args=-rdynamic", "-C", "default-linker-libraries"]
+
+[target.arm-unknown-linux-gnueabihf]
+rustflags = ["-C", "linker=arm-linux-gnueabihf-gcc", "-C", "link-args=-rdynamic"]
