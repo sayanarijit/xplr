@@ -2039,8 +2039,10 @@ impl App {
         let read_only = self.config.general.read_only;
         let global_kb = &self.config.general.global_key_bindings;
 
-        builtin.into_iter()
-        .chain(custom.into_iter())
+        let modes = builtin.into_iter().chain(custom.into_iter());
+
+        std::iter::once((self.mode.name.clone(), self.mode.clone()))
+        .chain(modes)
         .map(|(name, mode)| {
             (name, mode.sanitized(read_only, global_kb.clone()))
         })

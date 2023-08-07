@@ -705,6 +705,17 @@ xplr.config.general.start_fifo = nil
 -- Type: [Key Bindings](https://xplr.dev/en/configure-key-bindings#key-bindings)
 xplr.config.general.global_key_bindings = {
   on_key = {
+    ["f1"] = {
+      help = "global help menu",
+      messages = {
+        {
+          BashExec = [===[
+            [ -z "$PAGER" ] && PAGER="less -+F"
+            cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
+          ]===],
+        },
+      },
+    },
     ["esc"] = {
       messages = {
         "PopMode",
@@ -1079,17 +1090,6 @@ xplr.config.modes.builtin.default = {
           { SwitchModeBuiltin = "action" },
         },
       },
-      ["?"] = {
-        help = "global help menu",
-        messages = {
-          {
-            BashExec = [===[
-              [ -z "$PAGER" ] && PAGER="less -+F"
-              cat -- "${XPLR_PIPE_GLOBAL_HELP_MENU_OUT}" | ${PAGER:?}
-            ]===],
-          },
-        },
-      },
       ["G"] = {
         help = "go to bottom",
         messages = {
@@ -1312,6 +1312,8 @@ xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
     xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
     xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
+xplr.config.modes.builtin.default.key_bindings.on_key["?"] =
+    xplr.config.general.global_key_bindings.on_key["f1"]
 
 -- The builtin debug error mode.
 --
