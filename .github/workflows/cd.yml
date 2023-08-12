@@ -91,8 +91,7 @@ jobs:
         run: |
           cd target/${{ matrix.target }}/release
           BINARY_NAME=xplr
-          strip $BINARY_NAME
-          RELEASE_NAME=xplr-${{ matrix.build }}
+          RELEASE_NAME=$BINARY_NAME-${{ matrix.build }}
           tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
           shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
           cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor $RELEASE_NAME.tar.gz
