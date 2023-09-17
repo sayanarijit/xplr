@@ -54,6 +54,7 @@ of the following plugins work for you, it's very easy to
   with zentable.xplr.
 - [**hartan/web-devicons.xplr**][59] Adds [nvim-web-devicons][60] to xplr with
   optional coloring
+- [**duganchen/one-table-column.xplr**][62] Moves file stats to a status bar.
 
 ## Also See:
 
@@ -120,3 +121,4 @@ of the following plugins work for you, it's very easy to
 [59]: https://gitlab.com/hartan/web-devicons.xplr
 [60]: https://github.com/nvim-tree/nvim-web-devicons
 [61]: https://github.com/sayanarijit/tree-view.xplr
+[62]: https://github.com/duganchen/one-table-column.xplr
