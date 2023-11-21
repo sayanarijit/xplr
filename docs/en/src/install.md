@@ -219,7 +219,7 @@ cargo install --locked xplr
 [4]: https://github.com/sayanarijit/xplr/watchers
 [5]: https://repology.org/badge/vertical-allrepos/xplr.svg
 [6]: https://repology.org/project/xplr/versions
-[7]: https://archlinux.org/packages/community/x86_64/xplr
+[7]: https://archlinux.org/packages/extra/x86_64/xplr
 [8]: https://aur.archlinux.org/packages/?O=0&SeB=n&K=xplr&outdated=&SB=n&SO=a&PP=50&do_Search=Go
 [9]: https://github.com/shubham-cpp/void-pkg-templates
 [10]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/file-managers/xplr/default.nix
