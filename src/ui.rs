@@ -40,6 +40,15 @@ fn read_only_indicator(app: &app::App) -> &str {
     }
 }
 
+fn selection_indicator(app: &app::App) -> String {
+    let count = app.selection.len();
+    if count == 0 {
+        String::new()
+    } else {
+        format!(" {{{count} sel}}")
+    }
+}
+
 pub fn string_to_text<'a>(string: String) -> Text<'a> {
     if *NO_COLOR {
         Text::raw(string)
@@ -991,7 +1000,12 @@ fn draw_input_buffer<B: Backend>(
         .scroll((0, scroll))
         .block(block(
             config,
-            format!(" Input [{}{}] ", app.mode.name, read_only_indicator(app)),
+            format!(
+                " Input [{}{}]{} ",
+                app.mode.name,
+                read_only_indicator(app),
+                selection_indicator(app),
+            ),
         ));
 
         f.render_widget(input_buf, layout_size);
@@ -1187,16 +1201,17 @@ fn draw_logs<B: Backend>(
     let logs_count = if logs_count == 0 {
         String::new()
     } else {
-        format!("({logs_count}) ")
+        format!(" ({logs_count})")
     };
 
     let logs_list = List::new(logs).block(block(
         config,
         format!(
-            " Logs {}[{}{}] ",
+            " Logs{} [{}{}]{} ",
             logs_count,
             app.mode.name,
             read_only_indicator(app),
+            selection_indicator(app)
         ),
     ));
 
