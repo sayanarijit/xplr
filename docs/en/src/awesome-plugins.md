@@ -56,6 +56,7 @@ of the following plugins work for you, it's very easy to
 - [**hartan/web-devicons.xplr**][59] Adds [nvim-web-devicons][60] to xplr with
   optional coloring
 - [**duganchen/one-table-column.xplr**][62] Moves file stats to a status bar.
+- [**dy-sh/get-rid-of-index.xplr**][64] Removes the index column.
 
 ## Also See:
 
@@ -124,3 +125,5 @@ of the following plugins work for you, it's very easy to
 [61]: https://github.com/sayanarijit/tree-view.xplr
 [62]: https://github.com/duganchen/one-table-column.xplr
 [63]: https://github.com/dy-sh/dysh-style.xplr
+[64]: https://github.com/dy-sh/get-rid-of-index.xplr
+
