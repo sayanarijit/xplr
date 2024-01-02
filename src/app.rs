@@ -135,6 +135,10 @@ impl History {
         self
     }
 
+    fn peek(&self) -> Option<&String> {
+        self.paths.get(self.loc)
+    }
+
     fn push(mut self, path: String) -> Self {
         if self.peek() != Some(&path) {
             self.paths = self.paths.into_iter().take(self.loc + 1).collect();
@@ -167,8 +171,51 @@ impl History {
         self.cleanup()
     }
 
-    fn peek(&self) -> Option<&String> {
-        self.paths.get(self.loc)
+    fn _is_deepest_dir(&self, path: &str) -> bool {
+        return self
+            .paths
+            .iter()
+            .filter(|p| p.ends_with('/') && p.starts_with(path) && &path != p)
+            .next()
+            .is_none();
+    }
+
+    fn _uniq_deep_dirs(&self) -> IndexSet<String> {
+        self.paths
+            .clone()
+            .into_iter()
+            .filter(|p| p.ends_with('/') && self._is_deepest_dir(p))
+            .collect::<IndexSet<String>>()
+    }
+
+    fn visit_next_deep_branch(self, pwd: &str) -> Self {
+        let uniq_deep_dirs = self._uniq_deep_dirs();
+
+        if let Some(path) = uniq_deep_dirs
+            .iter()
+            .skip_while(|p| p.trim_end_matches('/') != pwd)
+            .skip(1)
+            .next()
+        {
+            self.push(path.to_string())
+        } else {
+            self
+        }
+    }
+
+    fn visit_last_deep_branch(self, pwd: &str) -> Self {
+        let uniq_deep_dirs = self._uniq_deep_dirs();
+        if let Some(path) = uniq_deep_dirs
+            .iter()
+            .rev()
+            .skip_while(|p| p.trim_end_matches('/') != pwd)
+            .skip(1)
+            .next()
+        {
+            self.push(path.to_string())
+        } else {
+            self
+        }
     }
 }
 
@@ -505,6 +552,8 @@ impl App {
                 Back => self.back(),
                 LastVisitedPath => self.last_visited_path(),
                 NextVisitedPath => self.next_visited_path(),
+                LastVisitedDeepBranch => self.last_visited_deep_branch(),
+                NextVisitedDeepBranch => self.next_visited_deep_branch(),
                 FollowSymlink => self.follow_symlink(),
                 SetVroot(p) => self.set_vroot(&p),
                 UnsetVroot => self.unset_vroot(),
@@ -1077,6 +1126,24 @@ impl App {
             } else {
                 self.focus_path(&target, false)
             }
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn last_visited_deep_branch(mut self) -> Result<Self> {
+        self.history = self.history.visit_last_deep_branch(&self.pwd);
+        if let Some(path) = self.history.peek().cloned() {
+            self.change_directory(path.trim_end_matches('/'), false)
+        } else {
+            Ok(self)
+        }
+    }
+
+    fn next_visited_deep_branch(mut self) -> Result<Self> {
+        self.history = self.history.visit_next_deep_branch(&self.pwd);
+        if let Some(path) = self.history.peek().cloned() {
+            self.change_directory(path.trim_end_matches('/'), false)
         } else {
             Ok(self)
         }
