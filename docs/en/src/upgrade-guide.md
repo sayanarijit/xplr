@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.20.2][48] -> [v0.21.3][49]
+#### [v0.20.2][48] -> [v0.21.4][49]
 
 - Some plugins might stop rendering colors. Wait for them to update.
 - Rename `xplr.config.general.sort_and_filter_ui.search_identifier` to
@@ -119,6 +119,10 @@ compatibility.
 - Executables will me marked with the mime type: `application/x-executable`.
 - macOS legacy coreutils will be generally supported, but please update it.
 - Since v0.21.2 you can use the on_selection_change hook.
+- Since v0.21.4 you can use function keys upto F24 and the following new
+  messages:
+  - NextVisitedDeepBranch (bound to `)` key)
+  - PreviousVisitedDeepBranch (bound to `(` key)
 
 Thanks to @noahmayr for contributing to a major part of this release.
 
@@ -517,5 +521,5 @@ Else do the following:
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
-[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.3
+[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.4
 [50]: https://github.com/lotabout/skim#search-syntax
