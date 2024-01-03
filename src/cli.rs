@@ -185,7 +185,7 @@ pub fn pipe_msg_in(args: Vec<String>) -> Result<()> {
             .cloned()
             .context("failed to detect delimmiter")?;
 
-        msg.push(delimiter.try_into()?);
+        msg.push(delimiter.into());
         File::options()
             .append(true)
             .open(&path)?
