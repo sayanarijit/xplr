@@ -172,12 +172,10 @@ impl History {
     }
 
     fn _is_deepest_dir(&self, path: &str) -> bool {
-        return self
+        return !self
             .paths
             .iter()
-            .filter(|p| p.ends_with('/') && p.starts_with(path) && &path != p)
-            .next()
-            .is_none();
+            .any(|p| p.ends_with('/') && p.starts_with(path) && path != p);
     }
 
     fn _uniq_deep_dirs(&self) -> IndexSet<String> {
@@ -194,8 +192,7 @@ impl History {
         if let Some(path) = uniq_deep_dirs
             .iter()
             .skip_while(|p| p.trim_end_matches('/') != pwd)
-            .skip(1)
-            .next()
+            .nth(1)
         {
             self.push(path.to_string())
         } else {
@@ -209,8 +206,7 @@ impl History {
             .iter()
             .rev()
             .skip_while(|p| p.trim_end_matches('/') != pwd)
-            .skip(1)
-            .next()
+            .nth(1)
         {
             self.push(path.to_string())
         } else {
@@ -318,9 +314,7 @@ impl App {
             }
         };
 
-        let config_files = config_file
-            .into_iter()
-            .chain(extra_config_files.into_iter());
+        let config_files = config_file.into_iter().chain(extra_config_files);
 
         let mut load_errs = vec![];
         for config_file in config_files {
@@ -2106,7 +2100,7 @@ impl App {
         let read_only = self.config.general.read_only;
         let global_kb = &self.config.general.global_key_bindings;
 
-        let modes = builtin.into_iter().chain(custom.into_iter());
+        let modes = builtin.into_iter().chain(custom);
 
         std::iter::once((self.mode.name.clone(), self.mode.clone()))
         .chain(modes)
