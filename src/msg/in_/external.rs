@@ -277,6 +277,22 @@ pub enum ExternalMsg {
     /// - YAML: `NextVisitedPath`
     NextVisitedPath,
 
+    /// Go to the previous deep level branch.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"PreviousVisitedDeepBranch"`
+    /// - YAML: `PreviousVisitedDeepBranch`
+    PreviousVisitedDeepBranch,
+
+    /// Go to the next deep level branch.
+    ///
+    /// Example:
+    ///
+    /// - Lua: `"NextVisitedDeepBranch"`
+    /// - YAML: `NextVisitedDeepBranch`
+    NextVisitedDeepBranch,
+
     /// Follow the symlink under focus to its actual location.
     ///
     /// Example:

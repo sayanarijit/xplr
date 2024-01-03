@@ -49,12 +49,14 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/material-landscape.xplr**][19] Material Landscape
 - [**sayanarijit/material-landscape2.xplr**][20] Material Landscape 2
 - [**sayanarijit/zentable.xplr**][31] A clean, distraction free xplr table UI
+- [**dy-sh/dysh-style.xplr**][63] Complements xplr theme with icons and highlighting.
 - [**prncss-xyz/icons.xplr**][30] An icon theme for xplr.
 - [**dtomvan/extra-icons.xplr**][50] Adds more icons to icons.xplr, compatible
   with zentable.xplr.
 - [**hartan/web-devicons.xplr**][59] Adds [nvim-web-devicons][60] to xplr with
   optional coloring
 - [**duganchen/one-table-column.xplr**][62] Moves file stats to a status bar.
+- [**dy-sh/get-rid-of-index.xplr**][64] Removes the index column.
 
 ## Also See:
 
@@ -122,3 +124,5 @@ of the following plugins work for you, it's very easy to
 [60]: https://github.com/nvim-tree/nvim-web-devicons
 [61]: https://github.com/sayanarijit/tree-view.xplr
 [62]: https://github.com/duganchen/one-table-column.xplr
+[63]: https://github.com/dy-sh/dysh-style.xplr
+[64]: https://github.com/dy-sh/get-rid-of-index.xplr

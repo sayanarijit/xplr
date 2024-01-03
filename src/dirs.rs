@@ -18,7 +18,8 @@ pub fn config_dir() -> Option<PathBuf> {
 pub fn runtime_dir() -> PathBuf {
     let Some(dir) = BASE_DIRS
         .as_ref()
-        .and_then(|base| base.get_runtime_directory().ok()) else {
+        .and_then(|base| base.get_runtime_directory().ok())
+    else {
         return env::temp_dir();
     };
     dir.to_owned()

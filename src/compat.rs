@@ -9,7 +9,6 @@ use crate::ui::Constraint;
 use crate::ui::ContentRendererArg;
 use mlua::Lua;
 use serde::{Deserialize, Serialize};
-use tui::backend::Backend;
 use tui::layout::Constraint as TuiConstraint;
 use tui::layout::Rect as TuiRect;
 use tui::widgets::Cell;
@@ -60,8 +59,8 @@ pub struct CustomContent {
 }
 
 /// A cursed function from crate::ui.
-pub fn draw_custom_content<B: Backend>(
-    f: &mut Frame<B>,
+pub fn draw_custom_content(
+    f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -165,8 +164,7 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|w| w.to_tui(screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
-            let content = Table::new(rows)
-                .widths(&widths)
+            let content = Table::new(rows, widths)
                 .column_spacing(col_spacing.unwrap_or(1))
                 .block(block(
                     config,
@@ -209,7 +207,7 @@ pub fn draw_custom_content<B: Backend>(
                 .map(|w| w.to_tui(screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
-            let mut content = Table::new(rows).widths(&widths).block(block(
+            let mut content = Table::new(rows, &widths).block(block(
                 config,
                 title.map(|t| format!(" {t} ")).unwrap_or_default(),
             ));

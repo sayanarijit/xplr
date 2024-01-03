@@ -39,8 +39,8 @@ where
                 }
                 (None, _) => comps.push(Component::ParentDir),
                 (Some(a), Some(b)) if comps.is_empty() && a == b => (),
-                (Some(a), Some(b)) if b == Component::CurDir => comps.push(a),
-                (Some(_), Some(b)) if b == Component::ParentDir => {
+                (Some(a), Some(Component::CurDir)) => comps.push(a),
+                (Some(_), Some(Component::ParentDir)) => {
                     let path = path.to_string_lossy();
                     let base = base.to_string_lossy();
                     bail!("{base} is not a parent of {path}")
@@ -242,7 +242,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             relative,
-            PathBuf::from("../..").join(parent.clone().file_name().unwrap())
+            PathBuf::from("../..").join(parent.file_name().unwrap())
         );
     }
 
