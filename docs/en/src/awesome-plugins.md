@@ -126,4 +126,3 @@ of the following plugins work for you, it's very easy to
 [62]: https://github.com/duganchen/one-table-column.xplr
 [63]: https://github.com/dy-sh/dysh-style.xplr
 [64]: https://github.com/dy-sh/get-rid-of-index.xplr
-

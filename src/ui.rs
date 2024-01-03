@@ -16,7 +16,6 @@ use std::collections::HashMap;
 use std::env;
 use std::ops::BitXor;
 use time::macros::format_description;
-use tui::backend::Backend;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
@@ -666,8 +665,8 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
         .border_style(config.border_style.into())
 }
 
-fn draw_table<B: Backend>(
-    f: &mut Frame<B>,
+fn draw_table(
+    f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -822,8 +821,7 @@ fn draw_table<B: Backend>(
         format!("({node_count}) ")
     };
 
-    let table = Table::new(rows)
-        .widths(&table_constraints)
+    let table = Table::new(rows, table_constraints)
         .style(app_config.general.table.style.to_owned().into())
         .highlight_style(app_config.general.focus_ui.style.to_owned().into())
         .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
@@ -855,8 +853,8 @@ fn draw_table<B: Backend>(
     f.render_widget(table, layout_size);
 }
 
-fn draw_selection<B: Backend>(
-    f: &mut Frame<B>,
+fn draw_selection(
+    f: &mut Frame,
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -911,8 +909,8 @@ fn draw_selection<B: Backend>(
     f.render_widget(selection_list, layout_size);
 }
 
-fn draw_help_menu<B: Backend>(
-    f: &mut Frame<B>,
+fn draw_help_menu(
+    f: &mut Frame,
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -941,25 +939,24 @@ fn draw_help_menu<B: Backend>(
         })
         .collect::<Vec<Row>>();
 
-    let help_menu = Table::new(help_menu_rows)
-        .block(block(
-            config,
-            format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
-        ))
-        .widths(if app.config.general.hide_remaps_in_help_menu {
-            &[TuiConstraint::Percentage(20), TuiConstraint::Percentage(80)]
-        } else {
-            &[
-                TuiConstraint::Percentage(20),
-                TuiConstraint::Percentage(20),
-                TuiConstraint::Percentage(60),
-            ]
-        });
+    let widths = if app.config.general.hide_remaps_in_help_menu {
+        vec![TuiConstraint::Percentage(20), TuiConstraint::Percentage(80)]
+    } else {
+        vec![
+            TuiConstraint::Percentage(20),
+            TuiConstraint::Percentage(20),
+            TuiConstraint::Percentage(60),
+        ]
+    };
+    let help_menu = Table::new(help_menu_rows, widths).block(block(
+        config,
+        format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
+    ));
     f.render_widget(help_menu, layout_size);
 }
 
-fn draw_input_buffer<B: Backend>(
-    f: &mut Frame<B>,
+fn draw_input_buffer(
+    f: &mut Frame,
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1020,8 +1017,8 @@ fn draw_input_buffer<B: Backend>(
     };
 }
 
-fn draw_sort_n_filter<B: Backend>(
-    f: &mut Frame<B>,
+fn draw_sort_n_filter(
+    f: &mut Frame,
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1142,8 +1139,8 @@ fn draw_sort_n_filter<B: Backend>(
     f.render_widget(p, layout_size);
 }
 
-fn draw_logs<B: Backend>(
-    f: &mut Frame<B>,
+fn draw_logs(
+    f: &mut Frame,
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1218,8 +1215,8 @@ fn draw_logs<B: Backend>(
     f.render_widget(logs_list, layout_size);
 }
 
-pub fn draw_nothing<B: Backend>(
-    f: &mut Frame<B>,
+pub fn draw_nothing(
+    f: &mut Frame,
     _screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1231,8 +1228,8 @@ pub fn draw_nothing<B: Backend>(
     f.render_widget(nothing, layout_size);
 }
 
-pub fn draw_dynamic<B: Backend>(
-    f: &mut Frame<B>,
+pub fn draw_dynamic(
+    f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1255,8 +1252,8 @@ pub fn draw_dynamic<B: Backend>(
     draw_static(f, screen_size, layout_size, app, panel, lua);
 }
 
-pub fn draw_static<B: Backend>(
-    f: &mut Frame<B>,
+pub fn draw_static(
+    f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1309,8 +1306,7 @@ pub fn draw_static<B: Backend>(
                 .map(|w| w.to_tui(screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
-            let content = Table::new(rows)
-                .widths(&widths)
+            let content = Table::new(rows, widths)
                 .column_spacing(col_spacing.unwrap_or(1))
                 .block(block(config, "".into()));
 
@@ -1349,9 +1345,9 @@ pub struct ContentRendererArg {
     pub layout_size: Rect,
 }
 
-pub fn draw_layout<B: Backend>(
+pub fn draw_layout(
     layout: Layout,
-    f: &mut Frame<B>,
+    f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
@@ -1445,7 +1441,7 @@ pub fn draw_layout<B: Backend>(
     }
 }
 
-pub fn draw<B: Backend>(f: &mut Frame<B>, app: &app::App, lua: &Lua) {
+pub fn draw(f: &mut Frame, app: &app::App, lua: &Lua) {
     let screen_size = f.size();
     let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).to_owned();
 

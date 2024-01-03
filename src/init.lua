@@ -157,11 +157,11 @@ xplr.config.general.logs.error.style = { fg = "Red" }
 -- * format: nullable string
 -- * style: [Style](https://xplr.dev/en/style)
 xplr.config.general.table.header.cols = {
-  { format = " index",            style = {} },
+  { format = " index", style = {} },
   { format = "╭─── path", style = {} },
-  { format = "perm",              style = {} },
-  { format = "size",              style = {} },
-  { format = "modified",          style = {} },
+  { format = "perm", style = {} },
+  { format = "size", style = {} },
+  { format = "modified", style = {} },
 }
 
 -- Style of the table header.
@@ -1121,6 +1121,18 @@ xplr.config.modes.builtin.default = {
         help = "last visited path",
         messages = {
           "LastVisitedPath",
+        },
+      },
+      [")"] = {
+        help = "next deep branch",
+        messages = {
+          "NextVisitedDeepBranch",
+        },
+      },
+      ["("] = {
+        help = "prev deep branch",
+        messages = {
+          "PreviousVisitedDeepBranch",
         },
       },
       ["ctrl-r"] = {

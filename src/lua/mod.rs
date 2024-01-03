@@ -7,7 +7,7 @@ use anyhow::Result;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
 use mlua::SerializeOptions;
-use serde::Deserialize;
+use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fs;
 
@@ -81,7 +81,7 @@ pub fn init(lua: &Lua) -> Result<(Config, Option<Hooks>)> {
 
     let hooks: Option<Hooks> = lua
         .load(DEFAULT_LUA_SCRIPT)
-        .set_name("xplr init")?
+        .set_name("xplr init")
         .call(())
         .and_then(|v| lua.from_value(v))?;
 
@@ -98,7 +98,7 @@ pub fn extend(lua: &Lua, path: &str) -> Result<(Config, Option<Hooks>)> {
 
     let hooks: Option<Hooks> = lua
         .load(&script)
-        .set_name(path)?
+        .set_name(path)
         .call(())
         .and_then(|v| lua.from_value(v))?;
 
@@ -138,7 +138,7 @@ pub fn resolve_fn<'lua>(
     resolve_fn_recursive(globals, path.split('.'))
 }
 
-pub fn call<'lua, R: Deserialize<'lua>>(
+pub fn call<'lua, R: DeserializeOwned>(
     lua: &'lua Lua,
     func: &str,
     arg: mlua::Value<'lua>,

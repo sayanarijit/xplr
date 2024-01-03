@@ -320,6 +320,24 @@ Example:
 - Lua: `"NextVisitedPath"`
 - YAML: `NextVisitedPath`
 
+#### PreviousVisitedDeepBranch
+
+Go to the previous deep level branch.
+
+Example:
+
+- Lua: `"PreviousVisitedDeepBranch"`
+- YAML: `PreviousVisitedDeepBranch`
+
+#### NextVisitedDeepBranch
+
+Go to the next deep level branch.
+
+Example:
+
+- Lua: `"NextVisitedDeepBranch"`
+- YAML: `NextVisitedDeepBranch`
+
 #### FollowSymlink
 
 Follow the symlink under focus to its actual location.
