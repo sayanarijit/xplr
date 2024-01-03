@@ -414,13 +414,19 @@ impl App {
             prompt: config.general.prompt.format.clone().unwrap_or_default(),
         };
 
+        let hist = if &pwd == "/" {
+            pwd.clone()
+        } else {
+            format!("{0}/", &pwd)
+        };
+
         let mut app = Self {
             bin,
             version: VERSION.to_string(),
             config,
             vroot,
             initial_vroot,
-            pwd: pwd.clone(),
+            pwd,
             initial_pwd,
             directory_buffer: Default::default(),
             last_focus: Default::default(),
@@ -435,7 +441,7 @@ impl App {
             explorer_config,
             logs: Default::default(),
             logs_hidden: Default::default(),
-            history: History::default().push(format!("{pwd}/")),
+            history: History::default().push(hist),
             last_modes: Default::default(),
             hostname,
             hooks,
