@@ -203,7 +203,7 @@ impl History {
         }
     }
 
-    fn visit_last_deep_branch(self, pwd: &str) -> Self {
+    fn visit_previous_deep_branch(self, pwd: &str) -> Self {
         let uniq_deep_dirs = self._uniq_deep_dirs();
         if let Some(path) = uniq_deep_dirs
             .iter()
@@ -552,7 +552,7 @@ impl App {
                 Back => self.back(),
                 LastVisitedPath => self.last_visited_path(),
                 NextVisitedPath => self.next_visited_path(),
-                LastVisitedDeepBranch => self.last_visited_deep_branch(),
+                PreviousVisitedDeepBranch => self.previous_visited_deep_branch(),
                 NextVisitedDeepBranch => self.next_visited_deep_branch(),
                 FollowSymlink => self.follow_symlink(),
                 SetVroot(p) => self.set_vroot(&p),
@@ -1131,8 +1131,8 @@ impl App {
         }
     }
 
-    fn last_visited_deep_branch(mut self) -> Result<Self> {
-        self.history = self.history.visit_last_deep_branch(&self.pwd);
+    fn previous_visited_deep_branch(mut self) -> Result<Self> {
+        self.history = self.history.visit_previous_deep_branch(&self.pwd);
         if let Some(path) = self.history.peek().cloned() {
             self.change_directory(path.trim_end_matches('/'), false)
         } else {

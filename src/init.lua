@@ -1130,9 +1130,9 @@ xplr.config.modes.builtin.default = {
         },
       },
       ["("] = {
-        help = "last deep branch",
+        help = "prev deep branch",
         messages = {
-          "LastVisitedDeepBranch",
+          "PreviousVisitedDeepBranch",
         },
       },
       ["ctrl-r"] = {

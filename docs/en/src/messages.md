@@ -320,14 +320,14 @@ Example:
 - Lua: `"NextVisitedPath"`
 - YAML: `NextVisitedPath`
 
-#### LastVisitedDeepBranch
+#### PreviousVisitedDeepBranch
 
 Go to the previous deep level branch.
 
 Example:
 
-- Lua: `"LastVisitedDeepBranch"`
-- YAML: `LastVisitedDeepBranch`
+- Lua: `"PreviousVisitedDeepBranch"`
+- YAML: `PreviousVisitedDeepBranch`
 
 #### NextVisitedDeepBranch
 

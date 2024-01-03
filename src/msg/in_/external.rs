@@ -281,9 +281,9 @@ pub enum ExternalMsg {
     ///
     /// Example:
     ///
-    /// - Lua: `"LastVisitedDeepBranch"`
-    /// - YAML: `LastVisitedDeepBranch`
-    LastVisitedDeepBranch,
+    /// - Lua: `"PreviousVisitedDeepBranch"`
+    /// - YAML: `PreviousVisitedDeepBranch`
+    PreviousVisitedDeepBranch,
 
     /// Go to the next deep level branch.
     ///
