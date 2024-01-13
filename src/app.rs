@@ -1301,7 +1301,7 @@ impl App {
     }
 
     pub fn scroll_up_half(mut self) -> Result<Self> {
-        self.msg_out.push_back(MsgOut::ScrollUp);
+        self.msg_out.push_back(MsgOut::ScrollUpHalf);
         Ok(self)
     }
 
