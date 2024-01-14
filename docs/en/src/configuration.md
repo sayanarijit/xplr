@@ -47,6 +47,20 @@ that can be overwritten.
 
 Tries to auto complete the path in the input buffer
 
+#### xplr.fn.builtin.fmt_general_selection_item
+
+Formats each node in the selection
+
+#### xplr.fn.builtin.fmt_general_preview_renderer
+
+Renders the focused node in preview pane
+
+See: [xplr.util.preview](https://xplr.dev/en/xplr.util#xplrutilpreview)
+
+The focused node is passed as the node value, and layout_hight is passed
+dynamically.
+When there is no item under focus, the node value will be nil.
+
 #### xplr.fn.builtin.fmt_general_table_row_cols_0
 
 Renders the first column in the table

@@ -256,6 +256,16 @@ xplr.config.general.selection.item.format = "builtin.fmt_general_selection_item"
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.selection.item.style = {}
 
+--  Preview renderer for the path under focus.
+--
+--  Type: nullable string
+xplr.config.general.preview.renderer.format = "builtin.fmt_general_preview_renderer"
+
+-- Style for preview panel.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.preview.renderer.style = {}
+
 -- The default search algorithm
 --
 -- Type: [Search Algorithm](https://xplr.dev/en/searching#algorithm)
@@ -634,12 +644,43 @@ xplr.config.general.panel_ui.selection.borders = nil
 -- Type of the borders for selection panel.
 --
 -- Type: nullable [Border Type](https://xplr.dev/en/borders#border-type)
-xplr.config.general.panel_ui.selection.border_type = nil
+xplr.config.general.panel_ui.selection.border_type = "Double"
 
 -- Style of the selection panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.selection.border_style = {}
+xplr.config.general.panel_ui.selection.border_style = {
+  fg = "Red",
+}
+
+-- The content for the preview panel title.
+--
+-- Type: nullable string
+xplr.config.general.panel_ui.preview.title.format = nil
+
+-- Style of the preview panel title.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.panel_ui.preview.title.style = {}
+
+-- Style of the preview panel.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.panel_ui.preview.style = {}
+-- Defines where to show borders for the preview panel.
+--
+-- Type: nullable list of [Border](https://xplr.dev/en/borders#border)
+xplr.config.general.panel_ui.preview.borders = nil
+
+-- Type of the borders for preview panel.
+--
+-- Type: nullable [Border Type](https://xplr.dev/en/borders#border-type)
+xplr.config.general.panel_ui.preview.border_type = nil
+
+-- Style of the preview panel borders.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.panel_ui.preview.border_style = {}
 
 -- The content for the sort & filter panel title.
 --
@@ -2948,6 +2989,7 @@ xplr.fn.builtin.try_complete_path = function(m)
   end
 end
 
+-- Formats each node in the selection
 xplr.fn.builtin.fmt_general_selection_item = function(n)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
@@ -2960,6 +3002,15 @@ xplr.fn.builtin.fmt_general_selection_item = function(n)
   local style = xplr.util.style_mix({ ls_style, meta_style })
   return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
+
+-- Renders the focused node in preview pane
+--
+-- See: [xplr.util.preview](https://xplr.dev/en/xplr.util#xplrutilpreview)
+--
+-- The focused node is passed as the node value, and layout_hight is passed
+-- dynamically.
+-- When there is no item under focus, the node value will be nil.
+xplr.fn.builtin.fmt_general_preview_renderer = xplr.util.preview
 
 -- Renders the first column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)

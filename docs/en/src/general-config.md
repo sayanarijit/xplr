@@ -193,6 +193,18 @@ Style for each item in the selection list.
 
 Type: [Style](https://xplr.dev/en/style)
 
+#### xplr.config.general.preview.renderer.format
+
+Preview renderer for the path under focus.
+
+Type: nullable string
+
+#### xplr.config.general.preview.renderer.style
+
+Style for preview panel.
+
+Type: [Style](https://xplr.dev/en/style)
+
 #### xplr.config.general.search.algorithm
 
 The default search algorithm
@@ -539,6 +551,41 @@ Type: nullable [Border Type](https://xplr.dev/en/borders#border-type)
 #### xplr.config.general.panel_ui.selection.border_style
 
 Style of the selection panel borders.
+
+Type: [Style](https://xplr.dev/en/style)
+
+#### xplr.config.general.panel_ui.preview.title.format
+
+The content for the preview panel title.
+
+Type: nullable string
+
+#### xplr.config.general.panel_ui.preview.title.style
+
+Style of the preview panel title.
+
+Type: [Style](https://xplr.dev/en/style)
+
+#### xplr.config.general.panel_ui.preview.borders
+
+#### xplr.config.general.panel_ui.preview.style
+
+Style of the preview panel.
+
+Type: [Style](https://xplr.dev/en/style)
+Defines where to show borders for the preview panel.
+
+Type: nullable list of [Border](https://xplr.dev/en/borders#border)
+
+#### xplr.config.general.panel_ui.preview.border_type
+
+Type of the borders for preview panel.
+
+Type: nullable [Border Type](https://xplr.dev/en/borders#border-type)
+
+#### xplr.config.general.panel_ui.preview.border_style
+
+Style of the preview panel borders.
 
 Type: [Style](https://xplr.dev/en/style)
 

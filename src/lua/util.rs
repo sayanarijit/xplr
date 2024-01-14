@@ -10,6 +10,7 @@ use crate::permissions::Octal;
 use crate::permissions::Permissions;
 use crate::ui;
 use crate::ui::Layout;
+use crate::ui::PreviewRendererArgs;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
 use anyhow::Result;
@@ -25,8 +26,11 @@ use serde::{Deserialize, Serialize};
 use serde_json as json;
 use serde_yaml as yaml;
 use std::borrow::Cow;
+use std::io::BufRead;
+use std::iter;
 use std::path::PathBuf;
 use std::process::Command;
+use std::{fs, io};
 
 /// Get the xplr version details.
 ///
@@ -195,12 +199,12 @@ pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Get [Node][5] information of a given path.
+/// Get [Node][2] information of a given path.
 /// Doesn't check if the path exists.
 /// Returns nil if the path is "/".
 /// Errors out if absolute path can't be obtained.
 ///
-/// Type: function( path:string ) -> [Node][5]|nil
+/// Type: function( path:string ) -> [Node][2]|nil
 ///
 /// Example:
 ///
@@ -230,9 +234,9 @@ pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
-/// Get the configured [Node Type][6] of a given [Node][5].
+/// Get the configured [Node Type][6] of a given [Node][2].
 ///
-/// Type: function( [Node][5], [xplr.config.node_types][7]|nil ) -> [Node Type][6]
+/// Type: function( [Node][2], [xplr.config.node_types][7]|nil ) -> [Node Type][6]
 ///
 /// If the second argument is missing, global config `xplr.config.node_types`
 /// will be used.
@@ -824,15 +828,105 @@ pub fn permissions_octal<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
+/// Renders a preview of the given node as string.
+///
+/// You probably want to use it inside the function mentioned in
+/// [xplr.config.general.preview.renderer.format][9], or inside a
+/// [custom dynamic layout][10].
+///
+/// Type: function( { node:[Node][2]|nil, layout_size:[Size][5] } ) -> string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.preview({
+///     node = xplr.util.node("/foo"),
+///     layout_size = { x = 0, y = 0, height = 10, width = 10 },
+/// })
+/// -- "Preview of /foo"
+/// ```
+pub fn preview<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    fn format_node(node: &Node) -> String {
+        format!(
+            "{}
+{}
+{}
+{}:{}",
+            node.mime_essence,
+            node.permissions.to_string(),
+            node.human_size,
+            node.uid,
+            node.gid
+        )
+    }
+
+    let func = lua.create_function(|lua, args: Table| {
+        let args: PreviewRendererArgs = lua.from_value(Value::Table(args))?;
+        let Some(node) = args.node else {
+            return Ok("".into());
+        };
+
+        let size = args.layout_size;
+
+        let preview = if node.is_file {
+            let file = fs::File::open(&node.absolute_path)?;
+            let reader = io::BufReader::new(file);
+            let mut lines = vec![];
+            for line in reader.lines() {
+                let Ok(mut line) = line else {
+                    return Ok(format_node(&node));
+                };
+                line.truncate(size.width.into());
+                lines.push(line);
+                if lines.len() >= size.height.into() {
+                    break;
+                }
+            }
+            lines.join("\n")
+        } else if node.is_dir {
+            match fs::read_dir(node.absolute_path) {
+                Ok(nodes) => iter::once(node.relative_path)
+                    .chain(
+                        nodes
+                            .map(|d| {
+                                d.ok()
+                                    .map(|d| d.file_name().to_string_lossy().to_string())
+                                    .map(|n| format!("  {n}"))
+                                    .unwrap_or_else(|| "???".into())
+                            })
+                            .take(size.height.into()),
+                    )
+                    .collect::<Vec<String>>()
+                    .join("\n"),
+                Err(err) => err.to_string(),
+            }
+        } else if node.is_symlink && node.is_broken {
+            "-> ×".into()
+        } else if node.is_symlink {
+            node.symlink
+                .map(|s| format!(" -> {}", s.absolute_path))
+                .unwrap_or_default()
+        } else {
+            format_node(&node)
+        };
+
+        Ok(preview)
+    })?;
+    util.set("preview", func)?;
+    Ok(util)
+}
+
 ///
 /// [1]: https://xplr.dev/en/lua-function-calls#explorer-config
 /// [2]: https://xplr.dev/en/lua-function-calls#node
 /// [3]: https://xplr.dev/en/style
 /// [4]: https://xplr.dev/en/layout
-/// [5]: https://xplr.dev/en/lua-function-calls#node
+/// [5]: https://xplr.dev/en/layout#size
 /// [6]: https://xplr.dev/en/node-type
 /// [7]: https://xplr.dev/en/node_types
 /// [8]: https://xplr.dev/en/column-renderer#permission
+/// [9]: https://xplr.dev/en/general-config#xplrconfiggeneralpreviewrendererformat
+/// [10]: https://xplr.dev/en/layout#dynamic
 
 pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
@@ -867,6 +961,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     util = layout_replace(util, lua)?;
     util = permissions_rwx(util, lua)?;
     util = permissions_octal(util, lua)?;
+    util = preview(util, lua)?;
 
     Ok(util)
 }
