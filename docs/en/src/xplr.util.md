@@ -110,12 +110,12 @@ xplr.util.path_split(".././foo")
 
 ### xplr.util.node
 
-Get [Node][5] information of a given path.
+Get [Node][2] information of a given path.
 Doesn't check if the path exists.
 Returns nil if the path is "/".
 Errors out if absolute path can't be obtained.
 
-Type: function( path:string ) -> [Node][5]|nil
+Type: function( path:string ) -> [Node][2]|nil
 
 Example:
 
@@ -129,9 +129,9 @@ xplr.util.node("/")
 
 ### xplr.util.node_type
 
-Get the configured [Node Type][6] of a given [Node][5].
+Get the configured [Node Type][6] of a given [Node][2].
 
-Type: function( [Node][5], [xplr.config.node_types][7]|nil ) -> [Node Type][6]
+Type: function( [Node][2], [xplr.config.node_types][7]|nil ) -> [Node Type][6]
 
 If the second argument is missing, global config `xplr.config.node_types`
 will be used.
@@ -501,11 +501,33 @@ xplr.util.permissions_octal(app.focused_node.permission)
 -- { 0, 7, 5, 4 }
 ```
 
+### xplr.util.preview
+
+Renders a preview of the given node as string.
+
+You probably want to use it inside the function mentioned in
+[xplr.config.general.preview.renderer.format][9], or inside a
+[custom dynamic layout][10].
+
+Type: function( { node:[Node][2]|nil, layout_size:[Size][5] } ) -> string
+
+Example:
+
+```lua
+xplr.util.preview({
+    node = xplr.util.node("/foo"),
+    layout_size = { x = 0, y = 0, height = 10, width = 10 },
+})
+-- "..."
+```
+
 [1]: https://xplr.dev/en/lua-function-calls#explorer-config
 [2]: https://xplr.dev/en/lua-function-calls#node
 [3]: https://xplr.dev/en/style
 [4]: https://xplr.dev/en/layout
-[5]: https://xplr.dev/en/lua-function-calls#node
+[5]: https://xplr.dev/en/layout#size
 [6]: https://xplr.dev/en/node-type
 [7]: https://xplr.dev/en/node_types
 [8]: https://xplr.dev/en/column-renderer#permission
+[9]: https://xplr.dev/en/general-config#xplrconfiggeneralpreviewrendererformat
+[10]: https://xplr.dev/en/layout#dynamic

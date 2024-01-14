@@ -256,6 +256,16 @@ xplr.config.general.selection.item.format = "builtin.fmt_general_selection_item"
 -- Type: [Style](https://xplr.dev/en/style)
 xplr.config.general.selection.item.style = {}
 
+--  Preview renderer for the path under focus.
+--
+--  Type: nullable string
+xplr.config.general.preview.renderer.format = "builtin.fmt_general_preview_renderer"
+
+-- Style for preview panel.
+--
+-- Type: [Style](https://xplr.dev/en/style)
+xplr.config.general.preview.renderer.style = {}
+
 -- The default search algorithm
 --
 -- Type: [Search Algorithm](https://xplr.dev/en/searching#algorithm)
@@ -2948,6 +2958,7 @@ xplr.fn.builtin.try_complete_path = function(m)
   end
 end
 
+-- Formats each node in the selection
 xplr.fn.builtin.fmt_general_selection_item = function(n)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
@@ -2960,6 +2971,15 @@ xplr.fn.builtin.fmt_general_selection_item = function(n)
   local style = xplr.util.style_mix({ ls_style, meta_style })
   return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
+
+-- Renders the focused node in preview pane
+--
+-- See: [xplr.util.preview](https://xplr.dev/en/xplr.util#xplrutilpreview)
+--
+-- The focused node is passed as the node value, and layout_hight is passed
+-- dynamically.
+-- When there is no item under focus, the node value will be nil.
+xplr.fn.builtin.fmt_general_preview_renderer = xplr.util.preview
 
 -- Renders the first column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_0 = function(m)

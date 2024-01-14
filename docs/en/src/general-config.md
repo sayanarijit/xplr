@@ -193,6 +193,18 @@ Style for each item in the selection list.
 
 Type: [Style](https://xplr.dev/en/style)
 
+#### xplr.config.general.preview.renderer.format
+
+Preview renderer for the path under focus.
+
+Type: nullable string
+
+#### xplr.config.general.preview.renderer.style
+
+Style for preview panel.
+
+Type: [Style](https://xplr.dev/en/style)
+
 #### xplr.config.general.search.algorithm
 
 The default search algorithm

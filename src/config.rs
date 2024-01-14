@@ -191,6 +191,13 @@ pub struct SelectionConfig {
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+pub struct PreviewConfig {
+    #[serde(default)]
+    pub renderer: UiElement,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SearchConfig {
     #[serde(default)]
     pub algorithm: SearchAlgorithm,
@@ -317,6 +324,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub selection: SelectionConfig,
+
+    #[serde(default)]
+    pub preview: PreviewConfig,
 
     #[serde(default)]
     pub search: SearchConfig,

@@ -853,6 +853,53 @@ fn draw_table(
     f.render_widget(table, layout_size);
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PreviewRendererArgs {
+    pub node: Option<Node>,
+    pub layout_size: TuiRect,
+}
+
+fn draw_preview(
+    f: &mut Frame,
+    _screen_size: TuiRect,
+    layout_size: TuiRect,
+    app: &app::App,
+    lua: &Lua,
+) {
+    let panel_config = &app.config.general.panel_ui;
+    let config = panel_config
+        .default
+        .to_owned()
+        .extend(&panel_config.selection);
+
+    let renderer = app
+        .config
+        .general
+        .preview
+        .renderer
+        .format
+        .clone()
+        .unwrap_or_default();
+
+    let preview = if let Some(node) = app.focused_node() {
+        let args = PreviewRendererArgs {
+            node: Some(node.to_owned()),
+            layout_size,
+        };
+        lua::serialize::<PreviewRendererArgs>(lua, &args)
+            .and_then(|args| lua::call(lua, &renderer, args))
+            .unwrap_or_else(|e| format!("{e:?}"))
+    } else {
+        String::new()
+    };
+
+    let preview =
+        Paragraph::new(string_to_text(preview)).block(block(config, " Preview ".into()));
+
+    f.render_widget(preview, layout_size);
+}
+
 fn draw_selection(
     f: &mut Frame,
     _screen_size: TuiRect,
@@ -1360,7 +1407,13 @@ pub fn draw_layout(
             draw_sort_n_filter(f, screen_size, layout_size, app, lua)
         }
         Layout::HelpMenu => draw_help_menu(f, screen_size, layout_size, app, lua),
-        Layout::Selection => draw_selection(f, screen_size, layout_size, app, lua),
+        Layout::Selection => {
+            if app.selection.is_empty() {
+                draw_preview(f, screen_size, layout_size, app, lua);
+            } else {
+                draw_selection(f, screen_size, layout_size, app, lua);
+            }
+        }
         Layout::InputAndLogs => {
             if app.input.buffer.is_some() {
                 draw_input_buffer(f, screen_size, layout_size, app, lua);
