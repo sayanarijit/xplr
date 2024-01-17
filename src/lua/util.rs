@@ -848,15 +848,12 @@ pub fn permissions_octal<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 pub fn preview<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     fn format_node(node: &Node) -> String {
         format!(
-            "{}
-{}
-{}
-{}:{}",
+            "• T: {}\n• P: {}\n• O: {}:{}\n• S: {}",
             node.mime_essence,
             node.permissions.to_string(),
-            node.human_size,
             node.uid,
-            node.gid
+            node.gid,
+            node.human_size,
         )
     }
 
@@ -868,8 +865,19 @@ pub fn preview<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 
         let size = args.layout_size;
 
-        let preview = if node.is_file {
-            let file = fs::File::open(&node.absolute_path)?;
+        let preview = if node
+            .canonical
+            .as_ref()
+            .map(|c| c.is_file)
+            .unwrap_or(node.is_file)
+        {
+            let path = node
+                .canonical
+                .as_ref()
+                .map(|c| &c.absolute_path)
+                .unwrap_or(&node.absolute_path);
+
+            let file = fs::File::open(path)?;
             let reader = io::BufReader::new(file);
             let mut lines = vec![];
             for line in reader.lines() {
@@ -883,16 +891,33 @@ pub fn preview<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
                 }
             }
             lines.join("\n")
-        } else if node.is_dir {
-            match fs::read_dir(node.absolute_path) {
-                Ok(nodes) => iter::once(node.relative_path)
+        } else if node
+            .canonical
+            .as_ref()
+            .map(|c| c.is_dir)
+            .unwrap_or(node.is_dir)
+        {
+            let path = node
+                .symlink
+                .as_ref()
+                .map(|c| &c.absolute_path)
+                .unwrap_or(&node.relative_path);
+
+            match fs::read_dir(path) {
+                Ok(nodes) => iter::once(format!("▼ {}/", path))
                     .chain(
                         nodes
+                            .filter_map(|d| d.ok())
                             .map(|d| {
-                                d.ok()
-                                    .map(|d| d.file_name().to_string_lossy().to_string())
-                                    .map(|n| format!("  {n}"))
-                                    .unwrap_or_else(|| "???".into())
+                                if d.file_type()
+                                    .ok()
+                                    .map(|t| t.is_dir())
+                                    .unwrap_or(false)
+                                {
+                                    format!("  ▷ {}/", d.file_name().to_string_lossy())
+                                } else {
+                                    format!("    {}", d.file_name().to_string_lossy())
+                                }
                             })
                             .take(size.height.into()),
                     )
@@ -904,7 +929,7 @@ pub fn preview<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
             "-> ×".into()
         } else if node.is_symlink {
             node.symlink
-                .map(|s| format!(" -> {}", s.absolute_path))
+                .map(|s| format!("-> {}", s.absolute_path))
                 .unwrap_or_default()
         } else {
             format_node(&node)

@@ -894,10 +894,10 @@ fn draw_preview(
         String::new()
     };
 
-    let preview =
-        Paragraph::new(string_to_text(preview)).block(block(config, " Preview ".into()));
-
-    f.render_widget(preview, layout_size);
+    let mut text = string_to_text(preview);
+    text.patch_style(app.config.general.preview.renderer.style.to_owned().into());
+    let block = Paragraph::new(text).block(block(config, " Preview ".into()));
+    f.render_widget(block, layout_size);
 }
 
 fn draw_selection(

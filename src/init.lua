@@ -264,7 +264,7 @@ xplr.config.general.preview.renderer.format = "builtin.fmt_general_preview_rende
 -- Style for preview panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.preview.renderer.style = {}
+xplr.config.general.preview.renderer.style = { add_modifiers = { "Dim" } }
 
 -- The default search algorithm
 --
@@ -348,9 +348,7 @@ xplr.config.general.sort_and_filter_ui.separator.format = " › "
 -- The style of the separator for the Sort & filter panel.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.sort_and_filter_ui.separator.style = {
-  add_modifiers = { "Dim" },
-}
+xplr.config.general.sort_and_filter_ui.separator.style = { add_modifiers = { "Dim" } }
 
 -- The content of the default identifier in Sort & filter panel.
 --
@@ -649,9 +647,7 @@ xplr.config.general.panel_ui.selection.border_type = "Double"
 -- Style of the selection panel borders.
 --
 -- Type: [Style](https://xplr.dev/en/style)
-xplr.config.general.panel_ui.selection.border_style = {
-  fg = "Red",
-}
+xplr.config.general.panel_ui.selection.border_style = { fg = "Red" }
 
 -- The content for the preview panel title.
 --
