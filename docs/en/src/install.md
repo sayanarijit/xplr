@@ -72,15 +72,16 @@ programs.xplr = {
   plugins = {
     icons = fetchFromGitHub {
       owner = "sayanarijit";
-      repo = "wl-clipboard.xplr";
+      repo = "icons.xplr";
     };
-    local-plugin = "/home/user/.config/plugins/local-plugin";
+    local-plugin = "/home/user/.config/xplr/plugins/local-plugin";
   };
   extraConfig = ''
     package.path = os.getenv("LUA_PATH") .. ";" .. package.path
     package.cpath = os.getenv("LUA_CPATH") .. ";" .. package.cpath
 
     require("icons").setup()
+    require("local-plugin").setup()
   '';
 };
 ```
