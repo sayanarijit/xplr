@@ -294,9 +294,6 @@ programs.xplr = {
     local-plugin = &quot;/home/user/.config/xplr/plugins/local-plugin&quot;;
   };
   extraConfig = ''
-    package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
-    package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
-
     require(&quot;tree-view&quot;).setup()
     require(&quot;local-plugin&quot;).setup()
   '';
