@@ -61,7 +61,7 @@ home.packages = with nixpkgs; [
 ];
 ```
 
-# Or
+Or
 
 ```nix
 # home.nix
