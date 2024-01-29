@@ -41,6 +41,50 @@ repositories:
 nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
 ```
 
+Or
+
+```nix
+# configuration.nix or darwin-configuration.nix
+environment.systemPackages = with nixpkgs; [
+  xplr
+  # ...
+];
+```
+
+#### [Home Manager][30]
+
+```nix
+# home.nix
+home.packages = with nixpkgs; [
+  xplr
+  # ...
+];
+```
+
+# Or
+
+```nix
+# home.nix
+programs.xplr = {
+  enable = true;
+
+  # Optional params:
+  plugins = {
+    icons = fetchFromGitHub {
+      owner = "sayanarijit";
+      repo = "wl-clipboard.xplr";
+    };
+    local-plugin = "/home/user/.config/plugins/local-plugin";
+  };
+  extraConfig = ''
+    package.path = os.getenv("LUA_PATH") .. ";" .. package.path
+    package.cpath = os.getenv("LUA_CPATH") .. ";" .. package.cpath
+
+    require("icons").setup()
+  '';
+};
+```
+
 ### Arch Linux
 
 (same for Manjaro Linux)
@@ -242,3 +286,4 @@ cargo install --locked xplr
 [27]: https://pkgs.alpinelinux.org/packages?name=xplr
 [28]: https://gpo.zugaina.org/Overlays/guru/app-misc/xplr
 [29]: https://formulae.brew.sh/formula/coreutils
+[30]: https://github.com/nix-community/home-manager/blob/master/modules/programs/xplr.nix
