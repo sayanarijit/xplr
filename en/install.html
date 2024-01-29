@@ -179,6 +179,41 @@ repositories:</p>
 <h4 id="nixpkgs"><a class="header" href="#nixpkgs"><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/file-managers/xplr/default.nix">Nixpkgs</a></a></h4>
 <pre><code>nix-env -f https://github.com/NixOS/nixpkgs/tarball/master -iA xplr
 </code></pre>
+<p>Or</p>
+<pre><code class="language-nix"># configuration.nix or darwin-configuration.nix
+environment.systemPackages = with nixpkgs; [
+  xplr
+  # ...
+];
+</code></pre>
+<h4 id="home-manager"><a class="header" href="#home-manager"><a href="https://github.com/nix-community/home-manager/blob/master/modules/programs/xplr.nix">Home Manager</a></a></h4>
+<pre><code class="language-nix"># home.nix
+home.packages = with nixpkgs; [
+  xplr
+  # ...
+];
+</code></pre>
+<h1 id="or"><a class="header" href="#or">Or</a></h1>
+<pre><code class="language-nix"># home.nix
+programs.xplr = {
+  enable = true;
+
+  # Optional params:
+  plugins = {
+    icons = fetchFromGitHub {
+      owner = &quot;sayanarijit&quot;;
+      repo = &quot;wl-clipboard.xplr&quot;;
+    };
+    local-plugin = &quot;/home/user/.config/plugins/local-plugin&quot;;
+  };
+  extraConfig = ''
+    package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
+    package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
+
+    require(&quot;icons&quot;).setup()
+  '';
+};
+</code></pre>
 <h3 id="arch-linux"><a class="header" href="#arch-linux">Arch Linux</a></h3>
 <p>(same for Manjaro Linux)</p>
 <h4 id="official-community-repo"><a class="header" href="#official-community-repo"><a href="https://archlinux.org/packages/extra/x86_64/xplr">Official Community Repo</a></a></h4>
