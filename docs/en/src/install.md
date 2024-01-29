@@ -70,7 +70,7 @@ programs.xplr = {
 
   # Optional params:
   plugins = {
-    icons = fetchFromGitHub {
+    tree-view = fetchFromGitHub {
       owner = "sayanarijit";
       repo = "tree-view.xplr";
     };
