@@ -72,7 +72,7 @@ programs.xplr = {
   plugins = {
     icons = fetchFromGitHub {
       owner = "sayanarijit";
-      repo = "icons.xplr";
+      repo = "tree-view.xplr";
     };
     local-plugin = "/home/user/.config/xplr/plugins/local-plugin";
   };
@@ -80,7 +80,7 @@ programs.xplr = {
     package.path = os.getenv("LUA_PATH") .. ";" .. package.path
     package.cpath = os.getenv("LUA_CPATH") .. ";" .. package.cpath
 
-    require("icons").setup()
+    require("tree-view").setup()
     require("local-plugin").setup()
   '';
 };
