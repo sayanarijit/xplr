@@ -202,7 +202,7 @@ programs.xplr = {
   plugins = {
     icons = fetchFromGitHub {
       owner = &quot;sayanarijit&quot;;
-      repo = &quot;icons.xplr&quot;;
+      repo = &quot;tree-view.xplr&quot;;
     };
     local-plugin = &quot;/home/user/.config/xplr/plugins/local-plugin&quot;;
   };
@@ -210,7 +210,7 @@ programs.xplr = {
     package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
     package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
 
-    require(&quot;icons&quot;).setup()
+    require(&quot;tree-view&quot;).setup()
     require(&quot;local-plugin&quot;).setup()
   '';
 };
