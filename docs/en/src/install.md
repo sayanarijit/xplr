@@ -77,9 +77,6 @@ programs.xplr = {
     local-plugin = "/home/user/.config/xplr/plugins/local-plugin";
   };
   extraConfig = ''
-    package.path = os.getenv("LUA_PATH") .. ";" .. package.path
-    package.cpath = os.getenv("LUA_CPATH") .. ";" .. package.cpath
-
     require("tree-view").setup()
     require("local-plugin").setup()
   '';
