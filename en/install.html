@@ -202,15 +202,16 @@ programs.xplr = {
   plugins = {
     icons = fetchFromGitHub {
       owner = &quot;sayanarijit&quot;;
-      repo = &quot;wl-clipboard.xplr&quot;;
+      repo = &quot;icons.xplr&quot;;
     };
-    local-plugin = &quot;/home/user/.config/plugins/local-plugin&quot;;
+    local-plugin = &quot;/home/user/.config/xplr/plugins/local-plugin&quot;;
   };
   extraConfig = ''
     package.path = os.getenv(&quot;LUA_PATH&quot;) .. &quot;;&quot; .. package.path
     package.cpath = os.getenv(&quot;LUA_CPATH&quot;) .. &quot;;&quot; .. package.cpath
 
     require(&quot;icons&quot;).setup()
+    require(&quot;local-plugin&quot;).setup()
   '';
 };
 </code></pre>
