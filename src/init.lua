@@ -1497,7 +1497,7 @@ xplr.config.modes.builtin.quick_move = {
               fi
               "$XPLR" -m "ChangeDirectory: %q" "$DEST"
               ! cd -- "$DEST" && exit
-              DEST="$(pwd)"
+              DEST="$(pwd)" && echo "PWD=$DEST"
               while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
@@ -1518,11 +1518,11 @@ xplr.config.modes.builtin.quick_move = {
                       ;;
                   esac
                 fi
-                if mv -v -- "${PTH:?}" "$DEST/${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to $DEST/$BASENAME_ESC"
+                if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to $DEST/$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}"
               echo
@@ -1568,14 +1568,14 @@ xplr.config.modes.builtin.quick_copy = {
               fi
               "$XPLR" -m "ChangeDirectory: %q" "$DEST"
               ! cd -- "$DEST" && exit
-              DEST="$(pwd)"
+              DEST="$(pwd)" && echo "PWD=$DEST"
               while IFS= read -r -d '' PTH; do
                 PTH_ESC=$(printf %q "$PTH")
                 BASENAME=$(basename -- "$PTH")
                 BASENAME_ESC=$(printf %q "$BASENAME")
                 if [ -e "$BASENAME" ]; then
                   echo
-                  echo "$DEST/$BASENAME_ESC exists, do you want to overwrite it?"
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
                   read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
                   case "$ANS" in
                     [yY]*)
@@ -1589,11 +1589,11 @@ xplr.config.modes.builtin.quick_copy = {
                       ;;
                   esac
                 fi
-                if cp -vr -- "${PTH:?}" "$DEST/${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to $DEST/$BASENAME_ESC"
+                if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to $DEST/$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_RESULT_OUT:?}"
               echo
