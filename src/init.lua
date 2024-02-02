@@ -1297,18 +1297,18 @@ xplr.config.modes.builtin.default = {
         },
       },
       ["m"] = {
-        help = "quick move",
+        help = "move to",
         messages = {
           "PopMode",
-          { SwitchModeBuiltin = "quick_move" },
+          { SwitchModeBuiltin = "move_to" },
           { SetInputBuffer = "" },
         },
       },
       ["c"] = {
-        help = "quick copy",
+        help = "copy to",
         messages = {
           "PopMode",
-          { SwitchModeBuiltin = "quick_copy" },
+          { SwitchModeBuiltin = "copy_to" },
           { SetInputBuffer = "" },
         },
       },
@@ -1476,16 +1476,16 @@ xplr.config.modes.builtin.go_to_path = {
   },
 }
 
--- The builtin quick_move mode.
+-- The builtin move_to mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
-xplr.config.modes.builtin.quick_move = {
-  name = "quick_move",
+xplr.config.modes.builtin.move_to = {
+  name = "move_to",
   prompt = "ð ❯ ",
   key_bindings = {
     on_key = {
       ["enter"] = {
-        help = "move here",
+        help = "submit",
         messages = {
           {
             BashExec0 = [===[
@@ -1547,16 +1547,16 @@ xplr.config.modes.builtin.quick_move = {
   },
 }
 
--- The builtin quick_copy mode.
+-- The builtin copy_to mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
-xplr.config.modes.builtin.quick_copy = {
-  name = "quick_copy",
+xplr.config.modes.builtin.copy_to = {
+  name = "copy_to",
   prompt = "ð ❯ ",
   key_bindings = {
     on_key = {
       ["enter"] = {
-        help = "copy here",
+        help = "submit",
         messages = {
           {
             BashExec0 = [===[

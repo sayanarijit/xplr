@@ -35,15 +35,15 @@ The builtin go to path mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
-#### xplr.config.modes.builtin.quick_move
+#### xplr.config.modes.builtin.move_to
 
-The builtin quick_move mode.
+The builtin move_to mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
-#### xplr.config.modes.builtin.quick_copy
+#### xplr.config.modes.builtin.copy_to
 
-The builtin quick_copy mode.
+The builtin copy_to mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
