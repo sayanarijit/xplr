@@ -478,7 +478,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-"↓"
+  "↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -676,7 +676,7 @@ xplr.config.general.panel_ui.sort_and_filter.border_style = {}
 -- Type: nullable list of [Node Sorter](https://xplr.dev/en/sorting#node-sorter-applicable)
 xplr.config.general.initial_sorting = {
   { sorter = "ByCanonicalIsDir", reverse = true },
-  { sorter = "ByIRelativePath",  reverse = false },
+  { sorter = "ByIRelativePath", reverse = false },
 }
 
 -- The name of one of the modes to use when xplr loads.
@@ -1296,6 +1296,22 @@ xplr.config.modes.builtin.default = {
           "FocusPreviousSelection",
         },
       },
+      ["m"] = {
+        help = "quick move",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "quick_move" },
+          { SetInputBuffer = "" },
+        },
+      },
+      ["c"] = {
+        help = "quick copy",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "quick_copy" },
+          { SetInputBuffer = "" },
+        },
+      },
     },
     on_number = {
       help = "input",
@@ -1309,23 +1325,23 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
 xplr.config.modes.builtin.default.key_bindings.on_key["?"] =
-    xplr.config.general.global_key_bindings.on_key["f1"]
+  xplr.config.general.global_key_bindings.on_key["f1"]
 
 -- The builtin debug error mode.
 --
@@ -1460,6 +1476,146 @@ xplr.config.modes.builtin.go_to_path = {
   },
 }
 
+-- The builtin quick_move mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.quick_move = {
+  name = "quick_move",
+  prompt = "ð ❯ ",
+  key_bindings = {
+    on_key = {
+      ["enter"] = {
+        help = "move here",
+        messages = {
+          {
+            BashExec0 = [===[
+              DEST="$XPLR_INPUT_BUFFER"
+              [ -z "$DEST" ] && exit
+              if [ ! -d "$DEST" ] && ! mkdir -p -- "$DEST"; then
+                  "$XPLR" -m 'LogError: %q' "could not create $DEST"
+                  exit
+              fi
+              cd -- "$DEST" && pwd
+              "$XPLR" -m "ChangeDirectory: %q" "$DEST"
+              while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$DEST/$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
+                if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to $BASENAME_ESC"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
+                else
+                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to $BASENAME_ESC"
+                fi
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      ["tab"] = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
+-- The builtin quick_copy mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.quick_copy = {
+  name = "quick_copy",
+  prompt = "ð ❯ ",
+  key_bindings = {
+    on_key = {
+      ["enter"] = {
+        help = "copy here",
+        messages = {
+          {
+            BashExec0 = [===[
+              DEST="$XPLR_INPUT_BUFFER"
+              [ -z "$DEST" ] && exit
+              if [ ! -d "$DEST" ] && ! mkdir -p -- "$DEST"; then
+                  "$XPLR" -m 'LogError: %q' "could not create $DEST"
+                  exit
+              fi
+              cd -- "$DEST" && pwd
+              "$XPLR" -m "ChangeDirectory: %q" "$DEST"
+              while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
+                if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to $BASENAME_ESC"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
+                else
+                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to $BASENAME_ESC"
+                fi
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      ["tab"] = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
 -- The builtin selection ops mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
@@ -1531,10 +1687,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1571,10 +1727,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1611,10 +1767,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if ln -sv -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1651,10 +1807,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if ln -v -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1835,9 +1991,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-    xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-    xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2321,9 +2477,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-    xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-    xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -3003,7 +3159,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
       r = r .. "×"
     else
       local symlink_path =
-          xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
+        xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
       if m.symlink.is_dir then
         symlink_path = symlink_path .. "/"
       end
@@ -3025,14 +3181,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local T = xplr.util.paint("T", { fg = "Red" })
 
   return xplr.util
-      .permissions_rwx(m.permissions)
-      :gsub("r", r)
-      :gsub("w", w)
-      :gsub("x", x)
-      :gsub("s", s)
-      :gsub("S", S)
-      :gsub("t", t)
-      :gsub("T", T)
+    .permissions_rwx(m.permissions)
+    :gsub("r", r)
+    :gsub("w", w)
+    :gsub("x", x)
+    :gsub("s", s)
+    :gsub("S", S)
+    :gsub("t", t)
+    :gsub("T", T)
 end
 
 -- Renders the fourth column in the table
