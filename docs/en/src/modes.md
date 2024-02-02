@@ -35,6 +35,18 @@ The builtin go to path mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
+#### xplr.config.modes.builtin.move_to
+
+The builtin move_to mode.
+
+Type: [Mode](https://xplr.dev/en/mode)
+
+#### xplr.config.modes.builtin.copy_to
+
+The builtin copy_to mode.
+
+Type: [Mode](https://xplr.dev/en/mode)
+
 #### xplr.config.modes.builtin.selection_ops
 
 The builtin selection ops mode.
