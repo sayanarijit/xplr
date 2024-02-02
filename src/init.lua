@@ -1503,7 +1503,7 @@ xplr.config.modes.builtin.quick_move = {
                 BASENAME_ESC=$(printf %q "$BASENAME")
                 if [ -e "$BASENAME" ]; then
                   echo
-                  echo "$DEST/$BASENAME_ESC exists, do you want to overwrite it?"
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
                   read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
                   case "$ANS" in
                     [yY]*)
