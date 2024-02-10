@@ -64,6 +64,30 @@ pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     Ok(util)
 }
 
+/// Print the given value to the console, and return it as a string.
+/// Useful for debugging.
+///
+/// Type: function( value ) -> string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.debug({ foo = "bar", bar = function() end })
+/// -- {
+/// --   ["bar"] = function: 0x55e5cebdeae0,
+/// --   ["foo"] = "bar",
+/// -- }
+/// ```
+pub fn debug<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|_, value: Value| {
+        let log = format!("{:#?}", value);
+        println!("{}", log);
+        Ok(log)
+    })?;
+    util.set("debug", func)?;
+    Ok(util)
+}
+
 /// Clone/deepcopy a Lua value. Doesn't work with functions.
 ///
 /// Type: function( value ) -> value
@@ -838,6 +862,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
 
     util = version(util, lua)?;
+    util = debug(util, lua)?;
     util = clone(util, lua)?;
     util = exists(util, lua)?;
     util = is_dir(util, lua)?;
