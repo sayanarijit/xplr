@@ -1,0 +1,26 @@
+name: xplr
+version: git
+summary: A hackable, minimal, fast TUI file explorer
+description: |
+  xplr is a terminal UI based file explorer
+  that aims to increase our terminal productivity by being a flexible,
+  interactive orchestrator for the ever growing awesome command-line
+  utilities that work with the file-system.
+source-code: https://github.com/sayanarijit/xplr
+issues: https://github.com/sayanarijit/xplr/issues
+website: https://xplr.dev/
+
+base: core20
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+
+parts:
+  xplr:
+    plugin: rust
+    source: .
+
+apps:
+  xplr:
+    command: bin/xplr
+
