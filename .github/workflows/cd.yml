@@ -66,8 +66,8 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc pkg-config curl git make ca-certificates
           sudo apt-get install -y snapd
-          sudo snap install snapcraft --classic
-          sudo snap install multipass --classic --beta
+          # sudo snap install snapcraft --classic
+          # sudo snap install multipass --classic --beta
 
       - if: matrix.build == 'linux-musl'
         run: sudo apt-get install -y musl-tools
@@ -84,12 +84,12 @@ jobs:
       - name: Running cargo build
         run: cargo build --locked --release --target ${{ matrix.target }}
 
-      - name: Running snapcraft build
-        run: |
-          snapcraft
-          printf ' [ INFO ] generated <snapcraft> files include:\n'
-          command ls -Al | grep "\.snap" | awk '{ print $9 }'
-          mv ./*.snap ./xplr.snap
+      # - name: Running snapcraft build
+      #   run: |
+      #     snapcraft
+      #     printf ' [ INFO ] generated <snapcraft> files include:\n'
+      #     command ls -Al | grep "\.snap" | awk '{ print $9 }'
+      #     mv ./*.snap ./xplr.snap
 
       - name: Install gpg secret key
         run: |
@@ -117,6 +117,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # - name: Cleaning snapcraft
+      #   run: |
+      #     command rm --verbose ./*.snap
+      #     snapcraft clean
+
   publish-gpg-signature:
     name: Publishing GPG signature
     runs-on: ubuntu-latest
@@ -141,10 +146,6 @@ jobs:
             source.tar.gz.asc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Cleaning snapcraft
-        run: |
-          command rm --verbose ./*.snap
-          snapcraft clean
 
   publish-cargo:
     name: Publishing to Cargo
