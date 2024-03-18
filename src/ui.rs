@@ -18,7 +18,7 @@ use std::ops::BitXor;
 use time::macros::format_description;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
-use tui::style::{Color, Modifier as TuiModifier, Style as TuiStyle};
+use tui::style::{Color as TuiColor, Modifier as TuiModifier, Style as TuiStyle};
 use tui::text::{Line, Span, Text};
 use tui::widgets::{
     Block, BorderType as TuiBorderType, Borders as TuiBorders, Cell, List, ListItem,
@@ -26,9 +26,10 @@ use tui::widgets::{
 };
 use tui::Frame;
 
+const DEFAULT_STYLE: TuiStyle = TuiStyle::new();
+
 lazy_static! {
     pub static ref NO_COLOR: bool = env::var("NO_COLOR").is_ok();
-    pub static ref DEFAULT_STYLE: TuiStyle = TuiStyle::default();
 }
 
 fn read_only_indicator(app: &app::App) -> &str {
@@ -297,6 +298,59 @@ fn extend_optional_modifiers(
     }
 }
 
+// raratui doesn't support directly serializing `Color::Rgb` and
+// `Color::Indexed` anymore.
+// See https://github.com/ratatui-org/ratatui/pull/934
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
+pub enum Color {
+    #[default]
+    Reset,
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    Gray,
+    DarkGray,
+    LightRed,
+    LightGreen,
+    LightYellow,
+    LightBlue,
+    LightMagenta,
+    LightCyan,
+    White,
+    Rgb(u8, u8, u8),
+    Indexed(u8),
+}
+
+impl From<Color> for TuiColor {
+    fn from(value: Color) -> Self {
+        match value {
+            Color::Reset => TuiColor::Reset,
+            Color::Black => TuiColor::Black,
+            Color::Red => TuiColor::Red,
+            Color::Green => TuiColor::Green,
+            Color::Yellow => TuiColor::Yellow,
+            Color::Blue => TuiColor::Blue,
+            Color::Magenta => TuiColor::Magenta,
+            Color::Cyan => TuiColor::Cyan,
+            Color::Gray => TuiColor::Gray,
+            Color::DarkGray => TuiColor::DarkGray,
+            Color::LightRed => TuiColor::LightRed,
+            Color::LightGreen => TuiColor::LightGreen,
+            Color::LightYellow => TuiColor::LightYellow,
+            Color::LightBlue => TuiColor::LightBlue,
+            Color::LightMagenta => TuiColor::LightMagenta,
+            Color::LightCyan => TuiColor::LightCyan,
+            Color::White => TuiColor::White,
+            Color::Rgb(r, g, b) => TuiColor::Rgb(r, g, b),
+            Color::Indexed(index) => TuiColor::Indexed(index),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Style {
@@ -322,8 +376,8 @@ impl Style {
     }
 }
 
-impl Into<TuiStyle> for Style {
-    fn into(self) -> TuiStyle {
+impl From<Style> for TuiStyle {
+    fn from(val: Style) -> Self {
         fn xor(modifiers: Option<IndexSet<Modifier>>) -> u16 {
             modifiers
                 .unwrap_or_default()
@@ -332,14 +386,13 @@ impl Into<TuiStyle> for Style {
                 .fold(0, BitXor::bitxor)
         }
         if *NO_COLOR {
-            *DEFAULT_STYLE
+            DEFAULT_STYLE
         } else {
             TuiStyle {
-                fg: self.fg,
-                bg: self.bg,
-                underline_color: None,
-                add_modifier: TuiModifier::from_bits_truncate(xor(self.add_modifiers)),
-                sub_modifier: TuiModifier::from_bits_truncate(xor(self.sub_modifiers)),
+                fg: val.fg.map(Into::into),
+                bg: val.bg.map(Into::into),
+                add_modifier: TuiModifier::from_bits_truncate(xor(val.add_modifiers)),
+                sub_modifier: TuiModifier::from_bits_truncate(xor(val.sub_modifiers)),
             }
         }
     }
@@ -378,8 +431,8 @@ impl From<&LsColorsStyle> for Style {
     }
 }
 
-impl Into<nu_ansi_term::Style> for Style {
-    fn into(self) -> nu_ansi_term::Style {
+impl From<Style> for nu_ansi_term::Style {
+    fn from(val: Style) -> Self {
         fn convert_color(color: Color) -> Option<nu_ansi_term::Color> {
             match color {
                 Color::Black => Some(nu_ansi_term::Color::Black),
@@ -411,20 +464,20 @@ impl Into<nu_ansi_term::Style> for Style {
         }
 
         let mut style = nu_ansi_term::Style::new();
-        style.foreground = self.fg.and_then(convert_color);
-        style.background = self.bg.and_then(convert_color);
-        style.is_bold = match_modifiers(&self, |m| m.contains(&Modifier::Bold));
-        style.is_dimmed = match_modifiers(&self, |m| m.contains(&Modifier::Dim));
-        style.is_italic = match_modifiers(&self, |m| m.contains(&Modifier::Italic));
+        style.foreground = val.fg.and_then(convert_color);
+        style.background = val.bg.and_then(convert_color);
+        style.is_bold = match_modifiers(&val, |m| m.contains(&Modifier::Bold));
+        style.is_dimmed = match_modifiers(&val, |m| m.contains(&Modifier::Dim));
+        style.is_italic = match_modifiers(&val, |m| m.contains(&Modifier::Italic));
         style.is_underline =
-            match_modifiers(&self, |m| m.contains(&Modifier::Underlined));
-        style.is_blink = match_modifiers(&self, |m| {
+            match_modifiers(&val, |m| m.contains(&Modifier::Underlined));
+        style.is_blink = match_modifiers(&val, |m| {
             m.contains(&Modifier::SlowBlink) || m.contains(&Modifier::RapidBlink)
         });
-        style.is_reverse = match_modifiers(&self, |m| m.contains(&Modifier::Reversed));
-        style.is_hidden = match_modifiers(&self, |m| m.contains(&Modifier::Hidden));
+        style.is_reverse = match_modifiers(&val, |m| m.contains(&Modifier::Reversed));
+        style.is_hidden = match_modifiers(&val, |m| m.contains(&Modifier::Hidden));
         style.is_strikethrough =
-            match_modifiers(&self, |m| m.contains(&Modifier::CrossedOut));
+            match_modifiers(&val, |m| m.contains(&Modifier::CrossedOut));
         style
     }
 }
@@ -658,11 +711,11 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
         ))
         .title(Span::styled(
             config.title.format.unwrap_or(default_title),
-            config.title.style.into(),
+            config.title.style,
         ))
-        .style(config.style.into())
+        .style(config.style)
         .border_type(config.border_type.unwrap_or_default().into())
-        .border_style(config.border_style.into())
+        .border_style(config.border_style)
 }
 
 fn draw_table(
@@ -784,10 +837,10 @@ fn draw_table(
                         })
                         .unwrap_or_default()
                         .into_iter()
-                        .map(|(text, style)| Cell::from(text).style(style.into()))
+                        .map(|(text, style)| Cell::from(text).style(style))
                         .collect::<Vec<Cell>>();
 
-                    Row::new(cols).style(row_style.to_owned().into())
+                    Row::new(cols).style(row_style.to_owned())
                 })
                 .collect::<Vec<Row>>()
         })
@@ -822,8 +875,8 @@ fn draw_table(
     };
 
     let table = Table::new(rows, table_constraints)
-        .style(app_config.general.table.style.to_owned().into())
-        .highlight_style(app_config.general.focus_ui.style.to_owned().into())
+        .style(app_config.general.table.style.to_owned())
+        .highlight_style(app_config.general.focus_ui.style.to_owned())
         .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
         .block(block(
             config,
@@ -842,12 +895,12 @@ fn draw_table(
                 .iter()
                 .map(|c| {
                     Cell::from(c.format.to_owned().unwrap_or_default())
-                        .style(c.style.to_owned().into())
+                        .style(c.style.to_owned())
                 })
                 .collect::<Vec<Cell>>(),
         )
         .height(header_height)
-        .style(app_config.general.table.header.style.to_owned().into()),
+        .style(app_config.general.table.header.style.to_owned()),
     );
 
     f.render_widget(table, layout_size);
@@ -891,8 +944,7 @@ fn draw_selection(
             string_to_text(out)
         })
         .map(|i| {
-            ListItem::new(i)
-                .style(app.config.general.selection.item.style.to_owned().into())
+            ListItem::new(i).style(app.config.general.selection.item.style.to_owned())
         })
         .collect();
 
@@ -990,7 +1042,7 @@ fn draw_input_buffer(
         let input_buf = Paragraph::new(Line::from(vec![
             Span::styled(
                 app.input.prompt.to_owned(),
-                app.config.general.prompt.style.to_owned().into(),
+                app.config.general.prompt.style.to_owned(),
             ),
             Span::raw(input.value()),
         ]))
@@ -1061,9 +1113,9 @@ fn draw_sort_n_filter(
                     (
                         Span::styled(
                             ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned().into(),
+                            ui.style.to_owned(),
                         ),
-                        Span::styled(f.input.to_owned(), ui.style.into()),
+                        Span::styled(f.input.to_owned(), ui.style),
                     )
                 })
                 .unwrap_or((Span::raw("f"), Span::raw("")))
@@ -1084,10 +1136,10 @@ fn draw_sort_n_filter(
                         .map(|f| format!("{f}{p}", p = &s.pattern))
                         .unwrap_or_else(|| s.pattern.clone());
                     (
-                        Span::styled(f, ui.style.into()),
+                        Span::styled(f, ui.style),
                         Span::styled(
                             direction.format.to_owned().unwrap_or_default(),
-                            direction.style.to_owned().into(),
+                            direction.style.to_owned(),
                         ),
                     )
                 })
@@ -1105,11 +1157,11 @@ fn draw_sort_n_filter(
                             (
                                 Span::styled(
                                     ui.format.to_owned().unwrap_or_default(),
-                                    ui.style.into(),
+                                    ui.style,
                                 ),
                                 Span::styled(
                                     direction.format.to_owned().unwrap_or_default(),
-                                    direction.style.to_owned().into(),
+                                    direction.style.to_owned(),
                                 ),
                             )
                         })
@@ -1119,7 +1171,7 @@ fn draw_sort_n_filter(
         )
         .zip(std::iter::repeat(Span::styled(
             ui.separator.format.to_owned().unwrap_or_default(),
-            ui.separator.style.to_owned().into(),
+            ui.separator.style.to_owned(),
         )))
         .flat_map(|((a, b), c)| vec![a, b, c])
         .collect::<Vec<Span>>();
@@ -1189,7 +1241,7 @@ fn draw_logs(
                     .collect::<Vec<_>>()
                     .join("\n");
 
-                ListItem::new(txt).style(cfg.style.to_owned().into())
+                ListItem::new(txt).style(cfg.style.to_owned())
             })
             .collect::<Vec<ListItem>>()
     };
@@ -1451,7 +1503,6 @@ pub fn draw(f: &mut Frame, app: &app::App, lua: &Lua) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tui::style::Color;
 
     fn modifier(m: Modifier) -> Option<IndexSet<Modifier>> {
         let mut x = IndexSet::new();
