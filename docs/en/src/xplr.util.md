@@ -11,6 +11,23 @@ xplr.util.version()
 -- { major = 0, minor = 0, patch = 0 }
 ```
 
+### xplr.util.debug
+
+Print the given value to the console, and return it as a string.
+Useful for debugging.
+
+Type: function( value ) -> string
+
+Example:
+
+```lua
+xplr.util.debug({ foo = "bar", bar = function() end })
+-- {
+--   ["bar"] = function: 0x55e5cebdeae0,
+--   ["foo"] = "bar",
+-- }
+```
+
 ### xplr.util.clone
 
 Clone/deepcopy a Lua value. Doesn't work with functions.

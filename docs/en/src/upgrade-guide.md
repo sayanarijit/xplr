@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.20.2][48] -> [v0.21.5][49]
+#### [v0.20.2][48] -> [v0.21.6][49]
 
 - Some plugins might stop rendering colors. Wait for them to update.
 - Rename `xplr.config.general.sort_and_filter_ui.search_identifier` to
@@ -123,6 +123,10 @@ compatibility.
   messages:
   - NextVisitedDeepBranch (bound to `)` key)
   - PreviousVisitedDeepBranch (bound to `(` key)
+- Since v0.21.6:
+  - You can use `c` and `m` keys in default mode to quickly copy
+    and move focused or selected files, without having to change directory.
+  - Use `xplr.util.debug()` to debug lua values.
 
 Thanks to @noahmayr for contributing to a major part of this release.
 
@@ -521,5 +525,5 @@ Else do the following:
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
-[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.5
+[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.6
 [50]: https://github.com/lotabout/skim#search-syntax

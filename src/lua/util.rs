@@ -13,6 +13,7 @@ use crate::ui::Layout;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
 use anyhow::Result;
+use lazy_static::lazy_static;
 use lscolors::LsColors;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -27,6 +28,10 @@ use serde_yaml as yaml;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
+
+lazy_static! {
+    static ref LS_COLORS: LsColors = LsColors::from_env().unwrap_or_default();
+}
 
 /// Get the xplr version details.
 ///
@@ -61,6 +66,30 @@ pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     })?;
 
     util.set("version", func)?;
+    Ok(util)
+}
+
+/// Print the given value to the console, and return it as a string.
+/// Useful for debugging.
+///
+/// Type: function( value ) -> string
+///
+/// Example:
+///
+/// ```lua
+/// xplr.util.debug({ foo = "bar", bar = function() end })
+/// -- {
+/// --   ["bar"] = function: 0x55e5cebdeae0,
+/// --   ["foo"] = "bar",
+/// -- }
+/// ```
+pub fn debug<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+    let func = lua.create_function(|_, value: Value| {
+        let log = format!("{:#?}", value);
+        println!("{}", log);
+        Ok(log)
+    })?;
+    util.set("debug", func)?;
     Ok(util)
 }
 
@@ -634,9 +663,8 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
-        let style = lscolors.style_for_path(path).map(Style::from);
+        let style = LS_COLORS.style_for_path(path).map(Style::from);
         lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
     util.set("lscolor", func)?;
@@ -838,6 +866,7 @@ pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
 
     util = version(util, lua)?;
+    util = debug(util, lua)?;
     util = clone(util, lua)?;
     util = exists(util, lua)?;
     util = is_dir(util, lua)?;

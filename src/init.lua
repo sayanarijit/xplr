@@ -1296,6 +1296,22 @@ xplr.config.modes.builtin.default = {
           "FocusPreviousSelection",
         },
       },
+      ["m"] = {
+        help = "move to",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "move_to" },
+          { SetInputBuffer = "" },
+        },
+      },
+      ["c"] = {
+        help = "copy to",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "copy_to" },
+          { SetInputBuffer = "" },
+        },
+      },
     },
     on_number = {
       help = "input",
@@ -1460,6 +1476,148 @@ xplr.config.modes.builtin.go_to_path = {
   },
 }
 
+-- The builtin move_to mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.move_to = {
+  name = "move_to",
+  prompt = "ð ❯ ",
+  key_bindings = {
+    on_key = {
+      ["enter"] = {
+        help = "submit",
+        messages = {
+          {
+            BashExec0 = [===[
+              DEST="$XPLR_INPUT_BUFFER"
+              [ -z "$DEST" ] && exit
+              if [ ! -d "$DEST" ] && ! mkdir -p -- "$DEST"; then
+                  "$XPLR" -m 'LogError: %q' "could not create $DEST"
+                  exit
+              fi
+              "$XPLR" -m "ChangeDirectory: %q" "$DEST"
+              ! cd -- "$DEST" && exit
+              DEST="$(pwd)" && echo "PWD=$DEST"
+              while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
+                if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to $BASENAME_ESC"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
+                else
+                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to $BASENAME_ESC"
+                fi
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      ["tab"] = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
+-- The builtin copy_to mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.copy_to = {
+  name = "copy_to",
+  prompt = "ð ❯ ",
+  key_bindings = {
+    on_key = {
+      ["enter"] = {
+        help = "submit",
+        messages = {
+          {
+            BashExec0 = [===[
+              DEST="$XPLR_INPUT_BUFFER"
+              [ -z "$DEST" ] && exit
+              if [ ! -d "$DEST" ] && ! mkdir -p -- "$DEST"; then
+                  "$XPLR" -m 'LogError: %q' "could not create $DEST"
+                  exit
+              fi
+              "$XPLR" -m "ChangeDirectory: %q" "$DEST"
+              ! cd -- "$DEST" && exit
+              DEST="$(pwd)" && echo "PWD=$DEST"
+              while IFS= read -r -d '' PTH; do
+                PTH_ESC=$(printf %q "$PTH")
+                BASENAME=$(basename -- "$PTH")
+                BASENAME_ESC=$(printf %q "$BASENAME")
+                if [ -e "$BASENAME" ]; then
+                  echo
+                  echo "$BASENAME_ESC exists, do you want to overwrite it?"
+                  read -p "[y]es, [n]o, [S]kip: " ANS < /dev/tty
+                  case "$ANS" in
+                    [yY]*)
+                      ;;
+                    [nN]*)
+                      read -p "Enter new name: " BASENAME < /dev/tty
+                      BASENAME_ESC=$(printf %q "$BASENAME")
+                      ;;
+                    *)
+                      continue
+                      ;;
+                  esac
+                fi
+                if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to $BASENAME_ESC"
+                  "$XPLR" -m 'FocusPath: %q' "$BASENAME"
+                else
+                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to $BASENAME_ESC"
+                fi
+              done < "${XPLR_PIPE_RESULT_OUT:?}"
+              echo
+              read -p "[press enter to continue]"
+            ]===],
+          },
+          "PopMode",
+        },
+      },
+      ["tab"] = {
+        help = "try complete",
+        messages = {
+          { CallLuaSilently = "builtin.try_complete_path" },
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
 -- The builtin selection ops mode.
 --
 -- Type: [Mode](https://xplr.dev/en/mode)
@@ -1531,10 +1689,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if cp -vr -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC copied to $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not copy $PTH_ESC to $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1571,10 +1729,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if mv -v -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC moved to $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not move $PTH_ESC to $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1611,10 +1769,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if ln -sv -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC softlinked as $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not softlink $PTH_ESC as $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
@@ -1651,10 +1809,10 @@ xplr.config.modes.builtin.selection_ops = {
                   esac
                 fi
                 if ln -v -- "${PTH:?}" "./${BASENAME:?}"; then
-                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC hardlinked as $BASENAME_ESC"
                   "$XPLR" -m 'FocusPath: %q' "$BASENAME"
                 else
-                  "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as ./$BASENAME_ESC"
+                  "$XPLR" -m 'LogError: %q' "could not hardlink $PTH_ESC as $BASENAME_ESC"
                 fi
               done < "${XPLR_PIPE_SELECTION_OUT:?}"
               echo
