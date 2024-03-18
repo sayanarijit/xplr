@@ -158,6 +158,17 @@
 <pre><code class="language-lua">xplr.util.version()
 -- { major = 0, minor = 0, patch = 0 }
 </code></pre>
+<h3 id="xplrutildebug"><a class="header" href="#xplrutildebug">xplr.util.debug</a></h3>
+<p>Print the given value to the console, and return it as a string.
+Useful for debugging.</p>
+<p>Type: function( value ) -&gt; string</p>
+<p>Example:</p>
+<pre><code class="language-lua">xplr.util.debug({ foo = &quot;bar&quot;, bar = function() end })
+-- {
+--   [&quot;bar&quot;] = function: 0x55e5cebdeae0,
+--   [&quot;foo&quot;] = &quot;bar&quot;,
+-- }
+</code></pre>
 <h3 id="xplrutilclone"><a class="header" href="#xplrutilclone">xplr.util.clone</a></h3>
 <p>Clone/deepcopy a Lua value. Doesn't work with functions.</p>
 <p>Type: function( value ) -&gt; value</p>
