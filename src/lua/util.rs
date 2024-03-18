@@ -13,6 +13,7 @@ use crate::ui::Layout;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
 use anyhow::Result;
+use lazy_static::lazy_static;
 use lscolors::LsColors;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -27,6 +28,10 @@ use serde_yaml as yaml;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
+
+lazy_static! {
+    static ref LS_COLORS: LsColors = LsColors::from_env().unwrap_or_default();
+}
 
 /// Get the xplr version details.
 ///
@@ -658,9 +663,8 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
-    let lscolors = LsColors::from_env().unwrap_or_default();
     let func = lua.create_function(move |lua, path: String| {
-        let style = lscolors.style_for_path(path).map(Style::from);
+        let style = LS_COLORS.style_for_path(path).map(Style::from);
         lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
     util.set("lscolor", func)?;
