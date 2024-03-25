@@ -28,7 +28,7 @@ natord = "1.0.9"
 anyhow = "1.0.81"
 serde_yaml = "0.9.33"
 crossterm = { version = "0.27.0", features = [], default-features = false }
-ansi-to-tui = "4.0.1"
+ansi-to-tui = "3.1.0"
 regex = "1.10.3"
 gethostname = "0.4.3"
 serde_json = "1.0.114"
