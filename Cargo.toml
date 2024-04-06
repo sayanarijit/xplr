@@ -73,7 +73,7 @@ features = ['serde']
 
 [dependencies.mlua]
 version = "0.9.6"
-features = ['luajit', 'vendored', 'serialize', 'send']
+features = ['luajit', 'serialize', 'send']
 
 [dependencies.tui-input]
 version = "0.8.0"
@@ -90,5 +90,7 @@ panic = 'abort'
 strip = true
 
 [features]
+default = ["vendored-lua"]
+vendored-lua = ["mlua/vendored"]
 
 
