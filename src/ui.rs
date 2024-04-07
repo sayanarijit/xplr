@@ -722,7 +722,7 @@ fn draw_table(
     f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
-    app: &app::App,
+    app: &mut app::App,
     lua: &Lua,
 ) {
     let panel_config = &app.config.general.panel_ui;
@@ -735,15 +735,16 @@ fn draw_table(
 
     let rows = app
         .directory_buffer
-        .as_ref()
+        .as_mut()
         .map(|dir| {
+            dir.scroll_state.skipped_rows = dir.scroll_state.calc_skipped_rows(height, dir.total);
             dir.nodes
                 .iter()
                 .enumerate()
-                .skip(height * (dir.focus / height.max(1)))
+                .skip(dir.scroll_state.skipped_rows)
                 .take(height)
                 .map(|(index, node)| {
-                    let is_focused = dir.focus == index;
+                    let is_focused = dir.scroll_state.current_focus == index;
 
                     let is_selected = app
                         .selection
@@ -772,9 +773,13 @@ fn draw_table(
                     let node_type = app_config.node_types.get(node);
 
                     let (relative_index, is_before_focus, is_after_focus) =
-                        match dir.focus.cmp(&index) {
-                            Ordering::Greater => (dir.focus - index, true, false),
-                            Ordering::Less => (index - dir.focus, false, true),
+                        match dir.scroll_state.current_focus.cmp(&index) {
+                            Ordering::Greater => {
+                                (dir.scroll_state.current_focus - index, true, false)
+                            }
+                            Ordering::Less => {
+                                (index - dir.scroll_state.current_focus, false, true)
+                            }
                             Ordering::Equal => (0, false, false),
                         };
 
@@ -1284,7 +1289,7 @@ pub fn draw_dynamic(
     f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
-    app: &app::App,
+    app: &mut app::App,
     func: &str,
     lua: &Lua,
 ) {
@@ -1308,7 +1313,7 @@ pub fn draw_static(
     f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
-    app: &app::App,
+    app: &mut app::App,
     panel: CustomPanel,
     _lua: &Lua,
 ) {
@@ -1402,7 +1407,7 @@ pub fn draw_layout(
     f: &mut Frame,
     screen_size: TuiRect,
     layout_size: TuiRect,
-    app: &app::App,
+    app: &mut app::App,
     lua: &Lua,
 ) {
     match layout {
@@ -1493,7 +1498,7 @@ pub fn draw_layout(
     }
 }
 
-pub fn draw(f: &mut Frame, app: &app::App, lua: &Lua) {
+pub fn draw(f: &mut Frame, app: &mut app::App, lua: &Lua) {
     let screen_size = f.size();
     let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).to_owned();
 

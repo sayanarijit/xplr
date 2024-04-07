@@ -752,7 +752,10 @@ impl App {
             self.explorer_config.clone(),
             self.pwd.clone().into(),
             focus.as_ref().map(PathBuf::from),
-            self.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
+            self.directory_buffer
+                .as_ref()
+                .map(|d| d.scroll_state.current_focus)
+                .unwrap_or(0),
         ) {
             Ok(dir) => self.set_directory(dir),
             Err(e) => {
@@ -791,7 +794,7 @@ impl App {
                 }
             }
 
-            dir.focus = 0;
+            dir.scroll_state.set_focus(0);
 
             if save_history {
                 if let Some(n) = self.focused_node() {
@@ -809,7 +812,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir.total.saturating_sub(1);
+            dir.scroll_state.set_focus(dir.total.saturating_sub(1));
 
             if let Some(n) = dir.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
@@ -822,14 +825,15 @@ impl App {
         let bounded = self.config.general.enforce_bounded_index_navigation;
 
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = if dir.focus == 0 {
+            if dir.scroll_state.current_focus == 0 {
                 if bounded {
-                    dir.focus
+                    dir.scroll_state.set_focus(dir.scroll_state.current_focus);
                 } else {
-                    dir.total.saturating_sub(1)
+                    dir.scroll_state.set_focus(dir.total.saturating_sub(1));
                 }
             } else {
-                dir.focus.saturating_sub(1)
+                dir.scroll_state
+                    .set_focus(dir.scroll_state.current_focus.saturating_sub(1));
             };
         };
         Ok(self)
@@ -882,7 +886,8 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir.focus.saturating_sub(index);
+            dir.scroll_state
+                .set_focus(dir.scroll_state.current_focus.saturating_sub(index));
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -907,14 +912,15 @@ impl App {
         let bounded = self.config.general.enforce_bounded_index_navigation;
 
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = if (dir.focus + 1) == dir.total {
+            if (dir.scroll_state.current_focus + 1) == dir.total {
                 if bounded {
-                    dir.focus
+                    dir.scroll_state.set_focus(dir.scroll_state.current_focus);
                 } else {
-                    0
+                    dir.scroll_state.set_focus(0);
                 }
             } else {
-                dir.focus + 1
+                dir.scroll_state
+                    .set_focus(dir.scroll_state.current_focus + 1);
             }
         };
         Ok(self)
@@ -967,10 +973,12 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.focus = dir
-                .focus
-                .saturating_add(index)
-                .min(dir.total.saturating_sub(1));
+            dir.scroll_state.set_focus(
+                dir.scroll_state
+                    .current_focus
+                    .saturating_add(index)
+                    .min(dir.total.saturating_sub(1)),
+            );
 
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
@@ -1238,7 +1246,8 @@ impl App {
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
         let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.focus = index.min(dir.total.saturating_sub(1));
+            dir.scroll_state
+                .set_focus(index.min(dir.total.saturating_sub(1)));
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -1275,7 +1284,7 @@ impl App {
                         history = history.push(n.absolute_path.clone());
                     }
                 }
-                dir_buf.focus = focus;
+                dir_buf.scroll_state.set_focus(focus);
                 if save_history {
                     if let Some(n) = dir_buf.focused_node() {
                         self.history = history.push(n.absolute_path.clone());
