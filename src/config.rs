@@ -353,6 +353,9 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub global_key_bindings: KeyBindings,
+
+    #[serde(default)]
+    pub vimlike_scrolling: bool,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]

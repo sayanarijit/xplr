@@ -18,7 +18,12 @@ impl ScrollState {
         self.current_focus = current_focus;
     }
 
-    pub fn calc_skipped_rows(&mut self, height: usize, total: usize) -> usize {
+    pub fn calc_skipped_rows(
+        &mut self,
+        height: usize,
+        total: usize,
+        vimlike_scrolling: bool,
+    ) -> usize {
         let current_focus = self.current_focus;
         let last_focus = self.last_focus;
         let first_visible_row = self.skipped_rows;
@@ -26,9 +31,7 @@ impl ScrollState {
         let end_cushion_row = (first_visible_row + height)
             .saturating_sub(ScrollState::PREVIEW_CUSHION + 1);
 
-        let vim_scrolling_enabled = true;
-
-        if !vim_scrolling_enabled {
+        if !vimlike_scrolling {
             height * (self.current_focus / height.max(1))
         } else if last_focus == None {
             // Just entered the directory

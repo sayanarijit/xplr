@@ -91,6 +91,11 @@ xplr.config.general.enable_recover_mode = false
 -- Type: boolean
 xplr.config.general.hide_remaps_in_help_menu = false
 
+-- Set it to `true` if you want vim-like scrolling.
+--
+-- Type: boolean
+xplr.config.general.vimlike_scrolling = false
+
 -- Set it to `true` if you want the cursor to stay in the same position when
 -- the focus is on the first path and you navigate to the previous path
 -- (by pressing `up`/`k`), or when the focus is on the last path and you

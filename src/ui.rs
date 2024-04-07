@@ -737,7 +737,11 @@ fn draw_table(
         .directory_buffer
         .as_mut()
         .map(|dir| {
-            dir.scroll_state.skipped_rows = dir.scroll_state.calc_skipped_rows(height, dir.total);
+            dir.scroll_state.skipped_rows = dir.scroll_state.calc_skipped_rows(
+                height,
+                dir.total,
+                app.config.general.vimlike_scrolling,
+            );
             dir.nodes
                 .iter()
                 .enumerate()
