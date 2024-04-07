@@ -754,7 +754,7 @@ impl App {
             focus.as_ref().map(PathBuf::from),
             self.directory_buffer
                 .as_ref()
-                .map(|d| d.scroll_state.current_focus)
+                .map(|d| d.scroll_state.get_focus())
                 .unwrap_or(0),
         ) {
             Ok(dir) => self.set_directory(dir),
@@ -825,15 +825,15 @@ impl App {
         let bounded = self.config.general.enforce_bounded_index_navigation;
 
         if let Some(dir) = self.directory_buffer_mut() {
-            if dir.scroll_state.current_focus == 0 {
+            if dir.scroll_state.get_focus() == 0 {
                 if bounded {
-                    dir.scroll_state.set_focus(dir.scroll_state.current_focus);
+                    dir.scroll_state.set_focus(dir.scroll_state.get_focus());
                 } else {
                     dir.scroll_state.set_focus(dir.total.saturating_sub(1));
                 }
             } else {
                 dir.scroll_state
-                    .set_focus(dir.scroll_state.current_focus.saturating_sub(1));
+                    .set_focus(dir.scroll_state.get_focus().saturating_sub(1));
             };
         };
         Ok(self)
@@ -887,7 +887,7 @@ impl App {
             }
 
             dir.scroll_state
-                .set_focus(dir.scroll_state.current_focus.saturating_sub(index));
+                .set_focus(dir.scroll_state.get_focus().saturating_sub(index));
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -912,15 +912,15 @@ impl App {
         let bounded = self.config.general.enforce_bounded_index_navigation;
 
         if let Some(dir) = self.directory_buffer_mut() {
-            if (dir.scroll_state.current_focus + 1) == dir.total {
+            if (dir.scroll_state.get_focus() + 1) == dir.total {
                 if bounded {
-                    dir.scroll_state.set_focus(dir.scroll_state.current_focus);
+                    dir.scroll_state.set_focus(dir.scroll_state.get_focus());
                 } else {
                     dir.scroll_state.set_focus(0);
                 }
             } else {
                 dir.scroll_state
-                    .set_focus(dir.scroll_state.current_focus + 1);
+                    .set_focus(dir.scroll_state.get_focus() + 1);
             }
         };
         Ok(self)
@@ -975,7 +975,7 @@ impl App {
 
             dir.scroll_state.set_focus(
                 dir.scroll_state
-                    .current_focus
+                    .get_focus()
                     .saturating_add(index)
                     .min(dir.total.saturating_sub(1)),
             );

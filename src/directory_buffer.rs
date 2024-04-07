@@ -4,7 +4,7 @@ use time::OffsetDateTime;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ScrollState {
-    pub current_focus: usize,
+    current_focus: usize,
     pub last_focus: Option<usize>,
     pub skipped_rows: usize,
 }
@@ -16,6 +16,10 @@ impl ScrollState {
     pub fn set_focus(&mut self, current_focus: usize) {
         self.last_focus = Some(self.current_focus);
         self.current_focus = current_focus;
+    }
+
+    pub fn get_focus(&self) -> usize {
+        self.current_focus
     }
 
     pub fn calc_skipped_rows(

@@ -89,7 +89,7 @@ fn call(
     let focus_index = app
         .directory_buffer
         .as_ref()
-        .map(|d| d.scroll_state.current_focus)
+        .map(|d| d.scroll_state.get_focus())
         .unwrap_or_default()
         .to_string();
 
@@ -281,7 +281,7 @@ impl Runner {
             self.focused_path,
             app.directory_buffer
                 .as_ref()
-                .map(|d| d.scroll_state.current_focus)
+                .map(|d| d.scroll_state.get_focus())
                 .unwrap_or(0),
             tx_msg_in.clone(),
         );
@@ -433,7 +433,7 @@ impl Runner {
                                         .map(|n| n.relative_path.clone().into()),
                                     app.directory_buffer
                                         .as_ref()
-                                        .map(|d| d.scroll_state.current_focus)
+                                        .map(|d| d.scroll_state.get_focus())
                                         .unwrap_or(0),
                                     tx_msg_in.clone(),
                                 );
@@ -448,7 +448,7 @@ impl Runner {
                                         .map(|n| n.relative_path.clone().into()),
                                     app.directory_buffer
                                         .as_ref()
-                                        .map(|d| d.scroll_state.current_focus)
+                                        .map(|d| d.scroll_state.get_focus())
                                         .unwrap_or(0),
                                     tx_msg_in.clone(),
                                 );

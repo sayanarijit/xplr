@@ -748,7 +748,7 @@ fn draw_table(
                 .skip(dir.scroll_state.skipped_rows)
                 .take(height)
                 .map(|(index, node)| {
-                    let is_focused = dir.scroll_state.current_focus == index;
+                    let is_focused = dir.scroll_state.get_focus() == index;
 
                     let is_selected = app
                         .selection
@@ -777,12 +777,12 @@ fn draw_table(
                     let node_type = app_config.node_types.get(node);
 
                     let (relative_index, is_before_focus, is_after_focus) =
-                        match dir.scroll_state.current_focus.cmp(&index) {
+                        match dir.scroll_state.get_focus().cmp(&index) {
                             Ordering::Greater => {
-                                (dir.scroll_state.current_focus - index, true, false)
+                                (dir.scroll_state.get_focus() - index, true, false)
                             }
                             Ordering::Less => {
-                                (index - dir.scroll_state.current_focus, false, true)
+                                (index - dir.scroll_state.get_focus(), false, true)
                             }
                             Ordering::Equal => (0, false, false),
                         };
