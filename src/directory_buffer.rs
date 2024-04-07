@@ -110,3 +110,106 @@ fn now() -> OffsetDateTime {
         .ok()
         .unwrap_or_else(OffsetDateTime::now_utc)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calc_skipped_rows_non_vimlike_scrolling() {
+        let mut state = ScrollState {
+            current_focus: 10,
+            last_focus: Some(8),
+            skipped_rows: 0,
+        };
+
+        let height = 5;
+        let total = 20;
+        let vimlike_scrolling = false;
+
+        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        assert_eq!(result, height * (state.current_focus / height.max(1)));
+    }
+
+    #[test]
+    fn test_calc_skipped_rows_entered_directory() {
+        let mut state = ScrollState {
+            current_focus: 10,
+            last_focus: None,
+            skipped_rows: 0,
+        };
+
+        let height = 5;
+        let total = 20;
+        let vimlike_scrolling = true;
+
+        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_calc_skipped_rows_top_of_directory() {
+        let mut state = ScrollState {
+            current_focus: 0,
+            last_focus: Some(8),
+            skipped_rows: 5,
+        };
+
+        let height = 5;
+        let total = 20;
+        let vimlike_scrolling = true;
+
+        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_calc_skipped_rows_bottom_of_directory() {
+        let mut state = ScrollState {
+            current_focus: 19,
+            last_focus: Some(18),
+            skipped_rows: 15,
+        };
+
+        let height = 5;
+        let total = 20;
+        let vimlike_scrolling = true;
+
+        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        assert_eq!(result, 15);
+    }
+
+    #[test]
+    fn test_calc_skipped_rows_scrolling_down() {
+        let mut state = ScrollState {
+            current_focus: 12,
+            last_focus: Some(10),
+            skipped_rows: 10,
+        };
+
+        let height = 5;
+        let total = 20;
+        let vimlike_scrolling = true;
+
+        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        assert_eq!(result, 11);
+    }
+
+    #[test]
+    fn test_calc_skipped_rows_scrolling_up() {
+        let mut state = ScrollState {
+            current_focus: 8,
+            last_focus: Some(10),
+            skipped_rows: 10,
+        };
+
+        let height = 5;
+        let total = 20;
+        let vimlike_scrolling = true;
+
+        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        assert_eq!(result, 5);
+    }
+
+    // Add more tests for other scenarios...
+}
