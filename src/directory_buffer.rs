@@ -1,5 +1,3 @@
-use std::thread::current;
-
 use crate::node::Node;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -52,7 +50,7 @@ impl ScrollState {
             // When focus goes to last node
             total.saturating_sub(height)
         } else if (start_cushion_row..=end_cushion_row).contains(&current_focus) {
-            // IF within cushioned area; do nothing
+            // If within cushioned area; do nothing
             first_visible_row
         } else if current_focus > last_focus.unwrap() {
             // When scrolling down outside the view port

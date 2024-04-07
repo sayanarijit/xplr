@@ -27,8 +27,8 @@ use tui::Terminal;
 use tui_input::Input;
 
 pub fn get_tty() -> Result<fs::File> {
-    let tty = "/dev/stdout";
-    match fs::File::create(tty) {
+    let tty = "/dev/tty";
+    match fs::OpenOptions::new().read(true).write(true).open(tty) {
         Ok(f) => Ok(f),
         Err(e) => {
             bail!(format!("could not open {tty}. {e}"))
