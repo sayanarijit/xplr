@@ -31,18 +31,22 @@ impl ScrollState {
         let current_focus = self.current_focus;
         let last_focus = self.last_focus;
         let first_visible_row = self.skipped_rows;
+
+        // Calculate the cushion rows at the start and end of the view port
         let start_cushion_row = first_visible_row + ScrollState::PREVIEW_CUSHION;
         let end_cushion_row = (first_visible_row + height)
             .saturating_sub(ScrollState::PREVIEW_CUSHION + 1);
 
-        if !vimlike_scrolling {
+        let new_skipped_rows = if !vimlike_scrolling {
             height * (self.current_focus / height.max(1))
         } else if last_focus == None {
             // Just entered the directory
             0
         } else if current_focus == 0 {
+            // Focus on first node
             0
         } else if current_focus == total.saturating_sub(1) {
+            // Focus on last node
             total.saturating_sub(height)
         } else if current_focus > last_focus.unwrap() {
             // Scrolling down
@@ -63,7 +67,9 @@ impl ScrollState {
             } else {
                 current_focus.saturating_sub(ScrollState::PREVIEW_CUSHION)
             }
-        }
+        };
+
+        new_skipped_rows
     }
 }
 
