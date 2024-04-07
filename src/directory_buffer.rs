@@ -1,3 +1,5 @@
+use std::thread::current;
+
 use crate::node::Node;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -35,7 +37,8 @@ impl ScrollState {
         // Calculate the cushion rows at the start and end of the view port
         let start_cushion_row = first_visible_row + ScrollState::PREVIEW_CUSHION;
         let end_cushion_row = (first_visible_row + height)
-            .saturating_sub(ScrollState::PREVIEW_CUSHION + 1);
+            .saturating_sub(ScrollState::PREVIEW_CUSHION + 1)
+            .min(total.saturating_sub(ScrollState::PREVIEW_CUSHION + 1));
 
         let new_skipped_rows = if !vimlike_scrolling {
             height * (self.current_focus / height.max(1))
@@ -43,30 +46,38 @@ impl ScrollState {
             // Just entered the directory
             0
         } else if current_focus == 0 {
-            // Focus on first node
+            // When focus goes to first node
             0
         } else if current_focus == total.saturating_sub(1) {
-            // Focus on last node
+            // When focus goes to last node
             total.saturating_sub(height)
+        } else if (start_cushion_row..=end_cushion_row).contains(&current_focus) {
+            // IF within cushioned area; do nothing
+            first_visible_row
         } else if current_focus > last_focus.unwrap() {
-            // Scrolling down
-            if current_focus <= end_cushion_row {
-                first_visible_row
-            } else if total <= (current_focus + ScrollState::PREVIEW_CUSHION) {
-                first_visible_row
+            // When scrolling down outside the view port
+            if current_focus > total.saturating_sub(ScrollState::PREVIEW_CUSHION + 1) {
+                // When focusing the last nodes; always view the full last page
+                total.saturating_sub(height)
             } else {
-                (self.current_focus + ScrollState::PREVIEW_CUSHION + 1)
-                    .saturating_sub(height)
+                // When scrolling down the view port without reaching the last nodes
+                current_focus.saturating_sub(height - 1 - ScrollState::PREVIEW_CUSHION)
             }
-        } else {
-            // Scrolling up
-            if current_focus >= start_cushion_row {
-                first_visible_row
-            } else if current_focus <= ScrollState::PREVIEW_CUSHION {
+        } else if current_focus < last_focus.unwrap() {
+            // When scrolling up outside the view port
+            if current_focus < ScrollState::PREVIEW_CUSHION {
+                // When focusing the first nodes; always view the full first page
                 0
+            } else if current_focus > end_cushion_row {
+                // When scrolling up around from the last rows; do nothing
+                first_visible_row
             } else {
+                // When scrolling up the view port without reaching the first nodes
                 current_focus.saturating_sub(ScrollState::PREVIEW_CUSHION)
             }
+        } else {
+            // If nothing matches; do nothing
+            first_visible_row
         };
 
         new_skipped_rows
