@@ -23,7 +23,7 @@ impl ScrollState {
     }
 
     pub fn calc_skipped_rows(
-        &mut self,
+        &self,
         height: usize,
         total: usize,
         vimlike_scrolling: bool,
