@@ -7,11 +7,11 @@ pub struct ScrollState {
     current_focus: usize,
     pub last_focus: Option<usize>,
     pub skipped_rows: usize,
+    /* The number of visible next lines when scrolling towards either ends of the view port */
+    pub initial_preview_cushion: usize,
 }
 
 impl ScrollState {
-    /* The number of visible next lines when scrolling towards either ends of the view port */
-    pub const PREVIEW_CUSHION: usize = 5;
 
     pub fn set_focus(&mut self, current_focus: usize) {
         self.last_focus = Some(self.current_focus);
@@ -28,15 +28,25 @@ impl ScrollState {
         total: usize,
         vimlike_scrolling: bool,
     ) -> usize {
+        let preview_cushion = if height >= self.initial_preview_cushion * 3 {
+            self.initial_preview_cushion
+        } else if height >= 9 {
+            3
+        } else if height >= 3 {
+            1
+        } else {
+            0
+        };
+
         let current_focus = self.current_focus;
         let last_focus = self.last_focus;
         let first_visible_row = self.skipped_rows;
 
         // Calculate the cushion rows at the start and end of the view port
-        let start_cushion_row = first_visible_row + ScrollState::PREVIEW_CUSHION;
+        let start_cushion_row = first_visible_row + preview_cushion;
         let end_cushion_row = (first_visible_row + height)
-            .saturating_sub(ScrollState::PREVIEW_CUSHION + 1)
-            .min(total.saturating_sub(ScrollState::PREVIEW_CUSHION + 1));
+            .saturating_sub(preview_cushion + 1)
+            .min(total.saturating_sub(preview_cushion + 1));
 
         let new_skipped_rows = if !vimlike_scrolling {
             height * (self.current_focus / height.max(1))
@@ -54,16 +64,16 @@ impl ScrollState {
             first_visible_row
         } else if current_focus > last_focus.unwrap() {
             // When scrolling down the cushioned area
-            if current_focus > total.saturating_sub(ScrollState::PREVIEW_CUSHION + 1) {
+            if current_focus > total.saturating_sub(preview_cushion + 1) {
                 // When focusing the last nodes; always view the full last page
                 total.saturating_sub(height)
             } else {
                 // When scrolling down the cushioned area without reaching the last nodes
-                current_focus.saturating_sub(height - 1 - ScrollState::PREVIEW_CUSHION)
+                current_focus.saturating_sub(height.saturating_sub(preview_cushion + 1))
             }
         } else if current_focus < last_focus.unwrap() {
             // When scrolling up the cushioned area
-            if current_focus < ScrollState::PREVIEW_CUSHION {
+            if current_focus < preview_cushion {
                 // When focusing the first nodes; always view the full first page
                 0
             } else if current_focus > end_cushion_row {
@@ -71,7 +81,7 @@ impl ScrollState {
                 first_visible_row
             } else {
                 // When scrolling up the cushioned area without reaching the first nodes
-                current_focus.saturating_sub(ScrollState::PREVIEW_CUSHION)
+                current_focus.saturating_sub(preview_cushion)
             }
         } else {
             // If nothing matches; do nothing
@@ -104,6 +114,7 @@ impl DirectoryBuffer {
                 current_focus,
                 last_focus: None,
                 skipped_rows: 0,
+                initial_preview_cushion: 5,
             },
             explored_at: now(),
         }
@@ -126,10 +137,11 @@ mod tests {
 
     #[test]
     fn test_calc_skipped_rows_non_vimlike_scrolling() {
-        let mut state = ScrollState {
+        let state = ScrollState {
             current_focus: 10,
             last_focus: Some(8),
             skipped_rows: 0,
+            initial_preview_cushion: 5,
         };
 
         let height = 5;
@@ -142,10 +154,11 @@ mod tests {
 
     #[test]
     fn test_calc_skipped_rows_entered_directory() {
-        let mut state = ScrollState {
+        let state = ScrollState {
             current_focus: 10,
             last_focus: None,
             skipped_rows: 0,
+            initial_preview_cushion: 5,
         };
 
         let height = 5;
@@ -158,10 +171,11 @@ mod tests {
 
     #[test]
     fn test_calc_skipped_rows_top_of_directory() {
-        let mut state = ScrollState {
+        let state = ScrollState {
             current_focus: 0,
             last_focus: Some(8),
             skipped_rows: 5,
+            initial_preview_cushion: 5,
         };
 
         let height = 5;
@@ -174,10 +188,11 @@ mod tests {
 
     #[test]
     fn test_calc_skipped_rows_bottom_of_directory() {
-        let mut state = ScrollState {
+        let state = ScrollState {
             current_focus: 19,
             last_focus: Some(18),
             skipped_rows: 15,
+            initial_preview_cushion: 5,
         };
 
         let height = 5;
@@ -190,10 +205,11 @@ mod tests {
 
     #[test]
     fn test_calc_skipped_rows_scrolling_down() {
-        let mut state = ScrollState {
+        let state = ScrollState {
             current_focus: 12,
             last_focus: Some(10),
             skipped_rows: 10,
+            initial_preview_cushion: 5,
         };
 
         let height = 5;
@@ -201,15 +217,16 @@ mod tests {
         let vimlike_scrolling = true;
 
         let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
-        assert_eq!(result, 11);
+        assert_eq!(result, 10);
     }
 
     #[test]
     fn test_calc_skipped_rows_scrolling_up() {
-        let mut state = ScrollState {
+        let state = ScrollState {
             current_focus: 8,
             last_focus: Some(10),
             skipped_rows: 10,
+            initial_preview_cushion: 5,
         };
 
         let height = 5;
@@ -217,7 +234,7 @@ mod tests {
         let vimlike_scrolling = true;
 
         let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
-        assert_eq!(result, 5);
+        assert_eq!(result, 7);
     }
 
     // Add more tests for other scenarios...
