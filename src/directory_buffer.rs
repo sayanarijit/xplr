@@ -11,7 +11,7 @@ pub struct ScrollState {
 
 impl ScrollState {
     /* The number of visible next lines when scrolling towards either ends of the view port */
-    pub const PREVIEW_CUSHION: usize = 3;
+    pub const PREVIEW_CUSHION: usize = 5;
 
     pub fn set_focus(&mut self, current_focus: usize) {
         self.last_focus = Some(self.current_focus);
