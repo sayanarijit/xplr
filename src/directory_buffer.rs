@@ -53,24 +53,24 @@ impl ScrollState {
             // If within cushioned area; do nothing
             first_visible_row
         } else if current_focus > last_focus.unwrap() {
-            // When scrolling down outside the view port
+            // When scrolling down the cushioned area
             if current_focus > total.saturating_sub(ScrollState::PREVIEW_CUSHION + 1) {
                 // When focusing the last nodes; always view the full last page
                 total.saturating_sub(height)
             } else {
-                // When scrolling down the view port without reaching the last nodes
+                // When scrolling down the cushioned area without reaching the last nodes
                 current_focus.saturating_sub(height - 1 - ScrollState::PREVIEW_CUSHION)
             }
         } else if current_focus < last_focus.unwrap() {
-            // When scrolling up outside the view port
+            // When scrolling up the cushioned area
             if current_focus < ScrollState::PREVIEW_CUSHION {
                 // When focusing the first nodes; always view the full first page
                 0
             } else if current_focus > end_cushion_row {
-                // When scrolling up around from the last rows; do nothing
+                // When scrolling up from the last rows; do nothing
                 first_visible_row
             } else {
-                // When scrolling up the view port without reaching the first nodes
+                // When scrolling up the cushioned area without reaching the first nodes
                 current_focus.saturating_sub(ScrollState::PREVIEW_CUSHION)
             }
         } else {
