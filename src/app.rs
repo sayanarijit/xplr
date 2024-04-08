@@ -826,9 +826,7 @@ impl App {
 
         if let Some(dir) = self.directory_buffer_mut() {
             if dir.scroll_state.get_focus() == 0 {
-                if bounded {
-                    dir.scroll_state.set_focus(dir.scroll_state.get_focus());
-                } else {
+                if !bounded {
                     dir.scroll_state.set_focus(dir.total.saturating_sub(1));
                 }
             } else {
@@ -913,9 +911,7 @@ impl App {
 
         if let Some(dir) = self.directory_buffer_mut() {
             if (dir.scroll_state.get_focus() + 1) == dir.total {
-                if bounded {
-                    dir.scroll_state.set_focus(dir.scroll_state.get_focus());
-                } else {
+                if !bounded {
                     dir.scroll_state.set_focus(0);
                 }
             } else {
