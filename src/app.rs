@@ -915,8 +915,7 @@ impl App {
                     dir.scroll_state.set_focus(0);
                 }
             } else {
-                dir.scroll_state
-                    .set_focus(dir.scroll_state.get_focus() + 1);
+                dir.scroll_state.set_focus(dir.scroll_state.get_focus() + 1);
             }
         };
         Ok(self)

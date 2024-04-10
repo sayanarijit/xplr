@@ -12,7 +12,6 @@ pub struct ScrollState {
 }
 
 impl ScrollState {
-
     pub fn set_focus(&mut self, current_focus: usize) {
         self.last_focus = Some(self.current_focus);
         self.current_focus = current_focus;
@@ -48,9 +47,9 @@ impl ScrollState {
             .saturating_sub(preview_cushion + 1)
             .min(total.saturating_sub(preview_cushion + 1));
 
-        let new_skipped_rows = if !vimlike_scrolling {
+        if !vimlike_scrolling {
             height * (self.current_focus / height.max(1))
-        } else if last_focus == None {
+        } else if last_focus.is_none() {
             // Just entered the directory
             0
         } else if current_focus == 0 {
@@ -86,9 +85,7 @@ impl ScrollState {
         } else {
             // If nothing matches; do nothing
             first_visible_row
-        };
-
-        new_skipped_rows
+        }
     }
 }
 
