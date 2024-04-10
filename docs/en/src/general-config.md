@@ -42,6 +42,12 @@ Set it to `true` if you want to hide all remaps in the help menu.
 
 Type: boolean
 
+#### xplr.config.general.vimlike_scrolling
+
+Set it to `true` if you want vim-like scrolling.
+
+Type: boolean
+
 #### xplr.config.general.enforce_bounded_index_navigation
 
 Set it to `true` if you want the cursor to stay in the same position when

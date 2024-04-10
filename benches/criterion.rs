@@ -121,7 +121,7 @@ fn draw_benchmark(c: &mut Criterion) {
 
     c.bench_function("draw on terminal", |b| {
         b.iter(|| {
-            terminal.draw(|f| ui::draw(f, &app, &lua)).unwrap();
+            terminal.draw(|f| ui::draw(f, &mut app, &lua)).unwrap();
         })
     });
 
