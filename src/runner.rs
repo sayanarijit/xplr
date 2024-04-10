@@ -411,7 +411,7 @@ impl Runner {
                             }
 
                             ScrollUpHalf => {
-                                app = app.focus_next_by_relative_index(
+                                app = app.focus_previous_by_relative_index(
                                     terminal.size()?.height as usize / 2,
                                 )?;
                             }
