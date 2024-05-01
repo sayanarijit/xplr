@@ -3118,8 +3118,8 @@ xplr.fn.builtin.fmt_general_selection_item = function(n)
   if n.is_dir then
     shortened = shortened .. "/"
   end
-  local ls_style = xplr.util.lscolor(n.absolute_path)
   local meta_style = xplr.util.node_type(n).style
+  local ls_style = xplr.util.lscolor(n.absolute_path)
   local style = xplr.util.style_mix({ ls_style, meta_style })
   return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
@@ -3142,8 +3142,8 @@ end
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local r = m.tree .. m.prefix
-  local style = xplr.util.lscolor(m.absolute_path)
-  style = xplr.util.style_mix({ style, m.style })
+  local ls_style = xplr.util.lscolor(m.absolute_path)
+  local style = xplr.util.style_mix({ ls_style, m.style })
 
   if m.meta.icon == nil then
     r = r .. ""
