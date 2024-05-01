@@ -753,7 +753,6 @@ impl App {
             self.pwd.clone().into(),
             focus.as_ref().map(PathBuf::from),
             self.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
-            self.config.general.vimlike_scrolling,
         ) {
             Ok(dir) => self.set_directory(dir),
             Err(e) => {

@@ -91,10 +91,16 @@ xplr.config.general.enable_recover_mode = false
 -- Type: boolean
 xplr.config.general.hide_remaps_in_help_menu = false
 
--- Set it to `true` if you want vim-like scrolling.
+-- Set it to `true` if you want paginated scrolling.
 --
 -- Type: boolean
-xplr.config.general.vimlike_scrolling = false
+xplr.config.general.paginated_scrolling = false
+
+-- Set the padding value to the scroll area. Only applicable when
+-- `xplr.config.general.paginated_scrolling` is set to `false`.
+--
+-- Type: boolean
+xplr.config.general.scroll_padding = 5
 
 -- Set it to `true` if you want the cursor to stay in the same position when
 -- the focus is on the first path and you navigate to the previous path

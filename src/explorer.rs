@@ -45,7 +45,6 @@ pub(crate) fn explore_sync(
     parent: PathBuf,
     focused_path: Option<PathBuf>,
     fallback_focus: usize,
-    vimlike_scrolling: bool,
 ) -> Result<DirectoryBuffer> {
     let nodes = explore(&parent, &config)?;
     let focus_index = if config.searcher.is_some() {
@@ -74,33 +73,26 @@ pub(crate) fn explore_async(
     parent: PathBuf,
     focused_path: Option<PathBuf>,
     fallback_focus: usize,
-    vimlike_scrolling: bool,
     tx_msg_in: Sender<Task>,
 ) {
     thread::spawn(move || {
-        explore_sync(
-            config,
-            parent.clone(),
-            focused_path,
-            fallback_focus,
-            vimlike_scrolling,
-        )
-        .and_then(|buf| {
-            tx_msg_in
-                .send(Task::new(
-                    MsgIn::Internal(InternalMsg::SetDirectory(buf)),
-                    None,
-                ))
-                .map_err(Error::new)
-        })
-        .unwrap_or_else(|e| {
-            tx_msg_in
-                .send(Task::new(
-                    MsgIn::External(ExternalMsg::LogError(e.to_string())),
-                    None,
-                ))
-                .unwrap_or_default(); // Let's not panic if xplr closes.
-        })
+        explore_sync(config, parent.clone(), focused_path, fallback_focus)
+            .and_then(|buf| {
+                tx_msg_in
+                    .send(Task::new(
+                        MsgIn::Internal(InternalMsg::SetDirectory(buf)),
+                        None,
+                    ))
+                    .map_err(Error::new)
+            })
+            .unwrap_or_else(|e| {
+                tx_msg_in
+                    .send(Task::new(
+                        MsgIn::External(ExternalMsg::LogError(e.to_string())),
+                        None,
+                    ))
+                    .unwrap_or_default(); // Let's not panic if xplr closes.
+            })
     });
 }
 
@@ -109,7 +101,6 @@ pub(crate) fn explore_recursive_async(
     parent: PathBuf,
     focused_path: Option<PathBuf>,
     fallback_focus: usize,
-    vimlike_scrolling: bool,
     tx_msg_in: Sender<Task>,
 ) {
     explore_async(
@@ -117,7 +108,6 @@ pub(crate) fn explore_recursive_async(
         parent.clone(),
         focused_path,
         fallback_focus,
-        vimlike_scrolling,
         tx_msg_in.clone(),
     );
     if let Some(grand_parent) = parent.parent() {
@@ -126,7 +116,6 @@ pub(crate) fn explore_recursive_async(
             grand_parent.into(),
             parent.file_name().map(|p| p.into()),
             0,
-            vimlike_scrolling,
             tx_msg_in,
         );
     }
@@ -141,7 +130,7 @@ mod tests {
         let config = ExplorerConfig::default();
         let path = PathBuf::from(".");
 
-        let r = explore_sync(config, path, None, 0, false);
+        let r = explore_sync(config, path, None, 0);
 
         assert!(r.is_ok());
     }
@@ -151,7 +140,7 @@ mod tests {
         let config = ExplorerConfig::default();
         let path = PathBuf::from("/there/is/no/path");
 
-        let r = explore_sync(config, path, None, 0, false);
+        let r = explore_sync(config, path, None, 0);
 
         assert!(r.is_err());
     }
@@ -180,7 +169,7 @@ mod tests {
         let path = PathBuf::from(".");
         let (tx_msg_in, rx_msg_in) = mpsc::channel();
 
-        explore_async(config, path, None, 0, false, tx_msg_in.clone());
+        explore_async(config, path, None, 0, tx_msg_in.clone());
 
         let task = rx_msg_in.recv().unwrap();
         let dbuf = extract_dirbuf_from_msg(task.msg);

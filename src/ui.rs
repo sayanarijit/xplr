@@ -743,12 +743,18 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
 pub struct UI<'lua> {
     pub lua: &'lua Lua,
     pub screen_size: TuiRect,
+    pub scrolltop: usize,
 }
 
 impl<'lua> UI<'lua> {
     pub fn new(lua: &'lua Lua) -> Self {
         let screen_size = Default::default();
-        Self { lua, screen_size }
+        let scrolltop = 0;
+        Self {
+            lua,
+            scrolltop,
+            screen_size,
+        }
     }
 }
 
@@ -766,10 +772,40 @@ impl UI<'_> {
             .directory_buffer
             .as_ref()
             .map(|dir| {
+                // Scroll
+                if app.config.general.paginated_scrolling {
+                    // Paginated scrolling
+                    self.scrolltop = height * (dir.focus / height.max(1))
+                } else {
+                    // vim-like-scrolling
+                    self.scrolltop = match dir.focus.cmp(&self.scrolltop) {
+                        Ordering::Greater => {
+                            // Scrolling down
+                            if dir.focus >= self.scrolltop + height {
+                                dir.focus - height + 1
+                            } else {
+                                self.scrolltop
+                            }
+                        }
+                        Ordering::Less => dir.focus,
+                        Ordering::Equal => self.scrolltop,
+                    };
+
+                    // Add padding if possible
+                    let padding = app.config.general.scroll_padding;
+                    if padding != 0 {
+                        if dir.focus < self.scrolltop + padding {
+                            self.scrolltop = dir.focus.saturating_sub(padding);
+                        } else if dir.focus >= self.scrolltop + height - padding {
+                            self.scrolltop = dir.focus + padding - height + 1;
+                        };
+                    }
+                };
+
                 dir.nodes
                     .iter()
                     .enumerate()
-                    .skip(height * (dir.focus / height.max(1)))
+                    .skip(self.scrolltop)
                     .take(height)
                     .map(|(index, node)| {
                         let is_focused = dir.focus == index;
