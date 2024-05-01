@@ -1,32 +1,52 @@
 use crate::node::Node;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use time::OffsetDateTime;
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ScrollState {
-    current_focus: usize,
+    pub current_focus: usize,
     pub last_focus: Option<usize>,
     pub skipped_rows: usize,
     /* The number of visible next lines when scrolling towards either ends of the view port */
     pub initial_preview_cushion: usize,
+
+    pub vimlike_scrolling: bool,
 }
 
 impl ScrollState {
-    pub fn set_focus(&mut self, current_focus: usize) {
+    pub fn new(current_focus: usize, total: usize, vimlike_scrolling: bool) -> Self {
+        let initial_preview_cushion = 5;
+        Self {
+            current_focus,
+            last_focus: None,
+            skipped_rows: 0,
+            initial_preview_cushion,
+            vimlike_scrolling,
+        }
+        .update_skipped_rows(initial_preview_cushion + 1, total)
+    }
+
+    pub fn set_focus(mut self, current_focus: usize) -> Self {
         self.last_focus = Some(self.current_focus);
         self.current_focus = current_focus;
+        self
     }
 
-    pub fn get_focus(&self) -> usize {
-        self.current_focus
+    pub fn update_skipped_rows(self, height: usize, total: usize) -> Self {
+        if self.vimlike_scrolling {
+            self.update_skipped_rows_vimlike(height, total)
+        } else {
+            self.update_skipped_rows_paginated(height)
+        }
     }
 
-    pub fn calc_skipped_rows(
-        &self,
-        height: usize,
-        total: usize,
-        vimlike_scrolling: bool,
-    ) -> usize {
+    pub fn update_skipped_rows_paginated(mut self, height: usize) -> Self {
+        self.skipped_rows = height * (self.current_focus / height.max(1));
+        self
+    }
+
+    pub fn update_skipped_rows_vimlike(mut self, height: usize, total: usize) -> Self {
         let preview_cushion = if height >= self.initial_preview_cushion * 3 {
             self.initial_preview_cushion
         } else if height >= 9 {
@@ -47,45 +67,52 @@ impl ScrollState {
             .saturating_sub(preview_cushion + 1)
             .min(total.saturating_sub(preview_cushion + 1));
 
-        if !vimlike_scrolling {
-            height * (self.current_focus / height.max(1))
-        } else if last_focus.is_none() {
-            // Just entered the directory
-            0
-        } else if current_focus == 0 {
+        self.skipped_rows = if current_focus == 0 {
             // When focus goes to first node
             0
         } else if current_focus == total.saturating_sub(1) {
             // When focus goes to last node
             total.saturating_sub(height)
-        } else if (start_cushion_row..=end_cushion_row).contains(&current_focus) {
+        } else if current_focus > start_cushion_row && current_focus <= end_cushion_row {
             // If within cushioned area; do nothing
             first_visible_row
-        } else if current_focus > last_focus.unwrap() {
-            // When scrolling down the cushioned area
-            if current_focus > total.saturating_sub(preview_cushion + 1) {
-                // When focusing the last nodes; always view the full last page
-                total.saturating_sub(height)
-            } else {
-                // When scrolling down the cushioned area without reaching the last nodes
-                current_focus.saturating_sub(height.saturating_sub(preview_cushion + 1))
-            }
-        } else if current_focus < last_focus.unwrap() {
-            // When scrolling up the cushioned area
-            if current_focus < preview_cushion {
-                // When focusing the first nodes; always view the full first page
-                0
-            } else if current_focus > end_cushion_row {
-                // When scrolling up from the last rows; do nothing
-                first_visible_row
-            } else {
-                // When scrolling up the cushioned area without reaching the first nodes
-                current_focus.saturating_sub(preview_cushion)
+        } else if let Some(last_focus) = last_focus {
+            match current_focus.cmp(&last_focus) {
+                Ordering::Greater => {
+                    // When scrolling down the cushioned area
+                    if current_focus > total.saturating_sub(preview_cushion + 1) {
+                        // When focusing the last nodes; always view the full last page
+                        total.saturating_sub(height)
+                    } else {
+                        // When scrolling down the cushioned area without reaching the last nodes
+                        current_focus
+                            .saturating_sub(height.saturating_sub(preview_cushion + 1))
+                    }
+                }
+
+                Ordering::Less => {
+                    // When scrolling up the cushioned area
+                    if current_focus < preview_cushion {
+                        // When focusing the first nodes; always view the full first page
+                        0
+                    } else if current_focus > end_cushion_row {
+                        // When scrolling up from the last rows; do nothing
+                        first_visible_row
+                    } else {
+                        // When scrolling up the cushioned area without reaching the first nodes
+                        current_focus.saturating_sub(preview_cushion)
+                    }
+                }
+                Ordering::Equal => {
+                    // Do nothing
+                    first_visible_row
+                }
             }
         } else {
-            // If nothing matches; do nothing
+            // Just entered dir
             first_visible_row
-        }
+        };
+        self
     }
 }
 
@@ -94,31 +121,26 @@ pub struct DirectoryBuffer {
     pub parent: String,
     pub nodes: Vec<Node>,
     pub total: usize,
-    pub scroll_state: ScrollState,
+    pub focus: usize,
 
     #[serde(skip, default = "now")]
     pub explored_at: OffsetDateTime,
 }
 
 impl DirectoryBuffer {
-    pub fn new(parent: String, nodes: Vec<Node>, current_focus: usize) -> Self {
+    pub fn new(parent: String, nodes: Vec<Node>, focus: usize) -> Self {
         let total = nodes.len();
         Self {
             parent,
             nodes,
             total,
-            scroll_state: ScrollState {
-                current_focus,
-                last_focus: None,
-                skipped_rows: 0,
-                initial_preview_cushion: 5,
-            },
+            focus,
             explored_at: now(),
         }
     }
 
     pub fn focused_node(&self) -> Option<&Node> {
-        self.nodes.get(self.scroll_state.current_focus)
+        self.nodes.get(self.focus)
     }
 }
 
@@ -133,36 +155,39 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_calc_skipped_rows_non_vimlike_scrolling() {
+    fn test_update_skipped_rows_paginated() {
         let state = ScrollState {
             current_focus: 10,
             last_focus: Some(8),
             skipped_rows: 0,
             initial_preview_cushion: 5,
+            vimlike_scrolling: false,
         };
 
         let height = 5;
-        let total = 20;
-        let vimlike_scrolling = false;
+        let total = 100;
 
-        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
-        assert_eq!(result, height * (state.current_focus / height.max(1)));
+        let state = state.update_skipped_rows(height, total);
+        assert_eq!(
+            state.skipped_rows,
+            height * (state.current_focus / height.max(1))
+        );
     }
 
     #[test]
-    fn test_calc_skipped_rows_entered_directory() {
+    fn test_update_skipped_rows_entered_directory() {
         let state = ScrollState {
-            current_focus: 10,
+            current_focus: 100,
             last_focus: None,
             skipped_rows: 0,
             initial_preview_cushion: 5,
+            vimlike_scrolling: true,
         };
 
         let height = 5;
-        let total = 20;
-        let vimlike_scrolling = true;
+        let total = 200;
 
-        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        let result = state.update_skipped_rows(height, total).skipped_rows;
         assert_eq!(result, 0);
     }
 
@@ -173,13 +198,13 @@ mod tests {
             last_focus: Some(8),
             skipped_rows: 5,
             initial_preview_cushion: 5,
+            vimlike_scrolling: true,
         };
 
         let height = 5;
         let total = 20;
-        let vimlike_scrolling = true;
 
-        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        let result = state.update_skipped_rows(height, total).skipped_rows;
         assert_eq!(result, 0);
     }
 
@@ -190,13 +215,13 @@ mod tests {
             last_focus: Some(18),
             skipped_rows: 15,
             initial_preview_cushion: 5,
+            vimlike_scrolling: true,
         };
 
         let height = 5;
         let total = 20;
-        let vimlike_scrolling = true;
 
-        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        let result = state.update_skipped_rows(height, total).skipped_rows;
         assert_eq!(result, 15);
     }
 
@@ -207,13 +232,13 @@ mod tests {
             last_focus: Some(10),
             skipped_rows: 10,
             initial_preview_cushion: 5,
+            vimlike_scrolling: true,
         };
 
         let height = 5;
         let total = 20;
-        let vimlike_scrolling = true;
 
-        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        let result = state.update_skipped_rows(height, total).skipped_rows;
         assert_eq!(result, 10);
     }
 
@@ -224,13 +249,13 @@ mod tests {
             last_focus: Some(10),
             skipped_rows: 10,
             initial_preview_cushion: 5,
+            vimlike_scrolling: true,
         };
 
         let height = 5;
         let total = 20;
-        let vimlike_scrolling = true;
 
-        let result = state.calc_skipped_rows(height, total, vimlike_scrolling);
+        let result = state.update_skipped_rows(height, total).skipped_rows;
         assert_eq!(result, 7);
     }
 

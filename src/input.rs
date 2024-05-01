@@ -647,7 +647,7 @@ impl Key {
             Self::ShiftZ => Some('Z'),
 
             Self::Space => Some(' '),
-            Self::Special(c) => Some(c.to_owned()),
+            Self::Special(c) => Some(*c),
 
             _ => None,
         }

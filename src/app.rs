@@ -335,12 +335,12 @@ impl App {
             &config
                 .general
                 .initial_mode
-                .to_owned()
+                .clone()
                 .unwrap_or_else(|| "default".into()),
         ) {
             Some(m) => m.clone().sanitized(
                 config.general.read_only,
-                config.general.global_key_bindings.to_owned(),
+                config.general.global_key_bindings.clone(),
             ),
             None => {
                 bail!("'default' mode is missing")
@@ -351,7 +351,7 @@ impl App {
             &config
                 .general
                 .initial_layout
-                .to_owned()
+                .clone()
                 .unwrap_or_else(|| "default".into()),
         ) {
             Some(l) => l.clone(),
@@ -752,10 +752,8 @@ impl App {
             self.explorer_config.clone(),
             self.pwd.clone().into(),
             focus.as_ref().map(PathBuf::from),
-            self.directory_buffer
-                .as_ref()
-                .map(|d| d.scroll_state.get_focus())
-                .unwrap_or(0),
+            self.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
+            self.config.general.vimlike_scrolling,
         ) {
             Ok(dir) => self.set_directory(dir),
             Err(e) => {
@@ -794,7 +792,7 @@ impl App {
                 }
             }
 
-            dir.scroll_state.set_focus(0);
+            dir.focus = 0;
 
             if save_history {
                 if let Some(n) = self.focused_node() {
@@ -812,7 +810,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.scroll_state.set_focus(dir.total.saturating_sub(1));
+            dir.focus = dir.total.saturating_sub(1);
 
             if let Some(n) = dir.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
@@ -823,15 +821,15 @@ impl App {
 
     fn focus_previous(mut self) -> Result<Self> {
         let bounded = self.config.general.enforce_bounded_index_navigation;
-
         if let Some(dir) = self.directory_buffer_mut() {
-            if dir.scroll_state.get_focus() == 0 {
-                if !bounded {
-                    dir.scroll_state.set_focus(dir.total.saturating_sub(1));
+            dir.focus = if dir.focus == 0 {
+                if bounded {
+                    dir.focus
+                } else {
+                    dir.total.saturating_sub(1)
                 }
             } else {
-                dir.scroll_state
-                    .set_focus(dir.scroll_state.get_focus().saturating_sub(1));
+                dir.focus.saturating_sub(1)
             };
         };
         Ok(self)
@@ -884,8 +882,7 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.scroll_state
-                .set_focus(dir.scroll_state.get_focus().saturating_sub(index));
+            dir.focus = dir.focus.saturating_sub(index);
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -908,16 +905,18 @@ impl App {
 
     fn focus_next(mut self) -> Result<Self> {
         let bounded = self.config.general.enforce_bounded_index_navigation;
-
         if let Some(dir) = self.directory_buffer_mut() {
-            if (dir.scroll_state.get_focus() + 1) == dir.total {
-                if !bounded {
-                    dir.scroll_state.set_focus(0);
+            dir.focus = if (dir.focus + 1) == dir.total {
+                if bounded {
+                    dir.focus
+                } else {
+                    0
                 }
             } else {
-                dir.scroll_state.set_focus(dir.scroll_state.get_focus() + 1);
+                dir.focus + 1
             }
         };
+
         Ok(self)
     }
 
@@ -968,12 +967,10 @@ impl App {
                 history = history.push(n.absolute_path.clone());
             }
 
-            dir.scroll_state.set_focus(
-                dir.scroll_state
-                    .get_focus()
-                    .saturating_add(index)
-                    .min(dir.total.saturating_sub(1)),
-            );
+            dir.focus = dir
+                .focus
+                .saturating_add(index)
+                .min(dir.total.saturating_sub(1));
 
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
@@ -998,7 +995,7 @@ impl App {
     fn follow_symlink(self) -> Result<Self> {
         if let Some(pth) = self
             .focused_node()
-            .and_then(|n| n.symlink.to_owned().map(|s| s.absolute_path))
+            .and_then(|n| n.symlink.clone().map(|s| s.absolute_path))
         {
             self.focus_path(&pth, true)
         } else {
@@ -1241,8 +1238,7 @@ impl App {
     fn focus_by_index(mut self, index: usize) -> Result<Self> {
         let history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
-            dir.scroll_state
-                .set_focus(index.min(dir.total.saturating_sub(1)));
+            dir.focus = index.min(dir.total.saturating_sub(1));
             if let Some(n) = self.focused_node() {
                 self.history = history.push(n.absolute_path.clone());
             }
@@ -1279,7 +1275,7 @@ impl App {
                         history = history.push(n.absolute_path.clone());
                     }
                 }
-                dir_buf.scroll_state.set_focus(focus);
+                dir_buf.focus = focus;
                 if save_history {
                     if let Some(n) = dir_buf.focused_node() {
                         self.history = history.push(n.absolute_path.clone());
@@ -1386,7 +1382,7 @@ impl App {
             self = self.push_mode();
             self.mode = mode.sanitized(
                 self.config.general.read_only,
-                self.config.general.global_key_bindings.to_owned(),
+                self.config.general.global_key_bindings.clone(),
             );
 
             // Hooks
@@ -1411,7 +1407,7 @@ impl App {
             self = self.push_mode();
             self.mode = mode.sanitized(
                 self.config.general.read_only,
-                self.config.general.global_key_bindings.to_owned(),
+                self.config.general.global_key_bindings.clone(),
             );
 
             // Hooks
@@ -1438,7 +1434,7 @@ impl App {
 
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.builtin.get(layout) {
-            self.layout = l.to_owned();
+            self.layout = l.clone();
 
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
@@ -1454,7 +1450,7 @@ impl App {
 
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.get_custom(layout) {
-            self.layout = l.to_owned();
+            self.layout = l.clone();
 
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
@@ -1579,7 +1575,7 @@ impl App {
 
     pub fn select(mut self) -> Result<Self> {
         let count = self.selection.len();
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+        if let Some(n) = self.focused_node().cloned() {
             self.selection.insert(n);
         }
 
@@ -1634,7 +1630,7 @@ impl App {
 
     pub fn un_select(mut self) -> Result<Self> {
         let count = self.selection.len();
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+        if let Some(n) = self.focused_node().cloned() {
             self.selection
                 .retain(|s| s.absolute_path != n.absolute_path);
         }
@@ -1808,7 +1804,7 @@ impl App {
             .config
             .general
             .initial_sorting
-            .to_owned()
+            .clone()
             .unwrap_or_default();
         Ok(self)
     }
