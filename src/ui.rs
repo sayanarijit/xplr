@@ -84,6 +84,7 @@ pub struct ContentRendererArg {
     pub app: app::LuaContextLight,
     pub screen_size: Rect,
     pub layout_size: Rect,
+    pub scrolltop: u16,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
@@ -764,8 +765,7 @@ impl UI<'_> {
         let config = panel_config.default.clone().extend(&panel_config.table);
         let app_config = app.config.clone();
         let header_height = app_config.general.table.header.height.unwrap_or(1);
-        let height: usize =
-            (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
+        let height: usize = layout_size.height.saturating_sub(header_height + 2).into();
         let row_style = app_config.general.table.row.style.clone();
 
         let rows = app
@@ -777,12 +777,12 @@ impl UI<'_> {
                     // Paginated scrolling
                     self.scrolltop = height * (dir.focus / height.max(1))
                 } else {
-                    // vim-like-scrolling
+                    // Vim-like-scrolling
                     self.scrolltop = match dir.focus.cmp(&self.scrolltop) {
                         Ordering::Greater => {
                             // Scrolling down
                             if dir.focus >= self.scrolltop + height {
-                                dir.focus - height + 1
+                                dir.focus.saturating_sub(height + 1)
                             } else {
                                 self.scrolltop
                             }
@@ -1326,6 +1326,7 @@ impl UI<'_> {
             app: app.to_lua_ctx_light(),
             layout_size: layout_size.into(),
             screen_size: self.screen_size.into(),
+            scrolltop: self.scrolltop as u16,
         };
 
         let panel: CustomPanel = lua::serialize(self.lua, &ctx)

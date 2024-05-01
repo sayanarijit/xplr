@@ -132,6 +132,8 @@ compatibility.
     `xplr.config.general.paginated_scrolling = true` to revert back to the
     paginated scrolling.
   - Set `xplr.config.general.scroll_padding` to customize the scroll padding.
+  - The calculated `scrolltop` value will be passed as part of the
+    `Content Rendeder Argument` in `Dynamic` layout renderer functions.
 
 Thanks to @noahmayr for contributing to a major part of this release.
 
