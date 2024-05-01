@@ -281,7 +281,6 @@ impl Runner {
             app.pwd.clone().into(),
             self.focused_path,
             app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
-            app.config.general.vimlike_scrolling,
             tx_msg_in.clone(),
         );
         tx_pwd_watcher.send(app.pwd.clone())?;
@@ -437,7 +436,6 @@ impl Runner {
                                         .as_ref()
                                         .map(|d| d.focus)
                                         .unwrap_or(0),
-                                    app.config.general.vimlike_scrolling,
                                     tx_msg_in.clone(),
                                 );
                                 tx_pwd_watcher.send(app.pwd.clone())?;
@@ -453,7 +451,6 @@ impl Runner {
                                         .as_ref()
                                         .map(|d| d.focus)
                                         .unwrap_or(0),
-                                    app.config.general.vimlike_scrolling,
                                     tx_msg_in.clone(),
                                 );
                                 tx_pwd_watcher.send(app.pwd.clone())?;

@@ -128,8 +128,10 @@ compatibility.
     and move focused or selected files, without having to change directory.
   - Use `xplr.util.debug()` to debug lua values.
 - Since v0.21.8:
-  - You can set `xplr.config.general.vimlike_scrolling = true` to enable
-    vim-like scrolling.
+  - Scroll behavior will default to vim-like continuous scrolling. You can set
+    `xplr.config.general.paginated_scrolling = true` to revert back to the
+    paginated scrolling.
+  - Set `xplr.config.general.scroll_padding` to customize the scroll padding.
 
 Thanks to @noahmayr for contributing to a major part of this release.
 
