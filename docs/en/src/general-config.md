@@ -42,9 +42,16 @@ Set it to `true` if you want to hide all remaps in the help menu.
 
 Type: boolean
 
-#### xplr.config.general.vimlike_scrolling
+#### xplr.config.general.paginated_scrolling
 
-Set it to `true` if you want vim-like scrolling.
+Set it to `true` if you want paginated scrolling.
+
+Type: boolean
+
+#### xplr.config.general.scroll_padding
+
+Set the padding value to the scroll area.
+Only applicable when `xplr.config.general.paginated_scrolling = false`.
 
 Type: boolean
 

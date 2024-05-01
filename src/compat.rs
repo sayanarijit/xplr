@@ -85,6 +85,7 @@ pub fn draw_custom_content(
                 app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
                 screen_size: ui.screen_size.into(),
+                scrolltop: ui.scrolltop as u16,
             };
 
             let render = lua::serialize(ui.lua, &ctx)
@@ -121,6 +122,7 @@ pub fn draw_custom_content(
                 app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
                 screen_size: ui.screen_size.into(),
+                scrolltop: ui.scrolltop as u16,
             };
 
             let items = lua::serialize(ui.lua, &ctx)
@@ -182,6 +184,7 @@ pub fn draw_custom_content(
                 app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
                 screen_size: ui.screen_size.into(),
+                scrolltop: ui.scrolltop as u16,
             };
 
             let rows = lua::serialize(ui.lua, &ctx)
