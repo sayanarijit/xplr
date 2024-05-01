@@ -60,6 +60,32 @@ pub fn string_to_text<'a>(string: String) -> Text<'a> {
     }
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Rect {
+    x: u16,
+    y: u16,
+    height: u16,
+    width: u16,
+}
+
+impl From<TuiRect> for Rect {
+    fn from(tui: TuiRect) -> Self {
+        Self {
+            x: tui.x,
+            y: tui.y,
+            height: tui.height,
+            width: tui.width,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ContentRendererArg {
+    pub app: app::LuaContextLight,
+    pub screen_size: Rect,
+    pub layout_size: Rect,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct LayoutOptions {
@@ -81,7 +107,7 @@ impl LayoutOptions {
         self.margin = other.margin.or(self.margin);
         self.horizontal_margin = other.horizontal_margin.or(self.horizontal_margin);
         self.vertical_margin = other.vertical_margin.or(self.vertical_margin);
-        self.constraints = other.constraints.to_owned().or(self.constraints);
+        self.constraints = other.constraints.clone().or(self.constraints);
         self
     }
 }
@@ -154,7 +180,7 @@ impl Layout {
                 },
             ) => Self::Horizontal {
                 config: sconfig.extend(oconfig),
-                splits: osplits.to_owned(),
+                splits: osplits.clone(),
             },
 
             (
@@ -168,9 +194,9 @@ impl Layout {
                 },
             ) => Self::Vertical {
                 config: sconfig.extend(oconfig),
-                splits: osplits.to_owned(),
+                splits: osplits.clone(),
             },
-            (_, other) => other.to_owned(),
+            (_, other) => other.clone(),
         }
     }
 
@@ -192,7 +218,7 @@ impl Layout {
             },
             other => {
                 if other == *target {
-                    replacement.to_owned()
+                    replacement.clone()
                 } else {
                     other
                 }
@@ -364,14 +390,10 @@ impl Style {
     pub fn extend(mut self, other: &Self) -> Self {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.add_modifiers = extend_optional_modifiers(
-            self.add_modifiers,
-            other.add_modifiers.to_owned(),
-        );
-        self.sub_modifiers = extend_optional_modifiers(
-            self.sub_modifiers,
-            other.sub_modifiers.to_owned(),
-        );
+        self.add_modifiers =
+            extend_optional_modifiers(self.add_modifiers, other.add_modifiers.clone());
+        self.sub_modifiers =
+            extend_optional_modifiers(self.sub_modifiers, other.sub_modifiers.clone());
         self
     }
 }
@@ -594,12 +616,12 @@ pub struct ResolvedNodeUiMetadata {
 impl From<ResolvedNode> for ResolvedNodeUiMetadata {
     fn from(node: ResolvedNode) -> Self {
         Self {
-            absolute_path: node.absolute_path.to_owned(),
-            extension: node.extension.to_owned(),
+            absolute_path: node.absolute_path.clone(),
+            extension: node.extension.clone(),
             is_dir: node.is_dir,
             is_file: node.is_file,
             is_readonly: node.is_readonly,
-            mime_essence: node.mime_essence.to_owned(),
+            mime_essence: node.mime_essence.clone(),
             size: node.size,
             human_size: node.human_size,
             created: node.created,
@@ -663,21 +685,21 @@ impl NodeUiMetadata {
         style: Style,
     ) -> Self {
         Self {
-            parent: node.parent.to_owned(),
-            relative_path: node.relative_path.to_owned(),
-            absolute_path: node.absolute_path.to_owned(),
-            extension: node.extension.to_owned(),
+            parent: node.parent.clone(),
+            relative_path: node.relative_path.clone(),
+            absolute_path: node.absolute_path.clone(),
+            extension: node.extension.clone(),
             is_symlink: node.is_symlink,
             is_broken: node.is_broken,
             is_dir: node.is_dir,
             is_file: node.is_file,
             is_readonly: node.is_readonly,
-            mime_essence: node.mime_essence.to_owned(),
+            mime_essence: node.mime_essence.clone(),
             size: node.size,
-            human_size: node.human_size.to_owned(),
-            permissions: node.permissions.to_owned(),
-            canonical: node.canonical.to_owned().map(ResolvedNode::into),
-            symlink: node.symlink.to_owned().map(ResolvedNode::into),
+            human_size: node.human_size.clone(),
+            permissions: node.permissions,
+            canonical: node.canonical.clone().map(ResolvedNode::into),
+            symlink: node.symlink.clone().map(ResolvedNode::into),
             created: node.created,
             last_modified: node.last_modified,
             uid: node.uid,
@@ -703,7 +725,7 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
         .borders(TuiBorders::from_bits_truncate(
             config
                 .borders
-                .to_owned()
+                .clone()
                 .unwrap_or_default()
                 .iter()
                 .map(|b| b.bits())
@@ -718,795 +740,724 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
         .border_style(config.border_style)
 }
 
-fn draw_table(
-    f: &mut Frame,
-    screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &mut app::App,
-    lua: &Lua,
-) {
-    let panel_config = &app.config.general.panel_ui;
-    let config = panel_config.default.to_owned().extend(&panel_config.table);
-    let app_config = app.config.to_owned();
-    let header_height = app_config.general.table.header.height.unwrap_or(1);
-    let height: usize =
-        (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
-    let row_style = app_config.general.table.row.style.to_owned();
+pub struct UI<'lua> {
+    pub lua: &'lua Lua,
+    pub screen_size: TuiRect,
+}
 
-    let rows = app
-        .directory_buffer
-        .as_mut()
-        .map(|dir| {
-            dir.scroll_state.skipped_rows = dir.scroll_state.calc_skipped_rows(
-                height,
-                dir.total,
-                app.config.general.vimlike_scrolling,
-            );
-            dir.nodes
-                .iter()
-                .enumerate()
-                .skip(dir.scroll_state.skipped_rows)
-                .take(height)
-                .map(|(index, node)| {
-                    let is_focused = dir.scroll_state.get_focus() == index;
+impl<'lua> UI<'lua> {
+    pub fn new(lua: &'lua Lua) -> Self {
+        let screen_size = Default::default();
+        Self { lua, screen_size }
+    }
+}
 
-                    let is_selected = app
-                        .selection
-                        .iter()
-                        .any(|s| s.absolute_path == node.absolute_path);
+impl UI<'_> {
+    fn draw_table(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+        let panel_config = &app.config.general.panel_ui;
+        let config = panel_config.default.clone().extend(&panel_config.table);
+        let app_config = app.config.clone();
+        let header_height = app_config.general.table.header.height.unwrap_or(1);
+        let height: usize =
+            (layout_size.height.max(header_height + 2) - (header_height + 2)).into();
+        let row_style = app_config.general.table.row.style.clone();
 
-                    let is_first = index == 0;
-                    let is_last = index == dir.total.max(1) - 1;
+        let rows = app
+            .directory_buffer
+            .as_ref()
+            .map(|dir| {
+                dir.nodes
+                    .iter()
+                    .enumerate()
+                    .skip(height * (dir.focus / height.max(1)))
+                    .take(height)
+                    .map(|(index, node)| {
+                        let is_focused = dir.focus == index;
 
-                    let tree = app_config
-                        .general
-                        .table
-                        .tree
-                        .to_owned()
-                        .map(|t| {
-                            if is_last {
-                                t.2.format
-                            } else if is_first {
-                                t.0.format
-                            } else {
-                                t.1.format
-                            }
-                        })
-                        .unwrap_or_default();
+                        let is_selected = app
+                            .selection
+                            .iter()
+                            .any(|s| s.absolute_path == node.absolute_path);
 
-                    let node_type = app_config.node_types.get(node);
+                        let is_first = index == 0;
+                        let is_last = index == dir.total.max(1) - 1;
 
-                    let (relative_index, is_before_focus, is_after_focus) =
-                        match dir.scroll_state.get_focus().cmp(&index) {
-                            Ordering::Greater => {
-                                (dir.scroll_state.get_focus() - index, true, false)
-                            }
-                            Ordering::Less => {
-                                (index - dir.scroll_state.get_focus(), false, true)
-                            }
-                            Ordering::Equal => (0, false, false),
+                        let tree = app_config
+                            .general
+                            .table
+                            .tree
+                            .clone()
+                            .map(|t| {
+                                if is_last {
+                                    t.2.format
+                                } else if is_first {
+                                    t.0.format
+                                } else {
+                                    t.1.format
+                                }
+                            })
+                            .unwrap_or_default();
+
+                        let node_type = app_config.node_types.get(node);
+
+                        let (relative_index, is_before_focus, is_after_focus) =
+                            match dir.focus.cmp(&index) {
+                                Ordering::Greater => (dir.focus - index, true, false),
+                                Ordering::Less => (index - dir.focus, false, true),
+                                Ordering::Equal => (0, false, false),
+                            };
+
+                        let (mut prefix, mut suffix, mut style) = {
+                            let ui = app_config.general.default_ui.clone();
+                            (ui.prefix, ui.suffix, ui.style.extend(&node_type.style))
                         };
 
-                    let (mut prefix, mut suffix, mut style) = {
-                        let ui = app_config.general.default_ui.to_owned();
-                        (ui.prefix, ui.suffix, ui.style.extend(&node_type.style))
-                    };
+                        if is_focused && is_selected {
+                            let ui = app_config.general.focus_selection_ui.clone();
+                            prefix = ui.prefix.clone().or(prefix);
+                            suffix = ui.suffix.clone().or(suffix);
+                            style = style.extend(&ui.style);
+                        } else if is_selected {
+                            let ui = app_config.general.selection_ui.clone();
+                            prefix = ui.prefix.clone().or(prefix);
+                            suffix = ui.suffix.clone().or(suffix);
+                            style = style.extend(&ui.style);
+                        } else if is_focused {
+                            let ui = app_config.general.focus_ui.clone();
+                            prefix = ui.prefix.clone().or(prefix);
+                            suffix = ui.suffix.clone().or(suffix);
+                            style = style.extend(&ui.style);
+                        };
 
-                    if is_focused && is_selected {
-                        let ui = app_config.general.focus_selection_ui.to_owned();
-                        prefix = ui.prefix.to_owned().or(prefix);
-                        suffix = ui.suffix.to_owned().or(suffix);
-                        style = style.extend(&ui.style);
-                    } else if is_selected {
-                        let ui = app_config.general.selection_ui.to_owned();
-                        prefix = ui.prefix.to_owned().or(prefix);
-                        suffix = ui.suffix.to_owned().or(suffix);
-                        style = style.extend(&ui.style);
-                    } else if is_focused {
-                        let ui = app_config.general.focus_ui.to_owned();
-                        prefix = ui.prefix.to_owned().or(prefix);
-                        suffix = ui.suffix.to_owned().or(suffix);
-                        style = style.extend(&ui.style);
-                    };
+                        let meta = NodeUiMetadata::new(
+                            node,
+                            index,
+                            relative_index,
+                            is_before_focus,
+                            is_after_focus,
+                            tree.unwrap_or_default(),
+                            prefix.unwrap_or_default(),
+                            suffix.unwrap_or_default(),
+                            is_selected,
+                            is_focused,
+                            dir.total,
+                            node_type.meta,
+                            style,
+                        );
 
-                    let meta = NodeUiMetadata::new(
-                        node,
-                        index,
-                        relative_index,
-                        is_before_focus,
-                        is_after_focus,
-                        tree.unwrap_or_default(),
-                        prefix.unwrap_or_default(),
-                        suffix.unwrap_or_default(),
-                        is_selected,
-                        is_focused,
-                        dir.total,
-                        node_type.meta,
-                        style,
-                    );
-
-                    let cols = lua::serialize::<NodeUiMetadata>(lua, &meta)
-                        .map(|v| {
-                            app_config
-                                .general
-                                .table
-                                .row
-                                .cols
-                                .to_owned()
-                                .unwrap_or_default()
-                                .iter()
-                                .filter_map(|c| {
-                                    c.format.as_ref().map(|f| {
-                                        let out = lua::call(lua, f, v.clone())
-                                            .unwrap_or_else(|e| format!("{e:?}"));
-                                        (string_to_text(out), c.style.to_owned())
+                        let cols = lua::serialize::<NodeUiMetadata>(self.lua, &meta)
+                            .map(|v| {
+                                app_config
+                                    .general
+                                    .table
+                                    .row
+                                    .cols
+                                    .clone()
+                                    .unwrap_or_default()
+                                    .iter()
+                                    .filter_map(|c| {
+                                        c.format.as_ref().map(|f| {
+                                            let out = lua::call(self.lua, f, v.clone())
+                                                .unwrap_or_else(|e| format!("{e:?}"));
+                                            (string_to_text(out), c.style.clone())
+                                        })
                                     })
-                                })
-                                .collect::<Vec<(Text, Style)>>()
-                        })
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(|(text, style)| Cell::from(text).style(style))
-                        .collect::<Vec<Cell>>();
+                                    .collect::<Vec<(Text, Style)>>()
+                            })
+                            .unwrap_or_default()
+                            .into_iter()
+                            .map(|(text, style)| Cell::from(text).style(style))
+                            .collect::<Vec<Cell>>();
 
-                    Row::new(cols).style(row_style.to_owned())
-                })
-                .collect::<Vec<Row>>()
-        })
-        .unwrap_or_default();
+                        Row::new(cols).style(row_style.clone())
+                    })
+                    .collect::<Vec<Row>>()
+            })
+            .unwrap_or_default();
 
-    let table_constraints: Vec<TuiConstraint> = app_config
-        .general
-        .table
-        .col_widths
-        .to_owned()
-        .unwrap_or_default()
-        .into_iter()
-        .map(|c| c.to_tui(screen_size, layout_size))
-        .collect();
+        let table_constraints: Vec<TuiConstraint> = app_config
+            .general
+            .table
+            .col_widths
+            .clone()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|c| c.to_tui(self.screen_size, layout_size))
+            .collect();
 
-    let pwd = if let Some(vroot) = app.vroot.as_ref() {
-        app.pwd.strip_prefix(vroot).unwrap_or(&app.pwd)
-    } else {
-        &app.pwd
+        let pwd = if let Some(vroot) = app.vroot.as_ref() {
+            app.pwd.strip_prefix(vroot).unwrap_or(&app.pwd)
+        } else {
+            &app.pwd
+        }
+        .trim_matches('/');
+
+        let pwd = path::escape(pwd);
+
+        let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
+
+        let node_count = app.directory_buffer.as_ref().map(|d| d.total).unwrap_or(0);
+        let node_count = if node_count == 0 {
+            String::new()
+        } else {
+            format!("({node_count}) ")
+        };
+
+        let table = Table::new(rows, table_constraints)
+            .style(app_config.general.table.style.clone())
+            .highlight_style(app_config.general.focus_ui.style.clone())
+            .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
+            .block(block(
+                config,
+                format!(" {vroot_indicator}/{pwd} {node_count}"),
+            ));
+
+        let table = table.clone().header(
+            Row::new(
+                app_config
+                    .general
+                    .table
+                    .header
+                    .cols
+                    .clone()
+                    .unwrap_or_default()
+                    .iter()
+                    .map(|c| {
+                        Cell::from(c.format.clone().unwrap_or_default())
+                            .style(c.style.clone())
+                    })
+                    .collect::<Vec<Cell>>(),
+            )
+            .height(header_height)
+            .style(app_config.general.table.header.style.clone()),
+        );
+
+        f.render_widget(table, layout_size);
     }
-    .trim_matches('/');
 
-    let pwd = path::escape(pwd);
+    fn draw_selection(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+        let panel_config = &app.config.general.panel_ui;
+        let config = panel_config.default.clone().extend(&panel_config.selection);
 
-    let vroot_indicator = if app.vroot.is_some() { "vroot:" } else { "" };
+        let selection_count = app.selection.len();
 
-    let node_count = app.directory_buffer.as_ref().map(|d| d.total).unwrap_or(0);
-    let node_count = if node_count == 0 {
-        String::new()
-    } else {
-        format!("({node_count}) ")
-    };
+        let selection: Vec<ListItem> = app
+            .selection
+            .iter()
+            .rev()
+            .take((layout_size.height.max(2) - 2).into())
+            .rev()
+            .map(|n| {
+                let out = app
+                    .config
+                    .general
+                    .selection
+                    .item
+                    .format
+                    .as_ref()
+                    .map(|f| {
+                        lua::serialize::<Node>(self.lua, n)
+                            .and_then(|n| lua::call(self.lua, f, n))
+                            .unwrap_or_else(|e| format!("{e:?}"))
+                    })
+                    .unwrap_or_else(|| n.absolute_path.clone());
+                string_to_text(out)
+            })
+            .map(|i| {
+                ListItem::new(i).style(app.config.general.selection.item.style.clone())
+            })
+            .collect();
 
-    let table = Table::new(rows, table_constraints)
-        .style(app_config.general.table.style.to_owned())
-        .highlight_style(app_config.general.focus_ui.style.to_owned())
-        .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
-        .block(block(
+        // Selected items
+        let selection_count = if selection_count == 0 {
+            String::new()
+        } else {
+            format!("({selection_count}) ")
+        };
+
+        let selection_list = List::new(selection)
+            .block(block(config, format!(" Selection {selection_count}")));
+
+        f.render_widget(selection_list, layout_size);
+    }
+
+    fn draw_help_menu(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+        let panel_config = &app.config.general.panel_ui;
+
+        let config = panel_config.default.clone().extend(&panel_config.help_menu);
+
+        let help_menu_rows = app
+            .mode
+            .help_menu()
+            .into_iter()
+            .map(|l| match l {
+                HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
+                HelpMenuLine::KeyMap(k, remaps, h) => Row::new({
+                    if app.config.general.hide_remaps_in_help_menu {
+                        [Cell::from(k), Cell::from(h)].to_vec()
+                    } else {
+                        [Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)]
+                            .to_vec()
+                    }
+                }),
+            })
+            .collect::<Vec<Row>>();
+
+        let widths = if app.config.general.hide_remaps_in_help_menu {
+            vec![TuiConstraint::Percentage(20), TuiConstraint::Percentage(80)]
+        } else {
+            vec![
+                TuiConstraint::Percentage(20),
+                TuiConstraint::Percentage(20),
+                TuiConstraint::Percentage(60),
+            ]
+        };
+        let help_menu = Table::new(help_menu_rows, widths).block(block(
             config,
-            format!(" {vroot_indicator}/{pwd} {node_count}"),
+            format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
         ));
+        f.render_widget(help_menu, layout_size);
+    }
 
-    let table = table.to_owned().header(
-        Row::new(
-            app_config
-                .general
-                .table
-                .header
-                .cols
-                .to_owned()
-                .unwrap_or_default()
-                .iter()
-                .map(|c| {
-                    Cell::from(c.format.to_owned().unwrap_or_default())
-                        .style(c.style.to_owned())
-                })
-                .collect::<Vec<Cell>>(),
-        )
-        .height(header_height)
-        .style(app_config.general.table.header.style.to_owned()),
-    );
+    fn draw_input_buffer(
+        &mut self,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+    ) {
+        if let Some(input) = app.input.buffer.as_ref() {
+            let panel_config = &app.config.general.panel_ui;
+            let config = panel_config
+                .default
+                .clone()
+                .extend(&panel_config.input_and_logs);
 
-    f.render_widget(table, layout_size);
-}
-
-fn draw_selection(
-    f: &mut Frame,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    lua: &Lua,
-) {
-    let panel_config = &app.config.general.panel_ui;
-    let config = panel_config
-        .default
-        .to_owned()
-        .extend(&panel_config.selection);
-
-    let selection_count = app.selection.len();
-
-    let selection: Vec<ListItem> = app
-        .selection
-        .iter()
-        .rev()
-        .take((layout_size.height.max(2) - 2).into())
-        .rev()
-        .map(|n| {
-            let out = app
-                .config
-                .general
-                .selection
-                .item
-                .format
+            let cursor_offset_left = config
+                .borders
                 .as_ref()
-                .map(|f| {
-                    lua::serialize::<Node>(lua, n)
-                        .and_then(|n| lua::call(lua, f, n))
-                        .unwrap_or_else(|e| format!("{e:?}"))
-                })
-                .unwrap_or_else(|| n.absolute_path.clone());
-            string_to_text(out)
-        })
-        .map(|i| {
-            ListItem::new(i).style(app.config.general.selection.item.style.to_owned())
-        })
-        .collect();
+                .map(|b| b.contains(&Border::Left))
+                .unwrap_or(false) as u16
+                + app.input.prompt.chars().count() as u16;
 
-    // Selected items
-    let selection_count = if selection_count == 0 {
-        String::new()
-    } else {
-        format!("({selection_count}) ")
-    };
+            let cursor_offset_right = config
+                .borders
+                .as_ref()
+                .map(|b| b.contains(&Border::Right))
+                .unwrap_or(false) as u16
+                + 1;
 
-    let selection_list = List::new(selection)
-        .block(block(config, format!(" Selection {selection_count}")));
+            let offset_width = cursor_offset_left + cursor_offset_right;
+            let width = layout_size.width.max(offset_width) - offset_width;
+            let scroll = input.visual_scroll(width.into()) as u16;
 
-    f.render_widget(selection_list, layout_size);
-}
+            let input_buf = Paragraph::new(Line::from(vec![
+                Span::styled(
+                    app.input.prompt.clone(),
+                    app.config.general.prompt.style.clone(),
+                ),
+                Span::raw(input.value()),
+            ]))
+            .scroll((0, scroll))
+            .block(block(
+                config,
+                format!(
+                    " Input [{}{}]{} ",
+                    app.mode.name,
+                    read_only_indicator(app),
+                    selection_indicator(app),
+                ),
+            ));
 
-fn draw_help_menu(
-    f: &mut Frame,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    _: &Lua,
-) {
-    let panel_config = &app.config.general.panel_ui;
+            f.render_widget(input_buf, layout_size);
+            f.set_cursor(
+                // Put cursor past the end of the input text
+                layout_size.x
+                    + (input.visual_cursor() as u16).min(width)
+                    + cursor_offset_left,
+                // Move one line down, from the border to the input line
+                layout_size.y + 1,
+            );
+        };
+    }
 
-    let config = panel_config
-        .default
-        .to_owned()
-        .extend(&panel_config.help_menu);
-
-    let help_menu_rows = app
-        .mode
-        .help_menu()
-        .into_iter()
-        .map(|l| match l {
-            HelpMenuLine::Paragraph(p) => Row::new([Cell::from(p)].to_vec()),
-            HelpMenuLine::KeyMap(k, remaps, h) => Row::new({
-                if app.config.general.hide_remaps_in_help_menu {
-                    [Cell::from(k), Cell::from(h)].to_vec()
-                } else {
-                    [Cell::from(k), Cell::from(remaps.join("|")), Cell::from(h)].to_vec()
-                }
-            }),
-        })
-        .collect::<Vec<Row>>();
-
-    let widths = if app.config.general.hide_remaps_in_help_menu {
-        vec![TuiConstraint::Percentage(20), TuiConstraint::Percentage(80)]
-    } else {
-        vec![
-            TuiConstraint::Percentage(20),
-            TuiConstraint::Percentage(20),
-            TuiConstraint::Percentage(60),
-        ]
-    };
-    let help_menu = Table::new(help_menu_rows, widths).block(block(
-        config,
-        format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
-    ));
-    f.render_widget(help_menu, layout_size);
-}
-
-fn draw_input_buffer(
-    f: &mut Frame,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    _: &Lua,
-) {
-    if let Some(input) = app.input.buffer.as_ref() {
+    fn draw_sort_n_filter(
+        &mut self,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+    ) {
         let panel_config = &app.config.general.panel_ui;
         let config = panel_config
             .default
-            .to_owned()
+            .clone()
+            .extend(&panel_config.sort_and_filter);
+        let ui = app.config.general.sort_and_filter_ui.clone();
+        let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
+        let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
+        let search = app.explorer_config.searcher.as_ref();
+
+        let defaultui = &ui.default_identifier;
+        let forwardui = defaultui
+            .clone()
+            .extend(&ui.sort_direction_identifiers.forward);
+        let reverseui = defaultui
+            .clone()
+            .extend(&ui.sort_direction_identifiers.reverse);
+
+        let orderedui = defaultui
+            .clone()
+            .extend(&ui.search_direction_identifiers.ordered);
+        let unorderedui = defaultui
+            .clone()
+            .extend(&ui.search_direction_identifiers.unordered);
+
+        let is_ordered_search = search.as_ref().map(|s| !s.unordered).unwrap_or(false);
+
+        let mut spans = filter_by
+            .iter()
+            .map(|f| {
+                ui.filter_identifiers
+                    .get(&f.filter)
+                    .map(|u| {
+                        let ui = defaultui.clone().extend(u);
+                        (
+                            Span::styled(
+                                ui.format.clone().unwrap_or_default(),
+                                ui.style.clone(),
+                            ),
+                            Span::styled(f.input.clone(), ui.style),
+                        )
+                    })
+                    .unwrap_or((Span::raw("f"), Span::raw("")))
+            })
+            .chain(search.iter().map(|s| {
+                ui.search_identifiers
+                    .get(&s.algorithm)
+                    .map(|u| {
+                        let direction = if s.unordered {
+                            &unorderedui
+                        } else {
+                            &orderedui
+                        };
+                        let ui = defaultui.clone().extend(u);
+                        let f = ui
+                            .format
+                            .as_ref()
+                            .map(|f| format!("{f}{p}", p = &s.pattern))
+                            .unwrap_or_else(|| s.pattern.clone());
+                        (
+                            Span::styled(f, ui.style),
+                            Span::styled(
+                                direction.format.clone().unwrap_or_default(),
+                                direction.style.clone(),
+                            ),
+                        )
+                    })
+                    .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
+            }))
+            .chain(
+                sort_by
+                    .iter()
+                    .map(|s| {
+                        let direction = if s.reverse { &reverseui } else { &forwardui };
+                        ui.sorter_identifiers
+                            .get(&s.sorter)
+                            .map(|u| {
+                                let ui = defaultui.clone().extend(u);
+                                (
+                                    Span::styled(
+                                        ui.format.clone().unwrap_or_default(),
+                                        ui.style,
+                                    ),
+                                    Span::styled(
+                                        direction.format.clone().unwrap_or_default(),
+                                        direction.style.clone(),
+                                    ),
+                                )
+                            })
+                            .unwrap_or((Span::raw("s"), Span::raw("")))
+                    })
+                    .take(if !is_ordered_search { sort_by.len() } else { 0 }),
+            )
+            .zip(std::iter::repeat(Span::styled(
+                ui.separator.format.clone().unwrap_or_default(),
+                ui.separator.style.clone(),
+            )))
+            .flat_map(|((a, b), c)| vec![a, b, c])
+            .collect::<Vec<Span>>();
+
+        spans.pop();
+
+        let item_count = filter_by.len() + sort_by.len();
+        let item_count = if item_count == 0 {
+            String::new()
+        } else {
+            format!("({item_count}) ")
+        };
+
+        let p = Paragraph::new(Line::from(spans))
+            .block(block(config, format!(" Sort & filter {item_count}")));
+
+        f.render_widget(p, layout_size);
+    }
+
+    fn draw_logs(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+        let panel_config = &app.config.general.panel_ui;
+        let config = panel_config
+            .default
+            .clone()
             .extend(&panel_config.input_and_logs);
+        let logs_config = app.config.general.logs.clone();
+        let logs = if app.logs_hidden {
+            vec![]
+        } else {
+            app.logs
+                .iter()
+                .rev()
+                .take(layout_size.height as usize)
+                .map(|log| {
+                    let fd = format_description!("[hour]:[minute]:[second]");
+                    let time =
+                        log.created_at.format(fd).unwrap_or_else(|_| "when?".into());
+                    let cfg = match log.level {
+                        app::LogLevel::Info => &logs_config.info,
+                        app::LogLevel::Warning => &logs_config.warning,
+                        app::LogLevel::Success => &logs_config.success,
+                        app::LogLevel::Error => &logs_config.error,
+                    };
 
-        let cursor_offset_left = config
-            .borders
-            .as_ref()
-            .map(|b| b.contains(&Border::Left))
-            .unwrap_or(false) as u16
-            + app.input.prompt.chars().count() as u16;
+                    let prefix =
+                        format!("{time}|{0}", cfg.format.clone().unwrap_or_default());
 
-        let cursor_offset_right = config
-            .borders
-            .as_ref()
-            .map(|b| b.contains(&Border::Right))
-            .unwrap_or(false) as u16
-            + 1;
+                    let padding = " ".repeat(prefix.chars().count());
 
-        let offset_width = cursor_offset_left + cursor_offset_right;
-        let width = layout_size.width.max(offset_width) - offset_width;
-        let scroll = input.visual_scroll(width.into()) as u16;
+                    let txt = log
+                        .message
+                        .lines()
+                        .enumerate()
+                        .map(|(i, line)| {
+                            if i == 0 {
+                                format!("{prefix}) {line}")
+                            } else {
+                                format!("{padding}  {line}")
+                            }
+                        })
+                        .take(layout_size.height as usize)
+                        .collect::<Vec<_>>()
+                        .join("\n");
 
-        let input_buf = Paragraph::new(Line::from(vec![
-            Span::styled(
-                app.input.prompt.to_owned(),
-                app.config.general.prompt.style.to_owned(),
-            ),
-            Span::raw(input.value()),
-        ]))
-        .scroll((0, scroll))
-        .block(block(
+                    ListItem::new(txt).style(cfg.style.clone())
+                })
+                .collect::<Vec<ListItem>>()
+        };
+
+        let logs_count = app.logs.len();
+        let logs_count = if logs_count == 0 {
+            String::new()
+        } else {
+            format!(" ({logs_count})")
+        };
+
+        let logs_list = List::new(logs).block(block(
             config,
             format!(
-                " Input [{}{}]{} ",
+                " Logs{} [{}{}]{} ",
+                logs_count,
                 app.mode.name,
                 read_only_indicator(app),
-                selection_indicator(app),
+                selection_indicator(app)
             ),
         ));
 
-        f.render_widget(input_buf, layout_size);
-        f.set_cursor(
-            // Put cursor past the end of the input text
-            layout_size.x
-                + (input.visual_cursor() as u16).min(width)
-                + cursor_offset_left,
-            // Move one line down, from the border to the input line
-            layout_size.y + 1,
-        );
-    };
-}
+        f.render_widget(logs_list, layout_size);
+    }
 
-fn draw_sort_n_filter(
-    f: &mut Frame,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    _: &Lua,
-) {
-    let panel_config = &app.config.general.panel_ui;
-    let config = panel_config
-        .default
-        .to_owned()
-        .extend(&panel_config.sort_and_filter);
-    let ui = app.config.general.sort_and_filter_ui.to_owned();
-    let filter_by: &IndexSet<NodeFilterApplicable> = &app.explorer_config.filters;
-    let sort_by: &IndexSet<NodeSorterApplicable> = &app.explorer_config.sorters;
-    let search = app.explorer_config.searcher.as_ref();
+    fn draw_nothing(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+        let panel_config = &app.config.general.panel_ui;
+        let config = panel_config.default.clone();
+        let nothing = Paragraph::new("").block(block(config, "".into()));
+        f.render_widget(nothing, layout_size);
+    }
 
-    let defaultui = &ui.default_identifier;
-    let forwardui = defaultui
-        .to_owned()
-        .extend(&ui.sort_direction_identifiers.forward);
-    let reverseui = defaultui
-        .to_owned()
-        .extend(&ui.sort_direction_identifiers.reverse);
+    fn draw_dynamic(
+        &mut self,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+        func: &str,
+    ) {
+        let ctx = ContentRendererArg {
+            app: app.to_lua_ctx_light(),
+            layout_size: layout_size.into(),
+            screen_size: self.screen_size.into(),
+        };
 
-    let orderedui = defaultui
-        .to_owned()
-        .extend(&ui.search_direction_identifiers.ordered);
-    let unorderedui = defaultui
-        .to_owned()
-        .extend(&ui.search_direction_identifiers.unordered);
+        let panel: CustomPanel = lua::serialize(self.lua, &ctx)
+            .and_then(|arg| lua::call(self.lua, func, arg))
+            .unwrap_or_else(|e| CustomPanel::CustomParagraph {
+                ui: app.config.general.panel_ui.default.clone(),
+                body: format!("{e:?}"),
+            });
 
-    let is_ordered_search = search.as_ref().map(|s| !s.unordered).unwrap_or(false);
+        self.draw_static(f, layout_size, app, panel);
+    }
 
-    let mut spans = filter_by
-        .iter()
-        .map(|f| {
-            ui.filter_identifiers
-                .get(&f.filter)
-                .map(|u| {
-                    let ui = defaultui.to_owned().extend(u);
-                    (
-                        Span::styled(
-                            ui.format.to_owned().unwrap_or_default(),
-                            ui.style.to_owned(),
-                        ),
-                        Span::styled(f.input.to_owned(), ui.style),
-                    )
-                })
-                .unwrap_or((Span::raw("f"), Span::raw("")))
-        })
-        .chain(search.iter().map(|s| {
-            ui.search_identifiers
-                .get(&s.algorithm)
-                .map(|u| {
-                    let direction = if s.unordered {
-                        &unorderedui
-                    } else {
-                        &orderedui
-                    };
-                    let ui = defaultui.to_owned().extend(u);
-                    let f = ui
-                        .format
-                        .as_ref()
-                        .map(|f| format!("{f}{p}", p = &s.pattern))
-                        .unwrap_or_else(|| s.pattern.clone());
-                    (
-                        Span::styled(f, ui.style),
-                        Span::styled(
-                            direction.format.to_owned().unwrap_or_default(),
-                            direction.style.to_owned(),
-                        ),
-                    )
-                })
-                .unwrap_or((Span::raw("/"), Span::raw(&s.pattern)))
-        }))
-        .chain(
-            sort_by
-                .iter()
-                .map(|s| {
-                    let direction = if s.reverse { &reverseui } else { &forwardui };
-                    ui.sorter_identifiers
-                        .get(&s.sorter)
-                        .map(|u| {
-                            let ui = defaultui.to_owned().extend(u);
-                            (
-                                Span::styled(
-                                    ui.format.to_owned().unwrap_or_default(),
-                                    ui.style,
-                                ),
-                                Span::styled(
-                                    direction.format.to_owned().unwrap_or_default(),
-                                    direction.style.to_owned(),
-                                ),
-                            )
-                        })
-                        .unwrap_or((Span::raw("s"), Span::raw("")))
-                })
-                .take(if !is_ordered_search { sort_by.len() } else { 0 }),
-        )
-        .zip(std::iter::repeat(Span::styled(
-            ui.separator.format.to_owned().unwrap_or_default(),
-            ui.separator.style.to_owned(),
-        )))
-        .flat_map(|((a, b), c)| vec![a, b, c])
-        .collect::<Vec<Span>>();
+    fn draw_static(
+        &mut self,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+        panel: CustomPanel,
+    ) {
+        let defaultui = app.config.general.panel_ui.default.clone();
+        match panel {
+            CustomPanel::CustomParagraph { ui, body } => {
+                let config = defaultui.extend(&ui);
+                let body = string_to_text(body);
+                let content = Paragraph::new(body).block(block(config, "".into()));
+                f.render_widget(content, layout_size);
+            }
 
-    spans.pop();
+            CustomPanel::CustomList { ui, body } => {
+                let config = defaultui.extend(&ui);
 
-    let item_count = filter_by.len() + sort_by.len();
-    let item_count = if item_count == 0 {
-        String::new()
-    } else {
-        format!("({item_count}) ")
-    };
+                let items = body
+                    .into_iter()
+                    .map(string_to_text)
+                    .map(ListItem::new)
+                    .collect::<Vec<ListItem>>();
 
-    let p = Paragraph::new(Line::from(spans))
-        .block(block(config, format!(" Sort & filter {item_count}")));
+                let content = List::new(items).block(block(config, "".into()));
+                f.render_widget(content, layout_size);
+            }
 
-    f.render_widget(p, layout_size);
-}
-
-fn draw_logs(
-    f: &mut Frame,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    _: &Lua,
-) {
-    let panel_config = &app.config.general.panel_ui;
-    let config = panel_config
-        .default
-        .to_owned()
-        .extend(&panel_config.input_and_logs);
-    let logs_config = app.config.general.logs.to_owned();
-    let logs = if app.logs_hidden {
-        vec![]
-    } else {
-        app.logs
-            .iter()
-            .rev()
-            .take(layout_size.height as usize)
-            .map(|log| {
-                let fd = format_description!("[hour]:[minute]:[second]");
-                let time = log.created_at.format(fd).unwrap_or_else(|_| "when?".into());
-                let cfg = match log.level {
-                    app::LogLevel::Info => &logs_config.info,
-                    app::LogLevel::Warning => &logs_config.warning,
-                    app::LogLevel::Success => &logs_config.success,
-                    app::LogLevel::Error => &logs_config.error,
-                };
-
-                let prefix =
-                    format!("{time}|{0}", cfg.format.to_owned().unwrap_or_default());
-
-                let padding = " ".repeat(prefix.chars().count());
-
-                let txt = log
-                    .message
-                    .lines()
-                    .enumerate()
-                    .map(|(i, line)| {
-                        if i == 0 {
-                            format!("{prefix}) {line}")
-                        } else {
-                            format!("{padding}  {line}")
-                        }
+            CustomPanel::CustomTable {
+                ui,
+                widths,
+                col_spacing,
+                body,
+            } => {
+                let config = defaultui.extend(&ui);
+                let rows = body
+                    .into_iter()
+                    .map(|cols| {
+                        Row::new(
+                            cols.into_iter()
+                                .map(string_to_text)
+                                .map(Cell::from)
+                                .collect::<Vec<Cell>>(),
+                        )
                     })
-                    .take(layout_size.height as usize)
-                    .collect::<Vec<_>>()
-                    .join("\n");
+                    .collect::<Vec<Row>>();
 
-                ListItem::new(txt).style(cfg.style.to_owned())
-            })
-            .collect::<Vec<ListItem>>()
-    };
+                let widths = widths
+                    .into_iter()
+                    .map(|w| w.to_tui(self.screen_size, layout_size))
+                    .collect::<Vec<TuiConstraint>>();
 
-    let logs_count = app.logs.len();
-    let logs_count = if logs_count == 0 {
-        String::new()
-    } else {
-        format!(" ({logs_count})")
-    };
+                let content = Table::new(rows, widths)
+                    .column_spacing(col_spacing.unwrap_or(1))
+                    .block(block(config, "".into()));
 
-    let logs_list = List::new(logs).block(block(
-        config,
-        format!(
-            " Logs{} [{}{}]{} ",
-            logs_count,
-            app.mode.name,
-            read_only_indicator(app),
-            selection_indicator(app)
-        ),
-    ));
+                f.render_widget(content, layout_size);
+            }
 
-    f.render_widget(logs_list, layout_size);
-}
-
-pub fn draw_nothing(
-    f: &mut Frame,
-    _screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &app::App,
-    _lua: &Lua,
-) {
-    let panel_config = &app.config.general.panel_ui;
-    let config = panel_config.default.to_owned();
-    let nothing = Paragraph::new("").block(block(config, "".into()));
-    f.render_widget(nothing, layout_size);
-}
-
-pub fn draw_dynamic(
-    f: &mut Frame,
-    screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &mut app::App,
-    func: &str,
-    lua: &Lua,
-) {
-    let ctx = ContentRendererArg {
-        app: app.to_lua_ctx_light(),
-        layout_size: layout_size.into(),
-        screen_size: screen_size.into(),
-    };
-
-    let panel: CustomPanel = lua::serialize(lua, &ctx)
-        .and_then(|arg| lua::call(lua, func, arg))
-        .unwrap_or_else(|e| CustomPanel::CustomParagraph {
-            ui: app.config.general.panel_ui.default.clone(),
-            body: format!("{e:?}"),
-        });
-
-    draw_static(f, screen_size, layout_size, app, panel, lua);
-}
-
-pub fn draw_static(
-    f: &mut Frame,
-    screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &mut app::App,
-    panel: CustomPanel,
-    _lua: &Lua,
-) {
-    let defaultui = app.config.general.panel_ui.default.clone();
-    match panel {
-        CustomPanel::CustomParagraph { ui, body } => {
-            let config = defaultui.extend(&ui);
-            let body = string_to_text(body);
-            let content = Paragraph::new(body).block(block(config, "".into()));
-            f.render_widget(content, layout_size);
+            CustomPanel::CustomLayout(layout) => {
+                self.draw_layout(layout, f, layout_size, app);
+            }
         }
+    }
 
-        CustomPanel::CustomList { ui, body } => {
-            let config = defaultui.extend(&ui);
-
-            let items = body
-                .into_iter()
-                .map(string_to_text)
-                .map(ListItem::new)
-                .collect::<Vec<ListItem>>();
-
-            let content = List::new(items).block(block(config, "".into()));
-            f.render_widget(content, layout_size);
-        }
-
-        CustomPanel::CustomTable {
-            ui,
-            widths,
-            col_spacing,
-            body,
-        } => {
-            let config = defaultui.extend(&ui);
-            let rows = body
-                .into_iter()
-                .map(|cols| {
-                    Row::new(
-                        cols.into_iter()
-                            .map(string_to_text)
-                            .map(Cell::from)
-                            .collect::<Vec<Cell>>(),
+    fn draw_layout(
+        &mut self,
+        layout: Layout,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+    ) {
+        match layout {
+            Layout::Nothing => self.draw_nothing(f, layout_size, app),
+            Layout::Table => self.draw_table(f, layout_size, app),
+            Layout::SortAndFilter => self.draw_sort_n_filter(f, layout_size, app),
+            Layout::HelpMenu => self.draw_help_menu(f, layout_size, app),
+            Layout::Selection => self.draw_selection(f, layout_size, app),
+            Layout::InputAndLogs => {
+                if app.input.buffer.is_some() {
+                    self.draw_input_buffer(f, layout_size, app);
+                } else {
+                    self.draw_logs(f, layout_size, app);
+                };
+            }
+            Layout::Static(panel) => self.draw_static(f, layout_size, app, *panel),
+            Layout::Dynamic(ref func) => self.draw_dynamic(f, layout_size, app, func),
+            Layout::CustomContent(content) => {
+                draw_custom_content(self, f, layout_size, app, *content)
+            }
+            Layout::Horizontal { config, splits } => {
+                let chunks = TuiLayout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints(
+                        config
+                            .constraints
+                            .clone()
+                            .unwrap_or_default()
+                            .iter()
+                            .map(|c| c.to_tui(self.screen_size, layout_size))
+                            .collect::<Vec<TuiConstraint>>(),
                     )
-                })
-                .collect::<Vec<Row>>();
+                    .horizontal_margin(
+                        config
+                            .horizontal_margin
+                            .or(config.margin)
+                            .unwrap_or_default(),
+                    )
+                    .vertical_margin(
+                        config.vertical_margin.or(config.margin).unwrap_or_default(),
+                    )
+                    .split(layout_size);
 
-            let widths = widths
-                .into_iter()
-                .map(|w| w.to_tui(screen_size, layout_size))
-                .collect::<Vec<TuiConstraint>>();
+                splits
+                    .into_iter()
+                    .zip(chunks.iter())
+                    .for_each(|(split, chunk)| self.draw_layout(split, f, *chunk, app));
+            }
 
-            let content = Table::new(rows, widths)
-                .column_spacing(col_spacing.unwrap_or(1))
-                .block(block(config, "".into()));
+            Layout::Vertical { config, splits } => {
+                let chunks = TuiLayout::default()
+                    .direction(Direction::Vertical)
+                    .constraints(
+                        config
+                            .constraints
+                            .clone()
+                            .unwrap_or_default()
+                            .iter()
+                            .map(|c| c.to_tui(self.screen_size, layout_size))
+                            .collect::<Vec<TuiConstraint>>(),
+                    )
+                    .horizontal_margin(
+                        config
+                            .horizontal_margin
+                            .or(config.margin)
+                            .unwrap_or_default(),
+                    )
+                    .vertical_margin(
+                        config.vertical_margin.or(config.margin).unwrap_or_default(),
+                    )
+                    .split(layout_size);
 
-            f.render_widget(content, layout_size);
-        }
-
-        CustomPanel::CustomLayout(layout) => {
-            draw_layout(layout, f, screen_size, layout_size, app, _lua);
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Rect {
-    x: u16,
-    y: u16,
-    height: u16,
-    width: u16,
-}
-
-impl From<TuiRect> for Rect {
-    fn from(tui: TuiRect) -> Self {
-        Self {
-            x: tui.x,
-            y: tui.y,
-            height: tui.height,
-            width: tui.width,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct ContentRendererArg {
-    pub app: app::LuaContextLight,
-    pub screen_size: Rect,
-    pub layout_size: Rect,
-}
-
-pub fn draw_layout(
-    layout: Layout,
-    f: &mut Frame,
-    screen_size: TuiRect,
-    layout_size: TuiRect,
-    app: &mut app::App,
-    lua: &Lua,
-) {
-    match layout {
-        Layout::Nothing => draw_nothing(f, screen_size, layout_size, app, lua),
-        Layout::Table => draw_table(f, screen_size, layout_size, app, lua),
-        Layout::SortAndFilter => {
-            draw_sort_n_filter(f, screen_size, layout_size, app, lua)
-        }
-        Layout::HelpMenu => draw_help_menu(f, screen_size, layout_size, app, lua),
-        Layout::Selection => draw_selection(f, screen_size, layout_size, app, lua),
-        Layout::InputAndLogs => {
-            if app.input.buffer.is_some() {
-                draw_input_buffer(f, screen_size, layout_size, app, lua);
-            } else {
-                draw_logs(f, screen_size, layout_size, app, lua);
-            };
-        }
-        Layout::Static(panel) => {
-            draw_static(f, screen_size, layout_size, app, *panel, lua)
-        }
-        Layout::Dynamic(ref func) => {
-            draw_dynamic(f, screen_size, layout_size, app, func, lua)
-        }
-        Layout::CustomContent(content) => {
-            draw_custom_content(f, screen_size, layout_size, app, *content, lua)
-        }
-        Layout::Horizontal { config, splits } => {
-            let chunks = TuiLayout::default()
-                .direction(Direction::Horizontal)
-                .constraints(
-                    config
-                        .constraints
-                        .to_owned()
-                        .unwrap_or_default()
-                        .iter()
-                        .map(|c| c.to_tui(screen_size, layout_size))
-                        .collect::<Vec<TuiConstraint>>(),
-                )
-                .horizontal_margin(
-                    config
-                        .horizontal_margin
-                        .or(config.margin)
-                        .unwrap_or_default(),
-                )
-                .vertical_margin(
-                    config.vertical_margin.or(config.margin).unwrap_or_default(),
-                )
-                .split(layout_size);
-
-            splits
-                .into_iter()
-                .zip(chunks.iter())
-                .for_each(|(split, chunk)| {
-                    draw_layout(split, f, screen_size, *chunk, app, lua)
-                });
-        }
-
-        Layout::Vertical { config, splits } => {
-            let chunks = TuiLayout::default()
-                .direction(Direction::Vertical)
-                .constraints(
-                    config
-                        .constraints
-                        .to_owned()
-                        .unwrap_or_default()
-                        .iter()
-                        .map(|c| c.to_tui(screen_size, layout_size))
-                        .collect::<Vec<TuiConstraint>>(),
-                )
-                .horizontal_margin(
-                    config
-                        .horizontal_margin
-                        .or(config.margin)
-                        .unwrap_or_default(),
-                )
-                .vertical_margin(
-                    config.vertical_margin.or(config.margin).unwrap_or_default(),
-                )
-                .split(layout_size);
-
-            splits
-                .into_iter()
-                .zip(chunks.iter())
-                .for_each(|(split, chunk)| {
-                    draw_layout(split, f, screen_size, *chunk, app, lua)
-                });
+                splits
+                    .into_iter()
+                    .zip(chunks.iter())
+                    .for_each(|(split, chunk)| self.draw_layout(split, f, *chunk, app));
+            }
         }
     }
-}
 
-pub fn draw(f: &mut Frame, app: &mut app::App, lua: &Lua) {
-    let screen_size = f.size();
-    let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).to_owned();
-
-    draw_layout(layout, f, screen_size, screen_size, app, lua);
+    pub fn draw(&mut self, f: &mut Frame, app: &app::App) {
+        self.screen_size = f.size();
+        let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).clone();
+        self.draw_layout(layout, f, self.screen_size, app);
+    }
 }
 
 #[cfg(test)]
@@ -1543,7 +1494,7 @@ mod tests {
         };
 
         assert_eq!(
-            a.to_owned().extend(&b),
+            a.clone().extend(&b),
             Style {
                 fg: Some(Color::Red),
                 bg: Some(Color::Blue),
@@ -1563,7 +1514,7 @@ mod tests {
         );
 
         assert_eq!(
-            a.to_owned().extend(&c),
+            a.clone().extend(&c),
             Style {
                 fg: Some(Color::Cyan),
                 bg: Some(Color::Magenta),

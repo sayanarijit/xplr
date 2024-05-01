@@ -8,7 +8,8 @@ use crate::explorer;
 use crate::lua;
 use crate::pipe;
 use crate::pwd_watcher;
-use crate::ui;
+use crate::ui::NO_COLOR;
+use crate::ui::UI;
 use crate::yaml;
 use anyhow::{bail, Error, Result};
 use crossterm::event;
@@ -89,7 +90,7 @@ fn call(
     let focus_index = app
         .directory_buffer
         .as_ref()
-        .map(|d| d.scroll_state.get_focus())
+        .map(|d| d.focus)
         .unwrap_or_default()
         .to_string();
 
@@ -279,16 +280,14 @@ impl Runner {
             app.explorer_config.clone(),
             app.pwd.clone().into(),
             self.focused_path,
-            app.directory_buffer
-                .as_ref()
-                .map(|d| d.scroll_state.get_focus())
-                .unwrap_or(0),
+            app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
+            app.config.general.vimlike_scrolling,
             tx_msg_in.clone(),
         );
         tx_pwd_watcher.send(app.pwd.clone())?;
 
         let mut result = Ok(None);
-        let session_path = app.session_path.to_owned();
+        let session_path = app.session_path.clone();
 
         term::enable_raw_mode()?;
 
@@ -343,6 +342,9 @@ impl Runner {
             app::MsgIn::External(app::ExternalMsg::Refresh),
             None,
         ))?;
+
+        // UI
+        let mut ui = UI::new(&lua);
 
         'outer: for task in rx_msg_in {
             match app.handle_task(task) {
@@ -433,8 +435,9 @@ impl Runner {
                                         .map(|n| n.relative_path.clone().into()),
                                     app.directory_buffer
                                         .as_ref()
-                                        .map(|d| d.scroll_state.get_focus())
+                                        .map(|d| d.focus)
                                         .unwrap_or(0),
+                                    app.config.general.vimlike_scrolling,
                                     tx_msg_in.clone(),
                                 );
                                 tx_pwd_watcher.send(app.pwd.clone())?;
@@ -448,8 +451,9 @@ impl Runner {
                                         .map(|n| n.relative_path.clone().into()),
                                     app.directory_buffer
                                         .as_ref()
-                                        .map(|d| d.scroll_state.get_focus())
+                                        .map(|d| d.focus)
                                         .unwrap_or(0),
+                                    app.config.general.vimlike_scrolling,
                                     tx_msg_in.clone(),
                                 );
                                 tx_pwd_watcher.send(app.pwd.clone())?;
@@ -479,7 +483,7 @@ impl Runner {
                                     tx_pwd_watcher.send(app.pwd.clone())?;
 
                                     // OSC 7: Change CWD
-                                    if !(*ui::NO_COLOR) {
+                                    if !(*NO_COLOR) {
                                         write!(
                                             terminal.backend_mut(),
                                             "\x1b]7;file://{}{}\x1b\\",
@@ -496,7 +500,7 @@ impl Runner {
                                 }
 
                                 // UI
-                                terminal.draw(|f| ui::draw(f, &mut app, &lua))?;
+                                terminal.draw(|f| ui.draw(f, &app))?;
                             }
 
                             EnableMouse => {

@@ -7,7 +7,7 @@ use crate::ui::block;
 use crate::ui::string_to_text;
 use crate::ui::Constraint;
 use crate::ui::ContentRendererArg;
-use mlua::Lua;
+use crate::ui::UI;
 use serde::{Deserialize, Serialize};
 use tui::layout::Constraint as TuiConstraint;
 use tui::layout::Rect as TuiRect;
@@ -60,12 +60,11 @@ pub struct CustomContent {
 
 /// A cursed function from crate::ui.
 pub fn draw_custom_content(
+    ui: &mut UI,
     f: &mut Frame,
-    screen_size: TuiRect,
     layout_size: TuiRect,
     app: &app::App,
     content: CustomContent,
-    lua: &Lua,
 ) {
     let config = app.config.general.panel_ui.default.clone();
     let title = content.title;
@@ -85,12 +84,12 @@ pub fn draw_custom_content(
             let ctx = ContentRendererArg {
                 app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
+                screen_size: ui.screen_size.into(),
             };
 
-            let render = lua::serialize(lua, &ctx)
+            let render = lua::serialize(ui.lua, &ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{e:?}"))
+                    lua::call(ui.lua, &render, arg).unwrap_or_else(|e| format!("{e:?}"))
                 })
                 .unwrap_or_else(|e| e.to_string());
 
@@ -121,12 +120,12 @@ pub fn draw_custom_content(
             let ctx = ContentRendererArg {
                 app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
+                screen_size: ui.screen_size.into(),
             };
 
-            let items = lua::serialize(lua, &ctx)
+            let items = lua::serialize(ui.lua, &ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg)
+                    lua::call(ui.lua, &render, arg)
                         .unwrap_or_else(|e| vec![format!("{e:?}")])
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
@@ -161,7 +160,7 @@ pub fn draw_custom_content(
 
             let widths = widths
                 .into_iter()
-                .map(|w| w.to_tui(screen_size, layout_size))
+                .map(|w| w.to_tui(ui.screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
             let content = Table::new(rows, widths)
@@ -182,12 +181,12 @@ pub fn draw_custom_content(
             let ctx = ContentRendererArg {
                 app: app.to_lua_ctx_light(),
                 layout_size: layout_size.into(),
-                screen_size: screen_size.into(),
+                screen_size: ui.screen_size.into(),
             };
 
-            let rows = lua::serialize(lua, &ctx)
+            let rows = lua::serialize(ui.lua, &ctx)
                 .map(|arg| {
-                    lua::call(lua, &render, arg)
+                    lua::call(ui.lua, &render, arg)
                         .unwrap_or_else(|e| vec![vec![format!("{e:?}")]])
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])
@@ -204,7 +203,7 @@ pub fn draw_custom_content(
 
             let widths = widths
                 .into_iter()
-                .map(|w| w.to_tui(screen_size, layout_size))
+                .map(|w| w.to_tui(ui.screen_size, layout_size))
                 .collect::<Vec<TuiConstraint>>();
 
             let mut content = Table::new(rows, &widths).block(block(

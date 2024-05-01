@@ -22,5 +22,5 @@ pub fn runtime_dir() -> PathBuf {
     else {
         return env::temp_dir();
     };
-    dir.to_owned()
+    dir.clone()
 }
