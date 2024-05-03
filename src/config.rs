@@ -104,7 +104,7 @@ impl NodeTypesConfig {
             node_type = node_type.extend(conf);
         }
 
-        if let Some(conf) = self.extension.get(&node.extension) {
+        if let (Some(conf), false) = (self.extension.get(&node.extension), node.is_dir) {
             node_type = node_type.extend(conf);
         }
 

@@ -160,7 +160,7 @@ pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
-        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_file()))?;
     util.set("is_file", func)?;
     Ok(util)
 }
