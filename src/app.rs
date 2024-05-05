@@ -387,7 +387,7 @@ impl App {
         }
 
         if let Some(sorters) = &config.general.initial_sorting {
-            explorer_config.sorters = sorters.clone();
+            explorer_config.sorters.clone_from(sorters);
         };
 
         let hostname = gethostname().to_string_lossy().to_string();

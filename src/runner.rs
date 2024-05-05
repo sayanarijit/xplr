@@ -474,7 +474,7 @@ impl Runner {
                                 }
 
                                 if app.pwd != last_pwd {
-                                    last_pwd = app.pwd.clone();
+                                    last_pwd.clone_from(&app.pwd);
 
                                     // $PWD watcher
                                     tx_pwd_watcher.send(app.pwd.clone())?;
