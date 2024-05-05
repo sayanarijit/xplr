@@ -778,27 +778,15 @@ impl UI<'_> {
                     self.scrolltop = height * (dir.focus / height.max(1))
                 } else {
                     // Vim-like-scrolling
-                    self.scrolltop = match dir.focus.cmp(&self.scrolltop) {
-                        Ordering::Greater => {
-                            // Scrolling down
-                            if dir.focus >= self.scrolltop + height {
-                                dir.focus.saturating_sub(height + 1)
-                            } else {
-                                self.scrolltop
-                            }
-                        }
-                        Ordering::Less => dir.focus,
-                        Ordering::Equal => self.scrolltop,
-                    };
-
-                    // Add padding if possible
                     let padding = app.config.general.scroll_padding;
-                    if padding != 0 {
-                        if dir.focus < self.scrolltop + padding {
-                            self.scrolltop = dir.focus.saturating_sub(padding);
-                        } else if dir.focus >= self.scrolltop + height - padding {
-                            self.scrolltop = dir.focus + padding - height + 1;
-                        };
+                    if dir.focus >= (self.scrolltop + height).saturating_sub(padding) {
+                        // Scrolling down
+                        self.scrolltop = (dir.focus + padding + 1)
+                            .saturating_sub(height)
+                            .min(dir.total.saturating_sub(height));
+                    } else if dir.focus < self.scrolltop + padding {
+                        // Scrolling up
+                        self.scrolltop = dir.focus.saturating_sub(padding);
                     }
                 };
 
