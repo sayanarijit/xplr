@@ -90,13 +90,7 @@ And then we'd go on documenting whatever `Layout Config` is.
 So, there you go. This is exactly what sum types are - glorified enums that can
 have nested types in each branch.
 
----
-
-If you're still confused about something, or if you found an error in this
-explanation, feel free to [discuss together][5].
-
 [1]: https://en.wikipedia.org/wiki/Tagged_union
 [2]: layout.md
 [3]: message.md
 [4]: style.md#color
-[5]: community.md

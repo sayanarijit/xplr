@@ -31,6 +31,6 @@ These are the alternative TUI/CLI file managers/explorers you might want to chec
 [10]: https://git.2f30.org/noice/
 [11]: https://github.com/pasqu4le/clifm
 [12]: https://github.com/leo-arch/clifm
-[13]: community.md
+[13]: https://github.com/sayanarijit/xplr/edit/dev/docs/en/src/alternatives.md
 [14]: https://github.com/kyoheiu/felix
 [15]: https://github.com/sxyazi/yazi

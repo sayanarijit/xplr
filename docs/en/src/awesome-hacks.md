@@ -6,7 +6,7 @@ too small or too niche for a full fledge [plugin][2].
 
 Do you have something cool to share?
 
-[Edit this file][3] or [share them here][4] or [let us know][5].
+[Edit this file][3] or [share them here][4].
 
 You can try these hacks by writing them to a file, say `hack.lua` and passing
 it to xplr with `--extra-config` or `-C`.
@@ -526,7 +526,6 @@ xplr.config.modes.builtin.default.key_bindings.on_key.T = {
 [2]: plugin.md
 [3]: https://github.com/sayanarijit/xplr/edit/main/docs/en/src/awesome-hacks.md
 [4]: https://github.com/sayanarijit/xplr/discussions/categories/show-and-tell
-[5]: community.md
 [6]: https://gifyu.com/image/rGSR
 [7]: https://s4.gifyu.com/images/xplr-bookmark.gif
 [8]: https://github.com/sayanarijit
