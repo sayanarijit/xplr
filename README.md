@@ -12,18 +12,6 @@ A hackable, minimal, fast TUI file explorer
 <img src="https://img.shields.io/crates/v/xplr.svg" />
 </a>
 
-<a href="https://github.com/sayanarijit/xplr/commits">
-<img src="https://img.shields.io/github/commit-activity/m/sayanarijit/xplr" />
-</a>
-
-<a href="https://matrix.to/#/#xplr-pub:matrix.org">
-<img alt="Matrix" src="https://img.shields.io/matrix/xplr-pub:matrix.org?color=0DB787&label=matrix&logo=Matrix">
-</a>
-  
-<a href="https://discord.gg/JmasSPCcz3">
-<img src="https://img.shields.io/discord/834369918312382485?color=5865F2&label=discord&logo=Discord" />
-</a>
-
 </p>
 
 <p align="center">
@@ -38,7 +26,6 @@ https://user-images.githubusercontent.com/11632726/166747867-8a4573f2-cb2f-43a6-
   [<a href="https://xplr.dev/en/awesome-hacks">Hacks</a>]
   [<a href="https://xplr.dev/en/awesome-plugins">Plugins</a>]
   [<a href="https://xplr.dev/en/awesome-integrations">Integrations</a>]
-  [<a href="https://xplr.dev/en/community">Community</a>]
 </h3>
 
 xplr is a terminal UI based file explorer that aims to increase our terminal
@@ -60,7 +47,7 @@ integration][15], enabling you to achieve insane terminal productivity.
 
 - [[Article] What is a TUI file explorer & why would you need one? ~ xplr.stck.me](https://xplr.stck.me/post/25252/What-is-a-TUI-file-explorer-why-would-you-need-one)
 
-- [[Article] FOSSPicks - Linux Magazine](https://www.linux-magazine.com/Issues/2022/258/FOSSPicks/(offset)/6)
+- [[Article] FOSSPicks - Linux Magazine](<https://www.linux-magazine.com/Issues/2022/258/FOSSPicks/(offset)/6>)
 
 ## Packaging
 

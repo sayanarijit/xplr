@@ -39,8 +39,6 @@
   - [Awesome Integrations][20]
 - [Alternatives][22]
 - [Upgrade Guide][23]
-- [Community][24]
-- [Contribute][25]
 
 [1]: introduction.md
 [2]: quickstart.md
@@ -64,8 +62,6 @@
 [20]: awesome-integrations.md
 [22]: alternatives.md
 [23]: upgrade-guide.md
-[24]: community.md
-[25]: contribute.md
 [26]: column-renderer.md
 [27]: key-bindings.md
 [28]: configure-key-bindings.md

@@ -221,8 +221,6 @@ Thanks to @noahmayr for contributing to a major part of this release.
   - ScrollUpHalf ---- {
   - ScrollDownHalf -- }
 
-<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
-
 #### [v0.17.6][45] -> [v0.18.0][46]
 
 - Key binding `f` `r` and `f` `R` will now filter using regex.
@@ -488,7 +486,6 @@ Else do the following:
 [2]: https://github.com/sayanarijit/xplr/releases/tag/v0.13.7
 [3]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.7
 [4]: https://github.com/sayanarijit/xplr/pull/229#issue-662426960
-[5]: contribute.md
 [6]: https://github.com/sayanarijit/xplr/releases/tag/v0.12.1
 [7]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua
 [8]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently

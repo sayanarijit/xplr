@@ -84,8 +84,6 @@ Some of the coolest features xplr provide beside the basic stuff:
     (`:` `q` `s`).
   - Quit with failure (`ctrl-c`).
 
-**Q.** What features should be added here? [let us know][20].
-
 [1]: layouts.md
 [2]: configure-key-bindings.md
 [3]: awesome-plugins.md
@@ -105,6 +103,5 @@ Some of the coolest features xplr provide beside the basic stuff:
 [17]: node_types.md
 [18]: https://github.com/sayanarijit/xplr/blob/main/src/init.lua
 [19]: messages.md#startfifo
-[20]: community.md
 [21]: messages.md#virtual-root
 [22]: configuration.md#hooks
