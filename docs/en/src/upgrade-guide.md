@@ -45,7 +45,7 @@ compatibility.
 
 ### Instructions
 
-#### [v0.20.2][48] -> [v0.21.7][49]
+#### [v0.20.2][48] -> [v0.21.8][49]
 
 - Some plugins might stop rendering colors. Wait for them to update.
 - Rename `xplr.config.general.sort_and_filter_ui.search_identifier` to
@@ -127,6 +127,13 @@ compatibility.
   - You can use `c` and `m` keys in default mode to quickly copy
     and move focused or selected files, without having to change directory.
   - Use `xplr.util.debug()` to debug lua values.
+- Since v0.21.8:
+  - Scroll behavior will default to vim-like continuous scrolling. You can set
+    `xplr.config.general.paginated_scrolling = true` to revert back to the
+    paginated scrolling.
+  - Set `xplr.config.general.scroll_padding` to customize the scroll padding.
+  - The calculated `scrolltop` value will be passed as part of the
+    `Content Rendeder Argument` in `Dynamic` layout renderer functions.
 
 Thanks to @noahmayr for contributing to a major part of this release.
 
@@ -213,8 +220,6 @@ Thanks to @noahmayr for contributing to a major part of this release.
   - ScrollDown ------ page-down
   - ScrollUpHalf ---- {
   - ScrollDownHalf -- }
-
-<sub>Like this project so far? **[Please consider contributing][5]**.</sub>
 
 #### [v0.17.6][45] -> [v0.18.0][46]
 
@@ -481,7 +486,6 @@ Else do the following:
 [2]: https://github.com/sayanarijit/xplr/releases/tag/v0.13.7
 [3]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.7
 [4]: https://github.com/sayanarijit/xplr/pull/229#issue-662426960
-[5]: contribute.md
 [6]: https://github.com/sayanarijit/xplr/releases/tag/v0.12.1
 [7]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua
 [8]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently
@@ -525,5 +529,5 @@ Else do the following:
 [46]: https://github.com/sayanarijit/xplr/releases/tag/v0.18.0
 [47]: https://github.com/sayanarijit/xplr/releases/tag/v0.19.4
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
-[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.7
+[49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.8
 [50]: https://github.com/lotabout/skim#search-syntax

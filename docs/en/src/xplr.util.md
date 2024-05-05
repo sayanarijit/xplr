@@ -397,7 +397,7 @@ xplr.util.to_yaml({ foo = "bar" })
 Get a [Style][3] object for the given path based on the LS_COLORS
 environment variable.
 
-Type: function( path:string ) -> [Style][3]|nil
+Type: function( path:string ) -> [Style][3]
 
 Example:
 

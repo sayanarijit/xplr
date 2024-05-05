@@ -91,6 +91,17 @@ xplr.config.general.enable_recover_mode = false
 -- Type: boolean
 xplr.config.general.hide_remaps_in_help_menu = false
 
+-- Set it to `true` if you want paginated scrolling.
+--
+-- Type: boolean
+xplr.config.general.paginated_scrolling = false
+
+-- Set the padding value to the scroll area.
+-- Only applicable when `xplr.config.general.paginated_scrolling = false`.
+--
+-- Type: boolean
+xplr.config.general.scroll_padding = 5
+
 -- Set it to `true` if you want the cursor to stay in the same position when
 -- the focus is on the first path and you navigate to the previous path
 -- (by pressing `up`/`k`), or when the focus is on the last path and you
@@ -478,7 +489,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-"↓"
+  "↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -676,7 +687,7 @@ xplr.config.general.panel_ui.sort_and_filter.border_style = {}
 -- Type: nullable list of [Node Sorter](https://xplr.dev/en/sorting#node-sorter-applicable)
 xplr.config.general.initial_sorting = {
   { sorter = "ByCanonicalIsDir", reverse = true },
-  { sorter = "ByIRelativePath",  reverse = false },
+  { sorter = "ByIRelativePath", reverse = false },
 }
 
 -- The name of one of the modes to use when xplr loads.
@@ -1325,23 +1336,23 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
-    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
+  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
 xplr.config.modes.builtin.default.key_bindings.on_key["?"] =
-    xplr.config.general.global_key_bindings.on_key["f1"]
+  xplr.config.general.global_key_bindings.on_key["f1"]
 
 -- The builtin debug error mode.
 --
@@ -1993,9 +2004,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-    xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-    xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2479,9 +2490,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-    xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-    xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -3113,8 +3124,8 @@ xplr.fn.builtin.fmt_general_selection_item = function(n)
   if n.is_dir then
     shortened = shortened .. "/"
   end
-  local ls_style = xplr.util.lscolor(n.absolute_path)
   local meta_style = xplr.util.node_type(n).style
+  local ls_style = xplr.util.lscolor(n.absolute_path)
   local style = xplr.util.style_mix({ ls_style, meta_style })
   return xplr.util.paint(shortened:gsub("\n", nl), style)
 end
@@ -3137,8 +3148,8 @@ end
 xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local r = m.tree .. m.prefix
-  local style = xplr.util.lscolor(m.absolute_path)
-  style = xplr.util.style_mix({ style, m.style })
+  local ls_style = xplr.util.lscolor(m.absolute_path)
+  local style = xplr.util.style_mix({ ls_style, m.style })
 
   if m.meta.icon == nil then
     r = r .. ""
@@ -3161,7 +3172,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
       r = r .. "×"
     else
       local symlink_path =
-          xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
+        xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
       if m.symlink.is_dir then
         symlink_path = symlink_path .. "/"
       end
@@ -3183,14 +3194,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local T = xplr.util.paint("T", { fg = "Red" })
 
   return xplr.util
-      .permissions_rwx(m.permissions)
-      :gsub("r", r)
-      :gsub("w", w)
-      :gsub("x", x)
-      :gsub("s", s)
-      :gsub("S", S)
-      :gsub("t", t)
-      :gsub("T", T)
+    .permissions_rwx(m.permissions)
+    :gsub("r", r)
+    :gsub("w", w)
+    :gsub("x", x)
+    :gsub("s", s)
+    :gsub("S", S)
+    :gsub("t", t)
+    :gsub("T", T)
 end
 
 -- Renders the fourth column in the table

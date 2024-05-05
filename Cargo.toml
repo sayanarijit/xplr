@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.21.7'
+version = '0.21.8'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
@@ -28,7 +28,7 @@ natord = "1.0.9"
 anyhow = "1.0.81"
 serde_yaml = "0.9.33"
 crossterm = { version = "0.27.0", features = [], default-features = false }
-ansi-to-tui = "4.0.1"
+ansi-to-tui = "3.1.0"
 regex = "1.10.3"
 gethostname = "0.4.3"
 serde_json = "1.0.114"
@@ -57,7 +57,7 @@ version = "2.0.4"
 default-features = false
 
 [dependencies.tui]
-version = "0.26.1"
+version = "=0.26.1"  # https://github.com/ratatui-org/ratatui/issues/1032
 default-features = false
 features = ['crossterm', 'serde']
 package = 'ratatui'
@@ -73,7 +73,7 @@ features = ['serde']
 
 [dependencies.mlua]
 version = "0.9.6"
-features = ['luajit', 'vendored', 'serialize', 'send']
+features = ['luajit', 'serialize', 'send']
 
 [dependencies.tui-input]
 version = "0.8.0"
@@ -90,5 +90,5 @@ panic = 'abort'
 strip = true
 
 [features]
-
-
+default = ["vendored-lua"]
+vendored-lua = ["mlua/vendored"]

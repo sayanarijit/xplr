@@ -98,6 +98,7 @@ fn draw_benchmark(c: &mut Criterion) {
     });
 
     let lua = mlua::Lua::new();
+    let mut ui = ui::UI::new(&lua);
     let mut app =
         app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into())
             .expect("failed to create app");
@@ -121,7 +122,7 @@ fn draw_benchmark(c: &mut Criterion) {
 
     c.bench_function("draw on terminal", |b| {
         b.iter(|| {
-            terminal.draw(|f| ui::draw(f, &app, &lua)).unwrap();
+            terminal.draw(|f| ui.draw(f, &app)).unwrap();
         })
     });
 

@@ -160,7 +160,7 @@ pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func =
-        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
+        lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_file()))?;
     util.set("is_file", func)?;
     Ok(util)
 }
@@ -654,7 +654,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// Get a [Style][3] object for the given path based on the LS_COLORS
 /// environment variable.
 ///
-/// Type: function( path:string ) -> [Style][3]|nil
+/// Type: function( path:string ) -> [Style][3]
 ///
 /// Example:
 ///
@@ -664,7 +664,10 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// ```
 pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
     let func = lua.create_function(move |lua, path: String| {
-        let style = LS_COLORS.style_for_path(path).map(Style::from);
+        let style = LS_COLORS
+            .style_for_path(path)
+            .map(Style::from)
+            .unwrap_or_default();
         lua::serialize(lua, &style).map_err(LuaError::custom)
     })?;
     util.set("lscolor", func)?;

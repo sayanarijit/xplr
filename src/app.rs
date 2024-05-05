@@ -335,12 +335,12 @@ impl App {
             &config
                 .general
                 .initial_mode
-                .to_owned()
+                .clone()
                 .unwrap_or_else(|| "default".into()),
         ) {
             Some(m) => m.clone().sanitized(
                 config.general.read_only,
-                config.general.global_key_bindings.to_owned(),
+                config.general.global_key_bindings.clone(),
             ),
             None => {
                 bail!("'default' mode is missing")
@@ -351,7 +351,7 @@ impl App {
             &config
                 .general
                 .initial_layout
-                .to_owned()
+                .clone()
                 .unwrap_or_else(|| "default".into()),
         ) {
             Some(l) => l.clone(),
@@ -387,7 +387,7 @@ impl App {
         }
 
         if let Some(sorters) = &config.general.initial_sorting {
-            explorer_config.sorters = sorters.clone();
+            explorer_config.sorters.clone_from(sorters);
         };
 
         let hostname = gethostname().to_string_lossy().to_string();
@@ -820,7 +820,6 @@ impl App {
 
     fn focus_previous(mut self) -> Result<Self> {
         let bounded = self.config.general.enforce_bounded_index_navigation;
-
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = if dir.focus == 0 {
                 if bounded {
@@ -905,7 +904,6 @@ impl App {
 
     fn focus_next(mut self) -> Result<Self> {
         let bounded = self.config.general.enforce_bounded_index_navigation;
-
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = if (dir.focus + 1) == dir.total {
                 if bounded {
@@ -917,6 +915,7 @@ impl App {
                 dir.focus + 1
             }
         };
+
         Ok(self)
     }
 
@@ -995,7 +994,7 @@ impl App {
     fn follow_symlink(self) -> Result<Self> {
         if let Some(pth) = self
             .focused_node()
-            .and_then(|n| n.symlink.to_owned().map(|s| s.absolute_path))
+            .and_then(|n| n.symlink.clone().map(|s| s.absolute_path))
         {
             self.focus_path(&pth, true)
         } else {
@@ -1382,7 +1381,7 @@ impl App {
             self = self.push_mode();
             self.mode = mode.sanitized(
                 self.config.general.read_only,
-                self.config.general.global_key_bindings.to_owned(),
+                self.config.general.global_key_bindings.clone(),
             );
 
             // Hooks
@@ -1407,7 +1406,7 @@ impl App {
             self = self.push_mode();
             self.mode = mode.sanitized(
                 self.config.general.read_only,
-                self.config.general.global_key_bindings.to_owned(),
+                self.config.general.global_key_bindings.clone(),
             );
 
             // Hooks
@@ -1434,7 +1433,7 @@ impl App {
 
     fn switch_layout_builtin(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.builtin.get(layout) {
-            self.layout = l.to_owned();
+            self.layout = l.clone();
 
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
@@ -1450,7 +1449,7 @@ impl App {
 
     fn switch_layout_custom(mut self, layout: &str) -> Result<Self> {
         if let Some(l) = self.config.layouts.get_custom(layout) {
-            self.layout = l.to_owned();
+            self.layout = l.clone();
 
             // Hooks
             if !self.hooks.on_layout_switch.is_empty() {
@@ -1575,7 +1574,7 @@ impl App {
 
     pub fn select(mut self) -> Result<Self> {
         let count = self.selection.len();
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+        if let Some(n) = self.focused_node().cloned() {
             self.selection.insert(n);
         }
 
@@ -1630,7 +1629,7 @@ impl App {
 
     pub fn un_select(mut self) -> Result<Self> {
         let count = self.selection.len();
-        if let Some(n) = self.focused_node().map(|n| n.to_owned()) {
+        if let Some(n) = self.focused_node().cloned() {
             self.selection
                 .retain(|s| s.absolute_path != n.absolute_path);
         }
@@ -1804,7 +1803,7 @@ impl App {
             .config
             .general
             .initial_sorting
-            .to_owned()
+            .clone()
             .unwrap_or_default();
         Ok(self)
     }

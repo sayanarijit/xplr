@@ -495,6 +495,7 @@ It contains the following information:
 
 - [layout_size][37]
 - [screen_size][37]
+- [scrolltop][57]
 - [app][38]
 
 ### Size
@@ -507,6 +508,12 @@ It contains the following information:
 - width
 
 Every field is of integer type.
+
+### scrolltop
+
+Type: integer
+
+The start index of the visible nodes in the table.
 
 ### app
 
@@ -587,3 +594,4 @@ Hence, only the following fields are available.
 [54]: borders.md#border-type
 [55]: #customlayout
 [56]: sum-type.md
+[57]: #scrolltop

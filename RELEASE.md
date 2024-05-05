@@ -3,8 +3,8 @@
 See [install.md](./docs/en/src/install.md#build-from-source)
 
 Note: xplr ships with vendored luajit. If the platform can't compile this,
-you need to grep out the feature "vendored" from the "mlua" dependency
-specified in [Cargo.toml](./Cargo.toml), and static link luajit yourself.
+you need to compile using `--no-default-features` argument to avoid using
+vendored luajit, so that you can static link luajit yourself.
 
 # Release
 

@@ -42,6 +42,19 @@ Set it to `true` if you want to hide all remaps in the help menu.
 
 Type: boolean
 
+#### xplr.config.general.paginated_scrolling
+
+Set it to `true` if you want paginated scrolling.
+
+Type: boolean
+
+#### xplr.config.general.scroll_padding
+
+Set the padding value to the scroll area.
+Only applicable when `xplr.config.general.paginated_scrolling = false`.
+
+Type: boolean
+
 #### xplr.config.general.enforce_bounded_index_navigation
 
 Set it to `true` if you want the cursor to stay in the same position when

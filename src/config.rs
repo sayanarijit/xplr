@@ -55,7 +55,7 @@ pub struct NodeTypeConfig {
 impl NodeTypeConfig {
     pub fn extend(mut self, other: &Self) -> Self {
         self.style = self.style.extend(&other.style);
-        self.meta.extend(other.meta.to_owned());
+        self.meta.extend(other.meta.clone());
         self
     }
 }
@@ -85,11 +85,11 @@ pub struct NodeTypesConfig {
 impl NodeTypesConfig {
     pub fn get(&self, node: &Node) -> NodeTypeConfig {
         let mut node_type = if node.is_symlink {
-            self.symlink.to_owned()
+            self.symlink.clone()
         } else if node.is_dir {
-            self.directory.to_owned()
+            self.directory.clone()
         } else {
-            self.file.to_owned()
+            self.file.clone()
         };
 
         let mut me = node.mime_essence.splitn(2, '/');
@@ -104,7 +104,7 @@ impl NodeTypesConfig {
             node_type = node_type.extend(conf);
         }
 
-        if let Some(conf) = self.extension.get(&node.extension) {
+        if let (Some(conf), false) = (self.extension.get(&node.extension), node.is_dir) {
             node_type = node_type.extend(conf);
         }
 
@@ -141,7 +141,7 @@ pub struct UiElement {
 
 impl UiElement {
     pub fn extend(mut self, other: &Self) -> Self {
-        self.format = other.format.to_owned().or(self.format);
+        self.format = other.format.clone().or(self.format);
         self.style = self.style.extend(&other.style);
         self
     }
@@ -353,6 +353,12 @@ pub struct GeneralConfig {
 
     #[serde(default)]
     pub global_key_bindings: KeyBindings,
+
+    #[serde(default)]
+    pub paginated_scrolling: bool,
+
+    #[serde(default)]
+    pub scroll_padding: usize,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -638,8 +644,8 @@ impl PanelUiConfig {
     pub fn extend(mut self, other: &Self) -> Self {
         self.title = self.title.extend(&other.title);
         self.style = self.style.extend(&other.style);
-        self.borders = other.borders.to_owned().or(self.borders);
-        self.border_type = other.border_type.to_owned().or(self.border_type);
+        self.borders = other.borders.clone().or(self.borders);
+        self.border_type = other.border_type.or(self.border_type);
         self.border_style = self.border_style.extend(&other.border_style);
         self
     }

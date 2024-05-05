@@ -8,7 +8,8 @@ use crate::explorer;
 use crate::lua;
 use crate::pipe;
 use crate::pwd_watcher;
-use crate::ui;
+use crate::ui::NO_COLOR;
+use crate::ui::UI;
 use crate::yaml;
 use anyhow::{bail, Error, Result};
 use crossterm::event;
@@ -285,7 +286,7 @@ impl Runner {
         tx_pwd_watcher.send(app.pwd.clone())?;
 
         let mut result = Ok(None);
-        let session_path = app.session_path.to_owned();
+        let session_path = app.session_path.clone();
 
         term::enable_raw_mode()?;
 
@@ -340,6 +341,9 @@ impl Runner {
             app::MsgIn::External(app::ExternalMsg::Refresh),
             None,
         ))?;
+
+        // UI
+        let mut ui = UI::new(&lua);
 
         'outer: for task in rx_msg_in {
             match app.handle_task(task) {
@@ -411,7 +415,7 @@ impl Runner {
                             }
 
                             ScrollUpHalf => {
-                                app = app.focus_next_by_relative_index(
+                                app = app.focus_previous_by_relative_index(
                                     terminal.size()?.height as usize / 2,
                                 )?;
                             }
@@ -470,13 +474,13 @@ impl Runner {
                                 }
 
                                 if app.pwd != last_pwd {
-                                    last_pwd = app.pwd.clone();
+                                    last_pwd.clone_from(&app.pwd);
 
                                     // $PWD watcher
                                     tx_pwd_watcher.send(app.pwd.clone())?;
 
                                     // OSC 7: Change CWD
-                                    if !(*ui::NO_COLOR) {
+                                    if !(*NO_COLOR) {
                                         write!(
                                             terminal.backend_mut(),
                                             "\x1b]7;file://{}{}\x1b\\",
@@ -493,7 +497,7 @@ impl Runner {
                                 }
 
                                 // UI
-                                terminal.draw(|f| ui::draw(f, &app, &lua))?;
+                                terminal.draw(|f| ui.draw(f, &app))?;
                             }
 
                             EnableMouse => {
