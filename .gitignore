@@ -20,3 +20,6 @@ book/
 
 # nix
 result
+
+# test files
+/init.lua

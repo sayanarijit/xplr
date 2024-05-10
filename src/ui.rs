@@ -778,7 +778,12 @@ impl UI<'_> {
                     self.scrolltop = height * (dir.focus / height.max(1))
                 } else {
                     // Vim-like-scrolling
-                    let padding = app.config.general.scroll_padding;
+                    let padding = app
+                        .config
+                        .general
+                        .scroll_padding
+                        .min(height / 2)
+                        .saturating_sub(1);
                     if dir.focus >= (self.scrolltop + height).saturating_sub(padding) {
                         // Scrolling down
                         self.scrolltop = (dir.focus + padding + 1)
