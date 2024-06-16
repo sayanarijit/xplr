@@ -69,7 +69,7 @@ Visit [Awesome Plugins][5] for xplr plugin examples.
 ## Also See
 
 - [Tip: A list of hacks yet to make it as Lua plugins][15]
-- [Tip: Some UI and themeing tips][12]
+- [Tip: Some UI and theming tips][12]
 - [Tutorial: Adding a New Mode][6]
 - [Example: Using Environment Variables and Pipes][7]
 - [Example: Using Lua Function Calls][8]

@@ -731,12 +731,6 @@ impl From<char> for Key {
     }
 }
 
-impl From<String> for Key {
-    fn from(string: String) -> Self {
-        string.into()
-    }
-}
-
 impl From<&str> for Key {
     fn from(string: &str) -> Self {
         if string.len() == 1 {

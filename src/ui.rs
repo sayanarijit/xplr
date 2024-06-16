@@ -156,7 +156,7 @@ pub enum Layout {
         splits: Vec<Layout>,
     },
 
-    /// For compatibility only. A better choice is Static or Dymanic layout.
+    /// For compatibility only. A better choice is Static or Dynamic layout.
     CustomContent(Box<CustomContent>),
 }
 
