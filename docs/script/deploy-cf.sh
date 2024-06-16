@@ -1,4 +1,4 @@
-v="0.4.37"
+v="0.4.40"
 
 curl -L https://github.com/rust-lang/mdBook/releases/download/v$v/mdbook-v$v-x86_64-unknown-linux-gnu.tar.gz -o mdbook.tgz \
   && tar xzvf mdbook.tgz \
