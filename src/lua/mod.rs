@@ -160,24 +160,24 @@ mod tests {
         assert!(check_version(VERSION, "foo path").is_ok());
 
         // Current release if OK
-        assert!(check_version("0.21.8", "foo path").is_ok());
+        assert!(check_version("0.21.9", "foo path").is_ok());
 
         // Prev major release is ERR
         // - Not yet
 
         // Prev minor release is ERR (Change when we get to v1)
-        assert!(check_version("0.20.8", "foo path").is_err());
+        assert!(check_version("0.20.9", "foo path").is_err());
 
         // Prev bugfix release is OK
-        assert!(check_version("0.21.7", "foo path").is_ok());
+        assert!(check_version("0.21.8", "foo path").is_ok());
 
         // Next major release is ERR
-        assert!(check_version("1.20.8", "foo path").is_err());
+        assert!(check_version("1.20.9", "foo path").is_err());
 
         // Next minor release is ERR
-        assert!(check_version("0.22.8", "foo path").is_err());
+        assert!(check_version("0.22.9", "foo path").is_err());
 
         // Next bugfix release is ERR (Change when we get to v1)
-        assert!(check_version("0.21.9", "foo path").is_err());
+        assert!(check_version("0.21.10", "foo path").is_err());
     }
 }
