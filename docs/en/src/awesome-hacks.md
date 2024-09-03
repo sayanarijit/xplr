@@ -524,7 +524,7 @@ Toggle the execute permission on the focused node.
 <details>
 <summary>Expand for details</summary>
 
-- Author: [@doums]
+- Author: [@doums](https://github.com/doums)
 - Requires: chmod
 - Tested on: Linux
 
