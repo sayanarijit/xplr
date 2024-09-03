@@ -517,6 +517,35 @@ xplr.config.modes.builtin.default.key_bindings.on_key.T = {
 
 </details>
 
+### Toggle exe
+
+Toggle the execute permission on the focused node.
+
+<details>
+<summary>Expand for details</summary>
+
+- Author: [@doums]
+- Requires: chmod
+- Tested on: Linux
+
+```lua
+xplr.config.modes.builtin.default.key_bindings.on_key['*'] = {
+  help = 'toggle exe',
+  messages = {
+    {
+      BashExecSilently0 = [===[
+          f="$XPLR_FOCUS_PATH"
+          if [ -x "$f" ]; then chmod -x "$f"; else chmod +x "$f"; fi
+          "$XPLR" -m 'ExplorePwd'
+          "$XPLR" -m 'FocusPath: %q' "$f"
+        ]===],
+    },
+  },
+}
+```
+
+</details>
+
 ## Also See:
 
 - [Awesome Plugins][15]
