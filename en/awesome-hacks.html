@@ -629,6 +629,30 @@ xplr.config.layouts.builtin.default =
 }
 </code></pre>
 </details>
+<h3 id="toggle-exe"><a class="header" href="#toggle-exe">Toggle exe</a></h3>
+<p>Toggle the execute permission on the focused node.</p>
+<details>
+<summary>Expand for details</summary>
+<ul>
+<li>Author: [@doums]</li>
+<li>Requires: chmod</li>
+<li>Tested on: Linux</li>
+</ul>
+<pre><code class="language-lua">xplr.config.modes.builtin.default.key_bindings.on_key['*'] = {
+  help = 'toggle exe',
+  messages = {
+    {
+      BashExecSilently0 = [===[
+          f=&quot;$XPLR_FOCUS_PATH&quot;
+          if [ -x &quot;$f&quot; ]; then chmod -x &quot;$f&quot;; else chmod +x &quot;$f&quot;; fi
+          &quot;$XPLR&quot; -m 'ExplorePwd'
+          &quot;$XPLR&quot; -m 'FocusPath: %q' &quot;$f&quot;
+        ]===],
+    },
+  },
+}
+</code></pre>
+</details>
 <h2 id="also-see"><a class="header" href="#also-see">Also See:</a></h2>
 <ul>
 <li><a href="awesome-plugins.html">Awesome Plugins</a></li>
