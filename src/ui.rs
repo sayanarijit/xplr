@@ -484,7 +484,7 @@ impl From<Style> for nu_ansi_term::Style {
         where
             F: Fn(&IndexSet<Modifier>) -> bool,
         {
-            style.add_modifiers.as_ref().map_or(false, f)
+            style.add_modifiers.as_ref().is_some_and(f)
         }
 
         let mut style = nu_ansi_term::Style::new();
