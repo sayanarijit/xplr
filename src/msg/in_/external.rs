@@ -10,7 +10,7 @@ use std::{cmp::Ordering, sync::Arc};
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
     /// ### Exploring ----------------------------------------------------------
-
+    ///
     /// Explore the present working directory and register the filtered nodes.
     /// This operation is expensive. So, try to avoid using it too often.
     ///
@@ -46,7 +46,7 @@ pub enum ExternalMsg {
     ExploreParentsAsync,
 
     /// ### Screen -------------------------------------------------------------
-
+    ///
     /// Clear the screen.
     ///
     /// Example:
@@ -68,7 +68,7 @@ pub enum ExternalMsg {
     Refresh,
 
     /// ### Navigation ---------------------------------------------------------
-
+    ///
     /// Focus next node.
     ///
     /// Example:
@@ -302,7 +302,7 @@ pub enum ExternalMsg {
     FollowSymlink,
 
     /// ### Virtual Root ------------------------------------------------------
-
+    ///
     /// Sets the virtual root for isolating xplr navigation, similar to
     /// `--vroot`, but temporary (can be reset back to initial value).
     /// If the $PWD is outside the vroot, xplr will automatically enter vroot.
@@ -341,7 +341,7 @@ pub enum ExternalMsg {
     ResetVroot,
 
     /// ### Reading Input -----------------------------------------------------
-
+    ///
     /// Set the input prompt temporarily, until the input buffer is reset.
     ///
     /// Type: { SetInputPrompt = string }
@@ -426,7 +426,7 @@ pub enum ExternalMsg {
     ResetInputBuffer,
 
     /// ### Switching Mode -----------------------------------------------------
-
+    ///
     /// Switch input [mode](https://xplr.dev/en/modes).
     ///
     /// Type : { SwitchMode = "string" }
@@ -518,7 +518,7 @@ pub enum ExternalMsg {
     PopModeKeepingInputBuffer,
 
     /// ### Switching Layout ---------------------------------------------------
-
+    ///
     /// Switch [layout](https://xplr.dev/en/layouts).
     ///
     /// Type: { SwitchLayout = "string" }
@@ -553,7 +553,7 @@ pub enum ExternalMsg {
     SwitchLayoutCustom(String),
 
     /// ### Executing Commands ------------------------------------------------
-
+    ///
     /// Like `Call0`, but it uses `\n` as the delimiter in input/output pipes,
     /// hence it cannot handle files with `\n` in the name.
     /// You may want to use `Call0` instead.
@@ -622,7 +622,7 @@ pub enum ExternalMsg {
     BashExecSilently0(String),
 
     /// ### Calling Lua Functions ----------------------------------------------
-
+    ///
     /// Call a Lua function.
     ///
     /// A [Lua Context](https://xplr.dev/en/lua-function-calls#lua-context)
@@ -677,7 +677,7 @@ pub enum ExternalMsg {
     LuaEvalSilently(String),
 
     /// ### Select Operations --------------------------------------------------
-
+    ///
     /// Select the focused node.
     ///
     /// Example:
@@ -764,7 +764,7 @@ pub enum ExternalMsg {
     ClearSelection,
 
     /// ### Filter Operations --------------------------------------------------
-
+    ///
     /// Add a [filter](https://xplr.dev/en/filtering#filter) to exclude nodes
     /// while exploring directories.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
@@ -854,7 +854,7 @@ pub enum ExternalMsg {
     ClearNodeFilters,
 
     /// ### Sort Operations ----------------------------------------------------
-
+    ///
     /// Add a [sorter](https://xplr.dev/en/sorting#sorter) to sort nodes while
     /// exploring directories.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
@@ -939,7 +939,7 @@ pub enum ExternalMsg {
     ClearNodeSorters,
 
     /// ### Search Operations --------------------------------------------------
-
+    ///
     /// Search files using the current or default (fuzzy) search algorithm.
     /// You need to call `ExplorePwd` or `ExplorePwdAsync` explicitly.
     /// It gets reset automatically when changing directory.
@@ -1106,7 +1106,7 @@ pub enum ExternalMsg {
     CancelSearch,
 
     /// ### Mouse Operations ---------------------------------------------------
-
+    ///
     /// Enable mouse
     ///
     /// Example:
@@ -1132,7 +1132,7 @@ pub enum ExternalMsg {
     ToggleMouse,
 
     /// ### Fifo Operations ----------------------------------------------------
-
+    ///
     /// Start piping the focused path to the given fifo path
     ///
     /// Type: { StartFifo = "string" }
@@ -1162,7 +1162,7 @@ pub enum ExternalMsg {
     ToggleFifo(String),
 
     /// ### Logging ------------------------------------------------------------
-
+    ///
     /// Log information message.
     ///
     /// Type: { LogInfo = "string" }
@@ -1204,7 +1204,7 @@ pub enum ExternalMsg {
     LogError(String),
 
     /// ### Debugging ----------------------------------------------------------
-
+    ///
     /// Write the application state to a file, without quitting. Also helpful
     /// for debugging.
     ///
@@ -1217,7 +1217,7 @@ pub enum ExternalMsg {
     Debug(String),
 
     /// ### Quit Options -------------------------------------------------------
-
+    ///
     /// Example:
     ///
     /// - Lua: `"Quit"`

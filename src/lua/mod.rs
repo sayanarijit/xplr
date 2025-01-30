@@ -16,10 +16,10 @@ pub mod util;
 const DEFAULT_LUA_SCRIPT: &str = include_str!("../init.lua");
 const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
 
-pub fn serialize<'lua, T: Serialize + Sized>(
-    lua: &'lua mlua::Lua,
+pub fn serialize<T: Serialize + Sized>(
+    lua: &mlua::Lua,
     value: &T,
-) -> Result<mlua::Value<'lua>> {
+) -> Result<mlua::Value> {
     lua.to_value_with(value, SerializeOptions::new().serialize_none_to_null(false))
         .map_err(Error::from)
 }
@@ -115,10 +115,10 @@ pub fn extend(lua: &Lua, path: &str) -> Result<(Config, Option<Hooks>)> {
     Ok((config, hooks))
 }
 
-fn resolve_fn_recursive<'lua, 'a>(
-    table: &mlua::Table<'lua>,
+fn resolve_fn_recursive<'a>(
+    table: &mlua::Table,
     mut path: impl Iterator<Item = &'a str>,
-) -> Result<mlua::Function<'lua>> {
+) -> Result<mlua::Function> {
     if let Some(nxt) = path.next() {
         match table.get(nxt)? {
             mlua::Value::Table(t) => resolve_fn_recursive(&t, path),
@@ -131,18 +131,11 @@ fn resolve_fn_recursive<'lua, 'a>(
 }
 
 /// This function resolves paths like `builtin.func_foo`, `custom.func_bar` into lua functions.
-pub fn resolve_fn<'lua>(
-    globals: &mlua::Table<'lua>,
-    path: &str,
-) -> Result<mlua::Function<'lua>> {
+pub fn resolve_fn(globals: &mlua::Table, path: &str) -> Result<mlua::Function> {
     resolve_fn_recursive(globals, path.split('.'))
 }
 
-pub fn call<'lua, R: DeserializeOwned>(
-    lua: &'lua Lua,
-    func: &str,
-    arg: mlua::Value<'lua>,
-) -> Result<R> {
+pub fn call<R: DeserializeOwned>(lua: &Lua, func: &str, arg: mlua::Value) -> Result<R> {
     let func = format!("xplr.fn.{func}");
     let func = resolve_fn(&lua.globals(), &func)?;
     let res: mlua::Value = func.call(arg)?;
@@ -160,24 +153,24 @@ mod tests {
         assert!(check_version(VERSION, "foo path").is_ok());
 
         // Current release if OK
-        assert!(check_version("0.21.9", "foo path").is_ok());
+        assert!(check_version("0.21.10", "foo path").is_ok());
 
         // Prev major release is ERR
         // - Not yet
 
         // Prev minor release is ERR (Change when we get to v1)
-        assert!(check_version("0.20.9", "foo path").is_err());
+        assert!(check_version("0.20.10", "foo path").is_err());
 
         // Prev bugfix release is OK
-        assert!(check_version("0.21.8", "foo path").is_ok());
+        assert!(check_version("0.21.9", "foo path").is_ok());
 
         // Next major release is ERR
-        assert!(check_version("1.20.9", "foo path").is_err());
+        assert!(check_version("1.20.10", "foo path").is_err());
 
         // Next minor release is ERR
-        assert!(check_version("0.22.9", "foo path").is_err());
+        assert!(check_version("0.22.10", "foo path").is_err());
 
         // Next bugfix release is ERR (Change when we get to v1)
-        assert!(check_version("0.21.10", "foo path").is_err());
+        assert!(check_version("0.21.11", "foo path").is_err());
     }
 }

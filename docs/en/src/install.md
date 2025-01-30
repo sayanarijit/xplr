@@ -183,13 +183,12 @@ One can directly download the standalone binary from the
 Currently, the following options are available for direct download:
 
 - [GNU/Linux][16]
-- [Linux musl][26]
 - [macOS][17]
 
 Command-line instructions:
 
 ```bash
-platform="linux"  # or "macos" / "linux-musl"
+platform="linux"  # or "macos"
 
 # Download
 wget https://github.com/sayanarijit/xplr/releases/latest/download/xplr-$platform.tar.gz
