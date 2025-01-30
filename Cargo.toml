@@ -22,7 +22,7 @@ categories = ['command-line-interface', 'command-line-utilities']
 include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
 
 [dependencies]
-libc = { version = "0.2.169", default-features = false }
+libc = "0.2.169"
 humansize = "2.1.3"
 natord = "1.0.9"
 anyhow = "1.0.95"
