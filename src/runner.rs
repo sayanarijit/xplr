@@ -81,7 +81,7 @@ fn call(
         event_reader.stop();
 
         terminal.clear()?;
-        terminal.set_cursor(0, 0)?;
+        terminal.set_cursor_position((0, 0))?;
         term::disable_raw_mode()?;
         terminal.show_cursor()?;
     }
@@ -109,9 +109,9 @@ fn call(
 
     let status = Command::new(cmd.command.clone())
         .env("XPLR", &app.bin)
-        .env("XPLR_VROOT", &app.vroot.clone().unwrap_or_default())
+        .env("XPLR_VROOT", app.vroot.clone().unwrap_or_default())
         .env("XPLR_APP_VERSION", &app.version)
-        .env("XPLR_PID", &app.pid.to_string())
+        .env("XPLR_PID", app.pid.to_string())
         .env("XPLR_INPUT_BUFFER", input_buffer)
         .env("XPLR_INITIAL_PWD", &app.initial_pwd)
         .env("XPLR_FOCUS_PATH", app.focused_node_str())
@@ -608,7 +608,7 @@ impl Runner {
                                 event_reader.stop();
 
                                 terminal.clear()?;
-                                terminal.set_cursor(0, 0)?;
+                                terminal.set_cursor_position((0, 0))?;
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
 
@@ -652,7 +652,7 @@ impl Runner {
                                 event_reader.stop();
 
                                 terminal.clear()?;
-                                terminal.set_cursor(0, 0)?;
+                                terminal.set_cursor_position((0, 0))?;
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
 
@@ -819,7 +819,7 @@ impl Runner {
         }
 
         terminal.clear()?;
-        terminal.set_cursor(0, 0)?;
+        terminal.set_cursor_position((0, 0))?;
         execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
         execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
         term::disable_raw_mode()?;

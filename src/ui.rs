@@ -416,6 +416,7 @@ impl From<Style> for TuiStyle {
                 bg: val.bg.map(Into::into),
                 add_modifier: TuiModifier::from_bits_truncate(xor(val.add_modifiers)),
                 sub_modifier: TuiModifier::from_bits_truncate(xor(val.sub_modifiers)),
+                underline_color: None,
             }
         }
     }
@@ -934,7 +935,7 @@ impl UI<'_> {
 
         let table = Table::new(rows, table_constraints)
             .style(app_config.general.table.style.clone())
-            .highlight_style(app_config.general.focus_ui.style.clone())
+            .row_highlight_style(app_config.general.focus_ui.style.clone())
             .column_spacing(app_config.general.table.col_spacing.unwrap_or_default())
             .block(block(
                 config,
@@ -1098,13 +1099,15 @@ impl UI<'_> {
             ));
 
             f.render_widget(input_buf, layout_size);
-            f.set_cursor(
+            f.set_cursor_position(
                 // Put cursor past the end of the input text
-                layout_size.x
-                    + (input.visual_cursor() as u16).min(width)
-                    + cursor_offset_left,
-                // Move one line down, from the border to the input line
-                layout_size.y + 1,
+                (
+                    layout_size.x
+                        + (input.visual_cursor() as u16).min(width)
+                        + cursor_offset_left,
+                    // Move one line down, from the border to the input line
+                    layout_size.y + 1,
+                ),
             );
         };
     }
@@ -1484,7 +1487,7 @@ impl UI<'_> {
     }
 
     pub fn draw(&mut self, f: &mut Frame, app: &app::App) {
-        self.screen_size = f.size();
+        self.screen_size = f.area();
         let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).clone();
         self.draw_layout(layout, f, self.screen_size, app);
     }

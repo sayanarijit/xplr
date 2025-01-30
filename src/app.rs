@@ -172,10 +172,10 @@ impl History {
     }
 
     fn _is_deepest_dir(&self, path: &str) -> bool {
-        return !self
+        !self
             .paths
             .iter()
-            .any(|p| p.ends_with('/') && p.starts_with(path) && path != p);
+            .any(|p| p.ends_with('/') && p.starts_with(path) && path != p)
     }
 
     fn _uniq_deep_dirs(&self) -> IndexSet<String> {

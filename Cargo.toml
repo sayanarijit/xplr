@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '0.21.9'
+version = '0.21.10'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
@@ -25,63 +25,63 @@ include = ['src/**/*', 'docs/en/src/**/*', 'LICENSE', 'README.md']
 libc = "0.2.155"
 humansize = "2.1.3"
 natord = "1.0.9"
-anyhow = "1.0.86"
+anyhow = "1.0.95"
 serde_yaml = "0.9.34"
-crossterm = { version = "0.27.0", features = [], default-features = false }
-ansi-to-tui = "=3.1.0"
-regex = "1.10.5"
-gethostname = "0.4.3"
-serde_json = "1.0.117"
+crossterm = { version = "0.28.1", features = [], default-features = false }
+ansi-to-tui = "7.0.0"
+regex = "1.11.1"
+gethostname = "0.5.0"
+serde_json = "1.0.138"
 path-absolutize = "3.1.1"
-which = "6.0.1"
-nu-ansi-term = "0.50.0"
-textwrap = "0.16"
+which = "7.0.1"
+nu-ansi-term = "0.50.1"
+textwrap = "0.16.1"
 snailquote = "0.3.1"
-skim = { version = "0.10.4", default-features = false }
-time = { version = "0.3.36", features = ["serde", "local-offset", "formatting", "macros"] }
+skim = "0.16.0"
+time = { version = "0.3.37", features = ["serde", "local-offset", "formatting", "macros"] }
 jf = "0.6.2"
 xdg = "2.5.2"
-home = "0.5.9"
+home = "0.5.11"
 
 [dependencies.lscolors]
-version = "0.17.0"
+version = "0.20.0"
 default-features = false
 features = ["nu-ansi-term"]
 
 [dependencies.lazy_static]
-version = "1.4.0"
+version = "1.5.0"
 default-features = false
 
 [dependencies.mime_guess]
-version = "2.0.4"
+version = "2.0.5"
 default-features = false
 
 [dependencies.tui]
-version = "=0.26.1"  # https://github.com/ratatui-org/ratatui/issues/1032
+version = "0.29.0"
 default-features = false
 features = ['crossterm', 'serde']
 package = 'ratatui'
 
 [dependencies.serde]
-version = "1.0.203"
+version = "1.0.217"
 features = []
 default-features = false
 
 [dependencies.indexmap]
-version = "2.2.6"
+version = "2.7.1"
 features = ['serde']
 
 [dependencies.mlua]
-version = "0.9.8"
+version = "0.10.3"
 features = ['luajit', 'serialize', 'send']
 
 [dependencies.tui-input]
-version = "0.8.0"
+version = "0.11.1"
 features = ['serde']
 
 [dev-dependencies]
 criterion = "0.5.1"
-assert_cmd = "2.0.14"
+assert_cmd = "2.0.16"
 
 [profile.release]
 lto = true

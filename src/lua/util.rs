@@ -43,7 +43,7 @@ lazy_static! {
 /// xplr.util.version()
 /// -- { major = 0, minor = 0, patch = 0 }
 /// ```
-pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn version(util: Table, lua: &Lua) -> Result<Table> {
     #[derive(Debug, Default, Serialize, Deserialize)]
     struct Version {
         major: u16,
@@ -83,7 +83,7 @@ pub fn version<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   ["foo"] = "bar",
 /// -- }
 /// ```
-pub fn debug<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn debug(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|_, value: Value| {
         let log = format!("{:#?}", value);
         println!("{}", log);
@@ -106,7 +106,7 @@ pub fn debug<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// print(val_clone.foo)
 /// -- "bar"
 /// ```
-pub fn clone<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn clone(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(move |lua, value: Value| {
         lua::serialize(lua, &value).map_err(LuaError::custom)
     })?;
@@ -124,7 +124,7 @@ pub fn clone<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.exists("/foo/bar")
 /// -- true
 /// ```
-pub fn exists<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn exists(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(move |_, path: String| Ok(PathBuf::from(path).exists()))?;
     util.set("exists", func)?;
@@ -141,7 +141,7 @@ pub fn exists<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.is_dir("/foo/bar")
 /// -- true
 /// ```
-pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn is_dir(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_dir()))?;
     util.set("is_dir", func)?;
@@ -158,7 +158,7 @@ pub fn is_dir<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.is_file("/foo/bar")
 /// -- true
 /// ```
-pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn is_file(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(move |_, path: String| Ok(PathBuf::from(path).is_file()))?;
     util.set("is_file", func)?;
@@ -175,7 +175,7 @@ pub fn is_file<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.is_file("/foo/bar")
 /// -- true
 /// ```
-pub fn is_symlink<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn is_symlink(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua
         .create_function(move |_, path: String| Ok(PathBuf::from(path).is_symlink()))?;
     util.set("is_symlink", func)?;
@@ -192,7 +192,7 @@ pub fn is_symlink<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.is_absolute("/foo/bar")
 /// -- true
 /// ```
-pub fn is_absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn is_absolute(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua
         .create_function(move |_, path: String| Ok(PathBuf::from(path).is_absolute()))?;
     util.set("is_absolute", func)?;
@@ -212,7 +212,7 @@ pub fn is_absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.path_split(".././foo")
 /// -- { "..", "foo" }
 /// ```
-pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn path_split(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(move |_, path: String| {
         let components: Vec<String> = PathBuf::from(path)
             .components()
@@ -240,7 +240,7 @@ pub fn path_split<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.node("/")
 /// -- nil
 /// ```
-pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn node(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(move |lua, path: String| {
         let path = PathBuf::from(path);
         let abs = path.absolutize()?;
@@ -275,7 +275,7 @@ pub fn node<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.node_type(xplr.util.node("/foo/bar"), xplr.config.node_types)
 /// -- { style = { fg = "Red", ... }, meta = { icon = "", ... } ... }
 /// ```
-pub fn node_type<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn node_type(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(move |lua, (node, config): (Table, Option<Table>)| {
             let node: Node = lua.from_value(Value::Table(node))?;
@@ -283,9 +283,9 @@ pub fn node_type<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
                 config
             } else {
                 lua.globals()
-                    .get::<_, Table>("xplr")?
-                    .get::<_, Table>("config")?
-                    .get::<_, Table>("node_types")?
+                    .get::<Table>("xplr")?
+                    .get::<Table>("config")?
+                    .get::<Table>("node_types")?
             };
             let config: NodeTypesConfig = lua.from_value(Value::Table(config))?;
             let node_type = config.get(&node);
@@ -306,7 +306,7 @@ pub fn node_type<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.dirname("/foo/bar")
 /// -- "/foo"
 /// ```
-pub fn dirname<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn dirname(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|_, path: String| {
         let parent = PathBuf::from(path)
             .parent()
@@ -327,7 +327,7 @@ pub fn dirname<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.basename("/foo/bar")
 /// -- "bar"
 /// ```
-pub fn basename<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn basename(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|_, path: String| {
         let parent = PathBuf::from(path)
             .file_name()
@@ -349,7 +349,7 @@ pub fn basename<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.absolute("foo/bar")
 /// -- "/tmp/foo/bar"
 /// ```
-pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn absolute(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|_, path: String| {
         let abs = PathBuf::from(path)
             .absolutize()?
@@ -396,7 +396,7 @@ pub fn absolute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.relative_to("/present/working/directory", { base = "/present/foo/bar" })
 /// -- "../../working/directory"
 /// ```
-pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn relative_to(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
         let config: Option<RelativityConfig<String>> =
             lua.from_value(config.map(Value::Table).unwrap_or(Value::Nil))?;
@@ -439,7 +439,7 @@ pub fn relative_to<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.shorten("/tmp")
 /// -- "/tmp"
 /// ```
-pub fn shorten<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn shorten(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(move |lua, (path, config): (String, Option<Table>)| {
             let config: Option<RelativityConfig<String>> =
@@ -464,7 +464,7 @@ pub fn shorten<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.explore("/tmp", app.explorer_config)
 /// -- { { absolute_path = "/tmp/a", ... }, ... }
 /// ```
-pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn explore(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, (path, config): (String, Option<Table>)| {
         let config: ExplorerConfig = if let Some(cfg) = config {
             lua.from_value(Value::Table(cfg))?
@@ -494,7 +494,7 @@ pub fn explore<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.shell_execute("bash", {"-c", "xplr --help"})
 /// -- { stdout = "xplr...", stderr = "", returncode = 0 }
 /// ```
-pub fn shell_execute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn shell_execute(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(|lua, (program, args): (String, Option<Vec<String>>)| {
             let mut cmd = Command::new(program);
@@ -524,7 +524,7 @@ pub fn shell_execute<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.shell_quote("a'b\"c")
 /// -- 'a'"'"'b"c'
 /// ```
-pub fn shell_quote<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn shell_quote(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|_, string: String| {
         Ok(format!("'{}'", string.replace('\'', r#"'"'"'"#)))
     })?;
@@ -542,7 +542,7 @@ pub fn shell_quote<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.shell_escape("a'b\"c")
 /// -- "\"a'b\\\"c\""
 /// ```
-pub fn shell_escape<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn shell_escape(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(move |_, string: String| {
         let val = path::escape(&string).to_string();
         Ok(val)
@@ -561,7 +561,7 @@ pub fn shell_escape<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.from_json([[{"foo": "bar"}]])
 /// -- { foo = "bar" }
 /// ```
-pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn from_json(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, string: String| {
         let val = json::from_str::<yaml::Value>(&string).map_err(LuaError::custom)?;
         lua::serialize(lua, &val).map_err(Error::custom)
@@ -585,7 +585,7 @@ pub fn from_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   "foo": "bar"
 /// -- }]]
 /// ```
-pub fn to_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn to_json(util: Table, lua: &Lua) -> Result<Table> {
     #[derive(Debug, Default, Serialize, Deserialize)]
     struct Options {
         pretty: bool,
@@ -619,7 +619,7 @@ pub fn to_json<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.from_yaml([[{foo: bar}]])
 /// -- { foo = "bar" }
 /// ```
-pub fn from_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn from_yaml(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, string: String| {
         let val = yaml::from_str::<yaml::Value>(&string).map_err(LuaError::custom)?;
         lua::serialize(lua, &val).map_err(Error::custom)
@@ -638,7 +638,7 @@ pub fn from_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.to_yaml({ foo = "bar" })
 /// -- "foo: bar"
 /// ```
-pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn to_yaml(util: Table, lua: &Lua) -> Result<Table> {
     #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
     pub struct Options {
         pretty: bool,
@@ -662,7 +662,7 @@ pub fn to_yaml<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.lscolor("Desktop")
 /// -- { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} }
 /// ```
-pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn lscolor(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(move |lua, path: String| {
         let style = LS_COLORS
             .style_for_path(path)
@@ -684,7 +684,7 @@ pub fn lscolor<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.paint("Desktop", { fg = "Red", bg = nil, add_modifiers = {}, sub_modifiers = {} })
 /// -- "\u001b[31mDesktop\u001b[0m"
 /// ```
-pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn paint(util: Table, lua: &Lua) -> Result<Table> {
     let func =
         lua.create_function(|lua, (string, style): (String, Option<Table>)| {
             if *ui::NO_COLOR {
@@ -713,7 +713,7 @@ pub fn paint<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.style_mix({{ fg = "Red" }, { bg = "Blue" }, { add_modifiers = {"Bold"} }})
 /// -- { fg = "Red", bg = "Blue", add_modifiers = { "Bold" }, sub_modifiers = {} }
 /// ```
-pub fn style_mix<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn style_mix(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, styles: Vec<Table>| {
         let mut style = Style::default();
         for other in styles {
@@ -746,7 +746,7 @@ pub fn style_mix<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// )
 /// -- { "this will be", "    cut off" }
 /// ```
-pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn textwrap(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, (text, options): (String, Value)| {
         let lines = match lua.from_value::<usize>(options.clone()) {
             Ok(width) => textwrap::wrap(&text, width),
@@ -791,7 +791,7 @@ pub fn textwrap<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// --   }
 /// -- }
 /// ```
-pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn layout_replace(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(
         move |lua, (layout, target, replacement): (Value, Value, Value)| {
             let layout: Layout = lua.from_value(layout)?;
@@ -821,7 +821,7 @@ pub fn layout_replace<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.permissions_rwx(app.focused_node.permission)
 /// -- "rwxrwsrwT"
 /// ```
-pub fn permissions_rwx<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn permissions_rwx(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, permission: Table| {
         let permissions: Permissions = lua.from_value(Value::Table(permission))?;
         let permissions = permissions.to_string();
@@ -844,7 +844,7 @@ pub fn permissions_rwx<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// xplr.util.permissions_octal(app.focused_node.permission)
 /// -- { 0, 7, 5, 4 }
 /// ```
-pub fn permissions_octal<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
+pub fn permissions_octal(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|lua, permission: Table| {
         let permissions: Permissions = lua.from_value(Value::Table(permission))?;
         let permissions: Octal = permissions.into();
@@ -864,7 +864,7 @@ pub fn permissions_octal<'a>(util: Table<'a>, lua: &Lua) -> Result<Table<'a>> {
 /// [6]: https://xplr.dev/en/node-type
 /// [7]: https://xplr.dev/en/node_types
 /// [8]: https://xplr.dev/en/column-renderer#permission
-
+///
 pub(crate) fn create_table(lua: &Lua) -> Result<Table> {
     let mut util = lua.create_table()?;
 
