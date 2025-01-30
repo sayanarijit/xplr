@@ -3060,7 +3060,7 @@ xplr.config.modes.custom = {}
 
 -- Tries to auto complete the path in the input buffer
 xplr.fn.builtin.try_complete_path = function(m)
-  if not m.input_buffer then
+  if not m.input_buffer or m.input_buffer == "" then
     return
   end
 
