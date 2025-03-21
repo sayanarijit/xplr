@@ -489,7 +489,7 @@ xplr.config.general.sort_and_filter_ui.search_identifiers = {
 --
 -- Type: nullable string
 xplr.config.general.sort_and_filter_ui.search_direction_identifiers.ordered.format =
-  "↓"
+"↓"
 
 -- The shape of unordered indicator for search ordering identifiers in Sort & filter panel.
 --
@@ -687,7 +687,7 @@ xplr.config.general.panel_ui.sort_and_filter.border_style = {}
 -- Type: nullable list of [Node Sorter](https://xplr.dev/en/sorting#node-sorter-applicable)
 xplr.config.general.initial_sorting = {
   { sorter = "ByCanonicalIsDir", reverse = true },
-  { sorter = "ByIRelativePath", reverse = false },
+  { sorter = "ByIRelativePath",  reverse = false },
 }
 
 -- The name of one of the modes to use when xplr loads.
@@ -1336,23 +1336,23 @@ xplr.config.modes.builtin.default = {
 }
 
 xplr.config.modes.builtin.default.key_bindings.on_key["v"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["space"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["space"]
 xplr.config.modes.builtin.default.key_bindings.on_key["V"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-a"]
 xplr.config.modes.builtin.default.key_bindings.on_key["/"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-f"]
 xplr.config.modes.builtin.default.key_bindings.on_key["h"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["left"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["left"]
 xplr.config.modes.builtin.default.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["down"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["down"]
 xplr.config.modes.builtin.default.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["up"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["up"]
 xplr.config.modes.builtin.default.key_bindings.on_key["l"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["right"]
+    xplr.config.modes.builtin.default.key_bindings.on_key["right"]
 xplr.config.modes.builtin.default.key_bindings.on_key["tab"] =
-  xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
+    xplr.config.modes.builtin.default.key_bindings.on_key["ctrl-i"] -- compatibility workaround
 xplr.config.modes.builtin.default.key_bindings.on_key["?"] =
-  xplr.config.general.global_key_bindings.on_key["f1"]
+    xplr.config.general.global_key_bindings.on_key["f1"]
 
 -- The builtin debug error mode.
 --
@@ -1475,7 +1475,7 @@ xplr.config.modes.builtin.go_to_path = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
     },
@@ -1546,7 +1546,7 @@ xplr.config.modes.builtin.move_to = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
     },
@@ -1617,7 +1617,7 @@ xplr.config.modes.builtin.copy_to = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
     },
@@ -1883,7 +1883,7 @@ xplr.config.modes.builtin.create_directory = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
       ["enter"] = {
@@ -1926,7 +1926,7 @@ xplr.config.modes.builtin.create_file = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
       ["enter"] = {
@@ -2004,9 +2004,9 @@ xplr.config.modes.builtin.number = {
 }
 
 xplr.config.modes.builtin.number.key_bindings.on_key["j"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["down"]
+    xplr.config.modes.builtin.number.key_bindings.on_key["down"]
 xplr.config.modes.builtin.number.key_bindings.on_key["k"] =
-  xplr.config.modes.builtin.number.key_bindings.on_key["up"]
+    xplr.config.modes.builtin.number.key_bindings.on_key["up"]
 
 -- The builtin go to mode.
 --
@@ -2087,7 +2087,7 @@ xplr.config.modes.builtin.rename = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
       ["enter"] = {
@@ -2131,7 +2131,7 @@ xplr.config.modes.builtin.duplicate_as = {
       ["tab"] = {
         help = "try complete",
         messages = {
-          { CallLuaSilently = "builtin.try_complete_path" },
+          "TryCompletePath",
         },
       },
       ["enter"] = {
@@ -2490,9 +2490,9 @@ xplr.config.modes.builtin.search = {
 }
 
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-n"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["down"]
+    xplr.config.modes.builtin.search.key_bindings.on_key["down"]
 xplr.config.modes.builtin.search.key_bindings.on_key["ctrl-p"] =
-  xplr.config.modes.builtin.search.key_bindings.on_key["up"]
+    xplr.config.modes.builtin.search.key_bindings.on_key["up"]
 
 -- The builtin filter mode.
 --
@@ -3058,65 +3058,6 @@ xplr.config.modes.custom = {}
 -- As always, `xplr.fn.builtin` is where the built-in functions are defined
 -- that can be overwritten.
 
--- Tries to auto complete the path in the input buffer
-xplr.fn.builtin.try_complete_path = function(m)
-  if not m.input_buffer or m.input_buffer == "" then
-    return
-  end
-
-  local function matches_all(str, paths)
-    for _, path in ipairs(paths) do
-      if string.sub(path, 1, #str) ~= str then
-        return false
-      end
-    end
-    return true
-  end
-
-  local path = m.input_buffer
-  local explorer_config = {
-    filters = {
-      { filter = "RelativePathDoesStartWith", input = xplr.util.basename(path) },
-    },
-  }
-  local parent = xplr.util.dirname(path)
-  if not parent or parent == "" then
-    parent = "./"
-  elseif parent ~= "/" then
-    parent = parent .. "/"
-  end
-
-  local nodes = xplr.util.explore(parent, explorer_config)
-  local found = {}
-  for _, node in ipairs(nodes) do
-    table.insert(found, parent .. node.relative_path)
-  end
-  local count = #found
-
-  if count == 0 then
-    return
-  elseif count == 1 then
-    return {
-      { SetInputBuffer = found[1] },
-    }
-  else
-    local first = found[1]
-    while #first > #path and matches_all(path, found) do
-      path = string.sub(first, 1, #path + 1)
-    end
-
-    if matches_all(path, found) then
-      return {
-        { SetInputBuffer = path },
-      }
-    end
-
-    return {
-      { SetInputBuffer = string.sub(path, 1, #path - 1) },
-    }
-  end
-end
-
 xplr.fn.builtin.fmt_general_selection_item = function(n)
   local nl = xplr.util.paint("\\n", { add_modifiers = { "Italic", "Dim" } })
   local sh_config = { with_prefix_dots = true, without_suffix_dots = true }
@@ -3172,7 +3113,7 @@ xplr.fn.builtin.fmt_general_table_row_cols_1 = function(m)
       r = r .. "×"
     else
       local symlink_path =
-        xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
+          xplr.util.shorten(m.symlink.absolute_path, { base = m.parent })
       if m.symlink.is_dir then
         symlink_path = symlink_path .. "/"
       end
@@ -3194,14 +3135,14 @@ xplr.fn.builtin.fmt_general_table_row_cols_2 = function(m)
   local T = xplr.util.paint("T", { fg = "Red" })
 
   return xplr.util
-    .permissions_rwx(m.permissions)
-    :gsub("r", r)
-    :gsub("w", w)
-    :gsub("x", x)
-    :gsub("s", s)
-    :gsub("S", S)
-    :gsub("t", t)
-    :gsub("T", T)
+      .permissions_rwx(m.permissions)
+      :gsub("r", r)
+      :gsub("w", w)
+      :gsub("x", x)
+      :gsub("s", s)
+      :gsub("S", S)
+      :gsub("t", t)
+      :gsub("T", T)
 end
 
 -- Renders the fourth column in the table
@@ -3216,6 +3157,17 @@ end
 -- Renders the fifth column in the table
 xplr.fn.builtin.fmt_general_table_row_cols_4 = function(m)
   return tostring(os.date("%a %b %d %H:%M:%S %Y", m.last_modified / 1000000000))
+end
+
+-- DEPRECATED: This function is just for compatibility.
+-- Use message `TryCompletePath` instead.
+xplr.fn.builtin.try_complete_path = function(m)
+  return {
+    {
+      LogWarning = "xplr.fn.builtin.try_complete_path is deprecated. Use message `TryCompletePath` instead.",
+    },
+    "TryCompletePath",
+  }
 end
 
 -- This is where the custom functions can be added.

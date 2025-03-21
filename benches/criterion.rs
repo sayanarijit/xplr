@@ -127,7 +127,7 @@ fn draw_benchmark(c: &mut Criterion) {
     });
 
     terminal.clear().unwrap();
-    terminal.set_cursor(0, 0).unwrap();
+    terminal.set_cursor_position((0, 0)).unwrap();
     execute!(terminal.backend_mut(), term::LeaveAlternateScreen).unwrap();
     term::disable_raw_mode().unwrap();
     terminal.show_cursor().unwrap();

@@ -34,7 +34,7 @@ CONFIGURATION_DOC_TEMPLATE = """
 
 @dataclass
 class MsgSection:
-    title: str
+    title: str | None
     body: List[str]
 
 
@@ -101,7 +101,9 @@ def gen_messages():
 
     for cat in res:
         slug = cat.title.lower().replace(" ", "-")
-        result.categories.append(f"- [{cat.title}](#{slug})")
+        result.categories.append(
+            MsgCategory(title=f"- [{cat.title}](#{slug})", sections=[])
+        )
         result.msgs.append(f"### {cat.title}")
         result.msgs.append("")
 
@@ -116,7 +118,8 @@ def gen_messages():
             result.msgs.append("")
 
     messages = MESSAGES_DOC_TEMPLATE.format(
-        categories="\n".join(result.categories), msgs="\n".join(result.msgs)
+        categories="\n".join(c.title for c in result.categories),
+        msgs="\n".join(result.msgs),
     )
 
     print(messages)
@@ -247,7 +250,7 @@ def gen_xplr_util():
                 reading = Function(doc=[line[4:]], name="")
 
         if line.startswith("pub fn") and reading:
-            reading.name = "\n### xplr.util." + line.split("<")[0].split()[-1] + "\n"
+            reading.name = "\n### xplr.util." + line.split("(", 1)[0].split()[-1] + "\n"
             functions.append(reading)
             reading = None
             continue

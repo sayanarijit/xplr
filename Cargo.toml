@@ -30,7 +30,7 @@ serde_yaml = "0.9.34"
 crossterm = { version = "0.28.1", features = [], default-features = false }
 ansi-to-tui = "7.0.0"
 regex = "1.11.1"
-gethostname = "0.5.0"
+gethostname = "1.0.0"
 serde_json = "1.0.138"
 path-absolutize = "3.1.1"
 which = "7.0.1"

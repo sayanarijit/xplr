@@ -65,6 +65,7 @@ pub struct RelativityConfig<B: AsRef<Path>> {
     base: Option<B>,
     with_prefix_dots: Option<bool>,
     without_suffix_dots: Option<bool>,
+    without_tilde: Option<bool>,
 }
 
 impl<B: AsRef<Path>> RelativityConfig<B> {
@@ -80,6 +81,11 @@ impl<B: AsRef<Path>> RelativityConfig<B> {
 
     pub fn without_suffix_dots(mut self) -> Self {
         self.without_suffix_dots = Some(true);
+        self
+    }
+
+    pub fn without_tilde(mut self) -> Self {
+        self.without_tilde = Some(true);
         self
     }
 }
@@ -152,6 +158,14 @@ where
     let relative = relative_to(path, config)?;
 
     let relative = relative.to_string_lossy().to_string();
+
+    if config.and_then(|c| c.without_tilde).unwrap_or(false) {
+        return if relative.len() < pathstring.len() {
+            Ok(relative)
+        } else {
+            Ok(pathstring)
+        };
+    }
 
     let fromhome = HOME
         .as_ref()
