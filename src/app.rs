@@ -517,8 +517,9 @@ impl App {
 
             self = match msg {
                 ExplorePwd => self.explore_pwd(),
-                ExploreParentsAsync => self.explore_parents_async(),
                 ExplorePwdAsync => self.explore_pwd_async(),
+                ExploreParentsAsync => self.explore_parents_async(),
+                TryCompletePath => self.try_complete_path(),
                 Refresh => self.refresh(),
                 ClearScreen => self.clear_screen(),
                 FocusFirst => self.focus_first(true),
@@ -770,6 +771,18 @@ impl App {
     fn explore_parents_async(mut self) -> Result<Self> {
         self.msg_out.push_back(MsgOut::ExploreParentsAsync);
         Ok(self)
+    }
+
+    fn try_complete_path(self) -> Result<Self> {
+        match self.input.buffer.as_ref().map(|b| b.value()) {
+            None => Ok(self),
+            Some("") => Ok(self),
+            Some(p) => match explorer::try_complete_path(&self.pwd, &p) {
+                Ok(Some(completed_path)) => self.set_input_buffer(completed_path),
+                Ok(None) => Ok(self),
+                Err(e) => self.log_error(e.to_string()),
+            },
+        }
     }
 
     fn refresh(mut self) -> Result<Self> {

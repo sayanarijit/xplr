@@ -45,6 +45,13 @@ pub enum ExternalMsg {
     /// - YAML: `ExploreParentsAsync`
     ExploreParentsAsync,
 
+    /// Tries to complete the path in the input buffer.
+    ///
+    /// Example:
+    /// - Lua: `"TryCompletePath"`
+    /// - YAML: `TryCompletePath`
+    TryCompletePath,
+
     /// ### Screen -------------------------------------------------------------
     ///
     /// Clear the screen.

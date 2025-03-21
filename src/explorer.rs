@@ -1,7 +1,9 @@
 use crate::app::{
     DirectoryBuffer, ExplorerConfig, ExternalMsg, InternalMsg, MsgIn, Node, Task,
 };
+use crate::path;
 use anyhow::{Error, Result};
+use path_absolutize::Absolutize;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
@@ -118,6 +120,63 @@ pub(crate) fn explore_recursive_async(
             0,
             tx_msg_in,
         );
+    }
+}
+
+pub(crate) fn try_complete_path(
+    pwd: &str,
+    partial_path: &str,
+) -> Result<Option<String>> {
+    let Ok(path) = PathBuf::from(partial_path).absolutize().map(PathBuf::from) else {
+        return Ok(None);
+    };
+
+    let (parent, maybe_fname) = if path.ends_with("/") {
+        (path.clone(), None)
+    } else {
+        (
+            path.parent()
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from(pwd)),
+            path.file_name().map(|f| f.to_string_lossy().to_string()),
+        )
+    };
+
+    let mut direntries = fs::read_dir(&parent)?
+        .filter_map(|d| d.ok())
+        .map(|e| (e.file_name().to_string_lossy().to_string()));
+
+    let maybe_found = if let Some(fname) = maybe_fname {
+        let mut matches = direntries
+            .filter(|n| n.starts_with(&fname))
+            .take(2)
+            .collect::<Vec<_>>();
+
+        let count = matches.len();
+        if count <= 1 {
+            matches.pop()
+        } else {
+            None
+        }
+    } else {
+        direntries.next()
+    };
+
+    if let Some(found) = maybe_found {
+        let config = path::RelativityConfig::<PathBuf>::default()
+            .without_suffix_dots()
+            .without_tilde();
+
+        let completion = parent.join(found);
+        let short = path::shorten::<_, PathBuf>(&completion, Some(&config))?;
+
+        if completion.is_dir() && !completion.ends_with("/") {
+            Ok(Some(format!("{short}/")))
+        } else {
+            Ok(Some(short))
+        }
+    } else {
+        Ok(None)
     }
 }
 

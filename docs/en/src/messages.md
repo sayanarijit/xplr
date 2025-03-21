@@ -62,6 +62,15 @@ Example:
 - Lua: `"ExploreParentsAsync"`
 - YAML: `ExploreParentsAsync`
 
+#### TryCompletePath
+
+Tries to complete the path in the input buffer.
+
+Example:
+
+- Lua: `"TryCompletePath"`
+- YAML: `TryCompletePath`
+
 ### Screen
 
 #### ClearScreen
