@@ -149,23 +149,31 @@ pub(crate) fn try_complete_path(
     let maybe_found = if let Some(fname) = maybe_fname {
         let mut matches = direntries
             .filter(|n| n.starts_with(&fname))
-            .take(2)
             .collect::<Vec<_>>();
 
         let count = matches.len();
         if count <= 1 {
             matches.pop()
         } else {
-            None
+            let mut common_prefix = fname.clone();
+            let match1_suffix = matches[0].chars().skip(fname.len());
+            for c in match1_suffix {
+                let new_common_prefix = format!("{common_prefix}{c}");
+                if matches.iter().all(|m| m.starts_with(&new_common_prefix)) {
+                    common_prefix = new_common_prefix;
+                } else {
+                    break;
+                }
+            }
+
+            Some(common_prefix)
         }
     } else {
         direntries.next()
     };
 
     if let Some(found) = maybe_found {
-        let config = path::RelativityConfig::<PathBuf>::default()
-            .without_suffix_dots()
-            .without_tilde();
+        let config = path::RelativityConfig::<PathBuf>::default().without_tilde();
 
         let completion = parent.join(found);
         let short = path::shorten::<_, PathBuf>(&completion, Some(&config))?;
