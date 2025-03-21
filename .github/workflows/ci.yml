@@ -48,6 +48,16 @@ jobs:
         with:
           ignore_words_file: .codespellignore
 
+  linkcheck:
+    name: Markdown Link Check
+    runs-on: ubuntu-latest
+    allow-failure: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          folder-path: "docs/en/src"
+
   test:
     name: Test Suite
     runs-on: ${{ matrix.os }}
