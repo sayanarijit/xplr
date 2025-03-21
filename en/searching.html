@@ -196,6 +196,8 @@ ordering is being applied, i.e. <a href="sorting.html">sorters</a> are being ign
 <li><a href="#recoverable_focus">recoverable_focus</a></li>
 <li><a href="#algorithm">algorithm</a></li>
 <li><a href="#unordered">unordered</a></li>
+<li><a href="#exact_mode">exact_mode</a></li>
+<li><a href="#rank_criteria">rank_criteria</a></li>
 </ul>
 <h3 id="pattern"><a class="header" href="#pattern">pattern</a></h3>
 <p>The patterns used to search.</p>
@@ -215,12 +217,32 @@ ordering is being applied, i.e. <a href="sorting.html">sorters</a> are being ign
 <p>Whether to skip ordering the search result by algorithm based ranking. Defaults
 to the value set in <a href="general-config.html#xplrconfiggeneralsearchunordered">xplr.config.general.search.unordered</a>.</p>
 <p>Type: boolean</p>
+<h3 id="exact_mode"><a class="header" href="#exact_mode">exact_mode</a></h3>
+<p>Whether to search in exact mode. Defaults to <code>false</code>.</p>
+<p>Type: boolean</p>
+<h3 id="rank_criteria"><a class="header" href="#rank_criteria">rank_criteria</a></h3>
+<p>Ranking criteria to use. Defaults to <code>nil</code>.</p>
+<p>Type: nullable list of the following options:</p>
+<ul>
+<li>Score</li>
+<li>NegScore</li>
+<li>Begin</li>
+<li>NegBegin</li>
+<li>End</li>
+<li>NegEnd</li>
+<li>Length</li>
+<li>NegLength</li>
+<li>Index</li>
+<li>NegIndex</li>
+</ul>
 <h2 id="example"><a class="header" href="#example">Example:</a></h2>
 <pre><code class="language-lua">local searcher = {
   pattern = &quot;pattern to search&quot;,
   recoverable_focus = &quot;/path/to/focus/on/cancel&quot;,
   algorithm = &quot;Fuzzy&quot;,
   unordered = false,
+  exact_mode = false,
+  rank_criteria = { &quot;Score&quot;, &quot;Begin&quot;, &quot;End&quot;, &quot;Length&quot; },
 }
 
 xplr.util.explore({ searcher = searcher })

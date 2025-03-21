@@ -471,8 +471,6 @@ following sections.</p>
 <p>See: <a href="https://xplr.dev/en/lua-function-calls">Lua Function Calls</a></p>
 <p>As always, <code>xplr.fn.builtin</code> is where the built-in functions are defined
 that can be overwritten.</p>
-<h4 id="xplrfnbuiltintry_complete_path"><a class="header" href="#xplrfnbuiltintry_complete_path">xplr.fn.builtin.try_complete_path</a></h4>
-<p>Tries to auto complete the path in the input buffer</p>
 <h4 id="xplrfnbuiltinfmt_general_table_row_cols_0"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_0">xplr.fn.builtin.fmt_general_table_row_cols_0</a></h4>
 <p>Renders the first column in the table</p>
 <h4 id="xplrfnbuiltinfmt_general_table_row_cols_1"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_1">xplr.fn.builtin.fmt_general_table_row_cols_1</a></h4>
@@ -483,6 +481,9 @@ that can be overwritten.</p>
 <p>Renders the fourth column in the table</p>
 <h4 id="xplrfnbuiltinfmt_general_table_row_cols_4"><a class="header" href="#xplrfnbuiltinfmt_general_table_row_cols_4">xplr.fn.builtin.fmt_general_table_row_cols_4</a></h4>
 <p>Renders the fifth column in the table</p>
+<h4 id="xplrfnbuiltintry_complete_path"><a class="header" href="#xplrfnbuiltintry_complete_path">xplr.fn.builtin.try_complete_path</a></h4>
+<p>DEPRECATED: This function is just for compatibility.
+Use message <code>TryCompletePath</code> instead.</p>
 <h4 id="xplrfncustom"><a class="header" href="#xplrfncustom">xplr.fn.custom</a></h4>
 <p>This is where the custom functions can be added.</p>
 <p>There is currently no restriction on what kind of functions can be defined
@@ -680,6 +681,12 @@ The default behavior is to rotate from the last/first path.</p>
 <h4 id="xplrconfiggeneralsearchunordered"><a class="header" href="#xplrconfiggeneralsearchunordered">xplr.config.general.search.unordered</a></h4>
 <p>The default search ordering</p>
 <p>Type: boolean</p>
+<h4 id="xplrconfiggeneralsearchexact_mode"><a class="header" href="#xplrconfiggeneralsearchexact_mode">xplr.config.general.search.exact_mode</a></h4>
+<p>The fuzzy search exact mode.</p>
+<p>Type: boolean</p>
+<h4 id="xplrconfiggeneralsearchrank_criteria"><a class="header" href="#xplrconfiggeneralsearchrank_criteria">xplr.config.general.search.rank_criteria</a></h4>
+<p>The fuzzy search rank criteria.</p>
+<p>Type: nullable list of <a href="https://xplr.dev/en/searching#rank_criteria">Rank Criteria</a></p>
 <h4 id="xplrconfiggeneraldefault_uiprefix"><a class="header" href="#xplrconfiggeneraldefault_uiprefix">xplr.config.general.default_ui.prefix</a></h4>
 <p>The content that is placed before the item name for each row by default.</p>
 <p>Type: nullable string</p>
@@ -2404,6 +2411,13 @@ instead.</p>
 <li>Lua: <code>&quot;ExploreParentsAsync&quot;</code></li>
 <li>YAML: <code>ExploreParentsAsync</code></li>
 </ul>
+<h4 id="trycompletepath"><a class="header" href="#trycompletepath">TryCompletePath</a></h4>
+<p>Tries to complete the path in the input buffer.</p>
+<p>Example:</p>
+<ul>
+<li>Lua: <code>&quot;TryCompletePath&quot;</code></li>
+<li>YAML: <code>TryCompletePath</code></li>
+</ul>
 <h3 id="screen"><a class="header" href="#screen">Screen</a></h3>
 <h4 id="clearscreen"><a class="header" href="#clearscreen">ClearScreen</a></h4>
 <p>Clear the screen.</p>
@@ -3576,6 +3590,8 @@ ordering is being applied, i.e. <a href="sorting.html">sorters</a> are being ign
 <li><a href="searching.html#recoverable_focus">recoverable_focus</a></li>
 <li><a href="searching.html#algorithm">algorithm</a></li>
 <li><a href="searching.html#unordered">unordered</a></li>
+<li><a href="searching.html#exact_mode">exact_mode</a></li>
+<li><a href="searching.html#rank_criteria">rank_criteria</a></li>
 </ul>
 <h3 id="pattern"><a class="header" href="#pattern">pattern</a></h3>
 <p>The patterns used to search.</p>
@@ -3595,12 +3611,32 @@ ordering is being applied, i.e. <a href="sorting.html">sorters</a> are being ign
 <p>Whether to skip ordering the search result by algorithm based ranking. Defaults
 to the value set in <a href="general-config.html#xplrconfiggeneralsearchunordered">xplr.config.general.search.unordered</a>.</p>
 <p>Type: boolean</p>
+<h3 id="exact_mode"><a class="header" href="#exact_mode">exact_mode</a></h3>
+<p>Whether to search in exact mode. Defaults to <code>false</code>.</p>
+<p>Type: boolean</p>
+<h3 id="rank_criteria"><a class="header" href="#rank_criteria">rank_criteria</a></h3>
+<p>Ranking criteria to use. Defaults to <code>nil</code>.</p>
+<p>Type: nullable list of the following options:</p>
+<ul>
+<li>Score</li>
+<li>NegScore</li>
+<li>Begin</li>
+<li>NegBegin</li>
+<li>End</li>
+<li>NegEnd</li>
+<li>Length</li>
+<li>NegLength</li>
+<li>Index</li>
+<li>NegIndex</li>
+</ul>
 <h2 id="example-2"><a class="header" href="#example-2">Example:</a></h2>
 <pre><code class="language-lua">local searcher = {
   pattern = &quot;pattern to search&quot;,
   recoverable_focus = &quot;/path/to/focus/on/cancel&quot;,
   algorithm = &quot;Fuzzy&quot;,
   unordered = false,
+  exact_mode = false,
+  rank_criteria = { &quot;Score&quot;, &quot;Begin&quot;, &quot;End&quot;, &quot;Length&quot; },
 }
 
 xplr.util.explore({ searcher = searcher })
@@ -5371,7 +5407,7 @@ used as a file picker or a pluggable file manager.</p>
 <p><a href="https://github.com/sayanarijit/xplr/edit/dev/docs/en/src/alternatives.md">add more</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="upgrade-guide"><a class="header" href="#upgrade-guide">Upgrade Guide</a></h1>
 <p>When you upgrade xplr, you might see an error like this</p>
-<pre><code>Incompatible script version in: /home/sayanarijit/.config/xplr/init.lua. The script version is: 0.9.0, the required version is: 0.10.1. Visit https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide
+<pre><code>Incompatible script version in: /home/user/.config/xplr/init.lua. The script version is: 0.21.0, the required version is: 1.0.0. Visit https://xplr.dev/en/upgrade-guide
 </code></pre>
 <p>All you need to do is follow the <a href="upgrade-guide.html#instructions">instructions</a> starting from
 your config version, all the way to the required version.</p>
@@ -5401,11 +5437,23 @@ app version.</li>
 e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fine.</li>
 <li><code>1.0.0</code> -&gt; <code>x.x.x</code>: Not compatible at all.</li>
 </ul>
-<p>Note that until we're <code>v1</code>, we'll be using the <code>{minor}</code> version number as
-<code>{major}</code>, and the <code>{patch}</code> number as <code>{minor}</code> to determine
-compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="v02110---v010"><a class="header" href="#v02110---v010"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.10">v0.21.10</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v1.0.0">v0.1.0</a></a></h4>
+<ul>
+<li>This release added a new message <code>TryCompletePath</code> which will try to complete
+the path in the input buffer. You should use this message instead of the
+fragile <code>xplr.fn.builtin.try_complete_path</code> Lua function, which will still
+keep working (with a warning log message) for compatibility reasons.</li>
+</ul>
+<p><strong>ANNOUNCEMENT:</strong></p>
+<p>This is not really a breaking change, but a declaration of the first stable
+release. You cat set <code>version = &quot;1.0.0&quot;</code> in your config file without any
+concern. With this release, xplr v1 can be considered feature complete.</p>
+<p>As of now, there is no plan for xplr v2, and so, the project will enter cleanup
+and maintenance mode. Thank you everyone, who directly or indirectly contributed
+to xplr, for all your effort, support and feedback. Looking forward to more
+such collaborations in the future.</p>
 <h4 id="v0202---v02110"><a class="header" href="#v0202---v02110"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.10">v0.21.10</a></a></h4>
 <ul>
 <li>Some plugins might stop rendering colors. Wait for them to update.</li>
@@ -5755,7 +5803,7 @@ available.</li>
 </ul>
 <h4 id="v0121---v0137"><a class="header" href="#v0121---v0137"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a></a></h4>
 <ul>
-<li>Lua functions called using <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua"><code>CallLua</code></a> and <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently"><code>CallLuaSilently</code></a> messages will receive <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
+<li>Lua functions called using <a href="messages.html#calllua"><code>CallLua</code></a> and <a href="messages.html#callluasilently"><code>CallLuaSilently</code></a> messages will receive <a href="lua-function-calls.html#lua-context"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
 <li>Each <code>node_types</code> config will inherit defaults from matching less specific <code>node_types</code> config and overwrite them.</li>
 <li>Since version <code>v0.13.2</code>, you don't need to use/send <code>Refresh</code> anymore. It will be auto-handled by xplr.</li>
 </ul>

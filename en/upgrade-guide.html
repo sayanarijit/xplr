@@ -182,7 +182,7 @@
                     <main>
                         <h1 id="upgrade-guide"><a class="header" href="#upgrade-guide">Upgrade Guide</a></h1>
 <p>When you upgrade xplr, you might see an error like this</p>
-<pre><code>Incompatible script version in: /home/sayanarijit/.config/xplr/init.lua. The script version is: 0.9.0, the required version is: 0.10.1. Visit https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide
+<pre><code>Incompatible script version in: /home/user/.config/xplr/init.lua. The script version is: 0.21.0, the required version is: 1.0.0. Visit https://xplr.dev/en/upgrade-guide
 </code></pre>
 <p>All you need to do is follow the <a href="#instructions">instructions</a> starting from
 your config version, all the way to the required version.</p>
@@ -212,11 +212,23 @@ app version.</li>
 e.g. <code>app-1.0.0</code> with <code>config-1.1.0</code>. But vice versa is fine.</li>
 <li><code>1.0.0</code> -&gt; <code>x.x.x</code>: Not compatible at all.</li>
 </ul>
-<p>Note that until we're <code>v1</code>, we'll be using the <code>{minor}</code> version number as
-<code>{major}</code>, and the <code>{patch}</code> number as <code>{minor}</code> to determine
-compatibility.</p>
 </details>
 <h3 id="instructions"><a class="header" href="#instructions">Instructions</a></h3>
+<h4 id="v02110---v010"><a class="header" href="#v02110---v010"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.10">v0.21.10</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v1.0.0">v0.1.0</a></a></h4>
+<ul>
+<li>This release added a new message <code>TryCompletePath</code> which will try to complete
+the path in the input buffer. You should use this message instead of the
+fragile <code>xplr.fn.builtin.try_complete_path</code> Lua function, which will still
+keep working (with a warning log message) for compatibility reasons.</li>
+</ul>
+<p><strong>ANNOUNCEMENT:</strong></p>
+<p>This is not really a breaking change, but a declaration of the first stable
+release. You cat set <code>version = &quot;1.0.0&quot;</code> in your config file without any
+concern. With this release, xplr v1 can be considered feature complete.</p>
+<p>As of now, there is no plan for xplr v2, and so, the project will enter cleanup
+and maintenance mode. Thank you everyone, who directly or indirectly contributed
+to xplr, for all your effort, support and feedback. Looking forward to more
+such collaborations in the future.</p>
 <h4 id="v0202---v02110"><a class="header" href="#v0202---v02110"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.20.2">v0.20.2</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.21.10">v0.21.10</a></a></h4>
 <ul>
 <li>Some plugins might stop rendering colors. Wait for them to update.</li>
@@ -566,7 +578,7 @@ available.</li>
 </ul>
 <h4 id="v0121---v0137"><a class="header" href="#v0121---v0137"><a href="https://github.com/sayanarijit/xplr/releases/tag/v0.12.1">v0.12.1</a> -&gt; <a href="https://github.com/sayanarijit/xplr/releases/tag/v0.13.7">v0.13.7</a></a></h4>
 <ul>
-<li>Lua functions called using <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua"><code>CallLua</code></a> and <a href="https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently"><code>CallLuaSilently</code></a> messages will receive <a href="https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
+<li>Lua functions called using <a href="messages.html#calllua"><code>CallLua</code></a> and <a href="messages.html#callluasilently"><code>CallLuaSilently</code></a> messages will receive <a href="lua-function-calls.html#lua-context"><code>CallLuaArg</code></a> object as the function argument (instead of the <a href="https://docs.rs/xplr/latest/xplr/app/struct.App.html"><code>App</code></a> object).</li>
 <li>Each <code>node_types</code> config will inherit defaults from matching less specific <code>node_types</code> config and overwrite them.</li>
 <li>Since version <code>v0.13.2</code>, you don't need to use/send <code>Refresh</code> anymore. It will be auto-handled by xplr.</li>
 </ul>
