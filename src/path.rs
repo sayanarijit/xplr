@@ -160,7 +160,11 @@ where
     let relative = relative.to_string_lossy().to_string();
 
     if config.and_then(|c| c.without_tilde).unwrap_or(false) {
-        return Ok(relative);
+        return if relative.len() < pathstring.len() {
+            Ok(relative)
+        } else {
+            Ok(pathstring)
+        };
     }
 
     let fromhome = HOME

@@ -131,54 +131,55 @@ pub(crate) fn try_complete_path(
         return Ok(None);
     };
 
-    let (parent, maybe_fname) = if path.ends_with("/") {
-        (path.clone(), None)
+    let (parent, fname) = if partial_path.ends_with("/") {
+        (path.clone(), "".into())
     } else {
         (
             path.parent()
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from(pwd)),
-            path.file_name().map(|f| f.to_string_lossy().to_string()),
+            path.file_name()
+                .map(|f| f.to_string_lossy().to_string())
+                .unwrap_or_default(),
         )
     };
 
-    let mut direntries = fs::read_dir(&parent)?
+    let direntries = fs::read_dir(&parent)?
         .filter_map(|d| d.ok())
         .map(|e| (e.file_name().to_string_lossy().to_string()));
 
-    let maybe_found = if let Some(fname) = maybe_fname {
-        let mut matches = direntries
-            .filter(|n| n.starts_with(&fname))
-            .collect::<Vec<_>>();
+    let mut matches = direntries
+        .filter(|n| n.starts_with(&fname))
+        .collect::<Vec<_>>();
 
-        let count = matches.len();
-        if count <= 1 {
-            matches.pop()
-        } else {
-            let mut common_prefix = fname.clone();
-            let match1_suffix = matches[0].chars().skip(fname.len());
-            for c in match1_suffix {
-                let new_common_prefix = format!("{common_prefix}{c}");
-                if matches.iter().all(|m| m.starts_with(&new_common_prefix)) {
-                    common_prefix = new_common_prefix;
-                } else {
-                    break;
-                }
-            }
-
-            Some(common_prefix)
-        }
+    let count = matches.len();
+    let maybe_found = if count <= 1 {
+        matches.pop()
     } else {
-        direntries.next()
+        let mut common_prefix = fname.clone();
+        let match1_suffix = matches[0].chars().skip(fname.len());
+        for c in match1_suffix {
+            let new_common_prefix = format!("{common_prefix}{c}");
+            if matches.iter().all(|m| m.starts_with(&new_common_prefix)) {
+                common_prefix = new_common_prefix;
+            } else {
+                break;
+            }
+        }
+
+        Some(common_prefix)
     };
 
     if let Some(found) = maybe_found {
-        let config = path::RelativityConfig::<PathBuf>::default().without_tilde();
+        let config = path::RelativityConfig::<PathBuf>::default()
+            .without_tilde()
+            .with_prefix_dots()
+            .without_suffix_dots();
 
         let completion = parent.join(found);
         let short = path::shorten::<_, PathBuf>(&completion, Some(&config))?;
 
-        if completion.is_dir() && !completion.ends_with("/") {
+        if completion.is_dir() && !short.ends_with("/") {
             Ok(Some(format!("{short}/")))
         } else {
             Ok(Some(short))
