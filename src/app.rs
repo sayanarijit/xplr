@@ -777,7 +777,7 @@ impl App {
         match self.input.buffer.as_ref().map(|b| b.value()) {
             None => Ok(self),
             Some("") => Ok(self),
-            Some(p) => match explorer::try_complete_path(&self.pwd, &p) {
+            Some(p) => match explorer::try_complete_path(&self.pwd, p) {
                 Ok(Some(completed_path)) => self.set_input_buffer(completed_path),
                 Ok(None) => Ok(self),
                 Err(e) => self.log_error(e.to_string()),
