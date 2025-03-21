@@ -3,7 +3,7 @@
 When you upgrade xplr, you might see an error like this
 
 ```
-Incompatible script version in: /home/sayanarijit/.config/xplr/init.lua. The script version is: 0.9.0, the required version is: 0.10.1. Visit https://github.com/sayanarijit/xplr/wiki/Upgrade-Guide
+Incompatible script version in: /home/user/.config/xplr/init.lua. The script version is: 0.21.0, the required version is: 1.0.0. Visit https://xplr.dev/en/upgrade-guide
 ```
 
 All you need to do is follow the [instructions][1] starting from
@@ -37,13 +37,27 @@ e.g.
   e.g. `app-1.0.0` with `config-1.1.0`. But vice versa is fine.
 - `1.0.0` -> `x.x.x`: Not compatible at all.
 
-Note that until we're `v1`, we'll be using the `{minor}` version number as
-`{major}`, and the `{patch}` number as `{minor}` to determine
-compatibility.
-
 </details>
 
 ### Instructions
+
+#### [v0.21.10][49] -> [v0.1.0][51]
+
+- This release added a new message `TryCompletePath` which will try to complete
+  the path in the input buffer. You should use this message instead of the
+  fragile `xplr.fn.builtin.try_complete_path` Lua function, which will still
+  keep working (with a warning log message) for compatibility reasons.
+
+**ANNOUNCEMENT:**
+
+This is not really a breaking change, but a declaration of the first stable
+release. You cat set `version = "1.0.0"` in your config file without any
+concern. With this release, xplr v1 can be considered feature complete.
+
+As of now, there is no plan for xplr v2, and so, the project will enter cleanup
+and maintenance mode. Thank you everyone, who directly or indirectly contributed
+to xplr, for all your effort, support and feedback. Looking forward to more
+such collaborations in the future.
 
 #### [v0.20.2][48] -> [v0.21.10][49]
 
@@ -531,3 +545,4 @@ Else do the following:
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
 [49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.10
 [50]: https://github.com/lotabout/skim#search-syntax
+[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.0.0
