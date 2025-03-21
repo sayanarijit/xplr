@@ -501,9 +501,9 @@ Else do the following:
 [3]: https://github.com/sayanarijit/xplr/releases/tag/v0.14.7
 [4]: https://github.com/sayanarijit/xplr/pull/229#issue-662426960
 [6]: https://github.com/sayanarijit/xplr/releases/tag/v0.12.1
-[7]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLua
-[8]: https://docs.rs/xplr/latest/xplr/app/enum.ExternalMsg.html#variant.CallLuaSilently
-[9]: https://docs.rs/xplr/latest/xplr/app/struct.CallLuaArg.html
+[7]: messages.md#calllua
+[8]: messages.md#callluasilently
+[9]: lua-function-calls.md#lua-context
 [10]: https://docs.rs/xplr/latest/xplr/app/struct.App.html
 [11]: https://github.com/sayanarijit/xplr/releases/tag/v0.11.1
 [12]: https://github.com/sayanarijit/xplr/releases/tag/v0.10.2
