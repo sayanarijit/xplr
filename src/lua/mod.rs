@@ -14,7 +14,7 @@ use std::fs;
 pub mod util;
 
 const DEFAULT_LUA_SCRIPT: &str = include_str!("../init.lua");
-const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide.html";
+const UPGRADE_GUIDE_LINK: &str = "https://xplr.dev/en/upgrade-guide";
 
 pub fn serialize<T: Serialize + Sized>(
     lua: &mlua::Lua,
@@ -153,24 +153,24 @@ mod tests {
         assert!(check_version(VERSION, "foo path").is_ok());
 
         // Current release if OK
-        assert!(check_version("0.21.10", "foo path").is_ok());
+        assert!(check_version("1.0.0", "foo path").is_ok());
 
         // Prev major release is ERR
-        // - Not yet
+        assert!(check_version("0.20.0", "foo path").is_err());
 
         // Prev minor release is ERR (Change when we get to v1)
-        assert!(check_version("0.20.10", "foo path").is_err());
+        // assert!(check_version("1.-1.0", "foo path").is_err());
 
         // Prev bugfix release is OK
-        assert!(check_version("0.21.9", "foo path").is_ok());
+        // assert!(check_version("1.0.-1", "foo path").is_ok());
 
         // Next major release is ERR
-        assert!(check_version("1.20.10", "foo path").is_err());
+        assert!(check_version("2.0.0", "foo path").is_err());
 
         // Next minor release is ERR
-        assert!(check_version("0.22.10", "foo path").is_err());
+        assert!(check_version("1.1.0", "foo path").is_err());
 
         // Next bugfix release is ERR (Change when we get to v1)
-        assert!(check_version("0.21.11", "foo path").is_err());
+        assert!(check_version("1.0.1", "foo path").is_err());
     }
 }

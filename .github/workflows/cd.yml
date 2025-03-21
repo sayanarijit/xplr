@@ -16,7 +16,7 @@ jobs:
           - macos
           - macos-aarch64
           - linux
-          # - linux-musl
+          - linux-musl
           - linux-aarch64
           - linux-arm
         rust: [stable]
@@ -35,9 +35,9 @@ jobs:
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
 
-          # - build: linux-musl
-          #   os: ubuntu-latest
-          #   target: x86_64-unknown-linux-musl
+          - build: linux-musl
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
 
           - build: linux-aarch64
             os: ubuntu-latest
@@ -69,8 +69,8 @@ jobs:
           # sudo snap install snapcraft --classic
           # sudo snap install multipass --classic --beta
 
-      # - if: matrix.build == 'linux-musl'
-      #   run: sudo apt-get install -y musl-tools
+      - if: matrix.build == 'linux-musl'
+        run: sudo apt-get install -y musl-tools
 
       - if: matrix.build == 'linux-aarch64'
         run: sudo apt-get install -y gcc-aarch64-linux-gnu
