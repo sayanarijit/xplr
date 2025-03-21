@@ -21,6 +21,8 @@ Node Searcher contains the following fields:
 - [recoverable_focus][4]
 - [algorithm][5]
 - [unordered][7]
+- [exact_mode][10]
+- [rank_criteria][11]
 
 ### pattern
 
@@ -51,6 +53,29 @@ to the value set in [xplr.config.general.search.unordered][9].
 
 Type: boolean
 
+### exact_mode
+
+Whether to search in exact mode. Defaults to `false`.
+
+Type: boolean
+
+### rank_criteria
+
+Ranking criteria to use. Defaults to `nil`.
+
+Type: nullable list of the following options:
+
+- Score
+- NegScore
+- Begin
+- NegBegin
+- End
+- NegEnd
+- Length
+- NegLength
+- Index
+- NegIndex
+
 ## Example:
 
 ```lua
@@ -59,6 +84,8 @@ local searcher = {
   recoverable_focus = "/path/to/focus/on/cancel",
   algorithm = "Fuzzy",
   unordered = false,
+  exact_mode = false,
+  rank_criteria = { "Score", "Begin", "End", "Length" },
 }
 
 xplr.util.explore({ searcher = searcher })
@@ -75,3 +102,5 @@ See [xplr.util.explore][6].
 [7]: #unordered
 [8]: general-config.md#xplrconfiggeneralsearchalgorithm
 [9]: general-config.md#xplrconfiggeneralsearchunordered
+[10]: #exact_mode
+[11]: #rank_criteria

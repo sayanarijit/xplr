@@ -218,6 +218,18 @@ The default search ordering
 
 Type: boolean
 
+#### xplr.config.general.search.exact_mode
+
+The fuzzy search exact mode.
+
+Type: boolean
+
+#### xplr.config.general.search.rank_criteria
+
+The fuzzy search rank criteria.
+
+Type: nullable list of [Rank Criteria](https://xplr.dev/en/searching#rank_criteria)
+
 #### xplr.config.general.default_ui.prefix
 
 The content that is placed before the item name for each row by default.
