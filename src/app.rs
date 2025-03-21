@@ -1862,7 +1862,12 @@ impl App {
             .unwrap_or_else(|| self.focused_node().map(|n| n.absolute_path.clone()));
 
         self.explorer_config.searcher = Some(NodeSearcherApplicable::new(
-            pattern, rf, algorithm, unordered,
+            pattern,
+            rf,
+            algorithm,
+            unordered,
+            self.config.general.search.exact_mode,
+            self.config.general.search.rank_criteria.clone(),
         ));
         Ok(self)
     }

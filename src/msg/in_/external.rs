@@ -1,6 +1,7 @@
 use crate::app::Node;
 use crate::input::InputOperation;
 use crate::search::PathItem;
+use crate::search::RankCriteria;
 use crate::search::SearchAlgorithm;
 use indexmap::IndexSet;
 use regex::Regex;
@@ -1812,6 +1813,12 @@ pub struct NodeSearcherApplicable {
 
     #[serde(default)]
     pub unordered: bool,
+
+    #[serde(default)]
+    pub exact_mode: bool,
+
+    #[serde(default)]
+    pub rank_criteria: Option<Vec<RankCriteria>>,
 }
 
 impl NodeSearcherApplicable {
@@ -1820,12 +1827,16 @@ impl NodeSearcherApplicable {
         recoverable_focus: Option<String>,
         algorithm: SearchAlgorithm,
         unordered: bool,
+        exact_mode: bool,
+        rank_criteria: Option<Vec<RankCriteria>>,
     ) -> Self {
         Self {
             pattern,
             recoverable_focus,
             algorithm,
             unordered,
+            exact_mode,
+            rank_criteria,
         }
     }
 
@@ -1833,7 +1844,11 @@ impl NodeSearcherApplicable {
     where
         I: IntoIterator<Item = Node>,
     {
-        let engine = self.algorithm.engine(&self.pattern);
+        let engine = self.algorithm.engine(
+            &self.pattern,
+            self.exact_mode,
+            self.rank_criteria.clone(),
+        );
         let ranked_nodes = nodes.into_iter().filter_map(|n| {
             let item = Arc::new(PathItem::from(n.relative_path.clone()));
             engine.match_item(item).map(|res| (n, res.rank))

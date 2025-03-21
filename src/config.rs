@@ -4,6 +4,7 @@ use crate::app::NodeFilter;
 use crate::app::NodeSorter;
 use crate::app::NodeSorterApplicable;
 use crate::node::Node;
+use crate::search::RankCriteria;
 use crate::search::SearchAlgorithm;
 use crate::ui::Border;
 use crate::ui::BorderType;
@@ -197,6 +198,12 @@ pub struct SearchConfig {
 
     #[serde(default)]
     pub unordered: bool,
+
+    #[serde(default)]
+    pub exact_mode: bool,
+
+    #[serde(default)]
+    pub rank_criteria: Option<Vec<RankCriteria>>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
