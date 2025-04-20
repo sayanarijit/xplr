@@ -418,7 +418,7 @@ done <"$FIFO_PATH"
 
 imv-msg "$IMV_PID" quit
 [ -e "$FIFO_PATH" ] && rm -f -- "$FIFO_PATH"
-```
+...
   ```
 
 
