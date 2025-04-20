@@ -400,13 +400,25 @@ sleep 0.5
 xdotool windowactivate "$MAINWINDOW"
 
 while read -r path; do
+
+  hash=$(echo "$path" | sha1sum | awk '{print $1}')
+
+  ext="${path##*.}"
+  [[ "$ext" == "$path" ]] && ext="img"
+
+  tmp_path="/tmp/imv_symlink_${hash}.${ext}"
+
+  ln -sf "$path" "$tmp_path"
+
   imv-msg "$IMV_PID" close all
-  imv-msg "$IMV_PID" open "$path"
-done < "$FIFO_PATH"
+  imv-msg "$IMV_PID" open "$tmp_path"
+
+  (sleep 2 && rm -f "$tmp_path") &
+done <"$FIFO_PATH"
 
 imv-msg "$IMV_PID" quit
 [ -e "$FIFO_PATH" ] && rm -f -- "$FIFO_PATH"
-```
+'''
 
 </details>
 
