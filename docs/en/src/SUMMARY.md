@@ -1,4 +1,4 @@
-# A hackable, minimal, fast TUI file explorer
+# Test A hackable, minimal, fast TUI file explorer
 
 - [Introduction][1]
 - [Quickstart][2]
