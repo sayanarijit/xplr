@@ -85,8 +85,8 @@ pub fn version(util: Table, lua: &Lua) -> Result<Table> {
 /// ```
 pub fn debug(util: Table, lua: &Lua) -> Result<Table> {
     let func = lua.create_function(|_, value: Value| {
-        let log = format!("{:#?}", value);
-        println!("{}", log);
+        let log = format!("{value:#?}");
+        println!("{log}");
         Ok(log)
     })?;
     util.set("debug", func)?;
