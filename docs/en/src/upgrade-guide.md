@@ -41,7 +41,7 @@ e.g.
 
 ### Instructions
 
-#### [v0.21.10][49] -> [v0.1.0][51]
+#### [v0.21.10][49] -> [v0.1.1][51]
 
 - This release added a new message `TryCompletePath` which will try to complete
   the path in the input buffer. You should use this message instead of the
@@ -545,4 +545,4 @@ Else do the following:
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
 [49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.10
 [50]: https://github.com/lotabout/skim#search-syntax
-[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.0.0
+[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.0.1
