@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use xdg::BaseDirectories;
 
 lazy_static! {
-    pub static ref BASE_DIRS: Option<BaseDirectories> = BaseDirectories::new().ok();
+    pub static ref BASE_DIRS: BaseDirectories = BaseDirectories::new();
 }
 
 pub fn home_dir() -> Option<PathBuf> {
@@ -12,14 +12,11 @@ pub fn home_dir() -> Option<PathBuf> {
 }
 
 pub fn config_dir() -> Option<PathBuf> {
-    BASE_DIRS.as_ref().map(|base| base.get_config_home())
+    BASE_DIRS.get_config_home()
 }
 
 pub fn runtime_dir() -> PathBuf {
-    let Some(dir) = BASE_DIRS
-        .as_ref()
-        .and_then(|base| base.get_runtime_directory().ok())
-    else {
+    let Some(dir) = BASE_DIRS.get_runtime_directory().ok() else {
         return env::temp_dir();
     };
     dir.clone()

@@ -2,11 +2,11 @@ use crate::app::Task;
 use crate::app::{ExternalMsg, InternalMsg, MsgIn};
 use crate::input::Key;
 use anyhow::Error;
-use crossterm::event::{self, Event, MouseEventKind};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
 use std::time::Duration;
+use tui::crossterm::event::{self, Event, MouseEventKind};
 
 pub(crate) struct EventReader {
     task_sender: Sender<Task>,
