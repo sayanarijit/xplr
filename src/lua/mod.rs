@@ -42,11 +42,10 @@ fn parse_version(version: &str) -> Result<(u16, u16, u16, Option<u16>)> {
 
 /// Check the config version and notify users.
 pub fn check_version(version: &str, path: &str) -> Result<()> {
-    // Until we're v1, let's ignore major versions
     let (rmajor, rminor, rbugfix, rbeta) = parse_version(VERSION)?;
     let (smajor, sminor, sbugfix, sbeta) = parse_version(version)?;
 
-    if rmajor == smajor && rminor == sminor && rbugfix >= sbugfix && rbeta == sbeta {
+    if rmajor == smajor && rminor >= sminor && rbugfix >= sbugfix && rbeta == sbeta {
         Ok(())
     } else {
         bail!(
@@ -159,7 +158,7 @@ mod tests {
         assert!(check_version("0.20.1", "foo path").is_err());
 
         // Prev minor release is ERR
-        assert!(check_version("1.0.0", "foo path").is_err());
+        assert!(check_version("1.-1.0", "foo path").is_err());
 
         // Prev bugfix release is OK
         assert!(check_version("1.0.0", "foo path").is_ok());
