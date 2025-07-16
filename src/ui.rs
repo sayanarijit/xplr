@@ -1347,8 +1347,7 @@ impl UI<'_> {
                 let config = defaultui.extend(&ui);
 
                 let items = body
-                    .into_iter()
-                    .par_bridge()
+                    .into_par_iter()
                     .map(string_to_text)
                     .map(ListItem::new)
                     .collect::<Vec<ListItem>>();
@@ -1365,8 +1364,7 @@ impl UI<'_> {
             } => {
                 let config = defaultui.extend(&ui);
                 let rows = body
-                    .into_iter()
-                    .par_bridge()
+                    .into_par_iter()
                     .map(|cols| {
                         Row::new(
                             cols.into_iter()

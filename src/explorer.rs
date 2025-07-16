@@ -38,7 +38,7 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
         .unwrap_or(false);
 
     if !is_ordered_search {
-        nodes.par_sort_by(|a, b| config.sort(a, b));
+        nodes.par_sort_unstable_by(|a, b| config.sort(a, b));
     }
 
     Ok(nodes)
