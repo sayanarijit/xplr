@@ -4,6 +4,7 @@ use crate::app::{
 use crate::path;
 use anyhow::{Error, Result};
 use path_absolutize::Absolutize;
+use rayon::prelude::*;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
@@ -12,6 +13,7 @@ use std::thread;
 pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
     let dirs = fs::read_dir(parent)?;
     let nodes = dirs
+        .par_bridge()
         .filter_map(|d| {
             d.ok().map(|e| {
                 e.path()
@@ -36,7 +38,7 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
         .unwrap_or(false);
 
     if !is_ordered_search {
-        nodes.sort_by(|a, b| config.sort(a, b));
+        nodes.par_sort_by(|a, b| config.sort(a, b));
     }
 
     Ok(nodes)

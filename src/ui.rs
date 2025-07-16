@@ -10,6 +10,7 @@ use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -206,6 +207,7 @@ impl Layout {
             Self::Horizontal { splits, config } => Self::Horizontal {
                 splits: splits
                     .into_iter()
+                    .par_bridge()
                     .map(|s| s.replace(target, replacement))
                     .collect(),
                 config,
@@ -213,6 +215,7 @@ impl Layout {
             Self::Vertical { splits, config } => Self::Vertical {
                 splits: splits
                     .into_iter()
+                    .par_bridge()
                     .map(|s| s.replace(target, replacement))
                     .collect(),
                 config,
@@ -797,7 +800,7 @@ impl UI<'_> {
                 };
 
                 dir.nodes
-                    .iter()
+                    .par_iter()
                     .enumerate()
                     .skip(self.scrolltop)
                     .take(height)
@@ -1244,7 +1247,7 @@ impl UI<'_> {
             vec![]
         } else {
             app.logs
-                .iter()
+                .par_iter()
                 .rev()
                 .take(layout_size.height as usize)
                 .map(|log| {
@@ -1356,6 +1359,7 @@ impl UI<'_> {
 
                 let items = body
                     .into_iter()
+                    .par_bridge()
                     .map(string_to_text)
                     .map(ListItem::new)
                     .collect::<Vec<ListItem>>();
@@ -1373,9 +1377,11 @@ impl UI<'_> {
                 let config = defaultui.extend(&ui);
                 let rows = body
                     .into_iter()
+                    .par_bridge()
                     .map(|cols| {
                         Row::new(
                             cols.into_iter()
+                                .par_bridge()
                                 .map(string_to_text)
                                 .map(Cell::from)
                                 .collect::<Vec<Cell>>(),
