@@ -207,7 +207,6 @@ impl Layout {
             Self::Horizontal { splits, config } => Self::Horizontal {
                 splits: splits
                     .into_iter()
-                    .par_bridge()
                     .map(|s| s.replace(target, replacement))
                     .collect(),
                 config,
@@ -215,7 +214,6 @@ impl Layout {
             Self::Vertical { splits, config } => Self::Vertical {
                 splits: splits
                     .into_iter()
-                    .par_bridge()
                     .map(|s| s.replace(target, replacement))
                     .collect(),
                 config,
@@ -1247,7 +1245,7 @@ impl UI<'_> {
             vec![]
         } else {
             app.logs
-                .par_iter()
+                .iter()
                 .rev()
                 .take(layout_size.height as usize)
                 .map(|log| {
@@ -1381,7 +1379,6 @@ impl UI<'_> {
                     .map(|cols| {
                         Row::new(
                             cols.into_iter()
-                                .par_bridge()
                                 .map(string_to_text)
                                 .map(Cell::from)
                                 .collect::<Vec<Cell>>(),
