@@ -93,7 +93,7 @@ pub fn init(lua: &Lua) -> Result<(Config, Option<Hooks>)> {
 pub fn extend(lua: &Lua, path: &str) -> Result<(Config, Option<Hooks>)> {
     let globals = lua.globals();
 
-    let script = fs::read_to_string(path)?;
+    let script = fs::read(path)?;
 
     let hooks: Option<Hooks> = lua
         .load(&script)
