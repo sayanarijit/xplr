@@ -16,7 +16,7 @@ impl From<String> for PathItem {
 }
 
 impl SkimItem for PathItem {
-    fn text(&self) -> std::borrow::Cow<str> {
+    fn text(&self) -> std::borrow::Cow<'_, str> {
         std::borrow::Cow::from(&self.path)
     }
 }
