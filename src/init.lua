@@ -1862,6 +1862,14 @@ xplr.config.modes.builtin.create = {
   layout = "HelpMenu",
   key_bindings = {
     on_key = {
+      ["c"] = {
+        help = "create file or directory/",
+        messages = {
+          "PopMode",
+          { SwitchModeBuiltin = "create_conditional" },
+          { SetInputBuffer = "" },
+        },
+      },
       ["d"] = {
         help = "create directory",
         messages = {
@@ -1953,6 +1961,58 @@ xplr.config.modes.builtin.create_file = {
                 && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
                 && "$XPLR" -m 'ExplorePwd' \
                 && "$XPLR" -m 'FocusPath: %q' "$PTH"
+              else
+                "$XPLR" -m PopMode
+              fi
+            ]===],
+          },
+        },
+      },
+    },
+    default = {
+      messages = {
+        "UpdateInputBufferFromKey",
+      },
+    },
+  },
+}
+
+-- The builtin create conditional mode.
+--
+-- Type: [Mode](https://xplr.dev/en/mode)
+xplr.config.modes.builtin.create_conditional = {
+  name = "create conditional",
+  prompt = "* ❯ ",
+  key_bindings = {
+    on_key = {
+      ["tab"] = {
+        help = "try complete",
+        messages = {
+          "TryCompletePath",
+        },
+      },
+      ["enter"] = {
+        help = "submit",
+        messages = {
+          {
+            BashExecSilently0 = [===[ 
+              PTH="$XPLR_INPUT_BUFFER"
+              PTH_ESC=$(printf %q "$PTH")
+              if [ "$PTH" ]; then
+                if [ "${PTH: -1}" = "/" ]; then
+                  mkdir -p -- "$PTH" \
+                  && "$XPLR" -m 'SetInputBuffer: ""' \
+                  && "$XPLR" -m ExplorePwd \
+                  && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
+                  && "$XPLR" -m 'FocusPath: %q' "$PTH"
+                else
+                  mkdir -p -- "$(dirname -- "$PTH")" \
+                  && touch -- "$PTH" \
+                  && "$XPLR" -m 'SetInputBuffer: ""' \
+                  && "$XPLR" -m 'LogSuccess: %q' "$PTH_ESC created" \
+                  && "$XPLR" -m 'ExplorePwd' \
+                  && "$XPLR" -m 'FocusPath: %q' "$PTH"
+                fi
               else
                 "$XPLR" -m PopMode
               fi
