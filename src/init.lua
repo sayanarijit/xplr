@@ -1995,7 +1995,7 @@ xplr.config.modes.builtin.create_conditional = {
         help = "submit",
         messages = {
           {
-            BashExecSilently0 = [===[ 
+            BashExecSilently0 = [===[
               PTH="$XPLR_INPUT_BUFFER"
               PTH_ESC=$(printf %q "$PTH")
               if [ "$PTH" ]; then
