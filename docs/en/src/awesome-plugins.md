@@ -41,6 +41,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/qrcp.xplr**][26] Send and receive files via QR code using [qrcp][27].
 - [**sayanarijit/scp.xplr**][54] Integrate xplr with scp.
 - [**sayanarijit/trash-cli.xplr**][13] Trash files and directories using [trash-cli][14].
+- [**LordMZTE/udisks.xplr**][65] Manage devices with UDisks.
 - [**sayanarijit/xclip.xplr**][15] Copy and paste with system clipboard using [xclip][16].
 - [**sayanarijit/zoxide.xplr**][17] Change directory using the [zoxide][18] database.
 
@@ -126,3 +127,4 @@ of the following plugins work for you, it's very easy to
 [62]: https://github.com/duganchen/one-table-column.xplr
 [63]: https://github.com/dy-sh/dysh-style.xplr
 [64]: https://github.com/dy-sh/get-rid-of-index.xplr
+[65]: https://github.com/LordMZTE/udisks.xplr
