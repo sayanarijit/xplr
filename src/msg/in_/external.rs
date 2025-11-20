@@ -4,6 +4,7 @@ use crate::search::PathItem;
 use crate::search::RankCriteria;
 use crate::search::SearchAlgorithm;
 use indexmap::IndexSet;
+use rayon::iter::ParallelIterator;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, sync::Arc};
@@ -1842,14 +1843,14 @@ impl NodeSearcherApplicable {
 
     pub fn search<I>(&self, nodes: I) -> Vec<Node>
     where
-        I: IntoIterator<Item = Node>,
+        I: ParallelIterator<Item = Node>,
     {
         let engine = self.algorithm.engine(
             &self.pattern,
             self.exact_mode,
             self.rank_criteria.clone(),
         );
-        let ranked_nodes = nodes.into_iter().filter_map(|n| {
+        let ranked_nodes = nodes.filter_map(|n| {
             let item = Arc::new(PathItem::from(n.relative_path.clone()));
             engine.match_item(item).map(|res| (n, res.rank))
         });
