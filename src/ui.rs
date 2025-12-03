@@ -138,7 +138,9 @@ pub enum CustomPanel {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
+#[derive(Default)]
 pub enum Layout {
+    #[default]
     Nothing,
     Table,
     InputAndLogs,
@@ -158,12 +160,6 @@ pub enum Layout {
 
     /// For compatibility only. A better choice is Static or Dynamic layout.
     CustomContent(Box<CustomContent>),
-}
-
-impl Default for Layout {
-    fn default() -> Self {
-        Self::Nothing
-    }
 }
 
 impl Layout {
@@ -251,20 +247,15 @@ impl Border {
 }
 
 #[derive(
-    Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize,
+    Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Serialize, Deserialize, Default,
 )]
 #[serde(deny_unknown_fields)]
 pub enum BorderType {
+    #[default]
     Plain,
     Rounded,
     Double,
     Thick,
-}
-
-impl Default for BorderType {
-    fn default() -> Self {
-        Self::Plain
-    }
 }
 
 impl Into<TuiBorderType> for BorderType {
@@ -731,7 +722,7 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
                 .unwrap_or_default()
                 .iter()
                 .map(|b| b.bits())
-                .fold(0, |a, b| (a ^ b)),
+                .fold(0, |a, b| a ^ b),
         ))
         .title(Span::styled(
             config.title.format.unwrap_or(default_title),

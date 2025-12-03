@@ -639,6 +639,7 @@ pub fn from_yaml(util: Table, lua: &Lua) -> Result<Table> {
 /// -- "foo: bar"
 /// ```
 pub fn to_yaml(util: Table, lua: &Lua) -> Result<Table> {
+    #[allow(dead_code)]
     #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
     pub struct Options {
         pretty: bool,

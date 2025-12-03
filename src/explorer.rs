@@ -146,7 +146,7 @@ pub(crate) fn try_complete_path(
 
     let direntries = fs::read_dir(&parent)?
         .filter_map(|d| d.ok())
-        .map(|e| (e.file_name().to_string_lossy().to_string()));
+        .map(|e| e.file_name().to_string_lossy().to_string());
 
     let mut matches = direntries
         .filter(|n| n.starts_with(&fname))

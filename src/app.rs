@@ -31,7 +31,7 @@ use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use time::OffsetDateTime;
 use tui_input::{Input, InputRequest};
 
@@ -1631,7 +1631,7 @@ impl App {
         let pathbuf = PathBuf::from(path).absolutize()?.to_path_buf();
         let count = self.selection.len();
         self.selection
-            .retain(|n| PathBuf::from(&n.absolute_path) != pathbuf);
+            .retain(|n| pathbuf.as_os_str() != Path::new(&n.absolute_path).as_os_str());
 
         if self.selection.len() != count {
             self = self.on_selection_change()?;
@@ -1694,7 +1694,7 @@ impl App {
         if self
             .selection
             .iter()
-            .any(|n| PathBuf::from(&n.absolute_path) == pathbuf)
+            .any(|n| pathbuf.as_os_str() == Path::new(&n.absolute_path).as_os_str())
         {
             self.un_select_path(path)
         } else {
