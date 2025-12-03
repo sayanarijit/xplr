@@ -1631,7 +1631,7 @@ impl App {
         let pathbuf = PathBuf::from(path).absolutize()?.to_path_buf();
         let count = self.selection.len();
         self.selection
-            .retain(|n| PathBuf::from(&n.absolute_path) != pathbuf);
+            .retain(|n| n.absolute_path.as_str() != pathbuf.to_str().unwrap_or(""));
 
         if self.selection.len() != count {
             self = self.on_selection_change()?;
@@ -1694,7 +1694,7 @@ impl App {
         if self
             .selection
             .iter()
-            .any(|n| PathBuf::from(&n.absolute_path) == pathbuf)
+            .any(|n| n.absolute_path.as_str() == pathbuf.to_str().unwrap_or(""))
         {
             self.un_select_path(path)
         } else {
