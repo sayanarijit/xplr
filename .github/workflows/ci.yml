@@ -48,15 +48,15 @@ jobs:
         with:
           ignore_words_file: .codespellignore
 
-  # linkcheck:
-  #   name: Markdown Link Check
-  #   runs-on: ubuntu-latest
-  #   continue-on-error: true
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: gaurav-nelson/github-action-markdown-link-check@v1
-  #       with:
-  #         folder-path: "docs/en/src"
+  linkcheck:
+    name: Markdown Link Check
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tcort/github-action-markdown-link-check@v1
+        with:
+          folder-path: "docs/en/src"
 
   test:
     name: Test Suite
