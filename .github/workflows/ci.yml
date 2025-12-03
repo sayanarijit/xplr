@@ -58,6 +58,16 @@ jobs:
         with:
           folder-path: "docs/en/src"
 
+  linkspector:
+    name: Linkspector
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: UmbrellaDocs/action-linkspector@v1
+        with:
+          paths: "docs/en/src/**/*.md"
+
   test:
     name: Test Suite
     runs-on: ${{ matrix.os }}
