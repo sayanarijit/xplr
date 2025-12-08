@@ -555,4 +555,4 @@ Else do the following:
 [49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.10
 [50]: https://github.com/lotabout/skim#search-syntax
 [51]: https://github.com/sayanarijit/xplr/releases/tag/v1.0.0
-[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.1.0
+[52]: https://github.com/sayanarijit/xplr/releases/tag/v1.1.0
