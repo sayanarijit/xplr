@@ -223,7 +223,7 @@ to lose some kb if it makes sense.</p>
 using:
 <ul>
 <li><a href="configure-key-bindings.html">Keyboard inputs</a></li>
-<li><a href="mode.html#input-pipe">Shell Commands</a></li>
+<li><a href="environment-variables-and-pipes.html">Shell Commands</a></li>
 <li><a href="lua-function-calls.html">Lua Functions</a></li>
 <li><a href="configuration.html#hooks">Hooks</a></li>
 </ul>
@@ -1279,7 +1279,7 @@ nested values will only exist when <code>Layout</code> is <code>Horizontal</code
 have nested types in each branch.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="key-bindings"><a class="header" href="#key-bindings">Key Bindings</a></h1>
 <p>Key bindings define how each keyboard input will be handled while in a specific
-<a href="modes.html#mode">mode</a>.</p>
+<a href="modes.html">mode</a>.</p>
 <p>See the <a href="default-key-bindings.html">Default key bindings</a> for example.</p>
 <p>To configure or work with key bindings, visit <a href="configure-key-bindings.html">Configure Key Bindings</a>.</p>
 <p>In case you need help debugging key bindings or to understand the system DYI
@@ -1808,8 +1808,8 @@ xplr.config.modes.custom.debug_key_bindings = {
 <h3 id="meta"><a class="header" href="#meta">meta</a></h3>
 <p>Type: mapping of string and string</p>
 <p>A meta field can contain custom metadata about a node. By default, the &quot;icon&quot;
-metadata is set for the <a href="node_types.html#directory">directory</a>, <a href="node_types.html#file">file</a>, and
-<a href="node_types.html#symlink">symlink</a> nodes.</p>
+metadata is set for the <a href="node_types.html#xplrconfignode_typesdirectorymetaicon">directory</a>, <a href="node_types.html#xplrconfignode_typesfilemetaicon">file</a>, and
+<a href="node_types.html#xplrconfignode_typessymlinkmetaicon">symlink</a> nodes.</p>
 <p>Example:</p>
 <pre><code class="language-lua">xplr.config.node_types.file = {
   meta = {
@@ -3895,7 +3895,7 @@ node. It will instead be null.</p>
 <p><code>true</code> if the node is after the focused node.</p>
 <h3 id="tree"><a class="header" href="#tree">tree</a></h3>
 <p>Type: string</p>
-<p>The <a href="general-config.html#tabletree">tree component</a> based on the node's index.</p>
+<p>The <a href="general-config.html#xplrconfiggeneraltabletree">tree component</a> based on the node's index.</p>
 <h3 id="prefix"><a class="header" href="#prefix">prefix</a></h3>
 <p>Type: string</p>
 <p>The prefix applicable for the node.</p>
@@ -4026,7 +4026,7 @@ that you can use in your Lua function calls.</p>
 <p>Type: list of selected <a href="lua-function-calls.html#node">Node</a>s</p>
 <p>The selected nodes.</p>
 <h3 id="mode-1"><a class="header" href="#mode-1">mode</a></h3>
-<p>Type: <a href="modes.html#mode">Mode</a></p>
+<p>Type: <a href="mode.html#mode">Mode</a></p>
 <p>Current mode.</p>
 <h3 id="layout-2"><a class="header" href="#layout-2">layout</a></h3>
 <p>Type: <a href="layouts.html">Layout</a></p>
@@ -4046,7 +4046,7 @@ that you can use in your Lua function calls.</p>
 <h3 id="history"><a class="header" href="#history">history</a></h3>
 <p>Type: <a href="lua-function-calls.html#history-1">History</a></p>
 <h3 id="last_modes"><a class="header" href="#last_modes">last_modes</a></h3>
-<p>Type: list of <a href="modes.html#mode">Mode</a></p>
+<p>Type: list of <a href="mode.html#mode">Mode</a></p>
 <p>Last modes, not popped yet.</p>
 <h2 id="node"><a class="header" href="#node">Node</a></h2>
 <p>A node contains the following fields:</p>
