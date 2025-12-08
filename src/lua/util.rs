@@ -639,12 +639,6 @@ pub fn from_yaml(util: Table, lua: &Lua) -> Result<Table> {
 /// -- "foo: bar"
 /// ```
 pub fn to_yaml(util: Table, lua: &Lua) -> Result<Table> {
-    #[allow(dead_code)]
-    #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq, Eq)]
-    pub struct Options {
-        pretty: bool,
-    }
-
     let func = lua.create_function(|_, value: Value| {
         yaml::to_string(&value).map_err(Error::custom)
     })?;

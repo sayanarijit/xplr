@@ -52,7 +52,7 @@ pub fn check_version(version: &str, path: &str) -> Result<()> {
             "incompatible script version in: {}. The script version is: {}, the required version is: {}. Visit {}",
             path,
             version,
-            VERSION.to_string(),
+            VERSION,
             UPGRADE_GUIDE_LINK,
         )
     }
@@ -152,24 +152,24 @@ mod tests {
         assert!(check_version(VERSION, "foo path").is_ok());
 
         // Current release if OK
-        assert!(check_version("1.0.1", "foo path").is_ok());
+        assert!(check_version("1.0.2", "foo path").is_ok());
 
         // Prev major release is ERR
-        assert!(check_version("0.20.1", "foo path").is_err());
+        assert!(check_version("0.20.2", "foo path").is_err());
 
         // Prev minor release is ERR
-        assert!(check_version("1.-1.0", "foo path").is_err());
+        assert!(check_version("1.-1.1", "foo path").is_err());
 
         // Prev bugfix release is OK
-        assert!(check_version("1.0.0", "foo path").is_ok());
+        assert!(check_version("1.0.1", "foo path").is_ok());
 
         // Next major release is ERR
-        assert!(check_version("2.0.1", "foo path").is_err());
+        assert!(check_version("2.0.2", "foo path").is_err());
 
         // Next minor release is ERR
-        assert!(check_version("1.1.1", "foo path").is_err());
+        assert!(check_version("1.1.2", "foo path").is_err());
 
         // Next bugfix release is ERR (Change when we get to v1)
-        assert!(check_version("1.0.2", "foo path").is_err());
+        assert!(check_version("1.0.3", "foo path").is_err());
     }
 }
