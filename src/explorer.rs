@@ -15,11 +15,10 @@ pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
     let nodes = dirs
         .par_bridge()
         .filter_map(|d| {
-            d.ok().map(|e| {
+            d.ok().and_then(|e| {
                 e.path()
                     .file_name()
                     .map(|n| n.to_string_lossy().to_string())
-                    .unwrap_or_default()
             })
         })
         .map(|name| Node::new(parent.to_string_lossy().to_string(), name))
