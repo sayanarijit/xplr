@@ -334,7 +334,7 @@ It contains the following fields.
 [29]: #size
 [30]: #permission
 [31]: #resolved-node-metadata
-[32]: general-config.md#xplr.config.general.table.tree
+[32]: general-config.md#xplrconfiggeneraltabletree
 [33]: node-type.md#meta
 [34]: #created
 [35]: #last_modified
