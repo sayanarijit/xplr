@@ -41,7 +41,16 @@ e.g.
 
 ### Instructions
 
-#### [v0.21.10][49] -> [v0.1.2][51]
+#### [v1.0.0][51] -> [v1.1.0][52]
+
+- No breaking changes.
+- Added a new keybinding in "create" mode. Press `:cc` to enter the
+  "create conditional" mode, in which, paths ending with "/" will be created as
+  directories, and others as files.
+- Optimized performance on large directories using parallel processing.
+- Allows Lua bytecode as init files.
+
+#### [v0.21.10][49] -> [v1.0.0][51]
 
 - This release added a new message `TryCompletePath` which will try to complete
   the path in the input buffer. You should use this message instead of the
@@ -545,4 +554,5 @@ Else do the following:
 [48]: https://github.com/sayanarijit/xplr/releases/tag/v0.20.2
 [49]: https://github.com/sayanarijit/xplr/releases/tag/v0.21.10
 [50]: https://github.com/lotabout/skim#search-syntax
-[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.0.2
+[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.0.0
+[51]: https://github.com/sayanarijit/xplr/releases/tag/v1.1.0
