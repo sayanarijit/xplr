@@ -52,7 +52,7 @@ pub fn check_version(version: &str, path: &str) -> Result<()> {
             "incompatible script version in: {}. The script version is: {}, the required version is: {}. Visit {}",
             path,
             version,
-            VERSION.to_string(),
+            VERSION,
             UPGRADE_GUIDE_LINK,
         )
     }
