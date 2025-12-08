@@ -10,7 +10,6 @@ use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
-use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -789,7 +788,7 @@ impl UI<'_> {
                 };
 
                 dir.nodes
-                    .par_iter()
+                    .iter()
                     .enumerate()
                     .skip(self.scrolltop)
                     .take(height)
@@ -1347,7 +1346,7 @@ impl UI<'_> {
                 let config = defaultui.extend(&ui);
 
                 let items = body
-                    .into_par_iter()
+                    .into_iter()
                     .map(string_to_text)
                     .map(ListItem::new)
                     .collect::<Vec<ListItem>>();
@@ -1364,7 +1363,7 @@ impl UI<'_> {
             } => {
                 let config = defaultui.extend(&ui);
                 let rows = body
-                    .into_par_iter()
+                    .into_iter()
                     .map(|cols| {
                         Row::new(
                             cols.into_iter()
