@@ -51,10 +51,6 @@ If set, this prompt will be displayed in the input buffer when in this mode.
 
 - [xplr.config.modes][12]
 
-[1]: #builtin
-[2]: #custom
-[3]: #mode
-[4]: default-key-bindings.md
 [5]: #name
 [6]: #help
 [7]: #extra_help

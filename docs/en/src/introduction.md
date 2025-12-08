@@ -95,7 +95,7 @@ Some of the coolest features xplr provide beside the basic stuff:
 [9]: https://github.com/sayanarijit/xplr/pull/397
 [10]: messages.md
 [11]: configure-key-bindings.md
-[12]: mode.md#input-pipe
+[12]: environment-variables-and-pipes.md
 [13]: lua-function-calls.md
 [14]: awesome-plugins.md#integration
 [15]: awesome-integrations.md

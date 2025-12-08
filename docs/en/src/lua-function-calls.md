@@ -377,18 +377,13 @@ Type: nullable [Node Searcher Applicable][82]
 - [xplr.util][85]
 
 [7]: https://www.json.org
-[8]: modes.md#mode
-[9]: modes.md#builtin
-[10]: modes.md#custom
+[8]: mode.md#mode
 [11]: layouts.md
-[12]: layouts.md#builtin
-[13]: layouts.md#custom
 [14]: #lua-context
 [15]: filtering.md#filter
 [16]: filtering.md
 [17]: sorting.md#sorter
 [29]: #version
-[30]: #config
 [31]: #pwd
 [32]: #focused_node
 [33]: #directory_buffer

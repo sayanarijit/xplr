@@ -28,9 +28,9 @@ xplr.config.node_types.file = {
 
 - [xplr.config.node_types][6]
 
-[1]: node_types.md#directory
-[2]: node_types.md#file
-[3]: node_types.md#symlink
+[1]: node_types.md#xplr.config.node_types.directory.meta.icon
+[2]: node_types.md#xplr.config.node_types.file.meta.icon
+[3]: node_types.md#xplr.config.node_types.symlink.meta.icon
 [4]: #meta
 [5]: style.md
 [6]: node_types.md

@@ -261,7 +261,6 @@ sudo cp target/release/xplr /usr/local/bin/
 [22]: https://git-scm.com/
 [23]: https://github.com/sayanarijit/xplr/assets/11632726/3b61e8c8-76f0-48e8-8734-50e9e7e495b7
 [25]: https://gifyu.com/image/tF2D
-[26]: https://github.com/sayanarijit/xplr/releases/latest/download/xplr-linux-musl.tar.gz
 [27]: https://pkgs.alpinelinux.org/packages?name=xplr
 [28]: https://gpo.zugaina.org/Overlays/guru/app-misc/xplr
 [29]: https://formulae.brew.sh/formula/coreutils

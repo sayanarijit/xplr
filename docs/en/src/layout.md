@@ -540,13 +540,7 @@ Hence, only the following fields are available.
 
 - [xplr.config.layouts][51]
 
-[1]: #builtin
-[2]: #custom
 [3]: #layout
-[4]: #default
-[5]: #no_help
-[6]: #no_selection
-[7]: #no_help_no_selection
 [8]: #nothing
 [9]: #table
 [10]: #inputandlogs

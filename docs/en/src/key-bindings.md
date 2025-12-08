@@ -13,4 +13,4 @@ way, refer to the [Debug Key Bindings][3] guide.
 [1]: default-key-bindings.md
 [2]: configure-key-bindings.md
 [3]: debug-key-bindings.md
-[4]: modes.md#mode
+[4]: modes.md
