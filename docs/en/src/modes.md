@@ -71,6 +71,12 @@ The builtin create file mode.
 
 Type: [Mode](https://xplr.dev/en/mode)
 
+#### xplr.config.modes.builtin.create_conditional
+
+The builtin create conditional mode.
+
+Type: [Mode](https://xplr.dev/en/mode)
+
 #### xplr.config.modes.builtin.number
 
 The builtin number mode.
