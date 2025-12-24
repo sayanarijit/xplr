@@ -86,7 +86,7 @@ features = ['serde']
 
 [dev-dependencies]
 criterion = "0.6"
-assert_cmd = "2.0"
+assert_cmd = "2.1"
 
 [profile.release]
 lto = true
