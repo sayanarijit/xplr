@@ -48,7 +48,7 @@ jobs:
             target: arm-unknown-linux-gnueabihf
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Installing Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -126,7 +126,7 @@ jobs:
     name: Publishing GPG signature
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install gpg secret key
         run: |
           cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
@@ -151,7 +151,7 @@ jobs:
     name: Publishing to Cargo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
         with:
