@@ -48,7 +48,7 @@ jobs:
             target: arm-unknown-linux-gnueabihf
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Installing Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -65,9 +65,6 @@ jobs:
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc pkg-config curl git make ca-certificates
-          sudo apt-get install -y snapd
-          # sudo snap install snapcraft --classic
-          # sudo snap install multipass --classic --beta
 
       # - if: matrix.build == 'linux-musl'
       #   run: sudo apt-get install -y musl-tools
@@ -83,13 +80,6 @@ jobs:
 
       - name: Running cargo build
         run: cargo build --locked --release --target ${{ matrix.target }}
-
-      # - name: Running snapcraft build
-      #   run: |
-      #     snapcraft
-      #     printf ' [ INFO ] generated <snapcraft> files include:\n'
-      #     command ls -Al | grep "\.snap" | awk '{ print $9 }'
-      #     mv ./*.snap ./xplr.snap
 
       - name: Install gpg secret key
         run: |
@@ -113,20 +103,68 @@ jobs:
             target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz
             target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.sha256
             target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz.asc
-            xplr.snap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Cleaning snapcraft
-      #   run: |
-      #     command rm --verbose ./*.snap
-      #     snapcraft clean
+  publish-snapcraft:
+    name: Publishing Snap Package
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install and configure LXD
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lxd lxd-client
+          sudo lxd init --auto
+          sudo usermod --append --groups lxd "$USER"
+          # Verify LXD is ready
+          sg lxd -c "lxc version"
+
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+        id: snapcraft
+        with:
+          snapcraft-args: "--use-lxd"
+
+      - name: Display snap build info
+        run: |
+          echo "=== Built snap file ==="
+          echo "${{ steps.snapcraft.outputs.snap }}"
+          echo ""
+          echo "=== Snap file details ==="
+          ls -la "${{ steps.snapcraft.outputs.snap }}"
+          echo ""
+          echo "=== Snap file name ==="
+          basename "${{ steps.snapcraft.outputs.snap }}"
+
+      - name: Prepare snap for GitHub Release
+        run: |
+          SNAP_FILE="${{ steps.snapcraft.outputs.snap }}"
+          cp "$SNAP_FILE" xplr.snap
+          echo "Prepared xplr.snap for GitHub Release"
+
+      - name: Publish to Snapcraft Store
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: snapcore/action-publish@v1
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: stable
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+      - name: Upload snap to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: xplr.snap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-gpg-signature:
     name: Publishing GPG signature
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install gpg secret key
         run: |
           cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
@@ -151,7 +189,7 @@ jobs:
     name: Publishing to Cargo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
         with:
