@@ -6,9 +6,9 @@ description: |
   interface to explore your filesystem, and perform batch operations efficiently.
 source-code: https://github.com/sayanarijit/xplr
 issues: https://github.com/sayanarijit/xplr/issues
-website: https://xplr.dev/source-code:
+website: https://xplr.dev
 
-base: core20
+base: core22
 grade: stable
 confinement: strict
 
