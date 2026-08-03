@@ -114,11 +114,11 @@ jobs:
 
       - name: Install and configure LXD
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lxd lxd-client
+          # sudo apt-get update
+          # sudo apt-get install -y lxd lxd-client # NOT SUPPORTED AFTER U.18
+          sudo snap install lxd
           sudo lxd init --auto
           sudo usermod --append --groups lxd "$USER"
-          # Verify LXD is ready
           sg lxd -c "lxc version"
 
       - name: Build snap package
