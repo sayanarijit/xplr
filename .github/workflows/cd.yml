@@ -139,24 +139,39 @@ jobs:
           basename "${{ steps.snapcraft.outputs.snap }}"
 
       - name: Prepare snap for GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: snap_prepare_github_release
         run: |
-          SNAP_FILE="${{ steps.snapcraft.outputs.snap }}"
-          cp "$SNAP_FILE" xplr.snap
-          echo "Prepared xplr.snap for GitHub Release"
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          ARCH=$(basename: "${{ steps.snapcraft.outputs.snap }}" |\
+                 grep -oP '_\K[^_]+(?=\.snap$)')
+          case "$ARCH" in
+            amd64) STANDARD_ARCH="x86_64"  ;;
+            arm64) STANDARD_ARCH="aarch64" ;;
+            armhf) STANDARD_ARCH="arm"     ;;
+            *)     STANDARD_ARCH="$ARCH"   ;;
+          esac
+
+          # SEMANTIC_NAME="xplr-v${VERSION}-linux-${STANDARD_ARCH}.snap"
+          SEMANTIC_NAME="xplr-v${VERSION}.snap"
+          cp "${{ steps.snapcraft.outputs.snap }}" "$SEMANTIC_NAME"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "arch=$STANDARD_ARCH" >> "$GITHUB_OUTPUT"
+          echo "snap_file=$SEMANTIC_NAME" >> "$GITHUB_OUTPUT"
+          echo "Prepared $SEMANTIC_NAME for GitHub Release"
 
       - name: Publish to Snapcraft Store
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: snapcore/action-publish@v1
         with:
           snap: ${{ steps.snapcraft.outputs.snap }}
-          release: stable
+          release: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || 'edge' }}
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
       - name: Upload snap to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: xplr.snap
+          files: ${{ steps.snap_prepare_github_release.outputs.snap_filename }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
