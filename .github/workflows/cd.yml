@@ -157,7 +157,7 @@ jobs:
           cp "${{ steps.snapcraft.outputs.snap }}" "$SEMANTIC_NAME"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "arch=$STANDARD_ARCH" >> "$GITHUB_OUTPUT"
-          echo "snap_file=$SEMANTIC_NAME" >> "$GITHUB_OUTPUT"
+          echo "snap_filename=$SEMANTIC_NAME" >> "$GITHUB_OUTPUT"
           echo "Prepared $SEMANTIC_NAME for GitHub Release"
 
       - name: Publish to Snapcraft Store
