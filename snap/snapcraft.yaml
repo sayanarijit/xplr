@@ -1,4 +1,5 @@
 name: xplr
+title: xplr
 version: git
 summary: A hackable, minimal, fast TUI file explorer
 description: |
@@ -7,6 +8,8 @@ description: |
 source-code: https://github.com/sayanarijit/xplr
 issues: https://github.com/sayanarijit/xplr/issues
 website: https://xplr.dev
+license: MIT
+contact: xplr@arijitbasu.in
 
 base: core22
 grade: stable
