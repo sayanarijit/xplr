@@ -4,12 +4,13 @@ on:
   push:
     tags:
       - "v*.*.*"
-  workflow_dispatch:
 
 jobs:
   publish:
     name: Publishing for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         build:
@@ -65,9 +66,6 @@ jobs:
         run: |
           sudo apt-get update --fix-missing
           sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc pkg-config curl git make ca-certificates
-          sudo apt-get install -y snapd
-          # sudo snap install snapcraft --classic
-          # sudo snap install multipass --classic --beta
 
       # - if: matrix.build == 'linux-musl'
       #   run: sudo apt-get install -y musl-tools
@@ -83,13 +81,6 @@ jobs:
 
       - name: Running cargo build
         run: cargo build --locked --release --target ${{ matrix.target }}
-
-      # - name: Running snapcraft build
-      #   run: |
-      #     snapcraft
-      #     printf ' [ INFO ] generated <snapcraft> files include:\n'
-      #     command ls -Al | grep "\.snap" | awk '{ print $9 }'
-      #     mv ./*.snap ./xplr.snap
 
       - name: Install gpg secret key
         run: |
@@ -113,18 +104,83 @@ jobs:
             target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz
             target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.sha256
             target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz.asc
-            xplr.snap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Cleaning snapcraft
-      #   run: |
-      #     command rm --verbose ./*.snap
-      #     snapcraft clean
+  publish-snapcraft:
+    name: Publishing Snap Package
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install and configure LXD
+        run: |
+          # sudo apt-get update
+          # sudo apt-get install -y lxd lxd-client # NOT SUPPORTED AFTER U.18
+          sudo snap install lxd
+          sudo lxd init --auto
+          sudo usermod --append --groups lxd "$USER"
+          sg lxd -c "lxc version"
+
+      - name: Build snap package
+        uses: snapcore/action-build@v1
+        id: snapcraft
+        with:
+          snapcraft-args: "--use-lxd"
+
+      - name: Display snap build info
+        run: |
+          echo "=== Built snap file ==="
+          echo "${{ steps.snapcraft.outputs.snap }}"
+          echo ""
+          echo "=== Snap file details ==="
+          ls -la "${{ steps.snapcraft.outputs.snap }}"
+          echo ""
+          echo "=== Snap file name ==="
+          basename "${{ steps.snapcraft.outputs.snap }}"
+
+      - name: Prepare snap for GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: snap_prepare_github_release
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          ARCH=$(basename "${{ steps.snapcraft.outputs.snap }}" | grep -oP '_\K[^_]+(?=\.snap$)')
+          case "$ARCH" in
+            amd64) STANDARD_ARCH="x86_64"  ;;
+            arm64) STANDARD_ARCH="aarch64" ;;
+            armhf) STANDARD_ARCH="arm"     ;;
+            *)     STANDARD_ARCH="$ARCH"   ;;
+          esac
+          # SEMANTIC_NAME="xplr-v${VERSION}-linux-${STANDARD_ARCH}.snap"
+          SEMANTIC_NAME="xplr-v${VERSION}.snap"
+          cp "${{ steps.snapcraft.outputs.snap }}" "$SEMANTIC_NAME"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "arch=$STANDARD_ARCH" >> "$GITHUB_OUTPUT"
+          echo "snap_filename=$SEMANTIC_NAME" >> "$GITHUB_OUTPUT"
+          echo "Prepared $SEMANTIC_NAME for GitHub Release"
+
+      - name: Publish to Snapcraft Store
+        uses: snapcore/action-publish@v1
+        with:
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || 'edge' }}
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+      - name: Upload snap to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.snap_prepare_github_release.outputs.snap_filename }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-gpg-signature:
     name: Publishing GPG signature
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Install gpg secret key

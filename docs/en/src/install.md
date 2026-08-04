@@ -83,6 +83,14 @@ programs.xplr = {
 };
 ```
 
+### Ubuntu
+
+Snap
+
+```bash
+sudo snap install xplr
+```
+
 ### Arch Linux
 
 (same for Manjaro Linux)
@@ -106,7 +114,9 @@ paru -S xplr-git
 #### [Edge Testing Repo][27]
 
 ```
+
 # Add the following line in /etc/apk/repositories:
+
 # https://dl-cdn.alpinelinux.org/alpine/edge/testing
 
 apk add xplr bash less
