@@ -143,8 +143,7 @@ jobs:
         id: snap_prepare_github_release
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
-          ARCH=$(basename: "${{ steps.snapcraft.outputs.snap }}" |\
-                 grep -oP '_\K[^_]+(?=\.snap$)')
+          ARCH=$(basename "${{ steps.snapcraft.outputs.snap }}" | grep -oP '_\K[^_]+(?=\.snap$)')
           case "$ARCH" in
             amd64) STANDARD_ARCH="x86_64"  ;;
             arm64) STANDARD_ARCH="aarch64" ;;
