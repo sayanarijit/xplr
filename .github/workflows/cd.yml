@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - "v*.*.*"
-    branch: # TODO: undo me
+    branches: # TODO: undo me
       - dev
 
 jobs:
