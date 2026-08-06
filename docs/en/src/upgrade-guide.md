@@ -128,7 +128,7 @@ such collaborations in the future.
 - Also check out the following utility functions:
   - xplr.util.layout_replace
   - xplr.util.relative_to
-  - xplr.util.shorthand
+  - xplr.util.shorten
   - xplr.util.clone
   - xplr.util.exists
   - xplr.util.is_dir
