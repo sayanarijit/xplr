@@ -135,7 +135,7 @@ jobs:
 
       - id: build_snap
         name: Build Snap via Snapcraft
-        uses: snapcore/action-build@v1
+        uses: snapcore/action-build@v2
         with:
           snapcraft-args: "--use-lxd"
 
@@ -275,7 +275,7 @@ jobs:
 
       - id: publish_snapcraft_store
         name: Publish to Snapcraft Store
-        uses: snapcore/action-publish@v1
+        uses: snapcore/action-publish@v2
         with:
           snap: ${{ steps.prepare_snap.outputs.snap_path }}
           release: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || 'edge' }}
