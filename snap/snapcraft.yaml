@@ -11,7 +11,7 @@ website: https://xplr.dev
 license: MIT
 contact: xplr@arijitbasu.in
 
-base: core22
+base: core24
 grade: stable
 confinement: strict
 
