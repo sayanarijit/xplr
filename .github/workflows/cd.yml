@@ -4,224 +4,319 @@ on:
   push:
     tags:
       - "v*.*.*"
-    branches: # TODO: undo me
-      - dev
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  # publish:
-  #   name: Publishing for ${{ matrix.os }}
-  #   runs-on: ${{ matrix.os }}
-  #   permissions:
-  #     contents: write
-  #   strategy:
-  #     matrix:
-  #       build:
-  #         - macos
-  #         - macos-aarch64
-  #         - linux
-  #         # - linux-musl
-  #         - linux-aarch64
-  #         - linux-arm
-  #       rust: [stable]
-  #       include:
-  #         # See the list: https://github.com/cross-rs/cross
+  job_build_binaries:
+    name: Build Binaries (${{ matrix.build }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - macos
+          - macos-aarch64
+          - linux
+          # - linux-musl
+          - linux-aarch64
+          - linux-arm
+        rust: [stable]
+        include:
+          - build: macos
+            os: macos-latest
+            target: x86_64-apple-darwin
+          - build: macos-aarch64
+            os: macos-latest
+            target: aarch64-apple-darwin
+          - build: linux
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          # - build: linux-musl
+          #   os: ubuntu-latest
+          #   target: x86_64-unknown-linux-musl
+          - build: linux-aarch64
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - build: linux-arm
+            os: ubuntu-latest
+            target: arm-unknown-linux-gnueabihf
 
-  #         - build: macos
-  #           os: macos-latest
-  #           target: x86_64-apple-darwin
+    steps:
+      - id: checkout_code
+        name: Checkout Repository
+        uses: actions/checkout@v4
 
-  #         - build: macos-aarch64
-  #           os: macos-latest
-  #           target: aarch64-apple-darwin
+      - id: install_rust
+        name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
 
-  #         - build: linux
-  #           os: ubuntu-latest
-  #           target: x86_64-unknown-linux-gnu
+      - id: install_macos_deps
+        name: Installing needed macOS dependencies
+        if: matrix.os == 'macos-latest'
+        run: brew install openssl@1.1
 
-  #         # - build: linux-musl
-  #         #   os: ubuntu-latest
-  #         #   target: x86_64-unknown-linux-musl
+      - id: install_linux_deps
+        name: Installing needed Ubuntu dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc pkg-config curl git make ca-certificates
 
-  #         - build: linux-aarch64
-  #           os: ubuntu-latest
-  #           target: aarch64-unknown-linux-gnu
+      # - if: matrix.build == 'linux-musl'
+      #   run: sudo apt-get install -y musl-tools
 
-  #         - build: linux-arm
-  #           os: ubuntu-latest
-  #           target: arm-unknown-linux-gnueabihf
+      - id: install_linux_aarch64_deps
+        name: Installing needed 'aarch64' dependencies
+        if: matrix.build == 'linux-aarch64'
+        run: sudo apt-get install -y gcc-aarch64-linux-gnu
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+      - id: install_linux_arm_deps
+        name: Installing needed 'arm' dependencies
+        if: matrix.build == 'linux-arm'
+        run: |
+          sudo apt-get install -y gcc-multilib
+          sudo apt-get install -y gcc-arm-linux-gnueabihf
+          sudo ln -s /usr/include/asm-generic/ /usr/include/asm
 
-  #     - name: Installing Rust toolchain
-  #       uses: dtolnay/rust-toolchain@stable
-  #       with:
-  #         toolchain: ${{ matrix.rust }}
-  #         target: ${{ matrix.target }}
+      - id: compile_binaries
+        name: Compile Release Binaries
+        run: cargo build --locked --release --target ${{ matrix.target }}
 
-  #     - name: Installing needed macOS dependencies
-  #       if: matrix.os == 'macos-latest'
-  #       run: brew install openssl@1.1
+      - id: package_binaries
+        name: Package and Hash Binaries
+        shell: bash
+        run: |
+          cd target/${{ matrix.target }}/release
+          BINARY_NAME=xplr
+          RELEASE_NAME=$BINARY_NAME-${{ matrix.build }}
+          tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
+          shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
 
-  #     - name: Installing needed Ubuntu dependencies
-  #       if: matrix.os == 'ubuntu-latest'
-  #       run: |
-  #         sudo apt-get update --fix-missing
-  #         sudo apt-get install -y --no-install-recommends liblua5.1-0-dev libluajit-5.1-dev gcc pkg-config curl git make ca-certificates
+      - id: upload_binary_artifacts
+        name: Upload Binary Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.build }}
+          path: |
+            target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz
+            target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.sha256
+          retention-days: 1
 
-  #     # - if: matrix.build == 'linux-musl'
-  #     #   run: sudo apt-get install -y musl-tools
-
-  #     - if: matrix.build == 'linux-aarch64'
-  #       run: sudo apt-get install -y gcc-aarch64-linux-gnu
-
-  #     - if: matrix.build == 'linux-arm'
-  #       run: |
-  #         sudo apt-get install -y gcc-multilib
-  #         sudo apt-get install -y gcc-arm-linux-gnueabihf
-  #         sudo ln -s /usr/include/asm-generic/ /usr/include/asm
-
-  #     - name: Running cargo build
-  #       run: cargo build --locked --release --target ${{ matrix.target }}
-
-  #     - name: Install gpg secret key
-  #       run: |
-  #         cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
-  #         gpg --list-secret-keys --keyid-format LONG
-
-  #     - name: Packaging final binary
-  #       shell: bash
-  #       run: |
-  #         cd target/${{ matrix.target }}/release
-  #         BINARY_NAME=xplr
-  #         RELEASE_NAME=$BINARY_NAME-${{ matrix.build }}
-  #         tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
-  #         shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
-  #         cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor $RELEASE_NAME.tar.gz
-
-  #     - name: Releasing assets
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: |
-  #           target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz
-  #           target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.sha256
-  #           target/${{ matrix.target }}/release/xplr-${{ matrix.build }}.tar.gz.asc
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-snapcraft:
-    name: Publishing Snap Package
+  job_build_snap:
+    name: Build Snap Package
     runs-on: ubuntu-22.04
     permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
+      contents: read
 
-      - name: Install and configure LXD
+    steps:
+      - id: checkout_code
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: setup_lxd
+        name: Install and Configure LXD
         run: |
-          # sudo apt-get update
-          # sudo apt-get install -y lxd lxd-client # NOT SUPPORTED AFTER U.18
           sudo snap install lxd
           sudo lxd init --auto
           sudo usermod --append --groups lxd "$USER"
           sg lxd -c "lxc version"
 
-      - name: Build snap package
+      - id: build_snap
+        name: Build Snap via Snapcraft
         uses: snapcore/action-build@v1
-        id: snapcraft
         with:
           snapcraft-args: "--use-lxd"
 
-      - name: Display snap build info
-        run: |
-          echo "=== Built snap file ==="
-          echo "${{ steps.snapcraft.outputs.snap }}"
-          echo ""
-          echo "=== Snap file details ==="
-          ls -la "${{ steps.snapcraft.outputs.snap }}"
-          echo ""
-          echo "=== Snap file name ==="
-          basename "${{ steps.snapcraft.outputs.snap }}"
+      - id: upload_snap_artifact
+        name: Upload Snap Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snap-package
+          path: ${{ steps.build_snap.outputs.snap }}
+          retention-days: 1
 
-      - name: Prepare snap for GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        id: snap_prepare_github_release
-        run: |
-          VERSION="1.1.0"
-          # VERSION="${GITHUB_REF#refs/tags/v}"  # TODO: undo me
-          ARCH=$(basename "${{ steps.snapcraft.outputs.snap }}" | grep -oP '_\K[^_]+(?=\.snap$)')
-          case "$ARCH" in
-            amd64) STANDARD_ARCH="x86_64"  ;;
-            arm64) STANDARD_ARCH="aarch64" ;;
-            armhf) STANDARD_ARCH="arm"     ;;
-            *)     STANDARD_ARCH="$ARCH"   ;;
-          esac
-          # SEMANTIC_NAME="xplr-v${VERSION}-linux-${STANDARD_ARCH}.snap"
-          SEMANTIC_NAME="xplr-v${VERSION}.snap"
-          sed -i "s/version: git/version: $VERSION/g" snap/snapcraft.yaml
-          cp "${{ steps.snapcraft.outputs.snap }}" "$SEMANTIC_NAME"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "arch=$STANDARD_ARCH" >> "$GITHUB_OUTPUT"
-          echo "snap_filename=$SEMANTIC_NAME" >> "$GITHUB_OUTPUT"
-          echo "Prepared $SEMANTIC_NAME for GitHub Release"
+  job_publish_github_release:
+    name: Publish Binaries to GitHub Release
+    needs: [job_build_binaries]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-      - name: Publish to Snapcraft Store
+    steps:
+      - id: checkout_code
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: download_binaries
+        name: Download All Binary Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - id: import_gpg_key
+        name: Install GPG Secret Key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
+      - id: sign_and_prepare_assets
+        name: Sign Binaries and Prepare Assets
+        run: |
+          mkdir -p release-assets
+          find artifacts -type f -exec cp {} release-assets/ \;
+          cd release-assets
+          for file in *.tar.gz; do
+            cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "$file"
+          done
+
+      - id: upload_github_release
+        name: Create GitHub Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release-assets/*.tar.gz
+            release-assets/*.sha256
+            release-assets/*.tar.gz.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  job_publish_source_signature:
+    name: Publish Source Code GPG Signature
+    needs: [job_build_binaries]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - id: checkout_code
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: import_gpg_key
+        name: Install GPG Secret Key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
+      - id: sign_source_archive
+        name: Sign Source Archive with GPG
+        run: |
+          VERSION=${GITHUB_REF##*v}
+          git -c tar.tar.gz.command='gzip -cn' archive \
+            -o xplr-${VERSION:?}.tar.gz \
+            --format tar.gz \
+            --prefix "xplr-${VERSION:?}/" \
+            "v${VERSION}"
+          cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "xplr-${VERSION:?}.tar.gz"
+          mv "xplr-${VERSION:?}.tar.gz.asc" "source.tar.gz.asc"
+
+      - id: upload_source_signature
+        name: Upload Source Signature to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: source.tar.gz.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  job_publish_snap:
+    name: Publish Snap to Store and GitHub
+    needs: [job_build_snap]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - id: checkout_code
+        name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - id: download_snap_artifact
+        name: Download Snap Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: snap-package
+          path: snap-artifact
+
+      - id: prepare_snap
+        name: Prepare Snap for Publishing
+        run: |
+          SNAP_FILE=$(find snap-artifact -name '*.snap' | head -n 1)
+          echo "snap_path=$SNAP_FILE" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            ARCH=$(basename "$SNAP_FILE" | grep -oP '_\K[^_]+(?=\.snap$)')
+            case "$ARCH" in
+              amd64) STANDARD_ARCH="x86_64"  ;;
+              arm64) STANDARD_ARCH="aarch64" ;;
+              armhf) STANDARD_ARCH="arm"     ;;
+              *)     STANDARD_ARCH="$ARCH"   ;;
+            esac
+
+            SEMANTIC_NAME="xplr-v${VERSION}.snap"
+            cp "$SNAP_FILE" "$SEMANTIC_NAME"
+            echo "snap_filename=$SEMANTIC_NAME" >> "$GITHUB_OUTPUT"
+          else
+            echo "snap_filename=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: publish_snapcraft_store
+        name: Publish to Snapcraft Store
         uses: snapcore/action-publish@v1
         with:
-          snap: ${{ steps.snap_prepare_github_release.outputs.snap_filename }}
-          # release: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || 'edge' }}
-          release: edge # TODO: undo me
+          snap: ${{ steps.prepare_snap.outputs.snap_path }}
+          release: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || 'edge' }}
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
-  #     - name: Upload snap to GitHub Release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: ${{ steps.snap_prepare_github_release.outputs.snap_filename }}
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: upload_snap_github_release
+        name: Upload Snap to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.prepare_snap.outputs.snap_filename }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # publish-gpg-signature:
-  #   name: Publishing GPG signature
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Install gpg secret key
-  #       run: |
-  #         cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
-  #         gpg --list-secret-keys --keyid-format LONG
+  job_publish_cargo:
+    name: Publish Crate to Cargo Registry
+    needs: [job_build_binaries, job_build_snap]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
-  #     - name: Signing archive with GPG
-  #       run: |
-  #         VERSION=${GITHUB_REF##*v}
-  #         git -c tar.tar.gz.command='gzip -cn' archive -o xplr-${VERSION:?}.tar.gz --format tar.gz --prefix "xplr-${VERSION:?}/" "v${VERSION}"
-  #         cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "xplr-${VERSION:?}.tar.gz"
-  #         mv "xplr-${VERSION:?}.tar.gz.asc" "source.tar.gz.asc"
+    steps:
+      - id: checkout_code
+        name: Checkout Repository
+        uses: actions/checkout@v4
 
-  #     - name: Releasing GPG signature
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: |
-  #           source.tar.gz.asc
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: install_rust
+        name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
-  # publish-cargo:
-  #   name: Publishing to Cargo
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+      - id: install_cargo_deps
+        name: Install System Dependencies
+        run: |
+          sudo apt-get update --fix-missing
+          sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
 
-  #     - uses: dtolnay/rust-toolchain@stable
-  #       with:
-  #         toolchain: stable
-
-  #     - run: |
-  #         sudo apt-get update --fix-missing
-  #         sudo apt-get install -y -qq pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-
-  #     - run: cargo publish --allow-dirty
-  #       env:
-  #         CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}
+      - id: publish_cargo
+        name: Publish to Crates.io
+        run: cargo publish --allow-dirty
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}
