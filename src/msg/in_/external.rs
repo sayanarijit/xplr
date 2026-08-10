@@ -1,13 +1,12 @@
 use crate::app::Node;
 use crate::input::InputOperation;
-use crate::search::PathItem;
 use crate::search::RankCriteria;
 use crate::search::SearchAlgorithm;
 use indexmap::IndexSet;
 use rayon::iter::ParallelIterator;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{cmp::Ordering, sync::Arc};
+use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ExternalMsg {
@@ -1851,15 +1850,16 @@ impl NodeSearcherApplicable {
             self.rank_criteria.clone(),
         );
         let ranked_nodes = nodes.filter_map(|n| {
-            let item = Arc::new(PathItem::from(n.relative_path.clone()));
-            engine.match_item(item).map(|res| (n, res.rank))
+            engine.match_item(&n.relative_path).map(|res| (n, res.rank))
         });
 
         if self.unordered {
             ranked_nodes.map(|(n, _)| n).collect()
         } else {
+            let criteria =
+                SearchAlgorithm::rank_builder_criteria(self.rank_criteria.as_deref());
             let mut ranked_nodes = ranked_nodes.collect::<Vec<_>>();
-            ranked_nodes.sort_by_key(|(_, s1)| *s1);
+            ranked_nodes.sort_by_key(|(_, rank)| rank.sort_key(&criteria));
             ranked_nodes.into_iter().map(|(n, _)| n).collect()
         }
     }
