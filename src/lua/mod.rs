@@ -6,7 +6,7 @@ use anyhow::Error;
 use anyhow::Result;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
-use mlua::SerializeOptions;
+use mlua::serde::SerializeOptions;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fs;
