@@ -11,23 +11,25 @@ use std::sync::mpsc::Sender;
 use std::thread;
 
 pub fn explore(parent: &PathBuf, config: &ExplorerConfig) -> Result<Vec<Node>> {
-    let dirs = fs::read_dir(parent)?;
-    let nodes = dirs
-        .par_bridge()
-        .filter_map(|d| {
-            d.ok().and_then(|e| {
+    let parent_str = parent.to_string_lossy().to_string();
+    let to_node = |d: std::io::Result<fs::DirEntry>| {
+        d.ok()
+            .and_then(|e| {
                 e.path()
                     .file_name()
                     .map(|n| n.to_string_lossy().to_string())
             })
-        })
-        .map(|name| Node::new(parent.to_string_lossy().to_string(), name))
-        .filter(|n| config.filter(n));
+            .map(|name| Node::new(parent_str.clone(), name))
+            .filter(|n| config.filter(n))
+    };
 
+    let dirs = fs::read_dir(parent)?;
     let mut nodes = if let Some(searcher) = config.searcher.as_ref() {
-        searcher.search(nodes)
+        // Use sync for stable search
+        searcher.search(dirs.filter_map(to_node))
     } else {
-        nodes.collect()
+        // Async for speed
+        dirs.par_bridge().filter_map(to_node).collect()
     };
 
     let is_ordered_search = config

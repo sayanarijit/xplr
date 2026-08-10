@@ -3,7 +3,6 @@ use crate::input::InputOperation;
 use crate::search::RankCriteria;
 use crate::search::SearchAlgorithm;
 use indexmap::IndexSet;
-use rayon::iter::ParallelIterator;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -1842,7 +1841,7 @@ impl NodeSearcherApplicable {
 
     pub fn search<I>(&self, nodes: I) -> Vec<Node>
     where
-        I: ParallelIterator<Item = Node>,
+        I: Iterator<Item = Node>,
     {
         let engine = self.algorithm.engine(
             &self.pattern,
