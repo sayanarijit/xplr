@@ -87,6 +87,7 @@ impl SearchAlgorithm {
             Self::Fuzzy => ExactOrFuzzyEngineFactory::builder()
                 .exact_mode(exact_mode)
                 .rank_builder(Arc::new(rank_builder))
+                .fuzzy_algorithm(skim::FuzzyAlgorithm::default())
                 .build()
                 .create_engine(pattern),
 
