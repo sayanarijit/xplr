@@ -1035,7 +1035,7 @@ impl UI<'_> {
         };
         let help_menu = Table::new(help_menu_rows, widths).block(block(
             config,
-            format!(" Help [{}{}] ", &app.mode.name, read_only_indicator(app)),
+            format!(" Help [{}{}] ", app.mode.name, read_only_indicator(app)),
         ));
         f.render_widget(help_menu, layout_size);
     }
@@ -1166,7 +1166,7 @@ impl UI<'_> {
                         let f = ui
                             .format
                             .as_ref()
-                            .map(|f| format!("{f}{p}", p = &s.pattern))
+                            .map(|f| format!("{f}{p}", p = s.pattern))
                             .unwrap_or_else(|| s.pattern.clone());
                         (
                             Span::styled(f, ui.style),
