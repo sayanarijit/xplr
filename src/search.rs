@@ -3,23 +3,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use skim::item::RankBuilder;
 use skim::prelude::{ExactOrFuzzyEngineFactory, RegexEngineFactory};
-use skim::{MatchEngine, MatchEngineFactory, SkimItem};
-
-pub struct PathItem {
-    path: String,
-}
-
-impl From<String> for PathItem {
-    fn from(value: String) -> Self {
-        Self { path: value }
-    }
-}
-
-impl SkimItem for PathItem {
-    fn text(&self) -> std::borrow::Cow<'_, str> {
-        std::borrow::Cow::from(&self.path)
-    }
-}
+use skim::{MatchEngine, MatchEngineFactory};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub enum RankCriteria {
@@ -35,19 +19,19 @@ pub enum RankCriteria {
     NegIndex,
 }
 
-impl Into<skim::prelude::RankCriteria> for RankCriteria {
-    fn into(self) -> skim::prelude::RankCriteria {
-        match self {
-            Self::Score => skim::prelude::RankCriteria::Score,
-            Self::NegScore => skim::prelude::RankCriteria::NegScore,
-            Self::Begin => skim::prelude::RankCriteria::Begin,
-            Self::NegBegin => skim::prelude::RankCriteria::NegBegin,
-            Self::End => skim::prelude::RankCriteria::End,
-            Self::NegEnd => skim::prelude::RankCriteria::NegEnd,
-            Self::Length => skim::prelude::RankCriteria::Length,
-            Self::NegLength => skim::prelude::RankCriteria::NegLength,
-            Self::Index => skim::prelude::RankCriteria::Index,
-            Self::NegIndex => skim::prelude::RankCriteria::NegIndex,
+impl From<RankCriteria> for skim::prelude::RankCriteria {
+    fn from(criterion: RankCriteria) -> Self {
+        match criterion {
+            RankCriteria::Score => skim::prelude::RankCriteria::Score,
+            RankCriteria::NegScore => skim::prelude::RankCriteria::NegScore,
+            RankCriteria::Begin => skim::prelude::RankCriteria::Begin,
+            RankCriteria::NegBegin => skim::prelude::RankCriteria::NegBegin,
+            RankCriteria::End => skim::prelude::RankCriteria::End,
+            RankCriteria::NegEnd => skim::prelude::RankCriteria::NegEnd,
+            RankCriteria::Length => skim::prelude::RankCriteria::Length,
+            RankCriteria::NegLength => skim::prelude::RankCriteria::NegLength,
+            RankCriteria::Index => skim::prelude::RankCriteria::Index,
+            RankCriteria::NegIndex => skim::prelude::RankCriteria::NegIndex,
         }
     }
 }
@@ -68,26 +52,36 @@ impl SearchAlgorithm {
         }
     }
 
+    pub fn rank_builder_criteria(
+        rank_criteria: Option<&[RankCriteria]>,
+    ) -> Vec<skim::prelude::RankCriteria> {
+        let criteria: Vec<skim::prelude::RankCriteria> = rank_criteria
+            .map_or_else(
+                || {
+                    vec![
+                        RankCriteria::Score,
+                        RankCriteria::Begin,
+                        RankCriteria::End,
+                        RankCriteria::Length,
+                    ]
+                },
+                |c| c.to_vec(),
+            )
+            .into_iter()
+            .map(Into::into)
+            .collect();
+
+        criteria
+    }
+
     pub fn engine(
         &self,
         pattern: &str,
         exact_mode: bool,
         rank_criteria: Option<Vec<RankCriteria>>,
     ) -> Box<dyn MatchEngine> {
-        let criteria = rank_criteria.map_or_else(
-            || {
-                vec![
-                    RankCriteria::Score,
-                    RankCriteria::Begin,
-                    RankCriteria::End,
-                    RankCriteria::Length,
-                ]
-            },
-            Into::into,
-        );
-
-        let rank_builder =
-            RankBuilder::new(criteria.into_iter().map(Into::into).collect());
+        let criteria = Self::rank_builder_criteria(rank_criteria.as_deref());
+        let rank_builder = RankBuilder::new(criteria);
 
         match self {
             Self::Fuzzy => ExactOrFuzzyEngineFactory::builder()
