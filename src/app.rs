@@ -87,7 +87,7 @@ impl std::fmt::Display for Log {
             LogLevel::Success => "SUCCESS",
             LogLevel::Error => "ERROR  ",
         };
-        write!(f, "[{0}] {level_str} {1}", &self.created_at, &self.message)
+        write!(f, "[{0}] {level_str} {1}", self.created_at, self.message)
     }
 }
 
@@ -417,7 +417,7 @@ impl App {
         let hist = if &pwd == "/" {
             pwd.clone()
         } else {
-            format!("{0}/", &pwd)
+            format!("{0}/", pwd)
         };
 
         let mut app = Self {
@@ -1084,7 +1084,7 @@ impl App {
                     let hist = if &self.pwd == "/" {
                         self.pwd.clone()
                     } else {
-                        format!("{0}/", &self.pwd)
+                        format!("{0}/", self.pwd)
                     };
                     self.history = self.history.push(hist);
                 }
@@ -2040,7 +2040,7 @@ impl App {
     }
 
     pub fn mode_str(&self) -> String {
-        format!("{0}\n", &self.mode.name)
+        format!("{0}\n", self.mode.name)
     }
 
     // This is a performance heavy function. Use it only when necessary.
@@ -2090,7 +2090,7 @@ impl App {
     }
 
     pub fn pwd_str(&self, delimiter: char) -> String {
-        format!("{0}{delimiter}", &self.pwd)
+        format!("{0}{delimiter}", self.pwd)
     }
 
     pub fn selection_str(&self, delimiter: char) -> String {

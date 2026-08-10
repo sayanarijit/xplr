@@ -484,8 +484,8 @@ impl Runner {
                                         write!(
                                             terminal.backend_mut(),
                                             "\x1b]7;file://{}{}\x1b\\",
-                                            &app.hostname,
-                                            &app.pwd
+                                            app.hostname,
+                                            app.pwd
                                         )?;
                                     }
 
