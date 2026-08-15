@@ -48,15 +48,15 @@ jobs:
         with:
           ignore_words_file: .codespellignore
 
-  linkcheck:
-    name: Markdown Link Check
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: tcort/github-action-markdown-link-check@v1
-        with:
-          folder-path: "docs/en/src"
+  # linkcheck:
+  #   name: Markdown Link Check
+  #   runs-on: ubuntu-latest
+  #   continue-on-error: true
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: tcort/github-action-markdown-link-check@v1
+  #       with:
+  #         folder-path: "docs/en/src"
 
   linkspector:
     name: Linkspector
@@ -126,7 +126,7 @@ jobs:
 
       - name: Installing needed macOS dependencies
         if: matrix.os == 'macos-latest'
-        run: brew install openssl@1.1
+        run: brew install openssl
 
       - name: Installing needed Ubuntu dependencies
         if: matrix.os == 'ubuntu-latest'
