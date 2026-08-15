@@ -4,9 +4,9 @@ use crate::config::Hooks;
 use anyhow::bail;
 use anyhow::Error;
 use anyhow::Result;
+use mlua::serde::SerializeOptions;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
-use mlua::serde::SerializeOptions;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fs;
@@ -152,24 +152,24 @@ mod tests {
         assert!(check_version(VERSION, "foo path").is_ok());
 
         // Current release if OK
-        assert!(check_version("1.1.0", "foo path").is_ok());
+        assert!(check_version("1.1.1", "foo path").is_ok());
 
         // Prev major release is ERR
-        assert!(check_version("0.20.2", "foo path").is_err());
+        assert!(check_version("0.20.3", "foo path").is_err());
 
         // Prev minor release is OK
-        assert!(check_version("1.0.0", "foo path").is_ok());
+        assert!(check_version("1.0.1", "foo path").is_ok());
 
         // Prev bugfix release is OK
-        // assert!(check_version("1.1.-1", "foo path").is_ok());
+        assert!(check_version("1.1.0", "foo path").is_ok());
 
         // Next major release is ERR
-        assert!(check_version("2.0.0", "foo path").is_err());
+        assert!(check_version("2.0.1", "foo path").is_err());
 
         // Next minor release is ERR
-        assert!(check_version("1.2.0", "foo path").is_err());
+        assert!(check_version("1.2.1", "foo path").is_err());
 
         // Next bugfix release is ERR (Change when we get to v1)
-        assert!(check_version("1.1.1", "foo path").is_err());
+        assert!(check_version("1.1.2", "foo path").is_err());
     }
 }

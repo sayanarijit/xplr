@@ -41,7 +41,7 @@ e.g.
 
 ### Instructions
 
-#### [v1.0.0][51] -> [v1.1.0][52]
+#### [v1.0.0][51] -> [v1.1.1][52]
 
 - No breaking changes.
 - Added a new keybinding in "create" mode. Press `:cc` to enter the
