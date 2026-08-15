@@ -65,7 +65,7 @@ jobs:
       - id: install_macos_deps
         name: Installing needed macOS dependencies
         if: matrix.os == 'macos-latest'
-        run: brew install openssl@1.1
+        run: brew install openssl
 
       - id: install_linux_deps
         name: Installing needed Ubuntu dependencies
@@ -135,7 +135,7 @@ jobs:
 
       - id: build_snap
         name: Build Snap via Snapcraft
-        uses: snapcore/action-build@v2
+        uses: snapcore/action-build@v1
         with:
           snapcraft-args: "--use-lxd"
 
