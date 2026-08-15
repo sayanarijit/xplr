@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 
 use std::env;
+use std::io::Write;
 use xplr::cli::{self, Cli};
 use xplr::runner;
 
@@ -70,7 +71,11 @@ fn main() {
     } else {
         match runner::from_cli(cli).and_then(|a| a.run()) {
             Ok(Some(out)) => {
-                print!("{out}");
+                let mut stdout = std::io::stdout().lock();
+                write!(stdout, "{out}").unwrap_or_else(|err| {
+                    eprintln!("error: {err}");
+                    std::process::exit(1);
+                })
             }
             Ok(None) => {}
             Err(err) => {
