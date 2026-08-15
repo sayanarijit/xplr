@@ -80,7 +80,8 @@ fn call(
 
         event_reader.stop();
 
-        terminal.clear()?;
+        // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+        execute!(terminal.backend_mut(), term::Clear(term::ClearType::All))?;
         terminal.set_cursor_position((0, 0))?;
         term::disable_raw_mode()?;
         terminal.show_cursor()?;
@@ -161,7 +162,8 @@ fn call(
     };
 
     if !silent {
-        terminal.clear()?;
+        // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+        execute!(terminal.backend_mut(), term::Clear(term::ClearType::All))?;
         term::enable_raw_mode()?;
         terminal.hide_cursor()?;
         event_reader.start();
@@ -324,7 +326,8 @@ impl Runner {
         let backend = CrosstermBackend::new(stdout);
         let mut terminal = Terminal::new(backend)?;
         terminal.hide_cursor()?;
-        terminal.clear()?;
+        // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+        execute!(terminal.backend_mut(), term::Clear(term::ClearType::All))?;
 
         // Threads
         pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
@@ -399,7 +402,11 @@ impl Runner {
                             }
 
                             ClearScreen => {
-                                terminal.clear()?;
+                                // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+                                execute!(
+                                    terminal.backend_mut(),
+                                    term::Clear(term::ClearType::All)
+                                )?;
                             }
 
                             ScrollUp => {
@@ -607,7 +614,11 @@ impl Runner {
 
                                 event_reader.stop();
 
-                                terminal.clear()?;
+                                // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+                                execute!(
+                                    terminal.backend_mut(),
+                                    term::Clear(term::ClearType::All)
+                                )?;
                                 terminal.set_cursor_position((0, 0))?;
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
@@ -622,7 +633,11 @@ impl Runner {
                                     }
                                 };
 
-                                terminal.clear()?;
+                                // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+                                execute!(
+                                    terminal.backend_mut(),
+                                    term::Clear(term::ClearType::All)
+                                )?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
                                 event_reader.start();
@@ -651,7 +666,11 @@ impl Runner {
 
                                 event_reader.stop();
 
-                                terminal.clear()?;
+                                // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+                                execute!(
+                                    terminal.backend_mut(),
+                                    term::Clear(term::ClearType::All)
+                                )?;
                                 terminal.set_cursor_position((0, 0))?;
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
@@ -697,7 +716,11 @@ impl Runner {
                                     }
                                 };
 
-                                terminal.clear()?;
+                                // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+                                execute!(
+                                    terminal.backend_mut(),
+                                    term::Clear(term::ClearType::All)
+                                )?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
                                 event_reader.start();
@@ -818,7 +841,8 @@ impl Runner {
             }
         }
 
-        terminal.clear()?;
+        // terminal.clear()?; NOTE: https://github.com/ratatui/ratatui/pull/2694/changes
+        execute!(terminal.backend_mut(), term::Clear(term::ClearType::All))?;
         terminal.set_cursor_position((0, 0))?;
         execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
         execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
