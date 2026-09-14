@@ -108,7 +108,8 @@ fn call(
         .map(Input::to_string)
         .unwrap_or_default();
 
-    let status = Command::new(cmd.command.clone())
+    let mut command = Command::new(cmd.command.clone());
+    command
         .env("XPLR", &app.bin)
         .env("XPLR_VROOT", app.vroot.clone().unwrap_or_default())
         .env("XPLR_APP_VERSION", &app.version)
@@ -135,7 +136,20 @@ fn call(
         .stdin(stdin)
         .stdout(stdout)
         .stderr(stderr)
-        .args(cmd.args)
+        .args(cmd.args);
+
+    // Run silent commands in their own process group so that processes they
+    // leave behind (e.g. `cmd &`) are not in xplr's foreground process group
+    // and survive the terminal emulator closing after xplr quits (see #764).
+    // Interactive commands keep xplr's process group so terminal signals
+    // like Ctrl-C are still delivered to them.
+    #[cfg(unix)]
+    if silent {
+        use std::os::unix::process::CommandExt;
+        command.process_group(0);
+    }
+
+    let status = command
         .status()
         .map(|s| {
             if s.success() {
