@@ -76,7 +76,7 @@ impl From<&Metadata> for Permissions {
 
     #[cfg(windows)]
     fn from(_: &Metadata) -> Self {
-        panic!("Cannot get permissions from metadata on Windows")
+        Self::default()
     }
 }
 
