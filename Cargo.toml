@@ -8,7 +8,7 @@ path = './benches/criterion.rs'
 
 [package]
 name = 'xplr'
-version = '1.1.1'
+version = '1.1.2'
 authors = ['Arijit Basu <hi@arijitbasu.in>']
 edition = '2021'
 description = 'A hackable, minimal, fast TUI file explorer'
@@ -36,7 +36,7 @@ which = "8.0"
 nu-ansi-term = "0.50"
 textwrap = "0.16"
 snailquote = "0.3"
-skim = { version = "5.6", default-features = false, features = [] }
+skim = { version = "5.7", default-features = false, features = [] }
 time = { version = "0.3", features = [
   "serde",
   "local-offset",
