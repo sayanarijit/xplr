@@ -97,3 +97,22 @@ strip = true
 [features]
 default = ["vendored-lua"]
 vendored-lua = ["mlua/vendored"]
+
+[package.metadata.binstall]
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-apple-darwin]
+pkg-url = "{ repo }/releases/download/v{ version }/xplr-macos{ archive-suffix }"
+
+[package.metadata.binstall.overrides.aarch64-apple-darwin]
+pkg-url = "{ repo }/releases/download/v{ version }/xplr-macos-aarch64{ archive-suffix }"
+
+[package.metadata.binstall.overrides.x86_64-unknown-linux-gnu]
+pkg-url = "{ repo }/releases/download/v{ version }/xplr-linux{ archive-suffix }"
+
+[package.metadata.binstall.overrides.aarch64-unknown-linux-gnu]
+pkg-url = "{ repo }/releases/download/v{ version }/xplr-linux-aarch64{ archive-suffix }"
+
+[package.metadata.binstall.overrides.arm-unknown-linux-gnueabihf]
+pkg-url = "{ repo }/releases/download/v{ version }/xplr-linux-arm{ archive-suffix }"
