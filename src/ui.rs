@@ -221,7 +221,7 @@ impl CustomGraphicsState {
 
 enum CustomGraphicsEntry {
     Loading(Receiver<Result<CustomGraphicsState, ()>>),
-    Ready(CustomGraphicsState),
+    Ready(Box<CustomGraphicsState>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -1551,7 +1551,7 @@ impl UI<'_> {
 
                 if let Some(state) = ready {
                     self.graphics_states
-                        .insert(path.clone(), CustomGraphicsEntry::Ready(state));
+                        .insert(path.clone(), CustomGraphicsEntry::Ready(Box::new(state)));
                 }
 
                 if still_loading {
