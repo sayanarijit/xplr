@@ -1550,8 +1550,10 @@ impl UI<'_> {
                 }
 
                 if let Some(state) = ready {
-                    self.graphics_states
-                        .insert(path.clone(), CustomGraphicsEntry::Ready(Box::new(state)));
+                    self.graphics_states.insert(
+                        path.clone(),
+                        CustomGraphicsEntry::Ready(Box::new(state)),
+                    );
                 }
 
                 if still_loading {
