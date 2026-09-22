@@ -50,6 +50,7 @@ of the following plugins work for you, it's very easy to
 - [**sayanarijit/material-landscape.xplr**][19] Material Landscape
 - [**sayanarijit/material-landscape2.xplr**][20] Material Landscape 2
 - [**sayanarijit/zentable.xplr**][31] A clean, distraction free xplr table UI
+- [**sayanarijit/zenselection.xplr**][66] Hide or dynamically stretch the selection pane
 - [**dy-sh/dysh-style.xplr**][63] Complements xplr theme with icons and highlighting.
 - [**prncss-xyz/icons.xplr**][30] An icon theme for xplr.
 - [**dtomvan/extra-icons.xplr**][50] Adds more icons to icons.xplr, compatible
@@ -128,3 +129,4 @@ of the following plugins work for you, it's very easy to
 [63]: https://github.com/dy-sh/dysh-style.xplr
 [64]: https://github.com/dy-sh/get-rid-of-index.xplr
 [65]: https://github.com/LordMZTE/udisks.xplr
+[66]: https://github.com/sayanarijit/zenselection.xplr
