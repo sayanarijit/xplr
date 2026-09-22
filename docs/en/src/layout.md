@@ -191,6 +191,7 @@ Custom panel is a [sum type][56] can be one of the following:
 - [CustomParagraph][29]
 - [CustomList][30]
 - [CustomTable][31]
+- [CustomGraphics][58]
 - [CustomLayout][55]
 
 ### CustomParagraph
@@ -401,6 +402,29 @@ Result:
 ╰────────────────────────────────────────────╯
 ```
 
+## CustomGraphics
+
+A graphics panel to render an image from a filesystem path. It contains the
+following fields:
+
+- **ui** (nullable [Panel UI Config][32]): Optional UI config for the panel.
+- **path** (nullable string): Path to the image file.
+
+If the path is nil, empty, or unreadable, the panel is left blank.
+
+#### Example: Render a custom static image
+
+```lua
+xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomGraphics = {
+      ui = { title = { format = " image " } },
+      path = "/path/to/image.png",
+    },
+  },
+}
+```
+
 ### CustomLayout
 
 A whole custom layout to render. It doesn't make sense to use it as a
@@ -589,3 +613,4 @@ Hence, only the following fields are available.
 [55]: #customlayout
 [56]: sum-type.md
 [57]: #scrolltop
+[58]: #customgraphics

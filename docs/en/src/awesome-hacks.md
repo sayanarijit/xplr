@@ -410,9 +410,9 @@ imv-msg "$IMV_PID" quit
 
 </details>
 
-### Text preview pane
+### Text and image preview pane
 
-Preview text files in a native xplr pane (should be fast enough).
+Preview text files in a native xplr pane, and render images in the same pane.
 
 <details>
 <summary>Expand for details</summary>
@@ -463,7 +463,14 @@ xplr.fn.custom.preview_pane.render = function(ctx)
 
   if n then
     title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
-    if n.is_file then
+    if n.mime_essence and n.mime_essence:match("^image/") then
+      return {
+        CustomGraphics = {
+          ui = { title = title },
+          path = n.absolute_path,
+        },
+      }
+    elseif n.is_file then
       body = read(n.absolute_path, ctx.layout_size.height) or stat(n)
     else
       body = stat(n)
