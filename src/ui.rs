@@ -269,9 +269,7 @@ impl CustomOutputState {
         if !output.status.success() {
             if let Some(fallback) = fallback {
                 return Ok(Self {
-                    resolved: CustomOutputResolved::Text(string_to_text_owned(
-                        fallback,
-                    )),
+                    resolved: CustomOutputResolved::Text(string_to_text_owned(fallback)),
                 });
             }
 
@@ -1633,7 +1631,12 @@ impl UI<'_> {
                 if std::fs::metadata(&path).is_err() {
                     if let Some(fallback) = fallback.as_deref() {
                         if !fallback.is_empty() {
-                            render_fallback_text(f, layout_size, config.clone(), fallback);
+                            render_fallback_text(
+                                f,
+                                layout_size,
+                                config.clone(),
+                                fallback,
+                            );
                         }
                     }
                     return;
@@ -1713,7 +1716,9 @@ impl UI<'_> {
                 if let Some(fallback_text) = fallback_text {
                     self.graphics_states.insert(
                         key.clone(),
-                        CustomGraphicsEntry::Fallback(string_to_text_owned(fallback_text)),
+                        CustomGraphicsEntry::Fallback(string_to_text_owned(
+                            fallback_text,
+                        )),
                     );
 
                     if let Some(CustomGraphicsEntry::Fallback(text)) =
@@ -1755,15 +1760,19 @@ impl UI<'_> {
                 }
             }
 
-            CustomPanel::CustomOutput { ui, command, fallback } => {
+            CustomPanel::CustomOutput {
+                ui,
+                command,
+                fallback,
+            } => {
                 let config = defaultui.extend(&ui);
                 let panel_block = block(config.clone(), String::new());
                 let inner = panel_block.inner(layout_size);
                 f.render_widget(panel_block, layout_size);
 
-                let Some(command) = command.map(|command| {
-                    command.into_iter().collect::<Vec<String>>()
-                }) else {
+                let Some(command) =
+                    command.map(|command| command.into_iter().collect::<Vec<String>>())
+                else {
                     return;
                 };
 
@@ -1771,7 +1780,11 @@ impl UI<'_> {
                     return;
                 }
 
-                let key = format!("{}\u{1f}{}", command.join("\u{1f}"), fallback.as_deref().unwrap_or(""));
+                let key = format!(
+                    "{}\u{1f}{}",
+                    command.join("\u{1f}"),
+                    fallback.as_deref().unwrap_or("")
+                );
 
                 if !self.output_states.contains_key(&key) {
                     self.output_states.insert(
@@ -1863,7 +1876,8 @@ impl UI<'_> {
                         CustomOutputEntry::Fallback(string_to_text_owned(fallback_text)),
                     );
 
-                    if let Some(CustomOutputEntry::Fallback(text)) = self.output_states.get(&key)
+                    if let Some(CustomOutputEntry::Fallback(text)) =
+                        self.output_states.get(&key)
                     {
                         let content = Paragraph::new(text.clone())
                             .block(block(config.clone(), String::new()));
@@ -1887,7 +1901,9 @@ impl UI<'_> {
                     return;
                 }
 
-                if let Some(CustomOutputEntry::Ready(state)) = self.output_states.get_mut(&key) {
+                if let Some(CustomOutputEntry::Ready(state)) =
+                    self.output_states.get_mut(&key)
+                {
                     match &mut state.resolved {
                         CustomOutputResolved::Blank => {}
                         CustomOutputResolved::Text(text) => {
