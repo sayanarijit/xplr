@@ -440,7 +440,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
     if n.is_dir then
       return {
         CustomOutput = {
-          ui = { title = { format = "📁" } },
+          ui = { title = { format = " 📁 " } },
           command = { "tree", "-x", "-C", "-L", "2", n.absolute_path },
           fallback = body,
         },
@@ -448,7 +448,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
     elseif n.mime_essence and n.mime_essence:match("^image/") then
       return {
         CustomGraphics = {
-          ui = { title = { format = "🖼️" } },
+          ui = { title = { format = " 🖼️ " } },
           path = n.absolute_path,
           fallback = body,
         },
@@ -456,7 +456,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
     elseif n.is_file then
       return {
         CustomOutput = {
-          ui = { title = { format = "📄" } },
+          ui = { title = { format = " 📄 " } },
           command = {
             "bat",
             "-f",
@@ -469,9 +469,10 @@ xplr.fn.custom.preview_pane.render = function(ctx)
         },
       }
     else
-      return { CustomParagraph = { ui = { title = { format = "❓" } }, body = body } }
+      return { CustomParagraph = { ui = { title = { format = " 🤷 " } }, body = body } }
     end
   end
+  return { CustomParagraph = { ui = { title = { format = " 🚫 " } }, body = "" } }
 end
 
 local preview_pane = { Dynamic = "custom.preview_pane.render" }
