@@ -422,10 +422,6 @@ Preview text files or images in a native xplr pane.
 - Tested on: Linux, FreeBSD 13.1-RELEASE
 
 ```lua
-local function stat(node)
-  return xplr.util.to_yaml(xplr.util.node(node.absolute_path))
-end
-
 xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
   local n = ctx.app.focused_node
@@ -434,7 +430,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
   end
 
   if n then
-    local fallback = stat(n)
+    local fallback = xplr.util.to_yaml(xplr.util.node(n.absolute_path))
     if n.is_dir then
       return {
         CustomOutput = {
