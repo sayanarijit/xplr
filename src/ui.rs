@@ -252,6 +252,7 @@ impl CustomOutputState {
         tx_msg_in: Sender<app::Task>,
         picker: Picker,
         command: Vec<String>,
+        fallback: Option<String>,
     ) -> Result<Self, ()> {
         if command.is_empty() {
             return Ok(Self {
@@ -265,11 +266,29 @@ impl CustomOutputState {
             .output()
             .map_err(|_| ())?;
 
-        let bytes = if output.status.success() {
-            output.stdout
-        } else {
-            output.stderr
-        };
+        if !output.status.success() {
+            if let Some(fallback) = fallback {
+                return Ok(Self {
+                    resolved: CustomOutputResolved::Text(string_to_text_owned(
+                        fallback,
+                    )),
+                });
+            }
+
+            if output.stderr.is_empty() {
+                return Ok(Self {
+                    resolved: CustomOutputResolved::Blank,
+                });
+            }
+
+            return Ok(Self {
+                resolved: CustomOutputResolved::Text(string_to_text_owned(
+                    String::from_utf8_lossy(&output.stderr).into_owned(),
+                )),
+            });
+        }
+
+        let bytes = output.stdout;
 
         if bytes.is_empty() {
             return Ok(Self {
@@ -298,12 +317,13 @@ impl CustomOutputState {
         tx_msg_in: Sender<app::Task>,
         picker: Picker,
         command: Vec<String>,
+        fallback: Option<String>,
     ) -> Receiver<Result<Self, ()>> {
         let (tx_ready, rx_ready) = mpsc::channel();
         let tx_refresh = tx_msg_in.clone();
 
         thread::spawn(move || {
-            let state = Self::from_command(tx_msg_in, picker, command);
+            let state = Self::from_command(tx_msg_in, picker, command, fallback);
             let _ = tx_ready.send(state);
             let _ = tx_refresh.send(app::Task::new(
                 app::MsgIn::External(app::ExternalMsg::Refresh),
@@ -1761,6 +1781,7 @@ impl UI<'_> {
                                 self.tx_msg_in.clone(),
                                 self.image_picker.clone(),
                                 command.clone(),
+                                fallback.clone(),
                             ),
                             fallback.clone(),
                         ),

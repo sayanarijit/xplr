@@ -436,12 +436,19 @@ xplr.fn.custom.preview_pane.render = function(ctx)
   end
 
   if n then
-    title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
     body = stat(n)
-    if n.mime_essence and n.mime_essence:match("^image/") then
+    if n.is_dir then
+      return {
+        CustomOutput = {
+          ui = { title = { format = "📁" } },
+          command = { "tree", "-x", "-C", "-L", "2", n.absolute_path },
+          fallback = body,
+        },
+      }
+    elseif n.mime_essence and n.mime_essence:match("^image/") then
       return {
         CustomGraphics = {
-          ui = { title = title },
+          ui = { title = { format = "🖼️" } },
           path = n.absolute_path,
           fallback = body,
         },
@@ -449,19 +456,20 @@ xplr.fn.custom.preview_pane.render = function(ctx)
     elseif n.is_file then
       return {
         CustomOutput = {
-          ui = { title = title },
+          ui = { title = { format = "📄" } },
           command = {
             "bat",
             "-f",
-            "--style=-header",
-            string.format("--line-range=:%d", ctx.layout_size.height),
+            "--binary=as-text",
+            string.format("--line-range=:%s", ctx.layout_size.height),
+            string.format("--terminal-width=%s", ctx.layout_size.width),
             n.absolute_path,
           },
           fallback = body,
         },
       }
     else
-      return { CustomParagraph = { ui = { title = title }, body = body } }
+      return { CustomParagraph = { ui = { title = { format = "❓" } }, body = body } }
     end
   end
 end

@@ -440,7 +440,9 @@ following fields:
 
 If the command is nil or empty, the panel is left blank. If the command prints
 UTF-8 text, that text is rendered. If it prints image bytes, the image is
-rendered. Otherwise the fallback is rendered when provided.
+rendered. If the command exits with a nonzero status, the fallback is rendered
+when provided; otherwise stderr is rendered. If successful output cannot be
+parsed, the fallback is rendered when provided.
 
 #### Example: Render a custom static command output
 
