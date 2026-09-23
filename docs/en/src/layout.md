@@ -191,6 +191,8 @@ Custom panel is a [sum type][56] can be one of the following:
 - [CustomParagraph][29]
 - [CustomList][30]
 - [CustomTable][31]
+- [CustomGraphics][58]
+- [CustomOutput][59]
 - [CustomLayout][55]
 
 ### CustomParagraph
@@ -401,6 +403,70 @@ Result:
 ╰────────────────────────────────────────────╯
 ```
 
+## CustomGraphics
+
+A graphics panel to render an image from a filesystem path. It contains the
+following fields:
+
+- **ui** (nullable [Panel UI Config][32]): Optional UI config for the panel.
+- **path** (nullable string): Path to the image file.
+- **fallback** (nullable string): Text to render when the image cannot be parsed.
+
+If the path is nil or empty, the panel is left blank. If the image cannot be
+parsed, the fallback is rendered when provided.
+
+#### Example: Render a custom static image
+
+```lua
+xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomGraphics = {
+      ui = { title = { format = " image " } },
+      path = "/path/to/image.png",
+    },
+  },
+}
+```
+
+### CustomOutput
+
+A command-output panel to render the result of a command. It contains the
+following fields:
+
+- **ui** (nullable [Panel UI Config][32]): Optional UI config for the panel.
+- **command** (nullable list of string): Command and arguments to execute.
+- **fallback** (nullable string): Text to render when the command output cannot
+  be parsed.
+
+If the command is nil or empty, the panel is left blank. If the command prints
+UTF-8 text, that text is rendered. If it prints image bytes, the image is
+rendered. If the command exits with a nonzero status, the fallback is rendered
+when provided; otherwise stderr is rendered. If successful output cannot be
+parsed, the fallback is rendered when provided.
+
+#### Example: Render a custom static command output
+
+```lua
+xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomOutput = {
+      ui = { title = { format = " output " } },
+      command = { "sh", "-lc", "printf 'hello from xplr\\n'" },
+    },
+  },
+}
+```
+
+Result:
+
+```
+╭ output ───────────────╮
+│hello from xplr        │
+│                       │
+│                       │
+╰───────────────────────╯
+```
+
 ### CustomLayout
 
 A whole custom layout to render. It doesn't make sense to use it as a
@@ -589,3 +655,5 @@ Hence, only the following fields are available.
 [55]: #customlayout
 [56]: sum-type.md
 [57]: #scrolltop
+[58]: #customgraphics
+[59]: #customoutput

@@ -343,6 +343,11 @@ impl Runner {
         // Clear AND redraw the terminal surface
         terminal.clear()?;
 
+        // UI
+        // Picker::from_query_stdio() should run before terminal event reading starts,
+        // otherwise graphics protocol detection can fall back to lower fidelity mode.
+        let mut ui = UI::new(&lua, tx_msg_in.clone());
+
         // Threads
         pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
         let mut event_reader = EventReader::new(tx_msg_in.clone());
@@ -358,9 +363,6 @@ impl Runner {
             app::MsgIn::External(app::ExternalMsg::Refresh),
             None,
         ))?;
-
-        // UI
-        let mut ui = UI::new(&lua);
 
         'outer: for task in rx_msg_in {
             match app.handle_task(task) {
