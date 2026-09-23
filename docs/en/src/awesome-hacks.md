@@ -428,21 +428,19 @@ end
 
 xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
-  local title = nil
-  local body = nil
   local n = ctx.app.focused_node
   if n and n.canonical then
     n = n.canonical
   end
 
   if n then
-    body = stat(n)
+    local fallback = stat(n)
     if n.is_dir then
       return {
         CustomOutput = {
           ui = { title = { format = " 📁 " } },
           command = { "tree", "-x", "-C", "-L", "2", n.absolute_path },
-          fallback = body,
+          fallback = fallback,
         },
       }
     elseif n.mime_essence and n.mime_essence:match("^image/") then
@@ -450,7 +448,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
         CustomGraphics = {
           ui = { title = { format = " 🖼️ " } },
           path = n.absolute_path,
-          fallback = body,
+          fallback = fallback,
         },
       }
     elseif n.is_file then
@@ -465,11 +463,13 @@ xplr.fn.custom.preview_pane.render = function(ctx)
             string.format("--terminal-width=%s", ctx.layout_size.width),
             n.absolute_path,
           },
-          fallback = body,
+          fallback = fallback,
         },
       }
     else
-      return { CustomParagraph = { ui = { title = { format = " 🤷 " } }, body = body } }
+      return {
+        CustomParagraph = { ui = { title = { format = " 🤷 " } }, body = fallback },
+      }
     end
   end
   return { CustomParagraph = { ui = { title = { format = " 🚫 " } }, body = "" } }
