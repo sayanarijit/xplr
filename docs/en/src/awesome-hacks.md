@@ -412,7 +412,7 @@ imv-msg "$IMV_PID" quit
 
 ### Text and image preview pane
 
-Preview text files in a native xplr pane, and render images in the same pane.
+Preview text files or images in a native xplr pane.
 
 <details>
 <summary>Expand for details</summary>
@@ -426,36 +426,10 @@ local function stat(node)
   return xplr.util.to_yaml(xplr.util.node(node.absolute_path))
 end
 
-local function read(path, height)
-  local p = io.open(path)
-
-  if p == nil then
-    return nil
-  end
-
-  local i = 0
-  local res = ""
-  for line in p:lines() do
-    if line:match("[^ -~\n\t]") then
-      p:close()
-      return
-    end
-
-    res = res .. line .. "\n"
-    if i == height then
-      break
-    end
-    i = i + 1
-  end
-  p:close()
-
-  return res
-end
-
 xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
   local title = nil
-  local body = ""
+  local body = nil
   local n = ctx.app.focused_node
   if n and n.canonical then
     n = n.canonical
@@ -463,21 +437,33 @@ xplr.fn.custom.preview_pane.render = function(ctx)
 
   if n then
     title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
+    body = stat(n)
     if n.mime_essence and n.mime_essence:match("^image/") then
       return {
         CustomGraphics = {
           ui = { title = title },
           path = n.absolute_path,
+          fallback = body,
         },
       }
     elseif n.is_file then
-      body = read(n.absolute_path, ctx.layout_size.height) or stat(n)
+      return {
+        CustomOutput = {
+          ui = { title = title },
+          command = {
+            "bat",
+            "-f",
+            "--style=-header",
+            string.format("--line-range=:%d", ctx.layout_size.height),
+            n.absolute_path,
+          },
+          fallback = body,
+        },
+      }
     else
-      body = stat(n)
+      return { CustomParagraph = { ui = { title = title }, body = body } }
     end
   end
-
-  return { CustomParagraph = { ui = { title = title }, body = body } }
 end
 
 local preview_pane = { Dynamic = "custom.preview_pane.render" }
@@ -497,7 +483,7 @@ local split_preview = {
 }
 
 xplr.config.layouts.builtin.default =
-    xplr.util.layout_replace(xplr.config.layouts.builtin.default, "Table", split_preview)
+  xplr.util.layout_replace(xplr.config.layouts.builtin.default, "Table", split_preview)
 ```
 
 </details>
