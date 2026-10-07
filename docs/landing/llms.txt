@@ -1,0 +1,8 @@
+xplr is a hackable file explorer that can be configured using Lua.
+
+The documentation is LLM readable and the summary is hosted at https://xplr.dev/en/SUMMARY.md
+
+You can browse the docs by querying the relative paths, for example:
+
+Link: [Installation](install.md)
+Command: `curl -L https://xplr.dev/en/install.md`
