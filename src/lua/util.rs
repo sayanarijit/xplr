@@ -30,7 +30,14 @@ use std::path::PathBuf;
 use std::process::Command;
 
 lazy_static! {
-    static ref LS_COLORS: LsColors = LsColors::from_env().unwrap_or_default();
+    // NB: LsColors::from_env() falls back to built-in defaults when the
+    // variable is missing, and from_string("") keeps those defaults when
+    // it is empty, both of which would override the user's own style
+    // config. Start empty unless the user actually set LS_COLORS.
+    static ref LS_COLORS: LsColors = match std::env::var("LS_COLORS") {
+        Ok(s) if !s.is_empty() => LsColors::from_string(&s),
+        _ => LsColors::empty(),
+    };
 }
 
 /// Get the xplr version details.
