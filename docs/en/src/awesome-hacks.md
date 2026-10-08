@@ -410,9 +410,9 @@ imv-msg "$IMV_PID" quit
 
 </details>
 
-### Text preview pane
+### Text and image preview pane
 
-Preview text files in a native xplr pane (should be fast enough).
+Preview text files or images in a native xplr pane.
 
 <details>
 <summary>Expand for details</summary>
@@ -422,55 +422,53 @@ Preview text files in a native xplr pane (should be fast enough).
 - Tested on: Linux, FreeBSD 13.1-RELEASE
 
 ```lua
-local function stat(node)
-  return xplr.util.to_yaml(xplr.util.node(node.absolute_path))
-end
-
-local function read(path, height)
-  local p = io.open(path)
-
-  if p == nil then
-    return nil
-  end
-
-  local i = 0
-  local res = ""
-  for line in p:lines() do
-    if line:match("[^ -~\n\t]") then
-      p:close()
-      return
-    end
-
-    res = res .. line .. "\n"
-    if i == height then
-      break
-    end
-    i = i + 1
-  end
-  p:close()
-
-  return res
-end
-
 xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
-  local title = nil
-  local body = ""
   local n = ctx.app.focused_node
   if n and n.canonical then
     n = n.canonical
   end
 
   if n then
-    title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
-    if n.is_file then
-      body = read(n.absolute_path, ctx.layout_size.height) or stat(n)
+    local fallback = xplr.util.to_yaml(xplr.util.node(n.absolute_path))
+    if n.is_dir then
+      return {
+        CustomOutput = {
+          ui = { title = { format = " 📁 " } },
+          command = { "tree", "-x", "-C", "-L", "2", n.absolute_path },
+          fallback = fallback,
+        },
+      }
+    elseif n.mime_essence and n.mime_essence:match("^image/") then
+      return {
+        CustomGraphics = {
+          ui = { title = { format = " 🖼️ " } },
+          path = n.absolute_path,
+          fallback = fallback,
+        },
+      }
+    elseif n.is_file then
+      return {
+        CustomOutput = {
+          ui = { title = { format = " 📄 " } },
+          command = {
+            "bat",
+            "-f",
+            "--binary=as-text",
+            string.format("--line-range=:%s", ctx.layout_size.height),
+            string.format("--terminal-width=%s", ctx.layout_size.width),
+            n.absolute_path,
+          },
+          fallback = fallback,
+        },
+      }
     else
-      body = stat(n)
+      return {
+        CustomParagraph = { ui = { title = { format = " 🤷 " } }, body = fallback },
+      }
     end
   end
-
-  return { CustomParagraph = { ui = { title = title }, body = body } }
+  return { CustomParagraph = { ui = { title = { format = " 🚫 " } }, body = "" } }
 end
 
 local preview_pane = { Dynamic = "custom.preview_pane.render" }
@@ -490,7 +488,7 @@ local split_preview = {
 }
 
 xplr.config.layouts.builtin.default =
-    xplr.util.layout_replace(xplr.config.layouts.builtin.default, "Table", split_preview)
+  xplr.util.layout_replace(xplr.config.layouts.builtin.default, "Table", split_preview)
 ```
 
 </details>

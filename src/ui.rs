@@ -10,11 +10,17 @@ use indexmap::IndexSet;
 use lazy_static::lazy_static;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
+use ratatui_image::picker::Picker;
+use ratatui_image::thread::{ResizeRequest, ResizeResponse, ThreadProtocol};
+use ratatui_image::{Resize, StatefulImage};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::env;
 use std::ops::BitXor;
+use std::process::{Command, Stdio};
+use std::sync::mpsc::{self, Receiver, Sender};
+use std::thread;
 use time::macros::format_description;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
@@ -58,6 +64,10 @@ pub fn string_to_text<'a>(string: String) -> Text<'a> {
             .into_text()
             .unwrap_or_else(|e| Text::raw(format!("{e:?}")))
     }
+}
+
+fn string_to_text_owned(string: String) -> Text<'static> {
+    string_to_text(string)
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -133,7 +143,211 @@ pub enum CustomPanel {
         col_spacing: Option<u16>,
         body: Vec<Vec<String>>,
     },
+    CustomGraphics {
+        #[serde(default)]
+        ui: PanelUiConfig,
+        path: Option<String>,
+        fallback: Option<String>,
+    },
+    CustomOutput {
+        #[serde(default)]
+        ui: PanelUiConfig,
+        command: Option<Vec<String>>,
+        fallback: Option<String>,
+    },
     CustomLayout(Layout),
+}
+
+enum CustomOutputResolved {
+    Blank,
+    Text(Text<'static>),
+    Graphics(Box<CustomGraphicsState>),
+}
+
+struct CustomOutputState {
+    resolved: CustomOutputResolved,
+}
+
+enum CustomOutputEntry {
+    Loading(Receiver<Result<CustomOutputState, ()>>, Option<String>),
+    Ready(Box<CustomOutputState>),
+    Fallback(Text<'static>),
+}
+
+struct CustomGraphicsState {
+    thread_protocol: ThreadProtocol,
+    rx_responses: Receiver<Result<ResizeResponse, ratatui_image::errors::Errors>>,
+}
+
+impl CustomGraphicsState {
+    fn from_image(
+        tx_msg_in: Sender<app::Task>,
+        picker: Picker,
+        image: image::DynamicImage,
+    ) -> Self {
+        let (tx_requests, rx_requests) = mpsc::channel::<ResizeRequest>();
+        let (tx_responses, rx_responses) =
+            mpsc::channel::<Result<ResizeResponse, ratatui_image::errors::Errors>>();
+        let tx_refresh = tx_msg_in.clone();
+
+        thread::spawn(move || {
+            while let Ok(request) = rx_requests.recv() {
+                let completed = request.resize_encode();
+                let _ = tx_responses.send(completed);
+                let _ = tx_refresh.send(app::Task::new(
+                    app::MsgIn::External(app::ExternalMsg::Refresh),
+                    None,
+                ));
+            }
+        });
+
+        Self {
+            thread_protocol: ThreadProtocol::new(
+                tx_requests,
+                Some(picker.new_resize_protocol(image)),
+            ),
+            rx_responses,
+        }
+    }
+
+    fn spawn_loader(
+        tx_msg_in: Sender<app::Task>,
+        picker: Picker,
+        path: String,
+    ) -> Receiver<Result<Self, ()>> {
+        let (tx_ready, rx_ready) = mpsc::channel();
+        let tx_refresh = tx_msg_in.clone();
+
+        thread::spawn(move || {
+            let state = image::ImageReader::open(&path)
+                .ok()
+                .and_then(|reader| reader.decode().ok())
+                .map(|image| Self::from_image(tx_msg_in, picker, image))
+                .ok_or(());
+
+            let _ = tx_ready.send(state);
+            let _ = tx_refresh.send(app::Task::new(
+                app::MsgIn::External(app::ExternalMsg::Refresh),
+                None,
+            ));
+        });
+
+        rx_ready
+    }
+
+    fn sync_updates(&mut self) {
+        while let Ok(completed) = self.rx_responses.try_recv() {
+            match completed {
+                Ok(completed) => {
+                    let _ = self.thread_protocol.update_resized_protocol(completed);
+                }
+                Err(_) => self.thread_protocol.empty_protocol(),
+            }
+        }
+    }
+}
+
+impl CustomOutputState {
+    fn from_command(
+        tx_msg_in: Sender<app::Task>,
+        picker: Picker,
+        command: Vec<String>,
+        fallback: Option<String>,
+    ) -> Result<Self, ()> {
+        if command.is_empty() {
+            return Ok(Self {
+                resolved: CustomOutputResolved::Blank,
+            });
+        }
+
+        let output = Command::new(&command[0])
+            .args(&command[1..])
+            .stdin(Stdio::null())
+            .output()
+            .map_err(|_| ())?;
+
+        if !output.status.success() {
+            if let Some(fallback) = fallback {
+                return Ok(Self {
+                    resolved: CustomOutputResolved::Text(string_to_text_owned(fallback)),
+                });
+            }
+
+            if output.stderr.is_empty() {
+                return Ok(Self {
+                    resolved: CustomOutputResolved::Blank,
+                });
+            }
+
+            return Ok(Self {
+                resolved: CustomOutputResolved::Text(string_to_text_owned(
+                    String::from_utf8_lossy(&output.stderr).into_owned(),
+                )),
+            });
+        }
+
+        let bytes = output.stdout;
+
+        if bytes.is_empty() {
+            return Ok(Self {
+                resolved: CustomOutputResolved::Blank,
+            });
+        }
+
+        if let Ok(text) = String::from_utf8(bytes.clone()) {
+            return Ok(Self {
+                resolved: CustomOutputResolved::Text(string_to_text_owned(text)),
+            });
+        }
+
+        if let Ok(image) = image::load_from_memory(&bytes) {
+            return Ok(Self {
+                resolved: CustomOutputResolved::Graphics(Box::new(
+                    CustomGraphicsState::from_image(tx_msg_in, picker, image),
+                )),
+            });
+        }
+
+        Err(())
+    }
+
+    fn spawn_loader(
+        tx_msg_in: Sender<app::Task>,
+        picker: Picker,
+        command: Vec<String>,
+        fallback: Option<String>,
+    ) -> Receiver<Result<Self, ()>> {
+        let (tx_ready, rx_ready) = mpsc::channel();
+        let tx_refresh = tx_msg_in.clone();
+
+        thread::spawn(move || {
+            let state = Self::from_command(tx_msg_in, picker, command, fallback);
+            let _ = tx_ready.send(state);
+            let _ = tx_refresh.send(app::Task::new(
+                app::MsgIn::External(app::ExternalMsg::Refresh),
+                None,
+            ));
+        });
+
+        rx_ready
+    }
+}
+
+fn render_fallback_text(
+    f: &mut Frame,
+    layout_size: TuiRect,
+    config: PanelUiConfig,
+    fallback: &str,
+) {
+    let content = Paragraph::new(string_to_text_owned(fallback.to_string()))
+        .block(block(config, String::new()));
+    f.render_widget(content, layout_size);
+}
+
+enum CustomGraphicsEntry {
+    Loading(Receiver<Result<CustomGraphicsState, ()>>, Option<String>),
+    Ready(Box<CustomGraphicsState>),
+    Fallback(Text<'static>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -737,16 +951,26 @@ pub struct UI<'lua> {
     pub lua: &'lua Lua,
     pub screen_size: TuiRect,
     pub scrolltop: usize,
+    tx_msg_in: Sender<app::Task>,
+    image_picker: Picker,
+    graphics_states: HashMap<String, CustomGraphicsEntry>,
+    output_states: HashMap<String, CustomOutputEntry>,
 }
 
 impl<'lua> UI<'lua> {
-    pub fn new(lua: &'lua Lua) -> Self {
+    pub fn new(lua: &'lua Lua, tx_msg_in: Sender<app::Task>) -> Self {
         let screen_size = Default::default();
         let scrolltop = 0;
+        let image_picker =
+            Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
         Self {
             lua,
             scrolltop,
             screen_size,
+            tx_msg_in,
+            image_picker,
+            graphics_states: HashMap::new(),
+            output_states: HashMap::new(),
         }
     }
 }
@@ -1384,6 +1608,319 @@ impl UI<'_> {
                     .block(block(config, "".into()));
 
                 f.render_widget(content, layout_size);
+            }
+
+            CustomPanel::CustomGraphics { ui, path, fallback } => {
+                let config = defaultui.extend(&ui);
+                let panel_block = block(config.clone(), String::new());
+                let inner = panel_block.inner(layout_size);
+                f.render_widget(panel_block, layout_size);
+
+                let Some(path) =
+                    path.map(|p| p.trim().to_string()).filter(|p| !p.is_empty())
+                else {
+                    return;
+                };
+
+                if inner.width == 0 || inner.height == 0 {
+                    return;
+                }
+
+                let key = format!("{path}\u{1f}{}", fallback.as_deref().unwrap_or(""));
+
+                if std::fs::metadata(&path).is_err() {
+                    if let Some(fallback) = fallback.as_deref() {
+                        if !fallback.is_empty() {
+                            render_fallback_text(
+                                f,
+                                layout_size,
+                                config.clone(),
+                                fallback,
+                            );
+                        }
+                    }
+                    return;
+                }
+
+                if !self.graphics_states.contains_key(&key) {
+                    self.graphics_states.insert(
+                        key.clone(),
+                        CustomGraphicsEntry::Loading(
+                            CustomGraphicsState::spawn_loader(
+                                self.tx_msg_in.clone(),
+                                self.image_picker.clone(),
+                                path.clone(),
+                            ),
+                            fallback.clone(),
+                        ),
+                    );
+                    return;
+                }
+
+                let mut ready = None;
+                let mut still_loading = false;
+                let mut fallback_text = None;
+                let mut should_remove = false;
+                if let Some(entry) = self.graphics_states.get_mut(&key) {
+                    match entry {
+                        CustomGraphicsEntry::Loading(rx_ready, fallback) => {
+                            match rx_ready.try_recv() {
+                                Ok(Ok(state)) => {
+                                    ready = Some(state);
+                                }
+                                Ok(Err(())) => {
+                                    if let Some(fallback) = fallback.as_deref() {
+                                        if !fallback.is_empty() {
+                                            fallback_text = Some(fallback.to_string());
+                                        } else {
+                                            should_remove = true;
+                                        }
+                                    } else {
+                                        should_remove = true;
+                                    }
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Empty) => {
+                                    still_loading = true;
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                                    if let Some(fallback) = fallback.as_deref() {
+                                        if !fallback.is_empty() {
+                                            fallback_text = Some(fallback.to_string());
+                                        } else {
+                                            should_remove = true;
+                                        }
+                                    } else {
+                                        should_remove = true;
+                                    }
+                                }
+                            }
+                        }
+                        CustomGraphicsEntry::Ready(state) => {
+                            state.sync_updates();
+                            f.render_stateful_widget(
+                                StatefulImage::new().resize(Resize::Fit(None)),
+                                inner,
+                                &mut state.thread_protocol,
+                            );
+                            return;
+                        }
+                        CustomGraphicsEntry::Fallback(text) => {
+                            let content = Paragraph::new(text.clone())
+                                .block(block(config.clone(), String::new()));
+                            f.render_widget(content, layout_size);
+                            return;
+                        }
+                    }
+                }
+
+                if let Some(fallback_text) = fallback_text {
+                    self.graphics_states.insert(
+                        key.clone(),
+                        CustomGraphicsEntry::Fallback(string_to_text_owned(
+                            fallback_text,
+                        )),
+                    );
+
+                    if let Some(CustomGraphicsEntry::Fallback(text)) =
+                        self.graphics_states.get(&key)
+                    {
+                        let content = Paragraph::new(text.clone())
+                            .block(block(config.clone(), String::new()));
+                        f.render_widget(content, layout_size);
+                    }
+
+                    return;
+                }
+
+                if should_remove {
+                    self.graphics_states.remove(&key);
+                    return;
+                }
+
+                if let Some(state) = ready {
+                    self.graphics_states.insert(
+                        key.clone(),
+                        CustomGraphicsEntry::Ready(Box::new(state)),
+                    );
+                }
+
+                if still_loading {
+                    return;
+                }
+
+                if let Some(CustomGraphicsEntry::Ready(state)) =
+                    self.graphics_states.get_mut(&key)
+                {
+                    state.sync_updates();
+                    f.render_stateful_widget(
+                        StatefulImage::new().resize(Resize::Fit(None)),
+                        inner,
+                        &mut state.thread_protocol,
+                    );
+                }
+            }
+
+            CustomPanel::CustomOutput {
+                ui,
+                command,
+                fallback,
+            } => {
+                let config = defaultui.extend(&ui);
+                let panel_block = block(config.clone(), String::new());
+                let inner = panel_block.inner(layout_size);
+                f.render_widget(panel_block, layout_size);
+
+                let Some(command) =
+                    command.map(|command| command.into_iter().collect::<Vec<String>>())
+                else {
+                    return;
+                };
+
+                if command.is_empty() || inner.width == 0 || inner.height == 0 {
+                    return;
+                }
+
+                let key = format!(
+                    "{}\u{1f}{}",
+                    command.join("\u{1f}"),
+                    fallback.as_deref().unwrap_or("")
+                );
+
+                if !self.output_states.contains_key(&key) {
+                    self.output_states.insert(
+                        key.clone(),
+                        CustomOutputEntry::Loading(
+                            CustomOutputState::spawn_loader(
+                                self.tx_msg_in.clone(),
+                                self.image_picker.clone(),
+                                command.clone(),
+                                fallback.clone(),
+                            ),
+                            fallback.clone(),
+                        ),
+                    );
+                    return;
+                }
+
+                let mut ready = None;
+                let mut still_loading = false;
+                let mut fallback_text = None;
+                let mut should_remove = false;
+
+                if let Some(entry) = self.output_states.get_mut(&key) {
+                    match entry {
+                        CustomOutputEntry::Loading(rx_ready, fallback) => {
+                            match rx_ready.try_recv() {
+                                Ok(Ok(state)) => {
+                                    ready = Some(state);
+                                }
+                                Ok(Err(())) => {
+                                    if let Some(fallback) = fallback.as_deref() {
+                                        if !fallback.is_empty() {
+                                            fallback_text = Some(fallback.to_string());
+                                        } else {
+                                            should_remove = true;
+                                        }
+                                    } else {
+                                        should_remove = true;
+                                    }
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Empty) => {
+                                    still_loading = true;
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                                    if let Some(fallback) = fallback.as_deref() {
+                                        if !fallback.is_empty() {
+                                            fallback_text = Some(fallback.to_string());
+                                        } else {
+                                            should_remove = true;
+                                        }
+                                    } else {
+                                        should_remove = true;
+                                    }
+                                }
+                            }
+                        }
+                        CustomOutputEntry::Ready(state) => match &mut state.resolved {
+                            CustomOutputResolved::Blank => {
+                                return;
+                            }
+                            CustomOutputResolved::Text(text) => {
+                                let content = Paragraph::new(text.clone())
+                                    .block(block(config.clone(), String::new()));
+                                f.render_widget(content, layout_size);
+                                return;
+                            }
+                            CustomOutputResolved::Graphics(state) => {
+                                state.sync_updates();
+                                f.render_stateful_widget(
+                                    StatefulImage::new().resize(Resize::Fit(None)),
+                                    inner,
+                                    &mut state.thread_protocol,
+                                );
+                                return;
+                            }
+                        },
+                        CustomOutputEntry::Fallback(text) => {
+                            let content = Paragraph::new(text.clone())
+                                .block(block(config.clone(), String::new()));
+                            f.render_widget(content, layout_size);
+                            return;
+                        }
+                    }
+                }
+
+                if let Some(fallback_text) = fallback_text {
+                    self.output_states.insert(
+                        key.clone(),
+                        CustomOutputEntry::Fallback(string_to_text_owned(fallback_text)),
+                    );
+
+                    if let Some(CustomOutputEntry::Fallback(text)) =
+                        self.output_states.get(&key)
+                    {
+                        let content = Paragraph::new(text.clone())
+                            .block(block(config.clone(), String::new()));
+                        f.render_widget(content, layout_size);
+                    }
+
+                    return;
+                }
+
+                if should_remove {
+                    self.output_states.remove(&key);
+                    return;
+                }
+
+                if let Some(state) = ready {
+                    self.output_states
+                        .insert(key.clone(), CustomOutputEntry::Ready(Box::new(state)));
+                }
+
+                if still_loading {
+                    return;
+                }
+
+                if let Some(CustomOutputEntry::Ready(state)) =
+                    self.output_states.get_mut(&key)
+                {
+                    match &mut state.resolved {
+                        CustomOutputResolved::Blank => {}
+                        CustomOutputResolved::Text(text) => {
+                            let content = Paragraph::new(text.clone())
+                                .block(block(config.clone(), String::new()));
+                            f.render_widget(content, layout_size);
+                        }
+                        CustomOutputResolved::Graphics(state) => {
+                            state.sync_updates();
+                            f.render_stateful_widget(
+                                StatefulImage::new().resize(Resize::Fit(None)),
+                                inner,
+                                &mut state.thread_protocol,
+                            );
+                        }
+                    }
+                }
             }
 
             CustomPanel::CustomLayout(layout) => {
