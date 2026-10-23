@@ -1,11 +1,11 @@
 use crate::app;
 use crate::ui;
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, criterion_group, criterion_main};
 use std::fs;
+use tui::Terminal;
 use tui::backend::CrosstermBackend;
 use tui::crossterm::execute;
 use tui::crossterm::terminal as term;
-use tui::Terminal;
 use xplr::runner::get_tty;
 use xplr::*;
 

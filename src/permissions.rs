@@ -90,11 +90,7 @@ impl Display for Permissions {
 impl Into<RWX> for Permissions {
     fn into(self) -> RWX {
         let bit = |bit: bool, chr: char| {
-            if bit {
-                chr
-            } else {
-                '-'
-            }
+            if bit { chr } else { '-' }
         };
 
         let ur = bit(self.user_read, 'r');

@@ -11,7 +11,7 @@ use crate::pwd_watcher;
 use crate::ui::NO_COLOR;
 use crate::ui::UI;
 use crate::yaml;
-use anyhow::{bail, Error, Result};
+use anyhow::{Error, Result, bail};
 use mlua::LuaSerdeExt;
 use mlua::Value;
 use std::fs;
@@ -20,13 +20,13 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::sync::mpsc;
+use tui::Terminal;
 use tui::backend::Backend;
 use tui::backend::ClearType;
 use tui::backend::CrosstermBackend;
 use tui::crossterm::event;
 use tui::crossterm::execute;
 use tui::crossterm::terminal as term;
-use tui::Terminal;
 use tui_input::Input;
 
 fn clear_terminal(terminal: &mut Terminal<CrosstermBackend<File>>) -> Result<()> {
@@ -340,10 +340,8 @@ impl Runner {
         let mut last_pwd = app.pwd.clone();
 
         let mut mouse_enabled = app.config.general.enable_mouse;
-        if mouse_enabled {
-            if let Err(e) = execute!(stdout, event::EnableMouseCapture) {
-                app = app.log_error(format!("could not enable mouse: {e}"))?;
-            }
+        if mouse_enabled && let Err(e) = execute!(stdout, event::EnableMouseCapture) {
+            app = app.log_error(format!("could not enable mouse: {e}"))?;
         }
 
         let backend = CrosstermBackend::new(stdout);

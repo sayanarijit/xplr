@@ -1,6 +1,6 @@
-use serde_yaml::with::singleton_map_recursive;
 pub use serde_yaml::Result;
 pub use serde_yaml::Value;
+use serde_yaml::with::singleton_map_recursive;
 
 pub fn to_string<T>(value: &T) -> Result<String>
 where

@@ -6,6 +6,9 @@ use crate::dirs;
 use crate::explorer;
 use crate::input::{InputOperation, Key};
 use crate::lua;
+pub use crate::msg::in_::ExternalMsg;
+pub use crate::msg::in_::InternalMsg;
+pub use crate::msg::in_::MsgIn;
 pub use crate::msg::in_::external::Command;
 pub use crate::msg::in_::external::ExplorerConfig;
 pub use crate::msg::in_::external::NodeFilter;
@@ -13,16 +16,13 @@ pub use crate::msg::in_::external::NodeFilterApplicable;
 use crate::msg::in_::external::NodeSearcherApplicable;
 pub use crate::msg::in_::external::NodeSorter;
 pub use crate::msg::in_::external::NodeSorterApplicable;
-pub use crate::msg::in_::ExternalMsg;
-pub use crate::msg::in_::InternalMsg;
-pub use crate::msg::in_::MsgIn;
 pub use crate::msg::out::MsgOut;
 pub use crate::node::Node;
 pub use crate::node::ResolvedNode;
 pub use crate::pipe::Pipe;
 use crate::search::SearchAlgorithm;
 use crate::ui::Layout;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use gethostname::gethostname;
 use indexmap::set::IndexSet;
 use path_absolutize::*;
@@ -300,18 +300,10 @@ impl App {
             Some(path)
         } else if let Some(dir) = dirs::config_dir() {
             let path = dir.join("xplr/init.lua");
-            if path.exists() {
-                Some(path)
-            } else {
-                None
-            }
+            if path.exists() { Some(path) } else { None }
         } else {
             let path = PathBuf::from("/etc/xplr/init.lua");
-            if path.exists() {
-                Some(path)
-            } else {
-                None
-            }
+            if path.exists() { Some(path) } else { None }
         };
 
         let config_files = config_file.into_iter().chain(extra_config_files);
@@ -392,14 +384,14 @@ impl App {
 
         let hostname = gethostname().to_string_lossy().to_string();
 
-        if let Some(vroot) = vroot.as_ref() {
-            if !pwd.starts_with(vroot) {
-                bail!(
-                    "{:?} is outside of virtual root {:?}",
-                    pwd.to_string_lossy(),
-                    vroot.to_string_lossy()
-                )
-            }
+        if let Some(vroot) = vroot.as_ref()
+            && !pwd.starts_with(vroot)
+        {
+            bail!(
+                "{:?} is outside of virtual root {:?}",
+                pwd.to_string_lossy(),
+                vroot.to_string_lossy()
+            )
         }
 
         let pwd = pwd.to_string_lossy().to_string();
@@ -798,18 +790,14 @@ impl App {
     pub fn focus_first(mut self, save_history: bool) -> Result<Self> {
         let mut history = self.history.clone();
         if let Some(dir) = self.directory_buffer_mut() {
-            if save_history {
-                if let Some(n) = dir.focused_node() {
-                    history = history.push(n.absolute_path.clone());
-                }
+            if save_history && let Some(n) = dir.focused_node() {
+                history = history.push(n.absolute_path.clone());
             }
 
             dir.focus = 0;
 
-            if save_history {
-                if let Some(n) = self.focused_node() {
-                    self.history = history.push(n.absolute_path.clone())
-                }
+            if save_history && let Some(n) = self.focused_node() {
+                self.history = history.push(n.absolute_path.clone())
             }
         };
         Ok(self)
@@ -919,11 +907,7 @@ impl App {
         let bounded = self.config.general.enforce_bounded_index_navigation;
         if let Some(dir) = self.directory_buffer_mut() {
             dir.focus = if (dir.focus + 1) == dir.total {
-                if bounded {
-                    dir.focus
-                } else {
-                    0
-                }
+                if bounded { dir.focus } else { 0 }
             } else {
                 dir.focus + 1
             }
@@ -947,11 +931,7 @@ impl App {
         {
             if let Some(idx) = self.selection.get_index_of(n) {
                 let idx = if idx + 1 == total {
-                    if bounded {
-                        idx
-                    } else {
-                        0
-                    }
+                    if bounded { idx } else { 0 }
                 } else {
                     idx + 1
                 };
@@ -1063,14 +1043,14 @@ impl App {
     fn change_directory(mut self, dir: &str, save_history: bool) -> Result<Self> {
         let dir = PathBuf::from(dir).absolutize()?.to_path_buf();
 
-        if let Some(vroot) = &self.vroot.clone() {
-            if !dir.starts_with(vroot) {
-                return self.log_error(format!(
-                    "{:?} is outside of virtual root {:?}",
-                    dir.to_string_lossy(),
-                    vroot,
-                ));
-            }
+        if let Some(vroot) = &self.vroot.clone()
+            && !dir.starts_with(vroot)
+        {
+            return self.log_error(format!(
+                "{:?} is outside of virtual root {:?}",
+                dir.to_string_lossy(),
+                vroot,
+            ));
         }
 
         match env::set_current_dir(&dir) {
@@ -1282,16 +1262,12 @@ impl App {
                 .find(|(_, n)| n.relative_path == name)
                 .map(|(i, _)| i)
             {
-                if save_history {
-                    if let Some(n) = dir_buf.focused_node() {
-                        history = history.push(n.absolute_path.clone());
-                    }
+                if save_history && let Some(n) = dir_buf.focused_node() {
+                    history = history.push(n.absolute_path.clone());
                 }
                 dir_buf.focus = focus;
-                if save_history {
-                    if let Some(n) = dir_buf.focused_node() {
-                        self.history = history.push(n.absolute_path.clone());
-                    }
+                if save_history && let Some(n) = dir_buf.focused_node() {
+                    self.history = history.push(n.absolute_path.clone());
                 }
                 Ok(self)
             } else {

@@ -1,6 +1,6 @@
 use crate::app::{HelpMenuLine, NodeFilterApplicable, NodeSorterApplicable};
 use crate::app::{Node, ResolvedNode};
-use crate::compat::{draw_custom_content, CustomContent};
+use crate::compat::{CustomContent, draw_custom_content};
 use crate::config::PanelUiConfig;
 use crate::lua;
 use crate::permissions::Permissions;
@@ -18,10 +18,11 @@ use std::collections::HashMap;
 use std::env;
 use std::ops::BitXor;
 use std::process::{Command, Stdio};
-use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::LazyLock;
+use std::sync::mpsc::{self, Receiver, Sender};
 use std::thread;
 use time::macros::format_description;
+use tui::Frame;
 use tui::layout::Rect as TuiRect;
 use tui::layout::{Constraint as TuiConstraint, Direction, Layout as TuiLayout};
 use tui::style::{Color as TuiColor, Modifier as TuiModifier, Style as TuiStyle};
@@ -30,7 +31,6 @@ use tui::widgets::{
     Block, BorderType as TuiBorderType, Borders as TuiBorders, Cell, List, ListItem,
     Paragraph, Row, Table,
 };
-use tui::Frame;
 
 const DEFAULT_STYLE: TuiStyle = TuiStyle::new();
 
@@ -1631,34 +1631,29 @@ impl UI<'_> {
                 let key = format!("{path}\u{1f}{}", fallback.as_deref().unwrap_or(""));
 
                 if std::fs::metadata(&path).is_err() {
-                    if let Some(fallback) = fallback.as_deref() {
-                        if !fallback.is_empty() {
-                            render_fallback_text(
-                                f,
-                                layout_size,
-                                config.clone(),
-                                fallback,
-                            );
-                        }
+                    if let Some(fallback) = fallback.as_deref()
+                        && !fallback.is_empty()
+                    {
+                        render_fallback_text(f, layout_size, config.clone(), fallback);
                     }
                     return;
                 }
 
-                if !self.graphics_states.contains_key(&key) {
-                    if let Some(picker) = self.image_picker.clone() {
-                        self.graphics_states.insert(
-                            key.clone(),
-                            CustomGraphicsEntry::Loading(
-                                CustomGraphicsState::spawn_loader(
-                                    self.tx_msg_in.clone(),
-                                    picker,
-                                    path.clone(),
-                                ),
-                                fallback.clone(),
+                if !self.graphics_states.contains_key(&key)
+                    && let Some(picker) = self.image_picker.clone()
+                {
+                    self.graphics_states.insert(
+                        key.clone(),
+                        CustomGraphicsEntry::Loading(
+                            CustomGraphicsState::spawn_loader(
+                                self.tx_msg_in.clone(),
+                                picker,
+                                path.clone(),
                             ),
-                        );
-                        return;
-                    }
+                            fallback.clone(),
+                        ),
+                    );
+                    return;
                 }
 
                 let mut ready = None;
@@ -1790,22 +1785,22 @@ impl UI<'_> {
                     fallback.as_deref().unwrap_or("")
                 );
 
-                if !self.output_states.contains_key(&key) {
-                    if let Some(picker) = self.image_picker.clone() {
-                        self.output_states.insert(
-                            key.clone(),
-                            CustomOutputEntry::Loading(
-                                CustomOutputState::spawn_loader(
-                                    self.tx_msg_in.clone(),
-                                    picker,
-                                    command.clone(),
-                                    fallback.clone(),
-                                ),
+                if !self.output_states.contains_key(&key)
+                    && let Some(picker) = self.image_picker.clone()
+                {
+                    self.output_states.insert(
+                        key.clone(),
+                        CustomOutputEntry::Loading(
+                            CustomOutputState::spawn_loader(
+                                self.tx_msg_in.clone(),
+                                picker,
+                                command.clone(),
                                 fallback.clone(),
                             ),
-                        );
-                        return;
-                    }
+                            fallback.clone(),
+                        ),
+                    );
+                    return;
                 }
 
                 let mut ready = None;

@@ -3,12 +3,13 @@
 
 use crate::app;
 use crate::lua;
-use crate::ui::block;
-use crate::ui::string_to_text;
 use crate::ui::Constraint;
 use crate::ui::ContentRendererArg;
 use crate::ui::UI;
+use crate::ui::block;
+use crate::ui::string_to_text;
 use serde::{Deserialize, Serialize};
+use tui::Frame;
 use tui::layout::Constraint as TuiConstraint;
 use tui::layout::Rect as TuiRect;
 use tui::widgets::Cell;
@@ -17,7 +18,6 @@ use tui::widgets::ListItem;
 use tui::widgets::Paragraph;
 use tui::widgets::Row;
 use tui::widgets::Table;
-use tui::Frame;
 
 /// A cursed enum from crate::ui.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

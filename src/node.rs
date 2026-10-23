@@ -1,5 +1,5 @@
 use crate::permissions::Permissions;
-use humansize::{format_size, DECIMAL};
+use humansize::{DECIMAL, format_size};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::os::unix::prelude::MetadataExt;

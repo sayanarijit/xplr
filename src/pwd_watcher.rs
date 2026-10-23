@@ -14,31 +14,33 @@ pub fn keep_watching(
     let mut pwd = PathBuf::from(pwd);
     let mut last_modified = pwd.metadata().and_then(|m| m.modified())?;
 
-    thread::spawn(move || loop {
-        if let Ok(new_pwd) = rx_pwd_watcher.try_recv() {
-            pwd = PathBuf::from(new_pwd);
-            last_modified = pwd
+    thread::spawn(move || {
+        loop {
+            if let Ok(new_pwd) = rx_pwd_watcher.try_recv() {
+                pwd = PathBuf::from(new_pwd);
+                last_modified = pwd
+                    .metadata()
+                    .and_then(|m| m.modified())
+                    .unwrap_or(last_modified)
+            } else if let Err(e) = pwd
                 .metadata()
-                .and_then(|m| m.modified())
-                .unwrap_or(last_modified)
-        } else if let Err(e) = pwd
-            .metadata()
-            .map_err(Error::new)
-            .and_then(|m| m.modified().map_err(Error::new))
-            .and_then(|modified| {
-                if modified != last_modified {
-                    last_modified = modified;
-                    let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
-                    tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
-                } else {
-                    thread::sleep(Duration::from_secs(1));
-                    Result::Ok(())
-                }
-            })
-        {
-            let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
-            tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
-            thread::sleep(Duration::from_secs(1));
+                .map_err(Error::new)
+                .and_then(|m| m.modified().map_err(Error::new))
+                .and_then(|modified| {
+                    if modified != last_modified {
+                        last_modified = modified;
+                        let msg = MsgIn::External(ExternalMsg::ExplorePwdAsync);
+                        tx_msg_in.send(Task::new(msg, None)).map_err(Error::new)
+                    } else {
+                        thread::sleep(Duration::from_secs(1));
+                        Result::Ok(())
+                    }
+                })
+            {
+                let msg = MsgIn::External(ExternalMsg::LogError(e.to_string()));
+                tx_msg_in.send(Task::new(msg, None)).unwrap_or_default();
+                thread::sleep(Duration::from_secs(1));
+            }
         }
     });
     Ok(())

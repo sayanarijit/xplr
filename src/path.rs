@@ -1,5 +1,5 @@
 use crate::dirs;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use serde::{Deserialize, Serialize};
 pub use snailquote::escape;
 use std::path::{Component, Path, PathBuf};

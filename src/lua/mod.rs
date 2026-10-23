@@ -1,14 +1,14 @@
 use crate::app::VERSION;
 use crate::config::Config;
 use crate::config::Hooks;
-use anyhow::bail;
 use anyhow::Error;
 use anyhow::Result;
-use mlua::serde::SerializeOptions;
+use anyhow::bail;
 use mlua::Lua;
 use mlua::LuaSerdeExt;
-use serde::de::DeserializeOwned;
+use mlua::serde::SerializeOptions;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::fs;
 
 pub mod util;

@@ -1,5 +1,5 @@
 use crate::{app, yaml};
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use app::ExternalMsg;
 use path_absolutize::*;
 use serde_json as json;

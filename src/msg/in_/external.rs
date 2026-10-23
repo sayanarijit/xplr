@@ -1530,11 +1530,7 @@ impl NodeSorterApplicable {
                 .map(|s| &s.last_modified)
                 .cmp(&b.symlink.as_ref().map(|s| &s.last_modified)),
         };
-        if self.reverse {
-            order.reverse()
-        } else {
-            order
-        }
+        if self.reverse { order.reverse() } else { order }
     }
 }
 
