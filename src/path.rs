@@ -1,13 +1,11 @@
 use crate::dirs;
 use anyhow::{bail, Result};
-use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 pub use snailquote::escape;
 use std::path::{Component, Path, PathBuf};
+use std::sync::LazyLock;
 
-lazy_static! {
-    pub static ref HOME: Option<PathBuf> = dirs::home_dir();
-}
+pub static HOME: LazyLock<Option<PathBuf>> = LazyLock::new(dirs::home_dir);
 
 // Stolen from https://github.com/Manishearth/pathdiff/blob/master/src/lib.rs
 pub fn diff<P, B>(path: P, base: B) -> Result<PathBuf>

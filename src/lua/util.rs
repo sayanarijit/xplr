@@ -13,7 +13,6 @@ use crate::ui::Layout;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
 use anyhow::Result;
-use lazy_static::lazy_static;
 use lscolors::LsColors;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -28,17 +27,17 @@ use serde_yaml as yaml;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::LazyLock;
 
-lazy_static! {
-    // NB: LsColors::from_env() falls back to built-in defaults when the
-    // variable is missing, and from_string("") keeps those defaults when
-    // it is empty, both of which would override the user's own style
-    // config. Start empty unless the user actually set LS_COLORS.
-    static ref LS_COLORS: LsColors = match std::env::var("LS_COLORS") {
+// NB: LsColors::from_env() falls back to built-in defaults when the
+// variable is missing, and from_string("") keeps those defaults when
+// it is empty, both of which would override the user's own style
+// config. Start empty unless the user actually set LS_COLORS.
+static LS_COLORS: LazyLock<LsColors> =
+    LazyLock::new(|| match std::env::var("LS_COLORS") {
         Ok(s) if !s.is_empty() => LsColors::from_string(&s),
         _ => LsColors::empty(),
-    };
-}
+    });
 
 /// Get the xplr version details.
 ///
