@@ -81,7 +81,8 @@ fn call(
         event_reader.stop();
 
         // Clear AND redraw the terminal surface
-        terminal.clear()?;
+        terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                   // TODO: revert to terminal.clear()?;
         terminal.set_cursor_position((0, 0))?;
         term::disable_raw_mode()?;
         terminal.show_cursor()?;
@@ -177,7 +178,8 @@ fn call(
 
     if !silent {
         // Clear AND redraw the terminal surface
-        terminal.clear()?;
+        terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                   // TODO: revert to terminal.clear()?;
         term::enable_raw_mode()?;
         terminal.hide_cursor()?;
         event_reader.start();
@@ -341,7 +343,8 @@ impl Runner {
         let mut terminal = Terminal::new(backend)?;
         terminal.hide_cursor()?;
         // Clear AND redraw the terminal surface
-        terminal.clear()?;
+        terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                   // TODO: revert to terminal.clear()?;
 
         // Threads
         pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
@@ -417,7 +420,8 @@ impl Runner {
 
                             ClearScreen => {
                                 // Clear AND redraw the terminal surface
-                                terminal.clear()?;
+                                terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                                           // TODO: revert to terminal.clear()?;
                             }
 
                             ScrollUp => {
@@ -626,7 +630,8 @@ impl Runner {
                                 event_reader.stop();
 
                                 // Clear AND redraw the terminal surface
-                                terminal.clear()?;
+                                terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                                           // TODO: revert to terminal.clear()?;
                                 terminal.set_cursor_position((0, 0))?;
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
@@ -642,7 +647,8 @@ impl Runner {
                                 };
 
                                 // Clear AND redraw the terminal surface
-                                terminal.clear()?;
+                                terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                                           // TODO: revert to terminal.clear()?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
                                 event_reader.start();
@@ -672,7 +678,8 @@ impl Runner {
                                 event_reader.stop();
 
                                 // Clear AND redraw the terminal surface
-                                terminal.clear()?;
+                                terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                                           // TODO: revert to terminal.clear()?;
                                 terminal.set_cursor_position((0, 0))?;
                                 term::disable_raw_mode()?;
                                 terminal.show_cursor()?;
@@ -719,7 +726,8 @@ impl Runner {
                                 };
 
                                 // Clear AND redraw the terminal surface
-                                terminal.clear()?;
+                                terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                                           // TODO: revert to terminal.clear()?;
                                 term::enable_raw_mode()?;
                                 terminal.hide_cursor()?;
                                 event_reader.start();
@@ -841,7 +849,8 @@ impl Runner {
         }
 
         // Clear AND redraw the terminal surface
-        terminal.clear()?;
+        terminal.resize(terminal.size()?.into())?; // https://github.com/sayanarijit/xplr/issues/790
+                                                   // TODO: revert to terminal.clear()?;
         terminal.set_cursor_position((0, 0))?;
         execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
         execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
