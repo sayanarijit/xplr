@@ -13,7 +13,6 @@ use crate::ui::Layout;
 use crate::ui::Style;
 use crate::ui::WrapOptions;
 use anyhow::Result;
-use lazy_static::lazy_static;
 use lscolors::LsColors;
 use mlua::Error as LuaError;
 use mlua::Lua;
@@ -28,10 +27,9 @@ use serde_yaml as yaml;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::LazyLock;
 
-lazy_static! {
-    static ref LS_COLORS: LsColors = LsColors::from_env().unwrap_or_default();
-}
+static LS_COLORS: LazyLock<LsColors> = LazyLock::new(|| LsColors::from_env().unwrap_or_default());
 
 /// Get the xplr version details.
 ///

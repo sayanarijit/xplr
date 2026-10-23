@@ -7,7 +7,6 @@ use crate::permissions::Permissions;
 use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
-use lazy_static::lazy_static;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
 use mlua::Lua;
 use ratatui_image::picker::Picker;
@@ -20,6 +19,7 @@ use std::env;
 use std::ops::BitXor;
 use std::process::{Command, Stdio};
 use std::sync::mpsc::{self, Receiver, Sender};
+use std::sync::LazyLock;
 use std::thread;
 use time::macros::format_description;
 use tui::layout::Rect as TuiRect;
@@ -34,9 +34,7 @@ use tui::Frame;
 
 const DEFAULT_STYLE: TuiStyle = TuiStyle::new();
 
-lazy_static! {
-    pub static ref NO_COLOR: bool = env::var("NO_COLOR").is_ok();
-}
+pub static NO_COLOR: LazyLock<bool> = LazyLock::new(|| env::var("NO_COLOR").is_ok());
 
 fn read_only_indicator(app: &app::App) -> &str {
     if app.config.general.read_only {

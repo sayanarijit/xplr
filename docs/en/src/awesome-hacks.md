@@ -418,7 +418,7 @@ Preview text files or images in a native xplr pane.
 <summary>Expand for details</summary>
 
 - Author: [@sayanarijit][8]
-- Requires: none
+- Requires: [bat][20], tree
 - Tested on: Linux, FreeBSD 13.1-RELEASE
 
 ```lua
@@ -567,3 +567,4 @@ xplr.config.modes.builtin.default.key_bindings.on_key['*'] = {
 [17]: https://sr.ht/~exec64/imv
 [18]: https://www.semicomplete.com/projects/xdotool
 [19]: https://github.com/mgunyho/tere
+[20]: https://github.com/sharkdp/bat

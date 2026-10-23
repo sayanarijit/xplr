@@ -45,19 +45,17 @@ time = { version = "0.3", features = [
 ] }
 jf = "1.0"
 xdg = "3.0"
-home = "0.5"
 rayon = "1.12"
 image = "0.25"
-ratatui-image = { version = "11.1", default-features = false, features = ["crossterm", "image-defaults"] }
+ratatui-image = { version = "11.1", default-features = false, features = [
+  "crossterm",
+  "image-defaults",
+] }
 
 [dependencies.lscolors]
 version = "0.21"
 default-features = false
 features = ["nu-ansi-term"]
-
-[dependencies.lazy_static]
-version = "1.5"
-default-features = false
 
 [dependencies.mime_guess]
 version = "2.0"
