@@ -319,6 +319,8 @@ the list of paths being displayed.</p>
 <li><a href="#customparagraph">CustomParagraph</a></li>
 <li><a href="#customlist">CustomList</a></li>
 <li><a href="#customtable">CustomTable</a></li>
+<li><a href="#customgraphics">CustomGraphics</a></li>
+<li><a href="#customoutput">CustomOutput</a></li>
 <li><a href="#customlayout">CustomLayout</a></li>
 </ul>
 <h3 id="customparagraph"><a class="header" href="#customparagraph">CustomParagraph</a></h3>
@@ -489,6 +491,57 @@ end
 │                                            │
 │                                            │
 ╰────────────────────────────────────────────╯
+</code></pre>
+<h2 id="customgraphics"><a class="header" href="#customgraphics">CustomGraphics</a></h2>
+<p>A graphics panel to render an image from a filesystem path. It contains the
+following fields:</p>
+<ul>
+<li><strong>ui</strong> (nullable <a href="#panel-ui-config">Panel UI Config</a>): Optional UI config for the panel.</li>
+<li><strong>path</strong> (nullable string): Path to the image file.</li>
+<li><strong>fallback</strong> (nullable string): Text to render when the image cannot be parsed.</li>
+</ul>
+<p>If the path is nil or empty, the panel is left blank. If the image cannot be
+parsed, the fallback is rendered when provided.</p>
+<h4 id="example-render-a-custom-static-image"><a class="header" href="#example-render-a-custom-static-image">Example: Render a custom static image</a></h4>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomGraphics = {
+      ui = { title = { format = &quot; image &quot; } },
+      path = &quot;/path/to/image.png&quot;,
+    },
+  },
+}
+</code></pre>
+<h3 id="customoutput"><a class="header" href="#customoutput">CustomOutput</a></h3>
+<p>A command-output panel to render the result of a command. It contains the
+following fields:</p>
+<ul>
+<li><strong>ui</strong> (nullable <a href="#panel-ui-config">Panel UI Config</a>): Optional UI config for the panel.</li>
+<li><strong>command</strong> (nullable list of string): Command and arguments to execute.</li>
+<li><strong>fallback</strong> (nullable string): Text to render when the command output cannot
+be parsed.</li>
+</ul>
+<p>If the command is nil or empty, the panel is left blank. If the command prints
+UTF-8 text, that text is rendered. If it prints image bytes, the image is
+rendered. If the command exits with a nonzero status, the fallback is rendered
+when provided; otherwise stderr is rendered. If successful output cannot be
+parsed, the fallback is rendered when provided.</p>
+<h4 id="example-render-a-custom-static-command-output"><a class="header" href="#example-render-a-custom-static-command-output">Example: Render a custom static command output</a></h4>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomOutput = {
+      ui = { title = { format = &quot; output &quot; } },
+      command = { &quot;sh&quot;, &quot;-lc&quot;, &quot;printf 'hello from xplr\\n'&quot; },
+    },
+  },
+}
+</code></pre>
+<p>Result:</p>
+<pre><code>╭ output ───────────────╮
+│hello from xplr        │
+│                       │
+│                       │
+╰───────────────────────╯
 </code></pre>
 <h3 id="customlayout"><a class="header" href="#customlayout">CustomLayout</a></h3>
 <p>A whole custom layout to render. It doesn't make sense to use it as a

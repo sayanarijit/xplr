@@ -1967,6 +1967,8 @@ the list of paths being displayed.</p>
 <li><a href="layout.html#customparagraph">CustomParagraph</a></li>
 <li><a href="layout.html#customlist">CustomList</a></li>
 <li><a href="layout.html#customtable">CustomTable</a></li>
+<li><a href="layout.html#customgraphics">CustomGraphics</a></li>
+<li><a href="layout.html#customoutput">CustomOutput</a></li>
 <li><a href="layout.html#customlayout">CustomLayout</a></li>
 </ul>
 <h3 id="customparagraph"><a class="header" href="#customparagraph">CustomParagraph</a></h3>
@@ -2137,6 +2139,57 @@ end
 │                                            │
 │                                            │
 ╰────────────────────────────────────────────╯
+</code></pre>
+<h2 id="customgraphics"><a class="header" href="#customgraphics">CustomGraphics</a></h2>
+<p>A graphics panel to render an image from a filesystem path. It contains the
+following fields:</p>
+<ul>
+<li><strong>ui</strong> (nullable <a href="layout.html#panel-ui-config">Panel UI Config</a>): Optional UI config for the panel.</li>
+<li><strong>path</strong> (nullable string): Path to the image file.</li>
+<li><strong>fallback</strong> (nullable string): Text to render when the image cannot be parsed.</li>
+</ul>
+<p>If the path is nil or empty, the panel is left blank. If the image cannot be
+parsed, the fallback is rendered when provided.</p>
+<h4 id="example-render-a-custom-static-image"><a class="header" href="#example-render-a-custom-static-image">Example: Render a custom static image</a></h4>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomGraphics = {
+      ui = { title = { format = &quot; image &quot; } },
+      path = &quot;/path/to/image.png&quot;,
+    },
+  },
+}
+</code></pre>
+<h3 id="customoutput"><a class="header" href="#customoutput">CustomOutput</a></h3>
+<p>A command-output panel to render the result of a command. It contains the
+following fields:</p>
+<ul>
+<li><strong>ui</strong> (nullable <a href="layout.html#panel-ui-config">Panel UI Config</a>): Optional UI config for the panel.</li>
+<li><strong>command</strong> (nullable list of string): Command and arguments to execute.</li>
+<li><strong>fallback</strong> (nullable string): Text to render when the command output cannot
+be parsed.</li>
+</ul>
+<p>If the command is nil or empty, the panel is left blank. If the command prints
+UTF-8 text, that text is rendered. If it prints image bytes, the image is
+rendered. If the command exits with a nonzero status, the fallback is rendered
+when provided; otherwise stderr is rendered. If successful output cannot be
+parsed, the fallback is rendered when provided.</p>
+<h4 id="example-render-a-custom-static-command-output"><a class="header" href="#example-render-a-custom-static-command-output">Example: Render a custom static command output</a></h4>
+<pre><code class="language-lua">xplr.config.layouts.builtin.default = {
+  Static = {
+    CustomOutput = {
+      ui = { title = { format = &quot; output &quot; } },
+      command = { &quot;sh&quot;, &quot;-lc&quot;, &quot;printf 'hello from xplr\\n'&quot; },
+    },
+  },
+}
+</code></pre>
+<p>Result:</p>
+<pre><code>╭ output ───────────────╮
+│hello from xplr        │
+│                       │
+│                       │
+╰───────────────────────╯
 </code></pre>
 <h3 id="customlayout"><a class="header" href="#customlayout">CustomLayout</a></h3>
 <p>A whole custom layout to render. It doesn't make sense to use it as a
@@ -5023,64 +5076,62 @@ imv-msg &quot;$IMV_PID&quot; quit
 [ -e &quot;$FIFO_PATH&quot; ] &amp;&amp; rm -f -- &quot;$FIFO_PATH&quot;
 </code></pre>
 </details>
-<h3 id="text-preview-pane"><a class="header" href="#text-preview-pane">Text preview pane</a></h3>
-<p>Preview text files in a native xplr pane (should be fast enough).</p>
+<h3 id="text-and-image-preview-pane"><a class="header" href="#text-and-image-preview-pane">Text and image preview pane</a></h3>
+<p>Preview text files or images in a native xplr pane.</p>
 <details>
 <summary>Expand for details</summary>
 <ul>
 <li>Author: <a href="https://github.com/sayanarijit">@sayanarijit</a></li>
-<li>Requires: none</li>
+<li>Requires: <a href="https://github.com/sharkdp/bat">bat</a>, tree</li>
 <li>Tested on: Linux, FreeBSD 13.1-RELEASE</li>
 </ul>
-<pre><code class="language-lua">local function stat(node)
-  return xplr.util.to_yaml(xplr.util.node(node.absolute_path))
-end
-
-local function read(path, height)
-  local p = io.open(path)
-
-  if p == nil then
-    return nil
-  end
-
-  local i = 0
-  local res = &quot;&quot;
-  for line in p:lines() do
-    if line:match(&quot;[^ -~\n\t]&quot;) then
-      p:close()
-      return
-    end
-
-    res = res .. line .. &quot;\n&quot;
-    if i == height then
-      break
-    end
-    i = i + 1
-  end
-  p:close()
-
-  return res
-end
-
-xplr.fn.custom.preview_pane = {}
+<pre><code class="language-lua">xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
-  local title = nil
-  local body = &quot;&quot;
   local n = ctx.app.focused_node
   if n and n.canonical then
     n = n.canonical
   end
 
   if n then
-    title = { format = n.absolute_path, style = xplr.util.lscolor(n.absolute_path) }
-    if n.is_file then
-      body = read(n.absolute_path, ctx.layout_size.height) or stat(n)
+    local fallback = xplr.util.to_yaml(xplr.util.node(n.absolute_path))
+    if n.is_dir then
+      return {
+        CustomOutput = {
+          ui = { title = { format = &quot; 📁 &quot; } },
+          command = { &quot;tree&quot;, &quot;-x&quot;, &quot;-C&quot;, &quot;-L&quot;, &quot;2&quot;, n.absolute_path },
+          fallback = fallback,
+        },
+      }
+    elseif n.mime_essence and n.mime_essence:match(&quot;^image/&quot;) then
+      return {
+        CustomGraphics = {
+          ui = { title = { format = &quot; 🖼️ &quot; } },
+          path = n.absolute_path,
+          fallback = fallback,
+        },
+      }
+    elseif n.is_file then
+      return {
+        CustomOutput = {
+          ui = { title = { format = &quot; 📄 &quot; } },
+          command = {
+            &quot;bat&quot;,
+            &quot;-f&quot;,
+            &quot;--binary=as-text&quot;,
+            string.format(&quot;--line-range=:%s&quot;, ctx.layout_size.height),
+            string.format(&quot;--terminal-width=%s&quot;, ctx.layout_size.width),
+            n.absolute_path,
+          },
+          fallback = fallback,
+        },
+      }
     else
-      body = stat(n)
+      return {
+        CustomParagraph = { ui = { title = { format = &quot; 🤷 &quot; } }, body = fallback },
+      }
     end
   end
-
-  return { CustomParagraph = { ui = { title = title }, body = body } }
+  return { CustomParagraph = { ui = { title = { format = &quot; 🚫 &quot; } }, body = &quot;&quot; } }
 end
 
 local preview_pane = { Dynamic = &quot;custom.preview_pane.render&quot; }
@@ -5100,7 +5151,7 @@ local split_preview = {
 }
 
 xplr.config.layouts.builtin.default =
-    xplr.util.layout_replace(xplr.config.layouts.builtin.default, &quot;Table&quot;, split_preview)
+  xplr.util.layout_replace(xplr.config.layouts.builtin.default, &quot;Table&quot;, split_preview)
 </code></pre>
 </details>
 <h3 id="tere-navigation"><a class="header" href="#tere-navigation">Tere Navigation</a></h3>
