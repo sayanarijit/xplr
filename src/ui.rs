@@ -1607,12 +1607,6 @@ impl UI<'_> {
             }
 
             CustomPanel::CustomGraphics { ui, path, fallback } => {
-                if self.image_picker.is_none() {
-                    self.image_picker = Some(
-                        Picker::from_query_stdio()
-                            .unwrap_or_else(|_| Picker::halfblocks()),
-                    );
-                }
                 let config = defaultui.extend(&ui);
                 let panel_block = block(config.clone(), String::new());
                 let inner = panel_block.inner(layout_size);
@@ -1629,6 +1623,13 @@ impl UI<'_> {
                 }
 
                 let key = format!("{path}\u{1f}{}", fallback.as_deref().unwrap_or(""));
+
+                if self.image_picker.is_none() {
+                    self.image_picker = Some(
+                        Picker::from_query_stdio()
+                            .unwrap_or_else(|_| Picker::halfblocks()),
+                    );
+                }
 
                 if std::fs::metadata(&path).is_err() {
                     if let Some(fallback) = fallback.as_deref()
@@ -1784,6 +1785,13 @@ impl UI<'_> {
                     command.join("\u{1f}"),
                     fallback.as_deref().unwrap_or("")
                 );
+
+                if self.image_picker.is_none() {
+                    self.image_picker = Some(
+                        Picker::from_query_stdio()
+                            .unwrap_or_else(|_| Picker::halfblocks()),
+                    );
+                }
 
                 if !self.output_states.contains_key(&key)
                     && let Some(picker) = self.image_picker.clone()
