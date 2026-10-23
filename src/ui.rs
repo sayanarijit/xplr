@@ -950,7 +950,7 @@ pub struct UI<'lua> {
     pub screen_size: TuiRect,
     pub scrolltop: usize,
     tx_msg_in: Sender<app::Task>,
-    image_picker: Picker,
+    image_picker: Option<Picker>,
     graphics_states: HashMap<String, CustomGraphicsEntry>,
     output_states: HashMap<String, CustomOutputEntry>,
 }
@@ -959,14 +959,12 @@ impl<'lua> UI<'lua> {
     pub fn new(lua: &'lua Lua, tx_msg_in: Sender<app::Task>) -> Self {
         let screen_size = Default::default();
         let scrolltop = 0;
-        let image_picker =
-            Picker::from_query_stdio().unwrap_or_else(|_| Picker::halfblocks());
         Self {
             lua,
             scrolltop,
             screen_size,
             tx_msg_in,
-            image_picker,
+            image_picker: None,
             graphics_states: HashMap::new(),
             output_states: HashMap::new(),
         }
@@ -1609,6 +1607,12 @@ impl UI<'_> {
             }
 
             CustomPanel::CustomGraphics { ui, path, fallback } => {
+                if self.image_picker.is_none() {
+                    self.image_picker = Some(
+                        Picker::from_query_stdio()
+                            .unwrap_or_else(|_| Picker::halfblocks()),
+                    );
+                }
                 let config = defaultui.extend(&ui);
                 let panel_block = block(config.clone(), String::new());
                 let inner = panel_block.inner(layout_size);
@@ -1641,18 +1645,20 @@ impl UI<'_> {
                 }
 
                 if !self.graphics_states.contains_key(&key) {
-                    self.graphics_states.insert(
-                        key.clone(),
-                        CustomGraphicsEntry::Loading(
-                            CustomGraphicsState::spawn_loader(
-                                self.tx_msg_in.clone(),
-                                self.image_picker.clone(),
-                                path.clone(),
+                    if let Some(picker) = self.image_picker.clone() {
+                        self.graphics_states.insert(
+                            key.clone(),
+                            CustomGraphicsEntry::Loading(
+                                CustomGraphicsState::spawn_loader(
+                                    self.tx_msg_in.clone(),
+                                    picker,
+                                    path.clone(),
+                                ),
+                                fallback.clone(),
                             ),
-                            fallback.clone(),
-                        ),
-                    );
-                    return;
+                        );
+                        return;
+                    }
                 }
 
                 let mut ready = None;
@@ -1785,19 +1791,21 @@ impl UI<'_> {
                 );
 
                 if !self.output_states.contains_key(&key) {
-                    self.output_states.insert(
-                        key.clone(),
-                        CustomOutputEntry::Loading(
-                            CustomOutputState::spawn_loader(
-                                self.tx_msg_in.clone(),
-                                self.image_picker.clone(),
-                                command.clone(),
+                    if let Some(picker) = self.image_picker.clone() {
+                        self.output_states.insert(
+                            key.clone(),
+                            CustomOutputEntry::Loading(
+                                CustomOutputState::spawn_loader(
+                                    self.tx_msg_in.clone(),
+                                    picker,
+                                    command.clone(),
+                                    fallback.clone(),
+                                ),
                                 fallback.clone(),
                             ),
-                            fallback.clone(),
-                        ),
-                    );
-                    return;
+                        );
+                        return;
+                    }
                 }
 
                 let mut ready = None;

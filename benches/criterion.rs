@@ -97,8 +97,9 @@ fn draw_benchmark(c: &mut Criterion) {
         fs::File::create(std::path::Path::new(PWD).join(i.to_string())).unwrap();
     });
 
+    let (tx, _) = std::sync::mpsc::channel();
     let lua = mlua::Lua::new();
-    let mut ui = ui::UI::new(&lua);
+    let mut ui = ui::UI::new(&lua, tx);
     let mut app =
         app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into())
             .expect("failed to create app");
