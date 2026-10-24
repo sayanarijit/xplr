@@ -7,7 +7,7 @@ use crate::event_reader::EventReader;
 use crate::explorer;
 use crate::lua;
 use crate::pipe;
-use crate::pwd_watcher;
+use crate::pwd_watcher::PwdWatcher;
 use crate::ui::NO_COLOR;
 use crate::ui::UI;
 use crate::yaml;
@@ -62,150 +62,6 @@ fn get_current_dir() -> Result<PathBuf, std::io::Error> {
     }
 }
 
-fn call_lua_heavy(
-    app: &app::App,
-    lua: &mlua::Lua,
-    func: &str,
-    _silent: bool,
-) -> Result<Option<Vec<app::ExternalMsg>>> {
-    let arg = app.to_lua_ctx_heavy();
-    let arg = lua::serialize(lua, &arg)?;
-    lua::call(lua, func, arg)
-}
-
-fn call(
-    mut app: app::App,
-    cmd: app::Command,
-    silent: bool,
-    terminal: &mut Terminal<CrosstermBackend<File>>,
-    event_reader: &mut EventReader,
-    mouse_enabled: &mut bool,
-    delimiter: char,
-) -> Result<app::App> {
-    if !silent {
-        if *mouse_enabled {
-            execute!(terminal.backend_mut(), event::DisableMouseCapture)
-                .unwrap_or_default();
-        }
-
-        event_reader.stop();
-
-        // Clear AND redraw the terminal surface
-        clear_terminal(terminal)?;
-        term::disable_raw_mode()?;
-        terminal.show_cursor()?;
-    }
-
-    app.write_pipes(delimiter)?;
-    let focus_index = app
-        .directory_buffer
-        .as_ref()
-        .map(|d| d.focus)
-        .unwrap_or_default()
-        .to_string();
-
-    let (stdin, stdout, stderr) = if silent {
-        (Stdio::null(), Stdio::null(), Stdio::null())
-    } else {
-        (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
-    };
-
-    let input_buffer = app
-        .input
-        .buffer
-        .as_ref()
-        .map(Input::to_string)
-        .unwrap_or_default();
-
-    let mut command = Command::new(cmd.command.clone());
-    command
-        .env("XPLR", &app.bin)
-        .env("XPLR_VROOT", app.vroot.clone().unwrap_or_default())
-        .env("XPLR_APP_VERSION", &app.version)
-        .env("XPLR_PID", app.pid.to_string())
-        .env("XPLR_INPUT_BUFFER", input_buffer)
-        .env("XPLR_INITIAL_PWD", &app.initial_pwd)
-        .env("XPLR_FOCUS_PATH", app.focused_node_str())
-        .env("XPLR_FOCUS_INDEX", focus_index)
-        .env("XPLR_SESSION_PATH", &app.session_path)
-        .env("XPLR_PIPE_MSG_IN", &app.pipe.msg_in)
-        .env("XPLR_PIPE_SELECTION_OUT", &app.pipe.selection_out)
-        .env("XPLR_PIPE_HISTORY_OUT", &app.pipe.history_out)
-        .env("XPLR_MODE", app.mode_str())
-        .env("XPLR_PIPE_RESULT_OUT", &app.pipe.result_out)
-        .env(
-            "XPLR_PIPE_GLOBAL_HELP_MENU_OUT",
-            &app.pipe.global_help_menu_out,
-        )
-        .env(
-            "XPLR_PIPE_DIRECTORY_NODES_OUT",
-            &app.pipe.directory_nodes_out,
-        )
-        .env("XPLR_PIPE_LOGS_OUT", &app.pipe.logs_out)
-        .stdin(stdin)
-        .stdout(stdout)
-        .stderr(stderr)
-        .args(cmd.args);
-
-    // Run silent commands in their own process group so that processes they
-    // leave behind (e.g. `cmd &`) are not in xplr's foreground process group
-    // and survive the terminal emulator closing after xplr quits (see #764).
-    // Interactive commands keep xplr's process group so terminal signals
-    // like Ctrl-C are still delivered to them.
-    #[cfg(unix)]
-    if silent {
-        use std::os::unix::process::CommandExt;
-        command.process_group(0);
-    }
-
-    let status = command
-        .status()
-        .map(|s| {
-            if s.success() {
-                Ok(())
-            } else {
-                Err(format!("process exited with code {s}"))
-            }
-        })
-        .unwrap_or_else(|e| Err(e.to_string()));
-
-    match pipe::read_all(&app.pipe.msg_in, delimiter) {
-        Ok(msgs) => {
-            app = app.handle_batch_external_msgs(msgs)?;
-        }
-        Err(err) => {
-            app = app.log_error(err.to_string())?;
-        }
-    };
-
-    app.cleanup_pipes()?;
-
-    if let Err(e) = status {
-        app = app.log_error(e)?;
-    };
-
-    if !silent {
-        // Clear AND redraw the terminal surface
-        clear_terminal(terminal)?;
-        term::enable_raw_mode()?;
-        terminal.hide_cursor()?;
-        event_reader.start();
-
-        if *mouse_enabled {
-            match execute!(terminal.backend_mut(), event::EnableMouseCapture) {
-                Ok(_) => {
-                    *mouse_enabled = true;
-                }
-                Err(e) => {
-                    app = app.log_error(e.to_string())?;
-                }
-            }
-        }
-    }
-
-    Ok(app)
-}
-
 fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
     match fs::OpenOptions::new().write(true).open(path) {
         Ok(mut file) => {
@@ -217,17 +73,18 @@ fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
 }
 
 pub struct Runner {
-    bin: String,
-    vroot: Option<PathBuf>,
-    pwd: PathBuf,
-    focused_path: Option<PathBuf>,
-    config_file: Option<PathBuf>,
-    extra_config_files: Vec<PathBuf>,
-    on_load: Vec<app::ExternalMsg>,
-    read_only: bool,
+    app: app::App,
+    lua: mlua::Lua,
+    ui: UI,
     print_pwd_as_result: bool,
-    selection: Vec<PathBuf>,
     delimiter: char,
+    pwd_watcher: PwdWatcher,
+    event_reader: EventReader,
+    task_sender: mpsc::Sender<app::Task>,
+    task_receiver: mpsc::Receiver<app::Task>,
+    terminal: Terminal<CrosstermBackend<File>>,
+    mouse_enabled: bool,
+    fifo: Option<fs::File>,
 }
 
 impl Runner {
@@ -244,55 +101,49 @@ impl Runner {
             .next()
             .or_else(|| cli.vroot.clone())
             .unwrap_or_else(|| currdir.clone());
-        let mut focused_path = None;
+        let mut focused_path: Option<PathBuf> = None;
 
         if cli.force_focus || pwd.is_file() {
             focused_path = pwd.file_name().map(|p| p.into());
             pwd = pwd.parent().map(|p| p.into()).unwrap_or(currdir);
         }
 
-        Ok(Self {
-            bin: cli.bin,
-            vroot: cli.vroot,
-            pwd,
-            focused_path,
-            config_file: cli.config,
-            extra_config_files: cli.extra_config,
-            on_load: cli.on_load,
-            read_only: cli.read_only,
-            print_pwd_as_result: cli.print_pwd_as_result,
-            selection: paths.collect(),
-            delimiter: if cli.write0 { '\0' } else { '\n' },
-        })
-    }
+        let (task_sender, task_receiver) = mpsc::channel();
+        let mut pwd_watcher = PwdWatcher::new(task_sender.clone());
+        let mut event_reader = EventReader::new(task_sender.clone());
 
-    /// Run the instance
-    pub fn run(self) -> Result<Option<String>> {
+        // Use a tty to enable piping results
+        let stdout = get_tty()?;
+        // let stdout = io::stdout();
+        // let mut stdout = stdout.lock();
+        let backend = CrosstermBackend::new(stdout);
+        let mut terminal = Terminal::new(backend)?;
+
         // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
         let lua = unsafe { mlua::Lua::unsafe_new() };
+        let ui = UI::new(task_sender.clone());
         let mut app = app::App::create(
-            self.bin,
-            self.vroot,
-            self.pwd,
+            cli.bin.clone(),
+            cli.vroot.clone(),
+            pwd.clone(),
             &lua,
-            self.config_file,
-            self.extra_config_files,
+            cli.config.clone(),
+            cli.extra_config.clone(),
         )?;
-        app.config.general.read_only = self.read_only;
+
+        if !app.config.general.read_only {
+            app.config.general.read_only = cli.read_only;
+        }
 
         fs::create_dir_all(app.session_path.clone())?;
 
-        let (tx_msg_in, rx_msg_in) = mpsc::channel();
-        let (tx_pwd_watcher, rx_pwd_watcher) = mpsc::channel();
+        app.explore_pwd()?;
 
-        app = app.explore_pwd()?;
-
-        for file in self.selection {
-            app = app.select_path(file.to_string_lossy().to_string())?;
+        for path in paths {
+            app.select_path(path.to_string_lossy().to_string())?;
         }
 
-        app = if let Some(f) = self
-            .focused_path
+        if let Some(f) = focused_path
             .clone()
             .map(|f| f.to_string_lossy().to_string())
         {
@@ -304,31 +155,21 @@ impl Runner {
         explorer::explore_recursive_async(
             app.explorer_config.clone(),
             app.pwd.clone().into(),
-            self.focused_path,
+            focused_path.clone(),
             app.directory_buffer.as_ref().map(|d| d.focus).unwrap_or(0),
-            tx_msg_in.clone(),
+            task_sender.clone(),
         );
-        tx_pwd_watcher.send(app.pwd.clone())?;
-
-        let mut result = Ok(None);
-        let session_path = app.session_path.clone();
 
         term::enable_raw_mode()?;
+        execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
 
-        // Use a tty to enable piping results
-        let mut stdout = get_tty()?;
-        // let stdout = io::stdout();
-        // let mut stdout = stdout.lock();
-        execute!(stdout, term::EnterAlternateScreen)?;
-
-        let mut fifo: Option<fs::File> =
+        let fifo: Option<fs::File> =
             if let Some(path) = app.config.general.start_fifo.clone() {
                 // TODO remove duplicate segment
                 match start_fifo(&path, &app.focused_node_str()) {
                     Ok(file) => Some(file),
                     Err(e) => {
-                        app = app
-                            .log_error(format!("could not start fifo {path:?}: {e}"))?;
+                        app.log_error(format!("could not start fifo {path:?}: {e}"))?;
                         None
                     }
                 }
@@ -336,50 +177,63 @@ impl Runner {
                 None
             };
 
-        let mut last_focus: Option<app::Node> = None;
-        let mut last_pwd = app.pwd.clone();
-
-        let mut mouse_enabled = app.config.general.enable_mouse;
-        if mouse_enabled && let Err(e) = execute!(stdout, event::EnableMouseCapture) {
-            app = app.log_error(format!("could not enable mouse: {e}"))?;
+        let mouse_enabled = app.config.general.enable_mouse;
+        if mouse_enabled
+            && let Err(e) = execute!(terminal.backend_mut(), event::EnableMouseCapture)
+        {
+            app.log_error(format!("could not enable mouse: {e}"))?;
         }
 
-        let backend = CrosstermBackend::new(stdout);
-        let mut terminal = Terminal::new(backend)?;
         terminal.hide_cursor()?;
         // Clear AND redraw the terminal surface
         clear_terminal(&mut terminal)?;
 
-        // UI
-        // Picker::from_query_stdio() should run before terminal event reading starts,
-        // otherwise graphics protocol detection can fall back to lower fidelity mode.
-        let mut ui = UI::new(&lua, tx_msg_in.clone());
-
         // Threads
-        pwd_watcher::keep_watching(app.pwd.as_ref(), tx_msg_in.clone(), rx_pwd_watcher)?;
-        let mut event_reader = EventReader::new(tx_msg_in.clone());
+        pwd_watcher.start(app.pwd.as_ref());
         event_reader.start();
 
         // Enqueue on_load messages
-        for msg in app.hooks.on_load.iter().chain(self.on_load.iter()) {
-            tx_msg_in.send(app::Task::new(app::MsgIn::External(msg.clone()), None))?;
+        for msg in app.hooks.on_load.iter().chain(cli.on_load.iter()) {
+            task_sender.send(app::Task::new(app::MsgIn::External(msg.clone()), None))?;
         }
 
         // Refresh screen once after loading
-        tx_msg_in.send(app::Task::new(
+        task_sender.send(app::Task::new(
             app::MsgIn::External(app::ExternalMsg::Refresh),
             None,
         ))?;
 
-        'outer: for task in rx_msg_in {
-            match app.handle_task(task) {
-                Ok(a) => {
-                    app = a;
-                    while let Some(msg) = app.msg_out.pop_front() {
+        Ok(Self {
+            app,
+            lua,
+            ui,
+            print_pwd_as_result: cli.print_pwd_as_result,
+            delimiter: if cli.write0 { '\0' } else { '\n' },
+            task_sender,
+            task_receiver,
+            pwd_watcher,
+            event_reader,
+            terminal,
+            mouse_enabled: false,
+            fifo,
+        })
+    }
+
+    /// Run the instance
+    pub fn run(mut self) -> Result<Option<String>> {
+        let mut result = Ok(None);
+        let session_path = self.app.session_path.clone();
+        let mut last_focus: Option<app::Node> = None;
+        let mut last_pwd = self.app.pwd.clone();
+
+        'outer: while let Ok(task) = self.task_receiver.recv() {
+            match self.app.handle_task(task) {
+                Ok(()) => {
+                    while let Some(msg) = self.app.msg_out.pop_front() {
                         use app::MsgOut::*;
                         match msg {
                             Enqueue(task) => {
-                                tx_msg_in.send(task)?;
+                                self.task_sender.send(task)?;
                             }
 
                             Quit => {
@@ -388,156 +242,168 @@ impl Runner {
                             }
 
                             PrintPwdAndQuit => {
-                                result = Ok(Some(app.pwd_str(self.delimiter)));
+                                result = Ok(Some(self.app.pwd_str(self.delimiter)));
                                 break 'outer;
                             }
 
                             PrintFocusPathAndQuit => {
-                                result = Ok(app.focused_node().map(|n| {
+                                result = Ok(self.app.focused_node().map(|n| {
                                     format!("{}{}", n.absolute_path, self.delimiter)
                                 }));
                                 break 'outer;
                             }
 
                             PrintSelectionAndQuit => {
-                                result = Ok(Some(app.selection_str(self.delimiter)));
+                                result =
+                                    Ok(Some(self.app.selection_str(self.delimiter)));
                                 break 'outer;
                             }
 
                             PrintResultAndQuit => {
                                 result = if self.print_pwd_as_result {
-                                    Ok(Some(app.pwd_str(self.delimiter)))
+                                    Ok(Some(self.app.pwd_str(self.delimiter)))
                                 } else {
-                                    Ok(Some(app.result_str(self.delimiter)))
+                                    Ok(Some(self.app.result_str(self.delimiter)))
                                 };
 
                                 break 'outer;
                             }
 
                             PrintAppStateAndQuit => {
-                                let out = yaml::to_string(&app)?;
+                                let out = yaml::to_string(&self.app)?;
                                 result = Ok(Some(out));
                                 break 'outer;
                             }
 
                             Debug(path) => {
-                                fs::write(path, yaml::to_string(&app)?)?;
+                                fs::write(path, yaml::to_string(&self.app)?)?;
                             }
 
                             ClearScreen => {
                                 // Clear AND redraw the terminal surface
-                                clear_terminal(&mut terminal)?;
+                                clear_terminal(&mut self.terminal)?;
                             }
 
                             ScrollUp => {
-                                app = app.focus_previous_by_relative_index(
-                                    terminal.size()?.height as usize,
+                                self.app.focus_previous_by_relative_index(
+                                    self.terminal.size()?.height as usize,
                                 )?;
                             }
 
                             ScrollDown => {
-                                app = app.focus_next_by_relative_index(
-                                    terminal.size()?.height as usize,
+                                self.app.focus_next_by_relative_index(
+                                    self.terminal.size()?.height as usize,
                                 )?;
                             }
 
                             ScrollUpHalf => {
-                                app = app.focus_previous_by_relative_index(
-                                    terminal.size()?.height as usize / 2,
+                                self.app.focus_previous_by_relative_index(
+                                    self.terminal.size()?.height as usize / 2,
                                 )?;
                             }
 
                             ScrollDownHalf => {
-                                app = app.focus_next_by_relative_index(
-                                    terminal.size()?.height as usize / 2,
+                                self.app.focus_next_by_relative_index(
+                                    self.terminal.size()?.height as usize / 2,
                                 )?;
                             }
 
                             ExplorePwdAsync => {
                                 explorer::explore_async(
-                                    app.explorer_config.clone(),
-                                    app.pwd.clone().into(),
-                                    app.focused_node()
+                                    self.app.explorer_config.clone(),
+                                    self.app.pwd.clone().into(),
+                                    self.app
+                                        .focused_node()
                                         .map(|n| n.relative_path.clone().into()),
-                                    app.directory_buffer
+                                    self.app
+                                        .directory_buffer
                                         .as_ref()
                                         .map(|d| d.focus)
                                         .unwrap_or(0),
-                                    tx_msg_in.clone(),
+                                    self.task_sender.clone(),
                                 );
-                                tx_pwd_watcher.send(app.pwd.clone())?;
+                                self.pwd_watcher.update_pwd(self.app.pwd.as_ref());
                             }
 
                             ExploreParentsAsync => {
                                 explorer::explore_recursive_async(
-                                    app.explorer_config.clone(),
-                                    app.pwd.clone().into(),
-                                    app.focused_node()
+                                    self.app.explorer_config.clone(),
+                                    self.app.pwd.clone().into(),
+                                    self.app
+                                        .focused_node()
                                         .map(|n| n.relative_path.clone().into()),
-                                    app.directory_buffer
+                                    self.app
+                                        .directory_buffer
                                         .as_ref()
                                         .map(|d| d.focus)
                                         .unwrap_or(0),
-                                    tx_msg_in.clone(),
+                                    self.task_sender.clone(),
                                 );
-                                tx_pwd_watcher.send(app.pwd.clone())?;
+                                self.pwd_watcher.update_pwd(self.app.pwd.as_ref());
                             }
 
                             Refresh => {
-                                let focus = app.focused_node();
+                                let focus = self.app.focused_node();
                                 if focus != last_focus.as_ref() {
                                     last_focus = focus.cloned();
 
                                     // Fifo
-                                    if let Some(ref mut file) = fifo {
-                                        writeln!(file, "{}", app.focused_node_str())?;
+                                    if let Some(ref mut file) = self.fifo {
+                                        writeln!(
+                                            file,
+                                            "{}",
+                                            self.app.focused_node_str()
+                                        )?;
                                     };
 
                                     // Hooks
-                                    if !app.hooks.on_focus_change.is_empty() {
-                                        let msgs = app.hooks.on_focus_change.clone();
-                                        app = app.handle_batch_external_msgs(msgs)?
+                                    if !self.app.hooks.on_focus_change.is_empty() {
+                                        let msgs =
+                                            self.app.hooks.on_focus_change.clone();
+                                        self.app.handle_batch_external_msgs(msgs)?
                                     }
                                 }
 
-                                if app.pwd != last_pwd {
-                                    last_pwd.clone_from(&app.pwd);
+                                if self.app.pwd != last_pwd {
+                                    last_pwd.clone_from(&self.app.pwd);
 
                                     // $PWD watcher
-                                    tx_pwd_watcher.send(app.pwd.clone())?;
+                                    self.pwd_watcher.update_pwd(self.app.pwd.as_ref());
 
                                     // OSC 7: Change CWD
                                     if !(*NO_COLOR) {
                                         write!(
-                                            terminal.backend_mut(),
+                                            self.terminal.backend_mut(),
                                             "\x1b]7;file://{}{}\x1b\\",
-                                            app.hostname,
-                                            app.pwd
+                                            self.app.hostname,
+                                            self.app.pwd
                                         )?;
                                     }
 
                                     // Hooks
-                                    if !app.hooks.on_directory_change.is_empty() {
-                                        let msgs = app.hooks.on_directory_change.clone();
-                                        app = app.handle_batch_external_msgs(msgs)?
+                                    if !self.app.hooks.on_directory_change.is_empty() {
+                                        let msgs =
+                                            self.app.hooks.on_directory_change.clone();
+                                        self.app.handle_batch_external_msgs(msgs)?
                                     }
                                 }
 
                                 // UI
-                                terminal.draw(|f| ui.draw(f, &app))?;
+                                self.terminal
+                                    .draw(|f| self.ui.draw(f, &self.app, &self.lua))?;
                             }
 
                             EnableMouse => {
-                                if !mouse_enabled {
+                                if !self.mouse_enabled {
                                     match execute!(
-                                        terminal.backend_mut(),
+                                        self.terminal.backend_mut(),
                                         event::EnableMouseCapture
                                     ) {
                                         Ok(_) => {
-                                            mouse_enabled = true;
+                                            self.mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(format!(
+                                            self.app.log_error(format!(
                                                 "could not enable mouse: {e}"
                                             ))?;
                                         }
@@ -546,28 +412,28 @@ impl Runner {
                             }
 
                             ToggleMouse => {
-                                let msg = if mouse_enabled {
+                                let msg = if self.mouse_enabled {
                                     app::ExternalMsg::DisableMouse
                                 } else {
                                     app::ExternalMsg::EnableMouse
                                 };
-                                app = app.handle_task(app::Task::new(
+                                self.app.handle_task(app::Task::new(
                                     app::MsgIn::External(msg),
                                     None,
                                 ))?;
                             }
 
                             DisableMouse => {
-                                if mouse_enabled {
+                                if self.mouse_enabled {
                                     match execute!(
-                                        terminal.backend_mut(),
+                                        self.terminal.backend_mut(),
                                         event::DisableMouseCapture
                                     ) {
                                         Ok(_) => {
-                                            mouse_enabled = false;
+                                            self.mouse_enabled = false;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(format!(
+                                            self.app.log_error(format!(
                                                 "could not disable mouse: {e}"
                                             ))?;
                                         }
@@ -576,95 +442,98 @@ impl Runner {
                             }
 
                             StartFifo(path) => {
-                                fifo = match start_fifo(&path, &app.focused_node_str()) {
-                                    Ok(file) => Some(file),
-                                    Err(e) => {
-                                        app = app.log_error(format!(
-                                            "could not start fifo {path:?}: {e}"
-                                        ))?;
-                                        None
+                                self.fifo =
+                                    match start_fifo(&path, &self.app.focused_node_str())
+                                    {
+                                        Ok(file) => Some(file),
+                                        Err(e) => {
+                                            self.app.log_error(format!(
+                                                "could not start fifo {path:?}: {e}"
+                                            ))?;
+                                            None
+                                        }
                                     }
-                                }
                             }
 
                             StopFifo => {
-                                if let Some(file) = fifo {
-                                    fifo = None;
+                                if let Some(file) = self.fifo {
+                                    self.fifo = None;
                                     std::mem::drop(file);
                                 }
                             }
 
                             ToggleFifo(path) => {
-                                if let Some(file) = fifo {
-                                    fifo = None;
+                                if let Some(file) = self.fifo {
+                                    self.fifo = None;
                                     std::mem::drop(file);
                                 } else {
-                                    fifo =
-                                        match start_fifo(&path, &app.focused_node_str())
-                                        {
-                                            Ok(file) => Some(file),
-                                            Err(e) => {
-                                                app = app.log_error(format!(
-                                                    "could not toggle fifo {path:?}: {e}"
-                                                ))?;
-                                                None
-                                            }
+                                    self.fifo = match start_fifo(
+                                        &path,
+                                        &self.app.focused_node_str(),
+                                    ) {
+                                        Ok(file) => Some(file),
+                                        Err(e) => {
+                                            self.app.log_error(format!(
+                                                "could not toggle fifo {path:?}: {e}"
+                                            ))?;
+                                            None
                                         }
+                                    }
                                 }
                             }
 
                             CallLuaSilently(func) => {
-                                match call_lua_heavy(&app, &lua, &func, false) {
+                                match self.call_lua_heavy(&func, false) {
                                     Ok(Some(msgs)) => {
-                                        app = app.handle_batch_external_msgs(msgs)?;
+                                        self.app.handle_batch_external_msgs(msgs)?;
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        self.app.log_error(err.to_string())?;
                                     }
                                 };
                             }
 
                             CallLua(func) => {
                                 execute!(
-                                    terminal.backend_mut(),
+                                    self.terminal.backend_mut(),
                                     event::DisableMouseCapture
                                 )
                                 .unwrap_or_default();
 
-                                event_reader.stop();
+                                self.event_reader.stop();
 
                                 // Clear AND redraw the terminal surface
-                                clear_terminal(&mut terminal)?;
+                                clear_terminal(&mut self.terminal)?;
                                 term::disable_raw_mode()?;
-                                terminal.show_cursor()?;
+                                self.terminal.show_cursor()?;
 
-                                match call_lua_heavy(&app, &lua, &func, false) {
+                                match self.call_lua_heavy(&func, false) {
                                     Ok(Some(msgs)) => {
-                                        app = app.handle_batch_external_msgs(msgs)?;
+                                        self.app.handle_batch_external_msgs(msgs)?;
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        self.app.log_error(err.to_string())?;
                                     }
                                 };
 
                                 // Clear AND redraw the terminal surface
-                                clear_terminal(&mut terminal)?;
+                                clear_terminal(&mut self.terminal)?;
                                 term::enable_raw_mode()?;
-                                terminal.hide_cursor()?;
-                                event_reader.start();
+                                self.terminal.hide_cursor()?;
+                                self.event_reader.start();
 
-                                if mouse_enabled {
+                                if self.mouse_enabled {
                                     match execute!(
-                                        terminal.backend_mut(),
+                                        self.terminal.backend_mut(),
                                         event::EnableMouseCapture
                                     ) {
                                         Ok(_) => {
-                                            mouse_enabled = true;
+                                            self.mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            self.app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -672,75 +541,76 @@ impl Runner {
 
                             LuaEval(code) => {
                                 execute!(
-                                    terminal.backend_mut(),
+                                    self.terminal.backend_mut(),
                                     event::DisableMouseCapture
                                 )
                                 .unwrap_or_default();
 
-                                event_reader.stop();
+                                self.event_reader.stop();
 
                                 // Clear AND redraw the terminal surface
-                                clear_terminal(&mut terminal)?;
+                                clear_terminal(&mut self.terminal)?;
                                 term::disable_raw_mode()?;
-                                terminal.show_cursor()?;
+                                self.terminal.show_cursor()?;
 
                                 let res: Result<Value> =
-                                    lua.load(&code).eval().map_err(Error::from);
+                                    self.lua.load(&code).eval().map_err(Error::from);
 
                                 match res {
                                     Ok(Value::Function(f)) => {
-                                        let arg = app.to_lua_ctx_heavy();
-                                        let res: Result<Option<Vec<ExternalMsg>>> = lua
+                                        let arg = self.app.to_lua_ctx_heavy();
+                                        let res: Result<Option<Vec<ExternalMsg>>> = self
+                                            .lua
                                             .to_value(&arg)
                                             .and_then(|a| f.call(a))
-                                            .and_then(|v| lua.from_value(v))
+                                            .and_then(|v| self.lua.from_value(v))
                                             .map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                app = app
+                                                self.app
                                                     .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(err.to_string())?;
+                                                self.app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
                                     Ok(v) => {
                                         let res: Result<Option<Vec<ExternalMsg>>> =
-                                            lua.from_value(v).map_err(Error::from);
+                                            self.lua.from_value(v).map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                app = app
+                                                self.app
                                                     .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(err.to_string())?;
+                                                self.app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        self.app.log_error(err.to_string())?;
                                     }
                                 };
 
                                 // Clear AND redraw the terminal surface
-                                clear_terminal(&mut terminal)?;
+                                clear_terminal(&mut self.terminal)?;
                                 term::enable_raw_mode()?;
-                                terminal.hide_cursor()?;
-                                event_reader.start();
+                                self.terminal.hide_cursor()?;
+                                self.event_reader.start();
 
-                                if mouse_enabled {
+                                if self.mouse_enabled {
                                     match execute!(
-                                        terminal.backend_mut(),
+                                        self.terminal.backend_mut(),
                                         event::EnableMouseCapture
                                     ) {
                                         Ok(_) => {
-                                            mouse_enabled = true;
+                                            self.mouse_enabled = true;
                                         }
                                         Err(e) => {
-                                            app = app.log_error(e.to_string())?;
+                                            self.app.log_error(e.to_string())?;
                                         }
                                     }
                                 }
@@ -748,93 +618,62 @@ impl Runner {
 
                             LuaEvalSilently(code) => {
                                 let res: Result<Value> =
-                                    lua.load(&code).eval().map_err(Error::from);
+                                    self.lua.load(&code).eval().map_err(Error::from);
 
                                 match res {
                                     Ok(Value::Function(f)) => {
-                                        let arg = app.to_lua_ctx_heavy();
-                                        let res: Result<Option<Vec<ExternalMsg>>> = lua
+                                        let arg = self.app.to_lua_ctx_heavy();
+                                        let res: Result<Option<Vec<ExternalMsg>>> = self
+                                            .lua
                                             .to_value(&arg)
                                             .and_then(|a| f.call(a))
-                                            .and_then(|v| lua.from_value(v))
+                                            .and_then(|v| self.lua.from_value(v))
                                             .map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                app = app
+                                                self.app
                                                     .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(err.to_string())?;
+                                                self.app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
                                     Ok(v) => {
                                         let res: Result<Option<Vec<ExternalMsg>>> =
-                                            lua.from_value(v).map_err(Error::from);
+                                            self.lua.from_value(v).map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                app = app
+                                                self.app
                                                     .handle_batch_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
-                                                app = app.log_error(err.to_string())?;
+                                                self.app.log_error(err.to_string())?;
                                             }
                                         }
                                     }
                                     Err(err) => {
-                                        app = app.log_error(err.to_string())?;
+                                        self.app.log_error(err.to_string())?;
                                     }
                                 };
                             }
 
                             Call(cmd) => {
-                                app = call(
-                                    app,
-                                    cmd,
-                                    false,
-                                    &mut terminal,
-                                    &mut event_reader,
-                                    &mut mouse_enabled,
-                                    '\n',
-                                )?;
+                                self.call(cmd, false)?;
                             }
 
                             Call0(cmd) => {
-                                app = call(
-                                    app,
-                                    cmd,
-                                    false,
-                                    &mut terminal,
-                                    &mut event_reader,
-                                    &mut mouse_enabled,
-                                    '\0',
-                                )?;
+                                self.call(cmd, false)?;
                             }
 
                             CallSilently(cmd) => {
-                                app = call(
-                                    app,
-                                    cmd,
-                                    true,
-                                    &mut terminal,
-                                    &mut event_reader,
-                                    &mut mouse_enabled,
-                                    '\n',
-                                )?;
+                                self.call(cmd, true)?;
                             }
 
                             CallSilently0(cmd) => {
-                                app = call(
-                                    app,
-                                    cmd,
-                                    true,
-                                    &mut terminal,
-                                    &mut event_reader,
-                                    &mut mouse_enabled,
-                                    '\0',
-                                )?;
+                                self.call(cmd, true)?;
                             }
                         };
                     }
@@ -848,15 +687,155 @@ impl Runner {
         }
 
         // Clear AND redraw the terminal surface
-        clear_terminal(&mut terminal)?;
-        execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
-        execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
+        clear_terminal(&mut self.terminal)?;
+        execute!(self.terminal.backend_mut(), term::LeaveAlternateScreen)?;
+        execute!(self.terminal.backend_mut(), event::DisableMouseCapture)
+            .unwrap_or_default();
         term::disable_raw_mode()?;
-        terminal.show_cursor()?;
+        self.terminal.show_cursor()?;
+        self.pwd_watcher.stop_async();
+        self.event_reader.stop();
 
         fs::remove_dir_all(session_path)?;
 
         result
+    }
+
+    fn call_lua_heavy(
+        &self,
+        func: &str,
+        _silent: bool,
+    ) -> Result<Option<Vec<app::ExternalMsg>>> {
+        let arg = self.app.to_lua_ctx_heavy();
+        let arg = lua::serialize(&self.lua, &arg)?;
+        lua::call(&self.lua, func, arg)
+    }
+
+    fn call(&mut self, cmd: app::Command, silent: bool) -> Result<()> {
+        if !silent {
+            if self.mouse_enabled {
+                execute!(self.terminal.backend_mut(), event::DisableMouseCapture)
+                    .unwrap_or_default();
+            }
+
+            self.event_reader.stop();
+
+            // Clear AND redraw the terminal surface
+            clear_terminal(&mut self.terminal)?;
+            term::disable_raw_mode()?;
+            self.terminal.show_cursor()?;
+        }
+
+        self.app.write_pipes(self.delimiter)?;
+        let focus_index = self
+            .app
+            .directory_buffer
+            .as_ref()
+            .map(|d| d.focus)
+            .unwrap_or_default()
+            .to_string();
+
+        let (stdin, stdout, stderr) = if silent {
+            (Stdio::null(), Stdio::null(), Stdio::null())
+        } else {
+            (get_tty()?.into(), get_tty()?.into(), get_tty()?.into())
+        };
+
+        let input_buffer = self
+            .app
+            .input
+            .buffer
+            .as_ref()
+            .map(Input::to_string)
+            .unwrap_or_default();
+
+        let mut command = Command::new(cmd.command.clone());
+        command
+            .env("XPLR", &self.app.bin)
+            .env("XPLR_VROOT", self.app.vroot.clone().unwrap_or_default())
+            .env("XPLR_APP_VERSION", &self.app.version)
+            .env("XPLR_PID", self.app.pid.to_string())
+            .env("XPLR_INPUT_BUFFER", input_buffer)
+            .env("XPLR_INITIAL_PWD", &self.app.initial_pwd)
+            .env("XPLR_FOCUS_PATH", self.app.focused_node_str())
+            .env("XPLR_FOCUS_INDEX", focus_index)
+            .env("XPLR_SESSION_PATH", &self.app.session_path)
+            .env("XPLR_PIPE_MSG_IN", &self.app.pipe.msg_in)
+            .env("XPLR_PIPE_SELECTION_OUT", &self.app.pipe.selection_out)
+            .env("XPLR_PIPE_HISTORY_OUT", &self.app.pipe.history_out)
+            .env("XPLR_MODE", self.app.mode_str())
+            .env("XPLR_PIPE_RESULT_OUT", &self.app.pipe.result_out)
+            .env(
+                "XPLR_PIPE_GLOBAL_HELP_MENU_OUT",
+                &self.app.pipe.global_help_menu_out,
+            )
+            .env(
+                "XPLR_PIPE_DIRECTORY_NODES_OUT",
+                &self.app.pipe.directory_nodes_out,
+            )
+            .env("XPLR_PIPE_LOGS_OUT", &self.app.pipe.logs_out)
+            .stdin(stdin)
+            .stdout(stdout)
+            .stderr(stderr)
+            .args(cmd.args);
+
+        // Run silent commands in their own process group so that processes they
+        // leave behind (e.g. `cmd &`) are not in xplr's foreground process group
+        // and survive the terminal emulator closing after xplr quits (see #764).
+        // Interactive commands keep xplr's process group so terminal signals
+        // like Ctrl-C are still delivered to them.
+        #[cfg(unix)]
+        if silent {
+            use std::os::unix::process::CommandExt;
+            command.process_group(0);
+        }
+
+        let status = command
+            .status()
+            .map(|s| {
+                if s.success() {
+                    Ok(())
+                } else {
+                    Err(format!("process exited with code {s}"))
+                }
+            })
+            .unwrap_or_else(|e| Err(e.to_string()));
+
+        match pipe::read_all(&self.app.pipe.msg_in, self.delimiter) {
+            Ok(msgs) => {
+                self.app.handle_batch_external_msgs(msgs)?;
+            }
+            Err(err) => {
+                self.app.log_error(err.to_string())?;
+            }
+        };
+
+        self.app.cleanup_pipes()?;
+
+        if let Err(e) = status {
+            self.app.log_error(e)?;
+        };
+
+        if !silent {
+            // Clear AND redraw the terminal surface
+            clear_terminal(&mut self.terminal)?;
+            term::enable_raw_mode()?;
+            self.terminal.hide_cursor()?;
+            self.event_reader.start();
+
+            if self.mouse_enabled {
+                match execute!(self.terminal.backend_mut(), event::EnableMouseCapture) {
+                    Ok(_) => {
+                        self.mouse_enabled = true;
+                    }
+                    Err(e) => {
+                        self.app.log_error(e.to_string())?;
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 

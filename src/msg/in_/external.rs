@@ -1859,32 +1859,20 @@ impl NodeSearcherApplicable {
         }
     }
 
-    pub fn enable_search_order(self) -> Self {
-        Self {
-            unordered: false,
-            ..self
-        }
+    pub fn enable_search_order(&mut self) {
+        self.unordered = false;
     }
 
-    pub fn disable_search_order(self) -> Self {
-        Self {
-            unordered: true,
-            ..self
-        }
+    pub fn disable_search_order(&mut self) {
+        self.unordered = true;
     }
 
-    pub fn toggle_search_order(self) -> Self {
-        Self {
-            unordered: !self.unordered,
-            ..self
-        }
+    pub fn toggle_search_order(&mut self) {
+        self.unordered = !self.unordered;
     }
 
-    pub fn toggle_algorithm(self) -> Self {
-        Self {
-            algorithm: self.algorithm.toggle(),
-            ..self
-        }
+    pub fn toggle_algorithm(&mut self) {
+        self.algorithm = self.algorithm.toggle();
     }
 }
 
