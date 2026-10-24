@@ -26,10 +26,7 @@ impl EventReader {
         let (tx_stopper, rx_stopper) = mpsc::channel();
         let (tx_ack, rx_ack) = mpsc::channel();
         self.stopper = Some((tx_stopper, rx_ack));
-
-        thread::spawn(move || {
-            keep_reading(sender, rx_stopper, tx_ack);
-        });
+        thread::spawn(move || keep_reading(sender, rx_stopper, tx_ack));
     }
 
     pub(crate) fn stop(&self) {

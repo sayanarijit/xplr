@@ -65,6 +65,7 @@ pub fn draw_custom_content(
     layout_size: TuiRect,
     app: &app::App,
     content: CustomContent,
+    lua: &mlua::Lua,
 ) {
     let config = app.config.general.panel_ui.default.clone();
     let title = content.title;
@@ -88,9 +89,9 @@ pub fn draw_custom_content(
                 scrolltop: ui.scrolltop as u16,
             };
 
-            let render = lua::serialize(ui.lua, &ctx)
+            let render = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call(ui.lua, &render, arg).unwrap_or_else(|e| format!("{e:?}"))
+                    lua::call(lua, &render, arg).unwrap_or_else(|e| format!("{e:?}"))
                 })
                 .unwrap_or_else(|e| e.to_string());
 
@@ -125,9 +126,9 @@ pub fn draw_custom_content(
                 scrolltop: ui.scrolltop as u16,
             };
 
-            let items = lua::serialize(ui.lua, &ctx)
+            let items = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call(ui.lua, &render, arg)
+                    lua::call(lua, &render, arg)
                         .unwrap_or_else(|e| vec![format!("{e:?}")])
                 })
                 .unwrap_or_else(|e| vec![e.to_string()])
@@ -187,9 +188,9 @@ pub fn draw_custom_content(
                 scrolltop: ui.scrolltop as u16,
             };
 
-            let rows = lua::serialize(ui.lua, &ctx)
+            let rows = lua::serialize(lua, &ctx)
                 .map(|arg| {
-                    lua::call(ui.lua, &render, arg)
+                    lua::call(lua, &render, arg)
                         .unwrap_or_else(|e| vec![vec![format!("{e:?}")]])
                 })
                 .unwrap_or_else(|e| vec![vec![e.to_string()]])

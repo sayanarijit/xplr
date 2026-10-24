@@ -8,7 +8,6 @@ use crate::{app, path};
 use ansi_to_tui::IntoText;
 use indexmap::IndexSet;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
-use mlua::Lua;
 use ratatui_image::picker::Picker;
 use ratatui_image::thread::{ResizeRequest, ResizeResponse, ThreadProtocol};
 use ratatui_image::{Resize, StatefulImage};
@@ -945,8 +944,7 @@ pub fn block<'a>(config: PanelUiConfig, default_title: String) -> Block<'a> {
         .border_style(config.border_style)
 }
 
-pub struct UI<'lua> {
-    pub lua: &'lua Lua,
+pub struct UI {
     pub screen_size: TuiRect,
     pub scrolltop: usize,
     tx_msg_in: Sender<app::Task>,
@@ -955,12 +953,11 @@ pub struct UI<'lua> {
     output_states: HashMap<String, CustomOutputEntry>,
 }
 
-impl<'lua> UI<'lua> {
-    pub fn new(lua: &'lua Lua, tx_msg_in: Sender<app::Task>) -> Self {
+impl UI {
+    pub fn new(tx_msg_in: Sender<app::Task>) -> Self {
         let screen_size = Default::default();
         let scrolltop = 0;
         Self {
-            lua,
             scrolltop,
             screen_size,
             tx_msg_in,
@@ -971,8 +968,14 @@ impl<'lua> UI<'lua> {
     }
 }
 
-impl UI<'_> {
-    fn draw_table(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+impl UI {
+    fn draw_table(
+        &mut self,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+        lua: &mlua::Lua,
+    ) {
         let panel_config = &app.config.general.panel_ui;
         let config = panel_config.default.clone().extend(&panel_config.table);
         let app_config = app.config.clone();
@@ -1086,7 +1089,7 @@ impl UI<'_> {
                             style,
                         );
 
-                        let cols = lua::serialize::<NodeUiMetadata>(self.lua, &meta)
+                        let cols = lua::serialize::<NodeUiMetadata>(lua, &meta)
                             .map(|v| {
                                 app_config
                                     .general
@@ -1098,7 +1101,7 @@ impl UI<'_> {
                                     .iter()
                                     .filter_map(|c| {
                                         c.format.as_ref().map(|f| {
-                                            let out = lua::call(self.lua, f, v.clone())
+                                            let out = lua::call(lua, f, v.clone())
                                                 .unwrap_or_else(|e| format!("{e:?}"));
                                             (string_to_text(out), c.style.clone())
                                         })
@@ -1176,7 +1179,13 @@ impl UI<'_> {
         f.render_widget(table, layout_size);
     }
 
-    fn draw_selection(&mut self, f: &mut Frame, layout_size: TuiRect, app: &app::App) {
+    fn draw_selection(
+        &mut self,
+        f: &mut Frame,
+        layout_size: TuiRect,
+        app: &app::App,
+        lua: &mlua::Lua,
+    ) {
         let panel_config = &app.config.general.panel_ui;
         let config = panel_config.default.clone().extend(&panel_config.selection);
 
@@ -1197,8 +1206,8 @@ impl UI<'_> {
                     .format
                     .as_ref()
                     .map(|f| {
-                        lua::serialize::<Node>(self.lua, n)
-                            .and_then(|n| lua::call(self.lua, f, n))
+                        lua::serialize::<Node>(lua, n)
+                            .and_then(|n| lua::call(lua, f, n))
                             .unwrap_or_else(|e| format!("{e:?}"))
                     })
                     .unwrap_or_else(|| n.absolute_path.clone());
@@ -1528,6 +1537,7 @@ impl UI<'_> {
         layout_size: TuiRect,
         app: &app::App,
         func: &str,
+        lua: &mlua::Lua,
     ) {
         let ctx = ContentRendererArg {
             app: app.to_lua_ctx_light(),
@@ -1536,14 +1546,14 @@ impl UI<'_> {
             scrolltop: self.scrolltop as u16,
         };
 
-        let panel: CustomPanel = lua::serialize(self.lua, &ctx)
-            .and_then(|arg| lua::call(self.lua, func, arg))
+        let panel: CustomPanel = lua::serialize(lua, &ctx)
+            .and_then(|arg| lua::call(lua, func, arg))
             .unwrap_or_else(|e| CustomPanel::CustomParagraph {
                 ui: app.config.general.panel_ui.default.clone(),
                 body: format!("{e:?}"),
             });
 
-        self.draw_static(f, layout_size, app, panel);
+        self.draw_static(f, layout_size, app, panel, lua);
     }
 
     fn draw_static(
@@ -1552,6 +1562,7 @@ impl UI<'_> {
         layout_size: TuiRect,
         app: &app::App,
         panel: CustomPanel,
+        lua: &mlua::Lua,
     ) {
         let defaultui = app.config.general.panel_ui.default.clone();
         match panel {
@@ -1933,7 +1944,7 @@ impl UI<'_> {
             }
 
             CustomPanel::CustomLayout(layout) => {
-                self.draw_layout(layout, f, layout_size, app);
+                self.draw_layout(layout, f, layout_size, app, lua);
             }
         }
     }
@@ -1944,13 +1955,14 @@ impl UI<'_> {
         f: &mut Frame,
         layout_size: TuiRect,
         app: &app::App,
+        lua: &mlua::Lua,
     ) {
         match layout {
             Layout::Nothing => self.draw_nothing(f, layout_size, app),
-            Layout::Table => self.draw_table(f, layout_size, app),
+            Layout::Table => self.draw_table(f, layout_size, app, lua),
             Layout::SortAndFilter => self.draw_sort_n_filter(f, layout_size, app),
             Layout::HelpMenu => self.draw_help_menu(f, layout_size, app),
-            Layout::Selection => self.draw_selection(f, layout_size, app),
+            Layout::Selection => self.draw_selection(f, layout_size, app, lua),
             Layout::InputAndLogs => {
                 if app.input.buffer.is_some() {
                     self.draw_input_buffer(f, layout_size, app);
@@ -1958,10 +1970,12 @@ impl UI<'_> {
                     self.draw_logs(f, layout_size, app);
                 };
             }
-            Layout::Static(panel) => self.draw_static(f, layout_size, app, *panel),
-            Layout::Dynamic(ref func) => self.draw_dynamic(f, layout_size, app, func),
+            Layout::Static(panel) => self.draw_static(f, layout_size, app, *panel, lua),
+            Layout::Dynamic(ref func) => {
+                self.draw_dynamic(f, layout_size, app, func, lua)
+            }
             Layout::CustomContent(content) => {
-                draw_custom_content(self, f, layout_size, app, *content)
+                draw_custom_content(self, f, layout_size, app, *content, lua)
             }
             Layout::Horizontal { config, splits } => {
                 let chunks = TuiLayout::default()
@@ -1989,7 +2003,9 @@ impl UI<'_> {
                 splits
                     .into_iter()
                     .zip(chunks.iter())
-                    .for_each(|(split, chunk)| self.draw_layout(split, f, *chunk, app));
+                    .for_each(|(split, chunk)| {
+                        self.draw_layout(split, f, *chunk, app, lua)
+                    });
             }
 
             Layout::Vertical { config, splits } => {
@@ -2018,15 +2034,17 @@ impl UI<'_> {
                 splits
                     .into_iter()
                     .zip(chunks.iter())
-                    .for_each(|(split, chunk)| self.draw_layout(split, f, *chunk, app));
+                    .for_each(|(split, chunk)| {
+                        self.draw_layout(split, f, *chunk, app, lua)
+                    });
             }
         }
     }
 
-    pub fn draw(&mut self, f: &mut Frame, app: &app::App) {
+    pub fn draw(&mut self, f: &mut Frame, app: &app::App, lua: &mlua::Lua) {
         self.screen_size = f.area();
         let layout = app.mode.layout.as_ref().unwrap_or(&app.layout).clone();
-        self.draw_layout(layout, f, self.screen_size, app);
+        self.draw_layout(layout, f, self.screen_size, app, lua);
     }
 }
 
