@@ -966,6 +966,7 @@ pub struct UI {
 /// we fall back to the universally supported `FullColor` ANSI mode for those.
 fn detect_display_mode() -> DisplayMode {
     let mode = get_terminal_protocol().builder().full().colored().build();
+    // TODO: Support Kitty/iTerm2/WezTerm/Sixel
     if mode.is_normal() {
         mode
     } else {
