@@ -6,11 +6,12 @@ use crate::lua;
 use crate::permissions::Permissions;
 use crate::{app, path};
 use ansi_to_tui::IntoText;
+use image::GenericImageView;
+use image_to_console_core::processor::{ImageProcessor, ImageProcessorOptions};
+use image_to_console_core::protocol::get_terminal_protocol;
+use image_to_console_core::{CustomResizeOption, DisplayMode, ResizeMode};
 use indexmap::IndexSet;
 use lscolors::{Color as LsColorsColor, Style as LsColorsStyle};
-use ratatui_image::picker::Picker;
-use ratatui_image::thread::{ResizeRequest, ResizeResponse, ThreadProtocol};
-use ratatui_image::{Resize, StatefulImage};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -168,58 +169,76 @@ enum CustomOutputEntry {
 }
 
 struct CustomGraphicsState {
-    thread_protocol: ThreadProtocol,
-    rx_responses: Receiver<Result<ResizeResponse, ratatui_image::errors::Errors>>,
+    text: Text<'static>,
 }
 
 impl CustomGraphicsState {
     fn from_image(
-        tx_msg_in: Sender<app::Task>,
-        picker: Picker,
         image: image::DynamicImage,
-    ) -> Self {
-        let (tx_requests, rx_requests) = mpsc::channel::<ResizeRequest>();
-        let (tx_responses, rx_responses) =
-            mpsc::channel::<Result<ResizeResponse, ratatui_image::errors::Errors>>();
-        let tx_refresh = tx_msg_in.clone();
-
-        thread::spawn(move || {
-            while let Ok(request) = rx_requests.recv() {
-                let completed = request.resize_encode();
-                let _ = tx_responses.send(completed);
-                let _ = tx_refresh.send(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::Refresh),
-                    None,
-                ));
-            }
-        });
-
-        Self {
-            thread_protocol: ThreadProtocol::new(
-                tx_requests,
-                Some(picker.new_resize_protocol(image)),
-            ),
-            rx_responses,
+        cols: u16,
+        rows: u16,
+        mode: DisplayMode,
+    ) -> Result<Self, ()> {
+        if cols == 0 || rows == 0 {
+            return Err(());
         }
+
+        let (img_width, img_height) = image.dimensions();
+        if img_width == 0 || img_height == 0 {
+            return Err(());
+        }
+
+        // "Full" display modes pack 2 vertical pixel rows into each terminal
+        // row (half-block rendering), while "half" modes map 1 pixel row to 1
+        // terminal row. Either way, each pixel column maps to 1 terminal
+        // column, so the available "pixel" box is cols x (rows * row_ratio).
+        let row_ratio = if mode.is_full() { 2.0 } else { 1.0 };
+        let box_width = cols as f64;
+        let box_height = rows as f64 * row_ratio;
+        let scale = (box_width / img_width as f64).min(box_height / img_height as f64);
+
+        let target_width =
+            ((img_width as f64 * scale).round() as u32).clamp(1, cols as u32);
+        let target_height = ((img_height as f64 * scale).round() as u32)
+            .clamp(1, (rows as f64 * row_ratio) as u32);
+
+        let options = ImageProcessorOptions {
+            mode,
+            resize_mode: ResizeMode::Custom(CustomResizeOption::new(
+                target_width,
+                target_height,
+            )),
+            center: false,
+            ..ImageProcessorOptions::default()
+        };
+
+        let result = ImageProcessor::new(image, options)
+            .process()
+            .map_err(|_| ())?;
+
+        Ok(Self {
+            text: string_to_text_owned(result.lines.join("\n")),
+        })
     }
 
     fn spawn_loader(
         tx_msg_in: Sender<app::Task>,
-        picker: Picker,
         path: String,
+        cols: u16,
+        rows: u16,
+        mode: DisplayMode,
     ) -> Receiver<Result<Self, ()>> {
         let (tx_ready, rx_ready) = mpsc::channel();
-        let tx_refresh = tx_msg_in.clone();
 
         thread::spawn(move || {
             let state = image::ImageReader::open(&path)
                 .ok()
                 .and_then(|reader| reader.decode().ok())
-                .map(|image| Self::from_image(tx_msg_in, picker, image))
-                .ok_or(());
+                .ok_or(())
+                .and_then(|image| Self::from_image(image, cols, rows, mode));
 
             let _ = tx_ready.send(state);
-            let _ = tx_refresh.send(app::Task::new(
+            let _ = tx_msg_in.send(app::Task::new(
                 app::MsgIn::External(app::ExternalMsg::Refresh),
                 None,
             ));
@@ -227,25 +246,15 @@ impl CustomGraphicsState {
 
         rx_ready
     }
-
-    fn sync_updates(&mut self) {
-        while let Ok(completed) = self.rx_responses.try_recv() {
-            match completed {
-                Ok(completed) => {
-                    let _ = self.thread_protocol.update_resized_protocol(completed);
-                }
-                Err(_) => self.thread_protocol.empty_protocol(),
-            }
-        }
-    }
 }
 
 impl CustomOutputState {
     fn from_command(
-        tx_msg_in: Sender<app::Task>,
-        picker: Picker,
         command: Vec<String>,
         fallback: Option<String>,
+        cols: u16,
+        rows: u16,
+        mode: DisplayMode,
     ) -> Result<Self, ()> {
         if command.is_empty() {
             return Ok(Self {
@@ -296,7 +305,7 @@ impl CustomOutputState {
         if let Ok(image) = image::load_from_memory(&bytes) {
             return Ok(Self {
                 resolved: CustomOutputResolved::Graphics(Box::new(
-                    CustomGraphicsState::from_image(tx_msg_in, picker, image),
+                    CustomGraphicsState::from_image(image, cols, rows, mode)?,
                 )),
             });
         }
@@ -306,17 +315,18 @@ impl CustomOutputState {
 
     fn spawn_loader(
         tx_msg_in: Sender<app::Task>,
-        picker: Picker,
         command: Vec<String>,
         fallback: Option<String>,
+        cols: u16,
+        rows: u16,
+        mode: DisplayMode,
     ) -> Receiver<Result<Self, ()>> {
         let (tx_ready, rx_ready) = mpsc::channel();
-        let tx_refresh = tx_msg_in.clone();
 
         thread::spawn(move || {
-            let state = Self::from_command(tx_msg_in, picker, command, fallback);
+            let state = Self::from_command(command, fallback, cols, rows, mode);
             let _ = tx_ready.send(state);
-            let _ = tx_refresh.send(app::Task::new(
+            let _ = tx_msg_in.send(app::Task::new(
                 app::MsgIn::External(app::ExternalMsg::Refresh),
                 None,
             ));
@@ -944,9 +954,24 @@ pub struct UI {
     pub screen_size: TuiRect,
     pub scrolltop: usize,
     tx_msg_in: Sender<app::Task>,
-    image_picker: Option<Picker>,
+    display_mode: DisplayMode,
     graphics_states: HashMap<String, CustomGraphicsEntry>,
     output_states: HashMap<String, CustomOutputEntry>,
+}
+
+/// Detect the terminal's image protocol once, at init time, and pick a
+/// `DisplayMode` compatible with xplr's ANSI/`Paragraph`-based rendering
+/// pipeline. Graphics protocols that require raw escape sequence passthrough
+/// (Kitty/iTerm2/WezTerm/Sixel) aren't renderable through that pipeline, so
+/// we fall back to the universally supported `FullColor` ANSI mode for those.
+fn detect_display_mode() -> DisplayMode {
+    let mode = get_terminal_protocol().builder().full().colored().build();
+    // TODO: Support Kitty/iTerm2/WezTerm/Sixel
+    if mode.is_normal() {
+        mode
+    } else {
+        DisplayMode::FullColor
+    }
 }
 
 impl UI {
@@ -957,7 +982,7 @@ impl UI {
             scrolltop,
             screen_size,
             tx_msg_in,
-            image_picker: None,
+            display_mode: detect_display_mode(),
             graphics_states: HashMap::new(),
             output_states: HashMap::new(),
         }
@@ -1629,14 +1654,9 @@ impl UI {
                     return;
                 }
 
-                let key = format!("{path}\u{1f}{}", fallback.as_deref().unwrap_or(""));
-
-                if self.image_picker.is_none() {
-                    self.image_picker = Some(
-                        Picker::from_query_stdio()
-                            .unwrap_or_else(|_| Picker::halfblocks()),
-                    );
-                }
+                let prefix =
+                    format!("{path}\u{1f}{}\u{1f}", fallback.as_deref().unwrap_or(""));
+                let key = format!("{prefix}{}x{}", inner.width, inner.height);
 
                 if std::fs::metadata(&path).is_err() {
                     if let Some(fallback) = fallback.as_deref()
@@ -1647,16 +1667,20 @@ impl UI {
                     return;
                 }
 
-                if !self.graphics_states.contains_key(&key)
-                    && let Some(picker) = self.image_picker.clone()
-                {
+                if !self.graphics_states.contains_key(&key) {
+                    // Drop any cached entries for the same source that were
+                    // sized for a different panel area.
+                    self.graphics_states.retain(|k, _| !k.starts_with(&prefix));
+
                     self.graphics_states.insert(
                         key.clone(),
                         CustomGraphicsEntry::Loading(
                             CustomGraphicsState::spawn_loader(
                                 self.tx_msg_in.clone(),
-                                picker,
                                 path.clone(),
+                                inner.width,
+                                inner.height,
+                                self.display_mode,
                             ),
                             fallback.clone(),
                         ),
@@ -1703,12 +1727,8 @@ impl UI {
                             }
                         }
                         CustomGraphicsEntry::Ready(state) => {
-                            state.sync_updates();
-                            f.render_stateful_widget(
-                                StatefulImage::new().resize(Resize::Fit(None)),
-                                inner,
-                                &mut state.thread_protocol,
-                            );
+                            let content = Paragraph::new(state.text.clone());
+                            f.render_widget(content, inner);
                             return;
                         }
                         CustomGraphicsEntry::Fallback(text) => {
@@ -1758,12 +1778,8 @@ impl UI {
                 if let Some(CustomGraphicsEntry::Ready(state)) =
                     self.graphics_states.get_mut(&key)
                 {
-                    state.sync_updates();
-                    f.render_stateful_widget(
-                        StatefulImage::new().resize(Resize::Fit(None)),
-                        inner,
-                        &mut state.thread_protocol,
-                    );
+                    let content = Paragraph::new(state.text.clone());
+                    f.render_widget(content, inner);
                 }
             }
 
@@ -1787,30 +1803,28 @@ impl UI {
                     return;
                 }
 
-                let key = format!(
-                    "{}\u{1f}{}",
+                let prefix = format!(
+                    "{}\u{1f}{}\u{1f}",
                     command.join("\u{1f}"),
                     fallback.as_deref().unwrap_or("")
                 );
+                let key = format!("{prefix}{}x{}", inner.width, inner.height);
 
-                if self.image_picker.is_none() {
-                    self.image_picker = Some(
-                        Picker::from_query_stdio()
-                            .unwrap_or_else(|_| Picker::halfblocks()),
-                    );
-                }
+                if !self.output_states.contains_key(&key) {
+                    // Drop any cached entries for the same source that were
+                    // sized for a different panel area.
+                    self.output_states.retain(|k, _| !k.starts_with(&prefix));
 
-                if !self.output_states.contains_key(&key)
-                    && let Some(picker) = self.image_picker.clone()
-                {
                     self.output_states.insert(
                         key.clone(),
                         CustomOutputEntry::Loading(
                             CustomOutputState::spawn_loader(
                                 self.tx_msg_in.clone(),
-                                picker,
                                 command.clone(),
                                 fallback.clone(),
+                                inner.width,
+                                inner.height,
+                                self.display_mode,
                             ),
                             fallback.clone(),
                         ),
@@ -1868,12 +1882,8 @@ impl UI {
                                 return;
                             }
                             CustomOutputResolved::Graphics(state) => {
-                                state.sync_updates();
-                                f.render_stateful_widget(
-                                    StatefulImage::new().resize(Resize::Fit(None)),
-                                    inner,
-                                    &mut state.thread_protocol,
-                                );
+                                let content = Paragraph::new(state.text.clone());
+                                f.render_widget(content, inner);
                                 return;
                             }
                         },
@@ -1928,12 +1938,8 @@ impl UI {
                             f.render_widget(content, layout_size);
                         }
                         CustomOutputResolved::Graphics(state) => {
-                            state.sync_updates();
-                            f.render_stateful_widget(
-                                StatefulImage::new().resize(Resize::Fit(None)),
-                                inner,
-                                &mut state.thread_protocol,
-                            );
+                            let content = Paragraph::new(state.text.clone());
+                            f.render_widget(content, inner);
                         }
                     }
                 }
