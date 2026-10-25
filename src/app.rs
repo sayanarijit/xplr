@@ -275,6 +275,7 @@ pub struct App {
     pub history: History,
     pub last_modes: Vec<Mode>,
     pub hostname: String,
+    pub read_only: bool,
 }
 
 impl App {
@@ -285,9 +286,11 @@ impl App {
         lua: &mlua::Lua,
         config_file: Option<PathBuf>,
         extra_config_files: Vec<PathBuf>,
+        read_only: bool,
     ) -> Result<Self> {
         let (mut config, hooks) = lua::init(lua)?;
         let mut hooks = hooks.unwrap_or_default();
+        let read_only = read_only || config.general.read_only;
 
         let config_file = if let Some(path) = config_file {
             Some(path)
@@ -323,10 +326,7 @@ impl App {
                 .clone()
                 .unwrap_or_else(|| "default".into()),
         ) {
-            Some(m) => m.clone().sanitized(
-                config.general.read_only,
-                config.general.global_key_bindings.clone(),
-            ),
+            Some(m) => m.clone().extend(config.general.global_key_bindings.clone()),
             None => {
                 bail!("'default' mode is missing")
             }
@@ -433,6 +433,7 @@ impl App {
             last_modes: Default::default(),
             hostname,
             hooks,
+            read_only,
         };
 
         let has_errs = !load_errs.is_empty();
@@ -492,187 +493,157 @@ impl App {
     }
 
     fn handle_external(&mut self, msg: ExternalMsg, key: Option<Key>) -> Result<()> {
-        let is_msg_read_only = msg.is_read_only();
-        if self.config.general.read_only && !is_msg_read_only {
-            self.log_error("could not execute code in read-only mode.".into())
-        } else {
-            use ExternalMsg::*;
+        use ExternalMsg::*;
 
-            if !is_msg_read_only {
-                // We don't want to operate on imaginary paths.
-                self.refresh_selection()?;
+        match msg {
+            ExplorePwd => self.explore_pwd(),
+            ExplorePwdAsync => self.explore_pwd_async(),
+            ExploreParentsAsync => self.explore_parents_async(),
+            TryCompletePath => self.try_complete_path(),
+            Refresh => self.refresh(),
+            ClearScreen => self.clear_screen(),
+            FocusFirst => self.focus_first(true),
+            FocusLast => self.focus_last(),
+            FocusPrevious => self.focus_previous(),
+            FocusPreviousSelection => self.focus_previous_selection(),
+            FocusPreviousByRelativeIndex(i) => self.focus_previous_by_relative_index(i),
+
+            FocusPreviousByRelativeIndexFromInput => {
+                self.focus_previous_by_relative_index_from_input()
             }
-
-            match msg {
-                ExplorePwd => self.explore_pwd(),
-                ExplorePwdAsync => self.explore_pwd_async(),
-                ExploreParentsAsync => self.explore_parents_async(),
-                TryCompletePath => self.try_complete_path(),
-                Refresh => self.refresh(),
-                ClearScreen => self.clear_screen(),
-                FocusFirst => self.focus_first(true),
-                FocusLast => self.focus_last(),
-                FocusPrevious => self.focus_previous(),
-                FocusPreviousSelection => self.focus_previous_selection(),
-                FocusPreviousByRelativeIndex(i) => {
-                    self.focus_previous_by_relative_index(i)
-                }
-
-                FocusPreviousByRelativeIndexFromInput => {
-                    self.focus_previous_by_relative_index_from_input()
-                }
-                FocusNext => self.focus_next(),
-                FocusNextSelection => self.focus_next_selection(),
-                FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
-                FocusNextByRelativeIndexFromInput => {
-                    self.focus_next_by_relative_index_from_input()
-                }
-                FocusPath(p) => self.focus_path(&p, true),
-                FocusPathFromInput => self.focus_path_from_input(),
-                FocusByIndex(i) => self.focus_by_index(i),
-                FocusByIndexFromInput => self.focus_by_index_from_input(),
-                FocusByFileName(n) => self.focus_by_file_name(&n, true),
-                ScrollUp => self.scroll_up(),
-                ScrollDown => self.scroll_down(),
-                ScrollUpHalf => self.scroll_up_half(),
-                ScrollDownHalf => self.scroll_down_half(),
-                ChangeDirectory(dir) => self.change_directory(&dir, true),
-                Enter => self.enter(),
-                Back => self.back(),
-                LastVisitedPath => self.last_visited_path(),
-                NextVisitedPath => self.next_visited_path(),
-                PreviousVisitedDeepBranch => self.previous_visited_deep_branch(),
-                NextVisitedDeepBranch => self.next_visited_deep_branch(),
-                FollowSymlink => self.follow_symlink(),
-                SetVroot(p) => self.set_vroot(&p),
-                UnsetVroot => self.unset_vroot(),
-                ToggleVroot => self.toggle_vroot(),
-                ResetVroot => self.reset_vroot(),
-                SetInputPrompt(p) => self.set_input_prompt(p),
-                UpdateInputBuffer(op) => self.update_input_buffer(op),
-                UpdateInputBufferFromKey => self.update_input_buffer_from_key(key),
-                BufferInput(input) => self.buffer_input(&input),
-                BufferInputFromKey => self.buffer_input_from_key(key),
-                SetInputBuffer(input) => self.set_input_buffer(input),
-                RemoveInputBufferLastCharacter => {
-                    self.remove_input_buffer_last_character()
-                }
-                RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
-                ResetInputBuffer => self.reset_input_buffer(),
-                SwitchMode(mode) => self.switch_mode(&mode),
-                SwitchModeKeepingInputBuffer(mode) => {
-                    self.switch_mode_keeping_input_buffer(&mode)
-                }
-                SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
-                SwitchModeBuiltinKeepingInputBuffer(mode) => {
-                    self.switch_mode_builtin_keeping_input_buffer(&mode)
-                }
-                SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
-                SwitchModeCustomKeepingInputBuffer(mode) => {
-                    self.switch_mode_custom_keeping_input_buffer(&mode)
-                }
-                PopMode => self.pop_mode(),
-                PopModeKeepingInputBuffer => self.pop_mode_keeping_input_buffer(),
-                SwitchLayout(mode) => self.switch_layout(&mode),
-                SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
-                SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
-                Call(cmd) => self.call(cmd),
-                Call0(cmd) => self.call0(cmd),
-                CallSilently(cmd) => self.call_silently(cmd),
-                CallSilently0(cmd) => self.call_silently0(cmd),
-                BashExec(cmd) => self.bash_exec(cmd),
-                BashExec0(cmd) => self.bash_exec0(cmd),
-                BashExecSilently(cmd) => self.bash_exec_silently(cmd),
-                BashExecSilently0(cmd) => self.bash_exec_silently0(cmd),
-                CallLua(func) => self.call_lua(func),
-                CallLuaSilently(func) => self.call_lua_silently(func),
-                LuaEval(code) => self.lua_eval(code),
-                LuaEvalSilently(code) => self.lua_eval_silently(code),
-                Select => self.select(),
-                SelectAll => self.select_all(),
-                SelectPath(p) => self.select_path(p),
-                UnSelect => self.un_select(),
-                UnSelectAll => self.un_select_all(),
-                UnSelectPath(p) => self.un_select_path(p),
-                ToggleSelection => self.toggle_selection(),
-                ToggleSelectAll => self.toggle_select_all(),
-                ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
-                ClearSelection => self.clear_selection(),
-                AddNodeFilter(f) => self.add_node_filter(f),
-                AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
-                RemoveNodeFilter(f) => self.remove_node_filter(f),
-                RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
-                ToggleNodeFilter(f) => self.toggle_node_filter(f),
-                RemoveLastNodeFilter => self.remove_last_node_filter(),
-                ResetNodeFilters => self.reset_node_filters(),
-                ClearNodeFilters => self.clear_node_filters(),
-                AddNodeSorter(f) => self.add_node_sorter(f),
-                RemoveNodeSorter(f) => self.remove_node_sorter(f),
-                ReverseNodeSorter(f) => self.reverse_node_sorter(f),
-                ToggleNodeSorter(f) => self.toggle_node_sorter(f),
-                RemoveLastNodeSorter => self.remove_last_node_sorter(),
-                ReverseNodeSorters => self.reverse_node_sorters(),
-                ResetNodeSorters => self.reset_node_sorters(),
-                ClearNodeSorters => self.clear_node_sorters(),
-                Search(p) => self.search(p),
-                SearchFromInput => self.search_from_input(),
-                SearchFuzzy(p) => self.search_with(p, SearchAlgorithm::Fuzzy, false),
-                SearchFuzzyFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::Fuzzy, false)
-                }
-                SearchRegex(p) => self.search_with(p, SearchAlgorithm::Regex, false),
-                SearchRegexFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::Regex, false)
-                }
-                SearchFuzzyUnordered(p) => {
-                    self.search_with(p, SearchAlgorithm::Fuzzy, true)
-                }
-                SearchFuzzyUnorderedFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::Fuzzy, true)
-                }
-                SearchRegexUnordered(p) => {
-                    self.search_with(p, SearchAlgorithm::Regex, true)
-                }
-                SearchRegexUnorderedFromInput => {
-                    self.search_from_input_with(SearchAlgorithm::Regex, true)
-                }
-                EnableSearchOrder => self.enable_search_order(),
-                DisableSearchOrder => self.disable_search_order(),
-                ToggleSearchOrder => self.toggle_search_order(),
-                ToggleSearchAlgorithm => self.toggle_search_algorithm(),
-                AcceptSearch => self.accept_search(),
-                CancelSearch => self.cancel_search(),
-                EnableMouse => self.enable_mouse(),
-                DisableMouse => self.disable_mouse(),
-                ToggleMouse => self.toggle_mouse(),
-                StartFifo(f) => self.start_fifo(f),
-                StopFifo => self.stop_fifo(),
-                ToggleFifo(f) => self.toggle_fifo(f),
-                LogInfo(l) => self.log_info(l),
-                LogSuccess(l) => self.log_success(l),
-                LogWarning(l) => self.log_warning(l),
-                LogError(l) => self.log_error(l),
-                Quit => self.quit(),
-                PrintPwdAndQuit => self.print_pwd_and_quit(),
-                PrintFocusPathAndQuit => self.print_focus_path_and_quit(),
-                PrintSelectionAndQuit => self.print_selection_and_quit(),
-                PrintResultAndQuit => self.print_result_and_quit(),
-                PrintAppStateAndQuit => self.print_app_state_and_quit(),
-                Debug(path) => self.debug(path),
-                Terminate => bail!(""),
-            }?;
-
-            if !is_msg_read_only {
-                // We don't want to keep imaginary paths in the selection.
-                // But the write action is probably still in queue.
-                // So we need to refresh selection after the write action.
-                let msg = InternalMsg::RefreshSelection;
-                let msg = MsgIn::Internal(msg);
-                let task = Task::new(msg, None);
-                self.msg_out.push_back(MsgOut::Enqueue(task));
+            FocusNext => self.focus_next(),
+            FocusNextSelection => self.focus_next_selection(),
+            FocusNextByRelativeIndex(i) => self.focus_next_by_relative_index(i),
+            FocusNextByRelativeIndexFromInput => {
+                self.focus_next_by_relative_index_from_input()
             }
-
-            Ok(())
+            FocusPath(p) => self.focus_path(&p, true),
+            FocusPathFromInput => self.focus_path_from_input(),
+            FocusByIndex(i) => self.focus_by_index(i),
+            FocusByIndexFromInput => self.focus_by_index_from_input(),
+            FocusByFileName(n) => self.focus_by_file_name(&n, true),
+            ScrollUp => self.scroll_up(),
+            ScrollDown => self.scroll_down(),
+            ScrollUpHalf => self.scroll_up_half(),
+            ScrollDownHalf => self.scroll_down_half(),
+            ChangeDirectory(dir) => self.change_directory(&dir, true),
+            Enter => self.enter(),
+            Back => self.back(),
+            LastVisitedPath => self.last_visited_path(),
+            NextVisitedPath => self.next_visited_path(),
+            PreviousVisitedDeepBranch => self.previous_visited_deep_branch(),
+            NextVisitedDeepBranch => self.next_visited_deep_branch(),
+            FollowSymlink => self.follow_symlink(),
+            SetVroot(p) => self.set_vroot(&p),
+            UnsetVroot => self.unset_vroot(),
+            ToggleVroot => self.toggle_vroot(),
+            ResetVroot => self.reset_vroot(),
+            SetInputPrompt(p) => self.set_input_prompt(p),
+            UpdateInputBuffer(op) => self.update_input_buffer(op),
+            UpdateInputBufferFromKey => self.update_input_buffer_from_key(key),
+            BufferInput(input) => self.buffer_input(&input),
+            BufferInputFromKey => self.buffer_input_from_key(key),
+            SetInputBuffer(input) => self.set_input_buffer(input),
+            RemoveInputBufferLastCharacter => self.remove_input_buffer_last_character(),
+            RemoveInputBufferLastWord => self.remove_input_buffer_last_word(),
+            ResetInputBuffer => self.reset_input_buffer(),
+            SwitchMode(mode) => self.switch_mode(&mode),
+            SwitchModeKeepingInputBuffer(mode) => {
+                self.switch_mode_keeping_input_buffer(&mode)
+            }
+            SwitchModeBuiltin(mode) => self.switch_mode_builtin(&mode),
+            SwitchModeBuiltinKeepingInputBuffer(mode) => {
+                self.switch_mode_builtin_keeping_input_buffer(&mode)
+            }
+            SwitchModeCustom(mode) => self.switch_mode_custom(&mode),
+            SwitchModeCustomKeepingInputBuffer(mode) => {
+                self.switch_mode_custom_keeping_input_buffer(&mode)
+            }
+            PopMode => self.pop_mode(),
+            PopModeKeepingInputBuffer => self.pop_mode_keeping_input_buffer(),
+            SwitchLayout(mode) => self.switch_layout(&mode),
+            SwitchLayoutBuiltin(mode) => self.switch_layout_builtin(&mode),
+            SwitchLayoutCustom(mode) => self.switch_layout_custom(&mode),
+            Call(cmd) => self.call(cmd),
+            Call0(cmd) => self.call0(cmd),
+            CallSilently(cmd) => self.call_silently(cmd),
+            CallSilently0(cmd) => self.call_silently0(cmd),
+            BashExec(cmd) => self.bash_exec(cmd),
+            BashExec0(cmd) => self.bash_exec0(cmd),
+            BashExecSilently(cmd) => self.bash_exec_silently(cmd),
+            BashExecSilently0(cmd) => self.bash_exec_silently0(cmd),
+            CallLua(func) => self.call_lua(func),
+            CallLuaSilently(func) => self.call_lua_silently(func),
+            LuaEval(code) => self.lua_eval(code),
+            LuaEvalSilently(code) => self.lua_eval_silently(code),
+            Select => self.select(),
+            SelectAll => self.select_all(),
+            SelectPath(p) => self.select_path(p),
+            UnSelect => self.un_select(),
+            UnSelectAll => self.un_select_all(),
+            UnSelectPath(p) => self.un_select_path(p),
+            ToggleSelection => self.toggle_selection(),
+            ToggleSelectAll => self.toggle_select_all(),
+            ToggleSelectionByPath(p) => self.toggle_selection_by_path(p),
+            ClearSelection => self.clear_selection(),
+            AddNodeFilter(f) => self.add_node_filter(f),
+            AddNodeFilterFromInput(f) => self.add_node_filter_from_input(f),
+            RemoveNodeFilter(f) => self.remove_node_filter(f),
+            RemoveNodeFilterFromInput(f) => self.remove_node_filter_from_input(f),
+            ToggleNodeFilter(f) => self.toggle_node_filter(f),
+            RemoveLastNodeFilter => self.remove_last_node_filter(),
+            ResetNodeFilters => self.reset_node_filters(),
+            ClearNodeFilters => self.clear_node_filters(),
+            AddNodeSorter(f) => self.add_node_sorter(f),
+            RemoveNodeSorter(f) => self.remove_node_sorter(f),
+            ReverseNodeSorter(f) => self.reverse_node_sorter(f),
+            ToggleNodeSorter(f) => self.toggle_node_sorter(f),
+            RemoveLastNodeSorter => self.remove_last_node_sorter(),
+            ReverseNodeSorters => self.reverse_node_sorters(),
+            ResetNodeSorters => self.reset_node_sorters(),
+            ClearNodeSorters => self.clear_node_sorters(),
+            Search(p) => self.search(p),
+            SearchFromInput => self.search_from_input(),
+            SearchFuzzy(p) => self.search_with(p, SearchAlgorithm::Fuzzy, false),
+            SearchFuzzyFromInput => {
+                self.search_from_input_with(SearchAlgorithm::Fuzzy, false)
+            }
+            SearchRegex(p) => self.search_with(p, SearchAlgorithm::Regex, false),
+            SearchRegexFromInput => {
+                self.search_from_input_with(SearchAlgorithm::Regex, false)
+            }
+            SearchFuzzyUnordered(p) => self.search_with(p, SearchAlgorithm::Fuzzy, true),
+            SearchFuzzyUnorderedFromInput => {
+                self.search_from_input_with(SearchAlgorithm::Fuzzy, true)
+            }
+            SearchRegexUnordered(p) => self.search_with(p, SearchAlgorithm::Regex, true),
+            SearchRegexUnorderedFromInput => {
+                self.search_from_input_with(SearchAlgorithm::Regex, true)
+            }
+            EnableSearchOrder => self.enable_search_order(),
+            DisableSearchOrder => self.disable_search_order(),
+            ToggleSearchOrder => self.toggle_search_order(),
+            ToggleSearchAlgorithm => self.toggle_search_algorithm(),
+            AcceptSearch => self.accept_search(),
+            CancelSearch => self.cancel_search(),
+            EnableMouse => self.enable_mouse(),
+            DisableMouse => self.disable_mouse(),
+            ToggleMouse => self.toggle_mouse(),
+            StartFifo(f) => self.start_fifo(f),
+            StopFifo => self.stop_fifo(),
+            ToggleFifo(f) => self.toggle_fifo(f),
+            LogInfo(l) => self.log_info(l),
+            LogSuccess(l) => self.log_success(l),
+            LogWarning(l) => self.log_warning(l),
+            LogError(l) => self.log_error(l),
+            Quit => self.quit(),
+            PrintPwdAndQuit => self.print_pwd_and_quit(),
+            PrintFocusPathAndQuit => self.print_focus_path_and_quit(),
+            PrintSelectionAndQuit => self.print_selection_and_quit(),
+            PrintResultAndQuit => self.print_result_and_quit(),
+            PrintAppStateAndQuit => self.print_app_state_and_quit(),
+            Debug(path) => self.debug(path),
+            Terminate => bail!(""),
         }
     }
 
@@ -1366,10 +1337,7 @@ impl App {
     fn switch_mode_builtin_keeping_input_buffer(&mut self, mode: &str) -> Result<()> {
         if let Some(mode) = self.config.modes.builtin.get(mode).cloned() {
             self.push_mode();
-            self.mode = mode.sanitized(
-                self.config.general.read_only,
-                self.config.general.global_key_bindings.clone(),
-            );
+            self.mode = mode.extend(self.config.general.global_key_bindings.clone());
 
             // Hooks
             if !self.hooks.on_mode_switch.is_empty() {
@@ -1391,10 +1359,7 @@ impl App {
     fn switch_mode_custom_keeping_input_buffer(&mut self, mode: &str) -> Result<()> {
         if let Some(mode) = self.config.modes.custom.get(mode).cloned() {
             self.push_mode();
-            self.mode = mode.sanitized(
-                self.config.general.read_only,
-                self.config.general.global_key_bindings.clone(),
-            );
+            self.mode = mode.extend(self.config.general.global_key_bindings.clone());
 
             // Hooks
             if !self.hooks.on_mode_switch.is_empty() {
@@ -2018,7 +1983,7 @@ impl App {
     }
 
     // This is a performance heavy function. Use it only when necessary.
-    fn refresh_selection(&mut self) -> Result<()> {
+    pub fn refresh_selection(&mut self) -> Result<()> {
         let count = self.selection.len();
         self.selection.retain(|n| {
             let p = PathBuf::from(&n.absolute_path);
@@ -2094,7 +2059,6 @@ impl App {
     pub fn global_help_menu_str(&self, delimiter: char) -> String {
         let builtin = self.config.modes.builtin.clone();
         let custom = self.config.modes.custom.clone();
-        let read_only = self.config.general.read_only;
         let global_kb = &self.config.general.global_key_bindings;
 
         let modes = builtin.into_iter().chain(custom);
@@ -2102,7 +2066,7 @@ impl App {
         std::iter::once((self.mode.name.clone(), self.mode.clone()))
         .chain(modes)
         .map(|(name, mode)| {
-            (name, mode.sanitized(read_only, global_kb.clone()))
+            (name, mode.extend(global_kb.clone()))
         })
         .map(|(name, mode)| {
             let help = mode

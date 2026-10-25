@@ -41,11 +41,10 @@ pub fn stop(
     terminal: &mut Terminal<CrosstermBackend<File>>,
     leave_alt_screen: bool,
 ) -> Result<()> {
+    clear(terminal)?;
     execute!(terminal.backend_mut(), event::DisableMouseCapture).unwrap_or_default();
     if leave_alt_screen {
         execute!(terminal.backend_mut(), term::LeaveAlternateScreen)?;
-    } else {
-        clear(terminal)?;
     }
     term::disable_raw_mode()?;
     terminal.show_cursor()?;

@@ -69,7 +69,7 @@ impl Runner {
         let pwd_watcher = PwdWatcher::new(task_sender.clone());
         let event_reader = EventReader::new(task_sender.clone());
 
-        let mut terminal = terminal::start()?;
+        let terminal = terminal::start()?;
 
         let lua = unsafe { mlua::Lua::unsafe_new() }; // Safety: https://github.com/sayanarijit/xplr/issues/309
 
@@ -81,11 +81,8 @@ impl Runner {
             &lua,
             cli.config.clone(),
             cli.extra_config.clone(),
+            cli.read_only,
         )?;
-
-        if !app.config.general.read_only {
-            app.config.general.read_only = cli.read_only;
-        }
 
         app.explore_pwd()?;
         for path in paths {
@@ -123,17 +120,12 @@ impl Runner {
                 None
             };
 
-        terminal.hide_cursor()?;
-        // Clear AND redraw the terminal surface
-        terminal::clear(&mut terminal)?;
-
         // Enqueue on_load messages
         for msg in app.hooks.on_load.iter().chain(cli.on_load.iter()) {
             task_sender.send(app::Task::new(app::MsgIn::External(msg.clone()), None))?;
         }
 
         let mut runner = Self {
-            app,
             lua,
             ui,
             print_pwd_as_result: cli.print_pwd_as_result,
@@ -143,7 +135,8 @@ impl Runner {
             pwd_watcher,
             event_reader,
             terminal,
-            mouse_enabled: false,
+            mouse_enabled: app.config.general.enable_mouse,
+            app,
             fifo,
         };
 
@@ -196,6 +189,19 @@ impl Runner {
                 Ok(()) => {
                     while let Some(msg) = self.app.msg_out.pop_front() {
                         use app::MsgOut::*;
+
+                        let is_write_msg = msg.is_read_only();
+                        if is_write_msg {
+                            if self.app.read_only {
+                                self.app.log_error(
+                                    "could not execute code in read-only mode.".into(),
+                                )?;
+                                continue;
+                            } else {
+                                self.app.refresh_selection()?;
+                            }
+                        }
+
                         match msg {
                             Enqueue(task) => {
                                 self.task_sender.send(task)?;
@@ -549,6 +555,10 @@ impl Runner {
                                 self.call(cmd, true, '\0')?;
                             }
                         };
+
+                        if is_write_msg {
+                            self.app.refresh_selection()?;
+                        }
                     }
                 }
 
@@ -721,6 +731,9 @@ impl Runner {
 
     fn start(&mut self) -> Result<()> {
         fs::create_dir_all(&self.app.session_path)?;
+        if self.app.config.general.enable_mouse {
+            self.try_enable_mouse()?;
+        }
         self.start_threads()?;
         Ok(())
     }

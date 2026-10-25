@@ -36,11 +36,7 @@ const DEFAULT_STYLE: TuiStyle = TuiStyle::new();
 pub static NO_COLOR: LazyLock<bool> = LazyLock::new(|| env::var("NO_COLOR").is_ok());
 
 fn read_only_indicator(app: &app::App) -> &str {
-    if app.config.general.read_only {
-        "(r)"
-    } else {
-        ""
-    }
+    if app.read_only { "(r)" } else { "" }
 }
 
 fn selection_indicator(app: &app::App) -> String {

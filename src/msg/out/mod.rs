@@ -35,3 +35,19 @@ pub enum MsgOut {
     PrintAppStateAndQuit,
     Enqueue(Task),
 }
+
+impl MsgOut {
+    pub fn is_read_only(&self) -> bool {
+        !matches!(
+            self,
+            Self::Call(_)
+                | Self::Call0(_)
+                | Self::CallSilently(_)
+                | Self::CallSilently0(_)
+                | Self::CallLua(_)
+                | Self::CallLuaSilently(_)
+                | Self::LuaEval(_)
+                | Self::LuaEvalSilently(_)
+        )
+    }
+}

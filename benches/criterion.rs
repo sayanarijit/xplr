@@ -19,11 +19,10 @@ fn navigation_benchmark(c: &mut Criterion) {
 
     let lua = mlua::Lua::new();
     let mut app =
-        app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into())
+        app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into(), true)
             .expect("failed to create app");
 
-    app = app
-        .clone()
+    app.clone()
         .handle_task(app::Task::new(
             app::MsgIn::External(app::ExternalMsg::ChangeDirectory(PWD.into())),
             None,
@@ -99,13 +98,12 @@ fn draw_benchmark(c: &mut Criterion) {
 
     let (tx, _) = std::sync::mpsc::channel();
     let lua = mlua::Lua::new();
-    let mut ui = ui::UI::new(&lua, tx);
+    let mut ui = ui::UI::new(tx);
     let mut app =
-        app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into())
+        app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into(), true)
             .expect("failed to create app");
 
-    app = app
-        .clone()
+    app.clone()
         .handle_task(app::Task::new(
             app::MsgIn::External(app::ExternalMsg::ChangeDirectory(PWD.into())),
             None,
@@ -121,9 +119,11 @@ fn draw_benchmark(c: &mut Criterion) {
     let mut terminal = Terminal::new(backend).unwrap();
     terminal.hide_cursor().unwrap();
 
+    let lua = mlua::Lua::new();
+
     c.bench_function("draw on terminal", |b| {
         b.iter(|| {
-            terminal.draw(|f| ui.draw(f, &app)).unwrap();
+            terminal.draw(|f| ui.draw(f, &app, &lua)).unwrap();
         })
     });
 
