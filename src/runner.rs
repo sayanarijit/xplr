@@ -8,10 +8,12 @@ use crate::explorer;
 use crate::lua;
 use crate::pipe;
 use crate::pwd_watcher::PwdWatcher;
+use crate::terminal;
+use crate::terminal::get_tty;
 use crate::ui::NO_COLOR;
 use crate::ui::UI;
 use crate::yaml;
-use anyhow::{Error, Result, bail};
+use anyhow::{Error, Result};
 use mlua::LuaSerdeExt;
 use mlua::Value;
 use std::fs;
@@ -21,46 +23,10 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::sync::mpsc;
 use tui::Terminal;
-use tui::backend::Backend;
-use tui::backend::ClearType;
 use tui::backend::CrosstermBackend;
 use tui::crossterm::event;
 use tui::crossterm::execute;
-use tui::crossterm::terminal as term;
 use tui_input::Input;
-
-fn clear_terminal(terminal: &mut Terminal<CrosstermBackend<File>>) -> Result<()> {
-    // TODO: workaround for https://github.com/sayanarijit/xplr/issues/790
-    // Clear AND redraw the terminal surface
-    terminal.backend_mut().clear_region(ClearType::All)?;
-    terminal.draw(|f| f.render_widget(tui::widgets::Clear, f.area()))?;
-    Ok(())
-}
-
-pub fn get_tty() -> Result<fs::File> {
-    let tty = "/dev/tty";
-    match fs::OpenOptions::new().read(true).write(true).open(tty) {
-        Ok(f) => Ok(f),
-        Err(e) => {
-            bail!(format!("could not open {tty}. {e}"))
-        }
-    }
-}
-
-// In unix system, the std::env::current_dir() calls libc getcwd() that
-// returns physical path. As a workaround, this function tries to use `PWD`
-// environment variable that is configured by shell.
-fn get_current_dir() -> Result<PathBuf, std::io::Error> {
-    if let Ok(pwd) = std::env::var("PWD") {
-        if pwd.is_empty() {
-            std::env::current_dir()
-        } else {
-            Ok(PathBuf::from(pwd))
-        }
-    } else {
-        std::env::current_dir()
-    }
-}
 
 fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
     match fs::OpenOptions::new().write(true).open(path) {
@@ -77,7 +43,7 @@ pub struct Runner {
     lua: mlua::Lua,
     ui: UI,
     print_pwd_as_result: bool,
-    delimiter: char,
+    default_delimiter: char,
     pwd_watcher: PwdWatcher,
     event_reader: EventReader,
     task_sender: mpsc::Sender<app::Task>,
@@ -95,7 +61,7 @@ impl Runner {
 
     /// Create a new runner object passing the given arguments
     pub fn from_cli(cli: Cli) -> Result<Self> {
-        let currdir = get_current_dir()?;
+        let currdir = crate::dirs::get_current_dir()?;
         let mut paths = cli.paths.into_iter();
         let mut pwd = paths
             .next()
@@ -109,18 +75,13 @@ impl Runner {
         }
 
         let (task_sender, task_receiver) = mpsc::channel();
-        let mut pwd_watcher = PwdWatcher::new(task_sender.clone());
-        let mut event_reader = EventReader::new(task_sender.clone());
+        let pwd_watcher = PwdWatcher::new(task_sender.clone());
+        let event_reader = EventReader::new(task_sender.clone());
 
-        // Use a tty to enable piping results
-        let stdout = get_tty()?;
-        // let stdout = io::stdout();
-        // let mut stdout = stdout.lock();
-        let backend = CrosstermBackend::new(stdout);
-        let mut terminal = Terminal::new(backend)?;
+        let mut terminal = terminal::start()?;
 
-        // Why unsafe? See https://github.com/sayanarijit/xplr/issues/309
-        let lua = unsafe { mlua::Lua::unsafe_new() };
+        let lua = unsafe { mlua::Lua::unsafe_new() }; // Safety: https://github.com/sayanarijit/xplr/issues/309
+
         let ui = UI::new(task_sender.clone());
         let mut app = app::App::create(
             cli.bin.clone(),
@@ -135,10 +96,7 @@ impl Runner {
             app.config.general.read_only = cli.read_only;
         }
 
-        fs::create_dir_all(app.session_path.clone())?;
-
         app.explore_pwd()?;
-
         for path in paths {
             app.select_path(path.to_string_lossy().to_string())?;
         }
@@ -160,9 +118,6 @@ impl Runner {
             task_sender.clone(),
         );
 
-        term::enable_raw_mode()?;
-        execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
-
         let fifo: Option<fs::File> =
             if let Some(path) = app.config.general.start_fifo.clone() {
                 // TODO remove duplicate segment
@@ -177,38 +132,21 @@ impl Runner {
                 None
             };
 
-        let mouse_enabled = app.config.general.enable_mouse;
-        if mouse_enabled
-            && let Err(e) = execute!(terminal.backend_mut(), event::EnableMouseCapture)
-        {
-            app.log_error(format!("could not enable mouse: {e}"))?;
-        }
-
         terminal.hide_cursor()?;
         // Clear AND redraw the terminal surface
-        clear_terminal(&mut terminal)?;
-
-        // Threads
-        pwd_watcher.start(app.pwd.as_ref());
-        event_reader.start();
+        terminal::clear(&mut terminal)?;
 
         // Enqueue on_load messages
         for msg in app.hooks.on_load.iter().chain(cli.on_load.iter()) {
             task_sender.send(app::Task::new(app::MsgIn::External(msg.clone()), None))?;
         }
 
-        // Refresh screen once after loading
-        task_sender.send(app::Task::new(
-            app::MsgIn::External(app::ExternalMsg::Refresh),
-            None,
-        ))?;
-
-        Ok(Self {
+        let mut runner = Self {
             app,
             lua,
             ui,
             print_pwd_as_result: cli.print_pwd_as_result,
-            delimiter: if cli.write0 { '\0' } else { '\n' },
+            default_delimiter: if cli.write0 { '\0' } else { '\n' },
             task_sender,
             task_receiver,
             pwd_watcher,
@@ -216,13 +154,49 @@ impl Runner {
             terminal,
             mouse_enabled: false,
             fifo,
-        })
+        };
+
+        runner.start()?;
+        Ok(runner)
+    }
+
+    fn try_enable_mouse(&mut self) -> Result<()> {
+        match execute!(self.terminal.backend_mut(), event::EnableMouseCapture) {
+            Ok(_) => {
+                self.mouse_enabled = true;
+            }
+            Err(e) => {
+                self.mouse_enabled = false;
+                self.app.log_error(format!("could not enable mouse: {e}"))?;
+            }
+        }
+        Ok(())
+    }
+
+    fn try_disable_mouse(&mut self) -> Result<()> {
+        match execute!(self.terminal.backend_mut(), event::DisableMouseCapture) {
+            Ok(_) => {
+                self.mouse_enabled = false;
+            }
+            Err(e) => {
+                self.mouse_enabled = true;
+                self.app
+                    .log_error(format!("could not disable mouse: {e}"))?;
+            }
+        }
+        Ok(())
+    }
+
+    fn resume_mouse_if_enabled(&mut self) -> Result<()> {
+        if self.mouse_enabled {
+            self.try_enable_mouse()?;
+        }
+        Ok(())
     }
 
     /// Run the instance
     pub fn run(mut self) -> Result<Option<String>> {
         let mut result = Ok(None);
-        let session_path = self.app.session_path.clone();
         let mut last_focus: Option<app::Node> = None;
         let mut last_pwd = self.app.pwd.clone();
 
@@ -242,28 +216,33 @@ impl Runner {
                             }
 
                             PrintPwdAndQuit => {
-                                result = Ok(Some(self.app.pwd_str(self.delimiter)));
+                                result =
+                                    Ok(Some(self.app.pwd_str(self.default_delimiter)));
                                 break 'outer;
                             }
 
                             PrintFocusPathAndQuit => {
                                 result = Ok(self.app.focused_node().map(|n| {
-                                    format!("{}{}", n.absolute_path, self.delimiter)
+                                    format!(
+                                        "{}{}",
+                                        n.absolute_path, self.default_delimiter
+                                    )
                                 }));
                                 break 'outer;
                             }
 
                             PrintSelectionAndQuit => {
-                                result =
-                                    Ok(Some(self.app.selection_str(self.delimiter)));
+                                result = Ok(Some(
+                                    self.app.selection_str(self.default_delimiter),
+                                ));
                                 break 'outer;
                             }
 
                             PrintResultAndQuit => {
                                 result = if self.print_pwd_as_result {
-                                    Ok(Some(self.app.pwd_str(self.delimiter)))
+                                    Ok(Some(self.app.pwd_str(self.default_delimiter)))
                                 } else {
-                                    Ok(Some(self.app.result_str(self.delimiter)))
+                                    Ok(Some(self.app.result_str(self.default_delimiter)))
                                 };
 
                                 break 'outer;
@@ -281,7 +260,7 @@ impl Runner {
 
                             ClearScreen => {
                                 // Clear AND redraw the terminal surface
-                                clear_terminal(&mut self.terminal)?;
+                                terminal::clear(&mut self.terminal)?;
                             }
 
                             ScrollUp => {
@@ -394,51 +373,19 @@ impl Runner {
                             }
 
                             EnableMouse => {
-                                if !self.mouse_enabled {
-                                    match execute!(
-                                        self.terminal.backend_mut(),
-                                        event::EnableMouseCapture
-                                    ) {
-                                        Ok(_) => {
-                                            self.mouse_enabled = true;
-                                        }
-                                        Err(e) => {
-                                            self.app.log_error(format!(
-                                                "could not enable mouse: {e}"
-                                            ))?;
-                                        }
-                                    }
-                                }
+                                self.try_enable_mouse()?;
                             }
 
                             ToggleMouse => {
-                                let msg = if self.mouse_enabled {
-                                    app::ExternalMsg::DisableMouse
+                                if self.mouse_enabled {
+                                    self.try_disable_mouse()?;
                                 } else {
-                                    app::ExternalMsg::EnableMouse
+                                    self.try_enable_mouse()?;
                                 };
-                                self.app.handle_task(app::Task::new(
-                                    app::MsgIn::External(msg),
-                                    None,
-                                ))?;
                             }
 
                             DisableMouse => {
-                                if self.mouse_enabled {
-                                    match execute!(
-                                        self.terminal.backend_mut(),
-                                        event::DisableMouseCapture
-                                    ) {
-                                        Ok(_) => {
-                                            self.mouse_enabled = false;
-                                        }
-                                        Err(e) => {
-                                            self.app.log_error(format!(
-                                                "could not disable mouse: {e}"
-                                            ))?;
-                                        }
-                                    }
-                                }
+                                self.try_disable_mouse()?;
                             }
 
                             StartFifo(path) => {
@@ -495,19 +442,7 @@ impl Runner {
                             }
 
                             CallLua(func) => {
-                                execute!(
-                                    self.terminal.backend_mut(),
-                                    event::DisableMouseCapture
-                                )
-                                .unwrap_or_default();
-
-                                self.event_reader.stop();
-
-                                // Clear AND redraw the terminal surface
-                                clear_terminal(&mut self.terminal)?;
-                                term::disable_raw_mode()?;
-                                self.terminal.show_cursor()?;
-
+                                self.pause()?;
                                 match self.call_lua_heavy(&func, false) {
                                     Ok(Some(msgs)) => {
                                         self.app.handle_batch_external_msgs(msgs)?;
@@ -517,42 +452,11 @@ impl Runner {
                                         self.app.log_error(err.to_string())?;
                                     }
                                 };
-
-                                // Clear AND redraw the terminal surface
-                                clear_terminal(&mut self.terminal)?;
-                                term::enable_raw_mode()?;
-                                self.terminal.hide_cursor()?;
-                                self.event_reader.start();
-
-                                if self.mouse_enabled {
-                                    match execute!(
-                                        self.terminal.backend_mut(),
-                                        event::EnableMouseCapture
-                                    ) {
-                                        Ok(_) => {
-                                            self.mouse_enabled = true;
-                                        }
-                                        Err(e) => {
-                                            self.app.log_error(e.to_string())?;
-                                        }
-                                    }
-                                }
+                                self.resume()?;
                             }
 
                             LuaEval(code) => {
-                                execute!(
-                                    self.terminal.backend_mut(),
-                                    event::DisableMouseCapture
-                                )
-                                .unwrap_or_default();
-
-                                self.event_reader.stop();
-
-                                // Clear AND redraw the terminal surface
-                                clear_terminal(&mut self.terminal)?;
-                                term::disable_raw_mode()?;
-                                self.terminal.show_cursor()?;
-
+                                self.pause()?;
                                 let res: Result<Value> =
                                     self.lua.load(&code).eval().map_err(Error::from);
 
@@ -594,26 +498,7 @@ impl Runner {
                                         self.app.log_error(err.to_string())?;
                                     }
                                 };
-
-                                // Clear AND redraw the terminal surface
-                                clear_terminal(&mut self.terminal)?;
-                                term::enable_raw_mode()?;
-                                self.terminal.hide_cursor()?;
-                                self.event_reader.start();
-
-                                if self.mouse_enabled {
-                                    match execute!(
-                                        self.terminal.backend_mut(),
-                                        event::EnableMouseCapture
-                                    ) {
-                                        Ok(_) => {
-                                            self.mouse_enabled = true;
-                                        }
-                                        Err(e) => {
-                                            self.app.log_error(e.to_string())?;
-                                        }
-                                    }
-                                }
+                                self.resume()?;
                             }
 
                             LuaEvalSilently(code) => {
@@ -661,19 +546,19 @@ impl Runner {
                             }
 
                             Call(cmd) => {
-                                self.call(cmd, false)?;
+                                self.call(cmd, false, '\n')?;
                             }
 
                             Call0(cmd) => {
-                                self.call(cmd, false)?;
+                                self.call(cmd, false, '\0')?;
                             }
 
                             CallSilently(cmd) => {
-                                self.call(cmd, true)?;
+                                self.call(cmd, true, '\n')?;
                             }
 
                             CallSilently0(cmd) => {
-                                self.call(cmd, true)?;
+                                self.call(cmd, true, '\0')?;
                             }
                         };
                     }
@@ -686,18 +571,7 @@ impl Runner {
             }
         }
 
-        // Clear AND redraw the terminal surface
-        clear_terminal(&mut self.terminal)?;
-        execute!(self.terminal.backend_mut(), term::LeaveAlternateScreen)?;
-        execute!(self.terminal.backend_mut(), event::DisableMouseCapture)
-            .unwrap_or_default();
-        term::disable_raw_mode()?;
-        self.terminal.show_cursor()?;
-        self.pwd_watcher.stop_async();
-        self.event_reader.stop();
-
-        fs::remove_dir_all(session_path)?;
-
+        self.stop()?;
         result
     }
 
@@ -711,22 +585,12 @@ impl Runner {
         lua::call(&self.lua, func, arg)
     }
 
-    fn call(&mut self, cmd: app::Command, silent: bool) -> Result<()> {
+    fn call(&mut self, cmd: app::Command, silent: bool, delimiter: char) -> Result<()> {
         if !silent {
-            if self.mouse_enabled {
-                execute!(self.terminal.backend_mut(), event::DisableMouseCapture)
-                    .unwrap_or_default();
-            }
-
-            self.event_reader.stop();
-
-            // Clear AND redraw the terminal surface
-            clear_terminal(&mut self.terminal)?;
-            term::disable_raw_mode()?;
-            self.terminal.show_cursor()?;
+            self.pause()?;
         }
 
-        self.app.write_pipes(self.delimiter)?;
+        self.write_pipes(delimiter)?;
         let focus_index = self
             .app
             .directory_buffer
@@ -801,7 +665,7 @@ impl Runner {
             })
             .unwrap_or_else(|e| Err(e.to_string()));
 
-        match pipe::read_all(&self.app.pipe.msg_in, self.delimiter) {
+        match pipe::read_all(&self.app.pipe.msg_in, delimiter) {
             Ok(msgs) => {
                 self.app.handle_batch_external_msgs(msgs)?;
             }
@@ -810,31 +674,94 @@ impl Runner {
             }
         };
 
-        self.app.cleanup_pipes()?;
-
+        self.cleanup_pipes()?;
         if let Err(e) = status {
             self.app.log_error(e)?;
         };
 
         if !silent {
-            // Clear AND redraw the terminal surface
-            clear_terminal(&mut self.terminal)?;
-            term::enable_raw_mode()?;
-            self.terminal.hide_cursor()?;
-            self.event_reader.start();
-
-            if self.mouse_enabled {
-                match execute!(self.terminal.backend_mut(), event::EnableMouseCapture) {
-                    Ok(_) => {
-                        self.mouse_enabled = true;
-                    }
-                    Err(e) => {
-                        self.app.log_error(e.to_string())?;
-                    }
-                }
-            }
+            self.resume()?;
         }
 
+        Ok(())
+    }
+
+    fn start_threads(&mut self) -> Result<()> {
+        self.event_reader.start();
+        self.pwd_watcher.start(&self.app.pwd);
+        Ok(())
+    }
+
+    fn stop_threads(&mut self) -> Result<()> {
+        self.pwd_watcher.stop_async();
+        self.event_reader.stop();
+        Ok(())
+    }
+
+    fn pause(&mut self) -> Result<()> {
+        self.stop_threads()?;
+        terminal::stop(&mut self.terminal, false)?;
+        Ok(())
+    }
+
+    fn resume(&mut self) -> Result<()> {
+        terminal::resume(&mut self.terminal)?;
+        self.resume_mouse_if_enabled()?;
+        self.start_threads()?;
+        Ok(())
+    }
+
+    fn start(&mut self) -> Result<()> {
+        fs::create_dir_all(&self.app.session_path)?;
+        self.start_threads()?;
+        Ok(())
+    }
+
+    fn stop(mut self) -> Result<()> {
+        self.stop_threads()?;
+        terminal::stop(&mut self.terminal, true)?;
+        fs::remove_dir_all(&self.app.session_path)?;
+        Ok(())
+    }
+
+    pub fn write_pipes(&self, delimiter: char) -> Result<()> {
+        fs::create_dir_all(self.app.pipe.path.clone())?;
+        fs::write(&self.app.pipe.msg_in, [delimiter as u8])?;
+
+        let selection_str = self.app.selection_str(delimiter);
+        fs::write(&self.app.pipe.selection_out, selection_str)?;
+
+        let history_str = self.app.history_str(delimiter);
+        fs::write(&self.app.pipe.history_out, history_str)?;
+
+        let directory_nodes_str = self.app.directory_nodes_str(delimiter);
+        fs::write(&self.app.pipe.directory_nodes_out, directory_nodes_str)?;
+
+        let logs_str = self.app.logs_str(delimiter);
+        fs::write(&self.app.pipe.logs_out, logs_str)?;
+
+        let result_str = self.app.result_str(delimiter);
+        fs::write(&self.app.pipe.result_out, result_str)?;
+
+        let global_help_menu_str = self.app.global_help_menu_str(delimiter);
+        fs::write(&self.app.pipe.global_help_menu_out, global_help_menu_str)?;
+
+        Ok(())
+    }
+
+    pub fn cleanup_pipes(&self) -> Result<()> {
+        while !fs::read_to_string(&self.app.pipe.msg_in)?.is_empty() {
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+
+        fs::remove_file(&self.app.pipe.msg_in)?;
+        fs::remove_file(&self.app.pipe.selection_out)?;
+        fs::remove_file(&self.app.pipe.result_out)?;
+        fs::remove_file(&self.app.pipe.directory_nodes_out)?;
+        fs::remove_file(&self.app.pipe.global_help_menu_out)?;
+        fs::remove_file(&self.app.pipe.logs_out)?;
+        fs::remove_file(&self.app.pipe.history_out)?;
+        fs::remove_dir(&self.app.pipe.path)?;
         Ok(())
     }
 }

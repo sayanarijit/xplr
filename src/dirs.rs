@@ -18,3 +18,18 @@ pub fn runtime_dir() -> PathBuf {
     };
     dir.clone()
 }
+
+// In unix system, the std::env::current_dir() calls libc getcwd() that
+// returns physical path. As a workaround, this function tries to use `PWD`
+// environment variable that is configured by shell.
+pub fn get_current_dir() -> Result<PathBuf, std::io::Error> {
+    if let Ok(pwd) = std::env::var("PWD") {
+        if pwd.is_empty() {
+            std::env::current_dir()
+        } else {
+            Ok(PathBuf::from(pwd))
+        }
+    } else {
+        std::env::current_dir()
+    }
+}

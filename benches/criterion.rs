@@ -6,7 +6,7 @@ use tui::Terminal;
 use tui::backend::CrosstermBackend;
 use tui::crossterm::execute;
 use tui::crossterm::terminal as term;
-use xplr::runner::get_tty;
+use xplr::terminal::get_tty;
 use xplr::*;
 
 const PWD: &str = "/tmp/xplr_bench";

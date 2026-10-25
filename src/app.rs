@@ -424,8 +424,8 @@ impl App {
             layout,
             input,
             pid,
-            session_path: session_path.clone(),
             pipe: Pipe::from_session_path(&session_path)?,
+            session_path,
             explorer_config,
             logs: Default::default(),
             logs_hidden: Default::default(),
@@ -2133,48 +2133,6 @@ impl App {
             .map(|p| format!("{p}{delimiter}"))
             .collect::<Vec<String>>()
             .join("")
-    }
-
-    pub fn write_pipes(&self, delimiter: char) -> Result<()> {
-        fs::create_dir_all(self.pipe.path.clone())?;
-        fs::write(&self.pipe.msg_in, [delimiter as u8])?;
-
-        let selection_str = self.selection_str(delimiter);
-        fs::write(&self.pipe.selection_out, selection_str)?;
-
-        let history_str = self.history_str(delimiter);
-        fs::write(&self.pipe.history_out, history_str)?;
-
-        let directory_nodes_str = self.directory_nodes_str(delimiter);
-        fs::write(&self.pipe.directory_nodes_out, directory_nodes_str)?;
-
-        let logs_str = self.logs_str(delimiter);
-        fs::write(&self.pipe.logs_out, logs_str)?;
-
-        let result_str = self.result_str(delimiter);
-        fs::write(&self.pipe.result_out, result_str)?;
-
-        let global_help_menu_str = self.global_help_menu_str(delimiter);
-        fs::write(&self.pipe.global_help_menu_out, global_help_menu_str)?;
-
-        Ok(())
-    }
-
-    pub fn cleanup_pipes(&self) -> Result<()> {
-        while !fs::read_to_string(&self.pipe.msg_in)?.is_empty() {
-            std::thread::sleep(std::time::Duration::from_millis(1));
-        }
-
-        fs::remove_file(&self.pipe.msg_in)?;
-        fs::remove_file(&self.pipe.selection_out)?;
-        fs::remove_file(&self.pipe.result_out)?;
-        fs::remove_file(&self.pipe.directory_nodes_out)?;
-        fs::remove_file(&self.pipe.global_help_menu_out)?;
-        fs::remove_file(&self.pipe.logs_out)?;
-        fs::remove_file(&self.pipe.history_out)?;
-
-        fs::remove_dir(&self.pipe.path)?;
-        Ok(())
     }
 
     pub fn to_lua_ctx_heavy(&self) -> LuaContextHeavy {
