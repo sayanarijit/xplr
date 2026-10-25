@@ -330,7 +330,7 @@ impl Runner {
                                     if !self.app.hooks.on_focus_change.is_empty() {
                                         let msgs =
                                             self.app.hooks.on_focus_change.clone();
-                                        self.app.handle_batch_external_msgs(msgs)?
+                                        self.handle_nested_external_msgs(msgs)?
                                     }
                                 }
 
@@ -354,7 +354,7 @@ impl Runner {
                                     if !self.app.hooks.on_directory_change.is_empty() {
                                         let msgs =
                                             self.app.hooks.on_directory_change.clone();
-                                        self.app.handle_batch_external_msgs(msgs)?
+                                        self.handle_nested_external_msgs(msgs)?
                                     }
                                 }
 
@@ -424,7 +424,7 @@ impl Runner {
                             CallLuaSilently(func) => {
                                 match self.call_lua_heavy(&func, false) {
                                     Ok(Some(msgs)) => {
-                                        self.app.handle_batch_external_msgs(msgs)?;
+                                        self.handle_nested_external_msgs(msgs)?;
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
@@ -437,7 +437,7 @@ impl Runner {
                                 self.pause()?;
                                 match self.call_lua_heavy(&func, false) {
                                     Ok(Some(msgs)) => {
-                                        self.app.handle_batch_external_msgs(msgs)?;
+                                        self.handle_nested_external_msgs(msgs)?;
                                     }
                                     Ok(None) => {}
                                     Err(err) => {
@@ -463,8 +463,7 @@ impl Runner {
                                             .map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                self.app
-                                                    .handle_batch_external_msgs(msgs)?;
+                                                self.handle_nested_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
@@ -477,8 +476,7 @@ impl Runner {
                                             self.lua.from_value(v).map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                self.app
-                                                    .handle_batch_external_msgs(msgs)?;
+                                                self.handle_nested_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
@@ -508,8 +506,7 @@ impl Runner {
                                             .map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                self.app
-                                                    .handle_batch_external_msgs(msgs)?;
+                                                self.handle_nested_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
@@ -522,8 +519,7 @@ impl Runner {
                                             self.lua.from_value(v).map_err(Error::from);
                                         match res {
                                             Ok(Some(msgs)) => {
-                                                self.app
-                                                    .handle_batch_external_msgs(msgs)?;
+                                                self.handle_nested_external_msgs(msgs)?;
                                             }
                                             Ok(None) => {}
                                             Err(err) => {
@@ -565,6 +561,26 @@ impl Runner {
 
         self.stop()?;
         result
+    }
+
+    /// Like `App::handle_batch_external_msgs`, but ensures that any `MsgOut`
+    /// entries produced while handling `msgs` (e.g. a Lua call or hook that
+    /// enqueues further messages) are processed before the messages that
+    /// were already pending in the queue at the time of this call. This
+    /// gives depth-first (tree) execution order: a message's children run
+    /// to completion before its siblings, instead of breadth-first/FIFO
+    /// order where children would run after already-queued siblings.
+    fn handle_nested_external_msgs(
+        &mut self,
+        msgs: Vec<app::ExternalMsg>,
+    ) -> Result<()> {
+        let before = self.app.msg_out.len();
+        self.app.handle_batch_external_msgs(msgs)?;
+        let added = self.app.msg_out.len().saturating_sub(before);
+        if added > 0 {
+            self.app.msg_out.rotate_right(added);
+        }
+        Ok(())
     }
 
     fn call_lua_heavy(
@@ -659,7 +675,7 @@ impl Runner {
 
         match pipe::read_all(&self.app.pipe.msg_in, delimiter) {
             Ok(msgs) => {
-                self.app.handle_batch_external_msgs(msgs)?;
+                self.handle_nested_external_msgs(msgs)?;
             }
             Err(err) => {
                 self.app.log_error(err.to_string())?;
