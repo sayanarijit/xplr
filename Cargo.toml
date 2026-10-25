@@ -47,9 +47,10 @@ jf = "1.0"
 xdg = "3.0"
 rayon = "1.12"
 image = "0.25"
-ratatui-image = { version = "11.1", default-features = false, features = [
-  "crossterm",
-  "image-defaults",
+image_to_console_core = { version = "0.2", default-features = false, features = [
+  "auto_select",
+  "sixel",
+  "gif",
 ] }
 
 [dependencies.lscolors]
