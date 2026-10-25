@@ -705,7 +705,7 @@ impl Runner {
     }
 
     fn resume(&mut self) -> Result<()> {
-        terminal::resume(&mut self.terminal)?;
+        terminal::resume(&mut self.terminal, false)?;
         self.resume_mouse_if_enabled()?;
         self.start_threads()?;
         Ok(())

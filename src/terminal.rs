@@ -33,7 +33,7 @@ pub fn start() -> Result<Terminal<CrosstermBackend<File>>> {
     let stdout = get_tty()?; // Use a tty to enable piping results
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
-    resume(&mut terminal)?;
+    resume(&mut terminal, true)?;
     Ok(terminal)
 }
 
@@ -52,9 +52,14 @@ pub fn stop(
     Ok(())
 }
 
-pub fn resume(terminal: &mut Terminal<CrosstermBackend<File>>) -> Result<()> {
+pub fn resume(
+    terminal: &mut Terminal<CrosstermBackend<File>>,
+    enter_alt_screen: bool,
+) -> Result<()> {
     term::enable_raw_mode()?;
-    execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
+    if enter_alt_screen {
+        execute!(terminal.backend_mut(), term::EnterAlternateScreen)?;
+    }
     terminal.hide_cursor()?;
     clear(terminal)?;
     Ok(())
