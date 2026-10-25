@@ -5,6 +5,7 @@ use crate::app::ExternalMsg;
 use crate::cli::Cli;
 use crate::event_reader::EventReader;
 use crate::explorer;
+use crate::fifo;
 use crate::lua;
 use crate::pipe;
 use crate::pwd_watcher::PwdWatcher;
@@ -27,16 +28,6 @@ use tui::backend::CrosstermBackend;
 use tui::crossterm::event;
 use tui::crossterm::execute;
 use tui_input::Input;
-
-fn start_fifo(path: &str, focus_path: &str) -> Result<fs::File> {
-    match fs::OpenOptions::new().write(true).open(path) {
-        Ok(mut file) => {
-            writeln!(file, "{focus_path}")?;
-            Ok(file)
-        }
-        Err(e) => Err(e.into()),
-    }
-}
 
 pub struct Runner {
     app: app::App,
@@ -121,7 +112,7 @@ impl Runner {
         let fifo: Option<fs::File> =
             if let Some(path) = app.config.general.start_fifo.clone() {
                 // TODO remove duplicate segment
-                match start_fifo(&path, &app.focused_node_str()) {
+                match fifo::start(&path, &app.focused_node_str()) {
                     Ok(file) => Some(file),
                     Err(e) => {
                         app.log_error(format!("could not start fifo {path:?}: {e}"))?;
@@ -389,17 +380,18 @@ impl Runner {
                             }
 
                             StartFifo(path) => {
-                                self.fifo =
-                                    match start_fifo(&path, &self.app.focused_node_str())
-                                    {
-                                        Ok(file) => Some(file),
-                                        Err(e) => {
-                                            self.app.log_error(format!(
-                                                "could not start fifo {path:?}: {e}"
-                                            ))?;
-                                            None
-                                        }
+                                self.fifo = match fifo::start(
+                                    &path,
+                                    &self.app.focused_node_str(),
+                                ) {
+                                    Ok(file) => Some(file),
+                                    Err(e) => {
+                                        self.app.log_error(format!(
+                                            "could not start fifo {path:?}: {e}"
+                                        ))?;
+                                        None
                                     }
+                                }
                             }
 
                             StopFifo => {
@@ -414,7 +406,7 @@ impl Runner {
                                     self.fifo = None;
                                     std::mem::drop(file);
                                 } else {
-                                    self.fifo = match start_fifo(
+                                    self.fifo = match fifo::start(
                                         &path,
                                         &self.app.focused_node_str(),
                                     ) {
