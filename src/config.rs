@@ -27,22 +27,6 @@ pub struct Action {
     pub messages: Vec<ExternalMsg>,
 }
 
-impl Action {
-    pub fn sanitized(self, read_only: bool) -> Option<Self> {
-        if self.messages.is_empty() {
-            None
-        } else if read_only {
-            if self.messages.iter().all(ExternalMsg::is_read_only) {
-                Some(self)
-            } else {
-                None
-            }
-        } else {
-            Some(self)
-        }
-    }
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeTypeConfig {
@@ -399,36 +383,13 @@ pub struct KeyBindings {
     pub default: Option<Action>,
     // Checklist for adding new field:
     // - [ ] Update App::handle_key
-    // - [ ] Update KeyBindings::sanitized
+    // - [ ] Update KeyBindings::extend
     // - [ ] Update Mode::help_menu
     // - [ ] Update configure-key-bindings.md
     // - [ ] Update debug-key-bindings.md
 }
 
 impl KeyBindings {
-    pub fn sanitized(mut self, read_only: bool) -> Self {
-        if read_only {
-            self.on_key = self
-                .on_key
-                .into_iter()
-                .filter_map(|(k, a)| a.sanitized(read_only).map(|a| (k, a)))
-                .collect();
-
-            self.on_alphabet = self.on_alphabet.and_then(|a| a.sanitized(read_only));
-            self.on_number = self.on_number.and_then(|a| a.sanitized(read_only));
-            self.on_alphanumeric =
-                self.on_alphanumeric.and_then(|a| a.sanitized(read_only));
-            self.on_special_character = self
-                .on_special_character
-                .and_then(|a| a.sanitized(read_only));
-            self.on_character = self.on_character.and_then(|a| a.sanitized(read_only));
-            self.on_navigation = self.on_navigation.and_then(|a| a.sanitized(read_only));
-            self.on_function = self.on_function.and_then(|a| a.sanitized(read_only));
-            self.default = self.default.and_then(|a| a.sanitized(read_only));
-        };
-        self
-    }
-
     pub fn extend(mut self, other: Self) -> Self {
         self.on_key.extend(other.on_key);
         self.on_alphabet = other.on_alphabet.or(self.on_alphabet);
@@ -467,14 +428,8 @@ pub struct Mode {
 }
 
 impl Mode {
-    pub fn sanitized(
-        mut self,
-        read_only: bool,
-        global_key_bindings: KeyBindings,
-    ) -> Self {
-        self.key_bindings = global_key_bindings
-            .sanitized(read_only)
-            .extend(self.key_bindings.sanitized(read_only));
+    pub fn extend(mut self, global_key_bindings: KeyBindings) -> Self {
+        self.key_bindings = global_key_bindings.extend(self.key_bindings);
         self
     }
 

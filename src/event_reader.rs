@@ -26,10 +26,7 @@ impl EventReader {
         let (tx_stopper, rx_stopper) = mpsc::channel();
         let (tx_ack, rx_ack) = mpsc::channel();
         self.stopper = Some((tx_stopper, rx_ack));
-
-        thread::spawn(move || {
-            keep_reading(sender, rx_stopper, tx_ack);
-        });
+        thread::spawn(move || keep_reading(sender, rx_stopper, tx_ack));
     }
 
     pub(crate) fn stop(&self) {
@@ -47,7 +44,7 @@ fn keep_reading(
 ) {
     loop {
         if rx_stopper.try_recv().unwrap_or(false) {
-            tx_ack.send(()).unwrap();
+            tx_ack.send(()).unwrap_or_default(); // Let's not panic when xplr stops.
             break;
         } else if event::poll(std::time::Duration::from_millis(150)).unwrap_or_default()
         {

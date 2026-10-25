@@ -1286,26 +1286,6 @@ pub enum ExternalMsg {
     Terminate,
 }
 
-impl ExternalMsg {
-    pub fn is_read_only(&self) -> bool {
-        !matches!(
-            self,
-            Self::Call(_)
-                | Self::Call0(_)
-                | Self::CallSilently(_)
-                | Self::CallSilently0(_)
-                | Self::BashExec(_)
-                | Self::BashExec0(_)
-                | Self::BashExecSilently(_)
-                | Self::BashExecSilently0(_)
-                | Self::CallLua(_)
-                | Self::CallLuaSilently(_)
-                | Self::LuaEval(_)
-                | Self::LuaEvalSilently(_)
-        )
-    }
-}
-
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum NodeSorter {
@@ -1859,32 +1839,20 @@ impl NodeSearcherApplicable {
         }
     }
 
-    pub fn enable_search_order(self) -> Self {
-        Self {
-            unordered: false,
-            ..self
-        }
+    pub fn enable_search_order(&mut self) {
+        self.unordered = false;
     }
 
-    pub fn disable_search_order(self) -> Self {
-        Self {
-            unordered: true,
-            ..self
-        }
+    pub fn disable_search_order(&mut self) {
+        self.unordered = true;
     }
 
-    pub fn toggle_search_order(self) -> Self {
-        Self {
-            unordered: !self.unordered,
-            ..self
-        }
+    pub fn toggle_search_order(&mut self) {
+        self.unordered = !self.unordered;
     }
 
-    pub fn toggle_algorithm(self) -> Self {
-        Self {
-            algorithm: self.algorithm.toggle(),
-            ..self
-        }
+    pub fn toggle_algorithm(&mut self) {
+        self.algorithm = self.algorithm.toggle();
     }
 }
 

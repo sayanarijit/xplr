@@ -10,6 +10,7 @@ pub mod directory_buffer;
 pub mod dirs;
 pub mod event_reader;
 pub mod explorer;
+pub mod fifo;
 pub mod input;
 pub mod lua;
 pub mod msg;
@@ -20,6 +21,7 @@ pub mod pipe;
 pub mod pwd_watcher;
 pub mod runner;
 pub mod search;
+pub mod terminal;
 pub mod ui;
 pub mod yaml;
 
