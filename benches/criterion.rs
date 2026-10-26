@@ -80,12 +80,12 @@ fn navigation_benchmark(c: &mut Criterion) {
                     app::MsgIn::External(app::ExternalMsg::Back),
                     None,
                 ))
-                .unwrap()
-                .handle_task(app::Task::new(
-                    app::MsgIn::External(app::ExternalMsg::Enter),
-                    None,
-                ))
-                .unwrap()
+                .unwrap();
+            app.handle_task(app::Task::new(
+                app::MsgIn::External(app::ExternalMsg::Enter),
+                None,
+            ))
+            .unwrap()
         })
     });
 }
@@ -99,7 +99,7 @@ fn draw_benchmark(c: &mut Criterion) {
     let (tx, _) = std::sync::mpsc::channel();
     let lua = mlua::Lua::new();
     let mut ui = ui::UI::new(tx);
-    let mut app =
+    let app =
         app::App::create("xplr".into(), None, PWD.into(), &lua, None, [].into(), true)
             .expect("failed to create app");
 

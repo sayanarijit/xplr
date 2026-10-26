@@ -425,25 +425,21 @@ Preview text files or images in a native xplr pane.
 xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
   local n = ctx.app.focused_node
-  if n and n.canonical then
-    n = n.canonical
-  end
-
   if n then
-    local fallback = xplr.util.to_yaml(xplr.util.node(n.absolute_path))
+    local fallback = xplr.util.to_yaml(xplr.util.node(n.relative_path))
     if n.is_dir then
       return {
         CustomOutput = {
           ui = { title = { format = " 📁 " } },
-          command = { "tree", "-x", "-C", "-L", "2", n.absolute_path },
+          command = { "tree", "-x", "-C", "-L", "2", n.relative_path },
           fallback = fallback,
         },
       }
     elseif n.mime_essence and n.mime_essence:match("^image/") then
       return {
         CustomGraphics = {
-          ui = { title = { format = " 🖼️ " } },
-          path = n.absolute_path,
+          ui = { title = { format = " 🖼️ " .. n.relative_path .. " " } },
+          path = n.relative_path,
           fallback = fallback,
         },
       }
@@ -457,7 +453,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
             "--binary=as-text",
             string.format("--line-range=:%s", ctx.layout_size.height),
             string.format("--terminal-width=%s", ctx.layout_size.width),
-            n.absolute_path,
+            n.relative_path,
           },
           fallback = fallback,
         },
