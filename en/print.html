@@ -5088,25 +5088,21 @@ imv-msg &quot;$IMV_PID&quot; quit
 <pre><code class="language-lua">xplr.fn.custom.preview_pane = {}
 xplr.fn.custom.preview_pane.render = function(ctx)
   local n = ctx.app.focused_node
-  if n and n.canonical then
-    n = n.canonical
-  end
-
   if n then
-    local fallback = xplr.util.to_yaml(xplr.util.node(n.absolute_path))
+    local fallback = xplr.util.to_yaml(xplr.util.node(n.relative_path))
     if n.is_dir then
       return {
         CustomOutput = {
           ui = { title = { format = &quot; 📁 &quot; } },
-          command = { &quot;tree&quot;, &quot;-x&quot;, &quot;-C&quot;, &quot;-L&quot;, &quot;2&quot;, n.absolute_path },
+          command = { &quot;tree&quot;, &quot;-x&quot;, &quot;-C&quot;, &quot;-L&quot;, &quot;2&quot;, n.relative_path },
           fallback = fallback,
         },
       }
     elseif n.mime_essence and n.mime_essence:match(&quot;^image/&quot;) then
       return {
         CustomGraphics = {
-          ui = { title = { format = &quot; 🖼️ &quot; } },
-          path = n.absolute_path,
+          ui = { title = { format = &quot; 🖼️ &quot; .. n.relative_path .. &quot; &quot; } },
+          path = n.relative_path,
           fallback = fallback,
         },
       }
@@ -5120,7 +5116,7 @@ xplr.fn.custom.preview_pane.render = function(ctx)
             &quot;--binary=as-text&quot;,
             string.format(&quot;--line-range=:%s&quot;, ctx.layout_size.height),
             string.format(&quot;--terminal-width=%s&quot;, ctx.layout_size.width),
-            n.absolute_path,
+            n.relative_path,
           },
           fallback = fallback,
         },
