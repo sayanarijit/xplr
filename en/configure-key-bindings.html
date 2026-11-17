@@ -9,6 +9,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
+        <!-- Markdown for LLMs -->
+        <link rel="alternate" type="text/markdown" href="configure-key-bindings.md" title="Markdown version of this page">
+        <link rel="describedby" href="/llms.txt" />
+
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -180,7 +184,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="configure-key-bindings"><a class="header" href="#configure-key-bindings">Configure Key Bindings</a></h1>
+                      <div style="text-align: center; font-size: 0.9em;">
+                        <a href="configure-key-bindings.md" title="Markdown version of this page" aria-label="Markdown version of this page">
+                          [ Markdown for LLMs ]
+                        </a>
+                      </div>
+
+                      <h1 id="configure-key-bindings"><a class="header" href="#configure-key-bindings">Configure Key Bindings</a></h1>
 <p>In xplr, each keyboard input passes through a bunch of handlers (e.g. <code>on_key</code>,
 <code>on_number</code>, <code>default</code> etc.) in a given order. If any of the handlers is
 configured to with an <a href="#action">action</a>, it will intercept the key and produce

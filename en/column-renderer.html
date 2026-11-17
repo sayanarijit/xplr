@@ -9,6 +9,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
+        <!-- Markdown for LLMs -->
+        <link rel="alternate" type="text/markdown" href="column-renderer.md" title="Markdown version of this page">
+        <link rel="describedby" href="/llms.txt" />
+
         <link rel="shortcut icon" href="favicon.png">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
@@ -180,7 +184,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="column-renderer"><a class="header" href="#column-renderer">Column Renderer</a></h1>
+                      <div style="text-align: center; font-size: 0.9em;">
+                        <a href="column-renderer.md" title="Markdown version of this page" aria-label="Markdown version of this page">
+                          [ Markdown for LLMs ]
+                        </a>
+                      </div>
+
+                      <h1 id="column-renderer"><a class="header" href="#column-renderer">Column Renderer</a></h1>
 <p>A column renderer is a Lua function that receives a <a href="#table-renderer-argument">special argument</a> and
 returns a string that will be displayed in each specific field of the
 <a href="layout.html#table">files table</a>.</p>
