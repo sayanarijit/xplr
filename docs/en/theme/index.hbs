@@ -19,6 +19,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
+        <!-- Markdown for LLMs -->
+        <link rel="alternate" type="text/markdown" href="{{ path_to_root }}{{ path }}" title="Markdown version of this page">
+        <link rel="describedby" href="/llms.txt" />
+
         {{#if favicon_svg}}
         <link rel="icon" href="{{ path_to_root }}favicon.svg">
         {{/if}}
@@ -223,7 +227,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        {{{ content }}}
+                      <div style="text-align: center; font-size: 0.9em;">
+                        <a href="{{ path_to_root }}{{ path }}" title="Markdown version of this page" aria-label="Markdown version of this page">
+                          [ Markdown for LLMs ]
+                        </a>
+                      </div>
+
+                      {{{ content }}}
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
